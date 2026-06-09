@@ -64,7 +64,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
         if (step.cancelled) {
             return (
                 <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#DC2626', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
-                    <Text style={{ color: '#fff', fontSize: 9, fontFamily: 'Inter-Bold', lineHeight: 11 }}>✕</Text>
+                    <icons.cancel_white width={10} height={10} />
                 </View>
             );
         }

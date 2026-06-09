@@ -175,7 +175,7 @@ function OrderCard({ order }: { order: Order }) {
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {String(order.orderId).slice(0,10).toUpperCase()}
+                {String(order.orderId).replace(/[^a-zA-Z_]/g, '') +"-"+ String(order.orderId).slice(-6).toUpperCase()}
               </Text>
             </View>
           </View>

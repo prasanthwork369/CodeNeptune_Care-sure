@@ -20,3 +20,13 @@ export function useCartWalletSettings() {
         refetchOnWindowFocus: false,
     });
 }
+
+export function useSettings() {
+    return useQuery({
+        queryKey: ['platform-settings'],
+        queryFn: () => settingsService.getSettings(),
+        staleTime: 5 * 60 * 1000, // 5 minutes cache
+        retry: 2,
+        refetchOnWindowFocus: false,
+    });
+}

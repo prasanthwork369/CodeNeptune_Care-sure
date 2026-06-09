@@ -26,6 +26,8 @@ export interface CreateOrderRequest {
   prescriptionId?: string;
   patientMemberIds?: string[];
   notes?: string;
+  problem?: string | null;
+  symptoms?: string | null;
   metadata?: OrderMetadata;
 }
 

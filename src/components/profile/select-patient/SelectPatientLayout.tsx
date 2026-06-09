@@ -87,6 +87,9 @@ export const SelectPatientLayout: React.FC = () => {
         toPay,
         prescriptionId,
         patientMemberId: selectedPatient?.id ?? "",
+        problem: selectedHealthProblem?.label ?? "",
+        symptoms: symptoms ?? "",
+        patientPhone: selectedPatient?.phone ?? "",
       },
     });
   };

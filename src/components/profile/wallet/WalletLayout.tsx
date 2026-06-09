@@ -1,22 +1,22 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { profileStyles as s } from '../profile.styles';
+import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
-import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
+import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
+import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType, WalletLog } from "@/src/types/wallet";
 import { LinearGradient } from "expo-linear-gradient";
 import LottieView from "lottie-react-native";
-import { Touchable } from "@/src/components/ui/Touchable";
-import { useNav } from "@/src/hooks/useNav";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    Text,
-    View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  View,
 } from "react-native";
+import { profileStyles as s } from '../profile.styles';
 import { TransactionHistorySheet } from "./TransactionHistorySheet";
 import { WalletInfoModal } from "./WalletInfoModal";
 
@@ -106,9 +106,9 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
   const isCredit = type === "plus" || type === "coin_credit" || type === "cash";
   const src =
     type === 'coin_credit' ? HOME_IMAGES.coinCredit :
-    type === 'coin_debit'  ? HOME_IMAGES.coinDebit  :
-    isCredit               ? HOME_IMAGES.accountBalanceCredit :
-                             HOME_IMAGES.accountBalanceDebit;
+      type === 'coin_debit' ? HOME_IMAGES.coinDebit :
+        isCredit ? HOME_IMAGES.accountBalanceCredit :
+          HOME_IMAGES.accountBalanceDebit;
   return (
     <View className={`w-10 h-10 rounded-full items-center justify-center ${isCredit ? "bg-[#DFF3E6]" : "bg-[#FCE8E8]"}`}>
       <Image source={src} style={{ width: 24, height: 24 }} resizeMode="contain" />
@@ -271,7 +271,7 @@ export const WalletLayout: React.FC = () => {
           <Text style={s.walletTitle} className="font-inter-extrabold text-brand-text">
             Transaction History
           </Text>
-          <Touchable onPress={() => setIsHistorySheetVisible(true)}>
+          <Touchable onPress={() => router.push('/profile/wallet/history' as any)}>
             <Text style={s.walletTxTitle} className="font-inter-bold text-[#FF8A00]">
               View All
             </Text>

@@ -67,10 +67,16 @@ export const PaymentLayout: React.FC = () => {
     toPay = "0",
     patientMemberId = "",
     prescriptionId = "",
+    problem = "",
+    symptoms = "",
+    patientPhone = "",
   } = useLocalSearchParams<{
     toPay: string;
     patientMemberId?: string;
     prescriptionId?: string;
+    problem?: string;
+    symptoms?: string;
+    patientPhone?: string;
   }>();
 
   const { bill, walletUsed, coinsUsed, couponCode, clear: clearCheckout } = useCheckoutStore();
@@ -122,7 +128,7 @@ export const PaymentLayout: React.FC = () => {
         medicineSnapshot: {
           name: i.medicineName,
           slug: i.medicineSlug,
-          productId: i.metadata?.productId ?? undefined,
+          productId: i.productId ?? i.metadata?.productId ?? undefined,
           image: i.image ?? i.metadata?.image ?? undefined,
           brand: i.metadata?.brand ?? undefined,
           pack: i.metadata?.pack ?? undefined,
@@ -148,6 +154,8 @@ export const PaymentLayout: React.FC = () => {
       deliveryType: "HOME_DELIVERY" as const,
       patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
       prescriptionId: prescriptionId || undefined,
+      problem: problem || null,
+      symptoms: symptoms || null,
       metadata: {
         billBreakdown,
         preferences: {
@@ -156,6 +164,12 @@ export const PaymentLayout: React.FC = () => {
           livePriceSyncUsed: false,
         },
         couponCode: couponCode ?? '',
+        patientDetails: {
+          phone: patientPhone || null,
+          problem: problem || null,
+          skipPrescription: !prescriptionId,
+          symptoms: symptoms || null,
+        },
       },
     };
     try {

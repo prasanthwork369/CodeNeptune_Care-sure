@@ -1,14 +1,13 @@
-import { icons } from '@/src/constants/icons';
-import { moderateScale, scale } from 'react-native-size-matters';
-import { ANIMATIONS } from '@/src/constants/images';
-import LottieView from 'lottie-react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { icons } from '@/src/constants/icons';
+import { ANIMATIONS } from '@/src/constants/images';
 import { useNav } from '@/src/hooks/useNav';
 import { useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import LottieView from 'lottie-react-native';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Easing,
     runOnJS,
@@ -19,7 +18,8 @@ import Animated, {
     withSpring,
     withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { moderateScale, scale } from 'react-native-size-matters';
 
 // ── Confetti ──────────────────────────────────────────────────────────────────
 
@@ -185,7 +185,7 @@ export const OrderSuccessLayout: React.FC = () => {
                         {orderId ? (
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Medium', color: '#6A6A6A' }}>Order ID</Text>
-                                <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Bold', color: '#1A1C1E' }}>#{orderId.slice(-8).toUpperCase()}</Text>
+                                <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Bold', color: '#1A1C1E' }}>{orderId.slice(-8).toUpperCase()}</Text>
                             </View>
                         ) : null}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>

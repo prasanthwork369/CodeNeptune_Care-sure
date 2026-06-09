@@ -1,6 +1,6 @@
+import { CreateOrderRequest, Order } from '../types/order';
 import { API_ENDPOINTS } from '../utils/urls';
 import { apiClient } from './client';
-import { CreateOrderRequest, Order } from '../types/order';
 
 export const orderApi = {
     createOrder: async (data: CreateOrderRequest): Promise<Order> => {
@@ -63,5 +63,10 @@ export const orderApi = {
                 lastOrdered: item.lastOrdered ?? item.lastOrderedAt ?? undefined,
             };
         });
+    },
+
+    cancelOrder: async (id: string, reason: string) => {
+        const response = await apiClient.post(API_ENDPOINTS.ORDER_CANCEL(id), { reason });
+        return response.data.data;
     },
 };

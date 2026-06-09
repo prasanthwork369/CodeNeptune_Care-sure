@@ -53,6 +53,7 @@ export const API_ENDPOINTS = {
   // ── Orders ───────────────────────────────────────────────────────────────
   ORDERS: "/api/v1/orders",
   ORDER_BY_ID: (id: string) => `/api/v1/orders/${id}`,
+  ORDER_CANCEL: (id: string) => `/api/v1/orders/${id}/cancel`,
 
   // ── Wallet ───────────────────────────────────────────────────────────────
   WALLET_BALANCE: "/api/v1/customers/wallet/balance",

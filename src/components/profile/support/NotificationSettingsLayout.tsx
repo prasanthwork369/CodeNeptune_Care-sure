@@ -2,7 +2,8 @@ import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { CustomSwitch } from '@/src/components/ui/CustomSwitch';
 import { useNotificationPreferences } from '@/src/hooks/queries/useNotificationPreferences';
 import React from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { Skeleton } from '@/src/components/ui/Skeleton';
 
 const ITEMS = [
     {
@@ -22,6 +23,35 @@ const ITEMS = [
     },
 ];
 
+const NotificationSkeleton = () => (
+    <View style={{ marginTop: 8 }}>
+        {[1, 2, 3].map((_, index) => (
+            <View key={index}>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: '#FFFFFF',
+                        paddingHorizontal: 20,
+                        paddingVertical: 16,
+                    }}
+                >
+                    <View style={{ flex: 1, marginRight: 16 }}>
+                        <Skeleton width="40%" height={15} style={{ marginBottom: 8 }} />
+                        <Skeleton width="80%" height={12} style={{ marginBottom: 4 }} />
+                        <Skeleton width="60%" height={12} />
+                    </View>
+                    <Skeleton width={44} height={24} borderRadius={12} />
+                </View>
+                {index < 2 && (
+                    <View style={{ height: 1, backgroundColor: '#E5E7EB', marginHorizontal: 20 }} />
+                )}
+            </View>
+        ))}
+    </View>
+);
+
 export const NotificationSettingsLayout: React.FC = () => {
     const { preferences, isLoading, updating, updatePreferences } = useNotificationPreferences();
 
@@ -34,7 +64,7 @@ export const NotificationSettingsLayout: React.FC = () => {
             <ScreenHeader title="Notification" showBorder backgroundColor="#FFFFFF" />
 
             {isLoading ? (
-                <ActivityIndicator color="#0F7635" style={{ marginTop: 40 }} />
+                <NotificationSkeleton />
             ) : (
                 <View style={{ marginTop: 8 }}>
                     {ITEMS.map((item, index) => (

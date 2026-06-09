@@ -26,6 +26,12 @@ export interface CartWalletSettings {
   };
 }
 
+export interface Settings {
+    whatsappNumber?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+}
+
 // Public axios instance — no auth headers, used for endpoints accessible without login
 const publicAxios = axios.create({
     baseURL: API_BASE_URL,
@@ -46,6 +52,11 @@ export const settingsApi = {
 
     getCartWalletSettings: async (): Promise<CartWalletSettings> => {
         const response = await apiClient.get(API_ENDPOINTS.SETTINGS_CART_WALLET);
+        return response.data.data;
+    },
+
+    getSettings: async (): Promise<Settings> => {
+        const response = await apiClient.get('/api/v1/settings/customer-website');
         return response.data.data;
     },
 };

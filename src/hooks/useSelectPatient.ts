@@ -102,6 +102,9 @@ export function useSelectPatient() {
         toPay,
         prescriptionId,
         patientMemberId: selectedPatient?.id ?? "",
+        problem: selectedHealthProblem?.label ?? "",
+        symptoms: symptoms ?? "",
+        patientPhone: selectedPatient?.phone ?? "",
       },
     });
   };

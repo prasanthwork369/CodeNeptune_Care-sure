@@ -92,6 +92,7 @@ import logout from "../../assets/icons/logout.svg";
 import mail from "../../assets/icons/mail.svg";
 import note_book from "../../assets/icons/note_book.svg";
 import package_icon from "../../assets/icons/package.svg";
+import return_package from "../../assets/icons/return_package.svg";
 import person from "../../assets/icons/person.svg";
 import person_outline from "../../assets/icons/person_outline.svg";
 import male from "../../assets/icons/female.svg";
@@ -105,6 +106,7 @@ import shopping_cart from "../../assets/icons/shopping_cart.svg";
 
 import plus from "../../assets/icons/plus.svg";
 import plus_light from "../../assets/icons/plus_light.svg";
+import cancel_white from "../../assets/icons/cancel_white.svg";
 import prescription_green from "../../assets/icons/prescription_green.svg";
 import prescriptions from "../../assets/icons/prescriptions.svg";
 import prescriptions_list from "../../assets/icons/prescriptions_list.svg";
@@ -208,6 +210,7 @@ export const icons = {
     cart_outline,
     coin_group,
     plus,
+    cancel_white,
     eye,
     add_photo,
     red_bags,
@@ -243,6 +246,7 @@ export const icons = {
     location_on,
     logout,
     package_icon,
+    return_package,
     person,
     person_outline,
     male,

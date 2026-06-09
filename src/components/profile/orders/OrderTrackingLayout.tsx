@@ -1,5 +1,7 @@
+import { orderApi } from "@/src/api/order.api";
 import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
 import { AlreadyHaveItemsModal } from "@/src/components/prescription/AlreadyHaveItemsModal";
+import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -21,6 +23,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { CancelOrderDialog } from "./CancelOrderDialog";
 import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
 import { orderStyles as s } from "./orders.styles";
 import { OrderTrackingModal } from "./OrderTrackingModal";
@@ -41,13 +44,13 @@ function TrackingStepRow({
   isLast: boolean;
   triggered: boolean;
 }) {
-  const opacity    = useSharedValue(0);
+  const opacity = useSharedValue(0);
   const translateY = useSharedValue(10);
 
   useEffect(() => {
     if (!triggered) return;
     const d = index * 90;
-    opacity.value    = withDelay(d, withTiming(1, { duration: 260, easing: EASE_OUT }));
+    opacity.value = withDelay(d, withTiming(1, { duration: 260, easing: EASE_OUT }));
     translateY.value = withDelay(d, withTiming(0, { duration: 260, easing: EASE_OUT }));
   }, [triggered]);
 
@@ -62,8 +65,8 @@ function TrackingStepRow({
   const renderDot = () => {
     if (step.cancelled) {
       return (
-        <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: "#DC2626", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#fff", fontSize: 9, fontFamily: "Inter-Bold", lineHeight: 11 }}>✕</Text>
+        <View style={{ width: 18, height: 18, borderRadius: 12, backgroundColor: "#DC2626", alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: "#FFF", fontSize: 9, fontFamily: "Inter-Bold", lineHeight: 11 }}>✕</Text>
         </View>
       );
     }
@@ -160,8 +163,26 @@ export const OrderTrackLayout: React.FC = () => {
   const [animTriggered, setAnimTriggered] = useState(false);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
   const [isProceeding, setIsProceeding] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelDialogVisible, setCancelDialogVisible] = useState(false);
+  const [alertState, setAlertState] = useState<{
+    visible: boolean;
+    icon: 'check-green' | 'delete' | 'package';
+    title: string;
+    onClose?: () => void;
+  }>({
+    visible: false,
+    icon: 'check-green',
+    title: '',
+  });
 
   const { items: cartItems, addItem, updateItem, clearCart } = useCart();
+
+  const closeAlert = () => {
+    const onClose = alertState.onClose;
+    setAlertState((prev) => ({ ...prev, visible: false, onClose: undefined }));
+    onClose?.();
+  };
 
   const addItemsToCart = async (replace: boolean) => {
     if (!order?.items?.length) return;
@@ -198,6 +219,34 @@ export const OrderTrackLayout: React.FC = () => {
     }
   };
 
+  const handleCancelOrder = async (reason: string) => {
+    if (!orderId) return;
+
+    setIsCancelling(true);
+    try {
+      await orderApi.cancelOrder(orderId, reason);
+      setCancelDialogVisible(false);
+      setAlertState({
+        visible: true,
+        icon: 'check-green',
+        title: 'Order cancelled successfully!',
+        onClose: () => {
+          setTimeout(() => router.back(), 500);
+        },
+      });
+    } catch (error) {
+      if (__DEV__) console.error('[CancelOrder]', error);
+      setCancelDialogVisible(false);
+      setAlertState({
+        visible: true,
+        icon: 'delete',
+        title: 'Failed to cancel order. Please try again.',
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   useEffect(() => {
     if (order && !animTriggered) setAnimTriggered(true);
   }, [order]);
@@ -224,9 +273,9 @@ export const OrderTrackLayout: React.FC = () => {
     subtotal > 0
       ? subtotal + productDiscount
       : toPay +
-        Number(order?.discountAmount ?? 0) -
-        deliveryFee -
-        handlingCharge;
+      Number(order?.discountAmount ?? 0) -
+      deliveryFee -
+      handlingCharge;
 
   const isCancelled = order?.status === 0;
 
@@ -256,59 +305,59 @@ export const OrderTrackLayout: React.FC = () => {
   // For cancelled orders: build steps only from what statusLogs recorded
   const trackingSteps = isCancelled
     ? (order?.statusLogs ?? [])
-        .slice()
-        .sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        )
-        .map((log) => ({
-          title: STATUS_TITLE[Number(log.toStatus)] ?? `Status ${log.toStatus}`,
-          time: formatDateTime(log.createdAt),
-          completed: Number(log.toStatus) !== 0,
-          cancelled: Number(log.toStatus) === 0,
-          isActive: false,
-        }))
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+      .map((log) => ({
+        title: STATUS_TITLE[Number(log.toStatus)] ?? `Status ${log.toStatus}`,
+        time: formatDateTime(log.createdAt),
+        completed: Number(log.toStatus) !== 0,
+        cancelled: Number(log.toStatus) === 0,
+        isActive: false,
+      }))
     : [
-        {
-          status: 1,
-          title: "Order Placed",
-          time: logTime(1) ?? order?.createdAt,
-        },
-        {
-          status: 2,
-          title: "Confirmed",
-          time: logTime(2) ?? order?.confirmedAt,
-        },
-        {
-          status: 3,
-          title: "Verified",
-          time: logTime(3) ?? order?.processingAt,
-        },
-        {
-          status: 4,
-          title: "Processing",
-          time: logTime(4) ?? order?.processingAt,
-        },
-        { status: 5, title: "Packed", time: logTime(5) ?? order?.processingAt },
-        { status: 6, title: "Shipped", time: logTime(6) ?? order?.shippedAt },
-        {
-          status: 7,
-          title: "Delivered",
-          time: logTime(7) ?? order?.deliveredAt ?? order?.estimatedDelivery,
-        },
-      ].map((s) => {
-        // Only treat status as a progress position if it's a known step (1-7).
-        // Unknown codes (e.g. 11 = pending payment) must not mark later steps complete.
-        const STEP_STATUSES = [1, 2, 3, 4, 5, 6, 7];
-        const cur = STEP_STATUSES.includes(order?.status ?? -1) ? (order?.status ?? 0) : 0;
-        return {
-          title: s.title,
-          time: s.time ? formatDateTime(s.time) : "—",
-          completed: cur > 0 && cur >= s.status,
-          cancelled: false,
-          isActive: cur > 0 ? cur === s.status : s.status === 1,
-        };
-      });
+      {
+        status: 1,
+        title: "Order Placed",
+        time: logTime(1) ?? order?.createdAt,
+      },
+      {
+        status: 2,
+        title: "Confirmed",
+        time: logTime(2) ?? order?.confirmedAt,
+      },
+      {
+        status: 3,
+        title: "Verified",
+        time: logTime(3) ?? order?.processingAt,
+      },
+      {
+        status: 4,
+        title: "Processing",
+        time: logTime(4) ?? order?.processingAt,
+      },
+      { status: 5, title: "Packed", time: logTime(5) ?? order?.processingAt },
+      { status: 6, title: "Shipped", time: logTime(6) ?? order?.shippedAt },
+      {
+        status: 7,
+        title: "Delivered",
+        time: logTime(7) ?? order?.deliveredAt ?? order?.estimatedDelivery,
+      },
+    ].map((s) => {
+      // Only treat status as a progress position if it's a known step (1-7).
+      // Unknown codes (e.g. 11 = pending payment) must not mark later steps complete.
+      const STEP_STATUSES = [1, 2, 3, 4, 5, 6, 7];
+      const cur = STEP_STATUSES.includes(order?.status ?? -1) ? (order?.status ?? 0) : 0;
+      return {
+        title: s.title,
+        time: s.time ? formatDateTime(s.time) : "—",
+        completed: cur > 0 && cur >= s.status,
+        cancelled: false,
+        isActive: cur > 0 ? cur === s.status : s.status === 1,
+      };
+    });
 
   if (loading) {
     return (
@@ -322,7 +371,7 @@ export const OrderTrackLayout: React.FC = () => {
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader
-        title={order?.orderId ?? "Order Details"}
+        title={order?.orderId ? `${String(order.orderId).replace(/[^a-zA-Z_]/g, '') + "-" + String(order.orderId).slice(-6).toUpperCase()}` : "Order Details"}
         showBorder
         rightSlot={
           <Touchable
@@ -359,10 +408,10 @@ export const OrderTrackLayout: React.FC = () => {
             <Text style={s.label20} className="font-inter-bold text-brand-text">
               {order?.status === 7
                 ? formatDate(
-                    logTime(7) ??
-                      order?.deliveredAt ??
-                      order?.estimatedDelivery,
-                  )
+                  logTime(7) ??
+                  order?.deliveredAt ??
+                  order?.estimatedDelivery,
+                )
                 : formatDate(order?.createdAt)}
             </Text>
             <View
@@ -436,24 +485,48 @@ export const OrderTrackLayout: React.FC = () => {
             <Text style={s.labelMd} className="font-inter-bold text-brand-text">
               Items Ordered ({items.length})
             </Text>
-            <Touchable
-              className="rounded-full px-3 py-1 flex-row items-center"
-              style={{
-                borderWidth: 1.33,
-                borderColor: "#FDE047",
-                backgroundColor: "#FEF9C3",
-              }}
-              activeOpacity={0.7}
-              onPress={() => router.push("/profile/orders/return" as any)}
-            >
-              <icons.package_icon width={14} height={14} fill="#854D0E" />
-              <Text
-                style={s.labelSm}
-                className="font-inter-semibold text-brand-text ml-1.5"
-              >
-                Return
-              </Text>
-            </Touchable>
+            <View className="flex-row gap-2">
+              {order?.status === 7 && (
+                <Touchable
+                  className="rounded-full px-3 py-1 flex-row items-center"
+                  style={{
+                    borderWidth: 1.33,
+                    borderColor: "#FDE047",
+                    backgroundColor: "#FEF9C3",
+                  }}
+                  activeOpacity={0.7}
+                  onPress={() => router.push("/profile/orders/return" as any)}
+                >
+                  <icons.package_icon width={14} height={14} fill="#854D0E" />
+                  <Text
+                    style={s.labelSm}
+                    className="font-inter-semibold text-brand-text ml-1.5"
+                  >
+                    Return
+                  </Text>
+                </Touchable>
+              )}
+              {order?.status !== 7 && order?.status !== 0 && (
+                <Touchable
+                  className="rounded-full px-3 py-1 flex-row items-center"
+                  style={{
+                    borderWidth: 1.33,
+                    borderColor: "#FEE2E2",
+                    backgroundColor: "#FEF2F2",
+                  }}
+                  activeOpacity={0.7}
+                  onPress={() => setCancelDialogVisible(true)}
+                  disabled={isCancelling || cancelDialogVisible}
+                >
+                  <Text
+                    style={s.labelSm}
+                    className="font-inter-semibold text-brand-text ml-1.5"
+                  >
+                    {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+                  </Text>
+                </Touchable>
+              )}
+            </View>
           </View>
           {items.map((item, index, arr) => (
             <View key={item.id}>
@@ -462,7 +535,8 @@ export const OrderTrackLayout: React.FC = () => {
                 onPress={() => {
                   const productId =
                     item.medicineSnapshot?.productId ??
-                    item.medicineSnapshot?.slug;
+                    item.medicineSnapshot?.slug ??
+                    item.medicineId;
                   if (productId)
                     router.push({
                       pathname: "/product/[id]",
@@ -517,15 +591,15 @@ export const OrderTrackLayout: React.FC = () => {
                   </View>
                   {(item.medicineSnapshot?.brand ||
                     item.medicineSnapshot?.pack) && (
-                    <Text
-                      style={s.labelSm}
-                      className="font-inter-medium text-brand-subtext mt-0.5"
-                    >
-                      {[item.medicineSnapshot.brand, item.medicineSnapshot.pack]
-                        .filter(Boolean)
-                        .join(" • ")}
-                    </Text>
-                  )}
+                      <Text
+                        style={s.labelSm}
+                        className="font-inter-medium text-brand-subtext mt-0.5"
+                      >
+                        {[item.medicineSnapshot.brand, item.medicineSnapshot.pack]
+                          .filter(Boolean)
+                          .join(" • ")}
+                      </Text>
+                    )}
                   <View className="flex-row mt-2">
                     <View
                       style={{
@@ -906,6 +980,27 @@ export const OrderTrackLayout: React.FC = () => {
         onAdd={() => addItemsToCart(false)}
         onReplace={() => addItemsToCart(true)}
         isProceeding={isProceeding}
+      />
+
+      <CancelOrderDialog
+        visible={cancelDialogVisible}
+        onClose={() => setCancelDialogVisible(false)}
+        onConfirm={handleCancelOrder}
+        loading={isCancelling}
+      />
+
+      <AlertDialog
+        visible={alertState.visible}
+        onClose={closeAlert}
+        icon={alertState.icon}
+        title={alertState.title}
+        buttons={[
+          {
+            label: 'OK',
+            onPress: closeAlert,
+            variant: 'green',
+          },
+        ]}
       />
     </View>
   );
