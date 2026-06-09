@@ -1,0 +1,77 @@
+import { create } from 'zustand';
+import { tokenStorage } from '@/src/lib/storage';
+import { profileApi, CustomerProfile } from '../api/profile.api';
+import { setAccessToken } from '../api/client';
+import { queryClient } from '@/src/lib/react-query/queryClient';
+import { usePrescriptionDraftStore } from './prescriptionDraftStore';
+import { useCouponStore } from './couponStore';
+import { useNotificationStore } from './notificationStore';
+import { useLocationStore } from './locationStore';
+
+interface AuthState {
+    isAuthenticated: boolean;
+    isLoaded: boolean; // Initial hydration check
+    token: string | null;
+    user: CustomerProfile | null;
+    initialize: () => Promise<void>;
+    login: (token: string, expiresIn: number) => Promise<void>;
+    setUser: (user: CustomerProfile | null) => void;
+    logout: () => Promise<void>;
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
+    isAuthenticated: false,
+    isLoaded: false,
+    token: null,
+    user: null,
+
+    initialize: async () => {
+        try {
+            const token = await tokenStorage.get();
+            if (token) {
+                setAccessToken(token);
+                set({ token, isAuthenticated: true });
+                try {
+                    const profile = await profileApi.getProfile();
+                    set({ user: profile, isLoaded: true });
+                } catch {
+                    // Token is invalid/expired — clear it so socket doesn't attempt connection
+                    await get().logout();
+                    set({ isLoaded: true });
+                }
+            } else {
+                set({ isLoaded: true });
+            }
+        } catch (error) {
+            console.error('Auth initialization failed:', error);
+            set({ isLoaded: true });
+        }
+    },
+
+    login: async (token: string, expiresIn: number) => {
+        const expiresAt = Date.now() + expiresIn * 1000;
+        setAccessToken(token); // set in-memory immediately
+        set({ isAuthenticated: true, token });
+        await tokenStorage.set(token);
+        await tokenStorage.setExpiresAt(expiresAt);
+    },
+
+    setUser: (user) => set({ user }),
+
+    logout: async () => {
+        setAccessToken(null);
+        set({ isAuthenticated: false, token: null, user: null });
+
+        // Clear all user-specific state
+        usePrescriptionDraftStore.getState().clearItems();
+        useCouponStore.getState().remove();
+        useNotificationStore.getState().clear();
+        useLocationStore.getState().clearLocation();
+        queryClient.clear();
+
+        await tokenStorage.clear();
+        await tokenStorage.clearExpiresAt();
+        await tokenStorage.clearRefreshToken();
+        await tokenStorage.clearAvatarUri();
+    },
+}));

@@ -1,0 +1,83 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}"
+  ],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          primary: "#0F7635",
+          "primary-pressed": "#0B5A28",
+          "primary-soft": "#E6F2EB",
+          secondary: "#FACA15",
+          text: "#222222",
+          subtext: "#6A6A6A",
+          muted: "#94A3B8",
+          border: "#919EAB33",
+          "border-strong": "#919EAB66",
+        },
+        surface: {
+          DEFAULT: "#FFFFFF",
+          muted: "#F9FAFB",
+          sunken: "#F3F4F6",
+        },
+        status: {
+          success: "#0F7635",
+          error: "#DC2626",
+          warning: "#F59E0B",
+          info: "#2563EB",
+        },
+      },
+      spacing: {
+        xs: "4px",
+        sm: "8px",
+        md: "12px",
+        base: "16px",
+        lg: "20px",
+        xl: "24px",
+        "2xl": "32px",
+        "3xl": "40px",
+        "4xl": "48px",
+        "5xl": "64px",
+        "6xl": "80px",
+        "7xl": "96px",
+      },
+      borderRadius: {
+        sm: "6px",
+        md: "10px",
+        lg: "14px",
+        xl: "18px",
+        "2xl": "24px",
+        "3xl": "32px",
+        "4xl": "40px",
+      },
+      fontSize: {
+        display: ["28px", { lineHeight: "36px", letterSpacing: "-0.5px" }],
+        h1: ["24px", { lineHeight: "32px", letterSpacing: "-0.3px" }],
+        h2: ["20px", { lineHeight: "28px" }],
+        h3: ["18px", { lineHeight: "26px" }],
+        "body-lg": ["17px", { lineHeight: "24px" }],
+        body: ["15px", { lineHeight: "22px" }],
+        "body-sm": ["13px", { lineHeight: "20px" }],
+        caption: ["12px", { lineHeight: "18px" }],
+        button: ["16px", { lineHeight: "22px", letterSpacing: "0.2px" }],
+      },
+      fontFamily: {
+        "inter-thin": ["Inter-Thin"],
+        "inter-extralight": ["Inter-ExtraLight"],
+        "inter-light": ["Inter-Light"],
+        "inter": ["Inter-Regular"],
+        "inter-medium": ["Inter-Medium"],
+        "inter-semibold": ["Inter-SemiBold"],
+        "inter-bold": ["Inter-Bold"],
+        "inter-extrabold": ["Inter-ExtraBold"],
+        "inter-black": ["Inter-Black"],
+      },
+    },
+  },
+  plugins: [],
+}

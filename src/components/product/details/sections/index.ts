@@ -1,0 +1,8 @@
+export { ProductDetailsHeader } from './ProductDetailsHeader';
+export { ProductDetailsFooter } from './ProductDetailsFooter';
+export { ProductInfo } from './ProductInfo';
+export { KnowYourMedicine } from './KnowYourMedicine';
+export { LogisticsBar } from './LogisticsBar';
+export { MoreAboutSection } from './MoreAboutSection';
+export { SaltCompositionBanner } from './SaltCompositionBanner';
+export { TrustBadge } from './TrustBadge';

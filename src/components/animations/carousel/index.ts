@@ -1,0 +1,1 @@
+export { CarouselDot } from "./CarouselDot";

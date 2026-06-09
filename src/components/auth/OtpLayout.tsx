@@ -1,0 +1,176 @@
+import { Touchable } from "@/src/components/ui/Touchable";
+import { useAuth } from "@/src/hooks/mutations/useAuth";
+import { useNav } from "@/src/hooks/useNav";
+import { sanitize, validate } from "@/src/utils/validation";
+import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
+import { Keyboard, Platform, Text, TextInput, View } from "react-native";
+import { useOtpVerify } from "react-native-otp-verify";
+import { styles as s } from "./OtpLayout.styles";
+import { AuthFooter } from "./sections/AuthFooter";
+import { AuthScreenShell } from "./sections/AuthScreenShell";
+import { OtpForm } from "./sections/OtpForm";
+
+export const OtpLayout: React.FC = () => {
+  const router = useNav();
+  const { phone, prefillOtp } = useLocalSearchParams<{
+    phone: string;
+    prefillOtp?: string;
+  }>();
+  const { verifyOtp, requestOtp, loading, error } = useAuth();
+
+  const [otp, setOtp] = useState<string[]>(() =>
+    prefillOtp && prefillOtp.length === 6
+      ? prefillOtp.split("")
+      : ["", "", "", "", "", ""],
+  );
+  // Tracks whether the OTP arrived pre-filled (route param, SMS retriever,
+  // resend, or paste) — guards the mount auto-focus from stealing focus
+  // back to the 1st box when the 6th box should be focused instead.
+  const filledRef = useRef(!!(prefillOtp && prefillOtp.length === 6));
+  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const [otpError, setOtpError] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(30);
+
+  useEffect(() => {
+    if (resendCooldown === 0) return;
+    const timer = setInterval(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  // Auto-focus first input on mount so keyboard is visible when SMS arrives.
+  // Guarded by filledRef so it doesn't steal focus back from the last box
+  // if the OTP is already pre-filled (route param) or autofill lands first.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (!filledRef.current) inputRefs.current[0]?.focus();
+      else inputRefs.current[5]?.focus();
+    }, 300);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Android SMS Retriever — reads OTP automatically when SMS arrives
+  // SMS must end with the app hash: "Your OTP is 123456 <#> AbCdEfGhIjK"
+  // Get hash: OtpVerify.getHash().then(hashes => console.log(hashes)) — share with backend
+  const { otp: smsOtp, hash } = useOtpVerify({ numberOfDigits: 6 });
+
+  useEffect(() => {
+    if (__DEV__ && hash?.length) console.log("[OTP SMS Hash]", hash);
+  }, [hash]);
+
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    if (!smsOtp || smsOtp.length !== 6) return;
+    const digits = smsOtp.split("");
+    filledRef.current = true;
+    setOtp(digits);
+    setOtpError("");
+    setTimeout(() => inputRefs.current[5]?.focus(), 50);
+    Keyboard.dismiss();
+  }, [smsOtp]);
+
+  const handleResend = async () => {
+    if (!phone || resendCooldown > 0) return;
+    try {
+      const res = await requestOtp(phone);
+      const newPrefill = res?.data?.otp ?? "";
+
+      // Prefill with the new OTP if provided, else clear the fields
+      if (newPrefill && newPrefill.length === 6) {
+        filledRef.current = true;
+        setOtp(newPrefill.split(""));
+        setTimeout(() => inputRefs.current[5]?.focus(), 50);
+      } else {
+        filledRef.current = false;
+        setOtp(["", "", "", "", "", ""]);
+        setTimeout(() => inputRefs.current[0]?.focus(), 50);
+      }
+
+      setResendCooldown(30);
+    } catch {
+      // error state is set by the hook
+    }
+  };
+
+  const handleOtpChange = (value: string, index: number) => {
+    setOtpError("");
+    if (value.length > 1) {
+      const digits = value.replace(/\D/g, "").slice(0, 6).split("");
+      setOtp([...Array(6)].map((_, i) => digits[i] ?? ""));
+      if (digits.length === 6) {
+        filledRef.current = true;
+        setTimeout(() => inputRefs.current[5]?.focus(), 50);
+        Keyboard.dismiss();
+      }
+      return;
+    }
+    const cleaned = sanitize.otpDigit(value);
+    const newOtp = [...otp];
+    newOtp[index] = cleaned;
+    setOtp(newOtp);
+    if (cleaned && index < 5) inputRefs.current[index + 1]?.focus();
+  };
+
+  const handleKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerify = async () => {
+    const otpCode = otp.join("");
+    const result = validate.otp(otpCode);
+    if (!result.valid) {
+      setOtpError(result.message);
+      return;
+    }
+    if (!phone) return;
+    try {
+      await verifyOtp(phone, otpCode);
+      router.replace("/(tabs)");
+    } catch {
+      // error state is set by the hook
+    }
+  };
+
+  const isValid = validate.otp(otp.join("")).valid;
+
+  return (
+    <AuthScreenShell onSkip={() => router.replace("/(tabs)")} keyboardShift={0}>
+      <View style={{ flexGrow: 1 }}>
+        <View>
+          <View className="items-start px-2">
+            <Text style={s.title}>Verify OTP</Text>
+            <View className="flex-row items-center mt-2">
+              <Text style={s.phone}>{phone}</Text>
+              <Touchable
+                onPress={() => router.back()}
+                accessibilityRole="button"
+                accessibilityLabel="Edit phone number"
+              >
+                <Text style={s.editBtn}>Edit</Text>
+              </Touchable>
+            </View>
+          </View>
+
+          <OtpForm
+            otp={otp}
+            otpError={otpError}
+            error={error}
+            loading={loading}
+            resendCooldown={resendCooldown}
+            onOtpChange={handleOtpChange}
+            onKeyPress={handleKeyPress}
+            onResend={handleResend}
+            onVerify={handleVerify}
+            isValid={isValid}
+            inputRefs={inputRefs}
+          />
+        </View>
+
+        <View style={{ flex: 1, maxHeight: 32 }} />
+        <AuthFooter />
+      </View>
+    </AuthScreenShell>
+  );
+};

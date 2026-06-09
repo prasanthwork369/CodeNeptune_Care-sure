@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Headings: Bold */
+  .text-heading {
+    @apply font-inter-bold text-2xl;
+  }
+
+  /* Subheadings: SemiBold */
+  .text-subheading {
+    @apply font-inter-semibold text-lg;
+  }
+
+  /* Body: Regular */
+  .text-body {
+    @apply font-inter text-base;
+  }
+
+  /* Buttons: Medium */
+  .btn-text {
+    @apply font-inter-medium text-sm;
+  }
+
+  /* Tab Bar Icon Container */
+  .tabs-icon {
+    @apply flex-1 items-center justify-center;
+  }
+
+  /* Tab Bar Pill (inactive) */
+  .tabs-pill {
+    @apply items-center justify-center rounded-full px-3 py-1;
+  }
+
+  /* Tab Bar Pill (active) */
+  .tabs-active {
+    @apply bg-white/20;
+  }
+
+  /* Tab Bar Icon image */
+  .tabs-glyph {
+    @apply w-6 h-6;
+  }
+}

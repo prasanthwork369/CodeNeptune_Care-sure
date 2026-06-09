@@ -1,0 +1,139 @@
+import { useCartActions } from '@/src/hooks/useCartActions';
+import { icons } from '@/src/constants/icons';
+import { Touchable } from '@/src/components/ui/Touchable';
+import React from 'react';
+import { ActivityIndicator, Animated, Image, Text, View } from 'react-native';
+import { cartCounterStyles as cc, searchCardStyles as s } from './search.styles';
+
+interface SearchRecommendCardProps {
+    data: {
+        id: string;
+        productId: string;
+        name: string;
+        packSize: string;
+        unit: string;
+        dosageForm: string;
+        price: number | null;
+        mrp: number | null;
+        discountPercentage: number;
+        thumbnailUrl?: string;
+    };
+    onPress: (productId: string) => void;
+}
+
+export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({ data, onPress }) => {
+    const hasSavings = data.discountPercentage > 0;
+    const base = [data.packSize?.trim(), data.unit].filter(Boolean).join(' ');
+    const packLabel = data.dosageForm ? `${base} in ${data.dosageForm}` : base;
+
+    const { count, increment, decrement, isPending, animations } = useCartActions({
+        medicineId: data.id,
+        variantId: null,
+        productId: data.productId,
+        name: data.name,
+        price: data.price ?? 0,
+        originalPrice: data.mrp ?? data.price ?? 0,
+        discountPercent: data.discountPercentage ?? 0,
+    });
+    const { slideAnim, opacityAnim } = animations;
+
+    return (
+        <Touchable
+            activeOpacity={0.85}
+            onPress={() => onPress(data.productId)}
+            className="w-full rounded-[12px] mb-4"
+            style={{ backgroundColor: '#F0FFF4', borderWidth: 1, borderColor: '#D1FAE5' }}
+        >
+            {/* We Recommend badge — top-right */}
+            <View className="absolute top-0 right-0 rounded-tr-[12px] rounded-bl-[10px] px-4 py-2" style={{ backgroundColor: '#0F7635', zIndex: 1 }}>
+                <Text style={s.badge} className="font-inter-bold text-white" numberOfLines={1}>
+                    We Recommend
+                </Text>
+            </View>
+
+            <View className="px-4 pt-10 pb-3">
+                {/* Top row: image + info */}
+                <View className="flex-row gap-x-3">
+                    <View className="bg-white rounded-[10px] items-center justify-center" style={[s.imgBox, { borderWidth: 1, borderColor: '#E5E7EB' }]}>
+                        {data.thumbnailUrl ? (
+                            <Image source={{ uri: data.thumbnailUrl }} style={s.imgInner} resizeMode="contain" />
+                        ) : (
+                            <icons.placeholder width={64} height={64} />
+                        )}
+                    </View>
+                    <View className="flex-1 justify-center">
+                        <Text style={s.name} className="font-inter-bold text-[#111827]" numberOfLines={2}>
+                            {data.name}
+                        </Text>
+                        {packLabel ? (
+                            <Text style={s.desc} className="font-inter-medium text-brand-subtext mt-0.5" numberOfLines={1}>
+                                {packLabel}
+                            </Text>
+                        ) : null}
+                    </View>
+                </View>
+            </View>
+
+            {/* Divider */}
+            <View className="h-[1px] w-full bg-[#EAEAEA]" />
+
+            {/* Bottom bar — same structure as SearchProductCard */}
+            <View className="flex-row justify-between items-center px-4 py-3.5">
+                <View>
+                    <View className="flex-row items-baseline gap-x-2">
+                        {data.price != null && (
+                            <Text style={s.priceSm} className="font-inter-extrabold text-[#111827]">
+                                ₹{Number(data.price).toFixed(2)}
+                            </Text>
+                        )}
+                        {hasSavings && data.mrp != null && (
+                            <Text style={s.mrp} className="font-inter-medium text-brand-subtext line-through">
+                                ₹{Number(data.mrp).toFixed(2)}
+                            </Text>
+                        )}
+                    </View>
+                    {hasSavings && (
+                        <View className="bg-[#DCFCE7] px-2 py-0.5 rounded-full self-start mt-1">
+                            <Text style={s.savingsTag} className="font-inter-bold text-[#0F7635]">
+                                Save {data.discountPercentage}%
+                            </Text>
+                        </View>
+                    )}
+                </View>
+
+                {count === 0 ? (
+                    <Touchable
+                        onPress={increment}
+                        disabled={isPending}
+                        activeOpacity={0.85}
+                        className="rounded-[10px] px-8 py-[9px] items-center justify-center bg-white"
+                        style={{ borderWidth: 1, borderColor: '#0F7635', minWidth: 72 }}
+                    >
+                        {isPending
+                            ? <ActivityIndicator size="small" color="#0F7635" />
+                            : <Text style={[cc.addText, { color: '#0F7635' }]} className="font-inter-bold">Add</Text>
+                        }
+                    </Touchable>
+                ) : (
+                    <View className="flex-row items-center justify-between rounded-[10px] overflow-hidden" style={[cc.wrap, { backgroundColor: '#0F7635' }]}>
+                        <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} style={cc.btn}>
+                            <Text style={cc.plusMinus} className="font-inter-medium text-white leading-none">−</Text>
+                        </Touchable>
+                        <View style={{ flex: 1, paddingVertical: 9, alignItems: 'center', justifyContent: 'center' }}>
+                            {isPending ? (
+                                <ActivityIndicator size="small" color="#FFFFFF" />
+                            ) : (
+                                <Animated.Text style={[cc.countText, { transform: [{ translateY: slideAnim }], opacity: opacityAnim }]} className="font-inter-bold text-white text-center">
+                                    {count}
+                                </Animated.Text>
+                            )}
+                        </View>
+                        <Touchable onPress={increment} disabled={isPending} activeOpacity={0.7} style={cc.btn}>
+                            <Text style={cc.plusMinus} className="font-inter-medium text-white leading-none">+</Text>
+                        </Touchable>
+                    </View>
+                )}
+            </View>
+        </Touchable>
+    );
+};
