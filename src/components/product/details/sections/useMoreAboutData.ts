@@ -2,17 +2,6 @@ import { ApiMobileAdditionalData } from '@/src/api/medicine.api';
 
 type SafetyItem = { image: string; label: string; title: string; description: string };
 
-const getSafetyIcon = (title: string) => {
-    const name = title.toLowerCase();
-    if (name.includes('alcohol') || name.includes('liquor')) return require('@/assets/images/cart/liquor.png');
-    if (name.includes('pregnant') || name.includes('pregnancy')) return require('@/assets/images/cart/pregnant_woman.png');
-    if (name.includes('breast')) return require('@/assets/images/cart/breastfeeding.png');
-    if (name.includes('drive') || name.includes('driving') || name.includes('car')) return require('@/assets/images/cart/directions_car.png');
-    if (name.includes('liver')) return require('@/assets/images/cart/liver.png');
-    if (name.includes('kidney') || name.includes('nephro')) return require('@/assets/images/cart/nephrology.png');
-    return require('@/assets/images/cart/directions_car.png');
-};
-
 const getSafetyStatusStyles = (label: string) => {
     const txt = label.toUpperCase();
     if (txt.includes('UNSAFE') || txt.includes('AVOID')) return { color: '#BC0808', bg: '#FFE3E3' };
@@ -67,7 +56,7 @@ export const buildMoreAboutData = (
                   status: sg.label,
                   statusColor: color,
                   statusBg: bg,
-                  image: getSafetyIcon(sg.title),
+                  image: sg.image ? { uri: sg.image } : null,
                   svgUri: sg.image?.endsWith('.svg') ? sg.image : null,
                   shortDescription: sg.description.length > 80 ? sg.description.slice(0, 80) + '...' : sg.description,
                   fullDescription: sg.description,

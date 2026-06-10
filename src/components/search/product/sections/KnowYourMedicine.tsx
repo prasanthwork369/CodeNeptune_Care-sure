@@ -2,13 +2,6 @@ import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
-import { TRUST_BADGES } from '@/src/constants/data';
-
-const TRUST_BADGE_BG: Record<string, string> = {
-    genuine: '#EAF8FF',
-    delivery: '#FFF8EA',
-    doctor: '#FCF0FC',
-};
 
 interface KnowYourMedicineProps {
     manufacturer: string;
@@ -62,22 +55,6 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Text style={{ color: '#009989' }} className="text-[14px] font-inter-semibold">{returnPolicy}</Text>
                     </View>
                 </View>
-            </View>
-
-            <View className="flex-row items-center justify-around">
-                {TRUST_BADGES.map((badge) => (
-                    <View key={badge.id} className="items-center px-2">
-                        <View
-                            style={{ backgroundColor: TRUST_BADGE_BG[badge.id] }}
-                            className="w-[64px] h-[64px] rounded-[18px] items-center justify-center mb-3"
-                        >
-                            <Image source={badge.image} style={{ width: 34, height: 34 }} resizeMode="contain" />
-                        </View>
-                        <Text className="text-[13px] font-inter-semibold text-[#1F2937] text-center leading-[1.3]">
-                            {badge.label}
-                        </Text>
-                    </View>
-                ))}
             </View>
         </LinearGradient>
     );

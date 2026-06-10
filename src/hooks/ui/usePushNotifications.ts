@@ -1,10 +1,13 @@
 import * as Notifications from 'expo-notifications';
 import { useNav } from '@/src/hooks/useNav';
+import { isExpoGo } from '@/src/utils/environment';
 import { useEffect, useRef } from 'react';
 import { notificationService } from '../../services/notification.service';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/notificationStore';
 
+// Remote push notifications are unsupported in Expo Go (SDK 53+).
+// Remove the `isExpoGo` check below once running via a development build.
 export const usePushNotifications = () => {
     const router = useNav();
     const { isAuthenticated } = useAuthStore();
@@ -25,6 +28,8 @@ export const usePushNotifications = () => {
     }, [isAuthenticated]);
 
     useEffect(() => {
+        if (isExpoGo) return;
+
         // Foreground notification received — save to store
         foregroundListener.current = Notifications.addNotificationReceivedListener(
             (notification) => {

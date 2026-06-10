@@ -3,7 +3,10 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { notificationApi } from '../api/notification.api';
+import { isExpoGo } from '../utils/environment';
 
+// Remote push notifications are unsupported in Expo Go (SDK 53+).
+// Remove the `isExpoGo` checks below once running via a development build.
 export const notificationService = {
     requestPermission: async (): Promise<boolean> => {
         if (!Device.isDevice) return false;
@@ -16,6 +19,7 @@ export const notificationService = {
     },
 
     getExpoPushToken: async (): Promise<string | null> => {
+        if (isExpoGo) return null;
         try {
             const { data } = await Notifications.getExpoPushTokenAsync({
                 projectId: '8af7d922-a6f0-45a5-8c9d-d51ba283e5c2',
@@ -27,6 +31,8 @@ export const notificationService = {
     },
 
     registerWithBackend: async (): Promise<void> => {
+        if (isExpoGo) return;
+
         const granted = await notificationService.requestPermission();
         if (!granted) return;
 
@@ -45,6 +51,7 @@ export const notificationService = {
     },
 
     unregister: async (): Promise<void> => {
+        if (isExpoGo) return;
         try {
             const { data: token } = await Notifications.getExpoPushTokenAsync({
                 projectId: '8af7d922-a6f0-45a5-8c9d-d51ba283e5c2',
@@ -54,6 +61,7 @@ export const notificationService = {
     },
 
     configureBehavior: () => {
+        if (isExpoGo) return;
         Notifications.setNotificationHandler({
             handleNotification: async () => ({
                 shouldShowBanner: true,

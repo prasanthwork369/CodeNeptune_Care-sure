@@ -1,15 +1,21 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
+import { isExpoGo } from "@/src/utils/environment";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Keyboard, Platform, Text, TextInput, View } from "react-native";
-import { useOtpVerify } from "react-native-otp-verify";
 import { styles as s } from "./OtpLayout.styles";
 import { AuthFooter } from "./sections/AuthFooter";
 import { AuthScreenShell } from "./sections/AuthScreenShell";
 import { OtpForm } from "./sections/OtpForm";
+
+// react-native-otp-verify is a native module unavailable in Expo Go
+const useOtpVerify =
+  !isExpoGo && Platform.OS === "android"
+    ? require("react-native-otp-verify").useOtpVerify
+    : () => ({ otp: "", hash: "" });
 
 export const OtpLayout: React.FC = () => {
   const router = useNav();

@@ -10,7 +10,7 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 60 }}>
             <Image
-                source={require('../../../../../assets/images/upload/no_patient.png')}
+                source={require('../../../../../assets/images/prescription/no-patient.png')}
                 style={{ width: 220, height: 220, marginBottom: 24 }}
                 resizeMode="contain"
             />

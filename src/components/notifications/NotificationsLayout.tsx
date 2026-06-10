@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { icons } from '@/src/constants/icons';
 
 import { HOME_IMAGES } from '@/src/constants/images';
-import PRESCRIPTION_ICON from '../../../assets/images/home/prescription.png';
+import PRESCRIPTION_ICON from '../../../assets/images/prescription/prescription-pending.png';
 
 const RX_CONFIG = {
     [PRESCRIPTION_STATUS.NEW]: {

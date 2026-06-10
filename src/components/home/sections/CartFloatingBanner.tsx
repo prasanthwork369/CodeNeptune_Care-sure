@@ -41,6 +41,7 @@ export const CartFloatingBanner = ({
     null;
 
   const {
+    isSlid,
     handleSlide,
     handleSnapBack,
     handleClosePress,
@@ -90,6 +91,14 @@ export const CartFloatingBanner = ({
     [secondImageUri],
   );
 
+  const handleBannerPress = useCallback(() => {
+    if (isSlid.value) {
+      handleSnapBack();
+    } else {
+      onViewCart?.();
+    }
+  }, [isSlid, handleSnapBack, onViewCart]);
+
   const handleRemove = useCallback(async () => {
     setIsClearing(true);
     onInteractionChange?.(true);
@@ -130,7 +139,7 @@ export const CartFloatingBanner = ({
           >
             <Touchable
               activeOpacity={1}
-              onPress={handleSnapBack}
+              onPress={handleBannerPress}
               style={{ width: "100%" }}
             >
               <View

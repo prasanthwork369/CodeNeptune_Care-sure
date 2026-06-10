@@ -1,15 +1,10 @@
 // Tabs SVGs
-import prescription_tab_active from "../../assets/icons/tabs/Active=Active, Property 2=Prescription.svg";
-import cart from "../../assets/icons/tabs/cart.svg";
-import cartActive from "../../assets/icons/tabs/cart_active.svg";
 import categories from "../../assets/icons/tabs/categories.svg";
 import categoriesActive from "../../assets/icons/tabs/categories_active.svg";
 import home from "../../assets/icons/tabs/home.svg";
 import homeActive from "../../assets/icons/tabs/home_active.svg";
-import order_tab_active from "../../assets/icons/tabs/Order Active=Order Active, Property 2=Order Active.svg";
 import profile from "../../assets/icons/tabs/profile.svg";
 import profileActive from "../../assets/icons/tabs/profile_active.svg";
-import upload from "../../assets/icons/Upload.svg";
 import uploadActive from "../../assets/icons/upload_active.svg";
 import placeholder from "../../assets/icons/placeholder.svg";
 
@@ -19,7 +14,6 @@ import add_circle from "../../assets/icons/add_circle.svg";
 import arrow_back from "../../assets/icons/arrow_back.svg";
 import arrow_down from "../../assets/icons/arrow_down.svg";
 import arrow_down_green from "../../assets/icons/arrow_down_green.svg";
-import arrow_drop_down from "../../assets/icons/arrow_drop_down.svg";
 import arrow_forward from "../../assets/icons/arrow_forward.svg";
 import arrow_forward_gray from "../../assets/icons/arrow_forward_gray.svg";
 import arrow_back_ios from "../../assets/icons/arrow_back_ios.svg";
@@ -28,7 +22,6 @@ import arrow_forward_ios_white from "../../assets/icons/arrow_forward_ios_white.
 import arrow_forward_white from "../../assets/icons/arrow_forward_white.svg";
 
 import arrow_up from "../../assets/icons/arrow_up.svg";
-import business_center from "../../assets/icons/business_center.svg";
 import check_circle from "../../assets/icons/check_circle.svg";
 import close_icon from "../../assets/icons/close.svg";
 import close_small from "../../assets/icons/close_small.svg";
@@ -38,10 +31,7 @@ import delete_icon from "../../assets/icons/delete.svg";
 import delete_red from "../../assets/icons/delete_red.svg";
 
 import edit_icon from "../../assets/icons/edit.svg";
-import home_icon from "../../assets/icons/home.svg";
-import info from "../../assets/icons/info.svg";
 import info_dark from "../../assets/icons/info_dark.svg";
-import info_orange from "../../assets/icons/info_orange.svg";
 import internet from "../../assets/icons/internet.svg";
 import info_outline from "../../assets/icons/info_outline.svg";
 import location from "../../assets/icons/location.svg";
@@ -74,7 +64,6 @@ import calendar_month from "../../assets/icons/calendar_month.svg";
 import calendar_today from "../../assets/icons/calendar_today.svg";
 import cart_svg from "../../assets/icons/Cart.svg";
 import cart_outline from "../../assets/icons/cart_outline.svg";
-import chat_info from "../../assets/icons/chat_info.svg";
 import coin_group from "../../assets/icons/coin_group.svg";
 import description from "../../assets/icons/description.svg";
 import down_arrow from "../../assets/icons/down_arrow.svg";
@@ -110,19 +99,15 @@ import cancel_white from "../../assets/icons/cancel_white.svg";
 import prescription_green from "../../assets/icons/prescription_green.svg";
 import prescriptions from "../../assets/icons/prescriptions.svg";
 import prescriptions_list from "../../assets/icons/prescriptions_list.svg";
-import red_bags from "../../assets/icons/red_bags.svg";
-import red_coins from "../../assets/icons/red_coins.svg";
 import stethoscope from "../../assets/icons/stethoscope.svg";
 import share from "../../assets/icons/share.svg";
 import share_gray from "../../assets/icons/share_gray.svg";
-import sync from "../../assets/icons/sync.svg";
 import tel from "../../assets/icons/tel.svg";
 import trend_up from "../../assets/icons/trend_up.svg";
 import verified_user from "../../assets/icons/verified_user.svg";
 import verified_user_outline from "../../assets/icons/verified_user_outline.svg";
 import verified_user_round from "../../assets/icons/verified_user_round.svg";
 import eye from "../../assets/icons/visibility.svg";
-import visibility_green from "../../assets/icons/visibility_green.svg";
 import whatsapp from "../../assets/icons/whatsapp.svg";
 import user_active from "../../assets/icons/user_active.svg";
 import upload_pdf from "../../assets/icons/upload_pdf.svg";
@@ -146,14 +131,9 @@ export const icons = {
     homeActive,
     categories,
     categoriesActive,
-    cart,
-    cartActive,
     profile,
     profileActive,
-    upload,
     uploadActive,
-    prescription_tab_active,
-    order_tab_active,
 
 
     // SVG Actions/UI
@@ -161,7 +141,6 @@ export const icons = {
     notification,
     notifications,
     faq_info,
-    arrow_drop_down,
     check_circle,
     sell,
     arrow_back,
@@ -182,8 +161,6 @@ export const icons = {
     my_location,
     outline_gallery,
     add_circle,
-    home_icon,
-    business_center,
     edit_icon,
     credit_card,
     camera_gray,
@@ -194,9 +171,7 @@ export const icons = {
     close_small,
     telegram,
     percent_discount,
-    info,
     info_dark,
-    info_orange,
     info_outline,
     internet,
     upload_file,
@@ -213,8 +188,6 @@ export const icons = {
     cancel_white,
     eye,
     add_photo,
-    red_bags,
-    red_coins,
     plus_light,
     mail,
     tel,
@@ -230,7 +203,6 @@ export const icons = {
     note_book,
     download,
     download_gray,
-    visibility_green,
     verified_user,
     verified_user_outline,
     verified_user_round,
@@ -240,7 +212,6 @@ export const icons = {
     account_balance_wallet_green,
     admin_meds,
     article,
-    chat_info,
     description,
     help,
     location_on,
@@ -257,7 +228,6 @@ export const icons = {
     resent,
     share,
     share_gray,
-    sync,
     trend_up,
     stethoscope,
     clinical_notes,

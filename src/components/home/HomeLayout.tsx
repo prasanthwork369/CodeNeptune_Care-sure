@@ -16,7 +16,6 @@ import {
 } from "@/src/components/home/sections";
 import {
   DELIVERY_LOCATION,
-  FREQUENT_SUBSTITUTES,
   QUICK_ACTIONS,
 } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
@@ -231,7 +230,13 @@ export const HomeLayout: React.FC = () => {
             colors={["#DEF5B0", "#EAF9D1", "#F6FDF0", "#FFFFFF"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
-            className="absolute top-0 left-0 right-0 h-[350px]"
+            style={{
+              position: "absolute",
+              top: -insets.top,
+              left: 0,
+              right: 0,
+              height: 350 + insets.top,
+            }}
           />
           <HomeHeader
             location={location ?? DELIVERY_LOCATION}

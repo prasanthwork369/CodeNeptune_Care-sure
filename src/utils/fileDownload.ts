@@ -1,7 +1,11 @@
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import { Platform, Alert } from 'react-native';
 import { Asset } from 'expo-asset';
 import * as Notifications from 'expo-notifications';
+import { isExpoGo } from './environment';
+
+// react-native-blob-util is a native module unavailable in Expo Go
+const getBlobUtil = (): typeof import('react-native-blob-util').default | null =>
+    isExpoGo ? null : require('react-native-blob-util').default;
 
 /**
  * Downloads a remote file from a URL to the local device storage.
@@ -13,6 +17,12 @@ import * as Notifications from 'expo-notifications';
  */
 export const downloadFile = async (url: string, fileName?: string): Promise<void> => {
     try {
+        const ReactNativeBlobUtil = getBlobUtil();
+        if (!ReactNativeBlobUtil) {
+            Alert.alert('Not Available', 'File downloads require the development build and are not available in Expo Go.');
+            return;
+        }
+
         if (!url) {
             Alert.alert('Error', 'Invalid download URL provided.');
             return;
@@ -78,6 +88,12 @@ export const downloadFile = async (url: string, fileName?: string): Promise<void
  */
 export const downloadLocalAsset = async (assetModule: number, fileName: string): Promise<void> => {
     try {
+        const ReactNativeBlobUtil = getBlobUtil();
+        if (!ReactNativeBlobUtil) {
+            Alert.alert('Not Available', 'File downloads require the development build and are not available in Expo Go.');
+            return;
+        }
+
         if (!assetModule) {
             Alert.alert('Error', 'Invalid asset provided.');
             return;

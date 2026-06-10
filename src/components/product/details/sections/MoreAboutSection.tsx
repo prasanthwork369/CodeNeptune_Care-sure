@@ -224,13 +224,13 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                       <View className="w-12 h-12 rounded-[8px] bg-[#F1EDFD] items-center justify-center mb-3">
                         {(item as any).svgUri ? (
                           <SvgUri uri={(item as any).svgUri} width={24} height={24} />
-                        ) : (
+                        ) : item.image ? (
                           <Image
                             source={item.image}
                             style={{ width: 20, height: 20, tintColor: "#423274" }}
                             resizeMode="contain"
                           />
-                        )}
+                        ) : null}
                       </View>
                       <Text className="text-[14px] font-inter-semibold text-brand-text mb-2">
                         {item.title}

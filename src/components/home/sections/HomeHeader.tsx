@@ -72,7 +72,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({ location, onPressLocatio
                     accessibilityRole="button"
                     accessibilityLabel={`Wallet, balance ${walletDisplay}`}
                 >
-                    <View style={s.iconBtn} className="rounded-full justify-center items-center bg-white shadow-sm shadow-[#919EAB33] [elevation:2]">
+                    <View style={s.iconBtn} className="rounded-full justify-center items-center bg-white">
                         <Image source={HOME_IMAGES.wallet} style={s.walletIcon} contentFit="contain" />
                     </View>
                     <View style={s.walletBadgeWrap} className="rounded-[18px] px-1 py-0.5 -mt-3 items-center justify-center bg-white">
@@ -85,7 +85,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({ location, onPressLocatio
                     accessibilityRole="button"
                     accessibilityLabel={`Notifications, ${unreadCount} unread`}
                     style={s.iconBtn}
-                    className="rounded-full justify-center items-center bg-white shadow-sm shadow-[#919EAB33] [elevation:2] relative"
+                    className="rounded-full justify-center items-center bg-white relative"
                 >
                     <NotificationIcon width={moderateScale(24, 0.3)} height={moderateScale(24, 0.3)} color={colors.text} />
                     {unreadCount > 0 && (

@@ -4,6 +4,7 @@ import { buildMoreAboutData } from '@/src/components/product/details/sections/us
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useRef, useState, useEffect } from 'react';
 import { Image, ScrollView, Text, View, Dimensions } from 'react-native';
+import { SvgUri } from 'react-native-svg';
 import Animated, {
     Easing,
     LinearTransition,
@@ -179,7 +180,11 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({ medicineName
                                             }}
                                         >
                                             <View className="w-12 h-12 rounded-[8px] bg-[#F1EDFD] items-center justify-center mb-3">
-                                                <Image source={item.image} style={{ width: 20, height: 20, tintColor: '#423274' }} resizeMode="contain" />
+                                                {(item as any).svgUri ? (
+                                                    <SvgUri uri={(item as any).svgUri} width={24} height={24} />
+                                                ) : item.image ? (
+                                                    <Image source={item.image} style={{ width: 20, height: 20, tintColor: '#423274' }} resizeMode="contain" />
+                                                ) : null}
                                             </View>
                                             <Text className="text-[14px] font-inter-semibold text-brand-text mb-2">{item.title}</Text>
                                             <View className="self-start px-2 py-1 rounded-[4px] mb-2" style={{ backgroundColor: item.statusBg }}>

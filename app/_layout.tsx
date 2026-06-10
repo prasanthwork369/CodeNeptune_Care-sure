@@ -16,7 +16,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Image, LogBox, View } from "react-native";
+import { Image, LogBox, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -73,7 +73,9 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    NavigationBar.setButtonStyleAsync('dark').catch(() => {});
+    if (Platform.OS === 'android') {
+      NavigationBar.setButtonStyleAsync('dark').catch(() => {});
+    }
   }, []);
 
   useEffect(() => {

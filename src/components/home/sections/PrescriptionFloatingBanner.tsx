@@ -19,7 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { HOME_IMAGES } from "@/src/constants/images";
-import PRESCRIPTION_ICON from "../../../../assets/images/home/prescription.png";
+import PRESCRIPTION_ICON from "../../../../assets/images/prescription/prescription-pending.png";
 
 const DURATION = 250;
 const EASE_IN_OUT = Easing.inOut(Easing.ease);

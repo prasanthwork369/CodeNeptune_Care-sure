@@ -1,9 +1,9 @@
+import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { icons } from "@/src/constants/icons";
 import { PreviewDisplayProps } from "@/src/types/prescription";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect } from "react";
 import { Alert, View } from "react-native";
-import Pdf from "react-native-pdf";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
     useAnimatedStyle,
@@ -119,14 +119,13 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
                 onLayout={(e) => onLayout(e.nativeEvent.layout.height)}
             >
                 {activeItem && isPdf(activeItem.localUri, activeItem.type) ? (
-                    <Pdf
-                        source={{ uri: activeItem.localUri, cache: true }}
+                    <PdfViewer
+                        uri={activeItem.localUri}
                         style={{
                             width: screenWidth - 48,
                             height: previewHeight,
                             backgroundColor: "#F9FAFB",
                         }}
-                        trustAllCerts={false}
                         onError={() => Alert.alert("Error", "Could not load PDF.")}
                     />
                 ) : (activeItem && previewHeight > 0) ? (

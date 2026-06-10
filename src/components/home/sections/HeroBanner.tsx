@@ -167,12 +167,22 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const highlights = content.highlighted_text ?? [];
 
   return (
+    <View
+      style={{
+        height: bannerHeight,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: "#00D1501A",
+        overflow: "hidden",
+      }}
+      className="mx-4 mt-5"
+    >
     <LinearGradient
       colors={["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={{ borderWidth: 1, borderColor: "#00D1501A", height: bannerHeight }}
-      className="mx-4 mt-5 rounded-[20px] overflow-hidden flex-row items-stretch"
+      style={{ flex: 1 }}
+      className="flex-row items-stretch"
     >
       {/* ── Right: Person image (rendered first so the text below always stacks above it) ── */}
       <Animated.View
@@ -280,5 +290,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         />
       </Animated.View>
     </LinearGradient>
+    </View>
   );
 };

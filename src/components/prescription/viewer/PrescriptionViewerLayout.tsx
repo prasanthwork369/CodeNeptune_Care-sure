@@ -1,3 +1,4 @@
+import { PdfViewer } from '@/src/components/ui/PdfViewer';
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { useNav } from '@/src/hooks/useNav';
 import { useLocalSearchParams } from 'expo-router';
@@ -11,7 +12,6 @@ import Animated, {
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useState } from 'react';
 import { Image, LayoutChangeEvent, Text, View, useWindowDimensions } from 'react-native';
-import Pdf from 'react-native-pdf';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const PrescriptionViewerLayout: React.FC = () => {
@@ -126,10 +126,9 @@ export const PrescriptionViewerLayout: React.FC = () => {
 
             <View className="flex-1" onLayout={onContainerLayout}>
                 {containerHeight > 0 && (isPdf ? (
-                    <Pdf
-                        source={{ uri: currentUrl, cache: true }}
+                    <PdfViewer
+                        uri={currentUrl}
                         style={{ width, height: containerHeight, backgroundColor: '#F5F6FB' }}
-                        trustAllCerts={false}
                     />
                 ) : (
                     <GestureDetector gesture={composed}>
