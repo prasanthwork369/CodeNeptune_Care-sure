@@ -1,10 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { homeApi } from '../../api/home.api';
+import type { ApiAppContent } from '../../types/home';
 import { QUERY_KEYS } from '@/src/lib/react-query/queryKeys';
+import { apiCache, withSqliteCache } from '@/src/lib/sqlite/cache';
 import { useCategories } from './useCategories';
 
 export const useHome = () => {
     const { tabs, cards, isLoading: isCategoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories();
+
+    const cachedContent = apiCache.getWithMeta<ApiAppContent>('app_contents');
 
     const {
         data: appContent,
@@ -13,7 +17,9 @@ export const useHome = () => {
         refetch: refetchContent
     } = useQuery({
         queryKey: QUERY_KEYS.APP.CONTENTS,
-        queryFn: homeApi.getAppContents,
+        queryFn: withSqliteCache('app_contents', homeApi.getAppContents),
+        initialData: () => cachedContent?.data,
+        initialDataUpdatedAt: () => cachedContent?.updatedAt ?? 0,
         staleTime: 10 * 60_000,
     });
 

@@ -29,6 +29,7 @@ LogBox.ignoreLogs([
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { queryClient } from "@/src/lib/react-query/queryClient";
+import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { initNetworkListener } from "@/src/utils/network";
@@ -36,6 +37,8 @@ import { requestQueue } from "@/src/utils/requestQueue";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import "../global.css";
+
+initDb();
 
 const CartSyncProvider = () => {
   useCartSocketSync();

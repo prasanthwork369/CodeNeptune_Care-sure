@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { profileApi, UpdateProfilePayload } from '../../api/profile.api';
+import { profileApi, UpdateProfilePayload, CustomerProfile } from '../../api/profile.api';
 import { apiClient } from '../../api/client';
 import { QUERY_KEYS } from '@/src/lib/react-query/queryKeys';
+import { apiCache, withSqliteCache } from '@/src/lib/sqlite/cache';
 import { API_ENDPOINTS } from '../../utils/urls';
 import { useAuthStore } from '../../store/authStore';
 
@@ -9,11 +10,14 @@ export const useProfile = () => {
     const queryClient = useQueryClient();
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
+    const cachedProfile = apiCache.getWithMeta<CustomerProfile>('customer_profile');
+
     const { data: profile, isLoading, isRefetching } = useQuery({
         queryKey: QUERY_KEYS.CUSTOMER.PROFILE,
-        queryFn: profileApi.getProfile,
-        staleTime: 0,
-        refetchOnMount: true,
+        queryFn: withSqliteCache('customer_profile', profileApi.getProfile),
+        initialData: () => cachedProfile?.data,
+        initialDataUpdatedAt: () => cachedProfile?.updatedAt ?? 0,
+        staleTime: 2 * 60_000,
         enabled: isAuthenticated,
     });
 

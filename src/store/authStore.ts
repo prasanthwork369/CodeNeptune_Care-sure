@@ -3,6 +3,7 @@ import { tokenStorage } from '@/src/lib/storage';
 import { profileApi, CustomerProfile } from '../api/profile.api';
 import { setAccessToken } from '../api/client';
 import { queryClient } from '@/src/lib/react-query/queryClient';
+import { apiCache } from '@/src/lib/sqlite/cache';
 import { usePrescriptionDraftStore } from './prescriptionDraftStore';
 import { useCouponStore } from './couponStore';
 import { useNotificationStore } from './notificationStore';
@@ -68,6 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         useNotificationStore.getState().clear();
         useLocationStore.getState().clearLocation();
         queryClient.clear();
+        apiCache.remove('customer_profile');
 
         await tokenStorage.clear();
         await tokenStorage.clearExpiresAt();

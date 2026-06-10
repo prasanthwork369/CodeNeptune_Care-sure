@@ -1,0 +1,264 @@
+import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
+import { useNav } from "@/src/hooks/useNav";
+import { useCart } from "@/src/hooks/queries/useCart";
+import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
+import React, { useMemo, useState } from "react";
+import {
+    ActivityIndicator,
+    ScrollView,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
+import { ProductCard } from "./sections";
+
+export const FrequentOrdersLayout: React.FC = () => {
+  const router = useNav();
+  const { totalItems } = useCart();
+  const { data: frequentlyOrdered = [], isLoading } = useFrequentlyOrdered();
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const displayProducts = frequentlyOrdered;
+
+  const categories: string[] = useMemo(() => {
+    const cats = displayProducts
+      .map((p: any) => {
+        if (!p.category) return "";
+        if (typeof p.category === "object") {
+          return p.category.name ?? p.category.title ?? "";
+        }
+        return String(p.category).trim();
+      })
+      .filter(Boolean);
+    const unique = Array.from(new Set<string>(cats));
+    return unique.length > 0 ? ["All", ...unique] : [];
+  }, [displayProducts]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return displayProducts.filter((p: any) => {
+      const matchSearch =
+        !q ||
+        p.name?.toLowerCase().includes(q) ||
+        p.brand?.toLowerCase().includes(q);
+      const pCat = !p.category
+        ? ""
+        : typeof p.category === "object"
+          ? (p.category.name ?? p.category.title ?? "")
+          : String(p.category).trim();
+      const matchFilter = activeFilter === "All" || pCat === activeFilter;
+      return matchSearch && matchFilter;
+    });
+  }, [displayProducts, search, activeFilter]);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+      <ScreenHeader
+        title="Frequently Ordered List"
+        backgroundColor="#FFFFFF"
+        rightSlot={
+          <View style={{ position: "relative" }}>
+            <Touchable
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "#fff",
+                borderWidth: 1,
+                borderColor: "#919EAB33",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => router.push("/(modal)/cart")}
+            >
+              <icons.cart_svg width={24} height={24} fill="#222222" />
+            </Touchable>
+            {totalItems > 0 && (
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: "#C22923",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontFamily: "Inter-Bold",
+                    color: "#fff",
+                  }}
+                >
+                  {totalItems}
+                </Text>
+              </View>
+            )}
+          </View>
+        }
+      />
+
+      {/* Search bar */}
+      {frequentlyOrdered.length > 0 && (
+        <View
+          style={{
+            paddingHorizontal: 16,
+            paddingTop: 12,
+            paddingBottom: 10,
+            backgroundColor: "#fff",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#F5F6FB",
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: "#EEEFF1",
+              height: 46,
+              paddingHorizontal: 12,
+            }}
+          >
+            <icons.search width={18} height={18} style={{ marginRight: 8 }} />
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search your ordered products..."
+              placeholderTextColor="#B0BAC4"
+              style={{
+                flex: 1,
+                fontSize: 14,
+                fontFamily: "Inter-Regular",
+                color: "#1C2024",
+                paddingVertical: 0,
+              }}
+              returnKeyType="done"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+            {!!search && (
+              <Touchable
+                onPress={() => setSearch("")}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <icons.close_small width={16} height={16} fill="#919EAB" />
+              </Touchable>
+            )}
+          </View>
+        </View>
+      )}
+
+      {/* Category filter chips */}
+      {categories.length > 1 && (
+        <View style={{ backgroundColor: "#fff", paddingBottom: 10 }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              gap: 8,
+              alignItems: "center",
+            }}
+          >
+            {categories.map((cat) => {
+              const active = activeFilter === cat;
+              return (
+                <Touchable
+                  key={cat}
+                  onPress={() => setActiveFilter(cat)}
+                  activeOpacity={0.7}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 6,
+                    borderRadius: 20,
+                    backgroundColor: active ? "#0F7635" : "#F5F6FB",
+                    borderWidth: 1,
+                    borderColor: active ? "#0F7635" : "#EEEFF1",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontFamily: active ? "Inter-SemiBold" : "Inter-Medium",
+                      color: active ? "#fff" : "#637381",
+                    }}
+                  >
+                    {cat}
+                  </Text>
+                </Touchable>
+              );
+            })}
+          </ScrollView>
+        </View>
+      )}
+
+      <View style={{ height: 1, backgroundColor: "#F0F1F3" }} />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={
+          filtered.length === 0
+            ? {
+                flexGrow: 1,
+                justifyContent: "center",
+                paddingHorizontal: 32,
+                paddingBottom: 80,
+              }
+            : { paddingTop: 14, paddingBottom: 32 }
+        }
+        keyboardShouldPersistTaps="handled"
+      >
+        {isLoading ? (
+          <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <ActivityIndicator size="large" color="#0F7635" />
+          </View>
+        ) : filtered.length === 0 ? (
+          <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: "Inter-SemiBold",
+                color: "#637381",
+                textAlign: "center",
+              }}
+            >
+              {search || activeFilter !== "All"
+                ? "No products found"
+                : "No frequently ordered products yet"}
+            </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                fontFamily: "Inter-Regular",
+                color: "#919EAB",
+                marginTop: 6,
+                textAlign: "center",
+              }}
+            >
+              {search || activeFilter !== "All"
+                ? "Try a different name or filter"
+                : "Your frequently ordered products will appear here"}
+            </Text>
+          </View>
+        ) : (
+          filtered.map((item: any, index: number) => (
+            <ProductCard
+              key={`${item.productId ?? item.id}-${index}`}
+              item={item}
+              index={index}
+            />
+          ))
+        )}
+      </ScrollView>
+    </View>
+  );
+};

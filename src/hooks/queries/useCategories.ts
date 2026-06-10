@@ -1,6 +1,7 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery } from "@tanstack/react-query";
-import { categoryApi } from "../../api/category.api";
+import { categoryApi, type ApiCategoryFamily } from "../../api/category.api";
 import type { CategoryProduct } from "../../types/category";
 import type { CategoryCard, CategoryTab } from "../../types/home";
 
@@ -15,6 +16,8 @@ const CARD_BG_COLORS = [
 ];
 
 export const useCategories = () => {
+  const cachedFamilies = apiCache.getWithMeta<ApiCategoryFamily[]>('category_family_map');
+
   const {
     data: families = [],
     isLoading,
@@ -22,7 +25,9 @@ export const useCategories = () => {
     refetch,
   } = useQuery({
     queryKey: QUERY_KEYS.CATALOG.CATEGORY_MAP,
-    queryFn: categoryApi.getCategoryFamilyMap,
+    queryFn: withSqliteCache('category_family_map', categoryApi.getCategoryFamilyMap),
+    initialData: () => cachedFamilies?.data,
+    initialDataUpdatedAt: () => cachedFamilies?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
   });
 
