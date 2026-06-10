@@ -49,7 +49,6 @@ export const PreviewLayout: React.FC = () => {
     files,
     toPay = "0",
     source,
-    prescriptionId: existingPrescriptionId,
   } = useLocalSearchParams<{
     uri: string;
     name: string;
@@ -187,22 +186,15 @@ export const PreviewLayout: React.FC = () => {
         "[Prescription] Proceed pressed! Starting upload flow for items:",
         items,
       );
-    if (source === "existing" && existingPrescriptionId) {
-      router.replace({
-        pathname: "/(prescription)/select-patient",
-        params: {
-          toPay,
-          prescriptionId: existingPrescriptionId,
-          files: JSON.stringify(uploadedSnapshot.current),
-        },
-      });
-      return;
-    }
     setSubmitting(true);
     uploadedSnapshot.current = [...items];
     try {
       const uploadedUrls: string[] = [];
       for (const item of uploadedSnapshot.current) {
+        if (/^https?:\/\//i.test(item.localUri)) {
+          uploadedUrls.push(item.localUri);
+          continue;
+        }
         const url = await storageApi.upload(
           { uri: item.localUri, name: item.name, type: item.type },
           FOLDER,

@@ -21,7 +21,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
     const [containerHeight, setContainerHeight] = useState(0);
     const onContainerLayout = (e: LayoutChangeEvent) => setContainerHeight(e.nativeEvent.layout.height);
 
-    const { prescriptionId, imageUrls, doctorName, patientName, uploadedDate, toPay, source } = useLocalSearchParams<{
+    const { imageUrls, doctorName, patientName, uploadedDate, toPay, source } = useLocalSearchParams<{
         prescriptionId: string;
         imageUrls: string;
         doctorName: string;
@@ -105,24 +105,19 @@ export const PrescriptionViewerLayout: React.FC = () => {
     }));
 
     const handleSelect = () => {
-        if (source === 'cart') {
-            router.push({
-                pathname: '/(prescription)/select-patient',
-                params: { toPay: toPay ?? '0', prescriptionId, files: imageUrls },
-            });
-        } else {
-            router.push({
-                pathname: '/(prescription)/preview',
-                params: {
-                    uri: currentUrl,
-                    name: currentUrl.split('/').pop() ?? 'prescription',
-                    type: isPdf ? 'application/pdf' : 'image/jpeg',
-                    toPay: toPay ?? '0',
-                    source: 'existing',
-                    prescriptionId,
-                },
-            });
-        }
+        const filesPayload = urls.map((u) => ({
+            localUri: u,
+            name: u.split('/').pop() ?? 'prescription',
+            type: u.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
+        }));
+        router.push({
+            pathname: '/(prescription)/preview',
+            params: {
+                files: JSON.stringify(filesPayload),
+                toPay: toPay ?? '0',
+                source: source === 'cart' ? 'cart' : 'existing',
+            },
+        });
     };
 
     return (

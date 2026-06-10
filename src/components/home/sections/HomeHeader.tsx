@@ -13,8 +13,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNav } from '@/src/hooks/useNav';
 import { useNotificationStore } from '@/src/store/notificationStore';
-import { useAuthStore } from '@/src/store/authStore';
-import { usePrescriptions } from '@/src/hooks/queries/usePrescriptions';
+import { usePrescriptionBanner } from '@/src/hooks/ui/usePrescriptionBanner';
 
 const NotificationIcon = icons.notification;
 
@@ -28,15 +27,12 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({ location, onPressLocatio
     const router = useNav();
     const insets = useSafeAreaInsets();
     const { balance } = useWalletBalance();
-    const { isAuthenticated } = useAuthStore();
-    const { prescriptions } = usePrescriptions(
-        isAuthenticated ? { limit: 1, sortOrder: 'desc', refetchInterval: 3000 } : {}
-    );
-    const latestRx = prescriptions[0] ?? null;
+    const { latestPrescription, hasPendingPrescription } = usePrescriptionBanner();
 
-    const { lastSeenRxId, lastSeenRxStatus } = useNotificationStore();
-    const isRxUnread = latestRx && (latestRx.id !== lastSeenRxId || latestRx.status !== lastSeenRxStatus);
-    const unreadCount = isRxUnread ? 1 : 0;
+    const { lastSeenRxId, lastSeenRxStatus, unreadCount: unreadNotificationsCount } = useNotificationStore();
+    const isRxUnread = hasPendingPrescription && latestPrescription
+        && (latestPrescription.id !== lastSeenRxId || latestPrescription.status !== lastSeenRxStatus);
+    const unreadCount = unreadNotificationsCount + (isRxUnread ? 1 : 0);
 
     const walletDisplay = balance != null
         ? `₹${Number(balance.walletBalance) % 1 === 0 ? Number(balance.walletBalance).toFixed(0) : Number(balance.walletBalance).toFixed(2)}`

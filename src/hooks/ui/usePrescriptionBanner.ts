@@ -1,3 +1,4 @@
+import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
 import { PRESCRIPTION_STATUS } from "@/src/constants/prescription-status";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useAuthStore } from "@/src/store/authStore";
@@ -26,7 +27,12 @@ export const usePrescriptionBanner = () => {
 
   const { prescriptions, refetch } = usePrescriptions(
     isAuthenticated
-      ? { limit: 1, sortOrder: "desc", refetchInterval: 3000 }
+      ? {
+          limit: 1,
+          sortOrder: "desc",
+          refetchInterval: 3000,
+          category: PRESCRIPTION_CATEGORY.ORDER,
+        }
       : {},
   );
   const latestPrescription = prescriptions[0] ?? null;

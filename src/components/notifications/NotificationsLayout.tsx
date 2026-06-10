@@ -1,7 +1,6 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { PRESCRIPTION_STATUS } from '@/src/constants/prescription-status';
-import { usePrescriptions } from '@/src/hooks/queries/usePrescriptions';
-import { useAuthStore } from '@/src/store/authStore';
+import { usePrescriptionBanner } from '@/src/hooks/ui/usePrescriptionBanner';
 import { useNotificationStore } from '@/src/store/notificationStore';
 import { useNav } from '@/src/hooks/useNav';
 import { Touchable } from '@/src/components/ui/Touchable';
@@ -55,12 +54,11 @@ export const NotificationsLayout: React.FC = () => {
     const insets = useSafeAreaInsets();
     const router = useNav();
     const { notifications, markAllRead, clear, setLastSeenRx } = useNotificationStore();
-    const { isAuthenticated } = useAuthStore();
-    const { prescriptions } = usePrescriptions(
-        isAuthenticated ? { limit: 1, sortOrder: 'desc', refetchInterval: 3000 } : {}
-    );
-    const latestRx = prescriptions[0] ?? null;
-    const rxConfig = latestRx ? RX_CONFIG[latestRx.status as keyof typeof RX_CONFIG] : null;
+    const { latestPrescription, hasPendingPrescription } = usePrescriptionBanner();
+    const latestRx = latestPrescription;
+    const rxConfig = hasPendingPrescription && latestRx
+        ? RX_CONFIG[latestRx.status as keyof typeof RX_CONFIG]
+        : null;
 
     useEffect(() => {
         markAllRead();

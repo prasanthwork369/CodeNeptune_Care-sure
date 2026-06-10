@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
 import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     ScrollView,
@@ -136,9 +137,11 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count,
                             <Text style={{ fontSize: 16, fontFamily: 'Inter-ExtraBold', color: '#111827' }}>
                                 ₹{Number(item.recommended.price).toFixed(2)}
                             </Text>
-                            <Text style={{ fontSize: 11, fontFamily: 'Inter-Medium', color: '#9CA3AF', textDecorationLine: 'line-through' }}>
-                                MRP ₹{Number(item.recommended.mrp).toFixed(2)}
-                            </Text>
+                            {item.recommended.mrp > item.recommended.price && (
+                                <Text style={{ fontSize: 11, fontFamily: 'Inter-Medium', color: '#9CA3AF', textDecorationLine: 'line-through' }}>
+                                    MRP ₹{Number(item.recommended.mrp).toFixed(2)}
+                                </Text>
+                            )}
                         </View>
                         {item.recommended.discountPercent > 0 && (
                             <View style={{ backgroundColor: '#0F7635', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-start', marginBottom: 10 }}>
@@ -147,26 +150,17 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count,
                                 </Text>
                             </View>
                         )}
-                        {count === 0 ? (
-                            <Touchable
-                                onPress={() => onCountChange(1)}
-                                style={{ borderRadius: 10, paddingVertical: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F7635' }}
-                            >
-                                <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#fff' }}>Add</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#fff', height: 40 }}>
+                            <Touchable onPress={() => onCountChange(Math.max(1, count - 1))} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                                <Text style={{ fontSize: 22, fontFamily: 'Inter-SemiBold', color: '#111827' }}>−</Text>
                             </Touchable>
-                        ) : (
-                            <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#fff', height: 40 }}>
-                                <Touchable onPress={() => onCountChange(Math.max(0, count - 1))} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                    <Text style={{ fontSize: 22, fontFamily: 'Inter-SemiBold', color: '#111827' }}>−</Text>
-                                </Touchable>
-                                <Text style={{ fontSize: 15, fontFamily: 'Inter-Bold', color: '#111827', width: 28, textAlign: 'center' }}>
-                                    {count}
-                                </Text>
-                                <Touchable onPress={() => onCountChange(count + 1)} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                    <Text style={{ fontSize: 20, fontFamily: 'Inter-SemiBold', color: '#111827' }}>+</Text>
-                                </Touchable>
-                            </View>
-                        )}
+                            <Text style={{ fontSize: 15, fontFamily: 'Inter-Bold', color: '#111827', width: 28, textAlign: 'center' }}>
+                                {count}
+                            </Text>
+                            <Touchable onPress={() => onCountChange(count + 1)} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                                <Text style={{ fontSize: 20, fontFamily: 'Inter-SemiBold', color: '#111827' }}>+</Text>
+                            </Touchable>
+                        </View>
                     </View>
                 </LinearGradient>
             </View>
@@ -188,6 +182,8 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
     const [isCartModalVisible, setIsCartModalVisible] = useState(false);
     const [isProceeding, setIsProceeding] = useState(false);
 
+    const getCount = (medicineId: string) => selectedCounts[medicineId] ?? 1;
+
     const handleCountChange = (medicineId: string, count: number) => {
         setSelectedCounts(prev => ({
             ...prev,
@@ -196,13 +192,6 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
     };
 
     const handleProceed = async () => {
-        const selectedItems = (medicines ?? []).filter(m => (selectedCounts[m.recommended.id] || 0) > 0);
-
-        if (selectedItems.length === 0) {
-            Alert.alert('No Items Selected', 'Please select at least one medicine to add to your cart.');
-            return;
-        }
-
         if (totalItems > 0) {
             setIsCartModalVisible(true);
         } else {
@@ -217,10 +206,10 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
                 await clearCart();
             }
             
-            const selectedItems = (medicines ?? []).filter(m => (selectedCounts[m.recommended.id] || 0) > 0);
+            const selectedItems = medicines ?? [];
             for (const item of selectedItems) {
-                const qty = selectedCounts[item.recommended.id] || 0;
-                
+                const qty = getCount(item.recommended.id);
+
                 // Check if item is already in cart to avoid duplicate POST validation error
                 const existingItem = !replaceCart ? cartItems.find(i => i.medicineId === item.recommended.id) : null;
                 
@@ -252,7 +241,7 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
             }
 
             setIsCartModalVisible(false);
-            router.push('/(modal)/cart');
+            router.replace('/(modal)/cart');
         } catch (error) {
             console.error('Failed to update cart:', error);
             Alert.alert('Error', 'Failed to add items to cart. Please try again.');
@@ -307,7 +296,7 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
                         key={item.id}
                         item={item}
                         cardWidth={cardWidth}
-                        count={selectedCounts[item.recommended.id] || 0}
+                        count={getCount(item.recommended.id)}
                         onCountChange={(count) => handleCountChange(item.recommended.id, count)}
                     />
                 ))}
@@ -319,9 +308,12 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
                     onPress={handleProceed}
                     disabled={isProceeding}
                     activeOpacity={0.85}
-                    style={{ backgroundColor: isProceeding ? '#6B7280' : '#0F7635', borderRadius: 14, paddingVertical: 18, alignItems: 'center' }}
+                    style={{ backgroundColor: isProceeding ? '#6B7280' : '#0F7635', borderRadius: 14, paddingVertical: 18, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
                 >
-                    <Text style={{ fontSize: 15, fontFamily: 'Inter-SemiBold', color: '#fff' }}>Proceed to Cart</Text>
+                    {isProceeding && <ActivityIndicator size="small" color="#fff" />}
+                    <Text style={{ fontSize: 15, fontFamily: 'Inter-SemiBold', color: '#fff' }}>
+                        {isProceeding ? 'Adding to Cart...' : 'Proceed to Cart'}
+                    </Text>
                 </Touchable>
             </View>
 

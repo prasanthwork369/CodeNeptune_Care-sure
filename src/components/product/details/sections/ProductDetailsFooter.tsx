@@ -48,7 +48,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
         <Text className="text-[20px] font-inter-extrabold text-[#111827]">
           ₹{Number(product.price).toFixed(2)}
         </Text>
-        {!!product.originalPrice && (
+        {!!product.originalPrice && product.originalPrice > product.price && (
           <Text className="text-[12px] font-inter-medium text-brand-subtext line-through">
             ₹{Number(product.originalPrice).toFixed(2)}
           </Text>

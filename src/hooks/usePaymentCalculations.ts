@@ -124,8 +124,8 @@ export function usePaymentCalculations() {
       deliveryType: "HOME_DELIVERY" as const,
       patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
       prescriptionId: prescriptionId || undefined,
-      problem: problem || null,
-      symptoms: symptoms || null,
+      problem: problem || undefined,
+      symptoms: symptoms || undefined,
       metadata: {
         billBreakdown,
         preferences: {
@@ -135,10 +135,10 @@ export function usePaymentCalculations() {
         },
         couponCode: couponCode ?? "",
         patientDetails: {
-          phone: patientPhone || null,
-          problem: problem || null,
+          phone: patientPhone || undefined,
+          problem: problem || undefined,
           skipPrescription: !prescriptionId,
-          symptoms: symptoms || null,
+          symptoms: symptoms || undefined,
         },
       },
     };
@@ -152,6 +152,10 @@ export function usePaymentCalculations() {
         params: { orderId: order?.id ?? "", total: toPay },
       });
     } catch (err: any) {
+      if (__DEV__) {
+        console.log("[PlaceOrder] payload:", JSON.stringify(payload, null, 2));
+        console.log("[PlaceOrder] error:", JSON.stringify(err?.data ?? err?.response?.data ?? err, null, 2));
+      }
       Alert.alert(
         "Order Failed",
         err?.message ?? "Failed to place order. Please try again.",

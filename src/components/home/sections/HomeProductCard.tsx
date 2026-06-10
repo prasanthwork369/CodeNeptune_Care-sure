@@ -132,7 +132,7 @@ export const HomeProductCard: React.FC<Props> = ({
             <Text style={s.price} className="font-inter-bold text-[#0F172A]">
               ₹{Number(item.price).toFixed(2)}
             </Text>
-            {!!item.originalPrice && (
+            {!!item.originalPrice && item.originalPrice > item.price && (
               <View className="flex-row items-center">
                 <Text
                   style={s.mrpLabel}

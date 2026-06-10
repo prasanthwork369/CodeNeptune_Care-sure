@@ -56,7 +56,7 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                     )}
                     <View className="flex-row items-center gap-x-2">
                         <Text className="text-base font-inter-bold text-brand-text">₹{Number(item.price).toFixed(2)}</Text>
-                        {!!item.originalPrice && (
+                        {!!item.originalPrice && item.originalPrice > item.price && (
                             <Text style={s.mrp} className="font-inter text-brand-subtext line-through">₹{Number(item.originalPrice).toFixed(2)}</Text>
                         )}
                     </View>

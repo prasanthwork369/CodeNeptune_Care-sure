@@ -240,7 +240,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
           >
             <Text style={s.price}>₹{Number(product.price).toFixed(2)}</Text>
           </View>
-          {!!product.originalPrice && (
+          {!!product.originalPrice && product.originalPrice > product.price && (
             <Text style={s.mrp}>
               ₹{Number(product.originalPrice).toFixed(2)}
             </Text>

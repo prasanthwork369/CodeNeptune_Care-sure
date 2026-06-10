@@ -85,7 +85,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                         <Text style={s.price} className="font-inter-bold text-[#0F172A]">
                             ₹{Number(product.price).toFixed(2)}
                         </Text>
-                        {!!product.originalPrice && (
+                        {!!product.originalPrice && product.originalPrice > product.price && (
                             <Text style={s.mrp} className="font-inter text-brand-subtext line-through">
                                 ₹{Number(product.originalPrice).toFixed(2)}
                             </Text>

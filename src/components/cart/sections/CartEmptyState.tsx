@@ -172,7 +172,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         >
                           ₹{Number(product.price).toFixed(2)}
                         </Text>
-                        {!!product.originalPrice && (
+                        {!!product.originalPrice && product.originalPrice > product.price && (
                           <Text
                             style={{
                               fontSize: 11,
