@@ -1,4 +1,4 @@
-export const LIVE = false;
+export const LIVE = true;
 
 const PROD_URL = "https://care-sure-api-gateway.onrender.com";
 const QA_URL = "https://qa-csapi.codeneptune.com";
@@ -7,6 +7,13 @@ export const API_BASE_URL = LIVE ? PROD_URL : QA_URL;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
 export const API_ENDPOINTS = {
+  // ── Catalog ──────────────────────────────────────────────────────────────
+  CATALOG_CATEGORIES_MAP: "/api/v1/catalog/categories/map",
+  CATALOG_PRODUCTS: "/api/v1/catalog/products",
+  CATALOG_FEATURED: "/api/v1/catalog/medicines/featured",
+  CATALOG_FEATURED_SUBCATEGORIES: "/api/v1/catalog/subcategories/featured",
+  HEALTH_PROBLEMS: "/api/v1/health-problems",
+
   // ── Auth ─────────────────────────────────────────────────────────────────
   AUTH_REQUEST_OTP: "/api/v1/customers/auth/request-otp",
   AUTH_VERIFY_OTP: "/api/v1/customers/auth/verify-otp",

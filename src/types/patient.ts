@@ -1,5 +1,5 @@
 import { FamilyMember } from './familyMember';
-import { HealthProblem } from '../constants/data';
+import { HealthProblem } from '../api/health-problem.api';
 
 export interface PatientPrescriptionPreviewProps {
     items: { localUri: string; name: string; type: string }[];
@@ -30,6 +30,8 @@ export interface PatientVitalInfoProps {
 export interface PatientHealthProblemProps {
     selected: HealthProblem | null;
     onPress: () => void;
+    customText?: string;
+    setCustomText?: (text: string) => void;
 }
 
 export interface PatientSymptomsInputProps {

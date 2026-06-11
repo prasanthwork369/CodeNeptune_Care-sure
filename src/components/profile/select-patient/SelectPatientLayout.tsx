@@ -2,7 +2,7 @@ import { HealthProblemSheet } from "@/src/components/prescription/HealthProblemS
 import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
-import { HealthProblem } from "@/src/constants/data";
+import { HealthProblem } from "@/src/api/health-problem.api";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { FamilyMember } from "@/src/types/familyMember";
 import { getAge } from "@/src/utils/patient";
@@ -62,6 +62,7 @@ export const SelectPatientLayout: React.FC = () => {
   const [symptoms, setSymptoms] = useState("");
   const [selectedHealthProblem, setSelectedHealthProblem] =
     useState<HealthProblem | null>(null);
+  const [customProblemText, setCustomProblemText] = useState("");
   const [showHealthSheet, setShowHealthSheet] = useState(false);
   const [isAddPatientSheetVisible, setIsAddPatientSheetVisible] =
     useState(false);
@@ -186,6 +187,8 @@ export const SelectPatientLayout: React.FC = () => {
             <PatientHealthProblem
               selected={selectedHealthProblem}
               onPress={() => setShowHealthSheet(true)}
+              customText={customProblemText}
+              setCustomText={setCustomProblemText}
             />
 
             <PatientSymptomsInput value={symptoms} onChangeText={setSymptoms} />

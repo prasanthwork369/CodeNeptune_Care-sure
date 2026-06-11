@@ -28,6 +28,7 @@ export const QUERY_KEYS = {
     },
     APP: {
         CONTENTS: ['app', 'contents'] as const,
+        HEALTH_PROBLEMS: (params?: any) => ['app', 'health-problems', params] as const,
     },
     SEARCH: {
         MEDICINES:    (query: string)                                    => ['search', 'medicines', query] as const,

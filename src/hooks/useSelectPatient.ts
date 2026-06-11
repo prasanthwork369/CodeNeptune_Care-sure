@@ -1,7 +1,7 @@
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { FamilyMember } from "@/src/types/familyMember";
-import { HealthProblem } from "@/src/constants/data";
+import { HealthProblem } from "@/src/api/health-problem.api";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -45,6 +45,7 @@ export function useSelectPatient() {
   const [symptoms, setSymptoms] = useState("");
   const [selectedHealthProblem, setSelectedHealthProblem] =
     useState<HealthProblem | null>(null);
+  const [customProblemText, setCustomProblemText] = useState("");
   const [showHealthSheet, setShowHealthSheet] = useState(false);
   const [isAddPatientSheetVisible, setIsAddPatientSheetVisible] =
     useState(false);
@@ -102,7 +103,7 @@ export function useSelectPatient() {
         toPay,
         prescriptionId,
         patientMemberId: selectedPatient?.id ?? "",
-        problem: selectedHealthProblem?.label ?? "",
+        problem: selectedHealthProblem?.id === "other" ? customProblemText : (selectedHealthProblem?.label ?? ""),
         symptoms: symptoms ?? "",
         patientPhone: selectedPatient?.phone ?? "",
       },
@@ -124,6 +125,8 @@ export function useSelectPatient() {
     setSymptoms,
     selectedHealthProblem,
     setSelectedHealthProblem,
+    customProblemText,
+    setCustomProblemText,
     showHealthSheet,
     setShowHealthSheet,
     isAddPatientSheetVisible,

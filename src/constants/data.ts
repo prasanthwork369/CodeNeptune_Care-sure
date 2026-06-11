@@ -59,32 +59,4 @@ export const QUICK_ACTIONS: QuickAction[] = [
         iconColor: "#2E7D32",
     },
 ];
-
-export interface HealthProblem {
-    id: string;
-    label: string;
-    emoji: string;
-}
-
-export const HEALTH_PROBLEMS: HealthProblem[] = [
-    { id: '1',  label: 'Fever & Cold',              emoji: '🤧' },
-    { id: '2',  label: 'Diabetes',                  emoji: '🩸' },
-    { id: '3',  label: 'Blood Pressure',            emoji: '❤️' },
-    { id: '4',  label: 'Thyroid',                   emoji: '🦋' },
-    { id: '5',  label: 'Heart Problems',            emoji: '🫀' },
-    { id: '6',  label: 'Asthma',                    emoji: '🌬️' },
-    { id: '7',  label: 'Nephrology',                emoji: '🫘' },
-    { id: '8',  label: 'Neurology',                 emoji: '🧠' },
-    { id: '9',  label: 'Lab Report Analysis',       emoji: '🧪' },
-    { id: '10', label: 'Hair & Scalp',              emoji: '🧴' },
-    { id: '11', label: 'Weight Management',         emoji: '⚖️' },
-    { id: '12', label: 'Pregnancy Problems',        emoji: '🤰' },
-    { id: '13', label: 'Psychiatric Issues',        emoji: '🤯' },
-    { id: '14', label: 'Psychological Counselling', emoji: '🗣️' },
-    { id: '15', label: 'Dentistry',                 emoji: '🦷' },
-    { id: '16', label: 'Ophthalmology',             emoji: '👁️' },
-    { id: '17', label: 'Pulmonology',               emoji: '🫁' },
-    { id: '18', label: 'Endocrinology',             emoji: '🧬' },
-    { id: '19', label: 'Urology',                   emoji: '💧' },
-    { id: '20', label: 'I do not know',             emoji: '🤔' },
-];
+

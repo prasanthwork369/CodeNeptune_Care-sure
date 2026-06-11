@@ -156,10 +156,13 @@ export function usePaymentCalculations() {
         console.log("[PlaceOrder] payload:", JSON.stringify(payload, null, 2));
         console.log("[PlaceOrder] error:", JSON.stringify(err?.data ?? err?.response?.data ?? err, null, 2));
       }
-      Alert.alert(
-        "Order Failed",
-        err?.message ?? "Failed to place order. Please try again.",
-      );
+      const errorMessage =
+        err?.response?.data?.message ??
+        err?.data?.message ??
+        err?.message ??
+        "Failed to place order. Please try again.";
+
+      Alert.alert("Order Failed", errorMessage);
     }
   };
 

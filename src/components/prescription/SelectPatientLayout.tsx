@@ -1,3 +1,4 @@
+import { HealthProblem } from "@/src/api/health-problem.api";
 import { HealthProblemSheet } from "@/src/components/prescription/HealthProblemSheet";
 import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
 import { PatientChipSkeleton } from "@/src/components/profile/patients/PatientSkeleton";
@@ -35,6 +36,8 @@ export const SelectPatientLayout: React.FC = () => {
     setSymptoms,
     selectedHealthProblem,
     setSelectedHealthProblem,
+    customProblemText,
+    setCustomProblemText,
     showHealthSheet,
     setShowHealthSheet,
     isAddPatientSheetVisible,
@@ -270,9 +273,13 @@ export const SelectPatientLayout: React.FC = () => {
             >
               {selectedHealthProblem ? (
                 <View className="flex-row items-center gap-[10px]">
-                  <Text className="text-[20px] leading-[24px]">
-                    {selectedHealthProblem.emoji}
-                  </Text>
+                  {selectedHealthProblem.icon && (selectedHealthProblem.icon.startsWith('http') || selectedHealthProblem.icon.startsWith('/') || selectedHealthProblem.icon.includes('.')) ? (
+                    <Image source={{ uri: selectedHealthProblem.icon }} style={{ width: 24, height: 24, borderRadius: 12 }} resizeMode="cover" />
+                  ) : (
+                    <Text className="text-[20px] leading-[24px]">
+                      {selectedHealthProblem.icon}
+                    </Text>
+                  )}
                   <Text className="text-[14px] font-inter-medium text-[#1A1C1E]">
                     {selectedHealthProblem.label}
                   </Text>
@@ -284,6 +291,18 @@ export const SelectPatientLayout: React.FC = () => {
               )}
               <icons.down_arrow width={16} height={16} />
             </Touchable>
+
+            {selectedHealthProblem?.id === "other" && (
+              <View className="mb-4">
+                <TextInput
+                  value={customProblemText}
+                  onChangeText={setCustomProblemText}
+                  placeholder="Type the health problem..."
+                  placeholderTextColor="#919EAB"
+                  className="w-full text-[14px] font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px] py-3"
+                />
+              </View>
+            )}
 
             <Text className="text-[13px] font-inter-semibold text-[#1A1C1E] mb-2">
               Help us understand your symptoms
