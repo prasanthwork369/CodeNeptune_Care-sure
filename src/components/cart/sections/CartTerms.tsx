@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { cartStyles as s } from '../cart.styles';
 import { useMobileAppLinks } from '@/src/hooks/queries/useSettings';
-import { PolicySheet } from '@/src/components/auth/PolicySheet';
+import { PolicyLink } from '@/src/components/auth/PolicyLink';
 
 export const CartTerms: React.FC = () => {
     const { data: links } = useMobileAppLinks();
@@ -35,7 +35,7 @@ export const CartTerms: React.FC = () => {
                 Before Proceeding To Payment.
             </Text>
 
-            <PolicySheet
+            <PolicyLink
                 isVisible={!!policy}
                 onClose={() => setPolicy(null)}
                 title={policy?.title ?? ''}

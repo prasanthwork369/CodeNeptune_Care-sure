@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { styles as s } from './AuthFooter.styles';
 import { useMobileAppLinks } from '@/src/hooks/queries/useSettings';
-import { PolicySheet } from '@/src/components/auth/PolicySheet';
+import { PolicyLink } from '@/src/components/auth/PolicyLink';
 
 export const AuthFooter: React.FC = () => {
     const { data: links } = useMobileAppLinks();
@@ -29,7 +29,7 @@ export const AuthFooter: React.FC = () => {
                 </Text>
             </Text>
 
-            <PolicySheet
+            <PolicyLink
                 isVisible={!!policy}
                 onClose={() => setPolicy(null)}
                 title={policy?.title ?? ''}
