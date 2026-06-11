@@ -1,30 +1,23 @@
 import { icons } from '@/src/constants/icons';
-import { Touchable } from '@/src/components/ui/Touchable';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
+import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { useEffect } from 'react';
 import {
-    Modal,
-    Pressable,
-    ScrollView,
     Text,
     View,
-    useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     Easing,
-    runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withDelay,
-    withSpring,
     withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { TrackingStep } from '@/src/types/order';
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
-const SHEET_SPRING = { damping: 26, stiffness: 280, mass: 0.9 };
 const EASE_OUT     = Easing.out(Easing.cubic);
 // Steps start after the sheet has settled (~380 ms)
 const STEP_BASE_DELAY = 380;
@@ -119,99 +112,16 @@ interface Props {
 }
 
 export function OrderTrackingModal({ visible, onClose, steps }: Props) {
-    const insets                   = useSafeAreaInsets();
-    const { height: screenHeight } = useWindowDimensions();
-
-    const sheetY         = useSharedValue(screenHeight);
-    const overlayOpacity = useSharedValue(0);
-    const panY           = useSharedValue(0);
-
-    useEffect(() => {
-        if (visible) {
-            overlayOpacity.value = withTiming(1, { duration: 260, easing: EASE_OUT });
-            sheetY.value         = withSpring(0, SHEET_SPRING);
-        } else {
-            overlayOpacity.value = withTiming(0, { duration: 220, easing: EASE_OUT });
-            sheetY.value         = withTiming(screenHeight, { duration: 300, easing: EASE_OUT });
-        }
-    }, [visible]);
-
-    const overlayStyle = useAnimatedStyle(() => ({
-        opacity: overlayOpacity.value,
-    }));
-    const sheetStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: sheetY.value + panY.value }],
-    }));
-
-    const panGesture = Gesture.Pan()
-        .onUpdate((e) => {
-            panY.value = Math.max(0, e.translationY);
-        })
-        .onEnd((e) => {
-            if (e.translationY > 100 || e.velocityY > 800) {
-                runOnJS(handleClose)();
-            } else {
-                panY.value = withSpring(0, { damping: 22, stiffness: 300 });
-            }
-        });
-
-    const handleClose = () => {
-        overlayOpacity.value = withTiming(0,            { duration: 220, easing: EASE_OUT });
-        sheetY.value         = withTiming(screenHeight, { duration: 300, easing: EASE_OUT }, (done) => {
-            if (done) runOnJS(onClose)();
-        });
-    };
+    const insets = useSafeAreaInsets();
 
     return (
-        <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-            {/* Dimmed backdrop */}
-            <Animated.View
-                style={[
-                    {
-                        position: 'absolute',
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.55)',
-                    },
-                    overlayStyle,
-                ]}
-            >
-                <Pressable style={{ flex: 1 }} onPress={handleClose} />
-            </Animated.View>
-
-            {/* Sheet + close button */}
-            <GestureDetector gesture={panGesture}>
-            <Animated.View
-                style={[
-                    {
-                        position: 'absolute',
-                        bottom: 0, left: 0, right: 0,
-                        alignItems: 'center',
-                    },
-                    sheetStyle,
-                ]}
-            >
-                <Touchable
-                    onPress={handleClose}
-                    activeOpacity={0.8}
+        <GorhomBottomSheet
+            isVisible={visible}
+            onClose={onClose}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
+        >
+                <BottomSheetView
                     style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 22,
-                        backgroundColor: '#555555',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 10,
-                    }}
-                >
-                    <icons.close_icon width={14} height={14} fill="#FFFFFF" />
-                </Touchable>
-
-                <View
-                    style={{
-                        backgroundColor: '#fff',
-                        borderTopLeftRadius: 24,
-                        borderTopRightRadius: 24,
-                        width: '100%',
                         paddingHorizontal: 20,
                         paddingTop: 20,
                         paddingBottom: Math.max(insets.bottom, 16) + 16,
@@ -228,7 +138,7 @@ export function OrderTrackingModal({ visible, onClose, steps }: Props) {
                         Order Tracking
                     </Text>
 
-                    <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 480 }}>
+                    <BottomSheetScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 480 }}>
                         {steps.map((step, index) => (
                             <ModalStepRow
                                 key={index}
@@ -238,10 +148,8 @@ export function OrderTrackingModal({ visible, onClose, steps }: Props) {
                                 triggered={visible}
                             />
                         ))}
-                    </ScrollView>
-                </View>
-            </Animated.View>
-            </GestureDetector>
-        </Modal>
+                    </BottomSheetScrollView>
+                </BottomSheetView>
+        </GorhomBottomSheet>
     );
 }

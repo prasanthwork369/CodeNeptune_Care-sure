@@ -1,5 +1,6 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
-import { BaseBottomSheet } from '@/src/components/ui/BaseBottomSheet';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
+import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { icons } from '@/src/constants/icons';
 import { useProfile } from '@/src/hooks/queries/useProfile';
 import { UpdateProfilePayload } from '@/src/api/profile.api';
@@ -262,12 +263,11 @@ export const MyProfileLayout: React.FC = () => {
             </SafeAreaView>
 
             {/* Gender Picker Sheet */}
-            <BaseBottomSheet
+            <GorhomBottomSheet
                 isVisible={showGenderSheet}
                 onClose={() => setShowGenderSheet(false)}
-                px={20}
-                pt={24}
             >
+              <BottomSheetView style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 16 }}>
                 <Text style={{ fontSize: 16, fontFamily: 'Inter-Bold', color: '#111827', marginBottom: 16 }}>Select Gender</Text>
                 {GENDERS.map((g, i) => (
                     <Touchable
@@ -290,7 +290,8 @@ export const MyProfileLayout: React.FC = () => {
                     </Touchable>
                 ))}
                 <View style={{ height: 8 }} />
-            </BaseBottomSheet>
+              </BottomSheetView>
+            </GorhomBottomSheet>
         </View>
     );
 };

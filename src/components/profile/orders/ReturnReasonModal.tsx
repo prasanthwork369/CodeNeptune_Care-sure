@@ -1,21 +1,13 @@
 import { icons } from '@/src/constants/icons';
 import { orderStyles as s } from './orders.styles';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { BottomSheetScrollView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import React, { useState, useEffect } from 'react';
 import {
-    Image, ScrollView, Text, View, Modal,
-    TextInput, KeyboardAvoidingView, Platform, useWindowDimensions,
+    Image, Text, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-    Easing,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 export type ReturnReason = {
     reason: string;
@@ -39,58 +31,24 @@ const PHOTO_SLOTS = [
     { label: 'Issue Photo', type: 'photo' },
 ];
 
-const EASE_OUT = Easing.out(Easing.cubic);
-
 export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialData, onSave }: ReturnReasonModalProps) {
     const [reason, setReason] = useState(initialData?.reason || '');
     const [details, setDetails] = useState(initialData?.details || '');
     const [images, setImages] = useState<string[]>(initialData?.images || []);
 
-    const { height: screenHeight } = useWindowDimensions();
     const insets = useSafeAreaInsets();
-
-    const sheetY         = useSharedValue(screenHeight);
-    const overlayOpacity = useSharedValue(0);
-    const panY           = useSharedValue(0);
 
     useEffect(() => {
         if (isVisible) {
             setReason(initialData?.reason || '');
             setDetails(initialData?.details || '');
             setImages(initialData?.images || []);
-            panY.value           = 0;
-            overlayOpacity.value = withTiming(1, { duration: 220, easing: EASE_OUT });
-            sheetY.value         = withSpring(0, { damping: 26, stiffness: 280, mass: 0.9 });
-        } else {
-            panY.value           = 0;
-            overlayOpacity.value = withTiming(0, { duration: 200, easing: EASE_OUT });
-            sheetY.value         = withTiming(screenHeight, { duration: 260, easing: EASE_OUT });
         }
     }, [isVisible, initialData]);
 
-    const overlayStyle = useAnimatedStyle(() => ({ opacity: overlayOpacity.value }));
-    const sheetStyle   = useAnimatedStyle(() => ({
-        transform: [{ translateY: sheetY.value + panY.value }],
-    }));
-
     const handleClose = () => {
-        overlayOpacity.value = withTiming(0, { duration: 200, easing: EASE_OUT });
-        sheetY.value = withTiming(screenHeight, { duration: 260, easing: EASE_OUT }, (done) => {
-            if (done) runOnJS(onClose)();
-        });
+        onClose();
     };
-
-    const panGesture = Gesture.Pan()
-        .onUpdate((e) => {
-            panY.value = Math.max(0, e.translationY);
-        })
-        .onEnd((e) => {
-            if (e.translationY > 100 || e.velocityY > 800) {
-                runOnJS(handleClose)();
-            } else {
-                panY.value = withSpring(0, { damping: 22, stiffness: 300 });
-            }
-        });
 
     const handleSave = () => {
         onSave({
@@ -113,41 +71,14 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
     }
 
     return (
-        <Modal visible={isVisible} transparent animationType="none" onRequestClose={handleClose}>
-            {/* Backdrop */}
-            <Animated.View
-                style={[{
-                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.6)',
-                }, overlayStyle]}
-            />
-
-            {/* Sheet */}
-            <GestureDetector gesture={panGesture}>
-                <Animated.View style={[{
-                    position: 'absolute', bottom: 0, left: 0, right: 0, alignItems: 'center',
-                }, sheetStyle]}>
-
-                    {/* Close button above sheet */}
-                    <View style={{ marginBottom: 12 }}>
-                        <Touchable
-                            onPress={handleClose}
-                            activeOpacity={0.9}
-                            style={{ backgroundColor: '#424242', width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}
-                        >
-                            <icons.close_icon width={20} height={20} fill="#FFFFFF" />
-                        </Touchable>
-                    </View>
-
-                    {/* White card */}
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        style={{ width: '100%', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden' }}
-                    >
-                        {/* Drag handle */}
-                        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 12, marginBottom: 4 }} />
-
-                        <ScrollView
+        <GorhomBottomSheet
+            isVisible={isVisible}
+            onClose={onClose}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
+        >
+                        <BottomSheetScrollView
                             style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 16 }}
                             showsVerticalScrollIndicator={false}
                         >
@@ -184,7 +115,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
 
                             {/* Details */}
                             <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">Add details</Text>
-                            <TextInput
+                            <BottomSheetTextInput
                                 multiline
                                 numberOfLines={4}
                                 placeholder="Please provide more details about the issue with the product"
@@ -240,10 +171,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
                                 <icons.arrow_forward width={18} height={18} fill="#FFFFFF" />
                             </Touchable>
 
-                        </ScrollView>
-                    </KeyboardAvoidingView>
-                </Animated.View>
-            </GestureDetector>
-        </Modal>
+                        </BottomSheetScrollView>
+        </GorhomBottomSheet>
     );
 }

@@ -1,16 +1,17 @@
 import { InfoModal } from '@/src/components/prescription/preview/sections';
-import { BaseBottomSheet } from '@/src/components/ui/BaseBottomSheet';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { colors } from '@/src/constants/theme';
 import { usePrescriptionPicker } from '@/src/hooks/ui/usePrescriptionPicker';
 import { useNav } from '@/src/hooks/useNav';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import React, { useEffect, useState } from 'react';
 import {
     Image,
-    ScrollView,
     Text,
+    useWindowDimensions,
     View,
 } from 'react-native';
 
@@ -57,15 +58,22 @@ export const UploadPrescriptionSheet: React.FC<UploadPrescriptionSheetProps> = (
         }
     }, [isVisible]);
 
+    const { height: screenHeight } = useWindowDimensions();
+
     return (
         <>
             {infoModal && <InfoModal title={infoModal.title} message={infoModal.message} onClose={() => setInfoModal(null)} onDismiss={infoModal.onDismiss} />}
 
-            <BaseBottomSheet isVisible={isVisible} onClose={onClose} maxHeightPercent={85} borderRadius={28} px={16} pt={20}>
-                <ScrollView
+            <GorhomBottomSheet
+                isVisible={isVisible}
+                onClose={onClose}
+                maxDynamicContentSize={screenHeight * 0.85}
+                backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
+            >
+                <BottomSheetScrollView
                     showsVerticalScrollIndicator={false}
                     bounces={false}
-                    contentContainerStyle={{ paddingBottom: 8 }}
+                    contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 8 }}
                 >
                     {/* Top action cards */}
                     <View className="flex-row gap-3">
@@ -216,8 +224,8 @@ export const UploadPrescriptionSheet: React.FC<UploadPrescriptionSheetProps> = (
                            
                         </View>
                     )}
-                </ScrollView>
-            </BaseBottomSheet>
+                </BottomSheetScrollView>
+            </GorhomBottomSheet>
 
         </>
     );

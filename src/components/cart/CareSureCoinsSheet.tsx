@@ -1,9 +1,11 @@
-import { BaseBottomSheet } from "@/src/components/ui/BaseBottomSheet";
+import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { cartStyles as s } from './cart.styles';
 import { HOME_IMAGES } from "@/src/constants/images";
+import { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface CareSureCoinsSheetProps {
   isVisible: boolean;
@@ -20,14 +22,15 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
   savedAmount = 50,
   coinValue = 1,
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <BaseBottomSheet
+    <GorhomBottomSheet
       isVisible={isVisible}
       onClose={onClose}
-      borderRadius={32}
-      px={16}
-      pt={24}
+      backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
     >
+      <BottomSheetView style={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: Math.max(insets.bottom, 16) + 16 }}>
       <View className="border border-[#919EAB33] rounded-[20px] overflow-hidden bg-white">
         {/* Header Part with Gradient */}
         <LinearGradient
@@ -78,6 +81,7 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
           </Text>
         </View>
       </View>
-    </BaseBottomSheet>
+      </BottomSheetView>
+    </GorhomBottomSheet>
   );
 };

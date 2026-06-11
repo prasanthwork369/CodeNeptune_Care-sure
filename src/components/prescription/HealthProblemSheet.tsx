@@ -1,9 +1,10 @@
 import { HealthProblem } from '@/src/api/health-problem.api';
 import { icons } from '@/src/constants/icons';
 import { Touchable } from '@/src/components/ui/Touchable';
-import { BaseBottomSheet } from '@/src/components/ui/BaseBottomSheet';
-import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Text, TextInput, View, Dimensions } from 'react-native';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
+import { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import React, { useMemo, useState } from 'react';
+import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHealthProblems } from '@/src/hooks/queries/useHealthProblems';
 
@@ -70,16 +71,16 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
         onClose();
     };
 
+    const snapPoints = useMemo(() => ['75%'], []);
+
     return (
-        <BaseBottomSheet
+        <GorhomBottomSheet
             isVisible={isVisible}
             onClose={handleClose}
-            showCloseButton={false}
-            maxHeightPercent={75}
-            pt={8}
-            px={0}
+            snapPoints={snapPoints}
+            closeButtonOffset={0}
         >
-            <View style={{ height: Dimensions.get('window').height * 0.5 }}>
+            <View style={{ flex: 1, paddingTop: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 12 }}>
                 <Text style={{ fontSize: 17, fontFamily: 'Inter-Bold', color: '#1A1C1E' }}>
                     {isCustomMode ? 'Enter Health Problem' : 'Select Health Problem'}
@@ -91,7 +92,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
 
             {isCustomMode ? (
                 <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: Math.max(bottom, 20) }}>
-                    <TextInput
+                    <BottomSheetTextInput
                         value={customText}
                         onChangeText={setCustomText}
                         placeholder="E.g., Back pain, acidity, etc."
@@ -119,7 +120,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 <>
                     <View style={{ marginHorizontal: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12, paddingHorizontal: 14, backgroundColor: '#fff' }}>
                         <icons.search width={16} height={16} />
-                        <TextInput
+                        <BottomSheetTextInput
                             value={query}
                             onChangeText={setQuery}
                             placeholder="Search health problem..."
@@ -134,7 +135,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                             <Text style={{ marginTop: 12, fontSize: 14, fontFamily: 'Inter-Medium', color: '#6A6A6A' }}>Loading health problems...</Text>
                         </View>
                     ) : (
-                        <FlatList
+                        <BottomSheetFlatList
                             data={filtered}
                             numColumns={3}
                             keyExtractor={item => item.id}
@@ -172,6 +173,6 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 </>
             )}
             </View>
-        </BaseBottomSheet>
+        </GorhomBottomSheet>
     );
 };

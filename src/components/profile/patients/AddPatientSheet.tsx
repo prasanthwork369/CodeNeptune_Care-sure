@@ -3,29 +3,16 @@ import { profileStyles as s } from '../profile.styles';
 import { formatDobDisplay, getMaxDob } from '@/src/utils/patient';
 import { FamilyMember, FamilyMemberInput } from '@/src/types/familyMember';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { BottomSheetScrollView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    Pressable,
-    ScrollView,
     Text,
-    TextInput,
     View,
-    useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
-
-const EASE_OUT = Easing.out(Easing.cubic);
 
 interface AddPatientSheetProps {
     isVisible: boolean;
@@ -46,23 +33,6 @@ const GENDERS = [
 
 export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit, onDelete }: AddPatientSheetProps) {
     const insets = useSafeAreaInsets();
-    const { height: screenHeight } = useWindowDimensions();
-
-    const sheetY         = useSharedValue(screenHeight);
-    const overlayOpacity = useSharedValue(0);
-
-    useEffect(() => {
-        if (isVisible) {
-            overlayOpacity.value = withTiming(1, { duration: 260, easing: EASE_OUT });
-            sheetY.value         = withTiming(0, { duration: 320, easing: EASE_OUT });
-        } else {
-            overlayOpacity.value = withTiming(0, { duration: 220, easing: EASE_OUT });
-            sheetY.value         = withTiming(screenHeight, { duration: 300, easing: EASE_OUT });
-        }
-    }, [isVisible]);
-
-    const overlayStyle = useAnimatedStyle(() => ({ opacity: overlayOpacity.value }));
-    const sheetStyle   = useAnimatedStyle(() => ({ transform: [{ translateY: sheetY.value }] }));
 
     const [name, setName] = useState('');
     const [mobile, setMobile] = useState('');
@@ -77,7 +47,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
     const inFlight = useRef(false);
 
     const isEditMode = !!editPatient;
-    const mobileRef = useRef<TextInput>(null);
+    const mobileRef = useRef<React.ElementRef<typeof BottomSheetTextInput>>(null);
     const maxDob = getMaxDob();
 
     useEffect(() => {
@@ -135,22 +105,14 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
 
     return (
         <>
-        <Modal visible={isVisible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-            <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.55)' }, overlayStyle]}>
-                <Pressable style={{ flex: 1 }} onPress={onClose} />
-            </Animated.View>
-
-            <Animated.View style={[{ position: 'absolute', bottom: 0, left: 0, right: 0 }, sheetStyle]}>
-                <View style={{ alignItems: 'center', marginBottom: 12 }}>
-                    <Touchable onPress={onClose} activeOpacity={0.7}
-                        style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#424242', alignItems: 'center', justifyContent: 'center' }}>
-                        <icons.close_icon width={16} height={16} fill="#FFFFFF" />
-                    </Touchable>
-                </View>
-
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                    style={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-                    <ScrollView style={{ paddingHorizontal: 20 }}
+        <GorhomBottomSheet
+            isVisible={isVisible}
+            onClose={onClose}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
+        >
+                    <BottomSheetScrollView style={{ paddingHorizontal: 20 }}
                         contentContainerStyle={{ paddingTop: 24, paddingBottom: insets.bottom + 24 }}
                         showsVerticalScrollIndicator={false} bounces={false} overScrollMode="never"
                         keyboardShouldPersistTaps="handled">
@@ -162,7 +124,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         </View>
 
                         <Text className="text-[14px] font-inter-bold text-brand-text mb-2">Name</Text>
-                        <TextInput placeholder="Enter the name" placeholderTextColor="#919EAB" style={[input, errors.name ? { borderColor: '#EF4444' } : {}]}
+                        <BottomSheetTextInput placeholder="Enter the name" placeholderTextColor="#919EAB" style={[input, errors.name ? { borderColor: '#EF4444' } : {}]}
                             value={name} onChangeText={t => { setName(t); setErrors(e => ({ ...e, name: undefined })); }}
                             returnKeyType="next" blurOnSubmit={false} onSubmitEditing={() => mobileRef.current?.focus()} autoCorrect={false} />
                         {errors.name && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: -12, marginBottom: 12 }}>{errors.name}</Text>}
@@ -170,7 +132,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         <Text className="text-[14px] font-inter-bold text-brand-text mb-2">Mobile Number</Text>
                         <View style={[{ flexDirection: 'row', alignItems: 'center', height: 52 }, input, errors.mobile ? { borderColor: '#EF4444' } : {}, { paddingVertical: 0, paddingHorizontal: 16, marginBottom: 18 }]}>
                             <Text style={{ fontSize: 14, fontFamily: 'Inter-Medium', color: '#1A1C1E', marginRight: 8 }}>+91 |</Text>
-                            <TextInput ref={mobileRef} placeholder="10 digit number" placeholderTextColor="#919EAB" keyboardType="phone-pad" maxLength={10} returnKeyType="done"
+                            <BottomSheetTextInput ref={mobileRef} placeholder="10 digit number" placeholderTextColor="#919EAB" keyboardType="phone-pad" maxLength={10} returnKeyType="done"
                                 style={{ flex: 1, fontSize: 14, fontFamily: 'Inter-Medium', color: '#1A1C1E', height: '100%' }}
                                 value={mobile} onChangeText={t => { const d = t.replace(/\D/g, ''); setMobile(d); setErrors(e => ({ ...e, mobile: undefined })); }} />
                         </View>
@@ -191,7 +153,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         {errors.relationship && relationship !== 'Other' && <Text style={{ color: '#EF4444', fontSize: 12, marginBottom: 12 }}>{errors.relationship}</Text>}
                         {relationship === 'Other' && (
                             <>
-                                <TextInput placeholder="Specify relationship" placeholderTextColor="#919EAB"
+                                <BottomSheetTextInput placeholder="Specify relationship" placeholderTextColor="#919EAB"
                                     style={[input, { marginTop: -10, marginBottom: errors.relationship ? 6 : 18 }, errors.relationship ? { borderColor: '#EF4444' } : {}]}
                                     value={otherRelationship} onChangeText={t => { setOtherRelationship(t); setErrors(e => ({ ...e, relationship: undefined })); }}
                                     autoCorrect={false} autoFocus />
@@ -244,10 +206,8 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                                 : <Text style={{ fontSize: 15, fontFamily: 'Inter-SemiBold', color: '#fff' }}>{isEditMode ? 'Save Changes' : 'Add Patient'}</Text>
                             }
                         </Touchable>
-                    </ScrollView>
-                </KeyboardAvoidingView>
-            </Animated.View>
-        </Modal>
+                    </BottomSheetScrollView>
+        </GorhomBottomSheet>
         </>
     );
 }

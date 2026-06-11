@@ -1,8 +1,9 @@
-import { BaseBottomSheet } from '@/src/components/ui/BaseBottomSheet';
+import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { useNav } from '@/src/hooks/useNav';
-import React from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import React, { useMemo } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Transaction, TxIconType } from '@/src/types/wallet';
 
 interface TransactionHistorySheetProps {
@@ -37,15 +38,15 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
         setTimeout(() => router.push('/profile/wallet/history' as any), 300);
     };
 
+    const snapPoints = useMemo(() => ['50%'], []);
+
     return (
-        <BaseBottomSheet
+        <GorhomBottomSheet
             isVisible={visible}
             onClose={onClose}
-            borderRadius={28}
-            px={0}
-            pt={0}
-            maxHeightPercent={50}
-            showCloseButton={false}
+            snapPoints={snapPoints}
+            closeButtonOffset="50%"
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
         >
             {/* Title */}
             <View style={{ alignItems: 'center', paddingTop: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>
@@ -53,7 +54,7 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
             </View>
 
             {/* Rows */}
-            <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+            <BottomSheetScrollView showsVerticalScrollIndicator={false} bounces={false} style={{ flex: 1 }}>
                 {transactions.length === 0 ? (
                     <Text style={{ textAlign: 'center', color: '#9CA3AF', fontFamily: 'Inter-Medium', fontSize: 14, paddingVertical: 32 }}>
                         No transactions yet
@@ -82,7 +83,7 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
                         </View>
                     ))
                 )}
-            </ScrollView>
+            </BottomSheetScrollView>
 
             {/* See All */}
             <View style={{ borderTopWidth: 1, borderTopColor: '#F3F4F6', paddingVertical: 16, alignItems: 'center' }}>
@@ -90,6 +91,6 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
                     <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#FF8A00' }}>See All</Text>
                 </TouchableOpacity>
             </View>
-        </BaseBottomSheet>
+        </GorhomBottomSheet>
     );
 };
