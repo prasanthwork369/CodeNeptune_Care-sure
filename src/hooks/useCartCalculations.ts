@@ -12,6 +12,7 @@ import { CartLine } from "@/src/types/cart";
 import { useFocusEffect } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useCallback, useRef, useState } from "react";
+import { useAuthStore } from "@/src/store/authStore";
 
 export function useCartCalculations() {
   const router = useNav();
@@ -220,17 +221,19 @@ export function useCartCalculations() {
       },
     );
     const hasRxItem = lines.some((l) => l.rx);
-    if (hasRxItem) {
-      router.push({
-        pathname: "/(prescription)/choose-method",
-        params: { toPay: String(toPay) },
-      });
-    } else {
-      router.push({
-        pathname: "/(prescription)/select-patient",
-        params: { toPay: String(toPay) },
-      });
+    const targetPath = hasRxItem ? "/(prescription)/choose-method" : "/(prescription)/select-patient";
+    const targetParams = { toPay: String(toPay) };
+
+    if (!useAuthStore.getState().isAuthenticated) {
+      useAuthStore.getState().setRedirectAfterLogin(`${targetPath}?toPay=${toPay}`);
+      router.push("/(auth)/login");
+      return;
     }
+
+    router.push({
+      pathname: targetPath as any,
+      params: targetParams,
+    });
   };
 
   return {

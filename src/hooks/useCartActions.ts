@@ -1,5 +1,3 @@
-import { useNav } from "@/src/hooks/useNav";
-import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
@@ -30,8 +28,6 @@ export interface CartActionProduct {
 }
 
 export const useCartActions = (product: CartActionProduct) => {
-  const router = useNav();
-  const { isAuthenticated } = useAuthStore();
   const { items, addItem, updateItem, removeItem } = useCart();
 
   // Primary match: medicineId = variant UUID (new items).
@@ -78,17 +74,13 @@ export const useCartActions = (product: CartActionProduct) => {
       }
     }
     prevCountRef.current = count;
-  }, [count]);
+  }, [count, opacityAnim, slideAnim]);
 
   useEffect(() => {
     prevIsPendingRef.current = isPending;
   });
 
   const increment = async () => {
-    if (!isAuthenticated) {
-      router.push("/(auth)/login");
-      return;
-    }
     if (isPending) return;
     setPending(pendingKey, true);
     try {

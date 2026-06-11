@@ -4,6 +4,11 @@ import { useNav } from "@/src/hooks/useNav";
 import { isExpoGo } from "@/src/utils/environment";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
+import { useCartPendingStore } from "@/src/store/cartStore";
+import { cartApi } from "@/src/api/cart.api";
+import { useAuthStore } from "@/src/store/authStore";
+import { queryClient } from "@/src/lib/react-query/queryClient";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import React, { useEffect, useRef, useState } from "react";
 import { Keyboard, Platform, Text, TextInput, View } from "react-native";
 import { styles as s } from "./OtpLayout.styles";
@@ -133,7 +138,38 @@ export const OtpLayout: React.FC = () => {
     if (!phone) return;
     try {
       await verifyOtp(phone, otpCode);
-      router.replace("/(tabs)");
+
+      // Merge guest cart items
+      const guestCart = useCartPendingStore.getState().guestCart;
+      if (guestCart && guestCart.items.length > 0) {
+        await Promise.all(
+          guestCart.items.map(item =>
+            cartApi.addItem({
+              medicineId: item.medicineId,
+              variantId: item.metadata?.selectedVariantId || null,
+              medicineName: item.medicineName,
+              medicineSlug: item.medicineSlug,
+              unitPrice: Number(item.unitPrice),
+              mrp: Number(item.metadata?.price || item.originalPrice || item.unitPrice),
+              discountPercent: Number(item.discountPercent || 0),
+              quantity: item.quantity,
+              requiresPrescription: item.requiresPrescription,
+              image: item.image,
+              metadata: item.metadata,
+            }).catch(() => {}) // Ignore individual failures
+          )
+        );
+        useCartPendingStore.getState().clearGuestCart();
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
+      }
+
+      const redirectPath = useAuthStore.getState().redirectAfterLogin;
+      if (redirectPath) {
+        useAuthStore.getState().setRedirectAfterLogin(null);
+        router.replace(redirectPath as any);
+      } else {
+        router.replace("/(tabs)");
+      }
     } catch {
       // error state is set by the hook
     }
