@@ -1,4 +1,4 @@
-export const LIVE = true;
+export const LIVE = false;
 
 const PROD_URL = "https://care-sure-api-gateway.onrender.com";
 const QA_URL = "https://qa-csapi.codeneptune.com";

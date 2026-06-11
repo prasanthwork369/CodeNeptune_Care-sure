@@ -10,6 +10,7 @@ import {
   Inter_900Black,
   useFonts,
 } from "@expo-google-fonts/inter";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as NavigationBar from 'expo-navigation-bar';
 import { Stack } from "expo-router";
@@ -17,6 +18,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Image, LogBox, Platform, View } from "react-native";
+import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -28,14 +30,14 @@ LogBox.ignoreLogs([
 ]);
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
+import NetworkToast from "@/src/components/common/NetworkToast";
+import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
+import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
-import NetworkToast from "@/src/components/common/NetworkToast";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
-import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
-import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import "../global.css";
 
 initDb();
@@ -77,7 +79,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setButtonStyleAsync('dark').catch(() => {});
+      NavigationBar.setButtonStyleAsync('dark').catch(() => { });
     }
   }, []);
 
@@ -112,24 +114,26 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <View style={{ flex: 1, backgroundColor: "#fff" }}>
-            <StatusBar style="dark" />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="(modal)" />
-              <Stack.Screen name="(prescription)" />
-              <Stack.Screen name="search" options={{ animation: 'fade', animationDuration: 180 }} />
-              <Stack.Screen name="frequent-orders" />
-              <Stack.Screen name="notifications" />
-              <Stack.Screen name="profile" />
-              <Stack.Screen name="product" options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false }} />
-            </Stack>
-            <CartSyncProvider />
-            <PushNotificationProvider />
-            <NetworkToast />
-          </View>
+          <BottomSheetModalProvider>
+            <View style={{ flex: 1, backgroundColor: "#fff" }}>
+              <StatusBar style="dark" />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(modal)" />
+                <Stack.Screen name="(prescription)" />
+                <Stack.Screen name="search" options={{ animation: 'fade', animationDuration: 180 }} />
+                <Stack.Screen name="frequent-orders" />
+                <Stack.Screen name="notifications" />
+                <Stack.Screen name="profile" />
+                <Stack.Screen name="product" options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false }} />
+              </Stack>
+              <CartSyncProvider />
+              <PushNotificationProvider />
+              <NetworkToast />
+            </View>
+          </BottomSheetModalProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>

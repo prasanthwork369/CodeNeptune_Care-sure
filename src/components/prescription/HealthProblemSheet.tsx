@@ -3,7 +3,7 @@ import { icons } from '@/src/constants/icons';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { BaseBottomSheet } from '@/src/components/ui/BaseBottomSheet';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Text, TextInput, View, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHealthProblems } from '@/src/hooks/queries/useHealthProblems';
 
@@ -79,6 +79,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
             pt={8}
             px={0}
         >
+            <View style={{ height: Dimensions.get('window').height * 0.5 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 12 }}>
                 <Text style={{ fontSize: 17, fontFamily: 'Inter-Bold', color: '#1A1C1E' }}>
                     {isCustomMode ? 'Enter Health Problem' : 'Select Health Problem'}
@@ -170,6 +171,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                     )}
                 </>
             )}
+            </View>
         </BaseBottomSheet>
     );
 };

@@ -1,23 +1,26 @@
+import { Address } from '@/src/api/address.api';
+import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { useAddress } from '@/src/hooks/queries/useAddress';
-import { Address } from '@/src/api/address.api';
+import { useNav } from '@/src/hooks/useNav';
 import { useLocationStore } from '@/src/store/locationStore';
-import { BaseBottomSheet } from '@/src/components/ui/BaseBottomSheet';
-import { Touchable } from '@/src/components/ui/Touchable';
-import React, { useState, useEffect } from 'react';
+import {
+    BottomSheetBackdrop,
+    BottomSheetBackdropProps,
+    BottomSheetModal,
+    BottomSheetScrollView,
+    BottomSheetTextInput,
+} from '@gorhom/bottom-sheet';
+import * as Location from 'expo-location';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
     Keyboard,
     Linking,
-    Platform,
-    ScrollView,
     Text,
-    TextInput,
-    View,
+    View
 } from 'react-native';
-import { useNav } from '@/src/hooks/useNav';
-import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface LocationBottomSheetProps {
@@ -41,13 +44,43 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({ isVisi
     const [searchQuery, setSearchQuery] = useState('');
     const { addresses, loading: addressesLoading, refetch } = useAddress();
 
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
+    const snapPoints = useMemo(() => ['50%', '90%'], []);
+    const isFirstRender = useRef(true);
+
     useEffect(() => {
-        if (isVisible) refetch();
+        console.log("LocationBottomSheet isVisible:", isVisible);
+        if (isVisible) {
+            isFirstRender.current = false;
+            refetch();
+            setTimeout(() => {
+                console.log("LocationBottomSheet bottomSheetRef.current:", bottomSheetRef.current);
+                bottomSheetRef.current?.present();
+            }, 10);
+        } else if (!isFirstRender.current) {
+            bottomSheetRef.current?.dismiss();
+        }
     }, [isVisible]);
+
+    const handleSheetChanges = useCallback((index: number) => {
+        console.log("LocationBottomSheet handleSheetChanges index:", index);
+    }, []);
+
+    const renderBackdrop = useCallback(
+        (props: BottomSheetBackdropProps) => (
+            <BottomSheetBackdrop
+                {...props}
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                pressBehavior="close"
+            />
+        ),
+        []
+    );
 
     const handleClose = () => {
         Keyboard.dismiss();
-        onClose();
+        bottomSheetRef.current?.dismiss();
     };
 
     const handleAddNewAddress = () => {
@@ -104,49 +137,60 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({ isVisi
     };
 
     return (
-        <BaseBottomSheet
-            isVisible={isVisible}
-            onClose={onClose}
-            keyboardAvoiding
-            borderRadius={18}
-            px={20}
-            pt={28}
-            maxHeightPercent={90}
+        <BottomSheetModal
+            ref={bottomSheetRef}
+            snapPoints={snapPoints}
+            index={0}
+            enablePanDownToClose
+            onDismiss={onClose}
+            onChange={handleSheetChanges}
+            backdropComponent={renderBackdrop}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            backgroundStyle={{ backgroundColor: '#fff', borderRadius: 18 }}
+            handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 36, height: 4, marginTop: 8 }}
+            style={{ zIndex: 999 }}
         >
-            <Text className="text-[16px] font-inter-bold text-brand-text mb-5">Change Location</Text>
+            <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 10 }}>
+                <Text className="text-[16px] font-inter-bold text-brand-text mb-5">Change Location</Text>
 
-            <View style={{ shadowColor: '#919EAB0A', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.04, shadowRadius: 20, elevation: 2, borderWidth: 1.05, borderColor: '#919EAB33' }}
-                className="flex-row items-center bg-white rounded-lg px-4 py-2.5 mb-4">
-                <icons.search width={18} height={18} />
-                <TextInput value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" autoCapitalize="words" autoCorrect={false}
-                    placeholder="Search for area, street name" placeholderTextColor="#6A6A6A" className="flex-1 ml-3 text-[14px] font-inter text-brand-text" />
+                <View style={{ shadowColor: '#919EAB0A', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.04, shadowRadius: 20, elevation: 2, borderWidth: 1.05, borderColor: '#919EAB33' }}
+                    className="flex-row items-center bg-white rounded-lg px-4 py-2.5 mb-4">
+                    <icons.search width={18} height={18} />
+                    <BottomSheetTextInput value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" autoCapitalize="words" autoCorrect={false}
+                        placeholder="Search for area, street name" placeholderTextColor="#6A6A6A" className="flex-1 ml-3 text-[14px] font-inter text-brand-text"
+                        onFocus={() => {
+                            bottomSheetRef.current?.snapToIndex(1);
+                        }}
+                    />
+                </View>
+
+                <View className="flex-row gap-x-3 mb-2">
+                    <Touchable onPress={handleUseCurrentLocation} disabled={isLocating} className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white">
+                        <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
+                            {isLocating ? <ActivityIndicator size="small" color="#059669" /> : <icons.my_location width={21} height={21} fill="#059669" />}
+                        </View>
+                        <View className="ml-3">
+                            <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">{isLocating ? 'Fetching' : 'Use Current'}</Text>
+                            <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">Location</Text>
+                        </View>
+                    </Touchable>
+                    <Touchable onPress={handleAddNewAddress} className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white">
+                        <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
+                            <icons.add_circle width={21} height={21} fill="#059669" />
+                        </View>
+                        <View className="ml-3">
+                            <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">Add New</Text>
+                            <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">Addresses</Text>
+                        </View>
+                    </Touchable>
+                </View>
+
+                <Text className="text-[15px] font-inter-bold text-brand-text mb-4">Your Saved Addresses</Text>
             </View>
 
-            <View className="flex-row gap-x-3 mb-2">
-                <Touchable onPress={handleUseCurrentLocation} disabled={isLocating} className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white">
-                    <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
-                        {isLocating ? <ActivityIndicator size="small" color="#059669" /> : <icons.my_location width={21} height={21} fill="#059669" />}
-                    </View>
-                    <View className="ml-3">
-                        <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">{isLocating ? 'Fetching' : 'Use Current'}</Text>
-                        <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">Location</Text>
-                    </View>
-                </Touchable>
-                <Touchable onPress={handleAddNewAddress} className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white">
-                    <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
-                        <icons.add_circle width={21} height={21} fill="#059669" />
-                    </View>
-                    <View className="ml-3">
-                        <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">Add New</Text>
-                        <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">Addresses</Text>
-                    </View>
-                </Touchable>
-            </View>
-
-            <Text className="text-[15px] font-inter-bold text-brand-text mb-4">Your Saved Addresses</Text>
-
-            <ScrollView showsVerticalScrollIndicator={false} bounces={false} keyboardShouldPersistTaps="handled"
-                style={{ maxHeight: 250 }} contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
+            <BottomSheetScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} bounces={false} keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 24) }}>
                 {addressesLoading ? (
                     <ActivityIndicator color="#0F7635" style={{ marginVertical: 24 }} />
                 ) : addresses.length === 0 ? (
@@ -178,7 +222,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({ isVisi
                         );
                     })
                 )}
-            </ScrollView>
-        </BaseBottomSheet>
+            </BottomSheetScrollView>
+        </BottomSheetModal>
     );
 };
