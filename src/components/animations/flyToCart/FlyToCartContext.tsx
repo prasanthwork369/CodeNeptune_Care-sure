@@ -173,6 +173,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           const newImages: VisualCartImage[] = cartItemsWithImage.map((i) => ({
             id: i.id,
             image: i.image ?? i.metadata?.image,
+            isPending: false,
           })).slice(-3);
 
           setVisualCartImages((prev) => {

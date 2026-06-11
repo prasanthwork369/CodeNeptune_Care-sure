@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withTiming,
   withDelay,
-  Easing,
+  withSpring,
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
@@ -16,6 +16,9 @@ import Animated, {
 interface CategoryCartBannerProps {
   onPress?: () => void;
 }
+
+// Gentle spring for the pill's expand/collapse width
+const WIDTH_SPRING = { damping: 20, stiffness: 140, mass: 0.7 } as const;
 
 export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress }) => {
   const ctx = useFlyToCartSafe();
@@ -57,10 +60,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
       // Step 3: after 200ms pause (user sees image in circle), expand to pill
       if (expansionTimer.current) clearTimeout(expansionTimer.current);
       expansionTimer.current = setTimeout(() => {
-        bannerWidth.value = withTiming(PILL_W, {
-          duration: 360,
-          easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
-        });
+        bannerWidth.value = withSpring(PILL_W, WIDTH_SPRING);
         // Step 4: text fades in mid-expansion
         textOpacity.value = withDelay(240, withTiming(1, { duration: 200 }));
         // Step 5: chevron fades in last
@@ -77,10 +77,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
       textOpacity.value    = withTiming(0, { duration: 180 });
 
       // Step 2: after text gone, shrink width back to circle
-      bannerWidth.value = withDelay(160, withTiming(60, {
-        duration: 320,
-        easing: Easing.bezier(0.55, 0.06, 0.68, 0.19), // ease-in — mirrors ease-out expand
-      }));
+      bannerWidth.value = withDelay(160, withSpring(60, WIDTH_SPRING));
 
       // Step 3: after shrink, fade the circle out
       opacity.value = withDelay(480, withTiming(0, { duration: 180 }));
