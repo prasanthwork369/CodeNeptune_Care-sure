@@ -37,7 +37,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
       className="px-4 z-10 mb-2"
       style={{ paddingTop: Math.max(insets.top, 20) + 8 }}
     >
-      <View className="flex-row items-center justify-between">
+      <View className="flex-row items-stretch justify-between">
         <Touchable
           activeOpacity={onQueryChange ? 1 : 0.5}
           onPress={
@@ -63,10 +63,13 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           </Touchable>
 
           {onQueryChange ? (
-            <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 1, justifyContent: "center" }}>
               {/* Cycling placeholder — visible only when input is empty */}
               {showCycler && (
-                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0 }}>
+                <View
+                  pointerEvents="none"
+                  style={{ position: "absolute", left: 0, right: 0 }}
+                >
                   <HomeSearchCycler />
                 </View>
               )}
@@ -76,14 +79,39 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 onSubmitEditing={onSubmit}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder={isFocused && !query ? 'Search medicines & health products' : ''}
-                placeholderTextColor="#9CA3AF"
-                style={{ fontSize: 13, fontFamily: 'Inter-Medium', color: '#222222', padding: 0, margin: 0, height: 20, lineHeight: 20, includeFontPadding: false }}
+                placeholder={
+                  isFocused && !query
+                    ? " Search medicines & health products"
+                    : ""
+                }
+                placeholderTextColor="#6A6A6A"
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Inter",
+                  color: "#222222",
+                  padding: 0,
+                  margin: 0,
+                  height: 28,
+                  lineHeight: 20,
+                  includeFontPadding: false,
+                }}
                 autoFocus
                 returnKeyType="search"
               />
             </View>
-          ) : (
+          ) : null}
+
+          {!!query && onQueryChange && (
+            <Touchable
+              onPress={() => onQueryChange("")}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              className="ml-2"
+            >
+              <icons.close_small width={15} height={15} fill="#6A6A6A" />
+            </Touchable>
+          )}
+
+          {!onQueryChange && (
             <Text
               className="flex-1 text-[15px] font-inter text-[#222222]"
               numberOfLines={1}
@@ -112,7 +140,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
               shadowRadius: 20,
               shadowOffset: { width: 0, height: 10 },
             }}
-            className="bg-white items-center justify-center p-3 rounded-[12px] relative"
+            className="bg-white items-center justify-center aspect-square rounded-[12px] relative"
           >
             <icons.Add_Cart width={24} height={24} />
             {cartCount > 0 && (

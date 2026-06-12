@@ -25,7 +25,11 @@ import arrow_forward_ios_white from "../../assets/icons/arrow_forward_ios_white.
 import arrow_forward_white from "../../assets/icons/arrow_forward_white.svg";
 
 import arrow_up from "../../assets/icons/arrow_up.svg";
+import cancel_circle from "../../assets/icons/cancel_circle.svg";
 import check_circle from "../../assets/icons/check_circle.svg";
+import filter_list from "../../assets/icons/filter_list.svg";
+import hourglass_bottom from "../../assets/icons/hourglass_bottom.svg";
+import pill_gray from "../../assets/icons/pill_gray.svg";
 import close_icon from "../../assets/icons/close.svg";
 import close_small from "../../assets/icons/close_small.svg";
 import credit_card from "../../assets/icons/credit_card.svg";
@@ -145,6 +149,10 @@ export const icons = {
     notifications,
     faq_info,
     check_circle,
+    cancel_circle,
+    hourglass_bottom,
+    filter_list,
+    pill_gray,
     sell,
     arrow_back,
     arrow_back_ios,

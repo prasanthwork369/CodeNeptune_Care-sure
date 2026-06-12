@@ -1,13 +1,12 @@
-import { colors } from "@/src/constants/theme";
 import { TextCycler } from "@/src/components/ui/TextCycler";
-import { HomeSearchCycler } from "./HomeSearchCycler";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
+import { colors } from "@/src/constants/theme";
+import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
-import { icons } from "@/src/constants/icons";
-import { styles as s, SEARCH_ICON_SIZE } from './SearchBar.styles';
+import { HomeSearchCycler } from "./HomeSearchCycler";
+import { styles as s, SEARCH_ICON_SIZE } from "./SearchBar.styles";
 
 const PLACEHOLDER_LINE_HEIGHT = 18;
 
@@ -71,7 +70,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 className="font-inter-medium text-brand-subtext"
               />
             ) : (
-              <Text style={s.placeholderText} className="font-inter-medium text-brand-subtext" numberOfLines={1}>
+              <Text
+                style={s.placeholderText}
+                className="font-inter-medium text-brand-subtext"
+                numberOfLines={1}
+              >
                 {placeholder}
               </Text>
             )}
@@ -100,8 +103,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         className="flex-1 font-inter text-brand-text py-1.5 ml-2"
       />
       {query.length > 0 && (
-        <Touchable onPress={() => setQuery("")}>
-          <MaterialIcons name="close" size={18} color={colors.subtext} />
+        <Touchable
+          onPress={() => setQuery("")}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <icons.close_small width={15} height={15} fill="#6A6A6A" />
         </Touchable>
       )}
       {rightSlot && <View className="ml-2">{rightSlot}</View>}

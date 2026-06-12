@@ -16,17 +16,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 interface AuthScreenShellProps {
     children: React.ReactNode;
     onSkip?: () => void;
-    keyboardShift?: number; // kept for API compat, unused
+    // Extra scrollable space (as a fraction of window height) added below the
+    // content so KeyboardAwareScrollView has room to scroll the focused input
+    // above the keyboard, even when the content alone doesn't overflow.
+    keyboardShift?: number;
 }
 
 export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     children,
     onSkip,
+    keyboardShift = 0,
 }) => {
     const router = useNav();
     const insets = useSafeAreaInsets();
     const { height: windowHeight, width } = useWindowDimensions();
-    // Pin backgroundHeight to mount-time value so Android adjustResize keyboard events
+    // Pin to mount-time value so Android adjustResize keyboard events
     // don't trigger a layout reflow mid-scroll, causing KASV to measure stale positions.
     const [backgroundHeight] = React.useState(() => windowHeight * 0.6);
 
@@ -36,7 +40,27 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 
     const scrollViewRef = React.useRef<any>(null);
 
+    // Manually drive the scroll on focus/blur instead of relying on KASV's
+    // automatic measurement, which can be a no-op when the content doesn't
+    // already overflow the viewport (e.g. the short login form).
+    React.useEffect(() => {
+        if (!keyboardShift) return;
+        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+        // Scroll up just enough to clear the keyboard, same offset OTP uses.
+        const targetY = Platform.select({ android: 160, ios: 140, default: 140 });
 
+        const showSub = Keyboard.addListener(showEvent, () => {
+            scrollViewRef.current?.scrollToPosition(0, targetY, true);
+        });
+        const hideSub = Keyboard.addListener(hideEvent, () => {
+            scrollViewRef.current?.scrollToPosition(0, 0, true);
+        });
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, [keyboardShift]);
 
     const skipScale = useSharedValue(1);
     const skipStyle = useAnimatedStyle(() => ({
@@ -106,6 +130,11 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                         <View style={{ flexGrow: 1, paddingTop: 32, paddingBottom: insets.bottom + 24 }}>
                             {children}
                         </View>
+
+                        {/* Extra scroll room so the keyboard can push the focused input into view */}
+                        {keyboardShift > 0 && (
+                            <View style={{ height: 200 }} />
+                        )}
                     </View>
                 </Pressable>
             </KeyboardAwareScrollView>

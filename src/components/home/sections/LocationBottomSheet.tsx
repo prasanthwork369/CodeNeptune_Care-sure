@@ -186,6 +186,14 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               bottomSheetRef.current?.snapToIndex(1);
             }}
           />
+          {!!searchQuery && (
+            <Touchable
+              onPress={() => setSearchQuery("")}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <icons.close_small width={16} height={16} fill="#919EAB" />
+            </Touchable>
+          )}
         </View>
 
         <View className="flex-row gap-x-3 mb-2">
