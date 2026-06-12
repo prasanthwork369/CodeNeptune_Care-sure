@@ -60,7 +60,7 @@ export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDia
     const isSingle = buttons.length === 1;
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
             <View
                 style={{
                     flex: 1,

@@ -12,7 +12,7 @@ interface InfoModalProps {
 export const InfoModal: React.FC<InfoModalProps> = ({ title, message, onClose, onDismiss }) => {
     const handleClose = () => { onClose(); onDismiss?.(); };
     return (
-        <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={handleClose}>
+        <Modal visible transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={handleClose}>
             <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={handleClose}>
                 <Pressable onPress={e => e.stopPropagation()}>
                     <View className="bg-white rounded-2xl px-6 py-6 w-full">

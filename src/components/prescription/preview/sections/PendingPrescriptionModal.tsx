@@ -9,7 +9,7 @@ interface PendingPrescriptionModalProps {
 }
 
 export const PendingPrescriptionModal: React.FC<PendingPrescriptionModalProps> = ({ visible, onViewPrescriptions, onClose }) => (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
         <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={onClose}>
             <Pressable onPress={e => e.stopPropagation()}>
                 <View className="bg-white rounded-2xl px-6 py-6 w-full">

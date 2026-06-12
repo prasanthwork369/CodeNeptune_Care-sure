@@ -10,7 +10,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     PatientContactInfo,
@@ -21,6 +21,7 @@ import {
     PatientSelectionFooter,
     PatientSymptomsInput,
     PatientVitalInfo,
+    SelectPatientSkeleton,
 } from "./sections";
 
 export const SelectPatientLayout: React.FC = () => {
@@ -117,9 +118,7 @@ export const SelectPatientLayout: React.FC = () => {
       />
 
       {showSkeleton ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#0F7635" />
-        </View>
+        <SelectPatientSkeleton />
       ) : showEmptyState ? (
         <PatientEmptyState
           onAddPress={() => {

@@ -6,3 +6,4 @@ export { PatientHealthProblem } from './PatientHealthProblem';
 export { PatientSymptomsInput } from './PatientSymptomsInput';
 export { PatientSelectionFooter } from './PatientSelectionFooter';
 export { PatientEmptyState } from './PatientEmptyState';
+export { SelectPatientSkeleton } from './SelectPatientSkeleton';

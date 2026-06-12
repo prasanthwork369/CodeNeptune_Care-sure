@@ -16,6 +16,8 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isVisibl
             visible={isVisible}
             transparent
             animationType="fade"
+            statusBarTranslucent
+            navigationBarTranslucent
             onRequestClose={onCancel}
         >
             <View className="flex-1 bg-black/60 items-center justify-center px-6">

@@ -30,6 +30,7 @@ LogBox.ignoreLogs([
 ]);
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
+import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
@@ -132,6 +133,7 @@ export default function RootLayout() {
               <CartSyncProvider />
               <PushNotificationProvider />
               <NetworkToast />
+              <SignupBonusPopup />
             </View>
           </BottomSheetModalProvider>
         </SafeAreaProvider>

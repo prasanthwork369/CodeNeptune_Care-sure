@@ -9,6 +9,9 @@ import uploadActive from "../../assets/icons/upload_active.svg";
 import placeholder from "../../assets/icons/placeholder.svg";
 
 // General SVGs
+import bonus_coins from "../../assets/icons/bonus_coins.svg";
+import bonus_discount from "../../assets/icons/bonus_discount.svg";
+import bonus_gift from "../../assets/icons/bonus_gift.svg";
 import Add_Cart from "../../assets/icons/Add_Cart.svg";
 import add_circle from "../../assets/icons/add_circle.svg";
 import arrow_back from "../../assets/icons/arrow_back.svg";
@@ -237,6 +240,9 @@ export const icons = {
     user_active,
     upload_pdf,
     placeholder,
+    bonus_coins,
+    bonus_discount,
+    bonus_gift,
 } as const;
 
 

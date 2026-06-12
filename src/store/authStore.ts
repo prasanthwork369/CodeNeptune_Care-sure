@@ -18,8 +18,6 @@ interface AuthState {
     login: (token: string, expiresIn: number) => Promise<void>;
     setUser: (user: CustomerProfile | null) => void;
     logout: () => Promise<void>;
-    redirectAfterLogin: string | null;
-    setRedirectAfterLogin: (path: string | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -27,9 +25,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     isLoaded: false,
     token: null,
     user: null,
-    redirectAfterLogin: null,
-
-    setRedirectAfterLogin: (path) => set({ redirectAfterLogin: path }),
 
     initialize: async () => {
         try {

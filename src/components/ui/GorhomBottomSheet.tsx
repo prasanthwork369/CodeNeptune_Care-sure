@@ -26,6 +26,7 @@ interface GorhomBottomSheetProps
         | 'style'
         | 'children'
         | 'maxDynamicContentSize'
+        | 'onChange'
     > {
     isVisible: boolean;
     onClose: () => void;
@@ -71,6 +72,7 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
             handleIndicatorStyle = DEFAULT_HANDLE_INDICATOR_STYLE,
             style,
             children,
+            onChange,
         },
         ref,
     ) => {
@@ -146,6 +148,7 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
                 enableDynamicSizing={enableDynamicSizing}
                 maxDynamicContentSize={maxDynamicContentSize}
                 enablePanDownToClose
+                onChange={onChange}
                 onDismiss={handleDismiss}
                 backdropComponent={renderBackdrop}
                 keyboardBehavior={keyboardBehavior}

@@ -36,7 +36,7 @@ export function CancelOrderDialog({
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
+        <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={handleClose}>
             <View
                 style={{
                     flex: 1,

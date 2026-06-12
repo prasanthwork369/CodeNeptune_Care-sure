@@ -6,7 +6,6 @@ import { sanitize, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { cartApi } from "@/src/api/cart.api";
-import { useAuthStore } from "@/src/store/authStore";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import React, { useEffect, useRef, useState } from "react";
@@ -42,6 +41,7 @@ export const OtpLayout: React.FC = () => {
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const [otpError, setOtpError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(30);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (resendCooldown === 0) return;
@@ -138,6 +138,8 @@ export const OtpLayout: React.FC = () => {
     if (!phone) return;
     try {
       await verifyOtp(phone, otpCode);
+      Keyboard.dismiss();
+      setIsRedirecting(true);
 
       // Merge guest cart items
       const guestCart = useCartPendingStore.getState().guestCart;
@@ -163,13 +165,7 @@ export const OtpLayout: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
       }
 
-      const redirectPath = useAuthStore.getState().redirectAfterLogin;
-      if (redirectPath) {
-        useAuthStore.getState().setRedirectAfterLogin(null);
-        router.replace(redirectPath as any);
-      } else {
-        router.replace("/(tabs)");
-      }
+      router.replace("/(tabs)");
     } catch {
       // error state is set by the hook
     }
@@ -199,7 +195,7 @@ export const OtpLayout: React.FC = () => {
             otp={otp}
             otpError={otpError}
             error={error}
-            loading={loading}
+            loading={loading || isRedirecting}
             resendCooldown={resendCooldown}
             onOtpChange={handleOtpChange}
             onKeyPress={handleKeyPress}

@@ -47,6 +47,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                 transparent
                 animationType="fade"
                 statusBarTranslucent
+                navigationBarTranslucent
                 onRequestClose={onClose}
             >
                 <View className="flex-1 bg-black/60 items-center justify-center px-4">
@@ -155,6 +156,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                 transparent
                 animationType="slide"
                 statusBarTranslucent
+                navigationBarTranslucent
                 onRequestClose={() => setShowPicker(false)}
             >
                 <View className="flex-1 bg-black/60 justify-end">

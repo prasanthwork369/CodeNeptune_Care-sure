@@ -55,13 +55,16 @@ const ScrollingColumn = ({
               height: itemSize,
               marginBottom: gap,
               backgroundColor: bgColor,
-              shadowColor: "#919EAB33",
+              borderRadius: 20,
+              borderWidth: 1.25,
+              borderColor: "#919EAB33",
+              shadowColor: "#919EAB",
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.05,
-              shadowRadius: 10,
+              shadowOpacity: 0.08,
+              shadowRadius: 6,
               elevation: 2,
             }}
-            className="rounded-2xl items-center justify-center p-3 border border-white/50"
+            className="items-center justify-center p-3"
           >
             <Image
               source={img}

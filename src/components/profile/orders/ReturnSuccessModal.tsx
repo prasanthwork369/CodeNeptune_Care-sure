@@ -16,6 +16,8 @@ export const ReturnSuccessModal: React.FC<ReturnSuccessModalProps> = ({ isVisibl
             visible={isVisible}
             transparent
             animationType="fade"
+            statusBarTranslucent
+            navigationBarTranslucent
             onRequestClose={onClose}
         >
             <View className="flex-1 bg-black/70 items-center justify-center px-8">

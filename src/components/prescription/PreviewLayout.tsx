@@ -444,6 +444,7 @@ export const PreviewLayout: React.FC = () => {
         transparent
         animationType="slide"
         statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowConfirmed(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">

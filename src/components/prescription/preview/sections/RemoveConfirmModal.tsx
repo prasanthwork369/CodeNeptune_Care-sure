@@ -10,7 +10,7 @@ interface RemoveConfirmModalProps {
 }
 
 export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({ visible, onConfirm, onCancel }) => (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onCancel}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onCancel}>
         <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={onCancel}>
             <Pressable onPress={e => e.stopPropagation()}>
                 <View className="bg-white rounded-2xl px-6 py-6 w-full">

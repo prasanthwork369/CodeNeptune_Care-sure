@@ -225,7 +225,6 @@ export function useCartCalculations() {
     const targetParams = { toPay: String(toPay) };
 
     if (!useAuthStore.getState().isAuthenticated) {
-      useAuthStore.getState().setRedirectAfterLogin(`${targetPath}?toPay=${toPay}`);
       router.push("/(auth)/login");
       return;
     }

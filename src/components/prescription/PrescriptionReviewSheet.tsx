@@ -77,6 +77,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
       transparent
       animationType="none"
       statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onClose}
     >
       {/* Backdrop — driven by the same enterAnim as the card */}

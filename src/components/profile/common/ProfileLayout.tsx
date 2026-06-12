@@ -1,6 +1,7 @@
 import { LogoutConfirmModal } from './LogoutConfirmModal';
 import { ProfileSkeleton } from './ProfileSkeleton';
 import UploadBottomSheet from '../sections/UploadBottomSheet';
+import { SignupBonusPopup } from '@/src/components/auth/SignupBonusPopup';
 import { components } from '@/src/constants/theme';
 import { useAuth } from '@/src/hooks/mutations/useAuth';
 import { useProfile } from '@/src/hooks/queries/useProfile';
@@ -34,6 +35,7 @@ export const ProfileLayout: React.FC = () => {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showUploadSheet, setShowUploadSheet] = useState(false);
     const [localAvatar, setLocalAvatar] = useState<string | null>(null);
+    const [bonusTestKey, setBonusTestKey] = useState<number | null>(null);
     const scrollY = useSharedValue(0);
     const { safeAreaBgStyle } = useScrollStatusBar(scrollY);
 
@@ -111,6 +113,19 @@ export const ProfileLayout: React.FC = () => {
 
                 <ProfileInfoList onLogout={() => setShowLogoutModal(true)} />
 
+                {__DEV__ && (
+                    <Touchable
+                        activeOpacity={0.8}
+                        onPress={() => setBonusTestKey((k) => (k ?? 0) + 1)}
+                        className="mx-4 mt-4 items-center rounded-xl py-3"
+                        style={{ backgroundColor: '#AD6CFE22' }}
+                    >
+                        <Text className="font-inter-semibold text-[#AD6CFE]" style={{ fontSize: 13 }}>
+                            Test Signup Bonus Popup
+                        </Text>
+                    </Touchable>
+                )}
+
             </ScrollView>
 
             <LogoutConfirmModal
@@ -126,6 +141,10 @@ export const ProfileLayout: React.FC = () => {
                 onSelectCamera={handleSelectCamera}
                 onSelectLibrary={handleSelectLibrary}
             />
+
+            {bonusTestKey !== null && (
+                <SignupBonusPopup key={bonusTestKey} testMode onClose={() => setBonusTestKey(null)} />
+            )}
         </View>
     );
 };
