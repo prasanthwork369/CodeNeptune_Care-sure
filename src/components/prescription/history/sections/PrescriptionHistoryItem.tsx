@@ -50,7 +50,7 @@ export const PrescriptionHistoryItem: React.FC<PrescriptionHistoryItemProps> = (
     return (
         <View className="mb-6">
             <Text className="text-[14px] font-inter-medium text-brand-subtext mb-3">Uploaded on {item.uploadedDate}</Text>
-            <View className="flex-row items-center">
+            <Touchable activeOpacity={0.7} className="flex-row items-center" onPress={handleView}>
                 <View className="w-[80px] h-[80px] rounded-md border border-[#919EAB33] overflow-hidden bg-white items-center justify-center mr-4">
                     {pdf ? (
                         <icons.note_book width={36} height={36} />
@@ -67,10 +67,10 @@ export const PrescriptionHistoryItem: React.FC<PrescriptionHistoryItemProps> = (
                     </View>
                     <Text className="text-[14px] font-inter-medium text-[#6A6A6A]">{item.patientName}</Text>
                 </View>
-                <Touchable activeOpacity={0.7} className="p-2" onPress={handleView}>
+                <View className="p-2">
                     <icons.eye width={24} height={24} fill="#6A6A6A" />
-                </Touchable>
-            </View>
+                </View>
+            </Touchable>
             <View className="h-[1px] bg-[#919EAB1A] mt-6" />
         </View>
     );

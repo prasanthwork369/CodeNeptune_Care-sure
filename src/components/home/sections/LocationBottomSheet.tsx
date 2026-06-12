@@ -50,7 +50,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
   const { addresses, loading: addressesLoading, refetch } = useAddress();
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["50%", "90%"], []);
+  const snapPoints = useMemo(() => ["70%", "90%"], []);
 
   const handleClose = () => {
     Keyboard.dismiss();
@@ -148,7 +148,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       onClose={onClose}
       onPresent={refetch}
       snapPoints={snapPoints}
-      closeButtonOffset="50%"
+      closeButtonOffset="70%"
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
       style={{ zIndex: 999 }}

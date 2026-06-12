@@ -6,6 +6,10 @@ const QA_URL = "https://qa-csapi.codeneptune.com";
 export const API_BASE_URL = LIVE ? PROD_URL : QA_URL;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
+/** Prefixes a relative backend path (e.g. "/uploads/icon.png") with the API base URL. */
+export const resolveAssetUrl = (path: string) =>
+  path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
+
 export const API_ENDPOINTS = {
   // ── Catalog ──────────────────────────────────────────────────────────────
   CATALOG_CATEGORIES_MAP: "/api/v1/catalog/categories/map",

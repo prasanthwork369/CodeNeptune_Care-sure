@@ -12,7 +12,7 @@ import React, {
     useImperativeHandle,
     useRef,
 } from 'react';
-import { Keyboard } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 
 interface GorhomBottomSheetProps
     extends Pick<
@@ -150,6 +150,9 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
                 backdropComponent={renderBackdrop}
                 keyboardBehavior={keyboardBehavior}
                 keyboardBlurBehavior={keyboardBlurBehavior}
+                android_keyboardInputMode={
+                    Platform.OS === 'android' ? 'adjustResize' : undefined
+                }
                 backgroundStyle={backgroundStyle}
                 handleIndicatorStyle={handleIndicatorStyle}
                 style={style}

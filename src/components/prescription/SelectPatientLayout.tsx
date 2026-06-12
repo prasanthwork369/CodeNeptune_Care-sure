@@ -7,6 +7,8 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { getAge } from "@/src/utils/patient";
+import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
+import { resolveAssetUrl } from "@/src/utils/urls";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useSelectPatient } from "@/src/hooks/useSelectPatient";
 import React from "react";
@@ -274,7 +276,7 @@ export const SelectPatientLayout: React.FC = () => {
               {selectedHealthProblem ? (
                 <View className="flex-row items-center gap-[10px]">
                   {selectedHealthProblem.icon && (selectedHealthProblem.icon.startsWith('http') || selectedHealthProblem.icon.startsWith('/') || selectedHealthProblem.icon.includes('.')) ? (
-                    <Image source={{ uri: selectedHealthProblem.icon }} style={{ width: 24, height: 24, borderRadius: 12 }} resizeMode="cover" />
+                    <RemoteIcon uri={resolveAssetUrl(selectedHealthProblem.icon)} size={24} style={{ borderRadius: 12 }} />
                   ) : (
                     <Text className="text-[20px] leading-[24px]">
                       {selectedHealthProblem.icon}

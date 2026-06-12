@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Image, TextInput } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { PatientHealthProblemProps } from '@/src/types/patient';
+import { RemoteIcon } from '@/src/components/ui/RemoteIcon';
+import { resolveAssetUrl } from '@/src/utils/urls';
 
 export const PatientHealthProblem: React.FC<PatientHealthProblemProps> = ({ selected, onPress, customText, setCustomText }) => {
     return (
@@ -16,7 +18,7 @@ export const PatientHealthProblem: React.FC<PatientHealthProblemProps> = ({ sele
                 {selected ? (
                     <View className="flex-row items-center gap-[10px]">
                         {selected.icon && (selected.icon.startsWith('http') || selected.icon.startsWith('/') || selected.icon.includes('.')) ? (
-                            <Image source={{ uri: selected.icon }} style={{ width: 24, height: 24, borderRadius: 12 }} resizeMode="cover" />
+                            <RemoteIcon uri={resolveAssetUrl(selected.icon)} size={24} style={{ borderRadius: 12 }} />
                         ) : (
                             <Text className="text-[20px] leading-[24px]">{selected.icon}</Text>
                         )}

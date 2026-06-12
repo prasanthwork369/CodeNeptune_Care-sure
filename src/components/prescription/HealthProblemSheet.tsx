@@ -4,9 +4,11 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { BottomSheetFlatList, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, Image, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHealthProblems } from '@/src/hooks/queries/useHealthProblems';
+import { RemoteIcon } from '@/src/components/ui/RemoteIcon';
+import { resolveAssetUrl } from '@/src/utils/urls';
 
 interface HealthProblemSheetProps {
     isVisible: boolean;
@@ -78,7 +80,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
             isVisible={isVisible}
             onClose={handleClose}
             snapPoints={snapPoints}
-            closeButtonOffset={0}
+            closeButtonOffset="75%"
         >
             <View style={{ flex: 1, paddingTop: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 12 }}>
@@ -151,7 +153,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                                         <View style={{ position: 'relative' }}>
                                             <View style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: isSelected ? '#fff' : '#F8F9FA', overflow: 'hidden' }}>
                                                 {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('/') || item.icon.includes('.')) ? (
-                                                    <Image source={{ uri: item.icon }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                                                    <RemoteIcon uri={resolveAssetUrl(item.icon)} size={44} />
                                                 ) : (
                                                     <Text style={{ fontSize: 22, lineHeight: 28 }}>{item.icon}</Text>
                                                 )}

@@ -1,15 +1,14 @@
 import { ApiMobileAdditionalData } from "@/src/api/medicine.api";
 import { HtmlContent } from "@/src/components/ui/HtmlContent";
+import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef, useState } from "react";
 import {
     Dimensions,
-    Image,
     ScrollView,
     Text,
     View,
 } from "react-native";
-import { SvgUri } from "react-native-svg";
 import Animated, {
     Easing,
     LinearTransition,
@@ -221,15 +220,9 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                         cardXOffsets.current[item.id] = e.nativeEvent.layout.x;
                       }}
                     >
-                      <View className="w-12 h-12 rounded-[8px] bg-[#F1EDFD] items-center justify-center mb-3">
-                        {(item as any).svgUri ? (
-                          <SvgUri uri={(item as any).svgUri} width={24} height={24} />
-                        ) : item.image ? (
-                          <Image
-                            source={item.image}
-                            style={{ width: 20, height: 20, tintColor: "#423274" }}
-                            resizeMode="contain"
-                          />
+                      <View className="w-14 h-14 rounded-[8px] bg-[#F1EDFD] items-center justify-center mb-3">
+                        {item.image ? (
+                          <RemoteIcon uri={item.image} size={60} />
                         ) : null}
                       </View>
                       <Text className="text-[14px] font-inter-semibold text-brand-text mb-2">

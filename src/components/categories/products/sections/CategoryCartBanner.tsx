@@ -38,6 +38,10 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
   const textOpacity    = useSharedValue(0);
   const chevronOpacity = useSharedValue(0);
 
+  // Only the most recently added item's thumbnail shows while the banner
+  // is still a circle; the full stack appears once it expands to a pill.
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
   const wasVisible     = useRef(false);
   const bannerRef      = useRef<View>(null);
   const expansionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,6 +58,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
       bannerWidth.value  = 60;
       textOpacity.value  = 0;
       chevronOpacity.value = 0;
+      setIsExpanded(false);
       opacity.value = withTiming(1, { duration: 160 });
 
       // Step 2: fly lands at 750ms → image visible in circle
@@ -61,6 +66,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
       if (expansionTimer.current) clearTimeout(expansionTimer.current);
       expansionTimer.current = setTimeout(() => {
         bannerWidth.value = withSpring(PILL_W, WIDTH_SPRING);
+        setIsExpanded(true);
         // Step 4: text fades in mid-expansion
         textOpacity.value = withDelay(240, withTiming(1, { duration: 200 }));
         // Step 5: chevron fades in last
@@ -88,6 +94,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
         bannerWidth.value    = 60;
         textOpacity.value    = 0;
         chevronOpacity.value = 0;
+        setIsExpanded(false);
       }, 700);
     }
   }, [visualCartCount, PILL_W]);
@@ -164,7 +171,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
           {/* Thumbnails — visible from the moment circle appears */}
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             {visualCartImages.length > 0
-              ? visualCartImages.map((item, index) => (
+              ? (isExpanded ? visualCartImages : visualCartImages.slice(-1)).map((item, index) => (
                   <ThumbnailItem
                     key={item.id}
                     imgUrl={item.image}

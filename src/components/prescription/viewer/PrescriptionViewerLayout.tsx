@@ -6,7 +6,6 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
     withTiming,
 } from 'react-native-reanimated';
 import { Touchable } from '@/src/components/ui/Touchable';
@@ -45,9 +44,11 @@ export const PrescriptionViewerLayout: React.FC = () => {
 
     const resetZoom = () => {
         'worklet';
-        scale.value = withSpring(1, { damping: 20 });
-        translateX.value = withSpring(0, { damping: 20 });
-        translateY.value = withSpring(0, { damping: 20 });
+        // Animate scale and translate together with the same timing so they
+        // settle in sync — independent springs drift apart and look like a jump.
+        scale.value = withTiming(1, { duration: 250 });
+        translateX.value = withTiming(0, { duration: 250 });
+        translateY.value = withTiming(0, { duration: 250 });
         savedScale.value = 1;
         savedTranslateX.value = 0;
         savedTranslateY.value = 0;
@@ -66,6 +67,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
         });
 
     const panGesture = Gesture.Pan()
+        .minDistance(10)
         .onUpdate((e) => {
             if (savedScale.value > 1) {
                 const maxX = (width * (savedScale.value - 1)) / 2;
@@ -92,15 +94,15 @@ export const PrescriptionViewerLayout: React.FC = () => {
         });
 
     const composed = Gesture.Simultaneous(
-        doubleTap,
-        Gesture.Simultaneous(pinchGesture, panGesture),
+        pinchGesture,
+        Gesture.Exclusive(doubleTap, panGesture),
     );
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { scale: scale.value },
             { translateX: translateX.value },
             { translateY: translateY.value },
+            { scale: scale.value },
         ],
     }));
 
