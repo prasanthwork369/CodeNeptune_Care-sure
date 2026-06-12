@@ -25,7 +25,7 @@ export const usePrescriptionBanner = () => {
   const hasJustUploadedRef = useRef(hasJustUploadedPrescription);
   hasJustUploadedRef.current = hasJustUploadedPrescription;
 
-  const { prescriptions, refetch } = usePrescriptions(
+  const { prescriptions, loading, refetch } = usePrescriptions(
     isAuthenticated
       ? {
           limit: 1,
@@ -97,5 +97,7 @@ export const usePrescriptionBanner = () => {
     showVerifiedBanner,
     showUnderReviewBanner,
     acknowledgeRejectedBanner,
+    isLoading: isAuthenticated && loading,
+    isRefetching: isAuthenticated && isFocusRefetching,
   };
 };

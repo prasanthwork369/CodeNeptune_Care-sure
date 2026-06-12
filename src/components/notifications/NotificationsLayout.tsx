@@ -7,6 +7,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { styles as s } from './notifications.styles';
+import { NotificationsSkeleton } from './NotificationsSkeleton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { icons } from '@/src/constants/icons';
 
@@ -53,8 +54,8 @@ function formatDate(iso: string) {
 export const NotificationsLayout: React.FC = () => {
     const insets = useSafeAreaInsets();
     const router = useNav();
-    const { notifications, markAllRead, clear, setLastSeenRx } = useNotificationStore();
-    const { latestPrescription, hasPendingPrescription } = usePrescriptionBanner();
+    const { notifications, markAllRead, clear, setLastSeenRx, hasHydrated } = useNotificationStore();
+    const { latestPrescription, hasPendingPrescription, isLoading: isRxLoading, isRefetching: isRxRefetching } = usePrescriptionBanner();
     const latestRx = latestPrescription;
     const rxConfig = hasPendingPrescription && latestRx
         ? RX_CONFIG[latestRx.status as keyof typeof RX_CONFIG]
@@ -68,6 +69,8 @@ export const NotificationsLayout: React.FC = () => {
     }, [latestRx]);
 
     const hasAny = notifications.length > 0 || !!rxConfig;
+    const isLoading = !hasHydrated || isRxLoading || isRxRefetching;
+    const showEmptyState = !isLoading && !hasAny;
 
     return (
         <View className="flex-1 bg-[#F5F6FB]">
@@ -82,6 +85,9 @@ export const NotificationsLayout: React.FC = () => {
                     ) : undefined
                 }
             />
+            {isLoading ? (
+                <NotificationsSkeleton />
+            ) : (
             <ScrollView
                 className="flex-1"
                 contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 16, flexGrow: 1 }}
@@ -158,7 +164,7 @@ export const NotificationsLayout: React.FC = () => {
                     </Touchable>
                 )}
 
-                {!hasAny ? (
+                {showEmptyState ? (
                     <View className="flex-1 items-center justify-center" style={{ paddingTop: 80 }}>
                         <icons.notification width={s.emptyIcon.width} height={s.emptyIcon.height} fill="#D1D5DB" />
                         <Text style={s.emptyTitle} className="font-inter-semibold text-brand-subtext mt-4">No notifications yet</Text>
@@ -200,6 +206,7 @@ export const NotificationsLayout: React.FC = () => {
                     ))
                 )}
             </ScrollView>
+            )}
         </View>
     );
 };

@@ -149,7 +149,7 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
                     <Text style={s.sectionTitle} className="font-inter-semibold text-brand-text">
                         Spend Less on What You Need
                     </Text>
-                    <Text style={s.sectionSubtitle} className="font-inter-bold text-[#2DAAFF] mt-1">
+                    <Text style={s.sectionSubtitle} className="font-inter-bold text-[#0F7635] mt-1">
                         More Affordable Choices
                     </Text>
                 </View>

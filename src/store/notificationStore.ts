@@ -18,12 +18,14 @@ interface NotificationState {
     lastSeenRxStatus: string | null;
     dismissedRxId: string | null;
     dismissedRxStatus: string | null;
+    hasHydrated: boolean;
     add: (notification: Omit<AppNotification, 'id' | 'receivedAt' | 'isRead'>) => void;
     markAllRead: () => void;
     markRead: (id: string) => void;
     clear: () => void;
     setLastSeenRx: (id: string, status: string) => void;
     setDismissedRx: (id: string, status: string) => void;
+    setHasHydrated: (value: boolean) => void;
 }
 
 export const useNotificationStore = create<NotificationState>()(
@@ -35,6 +37,7 @@ export const useNotificationStore = create<NotificationState>()(
             lastSeenRxStatus: null,
             dismissedRxId: null,
             dismissedRxStatus: null,
+            hasHydrated: false,
 
             add: (notification) => {
                 const newItem: AppNotification = {
@@ -64,10 +67,15 @@ export const useNotificationStore = create<NotificationState>()(
             setLastSeenRx: (id, status) => set({ lastSeenRxId: id, lastSeenRxStatus: status }),
 
             setDismissedRx: (id, status) => set({ dismissedRxId: id, dismissedRxStatus: status }),
+
+            setHasHydrated: (value) => set({ hasHydrated: value }),
         }),
         {
             name: 'caresure-notifications',
             storage: createJSONStorage(() => AsyncStorage),
+            onRehydrateStorage: () => (state) => {
+                state?.setHasHydrated(true);
+            },
         }
     )
 );
