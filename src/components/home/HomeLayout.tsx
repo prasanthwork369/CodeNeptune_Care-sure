@@ -1,38 +1,37 @@
 import {
   BannerCarousel,
+  FloatingBannersCarousel,
   FrequentSubstitutes,
+  HealthEssentials,
   HeroBanner,
   HomeFooter,
   HomeHeader,
-  QuickActions,
   LocationBottomSheet,
+  QuickActions,
   SearchBar,
   ShopByCategories,
   SmartSubstitution,
   WhyFamiliesTrustUs,
-  HealthEssentials,
-  FloatingBannersCarousel,
 } from "@/src/components/home/sections";
-import {
-  DELIVERY_LOCATION,
-  QUICK_ACTIONS,
-} from "@/src/constants/data";
+import { Touchable } from "@/src/components/ui/Touchable";
+import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
-import { useCart } from "@/src/hooks/queries/useCart";
 import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useCart } from "@/src/hooks/queries/useCart";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useFeaturedSubcategories } from "@/src/hooks/queries/useFeaturedSubcategories";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { useHomeScroll } from "@/src/hooks/ui/useHomeScroll";
+import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
-import { useLocationStore } from "@/src/store/locationStore";
-import { useAuthStore } from "@/src/store/authStore";
-import { LinearGradient } from "expo-linear-gradient";
 import { useNav } from "@/src/hooks/useNav";
+import { useAuthStore } from "@/src/store/authStore";
+import { useLocationStore } from "@/src/store/locationStore";
+import { useUIStore } from "@/src/store/uiStore";
+import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   RefreshControl,
@@ -41,12 +40,13 @@ import {
   useWindowDimensions,
 } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
   withDelay,
-  Easing,
+  withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const easeOut = Easing.out(Easing.cubic);
 
@@ -54,17 +54,20 @@ function useSlideUp(delayMs: number) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
   useEffect(() => {
-    opacity.value = withDelay(delayMs, withTiming(1, { duration: 480, easing: easeOut }));
-    translateY.value = withDelay(delayMs, withTiming(0, { duration: 480, easing: easeOut }));
+    opacity.value = withDelay(
+      delayMs,
+      withTiming(1, { duration: 480, easing: easeOut }),
+    );
+    translateY.value = withDelay(
+      delayMs,
+      withTiming(0, { duration: 480, easing: easeOut }),
+    );
   }, []);
   return useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [{ translateY: translateY.value }],
   }));
 }
-import { useUIStore } from "@/src/store/uiStore";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 
 export const HomeLayout: React.FC = () => {
   const router = useNav();
@@ -78,11 +81,12 @@ export const HomeLayout: React.FC = () => {
   const [carouselHeight, setCarouselHeight] = useState(0);
   const currentScrollY = useRef(0);
 
-  const searchBarAnim  = useSlideUp(350);
+  const searchBarAnim = useSlideUp(350);
   const quickActionsAnim = useSlideUp(500);
 
   const { isAuthenticated } = useAuthStore();
-  const { isTabBarVisible, setTabBarVisible, setUploadButtonCollapsed } = useUIStore();
+  const { isTabBarVisible, setTabBarVisible, setUploadButtonCollapsed } =
+    useUIStore();
   const { totalItems } = useCart();
   const { hasPendingPrescription } = usePrescriptionBanner();
   const hasFloatingBanner = totalItems > 0 || hasPendingPrescription;
@@ -104,9 +108,16 @@ export const HomeLayout: React.FC = () => {
     refetch: refetchSubcategories,
   } = useFeaturedSubcategories();
   const { addresses, refetch: refetchAddresses } = useAddress();
-  const { data: frequentlyOrdered = [], refetch: refetchFrequentlyOrdered } = useFrequentlyOrdered({ limit: 5 });
+  const { data: frequentlyOrdered = [], refetch: refetchFrequentlyOrdered } =
+    useFrequentlyOrdered({ limit: 5 });
   const { callSupport, whatsappOrder } = useContactActions();
-  const { location, setLocation, clearLocation, reopenLocationSheet, setReopenLocationSheet } = useLocationStore();
+  const {
+    location,
+    setLocation,
+    clearLocation,
+    reopenLocationSheet,
+    setReopenLocationSheet,
+  } = useLocationStore();
 
   const [isScreenFocused, setIsScreenFocused] = useState(true);
 
@@ -125,10 +136,11 @@ export const HomeLayout: React.FC = () => {
         setIsScreenFocused(false);
         clearTimeout(t);
       };
-    }, [reopenLocationSheet])
+    }, [reopenLocationSheet]),
   );
   const heroHeightRef = useRef(0);
-  const { scrollY, handleScroll, stickySearchVisible } = useHomeScroll(heroHeightRef);
+  const { scrollY, handleScroll, stickySearchVisible } =
+    useHomeScroll(heroHeightRef);
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY);
   const TAB_BAR_HEIGHT = 75 + insets.bottom;
 
@@ -137,7 +149,10 @@ export const HomeLayout: React.FC = () => {
     if (addresses.length > 0) {
       const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
       setLocation(
-        { label: defaultAddr.label, city: defaultAddr.city || defaultAddr.line2 || '' },
+        {
+          label: defaultAddr.label,
+          city: defaultAddr.city || defaultAddr.line2 || "",
+        },
         { addressId: defaultAddr.id, pincode: defaultAddr.pincode },
       );
     } else {
@@ -154,7 +169,7 @@ export const HomeLayout: React.FC = () => {
         refetchSubcategories(),
         refetchAddresses(),
         refetchFrequentlyOrdered(),
-        new Promise<void>(resolve => setTimeout(resolve, 800)),
+        new Promise<void>((resolve) => setTimeout(resolve, 800)),
       ]);
     } catch (e) {
       console.error("[Home] Refresh failed:", e);
@@ -167,13 +182,17 @@ export const HomeLayout: React.FC = () => {
     handleScroll(e);
     const y: number = e.nativeEvent?.contentOffset?.y ?? 0;
     currentScrollY.current = y;
-    setIsBannerVisible(y + height > carouselY && y < carouselY + carouselHeight);
+    setIsBannerVisible(
+      y + height > carouselY && y < carouselY + carouselHeight,
+    );
   };
 
   // Keep visibility in sync when layout coordinates are measured
   useEffect(() => {
     const y = currentScrollY.current;
-    setIsBannerVisible(y + height > carouselY && y < carouselY + carouselHeight);
+    setIsBannerVisible(
+      y + height > carouselY && y < carouselY + carouselHeight,
+    );
   }, [carouselY, carouselHeight, height]);
 
   const handleQuickAction = (id: string) => {
@@ -199,9 +218,6 @@ export const HomeLayout: React.FC = () => {
   const handleProductPress = (id: string) => {
     router.push({ pathname: "/product/[id]", params: { id } });
   };
-
-
-
 
   return (
     <View className="flex-1 bg-white">
@@ -260,7 +276,7 @@ export const HomeLayout: React.FC = () => {
             marginTop: -(insets.top + 8) - 40,
             paddingTop: insets.top + 8,
             paddingBottom: 16,
-            paddingHorizontal: 16,
+            paddingHorizontal: 36,
             backgroundColor: "transparent",
           }}
         >
@@ -284,7 +300,9 @@ export const HomeLayout: React.FC = () => {
         {/* Main content */}
         <View
           className="bg-white flex-1"
-          style={{ paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? 75 : 0) }}
+          style={{
+            paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? 75 : 0),
+          }}
         >
           <Animated.View style={quickActionsAnim}>
             <QuickActions
@@ -292,7 +310,6 @@ export const HomeLayout: React.FC = () => {
               onActionPress={handleQuickAction}
             />
           </Animated.View>
-          
 
           <ShopByCategories
             tabs={tabs}

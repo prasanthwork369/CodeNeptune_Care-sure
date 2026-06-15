@@ -166,7 +166,7 @@ export const SelectPatientLayout: React.FC = () => {
               onSave={async (val) => {
                 if (selectedPatient && val.trim()) {
                   setSavingPhone(true);
-                  await updateMember(selectedPatient.id, { phone: val.trim() });
+                  await updateMember(selectedPatient.id, { phone: `+91${val.trim()}` });
                   setSavingPhone(false);
                 }
                 setEditingPhone(false);

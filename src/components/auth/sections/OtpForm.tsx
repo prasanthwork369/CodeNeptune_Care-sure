@@ -1,7 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { OtpFormProps } from "@/src/types/auth";
-import React from "react";
+import React, { useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { scale } from "react-native-size-matters";
 import { styles as s } from "./OtpForm.styles";
@@ -19,6 +19,8 @@ export const OtpForm: React.FC<OtpFormProps> = ({
   isValid,
   inputRefs,
 }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
   return (
     <View>
       <View className="flex-row justify-between px-1" style={s.boxRow}>
@@ -28,7 +30,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
             className="w-[14%] aspect-square rounded-lg bg-white items-center justify-center"
             style={{
               borderWidth: 1,
-              borderColor: otpError || error ? "#EF4444" : "#919EAB22",
+              borderColor: otpError || error ? "#EF4444" : focusedIndex === index ? "#0F7635" : "#919EAB22",
             }}
           >
             <TextInput
@@ -38,6 +40,8 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               value={digit}
               onChangeText={(value) => onOtpChange(value, index)}
               onKeyPress={(e) => onKeyPress(e, index)}
+              onFocus={() => setFocusedIndex(index)}
+              onBlur={() => setFocusedIndex((cur) => (cur === index ? null : cur))}
               keyboardType="number-pad"
               maxLength={index === 0 ? 6 : 1}
               textContentType={index === 0 ? "oneTimeCode" : "none"}
@@ -48,6 +52,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               caretHidden={false}
               autoCorrect={false}
               spellCheck={false}
+              cursorColor="#0F7635"
               style={s.otpInput}
             />
           </View>

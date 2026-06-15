@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { tokenStorage } from '@/src/lib/storage';
+import { tokenStorage, guestStorage } from '@/src/lib/storage';
 import { profileApi, CustomerProfile } from '../api/profile.api';
 import { setAccessToken } from '../api/client';
 import { queryClient } from '@/src/lib/react-query/queryClient';
@@ -11,17 +11,20 @@ import { useLocationStore } from './locationStore';
 
 interface AuthState {
     isAuthenticated: boolean;
+    isGuest: boolean; // User skipped login — browse as guest, prompt to login at checkout
     isLoaded: boolean; // Initial hydration check
     token: string | null;
     user: CustomerProfile | null;
     initialize: () => Promise<void>;
     login: (token: string, expiresIn: number) => Promise<void>;
+    continueAsGuest: () => Promise<void>;
     setUser: (user: CustomerProfile | null) => void;
     logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
     isAuthenticated: false,
+    isGuest: false,
     isLoaded: false,
     token: null,
     user: null,
@@ -41,7 +44,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                     set({ isLoaded: true });
                 }
             } else {
-                set({ isLoaded: true });
+                const isGuest = await guestStorage.get();
+                set({ isGuest, isLoaded: true });
             }
         } catch (error) {
             console.error('Auth initialization failed:', error);
@@ -52,16 +56,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     login: async (token: string, expiresIn: number) => {
         const expiresAt = Date.now() + expiresIn * 1000;
         setAccessToken(token); // set in-memory immediately
-        set({ isAuthenticated: true, token });
+        set({ isAuthenticated: true, isGuest: false, token });
         await tokenStorage.set(token);
         await tokenStorage.setExpiresAt(expiresAt);
+        await guestStorage.clear();
+    },
+
+    continueAsGuest: async () => {
+        set({ isGuest: true });
+        await guestStorage.set(true);
     },
 
     setUser: (user) => set({ user }),
 
     logout: async () => {
         setAccessToken(null);
-        set({ isAuthenticated: false, token: null, user: null });
+        set({ isAuthenticated: false, isGuest: false, token: null, user: null });
 
         // Clear all user-specific state
         usePrescriptionDraftStore.getState().clearItems();
@@ -75,5 +85,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         await tokenStorage.clearExpiresAt();
         await tokenStorage.clearRefreshToken();
         await tokenStorage.clearAvatarUri();
+        await guestStorage.clear();
     },
 }));

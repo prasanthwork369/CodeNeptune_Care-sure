@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AUTH_TOKEN_KEY = 'caresure.auth.token';
 const AUTH_REFRESH_TOKEN_KEY = 'caresure.auth.refreshToken';
@@ -55,6 +56,28 @@ export const tokenStorage = {
   async clearAvatarUri(): Promise<void> {
     try {
       await SecureStore.deleteItemAsync(AVATAR_URI_KEY);
+    } catch {}
+  },
+};
+
+const GUEST_MODE_KEY = 'caresure.auth.isGuest';
+
+export const guestStorage = {
+  async get(): Promise<boolean> {
+    try {
+      return (await AsyncStorage.getItem(GUEST_MODE_KEY)) === 'true';
+    } catch {
+      return false;
+    }
+  },
+  async set(value: boolean): Promise<void> {
+    try {
+      await AsyncStorage.setItem(GUEST_MODE_KEY, value ? 'true' : 'false');
+    } catch {}
+  },
+  async clear(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(GUEST_MODE_KEY);
     } catch {}
   },
 };

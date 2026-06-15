@@ -25,7 +25,7 @@ export const PatientHealthProblem: React.FC<PatientHealthProblemProps> = ({ sele
                         <Text className="text-[14px] font-inter-medium text-[#1A1C1E]">{selected.label}</Text>
                     </View>
                 ) : (
-                    <Text className="text-[14px] font-inter text-[#919EAB]">Select</Text>
+                    <Text className="text-[14px] font-inter-medium text-[#6A6A6A]">Select</Text>
                 )}
                 <icons.down_arrow width={16} height={16} />
             </Touchable>

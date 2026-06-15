@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, Text, ActivityIndicator } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
@@ -15,11 +15,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     onGetOtp,
     isValid,
 }) => {
+    const [isFocused, setIsFocused] = useState(false);
+
     return (
         <View>
             <View
                 className="flex-row items-center rounded-lg px-4 bg-white"
-                style={[s.inputWrap, { borderWidth: 1, borderColor: phoneError ? '#EF4444' : '#919EAB22' }]}
+                style={[s.inputWrap, { borderWidth: 1, borderColor: phoneError ? '#EF4444' : isFocused ? '#0F7635' : '#919EAB22' }]}
             >
                 <Text style={s.prefix}>+91</Text>
                 <View style={{ width: 1, height: 20, backgroundColor: '#919EAB', marginHorizontal: 10 }} />
@@ -32,9 +34,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     accessibilityLabel="Mobile number"
                     className="flex-1 font-inter-regular text-brand-text"
                     style={s.input}
+                    cursorColor="#0F7635"
                     value={phoneNumber}
                     onChangeText={onPhoneChange}
-                    onFocus={onPhoneFocus}
+                    onFocus={() => { setIsFocused(true); onPhoneFocus?.(); }}
+                    onBlur={() => setIsFocused(false)}
                 />
             </View>
 

@@ -1,5 +1,6 @@
 import { AuthMedicineBackground } from '@/src/components/auth/AuthMedicineBackground';
 import { icons } from '@/src/constants/icons';
+import { useAuthStore } from '@/src/store/authStore';
 
 import * as Haptics from 'expo-haptics';
 import { useNav } from '@/src/hooks/useNav';
@@ -69,6 +70,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 
     const handleSkip = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        useAuthStore.getState().continueAsGuest();
         onSkip ? onSkip() : router.replace('/(tabs)');
     };
 
