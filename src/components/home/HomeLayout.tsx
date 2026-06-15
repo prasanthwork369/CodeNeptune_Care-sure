@@ -4,7 +4,6 @@ import {
   HeroBanner,
   HomeFooter,
   HomeHeader,
-  HomeStickyHeader,
   QuickActions,
   LocationBottomSheet,
   SearchBar,
@@ -27,6 +26,7 @@ import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { useHomeScroll } from "@/src/hooks/ui/useHomeScroll";
+import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useAuthStore } from "@/src/store/authStore";
 import { LinearGradient } from "expo-linear-gradient";
@@ -129,6 +129,7 @@ export const HomeLayout: React.FC = () => {
   );
   const heroHeightRef = useRef(0);
   const { scrollY, handleScroll, stickySearchVisible } = useHomeScroll(heroHeightRef);
+  const { safeAreaBgStyle } = useScrollStatusBar(scrollY);
   const TAB_BAR_HEIGHT = 75 + insets.bottom;
 
   useEffect(() => {
@@ -204,12 +205,13 @@ export const HomeLayout: React.FC = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <HomeStickyHeader scrollY={scrollY} stickySearchVisible={stickySearchVisible} />
+      <Animated.View style={safeAreaBgStyle} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1"
         onScroll={handleCombinedScroll}
         scrollEventThrottle={16}
+        stickyHeaderIndices={[1]}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -243,7 +245,19 @@ export const HomeLayout: React.FC = () => {
             onPressLocation={() => setIsLocationSheetVisible(true)}
           />
           <HeroBanner content={appContent?.hero} isLoading={isHomeLoading} />
-          <Animated.View style={searchBarAnim} className="px-5 -mt-10 z-10 mx-4">
+        </View>
+
+        {/* Child 1: Sticky SearchBar Container */}
+        <View
+          style={{
+            marginTop: -(insets.top + 8) - 40,
+            paddingTop: insets.top + 8,
+            paddingBottom: 16,
+            paddingHorizontal: 16,
+            backgroundColor: "transparent",
+          }}
+        >
+          <Animated.View style={searchBarAnim}>
             <SearchBar
               placeholder="Search medicines & health products"
               useHomeCycler

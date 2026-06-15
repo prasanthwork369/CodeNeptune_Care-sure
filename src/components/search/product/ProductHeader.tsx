@@ -4,8 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { HomeSearchCycler } from "@/src/components/home/sections/HomeSearchCycler";
 import { useNav } from "@/src/hooks/useNav";
 import React from "react";
-import { Text, View } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import { Text, View, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ProductHeaderProps {

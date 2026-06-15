@@ -7,7 +7,6 @@ export { FrequentSubstitutes } from './FrequentSubstitutes';
 export { HeroBanner } from './HeroBanner';
 export { HomeFooter } from './HomeFooter';
 export { HomeHeader } from './HomeHeader';
-export { HomeStickyHeader } from './HomeStickyHeader';
 export { LocationBottomSheet } from './LocationBottomSheet';
 export { PopularSubstitutes } from './PopularSubstitutes';
 export { ProductSection } from './ProductSection';
