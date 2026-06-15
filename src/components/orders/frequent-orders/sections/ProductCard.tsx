@@ -1,5 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { resolveUUID } from "@/src/utils/resolveUUID";
@@ -260,8 +261,8 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
 
       {/* Add to cart — full width */}
       {cartItem ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635', height: 44 }}>
-          <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635', height: CART_BUTTON_HEIGHT }}>
+          <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: 20, color: '#fff', fontFamily: 'Inter-Medium', lineHeight: 24 }}>−</Text>
           </Touchable>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -270,13 +271,13 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
               : <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#fff' }}>{cartItem.quantity}</Text>
             }
           </View>
-          <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+          <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: 20, color: '#fff', fontFamily: 'Inter-Medium', lineHeight: 24 }}>+</Text>
           </Touchable>
         </View>
       ) : (
         <Touchable
-          style={{ height: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F763533', backgroundColor: '#fff' }}
+          style={{ height: CART_BUTTON_HEIGHT, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F763533', backgroundColor: '#fff' }}
           activeOpacity={0.6}
           onPress={handleAddToCart}
           disabled={isAdding}

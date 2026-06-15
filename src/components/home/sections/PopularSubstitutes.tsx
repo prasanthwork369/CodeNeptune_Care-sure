@@ -1,5 +1,6 @@
 import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
+import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { useCartActions } from '@/src/hooks/useCartActions';
 import type { Product } from '@/src/types/home';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -100,15 +101,15 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                             onPress={increment}
                             disabled={isPending}
                             activeOpacity={0.85}
-                            className="rounded-[10px] h-[36px] items-center justify-center bg-white"
-                            style={{ borderWidth: 1, borderColor: ACCENT }}
+                            className="rounded-[10px] items-center justify-center bg-white"
+                            style={{ height: CART_BUTTON_HEIGHT, borderWidth: 1, borderColor: ACCENT }}
                         >
                             <Text style={[s.addBtn, { color: ACCENT }]} className="font-inter-bold">
                                 {isPending ? 'Adding...' : 'Add to Cart'}
                             </Text>
                         </Touchable>
                     ) : (
-                        <View className="flex-row items-center justify-between rounded-[10px] h-[36px]" style={{ backgroundColor: ACCENT }}>
+                        <View className="flex-row items-center justify-between rounded-[10px]" style={{ height: CART_BUTTON_HEIGHT, backgroundColor: ACCENT }}>
                             <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} className="w-9 h-9 items-center justify-center">
                                 <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                             </Touchable>

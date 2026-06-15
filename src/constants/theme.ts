@@ -1,3 +1,8 @@
+import { moderateScale } from "react-native-size-matters";
+
+// Standard height for "Add to Cart" / "+ Add" buttons across product cards
+export const CART_BUTTON_HEIGHT = moderateScale(14, 0.25) * 2.8;
+
 export const colors = {
     // Brand Colors
     primary: "#0F7635",       // Official Caresure Green

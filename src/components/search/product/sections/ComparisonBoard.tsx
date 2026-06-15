@@ -1,6 +1,6 @@
 import { HOME_IMAGES } from '@/src/constants/images';
 import { icons } from '@/src/constants/icons';
-import { colors } from '@/src/constants/theme';
+import { colors, CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
@@ -320,14 +320,15 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({ searched, reco
                                 disabled={isPending}
                                 accessibilityRole="button"
                                 accessibilityLabel={`Add ${recommended.name} to cart`}
-                                className="bg-brand-primary rounded-[10px] py-[12px] items-center justify-center"
+                                className="bg-brand-primary rounded-[10px] items-center justify-center"
+                                style={{ height: CART_BUTTON_HEIGHT }}
                             >
                                 <Text className="text-[15px] font-inter-bold text-white">
                                     {isPending ? 'Adding...' : 'Add'}
                                 </Text>
                             </Touchable>
                         ) : (
-                            <View className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white h-[42px]">
+                            <View className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white" style={{ height: CART_BUTTON_HEIGHT }}>
                                 <Touchable onPress={handleDecrement} disabled={isPending} className="flex-1 items-center justify-center h-full">
                                     <Text className="text-[24px] font-inter-semibold text-brand-text">−</Text>
                                 </Touchable>

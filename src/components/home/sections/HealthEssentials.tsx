@@ -1,5 +1,6 @@
 import { ApiFeaturedSubcategory, ApiFeaturedSubcategoryMetadata } from '@/src/api/category.api';
 import { icons } from '@/src/constants/icons';
+import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { useCartActions } from '@/src/hooks/useCartActions';
 import { formatPackLabel } from '@/src/utils/packLabel';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -110,15 +111,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
                             onPress={increment}
                             disabled={isPending}
                             activeOpacity={0.85}
-                            className="rounded-[10px] h-[36px] items-center  justify-center bg-white"
-                            style={{ borderWidth: 1, borderColor: accentColor }}
+                            className="rounded-[10px] items-center justify-center bg-white"
+                            style={{ height: CART_BUTTON_HEIGHT, borderWidth: 1, borderColor: accentColor }}
                         >
                             <Text style={[s.addBtn, { color: accentColor }]} className="font-inter-bold">
                                 {isPending ? 'Adding...' : 'Add to Cart'}
                             </Text>
                         </Touchable>
                     ) : (
-                        <View className="flex-row items-center justify-between rounded-[10px] h-[36px]" style={{ backgroundColor: accentColor }}>
+                        <View className="flex-row items-center justify-between rounded-[10px]" style={{ height: CART_BUTTON_HEIGHT, backgroundColor: accentColor }}>
                             <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} className="w-9 h-9 items-center justify-center">
                                 <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                             </Touchable>

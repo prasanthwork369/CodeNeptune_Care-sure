@@ -1,5 +1,6 @@
 import { useCartActions } from '@/src/hooks/useCartActions';
 import { useCart } from '@/src/hooks/queries/useCart';
+import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import Carousel from 'react-native-reanimated-carousel';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
@@ -153,15 +154,15 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ productId, medicineUui
                         onPress={handleIncrement}
                         disabled={isPending}
                         activeOpacity={0.85}
-                        className="rounded-[10px] px-8 py-[9px] min-w-[120px] items-center bg-white"
-                        style={{ borderWidth: 1, borderColor: '#0F7635' }}
+                        className="rounded-[10px] px-8 min-w-[120px] items-center justify-center bg-white"
+                        style={{ height: CART_BUTTON_HEIGHT, borderWidth: 1, borderColor: '#0F7635' }}
                     >
                         <Text className="text-[14px] font-inter-bold" style={{ color: '#0F7635' }}>
                             {isPending ? 'Adding...' : 'Add to Cart'}
                         </Text>
                     </Touchable>
                 ) : (
-                    <View className="flex-row items-center justify-between rounded-[10px] h-[42px] w-[120px]" style={{ backgroundColor: '#0F7635' }}>
+                    <View className="flex-row items-center justify-between rounded-[10px] w-[120px]" style={{ height: CART_BUTTON_HEIGHT, backgroundColor: '#0F7635' }}>
                         <Touchable
                             onPress={handleDecrement}
                             disabled={isPending}

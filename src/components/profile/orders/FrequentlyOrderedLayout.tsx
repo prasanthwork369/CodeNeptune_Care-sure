@@ -1,6 +1,7 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { orderStyles as s } from './orders.styles';
 import { icons } from "@/src/constants/icons";
+import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
@@ -323,7 +324,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
         <Touchable
           style={{
             flex: 1,
-            height: 40,
+            height: CART_BUTTON_HEIGHT,
             borderRadius: 8,
             alignItems: "center",
             justifyContent: "center",

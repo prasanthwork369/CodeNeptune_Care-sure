@@ -34,7 +34,7 @@ export const CartFloatingBanner = ({
 }: CartFloatingBannerProps) => {
   const [isClearing, setIsClearing] = useState(false);
   const { totalItems, items, clearCart } = useCart();
-  const { isUploadButtonCollapsed, isTabBarVisible } = useUIStore();
+  const { isUploadButtonCollapsed, isTabBarVisible, setTabBarVisible, setUploadButtonCollapsed } = useUIStore();
   const lastAddedItem =
     [...items].reverse().find((i) => i.image ?? i.metadata?.image) ??
     items[items.length - 1] ??
@@ -105,13 +105,15 @@ export const CartFloatingBanner = ({
     try {
       await triggerRemoveAnimation();
       await clearCart();
+      setTabBarVisible(true);
+      setUploadButtonCollapsed(false);
     } catch (error) {
       console.error("Failed to clear cart:", error);
     } finally {
       setIsClearing(false);
       onInteractionChange?.(false);
     }
-  }, [clearCart, onInteractionChange, triggerRemoveAnimation]);
+  }, [clearCart, onInteractionChange, triggerRemoveAnimation, setTabBarVisible, setUploadButtonCollapsed]);
 
   return (
     <Animated.View style={containerStyle}>

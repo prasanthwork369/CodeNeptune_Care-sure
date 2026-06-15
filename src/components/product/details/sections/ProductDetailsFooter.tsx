@@ -1,5 +1,6 @@
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
+import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { ProductDetailsFooterProps } from "@/src/types/product";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
@@ -92,8 +93,8 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             onPress={increment}
             disabled={isPending}
             activeOpacity={0.85}
-            className="bg-brand-primary rounded-[12px] px-8 py-3.5 items-center justify-center"
-            style={{ minWidth: 140 }}
+            className="bg-brand-primary rounded-[12px] px-8 items-center justify-center"
+            style={{ minWidth: 140, height: CART_BUTTON_HEIGHT }}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#fff" />

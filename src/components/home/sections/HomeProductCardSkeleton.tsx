@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { Skeleton } from '../../ui/Skeleton';
 
 const CardSkeleton = () => {
@@ -30,7 +31,7 @@ const CardSkeleton = () => {
 
             {/* Add to cart button */}
             <View style={{ backgroundColor: '#F2FFF9' }} className="px-3 pb-3 pt-2">
-                <Skeleton width="100%" height={36} borderRadius={10} />
+                <Skeleton width="100%" height={CART_BUTTON_HEIGHT} borderRadius={10} />
             </View>
         </View>
     );

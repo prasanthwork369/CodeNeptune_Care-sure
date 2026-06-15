@@ -46,7 +46,9 @@ const ScrollingColumn = ({
     <Animated.View style={animatedStyle} className="mx-2">
       {[...images, ...images, ...images].map((img, idx) => {
         const bgColor =
-          colors.pastels[(idx + colorOffset) % colors.pastels.length];
+          colors.pastels[
+            ((idx % images.length) + colorOffset) % colors.pastels.length
+          ];
         return (
           <View
             key={idx}
@@ -80,7 +82,7 @@ const ScrollingColumn = ({
 
 export const AuthMedicineBackground = () => {
   return (
-    <View className="flex-row justify-center h-full overflow-hidden bg-slate-50">
+    <View className="flex-row justify-center h-full overflow-hidden bg-white">
       <View className="mt-10 mx-1">
         <ScrollingColumn
           images={MEDICINE_COLUMNS.column1}
