@@ -205,7 +205,14 @@ export const HomeLayout: React.FC = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <Animated.View style={safeAreaBgStyle} />
+      <Animated.View style={safeAreaBgStyle}>
+        <LinearGradient
+          colors={["#DEF5B0", "#EAF9D1", "#F6FDF0"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={{ flex: 1 }}
+        />
+      </Animated.View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1"

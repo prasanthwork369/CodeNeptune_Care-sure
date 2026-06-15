@@ -23,7 +23,6 @@ export const useScrollStatusBar = (scrollY: SharedValue<number>) => {
       left: 0,
       right: 0,
       height: insets.top + 8.5,
-      backgroundColor: "white",
       zIndex: 101,
     };
   });
