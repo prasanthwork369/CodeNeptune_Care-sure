@@ -4,6 +4,7 @@ import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
+import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -28,6 +29,10 @@ export function usePaymentCalculations() {
     symptoms?: string;
     patientPhone?: string;
   }>();
+
+  const prescriptionOrderItems = usePrescriptionOrderStore((s) => s.items);
+  const clearPrescriptionOrder = usePrescriptionOrderStore((s) => s.clear);
+  const isPrescriptionFlow = prescriptionOrderItems.length > 0;
 
   const {
     bill,
@@ -82,22 +87,38 @@ export function usePaymentCalculations() {
       return;
     }
 
+    const orderItems = isPrescriptionFlow
+      ? prescriptionOrderItems.map((i) => ({
+          medicineId: i.medicineId,
+          quantity: i.quantity,
+          unitPrice: String(i.unitPrice),
+          medicineSnapshot: {
+            name: i.medicineName,
+            slug: i.medicineSlug,
+            productId: i.productId ?? undefined,
+            image: i.image ?? undefined,
+            mrp: i.mrp,
+            requiresPrescription: true,
+          },
+        }))
+      : cartItems.map((i) => ({
+          medicineId: i.medicineId,
+          quantity: i.quantity,
+          unitPrice: String(i.unitPrice),
+          medicineSnapshot: {
+            name: i.medicineName,
+            slug: i.medicineSlug,
+            productId: i.productId ?? i.metadata?.productId ?? undefined,
+            image: i.image ?? i.metadata?.image ?? undefined,
+            brand: i.metadata?.brand ?? undefined,
+            pack: i.metadata?.pack ?? undefined,
+            mrp: i.metadata?.mrp ?? undefined,
+            requiresPrescription: i.requiresPrescription,
+          },
+        }));
+
     const payload = {
-      items: cartItems.map((i) => ({
-        medicineId: i.medicineId,
-        quantity: i.quantity,
-        unitPrice: String(i.unitPrice),
-        medicineSnapshot: {
-          name: i.medicineName,
-          slug: i.medicineSlug,
-          productId: i.productId ?? i.metadata?.productId ?? undefined,
-          image: i.image ?? i.metadata?.image ?? undefined,
-          brand: i.metadata?.brand ?? undefined,
-          pack: i.metadata?.pack ?? undefined,
-          mrp: i.metadata?.mrp ?? undefined,
-          requiresPrescription: i.requiresPrescription,
-        },
-      })),
+      items: orderItems,
       deliveryAddress: {
         name: defaultAddress.name,
         phone: defaultAddress.phone,
@@ -111,10 +132,9 @@ export function usePaymentCalculations() {
       subtotal: String(
         Number(
           bill?.subtotal ??
-            cartItems.reduce(
-              (s, i) => s + parseFloat(String(i.unitPrice)) * i.quantity,
-              0,
-            ),
+            (isPrescriptionFlow
+              ? prescriptionOrderItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0)
+              : cartItems.reduce((s, i) => s + parseFloat(String(i.unitPrice)) * i.quantity, 0)),
         ).toFixed(2),
       ),
       deliveryCharge: String(billBreakdown.deliveryFee),
@@ -147,6 +167,7 @@ export function usePaymentCalculations() {
       const order: any = await createOrder(payload);
       removeCoupon();
       clearCheckout();
+      clearPrescriptionOrder();
       router.replace({
         pathname: "/(modal)/order-success",
         params: { orderId: order?.id ?? "", total: toPay },

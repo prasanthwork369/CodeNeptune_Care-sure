@@ -21,10 +21,10 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionBannerStore } from "@/src/store/prescriptionBannerStore";
+import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
-    Alert,
     Image,
     ScrollView,
     Text,
@@ -32,7 +32,6 @@ import {
     useWindowDimensions
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AlreadyHaveItemsModal } from "./AlreadyHaveItemsModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -522,17 +521,10 @@ export const MedicineComparisonLayout: React.FC<
   const { width } = useWindowDimensions();
   const cardWidth = width - 32;
 
-  const {
-    items: cartItems,
-    addItem,
-    updateItem,
-    clearCart,
-    totalItems,
-  } = useCart();
+  const { totalItems } = useCart();
   const { markVerifiedBannerCompleted, isVerifiedBannerCompleted } =
     usePrescriptionBannerStore();
-  const [isCartModalVisible, setIsCartModalVisible] = useState(false);
-  const [isProceeding, setIsProceeding] = useState(false);
+  const setPrescriptionOrderItems = usePrescriptionOrderStore((s) => s.setItems);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [walletOn, setWalletOn] = useState(false);
@@ -601,62 +593,30 @@ export const MedicineComparisonLayout: React.FC<
   ];
   const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
 
-  const handleProceed = async () => {
-    if (isProceeding) return;
-    if (totalItems > 0) {
-      setIsCartModalVisible(true);
-    } else {
-      await addItemsToCart(false);
+  const handleProceed = () => {
+    if (prescriptionId && !isVerifiedBannerCompleted(prescriptionId)) {
+      markVerifiedBannerCompleted(prescriptionId);
     }
-  };
-
-  const addItemsToCart = async (replaceCart: boolean) => {
-    setIsProceeding(true);
-    try {
-      if (replaceCart) await clearCart();
-
-      for (const item of medicines ?? []) {
-        const qty = item.quantity || 1;
-        const existingItem = !replaceCart
-          ? cartItems.find((i) => i.medicineId === item.recommended.id)
-          : null;
-        if (existingItem) {
-          await updateItem(existingItem.id, {
-            quantity: existingItem.quantity + qty,
-          });
-        } else {
-          await addItem({
-            medicineId: item.recommended.id,
-            variantId: null,
-            medicineName: item.recommended.name,
-            medicineSlug: item.recommended.slug,
-            unitPrice: item.recommended.price,
-            mrp: item.recommended.mrp,
-            discountPercent: item.recommended.discountPercent,
-            quantity: qty,
-            requiresPrescription: false,
-            image: item.recommended.image,
-            metadata: {
-              ...(item.recommended.productId
-                ? { productId: item.recommended.productId }
-                : {}),
-            },
-          });
-        }
-      }
-
-      if (prescriptionId && !isVerifiedBannerCompleted(prescriptionId)) {
-        markVerifiedBannerCompleted(prescriptionId);
-      }
-
-      setIsCartModalVisible(false);
-      router.replace("/(modal)/cart");
-    } catch (error) {
-      console.error("Failed to update cart:", error);
-      Alert.alert("Error", "Failed to add items to cart. Please try again.");
-    } finally {
-      setIsProceeding(false);
-    }
+    setPrescriptionOrderItems(
+      (medicines ?? []).map((item) => ({
+        medicineId: item.recommended.id,
+        medicineName: item.recommended.name,
+        medicineSlug: item.recommended.slug,
+        unitPrice: item.recommended.price,
+        mrp: item.recommended.mrp,
+        discountPercent: item.recommended.discountPercent,
+        quantity: item.quantity || 1,
+        image: typeof item.recommended.image === "string" ? item.recommended.image : null,
+        productId: item.recommended.productId ?? null,
+      }))
+    );
+    router.push({
+      pathname: "/(prescription)/select-patient",
+      params: {
+        toPay: toPay.toFixed(2),
+        prescriptionId: prescriptionId ?? "",
+      },
+    });
   };
 
   return (
@@ -840,14 +800,6 @@ export const MedicineComparisonLayout: React.FC<
         deliveryFee={0}
         handlingCharge={0}
         toPay={toPay}
-      />
-
-      <AlreadyHaveItemsModal
-        visible={isCartModalVisible}
-        onClose={() => setIsCartModalVisible(false)}
-        onAdd={() => addItemsToCart(false)}
-        onReplace={() => addItemsToCart(true)}
-        isProceeding={isProceeding}
       />
 
       <LocationBottomSheet
