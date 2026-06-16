@@ -39,6 +39,7 @@ const toComparisonMedicines = (items: ApiPrescriptionOrderItem[]): ComparisonMed
                 ? Math.round(item.recommended.discount)
                 : calcDiscount(item.recommended.mrp, item.recommended.sellingPrice),
         },
+        quantity: item.recommendationMedicineQuantity || item.medicineQuantity || 1,
     }));
 
 export const usePrescriptionOrderMedicines = (orderId: string) => {

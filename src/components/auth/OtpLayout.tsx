@@ -126,7 +126,13 @@ export const OtpLayout: React.FC = () => {
   };
 
   const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
+    if (e.nativeEvent.key !== "Backspace") return;
+    if (otp[index]) {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+      if (index > 0) inputRefs.current[index - 1]?.focus();
+    } else if (index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };

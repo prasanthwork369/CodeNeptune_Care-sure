@@ -2,7 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { OtpFormProps } from "@/src/types/auth";
 import React, { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { styles as s } from "./OtpForm.styles";
 
 export const OtpForm: React.FC<OtpFormProps> = ({
@@ -22,11 +22,12 @@ export const OtpForm: React.FC<OtpFormProps> = ({
     <View>
       <View className="flex-row justify-between px-1" style={s.boxRow}>
         {otp.map((digit, index) => (
-          <View
+          <Pressable
             key={index}
+            onPress={() => inputRefs.current[index]?.focus()}
             className="w-[14%] aspect-square rounded-lg bg-white items-center justify-center"
             style={{
-              borderWidth: 1,
+              borderWidth: focusedIndex === index ? 2 : 1,
               borderColor: otpError || error ? "#EF4444" : focusedIndex === index ? "#0F7635" : "#919EAB22",
             }}
           >
@@ -46,13 +47,13 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               accessibilityLabel={`OTP digit ${index + 1}`}
               selectTextOnFocus={false}
               contextMenuHidden
-              caretHidden={false}
+              caretHidden={true}
               autoCorrect={false}
               spellCheck={false}
               cursorColor="#0F7635"
               style={s.otpInput}
             />
-          </View>
+          </Pressable>
         ))}
       </View>
 
