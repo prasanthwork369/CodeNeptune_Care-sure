@@ -225,29 +225,36 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       });
+      const numberMatch = place?.name?.match(/^(\d+)/);
+      const line1 = numberMatch ? numberMatch[1] : "";
+      const buildingName = place?.name?.replace(/^\d+[,\s]*/, "").trim() || "";
+      const line2 = [
+        buildingName,
+        place?.street,
+        place?.district ?? place?.subregion,
+      ]
+        .filter(Boolean)
+        .join(", ");
       const city = place?.city || place?.subregion || place?.region || "";
+      const state = place?.region || "";
       const pincode = place?.postalCode
         ? place.postalCode.replace(/\D/g, "").slice(0, 6)
         : "";
-
-      if (!pincode || !/^\d{6}$/.test(pincode)) {
-        showToast("Could not detect a valid pincode for your location.", "warning");
-        return;
-      }
-
-      const result = await checkServiceability(pincode);
-      if (!result.serviceable) {
-        showToast(`Sorry, we don't deliver to ${pincode} yet.`, "error");
-        return;
-      }
-
-      const displayCity = city || "Current Location";
-      setLocation({ label: displayCity, city: displayCity }, { pincode });
-      onSelect?.(displayCity, displayCity);
-      showToast(`Location set to ${displayCity} - ${pincode}`, "success");
+      const params: Record<string, string> = {};
+      if (line1) params.prefill_line1 = line1;
+      if (line2) params.prefill_line2 = line2;
+      if (city) params.prefill_city = city;
+      if (state) params.prefill_state = state;
+      if (pincode) params.prefill_pincode = pincode;
       handleClose();
+      setTimeout(() => {
+        router.push({ pathname: "/profile/addresses/add" as any, params });
+      }, 500);
     } catch {
-      showToast("Could not fetch location. Please try again.", "error");
+      Alert.alert(
+        "Could not fetch location",
+        "Please check that location services are enabled and try again.",
+      );
     } finally {
       setIsLocating(false);
     }
