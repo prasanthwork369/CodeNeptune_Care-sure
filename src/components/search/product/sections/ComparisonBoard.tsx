@@ -270,8 +270,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
           {/* Status Slot Container at the bottom (aligned with Add Button) */}
           <View
-            className="px-[12px] pb-[8px] pt-0"
-            style={{ height: 54, justifyContent: "center" }}
+            className="px-[12px] pb-[8px] pt-[8px]"
+            style={{ height: 62, justifyContent: "center" }}
           >
             <Text className="text-[12px] font-inter-semibold text-[#EF4444]">
               {searched.status}
@@ -312,7 +312,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             <View
               style={{ width: cardWidth }}
               onLayout={(e) => {
-                const h = e.nativeEvent.layout.height + 54;
+                const h = e.nativeEvent.layout.height + 62;
                 if (h !== boardHeight) setBoardHeight(h);
               }}
             >
@@ -488,7 +488,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               style={{
                 paddingHorizontal: 12,
                 paddingBottom: 8,
-                paddingTop: 0,
+                paddingTop: 8,
               }}
             >
               {count === 0 ? (
