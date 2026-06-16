@@ -130,30 +130,34 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       const get = (type: string) =>
         components.find((c: any) => c.types.includes(type))?.long_name ?? "";
 
+      const streetNumber = get("street_number");
+      const route = get("route");
+      const sublocality = get("sublocality_level_1") || get("sublocality") || get("neighborhood");
       const city =
         get("locality") ||
         get("administrative_area_level_2") ||
-        get("sublocality_level_1") ||
-        get("sublocality");
+        sublocality;
+      const state = get("administrative_area_level_1");
       const pincode = get("postal_code").replace(/\D/g, "").slice(0, 6);
 
-      if (!pincode || !/^\d{6}$/.test(pincode)) {
-        showToast("Could not find a valid pincode for this location.", "warning");
-        return;
-      }
+      const line2Parts = [
+        prediction.description.split(",")[0],
+        route,
+        sublocality,
+      ].filter(Boolean);
+      const line2 = [...new Set(line2Parts)].join(", ");
 
-      const serviceability = await checkServiceability(pincode);
-      if (!serviceability.serviceable) {
-        showToast(`Pincode ${pincode} is not serviceable.`, "error");
-        return;
-      }
+      const params: Record<string, string> = {};
+      if (streetNumber) params.prefill_line1 = streetNumber;
+      if (line2) params.prefill_line2 = line2;
+      if (city) params.prefill_city = city;
+      if (state) params.prefill_state = state;
+      if (pincode) params.prefill_pincode = pincode;
 
-      const areaLabel = prediction.description.split(",")[0];
-      const displayCity = city || areaLabel;
-      setLocation({ label: displayCity, city: displayCity }, { pincode });
-      onSelect?.(displayCity, displayCity);
-      showToast(`Location set to ${displayCity} - ${pincode}`, "success");
       handleClose();
+      setTimeout(() => {
+        router.push({ pathname: "/profile/addresses/add" as any, params });
+      }, 500);
     } catch {
       showToast("Failed to get location details. Please try again.", "error");
     } finally {
