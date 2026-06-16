@@ -69,6 +69,10 @@ export const HOME_IMAGES = {
   chemical: require("../../assets/images/cart/chemical.png"),
   medicine: require("../../assets/images/cart/medicine-icon.png"),
   deliveryBox: require("../../assets/images/cart/delivery-box.png"),
+  clockIcon: require("../../assets/images/cart/clock-icon.png"),
+  couponIcon: require("../../assets/images/cart/coupon-icon.png"),
+  couponRibbon: require("../../assets/images/cart/coupon-ribbon.png"),
+  discountTag: require("../../assets/images/cart/discount-tag.png"),
 
   // Company Logos
   ciplaLogo: require("../../assets/images/branding/cipla-logo.png"),

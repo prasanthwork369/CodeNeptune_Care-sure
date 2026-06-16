@@ -1,6 +1,23 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { CustomSwitch } from '@/src/components/ui/CustomSwitch';
+import { CartDeliveringTo } from '@/src/components/cart/sections/CartDeliveringTo';
+import { CartFooter } from '@/src/components/cart/sections/CartFooter';
+import { CartCouponSection } from '@/src/components/cart/sections/CartCouponSection';
+import { CartWalletSection } from '@/src/components/cart/sections/CartWalletSection';
+import { CartCoinsSection } from '@/src/components/cart/sections/CartCoinsSection';
+import { CartBillSummary } from '@/src/components/cart/sections/CartBillSummary';
+import { CartSavingsBreakdown } from '@/src/components/cart/sections/CartSavingsBreakdown';
+import { CartTerms } from '@/src/components/cart/sections/CartTerms';
+import { BillDetailsSheet } from '@/src/components/cart/BillDetailsSheet';
+import { LocationBottomSheet } from '@/src/components/home/sections/LocationBottomSheet';
 import { icons } from '@/src/constants/icons';
+import { HOME_IMAGES } from '@/src/constants/images';
+import { useAddress } from '@/src/hooks/queries/useAddress';
+import { useWalletBalance } from '@/src/hooks/queries/useWallet';
+import { useCartWalletSettings } from '@/src/hooks/queries/useSettings';
+import { useLocationStore } from '@/src/store/locationStore';
+import { useCouponStore } from '@/src/store/couponStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
 import React, { useState } from 'react';
@@ -49,16 +66,64 @@ interface MedicineComparisonLayoutProps {
     prescriptionId?: string;
 }
 
-// ─── Comparison Card ─────────────────────────────────────────────────────────
+// ─── Savings Banner ───────────────────────────────────────────────────────────
+
+const SavingsBanner: React.FC<{ amount: number }> = ({ amount }) => (
+    <LinearGradient
+                    colors={['#D0EBFE', '#D7FFEA']} 
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={{
+            marginHorizontal: 16,
+            marginTop: 12,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: '#D0EBFE',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+            gap: 10,
+        }}
+    >
+        <Image source={HOME_IMAGES.discountTag} style={{ width: 32, height: 32 }} resizeMode="contain" />
+        <Text style={{ fontSize: 14, fontFamily: 'Inter-SemiBold', color: '#0A0A0A' }}>
+            {'You saved  '}
+            <Text style={{ fontFamily: 'Inter-ExtraBold' }}>₹{Number(amount).toFixed(0)}</Text>
+            {' on this Order'}
+        </Text>
+    </LinearGradient>
+);
+
+// ─── Refill Reminder ──────────────────────────────────────────────────────────
+
+const RefillReminder: React.FC<{ value: boolean; onToggle: (v: boolean) => void }> = ({ value, onToggle }) => (
+    <View style={{ marginHorizontal: 16, marginTop: 12, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33', paddingHorizontal: 16, paddingTop: 14, paddingBottom: value ? 10 : 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image source={HOME_IMAGES.clockIcon} style={{ width: 36, height: 36 }} resizeMode="contain" />
+            <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#111827' }}>Refill Reminder</Text>
+                <Text style={{ fontSize: 12, fontFamily: 'Inter-Medium', color: '#6B7280', marginTop: 2 }}>Never miss your medicines</Text>
+            </View>
+            <CustomSwitch value={value} onValueChange={onToggle} />
+        </View>
+        {value && (
+            <Text style={{ fontSize: 12, fontFamily: 'Inter-Medium', color: '#6B7280', marginTop: 10 }}>
+                We'll send your reminder in 7 days
+            </Text>
+        )}
+    </View>
+);
+
+// ─── Comparison Card ──────────────────────────────────────────────────────────
 
 interface ComparisonCardProps {
     item: ComparisonMedicine;
     cardWidth: number;
     count: number;
-    onCountChange: (count: number) => void;
 }
 
-const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count, onCountChange }) => {
+const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count }) => {
     const colWidth = cardWidth / 2;
 
     return (
@@ -75,11 +140,11 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count,
                 {item.saltComposition}
             </Text>
 
-            {/* Gradient two-column body */}
+            {/* Two-column body */}
             <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#E5E7EB' }}>
+
                 {/* Left — Prescribed */}
                 <View style={{ width: colWidth, padding: 12, flexDirection: 'column', justifyContent: 'space-between', backgroundColor: '#fff' }}>
-                    {/* Top info */}
                     <View>
                         <View style={{ borderRadius: 10, borderWidth: 1, borderColor: '#E5E7EB', height: 90, alignItems: 'center', justifyContent: 'center', marginBottom: 10, backgroundColor: '#F9FAFB', overflow: 'hidden' }}>
                             {item.prescribed.image
@@ -97,29 +162,35 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count,
                             {item.prescribed.packSize}
                         </Text>
                     </View>
-                    {/* Bottom price */}
                     <View style={{ marginTop: 14 }}>
                         <Text style={{ fontSize: 11, fontFamily: 'Inter-Medium', color: '#6B7280', marginBottom: 2 }}>MRP</Text>
                         <Text style={{ fontSize: 20, fontFamily: 'Inter-ExtraBold', color: '#111827' }}>
-                            ₹{Number(item.prescribed.mrp).toFixed(2)}
+                            ₹{Number(item.prescribed.mrp).toFixed(1)}
                         </Text>
                     </View>
                 </View>
 
-                {/* Right — Recommendation */}
+                {/* Right — Recommended */}
                 <LinearGradient
                     colors={['#EDFFC5', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 0, y: 1 }}
                     style={{ width: colWidth, padding: 12, flexDirection: 'column', justifyContent: 'space-between' }}
                 >
-                    {/* Top info */}
                     <View>
-                        <View style={{ borderRadius: 10, borderWidth: 1, borderColor: '#C6F0A0', height: 90, alignItems: 'center', justifyContent: 'center', marginBottom: 10, backgroundColor: '#F0FAE8', overflow: 'hidden' }}>
+                        {/* Image with absolute discount badge */}
+                        <View style={{ position: 'relative', borderRadius: 10, borderWidth: 1, borderColor: '#C6F0A0', height: 90, alignItems: 'center', justifyContent: 'center', marginBottom: 10, backgroundColor: '#F0FAE8', overflow: 'hidden' }}>
                             {item.recommended.image
                                 ? <Image source={item.recommended.image} style={{ width: '80%', height: '80%' }} resizeMode="contain" />
                                 : <icons.placeholder width="70%" height="70%" />
                             }
+                            {item.recommended.discountPercent > 0 && (
+                                <View style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#0F7635', borderTopRightRadius: 10, borderBottomLeftRadius: 8, paddingHorizontal: 6, paddingVertical: 3 }}>
+                                    <Text style={{ fontSize: 10, fontFamily: 'Inter-Bold', color: '#fff' }}>
+                                        {item.recommended.discountPercent}% OFF
+                                    </Text>
+                                </View>
+                            )}
                         </View>
                         <Text style={{ fontSize: 13, fontFamily: 'Inter-Bold', color: '#0F7635', lineHeight: 18, marginBottom: 3 }} numberOfLines={2}>
                             {item.recommended.name}
@@ -131,35 +202,24 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({ item, cardWidth, count,
                             {item.recommended.packSize}
                         </Text>
                     </View>
-                    {/* Bottom price + badge + counter */}
+
+                    {/* Price + qty display */}
                     <View style={{ marginTop: 14 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                             <Text style={{ fontSize: 16, fontFamily: 'Inter-ExtraBold', color: '#111827' }}>
-                                ₹{Number(item.recommended.price).toFixed(2)}
+                                ₹{Number(item.recommended.price).toFixed(1)}
                             </Text>
                             {item.recommended.mrp > item.recommended.price && (
                                 <Text style={{ fontSize: 11, fontFamily: 'Inter-Medium', color: '#9CA3AF', textDecorationLine: 'line-through' }}>
-                                    MRP ₹{Number(item.recommended.mrp).toFixed(2)}
+                                    MRP ₹{Number(item.recommended.mrp).toFixed(1)}
                                 </Text>
                             )}
                         </View>
-                        {item.recommended.discountPercent > 0 && (
-                            <View style={{ backgroundColor: '#0F7635', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-start', marginBottom: 10 }}>
-                                <Text style={{ fontSize: 11, fontFamily: 'Inter-Bold', color: '#fff' }}>
-                                    {item.recommended.discountPercent}% OFF
-                                </Text>
-                            </View>
-                        )}
-                        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#fff', height: 40 }}>
-                            <Touchable onPress={() => onCountChange(Math.max(1, count - 1))} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                <Text style={{ fontSize: 22, fontFamily: 'Inter-SemiBold', color: '#111827' }}>−</Text>
-                            </Touchable>
-                            <Text style={{ fontSize: 15, fontFamily: 'Inter-Bold', color: '#111827', width: 28, textAlign: 'center' }}>
-                                {count}
+                        {/* Qty display — non-editable */}
+                        <View style={{ borderRadius: 12, borderWidth: 1.5, borderColor: '#86C9A0', backgroundColor: '#F7FFF9', height: 42, alignItems: 'center', justifyContent: 'center', marginTop: 8 }}>
+                            <Text style={{ fontSize: 15, fontFamily: 'Inter-Bold', color: '#111827' }}>
+                                Qty {count}
                             </Text>
-                            <Touchable onPress={() => onCountChange(count + 1)} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                <Text style={{ fontSize: 20, fontFamily: 'Inter-SemiBold', color: '#111827' }}>+</Text>
-                            </Touchable>
                         </View>
                     </View>
                 </LinearGradient>
@@ -178,20 +238,56 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
 
     const { items: cartItems, addItem, updateItem, clearCart, totalItems } = useCart();
     const { markVerifiedBannerCompleted, isVerifiedBannerCompleted } = usePrescriptionBannerStore();
-    const [selectedCounts, setSelectedCounts] = useState<Record<string, number>>({});
     const [isCartModalVisible, setIsCartModalVisible] = useState(false);
     const [isProceeding, setIsProceeding] = useState(false);
+    const [showLocationSheet, setShowLocationSheet] = useState(false);
+    const [showBillDetails, setShowBillDetails] = useState(false);
+    const [walletOn, setWalletOn] = useState(false);
+    const [coinsOn, setCoinsOn] = useState(false);
+    const [refillOn, setRefillOn] = useState(false);
 
-    const getCount = (medicineId: string) => selectedCounts[medicineId] ?? 1;
+    // Delivery location
+    const storeLocation = useLocationStore(s => s.location);
+    const { addresses } = useAddress();
+    const defaultAddress = addresses.find(a => a.isDefault) ?? addresses[0] ?? null;
+    const deliveryLabel = storeLocation?.label ?? defaultAddress?.label ?? 'Address';
+    const deliveryDescription =
+        storeLocation?.city ??
+        [defaultAddress?.line1, defaultAddress?.line2, defaultAddress?.city].filter(Boolean).join(', ') ??
+        'No address saved';
 
-    const handleCountChange = (medicineId: string, count: number) => {
-        setSelectedCounts(prev => ({
-            ...prev,
-            [medicineId]: count
-        }));
-    };
+    // Wallet & coins
+    const { balance } = useWalletBalance();
+    const { data: settings } = useCartWalletSettings();
+    const walletBalance = balance != null ? Number(balance.walletBalance) : 0;
+    const availableCoins = balance?.coinsBalance ?? 0;
+    const coinValue = settings?.wallet?.coinValueInRupees ?? 1;
+    const coinLimitPct = settings?.wallet?.coinUsagePercentage ?? 10;
+
+    // Coupon
+    const { applied: appliedCoupon, remove: removeCoupon } = useCouponStore();
+
+    // Pricing — qty fixed at 1 per recommended medicine
+    const subtotal = (medicines ?? []).reduce((sum, item) => sum + item.recommended.price, 0);
+    const mrpTotal = (medicines ?? []).reduce((sum, item) => sum + item.recommended.mrp, 0);
+    const productSavings = Math.max(0, mrpTotal - subtotal);
+    const COUPON_DISCOUNT = appliedCoupon ? Math.min(Number(appliedCoupon.discount) || 0, subtotal) : 0;
+    const maxCoinsUsable = Math.min(availableCoins, (subtotal * (coinLimitPct / 100)) / coinValue);
+    const COINS_DISCOUNT = coinsOn ? Math.round(Math.floor(maxCoinsUsable) * coinValue * 10) / 10 : 0;
+    const subtotalBeforeWallet = Math.max(subtotal - COUPON_DISCOUNT - COINS_DISCOUNT, 0);
+    const WALLET_DISCOUNT = walletOn ? Math.round(Math.min(walletBalance, subtotalBeforeWallet) * 10) / 10 : 0;
+    const toPay = Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0);
+
+    const savingsRows = [
+        { label: 'Product Discount', value: productSavings },
+        { label: 'Coupon Discount', value: COUPON_DISCOUNT },
+        { label: 'CareSure Wallet', value: WALLET_DISCOUNT },
+        { label: 'CareSure Coins', value: COINS_DISCOUNT },
+    ];
+    const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
 
     const handleProceed = async () => {
+        if (isProceeding) return;
         if (totalItems > 0) {
             setIsCartModalVisible(true);
         } else {
@@ -202,19 +298,12 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
     const addItemsToCart = async (replaceCart: boolean) => {
         setIsProceeding(true);
         try {
-            if (replaceCart) {
-                await clearCart();
-            }
-            
-            const selectedItems = medicines ?? [];
-            for (const item of selectedItems) {
-                const qty = getCount(item.recommended.id);
+            if (replaceCart) await clearCart();
 
-                // Check if item is already in cart to avoid duplicate POST validation error
+            for (const item of medicines ?? []) {
                 const existingItem = !replaceCart ? cartItems.find(i => i.medicineId === item.recommended.id) : null;
-                
                 if (existingItem) {
-                    await updateItem(existingItem.id, { quantity: existingItem.quantity + qty });
+                    await updateItem(existingItem.id, { quantity: existingItem.quantity + 1 });
                 } else {
                     await addItem({
                         medicineId: item.recommended.id,
@@ -224,7 +313,7 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
                         unitPrice: item.recommended.price,
                         mrp: item.recommended.mrp,
                         discountPercent: item.recommended.discountPercent,
-                        quantity: qty,
+                        quantity: 1,
                         requiresPrescription: false,
                         image: item.recommended.image,
                         metadata: {
@@ -234,8 +323,6 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
                 }
             }
 
-            // First successful "Add to Cart" from this screen permanently
-            // completes the verified banner — it must never reappear after this.
             if (prescriptionId && !isVerifiedBannerCompleted(prescriptionId)) {
                 markVerifiedBannerCompleted(prescriptionId);
             }
@@ -272,58 +359,107 @@ export const MedicineComparisonLayout: React.FC<MedicineComparisonLayoutProps> =
                 }
             />
 
-            {/* Tab labels — display only */}
-            <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' }}>
+            {/* Delivery bar */}
+            <CartDeliveringTo
+                label={deliveryLabel}
+                description={deliveryDescription}
+                onChange={() => setShowLocationSheet(true)}
+            />
+
+            {/* Savings banner */}
+            {totalSavings > 0 && <SavingsBanner amount={totalSavings} />}
+
+            {/* Tab header */}
+            <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#E5E7EB', marginTop: 12 }}>
                 <View style={{ flex: 1, paddingVertical: 12, alignItems: 'center', backgroundColor: '#fff' }}>
                     <Text style={{ fontSize: 13, fontFamily: 'Inter-Medium', color: '#6B7280' }}>
                         Medicine in Prescription
                     </Text>
                 </View>
-                <View style={{ flex: 1, paddingVertical: 12, alignItems: 'center', backgroundColor: '#E4F5ED' }}>
+                <View style={{ flex: 1, paddingVertical: 12, alignItems: 'center', backgroundColor: '#E8F5EC' }}>
                     <Text style={{ fontSize: 13, fontFamily: 'Inter-SemiBold', color: '#0F7635' }}>
                         Our Recommendation
                     </Text>
                 </View>
             </View>
 
-            {/* Cards */}
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ padding: 16, paddingBottom: bottom + 90 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: bottom + 100 }}
             >
+                {/* Comparison cards */}
                 {(medicines ?? []).map((item) => (
                     <ComparisonCard
                         key={item.id}
                         item={item}
                         cardWidth={cardWidth}
-                        count={getCount(item.recommended.id)}
-                        onCountChange={(count) => handleCountChange(item.recommended.id, count)}
+                        count={1}
                     />
                 ))}
+
+                {/* Refill Reminder */}
+                <RefillReminder value={refillOn} onToggle={setRefillOn} />
+
+                {/* Coupons */}
+                <CartCouponSection appliedCoupon={appliedCoupon} onRemove={removeCoupon} />
+
+                {/* Wallet */}
+                <CartWalletSection value={walletOn} walletBalance={walletBalance} onToggle={setWalletOn} />
+
+                {/* Coins */}
+                <CartCoinsSection
+                    value={coinsOn}
+                    availableCoins={availableCoins}
+                    redeemedCoins={coinsOn ? Math.floor(maxCoinsUsable) : 0}
+                    onToggle={() => setCoinsOn(v => !v)}
+                    onInfoPress={() => {}}
+                />
+
+                {/* Total Bill */}
+                <CartBillSummary
+                    mrpTotal={mrpTotal}
+                    toPay={toPay}
+                    onPress={() => setShowBillDetails(true)}
+                />
+
+                {/* Savings Breakdown */}
+                {totalSavings > 0 && (
+                    <CartSavingsBreakdown totalSavings={totalSavings} rows={savingsRows} />
+                )}
+
+                {/* Terms */}
+                <CartTerms />
             </ScrollView>
 
-            {/* Proceed to Cart */}
-            <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 16, paddingBottom: Math.max(bottom, 16) + 4, paddingTop: 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#E5E7EB' }}>
-                <Touchable
-                    onPress={handleProceed}
-                    disabled={isProceeding}
-                    activeOpacity={0.85}
-                    style={{ backgroundColor: isProceeding ? '#6B7280' : '#0F7635', borderRadius: 14, paddingVertical: 18, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
-                >
-                    {isProceeding && <ActivityIndicator size="small" color="#fff" />}
-                    <Text style={{ fontSize: 15, fontFamily: 'Inter-SemiBold', color: '#fff' }}>
-                        {isProceeding ? 'Adding to Cart...' : 'Proceed to Cart'}
-                    </Text>
-                </Touchable>
-            </View>
+            {/* Footer */}
+            <CartFooter toPay={toPay} safeAreaBottom={bottom} onProceed={handleProceed} />
 
-            {/* Already Have Items Modal */}
+            {/* Sheets & Modals */}
+            <BillDetailsSheet
+                isVisible={showBillDetails}
+                onClose={() => setShowBillDetails(false)}
+                linesCount={medicines?.length ?? 0}
+                mrpTotal={mrpTotal}
+                productSavings={productSavings}
+                couponDiscount={COUPON_DISCOUNT}
+                walletDiscount={WALLET_DISCOUNT}
+                coinsDiscount={COINS_DISCOUNT}
+                deliveryFee={0}
+                handlingCharge={0}
+                toPay={toPay}
+            />
+
             <AlreadyHaveItemsModal
                 visible={isCartModalVisible}
                 onClose={() => setIsCartModalVisible(false)}
                 onAdd={() => addItemsToCart(false)}
                 onReplace={() => addItemsToCart(true)}
                 isProceeding={isProceeding}
+            />
+
+            <LocationBottomSheet
+                isVisible={showLocationSheet}
+                onClose={() => setShowLocationSheet(false)}
             />
         </View>
     );
