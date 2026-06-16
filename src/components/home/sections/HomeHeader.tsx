@@ -13,6 +13,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNav } from '@/src/hooks/useNav';
 import { useNotificationStore } from '@/src/store/notificationStore';
+import { useNotifications } from '@/src/hooks/queries/useNotifications';
 import { usePrescriptionBanner } from '@/src/hooks/ui/usePrescriptionBanner';
 
 const NotificationIcon = icons.notification;
@@ -29,10 +30,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({ location, onPressLocatio
     const { balance } = useWalletBalance();
     const { latestPrescription, hasPendingPrescription } = usePrescriptionBanner();
 
-    const { lastSeenRxId, lastSeenRxStatus, unreadCount: unreadNotificationsCount } = useNotificationStore();
+    const { lastSeenRxId, lastSeenRxStatus } = useNotificationStore();
+    const { unreadCount: apiUnreadCount } = useNotifications();
     const isRxUnread = hasPendingPrescription && latestPrescription
         && (latestPrescription.id !== lastSeenRxId || latestPrescription.status !== lastSeenRxStatus);
-    const unreadCount = unreadNotificationsCount + (isRxUnread ? 1 : 0);
+    const unreadCount = apiUnreadCount + (isRxUnread ? 1 : 0);
 
     const walletDisplay = balance != null
         ? `₹${Number(balance.walletBalance) % 1 === 0 ? Number(balance.walletBalance).toFixed(0) : Number(balance.walletBalance).toFixed(2)}`

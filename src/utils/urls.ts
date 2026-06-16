@@ -74,6 +74,12 @@ export const API_ENDPOINTS = {
   // ── Push Notifications ───────────────────────────────────────────────────
   PUSH_TOKEN: "/api/v1/customers/push-token",
 
+  // ── In-App Notifications ─────────────────────────────────────────────────
+  NOTIFICATIONS: "/api/v1/customers/notifications",
+  NOTIFICATION_MARK_READ: (id: string) => `/api/v1/customers/notifications/${id}/read`,
+  NOTIFICATION_DISMISS: (id: string) => `/api/v1/customers/notifications/${id}/dismiss`,
+  NOTIFICATIONS_DISMISS_ALL: "/api/v1/customers/notifications/dismiss-all",
+
   // ── Cart ─────────────────────────────────────────────────────────────────
   CART: "/api/v1/cart",
   CART_ITEMS: "/api/v1/cart/items",

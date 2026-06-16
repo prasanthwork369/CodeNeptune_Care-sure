@@ -13,6 +13,7 @@ export const QUERY_KEYS = {
             LIST:   (params?: any) => ['customer', 'orders', 'list', params] as const,
             BY_ID:  (id: string)   => ['customer', 'orders', 'detail', id] as const,
         },
+        NOTIFICATIONS: ['customer', 'notifications'] as const,
         NOTIFICATION_PREFERENCES: ['customer', 'notification-preferences'] as const,
         WALLET: {
             BALANCE: ['customer', 'wallet', 'balance'] as const,
