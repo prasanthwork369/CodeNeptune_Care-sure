@@ -23,7 +23,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface AuthScreenShellProps {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     onSkip?: () => void;
     footer?: React.ReactNode;
 }

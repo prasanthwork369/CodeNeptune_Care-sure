@@ -177,43 +177,12 @@ export const OtpLayout: React.FC = () => {
   const isValid = validate.otp(otp.join("")).valid;
   const isButtonLoading = loading || isRedirecting;
 
-  const renderFooter = () => (
-    <View>
-      <Touchable
-        activeOpacity={0.8}
-        onPress={handleVerify}
-        disabled={isButtonLoading || !isValid}
-        accessibilityRole="button"
-        accessibilityLabel="Verify and continue"
-        className="bg-brand-primary rounded-lg items-center justify-center flex-row"
-        style={[formStyles.btn, { opacity: isButtonLoading || !isValid ? 0.6 : 1 }]}
-      >
-        {isButtonLoading ? (
-          <ActivityIndicator color="#fff" size="small" />
-        ) : (
-          <>
-            <Text style={formStyles.btnText}>Verify & Continue</Text>
-            <icons.arrow_forward_white
-              width={scale(13)}
-              height={scale(13)}
-              fill="#ffffff"
-            />
-          </>
-        )}
-      </Touchable>
-      <View style={{ height: 24 }} />
-      <AuthFooter />
-    </View>
-  );
-
   return (
     <AuthScreenShell
       onSkip={() => router.replace("/(tabs)")}
-      footer={renderFooter()}
-    >
-      <View style={{ flexGrow: 1 }}>
+      footer={
         <View>
-          <View className="items-start px-2">
+          <View className="items-start px-2" style={{ marginBottom: 4 }}>
             <Text style={s.title}>Verify OTP</Text>
             <View className="flex-row items-center mt-2">
               <Text style={s.phone}>{phone}</Text>
@@ -238,8 +207,33 @@ export const OtpLayout: React.FC = () => {
             onResend={handleResend}
             inputRefs={inputRefs}
           />
+
+          <Touchable
+            activeOpacity={0.8}
+            onPress={handleVerify}
+            disabled={isButtonLoading || !isValid}
+            accessibilityRole="button"
+            accessibilityLabel="Verify and continue"
+            className="bg-brand-primary rounded-lg items-center justify-center flex-row"
+            style={[formStyles.btn, { opacity: isButtonLoading || !isValid ? 0.6 : 1 }]}
+          >
+            {isButtonLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <>
+                <Text style={formStyles.btnText}>Verify & Continue</Text>
+                <icons.arrow_forward_white
+                  width={scale(13)}
+                  height={scale(13)}
+                  fill="#ffffff"
+                />
+              </>
+            )}
+          </Touchable>
+          <View style={{ height: 24 }} />
+          <AuthFooter />
         </View>
-      </View>
-    </AuthScreenShell>
+      }
+    />
   );
 };

@@ -67,6 +67,11 @@ export const LoginLayout: React.FC = () => {
             onSkip={() => router.replace('/(tabs)')}
             footer={
                 <>
+                    <View className="items-center" style={{ marginBottom: 16 }}>
+                        <Text style={s.title} className="font-inter-extrabold text-brand-text text-center">
+                            Why pay more for the{'\n'}same medicine?
+                        </Text>
+                    </View>
                     <LoginForm
                         phoneNumber={phoneNumber}
                         phoneError={phoneError}
@@ -82,12 +87,6 @@ export const LoginLayout: React.FC = () => {
                     <AuthFooter />
                 </>
             }
-        >
-            <View className="items-center">
-                <Text style={s.title} className="font-inter-extrabold text-brand-text text-center">
-                    Why pay more for the{'\n'}same medicine?
-                </Text>
-            </View>
-        </AuthScreenShell>
+        />
     );
 };
