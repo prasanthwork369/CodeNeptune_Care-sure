@@ -5,9 +5,9 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { CartDeliveringToProps } from '@/src/types/cart';
 
-export const CartDeliveringTo: React.FC<CartDeliveringToProps> = ({ label, description, onChange }) => {
+export const CartDeliveringTo: React.FC<CartDeliveringToProps> = ({ label, description, onChange, flat }) => {
     return (
-        <View className="mx-4 mt-4 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-4 flex-row items-center">
+        <View className={flat ? "bg-white px-4 py-4 flex-row items-center" : "mx-4 mt-4 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-4 flex-row items-center"}>
             <View style={[s.deliverIconBox, { borderRadius: 4, backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', alignItems: 'center', justifyContent: 'center' }]}>
                 <icons.telegram width={18} height={18} fill="#0F7635" />
             </View>

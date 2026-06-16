@@ -116,6 +116,7 @@ export interface CartDeliveringToProps {
   label: string;
   description: string;
   onChange: () => void;
+  flat?: boolean;
 }
 
 export interface CartSavingsBannerProps {

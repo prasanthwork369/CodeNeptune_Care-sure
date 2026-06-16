@@ -74,11 +74,6 @@ const SavingsBanner: React.FC<{ amount: number }> = ({ amount }) => (
     start={{ x: 0, y: 0.5 }}
     end={{ x: 1, y: 0.5 }}
     style={{
-      marginHorizontal: 16,
-      marginTop: 12,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: "#D0EBFE",
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: 14,
@@ -712,22 +707,24 @@ export const MedicineComparisonLayout: React.FC<
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: bottom + 100 }}
       >
+        {/* Savings banner */}
+        {totalSavings > 0 && <SavingsBanner amount={totalSavings} />}
+
         {/* Delivery bar */}
         <CartDeliveringTo
           label={deliveryLabel}
           description={deliveryDescription}
           onChange={() => setShowLocationSheet(true)}
+          flat
         />
-
-        {/* Savings banner */}
-        {totalSavings > 0 && <SavingsBanner amount={totalSavings} />}
         {/* Tab header — sticky above scrollable content */}
         <View
           style={{
             flexDirection: "row",
+            borderTopWidth: 1,
             borderBottomWidth: 1,
-            borderBottomColor: "#E5E7EB",
-            marginTop: 12,
+            borderColor: "#E5E7EB",
+            marginTop: 1,
           }}
         >
           <View
