@@ -9,11 +9,14 @@ import { cartApi } from "@/src/api/cart.api";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import React, { useEffect, useRef, useState } from "react";
-import { Keyboard, Platform, Text, TextInput, View } from "react-native";
+import { Keyboard, Platform, Text, TextInput, View, ActivityIndicator } from "react-native";
 import { styles as s } from "./OtpLayout.styles";
+import { styles as formStyles } from "./sections/OtpForm.styles";
 import { AuthFooter } from "./sections/AuthFooter";
 import { AuthScreenShell } from "./sections/AuthScreenShell";
 import { OtpForm } from "./sections/OtpForm";
+import { icons } from "@/src/constants/icons";
+import { scale } from "react-native-size-matters";
 
 // react-native-otp-verify is a native module unavailable in Expo Go
 const useOtpVerify =
@@ -172,9 +175,42 @@ export const OtpLayout: React.FC = () => {
   };
 
   const isValid = validate.otp(otp.join("")).valid;
+  const isButtonLoading = loading || isRedirecting;
+
+  const renderFooter = () => (
+    <View>
+      <Touchable
+        activeOpacity={0.8}
+        onPress={handleVerify}
+        disabled={isButtonLoading || !isValid}
+        accessibilityRole="button"
+        accessibilityLabel="Verify and continue"
+        className="bg-brand-primary rounded-lg items-center justify-center flex-row"
+        style={[formStyles.btn, { opacity: isButtonLoading || !isValid ? 0.6 : 1 }]}
+      >
+        {isButtonLoading ? (
+          <ActivityIndicator color="#fff" size="small" />
+        ) : (
+          <>
+            <Text style={formStyles.btnText}>Verify & Continue</Text>
+            <icons.arrow_forward_white
+              width={scale(13)}
+              height={scale(13)}
+              fill="#ffffff"
+            />
+          </>
+        )}
+      </Touchable>
+      <View style={{ height: 24 }} />
+      <AuthFooter />
+    </View>
+  );
 
   return (
-    <AuthScreenShell onSkip={() => router.replace("/(tabs)")} keyboardShift={0}>
+    <AuthScreenShell
+      onSkip={() => router.replace("/(tabs)")}
+      footer={renderFooter()}
+    >
       <View style={{ flexGrow: 1 }}>
         <View>
           <View className="items-start px-2">
@@ -195,19 +231,14 @@ export const OtpLayout: React.FC = () => {
             otp={otp}
             otpError={otpError}
             error={error}
-            loading={loading || isRedirecting}
+            loading={isButtonLoading}
             resendCooldown={resendCooldown}
             onOtpChange={handleOtpChange}
             onKeyPress={handleKeyPress}
             onResend={handleResend}
-            onVerify={handleVerify}
-            isValid={isValid}
             inputRefs={inputRefs}
           />
         </View>
-
-        <View style={{ flex: 1, maxHeight: 32 }} />
-        <AuthFooter />
       </View>
     </AuthScreenShell>
   );

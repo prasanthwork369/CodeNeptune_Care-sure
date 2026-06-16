@@ -8,6 +8,7 @@ import { styles as s } from './LoginLayout.styles';
 import { AuthFooter } from './sections/AuthFooter';
 import { AuthScreenShell } from './sections/AuthScreenShell';
 import { LoginForm } from './sections/LoginForm';
+import { LoginSubmitButton } from './sections/LoginSubmitButton';
 
 export const LoginLayout: React.FC = () => {
     const router = useNav();
@@ -62,29 +63,30 @@ export const LoginLayout: React.FC = () => {
     };
 
     return (
-        <AuthScreenShell onSkip={() => router.replace('/(tabs)')} keyboardShift={0.65}>
-            <View style={{ flexGrow: 1 }}>
-                <View>
-                    <View className="items-center">
-                        <Text style={s.title} className="font-inter-extrabold text-brand-text text-center">
-                            Why pay more for the{'\n'}same medicine?
-                        </Text>
-                    </View>
-
+        <AuthScreenShell
+            onSkip={() => router.replace('/(tabs)')}
+            footer={
+                <>
                     <LoginForm
                         phoneNumber={phoneNumber}
                         phoneError={phoneError}
                         error={error}
-                        loading={loading}
                         onPhoneChange={handleChangeText}
                         onPhoneFocus={handlePhoneFocus}
+                    />
+                    <LoginSubmitButton
+                        loading={loading}
                         onGetOtp={handleGetOtp}
                         isValid={validate.phone(phoneNumber).valid}
                     />
-                </View>
-
-                <View style={{ flex: 1, maxHeight: 32 }} />
-                <AuthFooter />
+                    <AuthFooter />
+                </>
+            }
+        >
+            <View className="items-center">
+                <Text style={s.title} className="font-inter-extrabold text-brand-text text-center">
+                    Why pay more for the{'\n'}same medicine?
+                </Text>
             </View>
         </AuthScreenShell>
     );

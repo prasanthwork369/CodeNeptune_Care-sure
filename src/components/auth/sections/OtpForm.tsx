@@ -2,8 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { OtpFormProps } from "@/src/types/auth";
 import React, { useState } from "react";
-import { ActivityIndicator, Text, TextInput, View } from "react-native";
-import { scale } from "react-native-size-matters";
+import { Text, TextInput, View } from "react-native";
 import { styles as s } from "./OtpForm.styles";
 
 export const OtpForm: React.FC<OtpFormProps> = ({
@@ -15,8 +14,6 @@ export const OtpForm: React.FC<OtpFormProps> = ({
   onOtpChange,
   onKeyPress,
   onResend,
-  onVerify,
-  isValid,
   inputRefs,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
@@ -81,29 +78,6 @@ export const OtpForm: React.FC<OtpFormProps> = ({
           </Touchable>
         )}
       </View>
-
-      <Touchable
-        activeOpacity={0.8}
-        onPress={onVerify}
-        disabled={loading || !isValid}
-        accessibilityRole="button"
-        accessibilityLabel="Verify and continue"
-        className="bg-brand-primary rounded-lg items-center justify-center flex-row"
-        style={[s.btn, { opacity: loading || !isValid ? 0.6 : 1 }]}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" size="small" />
-        ) : (
-          <>
-            <Text style={s.btnText}>Verify & Continue</Text>
-            <icons.arrow_forward_white
-              width={scale(13)}
-              height={scale(13)}
-              fill="#ffffff"
-            />
-          </>
-        )}
-      </Touchable>
     </View>
   );
 };

@@ -1,67 +1,65 @@
 import { AuthMedicineBackground } from '@/src/components/auth/AuthMedicineBackground';
 import { icons } from '@/src/constants/icons';
 import { useAuthStore } from '@/src/store/authStore';
-
 import * as Haptics from 'expo-haptics';
 import { useNav } from '@/src/hooks/useNav';
 import React from 'react';
-import { Keyboard, Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import {
+    Keyboard,
+    KeyboardAvoidingView,
+    LayoutAnimation,
+    Platform,
+    Pressable,
+    ScrollView,
+    Text,
+    useWindowDimensions,
+    View,
+} from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface AuthScreenShellProps {
     children: React.ReactNode;
     onSkip?: () => void;
-    // Extra scrollable space (as a fraction of window height) added below the
-    // content so KeyboardAwareScrollView has room to scroll the focused input
-    // above the keyboard, even when the content alone doesn't overflow.
-    keyboardShift?: number;
+    footer?: React.ReactNode;
 }
 
 export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     children,
     onSkip,
-    keyboardShift = 0,
+    footer,
 }) => {
     const router = useNav();
     const insets = useSafeAreaInsets();
     const { height: windowHeight, width } = useWindowDimensions();
-    // Pin to mount-time value so Android adjustResize keyboard events
-    // don't trigger a layout reflow mid-scroll, causing KASV to measure stale positions.
+
+    // Pinned at mount so Android adjustResize doesn't cause the background
+    // illustration to resize when the keyboard opens.
     const [backgroundHeight] = React.useState(() => windowHeight * 0.6);
 
     const isTablet = width >= 600;
     const panelMaxWidth = isTablet ? 560 : undefined;
     const panelPaddingH = isTablet ? Math.round(width * 0.08) : 32;
 
-    const scrollViewRef = React.useRef<any>(null);
-
-    // Manually drive the scroll on focus/blur instead of relying on KASV's
-    // automatic measurement, which can be a no-op when the content doesn't
-    // already overflow the viewport (e.g. the short login form).
+    // On Android, adjustResize resizes the window instantly (no animation),
+    // which makes the footer jump to its new position. Smooth that layout
+    // change so the footer slides with the keyboard instead of snapping.
+    // iOS is already smooth via KeyboardAvoidingView's internal LayoutAnimation.
     React.useEffect(() => {
-        if (!keyboardShift) return;
-        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-        // Scroll up just enough to clear the keyboard, same offset OTP uses.
-        const targetY = Platform.select({ android: 160, ios: 140, default: 140 });
-
-        const showSub = Keyboard.addListener(showEvent, () => {
-            scrollViewRef.current?.scrollToPosition(0, targetY, true);
-        });
-        const hideSub = Keyboard.addListener(hideEvent, () => {
-            scrollViewRef.current?.scrollToPosition(0, 0, true);
-        });
+        if (!footer || Platform.OS !== 'android') return;
+        const animate = () =>
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        const s = Keyboard.addListener('keyboardDidShow', animate);
+        const h = Keyboard.addListener('keyboardDidHide', animate);
         return () => {
-            showSub.remove();
-            hideSub.remove();
+            s.remove();
+            h.remove();
         };
-    }, [keyboardShift]);
+    }, [footer]);
 
     const skipScale = useSharedValue(1);
     const skipStyle = useAnimatedStyle(() => ({
@@ -76,70 +74,132 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-            {/* Background illustration — fixed behind the ScrollView */}
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: backgroundHeight, zIndex: 0 }}>
+            {/* Background illustration — fixed behind everything */}
+            <View
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: backgroundHeight,
+                    zIndex: 0,
+                }}
+            >
                 <AuthMedicineBackground />
             </View>
 
-            {/* Skip button — stays fixed on top */}
+            {/* Skip button — fixed top-right */}
             <Animated.View
-                style={[{ position: 'absolute', top: Math.max(insets.top, 20) + 20, right: 24, zIndex: 50 }, skipStyle]}
+                style={[
+                    {
+                        position: 'absolute',
+                        top: Math.max(insets.top, 20) + 20,
+                        right: 24,
+                        zIndex: 50,
+                    },
+                    skipStyle,
+                ]}
             >
                 <Pressable
                     className="bg-white px-4 py-2 rounded-full flex-row items-center border border-brand-border"
                     accessibilityRole="button"
                     accessibilityLabel="Skip"
-                    onPressIn={() => { skipScale.value = withSpring(0.93, { damping: 15, stiffness: 300 }); }}
-                    onPressOut={() => { skipScale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
+                    onPressIn={() => {
+                        skipScale.value = withSpring(0.93, { damping: 15, stiffness: 300 });
+                    }}
+                    onPressOut={() => {
+                        skipScale.value = withSpring(1, { damping: 15, stiffness: 300 });
+                    }}
                     onPress={handleSkip}
                 >
-                    <Text className="text-brand-primary font-inter-medium mr-1 leading-none">Skip</Text>
+                    <Text className="text-brand-primary font-inter-medium mr-1 leading-none">
+                        Skip
+                    </Text>
                     <icons.arrow_forward_green width={12} height={12} />
                 </Pressable>
             </Animated.View>
 
-            {/* KeyboardAwareScrollView for the white panel content only */}
-            <KeyboardAwareScrollView
-                ref={scrollViewRef}
-                scrollEnabled={false}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                enableOnAndroid={true}
-                enableAutomaticScroll={true}
-                extraScrollHeight={Platform.select({ android: 160, ios: 140, default: 140 })}
-                resetScrollToCoords={{ x: 0, y: 0 }}
-                contentContainerStyle={{ flexGrow: 1 }}
-                style={{ flex: 1 }}
-            >
-                <Pressable onPress={Keyboard.dismiss} style={{ flexGrow: 1 }}>
-                    {/* Top spacer matching the background illustration height (minus overlap) */}
-                    <View style={{ height: backgroundHeight - 24, backgroundColor: 'transparent' }} />
+            {/*
+              KeyboardAvoidingView (iOS only, when a footer is present):
+                behavior="padding" → animates its own height reduction by the keyboard
+                height, synced to the keyboard's native curve/duration via internal
+                LayoutAnimation. The ScrollView (flex:1) absorbs the shrink.
+                The footer (flex sibling below ScrollView) naturally sits at the
+                bottom of the shrunken KAV = directly above the keyboard.
 
-                    {/* White panel */}
+              Android: adjustResize handles window resizing at the OS level,
+                so behavior is left undefined. The footer rides to the new window
+                bottom automatically. LayoutAnimation (above) smooths the snap.
+            */}
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' && !!footer ? 'padding' : undefined}
+            >
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    style={{ flex: 1 }}
+                >
+                    <Pressable onPress={Keyboard.dismiss} style={{ flexGrow: 1 }}>
+                        {/* Spacer pushes the white panel down behind the illustration */}
+                        <View
+                            style={{
+                                height: backgroundHeight - 24,
+                                backgroundColor: 'transparent',
+                            }}
+                        />
+
+                        {/* White panel */}
+                        <View
+                            style={{
+                                flexGrow: 1,
+                                backgroundColor: 'white',
+                                borderTopLeftRadius: 24,
+                                borderTopRightRadius: 24,
+                                paddingHorizontal: panelPaddingH,
+                                maxWidth: panelMaxWidth,
+                                width: '100%',
+                                alignSelf: 'center',
+                            }}
+                        >
+                            <View
+                                style={{
+                                    flexGrow: 1,
+                                    paddingTop: 32,
+                                    paddingBottom: footer ? 0 : insets.bottom + 24,
+                                }}
+                            >
+                                {children}
+                            </View>
+                        </View>
+                    </Pressable>
+                </ScrollView>
+
+                {/*
+                  Footer — flex sibling after ScrollView.
+                  Sits at the bottom of the KAV at all times. When the keyboard
+                  opens, the KAV shrinks (iOS) or the window shrinks (Android),
+                  and this block rides up naturally without any extra logic.
+                */}
+                {footer && (
                     <View
                         style={{
-                            flexGrow: 1,
                             backgroundColor: 'white',
                             borderTopLeftRadius: 24,
                             borderTopRightRadius: 24,
                             paddingHorizontal: panelPaddingH,
+                            paddingTop: 12,
+                            paddingBottom: insets.bottom + 12,
                             maxWidth: panelMaxWidth,
                             width: '100%',
                             alignSelf: 'center',
                         }}
                     >
-                        {/* Content starts with spacing; static bottom padding preserves exact closed-state visual layout */}
-                        <View style={{ flexGrow: 1, paddingTop: 32, paddingBottom: insets.bottom + 24 }}>
-                            {children}
-                        </View>
-
-                        {/* Extra scroll room so the keyboard can push the focused input into view */}
-                        {keyboardShift > 0 && (
-                            <View style={{ height: 200 }} />
-                        )}
+                        {footer}
                     </View>
-                </Pressable>
-            </KeyboardAwareScrollView>
+                )}
+            </KeyboardAvoidingView>
         </View>
     );
 };

@@ -4,9 +4,12 @@ export interface LoginFormProps {
     phoneNumber: string;
     phoneError: string;
     error: string | null;
-    loading: boolean;
     onPhoneChange: (text: string) => void;
     onPhoneFocus?: () => void;
+}
+
+export interface LoginSubmitButtonProps {
+    loading: boolean;
     onGetOtp: () => void;
     isValid: boolean;
 }
@@ -20,7 +23,5 @@ export interface OtpFormProps {
     onOtpChange: (value: string, index: number) => void;
     onKeyPress: (e: any, index: number) => void;
     onResend: () => void;
-    onVerify: () => void;
-    isValid: boolean;
     inputRefs: React.MutableRefObject<(TextInput | null)[]>;
 }
