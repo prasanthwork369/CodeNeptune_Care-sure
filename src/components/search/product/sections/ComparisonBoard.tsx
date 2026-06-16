@@ -180,83 +180,101 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
   const recBgColor = expandAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#FFFDEB", "#FEFFF9"],
+    outputRange: ["#FEFFF9", "#FEFFF9"],
   });
 
   return (
     <View
-      className="mx-4 mb-2 rounded-[14px] border border-[#D6E4EC] bg-white overflow-hidden"
-      style={{ width: cardWidth, height: boardHeight }}
+      className="mx-4 mb-2 overflow-hidden"
+      style={{ width: cardWidth, height: boardHeight, backgroundColor: "transparent" }}
+      {...panResponder.panHandlers}
     >
       {/* STATIC BASE LAYER — Left Column (You Searched) */}
       <View
         className="absolute top-0 left-0 bottom-0"
-        style={{ width: cardWidth / 2 }}
+        style={{ width: cardWidth / 2, paddingRight: 4 }}
       >
         <View
-          className="p-[14px] flex-1 flex-col"
-          style={{ paddingBottom: ADD_BTN_SECTION_H }}
+          style={{
+            flex: 1,
+            backgroundColor: "#FFFFFF",
+            borderWidth: 1.25,
+            borderColor: "#E5E7EB",
+            borderRadius: 16,
+            flexDirection: "column",
+            justifyContent: "space-between",
+            overflow: "hidden",
+          }}
         >
-          <Text
-            className="text-[11px] font-inter-bold text-brand-subtext uppercase tracking-[0.8px] mb-3"
-            style={{ height: 16, lineHeight: 16 }}
-          >
-            YOU SEARCHED
-          </Text>
-          <View className="bg-white border border-[#E5E7EB] rounded-[10px] h-[100px] mb-3 items-center justify-center overflow-hidden">
-            {searched.image ? (
-              <Image
-                source={searched.image}
-                style={{ width: "85%", height: "85%" }}
-                resizeMode="contain"
-              />
-            ) : (
-              <icons.placeholder width="70%" height="70%" />
-            )}
-          </View>
-          <Text
-            className="text-[14px] font-inter-semibold text-[#111827] mb-1 leading-[20px]"
-            numberOfLines={1}
-          >
-            {searched.name}
-          </Text>
-          <Text className="text-[12px] font-inter-medium text-brand-subtext mb-[3px]">
-            {searched.manufacturer}
-          </Text>
-          <Text
-            className="text-[11px] font-inter text-brand-subtext"
-            numberOfLines={2}
-          >
-            {searched.description}
-          </Text>
-          <View
-            className="mt-10"
-            style={{
-              borderTopWidth: 1,
-              borderColor: "#E5E7EB",
-              borderStyle: "dashed",
-            }}
-          />
+          <View className="px-[12px] pt-[12px] pb-0 flex-1 flex-col justify-between">
+            <View style={{ height: 210 }}>
+              <Text
+                className="text-[11px] font-inter-bold text-[#4B5563] uppercase tracking-[0.8px] mb-2"
+                style={{ height: 16, lineHeight: 16 }}
+              >
+                YOU SEARCHED
+              </Text>
+              <View className="bg-white border border-[#E5E7EB] rounded-[10px] h-[100px] mb-2 items-center justify-center overflow-hidden">
+                {searched.image ? (
+                  <Image
+                    source={searched.image}
+                    style={{ width: "85%", height: "85%" }}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <icons.placeholder width="70%" height="70%" />
+                )}
+              </View>
+              <Text
+                className="text-[15px] font-inter-bold text-[#111827] mb-1 leading-[20px]"
+                numberOfLines={2}
+              >
+                {searched.name}
+              </Text>
+              <Text className="text-[12px] font-inter-medium text-brand-subtext mb-[3px]">
+                {searched.manufacturer}
+              </Text>
+              <Text
+                className="text-[11px] font-inter text-brand-subtext"
+                numberOfLines={2}
+              >
+                {searched.description}
+              </Text>
+            </View>
 
-          <View style={{ marginTop: "auto" }}>
-            <Text className="text-[20px] font-inter-extrabold text-[#111827] mb-[2px]">
-              ₹{searched.priceDisplay}
-            </Text>
-            <Text className="text-[11px] font-inter-medium text-brand-subtext mb-2">
-              ₹{searched.unitPriceDisplay}/ Unit
-            </Text>
+            <View style={{ marginTop: "auto" }}>
+              <View
+                style={{
+                  borderTopWidth: 1,
+                  borderColor: "#E5E7EB",
+                  borderStyle: "dashed",
+                  marginVertical: 8,
+                }}
+              />
+              {/* Price Slot */}
+              <View style={{ height: 28, justifyContent: "center" }}>
+                <Text className="text-[20px] font-inter-extrabold text-[#111827] mb-[2px]">
+                  ₹{searched.priceDisplay}
+                </Text>
+              </View>
+              {/* Unit Price */}
+              <Text className="text-[11px] font-inter-medium text-brand-subtext mb-0">
+                ₹{searched.unitPriceDisplay}/ Unit
+              </Text>
+            </View>
+          </View>
+
+          {/* Status Slot Container at the bottom (aligned with Add Button) */}
+          <View
+            className="px-[12px] pb-[8px] pt-0"
+            style={{ height: 54, justifyContent: "center" }}
+          >
             <Text className="text-[12px] font-inter-semibold text-[#EF4444]">
               {searched.status}
             </Text>
           </View>
         </View>
       </View>
-
-      {/* CENTER DIVIDER */}
-      <View
-        className="absolute top-0 bottom-0 bg-[#E5E7EB]"
-        style={{ left: cardWidth / 2, width: 1 }}
-      />
 
       {/* EXPANDABLE WE RECOMMENDED SECTION */}
       <Animated.View
@@ -266,228 +284,262 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
           bottom: 0,
           left: recLeft,
           width: recWidth,
-          backgroundColor: recBgColor,
+          paddingLeft: expandAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [4, 0],
+          }),
+          backgroundColor: "transparent",
           overflow: "hidden",
           zIndex: 10,
         }}
-        {...panResponder.panHandlers}
       >
-        <View className="flex-1 flex-col justify-between">
-          {/* TOP INNER ROW HOLDING COLUMNS */}
-          <View
-            className="flex-row"
-            style={{ width: cardWidth }}
-            onLayout={(e) => {
-              const h = e.nativeEvent.layout.height + ADD_BTN_SECTION_H;
-              if (h !== boardHeight) setBoardHeight(h);
-            }}
-          >
-            {/* LEFT PRODUCT INFO COLUMN */}
+        <Animated.View
+          style={{
+            flex: 1,
+            backgroundColor: recBgColor,
+            borderWidth: 1.25,
+            borderColor: "#DBF6A080",
+            borderRadius: 16,
+            overflow: "hidden",
+          }}
+        >
+          <View className="flex-1 flex-col justify-between">
+            {/* WRAPPER FOR MEASUREMENT */}
             <View
-              style={{ width: cardWidth / 2 }}
-              className="px-[14px] pt-[14px] flex-col flex-1"
+              style={{ width: cardWidth }}
+              onLayout={(e) => {
+                const h = e.nativeEvent.layout.height + 54;
+                if (h !== boardHeight) setBoardHeight(h);
+              }}
             >
-              <Text
-                className="text-[11px] font-inter-bold text-brand-primary uppercase tracking-[0.8px] mb-3"
-                style={{ height: 16, lineHeight: 16 }}
-              >
-                WE RECOMMENDED
-              </Text>
-              <View className="bg-white border border-[#E5E7EB] rounded-[10px] h-[100px] mb-3 items-center justify-center overflow-hidden">
-                {recommended.image ? (
-                  <Image
-                    source={recommended.image}
-                    style={{ width: "85%", height: "85%" }}
-                    resizeMode="contain"
-                  />
+              {/* TOP INNER ROW HOLDING COLUMNS */}
+              <View className="flex-row">
+                {/* LEFT PRODUCT INFO COLUMN */}
+                <View
+                  style={{ width: cardWidth / 2 }}
+                  className="px-[12px] pt-[12px] pb-0 flex-col"
+                >
+                  <View style={{ height: 210 }}>
+                    <Text
+                      className="text-[11px] font-inter-bold text-[#0F7635] uppercase tracking-[0.8px] mb-2"
+                      style={{ height: 16, lineHeight: 16 }}
+                    >
+                      WE RECOMMENDED
+                    </Text>
+                    <View className="bg-white border border-[#E5E7EB] rounded-[10px] h-[100px] mb-2 items-center justify-center overflow-hidden">
+                      {recommended.image ? (
+                        <Image
+                          source={recommended.image}
+                          style={{ width: "85%", height: "85%" }}
+                          resizeMode="contain"
+                        />
+                      ) : (
+                        <icons.placeholder width="70%" height="70%" />
+                      )}
+                    </View>
+                    <Text
+                      className="text-[15px] font-inter-bold text-[#111827] leading-[20px]"
+                      numberOfLines={2}
+                    >
+                      {recommended.name}
+                    </Text>
+                    <Text className="text-[12px] font-inter-bold text-[#0F7635] mt-0.5">
+                      {recommended.manufacturer}
+                    </Text>
+                    <Text
+                      className="text-[11px] font-inter text-brand-subtext mt-0.5"
+                      numberOfLines={2}
+                    >
+                      {recommended.description}
+                    </Text>
+                    {(() => {
+                      const searchedPrice = searched.price ?? 0;
+                      const crossSaving = searchedPrice > 0
+                        ? parseFloat((searchedPrice - recommended.price).toFixed(2))
+                        : 0;
+                      const ownSaving = parseFloat(
+                        (parseFloat(recommended.mrpDisplay) - parseFloat(recommended.priceDisplay)).toFixed(2)
+                      );
+                      const effectiveSaving = crossSaving > 0 ? crossSaving : ownSaving > 0 ? ownSaving : 0;
+
+                      if (effectiveSaving <= 0) return null;
+                      return (
+                        <LinearGradient
+                          colors={["#C22923", "#FF8A00"]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={{
+                            alignSelf: "flex-start",
+                            paddingHorizontal: 8,
+                            paddingVertical: 4,
+                            borderRadius: 6,
+                            marginTop: 6,
+                          }}
+                        >
+                          <Text className="text-[10px] font-inter-semibold text-white">
+                            Save ₹{effectiveSaving.toFixed(2)}
+                          </Text>
+                        </LinearGradient>
+                      );
+                    })()}
+                  </View>
+                  <View style={{ marginTop: "auto" }}>
+                    <View
+                      style={{
+                        borderTopWidth: 1,
+                        borderColor: "#E5E7EB",
+                        borderStyle: "dashed",
+                        marginVertical: 16,
+                      }}
+                    />
+                    {/* Price & Strikethrough Slot */}
+                    <View style={{ height: 28, justifyContent: "center" }}>
+                      <View className="flex-row items-baseline gap-x-2">
+                        <Text className="text-[20px] font-inter-extrabold text-[#0F7635]">
+                          ₹{recommended.priceDisplay}
+                        </Text>
+                        {parseFloat(recommended.mrpDisplay) >
+                          parseFloat(recommended.priceDisplay) && (
+                          <Text className="text-[12px] font-inter-medium text-brand-subtext line-through">
+                            ₹{recommended.mrpDisplay}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+
+                    {/* Unit price spacer to align with left card */}
+                    <View style={{ height: 14 }} />
+                  </View>
+                </View>
+
+                {/* RIGHT DOCTOR TRUSTED GRAPHIC COLUMN */}
+                <Animated.View
+                  style={{
+                    width: cardWidth / 2,
+                    opacity: expandAnim,
+                  }}
+                  className="px-[12px] pt-7 pb-0 flex-col justify-between"
+                >
+                  <View
+                    className="flex-1 rounded-[12px] overflow-hidden"
+                    style={{ backgroundColor: "#E1F0D5", minHeight: 140 }}
+                  >
+                    <Image
+                      source={HOME_IMAGES.doctorLogo}
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: 100,
+                        height: 100,
+                      }}
+                      resizeMode="contain"
+                    />
+                    <View className="px-3 pt-3 z-10 w-[70%]">
+                      <Text className="text-[13px] font-inter-extrabold text-brand-text leading-[17px]">
+                        Doctor{"\n"}Trusted{"\n"}Medicines
+                      </Text>
+                    </View>
+                    <Image
+                      source={HOME_IMAGES.doctor}
+                      style={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: -25,
+                        width: "90%",
+                        height: "90%",
+                        zIndex: 5,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  <View className="mt-3 flex-row items-center justify-center bg-white rounded-[8px] border border-[#919EAB33] py-1.5">
+                    <Image
+                      source={HOME_IMAGES.shield}
+                      style={{ width: 18, height: 18, marginRight: 4 }}
+                      resizeMode="contain"
+                    />
+                    <Text className="text-[11px] font-inter-medium text-brand-text">
+                      CareSure Assured
+                    </Text>
+                  </View>
+                </Animated.View>
+              </View>
+            </View>
+
+            {/* ADD BUTTON CONTAINER AT THE BOTTOM */}
+            <View
+              style={{
+                paddingHorizontal: 12,
+                paddingBottom: 8,
+                paddingTop: 0,
+              }}
+            >
+                {count === 0 ? (
+                  <Touchable
+                    onPress={handleIncrement}
+                    disabled={isPending}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Add ${recommended.name} to cart`}
+                    className="bg-brand-primary rounded-[12px] items-center justify-center"
+                    style={{ height: 46 }}
+                  >
+                    <Text className="text-[15px] font-inter-bold text-white">
+                      {isPending ? "Adding..." : "Add"}
+                    </Text>
+                  </Touchable>
                 ) : (
-                  <icons.placeholder width="70%" height="70%" />
+                  <View
+                    className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[12px] bg-white"
+                    style={{ height: 46 }}
+                  >
+                    <Touchable
+                      onPress={handleDecrement}
+                      disabled={isPending}
+                      className="flex-1 items-center justify-center h-full"
+                    >
+                      <Text className="text-[24px] font-inter-semibold text-brand-text">
+                        −
+                      </Text>
+                    </Touchable>
+                    <View
+                      style={{
+                        width: 32,
+                        height: 24,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {isPending ? (
+                        <ActivityIndicator size="small" color="#0F7635" />
+                      ) : (
+                        <Animated.Text
+                          style={{
+                            transform: [{ translateY: slideAnim }],
+                            opacity: opacityAnim,
+                          }}
+                          className="text-[16px] font-inter-bold text-brand-text text-center px-2"
+                        >
+                          {count}
+                        </Animated.Text>
+                      )}
+                    </View>
+                    <Touchable
+                      onPress={handleIncrement}
+                      disabled={isPending}
+                      className="flex-1 items-center justify-center h-full"
+                    >
+                      <Text className="text-[22px] font-inter-semibold text-brand-text">
+                        +
+                      </Text>
+                    </Touchable>
+                  </View>
                 )}
               </View>
-              <Text
-                className="text-[14px] font-inter-bold text-[#111827] leading-[20px]"
-                numberOfLines={1}
-              >
-                {recommended.name}
-              </Text>
-              <Text className="text-[12px] font-inter-semibold text-[#009989] mt-0.5">
-                {recommended.manufacturer}
-              </Text>
-              <Text
-                className="text-[11px] font-inter text-brand-subtext mt-0.5"
-                numberOfLines={2}
-              >
-                {recommended.description}
-              </Text>
-              {(() => {
-                const searchedPrice = searched.price ?? 0;
-                const crossSaving = searchedPrice > 0
-                  ? parseFloat((searchedPrice - recommended.price).toFixed(2))
-                  : 0;
-                const ownSaving = parseFloat(
-                  (parseFloat(recommended.mrpDisplay) - parseFloat(recommended.priceDisplay)).toFixed(2)
-                );
-                const effectiveSaving = crossSaving > 0 ? crossSaving : ownSaving > 0 ? ownSaving : 0;
-                if (effectiveSaving <= 0) return null;
-                return (
-                  <LinearGradient
-                    colors={["#C22923", "#FF8A00"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={{
-                      alignSelf: "flex-start",
-                      paddingHorizontal: 8,
-                      paddingVertical: 4,
-                      borderRadius: 6,
-                      marginTop: 8,
-                    }}
-                  >
-                    <Text className="text-[10px] font-inter-semibold text-white">
-                      Save ₹{effectiveSaving.toFixed(2)}
-                    </Text>
-                  </LinearGradient>
-                );
-              })()}
-              <View style={{ marginTop: "auto" }}>
-                <View
-                  style={{
-                    borderTopWidth: 1,
-                    borderColor: "#E5E7EB",
-                    borderStyle: "dashed",
-                    marginVertical: 10,
-                  }}
-                />
-                <View className="flex-row items-baseline gap-x-2">
-                  <Text className="text-[20px] font-inter-extrabold text-brand-primary">
-                    ₹{recommended.priceDisplay}
-                  </Text>
-                  {parseFloat(recommended.mrpDisplay) >
-                    parseFloat(recommended.priceDisplay) && (
-                    <Text className="text-[12px] font-inter-medium text-brand-subtext line-through">
-                      ₹{recommended.mrpDisplay}
-                    </Text>
-                  )}
-                </View>
-              </View>
             </View>
-
-            {/* RIGHT DOCTOR TRUSTED GRAPHIC COLUMN */}
-            <View
-              style={{ width: cardWidth / 2 }}
-              className="px-[14px] pt-7 flex-col justify-between"
-            >
-              <View
-                className="flex-1 rounded-[12px] overflow-hidden"
-                style={{ backgroundColor: "#E1F0D5", minHeight: 140 }}
-              >
-                <Image
-                  source={HOME_IMAGES.doctorLogo}
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: 100,
-                    height: 100,
-                  }}
-                  resizeMode="contain"
-                />
-                <View className="px-3 pt-3 z-10 w-[70%]">
-                  <Text className="text-[13px] font-inter-extrabold text-brand-text leading-[17px]">
-                    Doctor{"\n"}Trusted{"\n"}Medicines
-                  </Text>
-                </View>
-                <Image
-                  source={HOME_IMAGES.doctor}
-                  style={{
-                    position: "absolute",
-                    bottom: -15,
-                    right: -25,
-                    width: "90%",
-                    height: "90%",
-                    zIndex: 5,
-                  }}
-                  resizeMode="contain"
-                />
-              </View>
-
-              <View className="mt-3 flex-row items-center justify-center bg-white rounded-[8px] border border-[#919EAB33] py-1.5">
-                <Image
-                  source={HOME_IMAGES.shield}
-                  style={{ width: 18, height: 18, marginRight: 4 }}
-                  resizeMode="contain"
-                />
-                <Text className="text-[11px] font-inter-medium text-brand-text">
-                  CareSure Assured
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* DYNAMIC BOTTOM ADD BUTTON Stretching perfectly across the expanding container */}
-          <View className="px-[14px] pb-3.5 pt-2" style={{ width: "100%" }}>
-            {count === 0 ? (
-              <Touchable
-                onPress={handleIncrement}
-                disabled={isPending}
-                accessibilityRole="button"
-                accessibilityLabel={`Add ${recommended.name} to cart`}
-                className="bg-brand-primary rounded-[10px] items-center justify-center"
-                style={{ height: CART_BUTTON_HEIGHT }}
-              >
-                <Text className="text-[15px] font-inter-bold text-white">
-                  {isPending ? "Adding..." : "Add"}
-                </Text>
-              </Touchable>
-            ) : (
-              <View
-                className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white"
-                style={{ height: CART_BUTTON_HEIGHT }}
-              >
-                <Touchable
-                  onPress={handleDecrement}
-                  disabled={isPending}
-                  className="flex-1 items-center justify-center h-full"
-                >
-                  <Text className="text-[24px] font-inter-semibold text-brand-text">
-                    −
-                  </Text>
-                </Touchable>
-                <View
-                  style={{
-                    width: 32,
-                    height: 24,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {isPending ? (
-                    <ActivityIndicator size="small" color="#0F7635" />
-                  ) : (
-                    <Animated.Text
-                      style={{
-                        transform: [{ translateY: slideAnim }],
-                        opacity: opacityAnim,
-                      }}
-                      className="text-[16px] font-inter-bold text-brand-text text-center px-2"
-                    >
-                      {count}
-                    </Animated.Text>
-                  )}
-                </View>
-                <Touchable
-                  onPress={handleIncrement}
-                  disabled={isPending}
-                  className="flex-1 items-center justify-center h-full"
-                >
-                  <Text className="text-[22px] font-inter-semibold text-brand-text">
-                    +
-                  </Text>
-                </Touchable>
-              </View>
-            )}
-          </View>
-        </View>
-      </Animated.View>
+          </Animated.View>
+        </Animated.View>
 
       {/* FLOATING SWAP BUTTON — Reanimated UI-thread opacity, zero blink */}
       <ReAnimated.View
@@ -495,7 +547,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
           swapBtnStyle,
           {
             position: "absolute",
-            top: 96,
+            top: 62,
             left: "50%",
             marginLeft: -24,
             width: 48,
