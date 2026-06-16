@@ -140,6 +140,17 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       const state = get("administrative_area_level_1");
       const pincode = get("postal_code").replace(/\D/g, "").slice(0, 6);
 
+      if (!pincode || !/^\d{6}$/.test(pincode)) {
+        showToast("Could not find a valid pincode for this location.", "warning");
+        return;
+      }
+
+      const serviceability = await checkServiceability(pincode);
+      if (!serviceability.serviceable) {
+        showToast(`Sorry, we don't deliver to ${pincode} yet.`, "error");
+        return;
+      }
+
       const line2Parts = [
         prediction.description.split(",")[0],
         route,
