@@ -22,7 +22,9 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     const recPrice = recRaw != null && recRaw !== '' ? parseFloat(recRaw) : null;
     const recMrpRaw = rec.mrp || rec.price;
     const recMrp = recMrpRaw != null && recMrpRaw !== '' ? parseFloat(recMrpRaw) : null;
-    const savings = searchedMrp != null && recPrice != null ? parseFloat((searchedMrp - recPrice).toFixed(2)) : 0;
+    const crossSavings = searchedMrp != null && recPrice != null ? parseFloat((searchedMrp - recPrice).toFixed(2)) : 0;
+    const ownSavings = recMrp != null && recPrice != null && recMrp > recPrice ? parseFloat((recMrp - recPrice).toFixed(2)) : 0;
+    const savings = crossSavings > 0 ? crossSavings : ownSavings;
     const buildPackLabel = (packSize?: string, unit?: string, dosageForm?: string) => {
         const base = [packSize?.trim(), unit].filter(Boolean).join(' ');
         return dosageForm ? `${base} in ${dosageForm}` : base;

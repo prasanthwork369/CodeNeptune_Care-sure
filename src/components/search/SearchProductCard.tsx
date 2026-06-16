@@ -110,7 +110,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                                     ₹{Number(data.recommended.price).toFixed(2)}
                                 </Text>
                             )}
-                            {data.recommended.originalPrice != null && data.recommended.originalPrice > 0 && (
+                            {data.recommended.originalPrice != null && data.recommended.originalPrice > data.recommended.price && (
                                 <Text style={s.mrp} className="font-inter-semibold text-brand-subtext line-through">
                                     ₹{Number(data.recommended.originalPrice).toFixed(2)}
                                 </Text>
