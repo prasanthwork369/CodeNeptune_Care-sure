@@ -84,6 +84,9 @@ export const API_ENDPOINTS = {
   COUPONS_ACTIVE: "/api/v1/coupons/active",
   COUPONS_VALIDATE: "/api/v1/coupons/validate",
 
+  // ── Pincodes ─────────────────────────────────────────────────────────────
+  PINCODE_CHECK: (pincode: string) => `/api/v1/pincodes/check/${pincode}`,
+
   // ── Settings ─────────────────────────────────────────────────────────────
   SETTINGS_MOBILE_APP_LINKS: "/api/v1/settings/mobile-app-links",
   SETTINGS_CART_WALLET: "/api/v1/settings/public/customer/cart-wallet",

@@ -32,6 +32,7 @@ export interface CategoryCard {
 export interface DeliveryLocation {
   label: string;
   city: string;
+  pincode?: string;
 }
 
 export interface HeroContent {

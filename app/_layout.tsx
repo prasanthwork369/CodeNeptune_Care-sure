@@ -32,6 +32,7 @@ LogBox.ignoreLogs([
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
 import NetworkToast from "@/src/components/common/NetworkToast";
+import { Toast } from "@/src/components/common/Toast";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
 import { queryClient } from "@/src/lib/react-query/queryClient";
@@ -133,6 +134,7 @@ export default function RootLayout() {
               <CartSyncProvider />
               <PushNotificationProvider />
               <NetworkToast />
+              <Toast />
               <SignupBonusPopup />
             </View>
           </BottomSheetModalProvider>

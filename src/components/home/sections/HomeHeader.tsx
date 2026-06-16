@@ -56,9 +56,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({ location, onPressLocatio
                     className="flex-row items-center mt-0.5"
                 >
                     <Text style={s.locationText} className="font-inter-bold text-brand-text">
-                        {(location.label && location.label !== 'DELIVER TO' && location.label !== location.city)
-                            ? `${location.label} - ${location.city}`
-                            : location.city}
+                        {location.pincode
+                            ? `${location.city} - ${location.pincode}`
+                            : (location.label && location.label !== 'DELIVER TO' && location.label !== location.city)
+                                ? `${location.label} - ${location.city}`
+                                : location.city}
                     </Text>
                     <MaterialIcons name="arrow-drop-down" size={moderateScale(24, 0.3)} color={colors.text} className="ml-0.5" />
                 </Touchable>

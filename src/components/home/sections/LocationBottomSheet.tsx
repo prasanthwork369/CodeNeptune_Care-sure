@@ -1,24 +1,27 @@
 import { Address } from "@/src/api/address.api";
-import { Touchable } from "@/src/components/ui/Touchable";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
+import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useSettings } from "@/src/hooks/queries/useSettings";
+import { usePincode } from "@/src/hooks/mutations/usePincode";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
+import { useToastStore } from "@/src/store/toastStore";
 import {
-    BottomSheetModal,
-    BottomSheetScrollView,
-    BottomSheetTextInput,
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import * as Location from "expo-location";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Keyboard,
-    Linking,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  Linking,
+  Text,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -26,6 +29,11 @@ interface LocationBottomSheetProps {
   isVisible: boolean;
   onClose: () => void;
   onSelect?: (label: string, city: string) => void;
+}
+
+interface GooglePrediction {
+  description: string;
+  place_id: string;
 }
 
 const labelToIcon = (label: string) => {
@@ -45,16 +53,112 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
   const router = useNav();
   const insets = useSafeAreaInsets();
   const { setLocation, selectedAddressId } = useLocationStore();
+  const showToast = useToastStore((s) => s.show);
   const [isLocating, setIsLocating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [predictions, setPredictions] = useState<GooglePrediction[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const { addresses, loading: addressesLoading, refetch } = useAddress();
+  const { checkServiceability, isChecking } = usePincode();
+  const { data: settings } = useSettings();
+  const mapsApiKey =
+    settings?.mapsApiKey ?? process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["70%", "90%"], []);
+  const snapPoints = useMemo(() => ["70%"], []);
+
+  // Debounced Places Autocomplete
+  useEffect(() => {
+    if (!searchQuery.trim() || !mapsApiKey) {
+      setPredictions([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${mapsApiKey}&components=country:in&types=geocode|establishment`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if (json.status === "OK") {
+          setPredictions(
+            (json.predictions ?? []).map((p: any) => ({
+              description: p.description,
+              place_id: p.place_id,
+            })),
+          );
+        } else {
+          setPredictions([]);
+        }
+      } catch {
+        setPredictions([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, mapsApiKey]);
 
   const handleClose = () => {
     Keyboard.dismiss();
     bottomSheetRef.current?.dismiss();
+    setSearchQuery("");
+    setPredictions([]);
+    setIsSearchFocused(false);
+  };
+
+  const handlePredictionSelect = async (prediction: GooglePrediction) => {
+    if (!mapsApiKey) {
+      showToast("Location search is not configured.", "error");
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.place_id}&fields=address_components&key=${mapsApiKey}`;
+      const res = await fetch(url);
+      const json = await res.json();
+
+      if (json.status !== "OK" || !json.result) {
+        showToast("Could not fetch location details. Please try again.", "error");
+        return;
+      }
+
+      const components: any[] = json.result.address_components ?? [];
+      const get = (type: string) =>
+        components.find((c: any) => c.types.includes(type))?.long_name ?? "";
+
+      const city =
+        get("locality") ||
+        get("administrative_area_level_2") ||
+        get("sublocality_level_1") ||
+        get("sublocality");
+      const pincode = get("postal_code").replace(/\D/g, "").slice(0, 6);
+
+      if (!pincode || !/^\d{6}$/.test(pincode)) {
+        showToast("Could not find a valid pincode for this location.", "warning");
+        return;
+      }
+
+      const serviceability = await checkServiceability(pincode);
+      if (!serviceability.serviceable) {
+        showToast(`Pincode ${pincode} is not serviceable.`, "error");
+        return;
+      }
+
+      const areaLabel = prediction.description.split(",")[0];
+      const displayCity = city || areaLabel;
+      setLocation({ label: displayCity, city: displayCity }, { pincode });
+      onSelect?.(displayCity, displayCity);
+      showToast(`Location set to ${displayCity} - ${pincode}`, "success");
+      handleClose();
+    } catch {
+      showToast("Failed to get location details. Please try again.", "error");
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleAddNewAddress = () => {
@@ -65,13 +169,28 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     });
   };
 
-  const handleSelectAddress = (addr: Address) => {
+  const handleSelectAddress = async (addr: Address) => {
+    if (!addr.pincode) {
+      showToast("This address is missing a pincode.", "warning");
+      return;
+    }
+    try {
+      const result = await checkServiceability(addr.pincode);
+      if (!result.serviceable) {
+        showToast(`Sorry, we don't deliver to ${addr.pincode} yet.`, "error");
+        return;
+      }
+    } catch {
+      showToast("Could not verify serviceability. Please try again.", "error");
+      return;
+    }
     const cityLabel = addr.city || addr.line2 || addr.line1;
     setLocation(
       { label: addr.label, city: cityLabel },
       { addressId: addr.id, pincode: addr.pincode },
     );
     onSelect?.(addr.label, cityLabel);
+    showToast(`Delivery location set to ${cityLabel} - ${addr.pincode}`, "success");
     handleClose();
   };
 
@@ -131,7 +250,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       setTimeout(() => {
         router.push({ pathname: "/profile/addresses/add" as any, params });
       }, 500);
-    } catch (err) {
+    } catch {
       Alert.alert(
         "Could not fetch location",
         "Please check that location services are enabled and try again.",
@@ -140,6 +259,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       setIsLocating(false);
     }
   };
+
+  const showPredictions =
+    predictions.length > 0 || (isSearching && !!searchQuery);
 
   return (
     <GorhomBottomSheet
@@ -160,85 +282,117 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           Change Location
         </Text>
 
-        <View
-          style={{
-            shadowColor: "#919EAB0A",
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.04,
-            shadowRadius: 20,
-            elevation: 2,
-            borderWidth: 1.05,
-            borderColor: "#919EAB33",
-          }}
-          className="flex-row items-center bg-white rounded-lg px-4 py-2.5 mb-4"
-        >
-          <icons.search width={18} height={18} />
-          <BottomSheetTextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            returnKeyType="search"
-            autoCapitalize="words"
-            autoCorrect={false}
-            placeholder="Search for area, street name"
-            placeholderTextColor="#6A6A6A"
-            className="flex-1 ml-3 text-[14px] font-inter text-brand-text"
-            onFocus={() => {
-              bottomSheetRef.current?.snapToIndex(1);
+        {/* Search Box + Cancel */}
+        <View className="flex-row items-center gap-x-3 mb-4">
+          <View
+            style={{
+              flex: 1,
+              shadowColor: "#919EAB0A",
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.04,
+              shadowRadius: 20,
+              elevation: 2,
+              borderWidth: 1.05,
+              borderColor: "#919EAB33",
             }}
-          />
-          {!!searchQuery && (
+            className="flex-row items-center bg-white rounded-lg px-4 py-2.5"
+          >
+            {isSearching ? (
+              <ActivityIndicator size="small" color="#0F7635" />
+            ) : (
+              <icons.search width={18} height={18} />
+            )}
+            <BottomSheetTextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              autoCapitalize="words"
+              autoCorrect={false}
+              placeholder="Search for area, street name"
+              placeholderTextColor="#6A6A6A"
+              className="flex-1 ml-3 text-[14px] font-inter text-brand-text"
+              onFocus={() => {
+                setIsSearchFocused(true);
+              }}
+              onBlur={() => setIsSearchFocused(false)}
+            />
+            {!!searchQuery && (
+              <Touchable
+                onPress={() => {
+                  setSearchQuery("");
+                  setPredictions([]);
+                }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <icons.close_small width={16} height={16} fill="#919EAB" />
+              </Touchable>
+            )}
+          </View>
+          {(!!searchQuery || isSearchFocused) && (
             <Touchable
-              onPress={() => setSearchQuery("")}
+              onPress={() => {
+                setSearchQuery("");
+                setPredictions([]);
+                setIsSearchFocused(false);
+                Keyboard.dismiss();
+              }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <icons.close_small width={16} height={16} fill="#919EAB" />
+              <Text className="text-[13px] font-inter-semibold text-brand-primary">
+                Cancel
+              </Text>
             </Touchable>
           )}
         </View>
 
-        <View className="flex-row gap-x-3 mb-2">
-          <Touchable
-            onPress={handleUseCurrentLocation}
-            disabled={isLocating}
-            className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
-          >
-            <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
-              {isLocating ? (
-                <ActivityIndicator size="small" color="#059669" />
-              ) : (
-                <icons.my_location width={21} height={21} fill="#059669" />
-              )}
-            </View>
-            <View className="ml-3">
-              <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
-                {isLocating ? "Fetching" : "Use Current"}
-              </Text>
-              <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
-                Location
-              </Text>
-            </View>
-          </Touchable>
-          <Touchable
-            onPress={handleAddNewAddress}
-            className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
-          >
-            <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
-              <icons.add_circle width={21} height={21} fill="#059669" />
-            </View>
-            <View className="ml-3">
-              <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
-                Add New
-              </Text>
-              <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
-                Addresses
-              </Text>
-            </View>
-          </Touchable>
-        </View>
+        {/* Current location + Add new — hidden while searching or focused */}
+        {!searchQuery && !isSearchFocused && (
+          <View className="flex-row gap-x-3 mb-2">
+            <Touchable
+              onPress={handleUseCurrentLocation}
+              disabled={isLocating}
+              className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
+            >
+              <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
+                {isLocating ? (
+                  <ActivityIndicator size="small" color="#059669" />
+                ) : (
+                  <icons.my_location width={21} height={21} fill="#059669" />
+                )}
+              </View>
+              <View className="ml-3">
+                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+                  {isLocating ? "Fetching" : "Use Current"}
+                </Text>
+                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+                  Location
+                </Text>
+              </View>
+            </Touchable>
+            <Touchable
+              onPress={handleAddNewAddress}
+              className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
+            >
+              <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
+                <icons.add_circle width={21} height={21} fill="#059669" />
+              </View>
+              <View className="ml-3">
+                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+                  Add New
+                </Text>
+                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+                  Addresses
+                </Text>
+              </View>
+            </Touchable>
+          </View>
+        )}
 
-        <Text className="text-[15px] font-inter-bold text-brand-text mb-4">
-          Your Saved Addresses
-        </Text>
+        {!showPredictions && (
+          <Text className="text-[15px] font-inter-bold text-brand-text mb-4">
+            Your Saved Addresses
+          </Text>
+        )}
       </View>
 
       <BottomSheetScrollView
@@ -251,7 +405,33 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           paddingBottom: Math.max(insets.bottom, 24),
         }}
       >
-        {addressesLoading ? (
+        {/* Predictions list */}
+        {showPredictions ? (
+          isSearching && predictions.length === 0 ? (
+            <ActivityIndicator color="#0F7635" style={{ marginVertical: 24 }} />
+          ) : (
+            predictions.map((p) => (
+              <Touchable
+                key={p.place_id}
+                onPress={() => handlePredictionSelect(p)}
+                disabled={isSearching || isChecking}
+                activeOpacity={0.75}
+                className="flex-row items-start py-3 border-b border-[#F3F4F6]"
+              >
+                <View className="mt-0.5 mr-3">
+                  <icons.location_pin width={16} height={16} fill="#6B7280" />
+                </View>
+                <Text
+                  className="flex-1 text-[13px] font-inter-medium text-brand-text leading-5"
+                  numberOfLines={2}
+                >
+                  {p.description}
+                </Text>
+              </Touchable>
+            ))
+          )
+        ) : /* Saved addresses */
+        addressesLoading ? (
           <ActivityIndicator color="#0F7635" style={{ marginVertical: 24 }} />
         ) : addresses.length === 0 ? (
           <Text className="text-[13px] font-inter-medium text-brand-subtext text-center py-6">

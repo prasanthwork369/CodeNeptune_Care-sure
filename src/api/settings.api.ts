@@ -30,6 +30,7 @@ export interface Settings {
     whatsappNumber?: string;
     contactPhone?: string;
     contactEmail?: string;
+    mapsApiKey?: string;
 }
 
 // Public axios instance — no auth headers, used for endpoints accessible without login

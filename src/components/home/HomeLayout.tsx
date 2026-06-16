@@ -113,6 +113,7 @@ export const HomeLayout: React.FC = () => {
   const { callSupport, whatsappOrder } = useContactActions();
   const {
     location,
+    pincode: locationPincode,
     setLocation,
     clearLocation,
     reopenLocationSheet,
@@ -264,7 +265,7 @@ export const HomeLayout: React.FC = () => {
             }}
           />
           <HomeHeader
-            location={location ?? DELIVERY_LOCATION}
+            location={location ? { ...location, pincode: locationPincode ?? undefined } : DELIVERY_LOCATION}
             onPressLocation={() => setIsLocationSheetVisible(true)}
           />
           <HeroBanner content={appContent?.hero} isLoading={isHomeLoading} />
