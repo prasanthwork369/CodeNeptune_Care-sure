@@ -7,7 +7,6 @@ import React from 'react';
 import {
     Keyboard,
     KeyboardAvoidingView,
-    LayoutAnimation,
     Platform,
     Pressable,
     ScrollView,
@@ -37,30 +36,11 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     const insets = useSafeAreaInsets();
     const { height: windowHeight, width } = useWindowDimensions();
 
-    // Pinned at mount so Android adjustResize doesn't cause the background
-    // illustration to resize when the keyboard opens.
     const [backgroundHeight] = React.useState(() => windowHeight * 0.6);
 
     const isTablet = width >= 600;
     const panelMaxWidth = isTablet ? 560 : undefined;
     const panelPaddingH = isTablet ? Math.round(width * 0.08) : 32;
-
-    // On Android, adjustResize resizes the window instantly (no animation),
-    // which makes the footer jump to its new position. Smooth that layout
-    // change so the footer slides with the keyboard instead of snapping.
-    // iOS is already smooth via KeyboardAvoidingView's internal LayoutAnimation.
-    React.useEffect(() => {
-        if (!footer || Platform.OS !== 'android') return;
-        const animate = () =>
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        const s = Keyboard.addListener('keyboardDidShow', animate);
-        const h = Keyboard.addListener('keyboardDidHide', animate);
-        return () => {
-            s.remove();
-            h.remove();
-        };
-    }, [footer]);
-
     const skipScale = useSharedValue(1);
     const skipStyle = useAnimatedStyle(() => ({
         transform: [{ scale: skipScale.value }],
@@ -119,41 +99,22 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                 </Pressable>
             </Animated.View>
 
-            {/*
-              KeyboardAvoidingView (iOS only, when a footer is present):
-                behavior="padding" → animates its own height reduction by the keyboard
-                height, synced to the keyboard's native curve/duration via internal
-                LayoutAnimation. The ScrollView (flex:1) absorbs the shrink.
-                The footer (flex sibling below ScrollView) naturally sits at the
-                bottom of the shrunken KAV = directly above the keyboard.
-
-              Android: adjustResize handles window resizing at the OS level,
-                so behavior is left undefined. The footer rides to the new window
-                bottom automatically. LayoutAnimation (above) smooths the snap.
-            */}
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' && !!footer ? 'padding' : undefined}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={{ flexGrow: 1 }}
-                    style={{ flex: 1 }}
                 >
                     <Pressable onPress={Keyboard.dismiss} style={{ flexGrow: 1 }}>
-                        {/* Spacer pushes the white panel down behind the illustration */}
-                        <View
-                            style={{
-                                height: backgroundHeight - 24,
-                                backgroundColor: 'transparent',
-                            }}
-                        />
+                        {/* Flexible spacer — shrinks when KAV/resize compresses the container */}
+                        <View style={{ flex: 1, minHeight: backgroundHeight * 0.3 }} />
 
-                        {/* White panel */}
+                        {/* White panel — always at bottom, rides up as spacer shrinks */}
                         <View
                             style={{
-                                flexGrow: 1,
                                 backgroundColor: 'white',
                                 borderTopLeftRadius: 24,
                                 borderTopRightRadius: 24,
@@ -161,44 +122,29 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                                 maxWidth: panelMaxWidth,
                                 width: '100%',
                                 alignSelf: 'center',
+                                paddingTop: 32,
+                                paddingBottom: footer ? 0 : insets.bottom + 24,
                             }}
                         >
+                            {children}
+                        </View>
+
+                        {footer && (
                             <View
                                 style={{
-                                    flexGrow: 1,
-                                    paddingTop: 32,
-                                    paddingBottom: footer ? 0 : insets.bottom + 24,
+                                    backgroundColor: 'white',
+                                    paddingHorizontal: panelPaddingH,
+                                    paddingBottom: insets.bottom + 16,
+                                    maxWidth: panelMaxWidth,
+                                    width: '100%',
+                                    alignSelf: 'center',
                                 }}
                             >
-                                {children}
+                                {footer}
                             </View>
-                        </View>
+                        )}
                     </Pressable>
                 </ScrollView>
-
-                {/*
-                  Footer — flex sibling after ScrollView.
-                  Sits at the bottom of the KAV at all times. When the keyboard
-                  opens, the KAV shrinks (iOS) or the window shrinks (Android),
-                  and this block rides up naturally without any extra logic.
-                */}
-                {footer && (
-                    <View
-                        style={{
-                            backgroundColor: 'white',
-                            borderTopLeftRadius: 24,
-                            borderTopRightRadius: 24,
-                            paddingHorizontal: panelPaddingH,
-                            paddingTop: 12,
-                            paddingBottom: insets.bottom + 12,
-                            maxWidth: panelMaxWidth,
-                            width: '100%',
-                            alignSelf: 'center',
-                        }}
-                    >
-                        {footer}
-                    </View>
-                )}
             </KeyboardAvoidingView>
         </View>
     );

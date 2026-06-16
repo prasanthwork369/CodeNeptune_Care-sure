@@ -1,24 +1,24 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { CART_BUTTON_HEIGHT, colors } from "@/src/constants/theme";
+import { colors } from "@/src/constants/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Animated,
-    Image,
-    PanResponder,
-    Text,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  Animated,
+  Image,
+  PanResponder,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import ReAnimated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 interface ComparisonBoardProps {
@@ -186,7 +186,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   return (
     <View
       className="mx-4 mb-2 overflow-hidden"
-      style={{ width: cardWidth, height: boardHeight, backgroundColor: "transparent" }}
+      style={{
+        width: cardWidth,
+        height: boardHeight,
+        backgroundColor: "transparent",
+      }}
       {...panResponder.panHandlers}
     >
       {/* STATIC BASE LAYER — Left Column (You Searched) */}
@@ -354,13 +358,24 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     </Text>
                     {(() => {
                       const searchedPrice = searched.price ?? 0;
-                      const crossSaving = searchedPrice > 0
-                        ? parseFloat((searchedPrice - recommended.price).toFixed(2))
-                        : 0;
+                      const crossSaving =
+                        searchedPrice > 0
+                          ? parseFloat(
+                              (searchedPrice - recommended.price).toFixed(2),
+                            )
+                          : 0;
                       const ownSaving = parseFloat(
-                        (parseFloat(recommended.mrpDisplay) - parseFloat(recommended.priceDisplay)).toFixed(2)
+                        (
+                          parseFloat(recommended.mrpDisplay) -
+                          parseFloat(recommended.priceDisplay)
+                        ).toFixed(2),
                       );
-                      const effectiveSaving = crossSaving > 0 ? crossSaving : ownSaving > 0 ? ownSaving : 0;
+                      const effectiveSaving =
+                        crossSaving > 0
+                          ? crossSaving
+                          : ownSaving > 0
+                            ? ownSaving
+                            : 0;
 
                       if (effectiveSaving <= 0) return null;
                       return (
@@ -476,70 +491,70 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 paddingTop: 0,
               }}
             >
-                {count === 0 ? (
+              {count === 0 ? (
+                <Touchable
+                  onPress={handleIncrement}
+                  disabled={isPending}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Add ${recommended.name} to cart`}
+                  className="bg-brand-primary rounded-[12px] items-center justify-center"
+                  style={{ height: 46 }}
+                >
+                  <Text className="text-[15px] font-inter-bold text-white">
+                    {isPending ? "Adding..." : "Add"}
+                  </Text>
+                </Touchable>
+              ) : (
+                <View
+                  className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[12px] bg-white"
+                  style={{ height: 46 }}
+                >
+                  <Touchable
+                    onPress={handleDecrement}
+                    disabled={isPending}
+                    className="flex-1 items-center justify-center h-full"
+                  >
+                    <Text className="text-[24px] font-inter-semibold text-brand-text">
+                      −
+                    </Text>
+                  </Touchable>
+                  <View
+                    style={{
+                      width: 32,
+                      height: 24,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {isPending ? (
+                      <ActivityIndicator size="small" color="#0F7635" />
+                    ) : (
+                      <Animated.Text
+                        style={{
+                          transform: [{ translateY: slideAnim }],
+                          opacity: opacityAnim,
+                        }}
+                        className="text-[16px] font-inter-bold text-brand-text text-center px-2"
+                      >
+                        {count}
+                      </Animated.Text>
+                    )}
+                  </View>
                   <Touchable
                     onPress={handleIncrement}
                     disabled={isPending}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Add ${recommended.name} to cart`}
-                    className="bg-brand-primary rounded-[12px] items-center justify-center"
-                    style={{ height: 46 }}
+                    className="flex-1 items-center justify-center h-full"
                   >
-                    <Text className="text-[15px] font-inter-bold text-white">
-                      {isPending ? "Adding..." : "Add"}
+                    <Text className="text-[22px] font-inter-semibold text-brand-text">
+                      +
                     </Text>
                   </Touchable>
-                ) : (
-                  <View
-                    className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[12px] bg-white"
-                    style={{ height: 46 }}
-                  >
-                    <Touchable
-                      onPress={handleDecrement}
-                      disabled={isPending}
-                      className="flex-1 items-center justify-center h-full"
-                    >
-                      <Text className="text-[24px] font-inter-semibold text-brand-text">
-                        −
-                      </Text>
-                    </Touchable>
-                    <View
-                      style={{
-                        width: 32,
-                        height: 24,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {isPending ? (
-                        <ActivityIndicator size="small" color="#0F7635" />
-                      ) : (
-                        <Animated.Text
-                          style={{
-                            transform: [{ translateY: slideAnim }],
-                            opacity: opacityAnim,
-                          }}
-                          className="text-[16px] font-inter-bold text-brand-text text-center px-2"
-                        >
-                          {count}
-                        </Animated.Text>
-                      )}
-                    </View>
-                    <Touchable
-                      onPress={handleIncrement}
-                      disabled={isPending}
-                      className="flex-1 items-center justify-center h-full"
-                    >
-                      <Text className="text-[22px] font-inter-semibold text-brand-text">
-                        +
-                      </Text>
-                    </Touchable>
-                  </View>
-                )}
-              </View>
+                </View>
+              )}
             </View>
-          </Animated.View>
+          </View>
         </Animated.View>
+      </Animated.View>
 
       {/* FLOATING SWAP BUTTON — Reanimated UI-thread opacity, zero blink */}
       <ReAnimated.View

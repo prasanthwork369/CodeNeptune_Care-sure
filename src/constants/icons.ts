@@ -71,6 +71,7 @@ import calendar_month from "../../assets/icons/calendar_month.svg";
 import calendar_today from "../../assets/icons/calendar_today.svg";
 import cart_svg from "../../assets/icons/Cart.svg";
 import cart_outline from "../../assets/icons/cart_outline.svg";
+import cart_outline_profile from "../../assets/icons/cart_outline_profile.svg";
 import coin_group from "../../assets/icons/coin_group.svg";
 import description from "../../assets/icons/description.svg";
 import down_arrow from "../../assets/icons/down_arrow.svg";
@@ -194,6 +195,7 @@ export const icons = {
     calendar_month,
     calendar_today,
     cart_outline,
+    cart_outline_profile,
     coin_group,
     plus,
     cancel_white,

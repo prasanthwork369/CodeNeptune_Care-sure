@@ -1,22 +1,29 @@
+import { cartApi } from "@/src/api/cart.api";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
+import { queryClient } from "@/src/lib/react-query/queryClient";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { useCartPendingStore } from "@/src/store/cartStore";
 import { isExpoGo } from "@/src/utils/environment";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
-import { useCartPendingStore } from "@/src/store/cartStore";
-import { cartApi } from "@/src/api/cart.api";
-import { queryClient } from "@/src/lib/react-query/queryClient";
-import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import React, { useEffect, useRef, useState } from "react";
-import { Keyboard, Platform, Text, TextInput, View, ActivityIndicator } from "react-native";
+import {
+  ActivityIndicator,
+  Keyboard,
+  Platform,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { scale } from "react-native-size-matters";
 import { styles as s } from "./OtpLayout.styles";
-import { styles as formStyles } from "./sections/OtpForm.styles";
 import { AuthFooter } from "./sections/AuthFooter";
 import { AuthScreenShell } from "./sections/AuthScreenShell";
 import { OtpForm } from "./sections/OtpForm";
-import { icons } from "@/src/constants/icons";
-import { scale } from "react-native-size-matters";
+import { styles as formStyles } from "./sections/OtpForm.styles";
 
 // react-native-otp-verify is a native module unavailable in Expo Go
 const useOtpVerify =
@@ -126,14 +133,23 @@ export const OtpLayout: React.FC = () => {
   };
 
   const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key !== "Backspace") return;
-    if (otp[index]) {
+    const key = e.nativeEvent.key;
+    if (key === "Backspace") {
+      if (otp[index]) {
+        // Clear current box and stay — user retypes here
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        // Box already empty — go back
+        inputRefs.current[index - 1]?.focus();
+      }
+    } else if (/^\d$/.test(key) && otp[index]) {
+      // Box is filled — maxLength blocks onChangeText, so replace directly here
       const newOtp = [...otp];
-      newOtp[index] = "";
+      newOtp[index] = key;
       setOtp(newOtp);
-      if (index > 0) inputRefs.current[index - 1]?.focus();
-    } else if (index > 0) {
-      inputRefs.current[index - 1]?.focus();
+      if (index < 5) inputRefs.current[index + 1]?.focus();
     }
   };
 
@@ -154,21 +170,28 @@ export const OtpLayout: React.FC = () => {
       const guestCart = useCartPendingStore.getState().guestCart;
       if (guestCart && guestCart.items.length > 0) {
         await Promise.all(
-          guestCart.items.map(item =>
-            cartApi.addItem({
-              medicineId: item.medicineId,
-              variantId: item.metadata?.selectedVariantId || null,
-              medicineName: item.medicineName,
-              medicineSlug: item.medicineSlug,
-              unitPrice: Number(item.unitPrice),
-              mrp: Number(item.metadata?.price || item.originalPrice || item.unitPrice),
-              discountPercent: Number(item.discountPercent || 0),
-              quantity: item.quantity,
-              requiresPrescription: item.requiresPrescription,
-              image: item.image,
-              metadata: item.metadata,
-            }).catch(() => {}) // Ignore individual failures
-          )
+          guestCart.items.map(
+            (item) =>
+              cartApi
+                .addItem({
+                  medicineId: item.medicineId,
+                  variantId: item.metadata?.selectedVariantId || null,
+                  medicineName: item.medicineName,
+                  medicineSlug: item.medicineSlug,
+                  unitPrice: Number(item.unitPrice),
+                  mrp: Number(
+                    item.metadata?.price ||
+                      item.originalPrice ||
+                      item.unitPrice,
+                  ),
+                  discountPercent: Number(item.discountPercent || 0),
+                  quantity: item.quantity,
+                  requiresPrescription: item.requiresPrescription,
+                  image: item.image,
+                  metadata: item.metadata,
+                })
+                .catch(() => {}), // Ignore individual failures
+          ),
         );
         useCartPendingStore.getState().clearGuestCart();
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
@@ -221,7 +244,10 @@ export const OtpLayout: React.FC = () => {
             accessibilityRole="button"
             accessibilityLabel="Verify and continue"
             className="bg-brand-primary rounded-lg items-center justify-center flex-row"
-            style={[formStyles.btn, { opacity: isButtonLoading || !isValid ? 0.6 : 1 }]}
+            style={[
+              formStyles.btn,
+              { opacity: isButtonLoading || !isValid ? 0.6 : 1 },
+            ]}
           >
             {isButtonLoading ? (
               <ActivityIndicator color="#fff" size="small" />

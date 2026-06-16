@@ -22,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: "./assets/images/icon.png",
       backgroundColor: "#FFFFFF",
     },
-    softwareKeyboardLayoutMode: "resize",
+    softwareKeyboardLayoutMode: "pan",
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
   },
