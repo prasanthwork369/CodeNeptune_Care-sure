@@ -1,4 +1,4 @@
-import { MedicineComparisonLayout } from '@/src/components/prescription/MedicineComparisonLayout';
+import { MedicineComparisonLayout } from '@/src/components/prescription/medicine-comparison/MedicineComparisonLayout';
 import { usePrescriptionOrderMedicines } from '@/src/hooks/queries/usePrescriptionOrderMedicines';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { prescriptionOrderApi, ApiPrescriptionOrderItem } from '../../api/prescriptionOrder.api';
-import { ComparisonMedicine } from '../../components/prescription/MedicineComparisonLayout';
+import { ComparisonMedicine } from '../../components/prescription/medicine-comparison/types';
 
 const buildSaltComposition = (item: ApiPrescriptionOrderItem): string => {
     return item.original.salts

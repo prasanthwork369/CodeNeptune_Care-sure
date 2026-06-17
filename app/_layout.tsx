@@ -20,6 +20,7 @@ import { useEffect } from "react";
 import { Image, LogBox, Platform, View } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 LogBox.ignoreLogs([
@@ -115,6 +116,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardProvider>
         <SafeAreaProvider>
           <BottomSheetModalProvider>
             <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -139,6 +141,7 @@ export default function RootLayout() {
             </View>
           </BottomSheetModalProvider>
         </SafeAreaProvider>
+        </KeyboardProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>
   );
