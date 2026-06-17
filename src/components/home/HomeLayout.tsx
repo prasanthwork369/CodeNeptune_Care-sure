@@ -49,6 +49,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const easeOut = Easing.out(Easing.cubic);
+const EMPTY_BANNERS: NonNullable<ReturnType<typeof useHome>["appContent"]>["banners"] = [];
 
 function useSlideUp(delayMs: number) {
   const opacity = useSharedValue(0);
@@ -325,7 +326,7 @@ export const HomeLayout: React.FC = () => {
             }}
           >
             <BannerCarousel
-              banners={appContent?.banners || []}
+              banners={appContent?.banners ?? EMPTY_BANNERS}
               categories={cards}
               isLoading={isHomeLoading}
               isVisible={isBannerVisible && isScreenFocused}

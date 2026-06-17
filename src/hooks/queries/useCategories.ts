@@ -1,6 +1,7 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { categoryApi, type ApiCategoryFamily } from "../../api/category.api";
 import type { CategoryProduct } from "../../types/category";
 import type { CategoryCard, CategoryTab } from "../../types/home";
@@ -31,35 +32,41 @@ export const useCategories = () => {
     staleTime: 5 * 60_000,
   });
 
-  const tabs: CategoryTab[] = families.map((family) => ({
-    id: family.id,
-    label: family.mobileShortName || family.name,
-    imageActive: family.mobIconUrl
-      ? { uri: family.mobIconUrl }
-      : { uri: family.iconActive },
-    imageInactive: family.mobIconUrl
-      ? { uri: family.mobIconUrl }
-      : { uri: family.iconInactive },
-  }));
-
-  const seenCardIds = new Set<string>();
-  const cards: CategoryCard[] = families.flatMap((family) =>
-    (family.subCategories ?? [])
-      .filter((sub) => {
-        if (seenCardIds.has(sub.id)) return false;
-        seenCardIds.add(sub.id);
-        return true;
-      })
-      .map((sub, idx) => ({
-        id: sub.id,
-        slug: sub.slug,
-        familySlug: family.slug,
-        label: sub.name,
-        image: sub.imageUrl ? { uri: sub.imageUrl } : null,
-        bgColor: CARD_BG_COLORS[idx % CARD_BG_COLORS.length],
-        tabId: family.id,
+  const tabs: CategoryTab[] = useMemo(
+    () =>
+      families.map((family) => ({
+        id: family.id,
+        label: family.mobileShortName || family.name,
+        imageActive: family.mobIconUrl
+          ? { uri: family.mobIconUrl }
+          : { uri: family.iconActive },
+        imageInactive: family.mobIconUrl
+          ? { uri: family.mobIconUrl }
+          : { uri: family.iconInactive },
       })),
+    [families],
   );
+
+  const cards: CategoryCard[] = useMemo(() => {
+    const seenCardIds = new Set<string>();
+    return families.flatMap((family) =>
+      (family.subCategories ?? [])
+        .filter((sub) => {
+          if (seenCardIds.has(sub.id)) return false;
+          seenCardIds.add(sub.id);
+          return true;
+        })
+        .map((sub, idx) => ({
+          id: sub.id,
+          slug: sub.slug,
+          familySlug: family.slug,
+          label: sub.name,
+          image: sub.imageUrl ? { uri: sub.imageUrl } : null,
+          bgColor: CARD_BG_COLORS[idx % CARD_BG_COLORS.length],
+          tabId: family.id,
+        })),
+    );
+  }, [families]);
 
   return { tabs, cards, isLoading, error, refetch };
 };

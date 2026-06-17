@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 /**
  * Drop-in for useRouter().
@@ -32,5 +32,5 @@ export function useNav() {
     router.back();
   }, [router]);
 
-  return { push, replace, back };
+  return useMemo(() => ({ push, replace, back }), [push, replace, back]);
 }
