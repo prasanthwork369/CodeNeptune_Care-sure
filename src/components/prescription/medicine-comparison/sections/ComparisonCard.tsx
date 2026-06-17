@@ -24,9 +24,8 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         width: cardWidth,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: "#E5E7EB",
+        borderColor: "#919EAB33",
         overflow: "hidden",
-        marginBottom: 16,
         backgroundColor: "#fff",
       }}
     >
@@ -39,6 +38,8 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           paddingTop: 12,
           paddingBottom: 6,
           gap: 6,
+          borderTopLeftRadius: 15,
+          borderTopRightRadius: 15,
         }}
       >
         <icons.info_outline width={13} height={13} fill="#6B7280" />
@@ -70,7 +71,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         style={{
           flexDirection: "row",
           borderTopWidth: 1,
-          borderTopColor: "#E5E7EB",
+          borderTopColor: "#919EAB33",
         }}
       >
         {/* Left — Prescribed */}
@@ -81,6 +82,9 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             flexDirection: "column",
             justifyContent: "space-between",
             backgroundColor: "#fff",
+            borderBottomLeftRadius: 15,
+            borderRightWidth: 1,
+            borderRightColor: "#919EAB33",
           }}
         >
           <View>
@@ -88,7 +92,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               style={{
                 borderRadius: 10,
                 borderWidth: 1,
-                borderColor: "#E5E7EB",
+                borderColor: "#919EAB33",
                 width: 76,
                 height: 76,
                 alignItems: "center",
@@ -178,6 +182,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             flexDirection: "column",
             justifyContent: "space-between",
             position: "relative",
+            borderBottomRightRadius: 15,
           }}
         >
           {item.recommended.discountPercent > 0 && (

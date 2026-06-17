@@ -1,6 +1,8 @@
 import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
+import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
 import { CartBillSummary } from "@/src/components/cart/sections/CartBillSummary";
 import { CartCoinsSection } from "@/src/components/cart/sections/CartCoinsSection";
+import { CartConfetti } from "@/src/components/cart/sections/CartConfetti";
 import { CartCouponSection } from "@/src/components/cart/sections/CartCouponSection";
 import { CartDeliveringTo } from "@/src/components/cart/sections/CartDeliveringTo";
 import { CartFooter } from "@/src/components/cart/sections/CartFooter";
@@ -8,11 +10,9 @@ import { CartSavingsBreakdown } from "@/src/components/cart/sections/CartSavings
 import { CartTerms } from "@/src/components/cart/sections/CartTerms";
 import { CartWalletSection } from "@/src/components/cart/sections/CartWalletSection";
 import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
+import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { Touchable } from "@/src/components/ui/Touchable";
-import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/hooks/queries/useAddress";
-import { useCart } from "@/src/hooks/queries/useCart";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
@@ -20,7 +20,8 @@ import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionBannerStore } from "@/src/store/prescriptionBannerStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import React, { useState } from "react";
+import LottieView from "lottie-react-native";
+import React, { useMemo, useRef, useState } from "react";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import {
     ScrollView,
@@ -48,21 +49,36 @@ export const MedicineComparisonLayout: React.FC<
   const { width } = useWindowDimensions();
   const cardWidth = width - 32;
 
-  const { totalItems } = useCart();
   const { markVerifiedBannerCompleted, isVerifiedBannerCompleted } =
     usePrescriptionBannerStore();
   const setPrescriptionOrderItems = usePrescriptionOrderStore((s) => s.setItems);
+  const walletConfettiRef = useRef<LottieView>(null);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [walletOn, setWalletOn] = useState(false);
   const [coinsOn, setCoinsOn] = useState(false);
+  const [showCoinsSheet, setShowCoinsSheet] = useState(false);
   const [refillOn, setRefillOn] = useState(false);
+  const [showReminderSheet, setShowReminderSheet] = useState(false);
   const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({ y: 0, height: 0 });
   const scrollYShared = useSharedValue(0);
 
   const handleScroll = (event: any) => {
     const y = event.nativeEvent.contentOffset.y;
     scrollYShared.value = y;
+  };
+
+  const handleWalletToggle = (v: boolean) => {
+    setWalletOn(v);
+    if (v) walletConfettiRef.current?.play();
+  };
+
+  const handleCoinsToggle = () => {
+    setCoinsOn((v) => {
+      const next = !v;
+      if (next) walletConfettiRef.current?.play();
+      return next;
+    });
   };
 
   // Delivery location
@@ -90,12 +106,27 @@ export const MedicineComparisonLayout: React.FC<
   // Coupon
   const { applied: appliedCoupon, remove: removeCoupon } = useCouponStore();
 
+  // Merge duplicate entries for the same recommended medicine, summing quantities
+  const mergedMedicines = useMemo(() => {
+    const map = new Map<string, ComparisonMedicine>();
+    for (const med of medicines ?? []) {
+      const key = med.recommended.id;
+      const existing = map.get(key);
+      if (existing) {
+        map.set(key, { ...existing, quantity: (existing.quantity || 1) + (med.quantity || 1) });
+      } else {
+        map.set(key, { ...med });
+      }
+    }
+    return Array.from(map.values());
+  }, [medicines]);
+
   // Pricing — qty based on recommended medicine quantity
-  const subtotal = (medicines ?? []).reduce(
+  const subtotal = mergedMedicines.reduce(
     (sum, item) => sum + (item.recommended.price * (item.quantity || 1)),
     0,
   );
-  const mrpTotal = (medicines ?? []).reduce(
+  const mrpTotal = mergedMedicines.reduce(
     (sum, item) => sum + (item.recommended.mrp * (item.quantity || 1)),
     0,
   );
@@ -132,7 +163,7 @@ export const MedicineComparisonLayout: React.FC<
       markVerifiedBannerCompleted(prescriptionId);
     }
     setPrescriptionOrderItems(
-      (medicines ?? []).map((item) => ({
+      mergedMedicines.map((item) => ({
         medicineId: item.recommended.id,
         medicineName: item.recommended.name,
         medicineSlug: item.recommended.slug,
@@ -155,49 +186,15 @@ export const MedicineComparisonLayout: React.FC<
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+      <CartConfetti ref={walletConfettiRef} />
+
       <ScreenHeader
         title="Medicine Comparison"
         showBorder
-        rightSlot={
-          <Touchable
-            onPress={() => router.push("/(modal)/cart")}
-            className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center shadow-sm"
-            style={{ position: "relative" }}
-          >
-            <icons.cart_outline width={22} height={22} />
-            {totalItems > 0 && (
-              <View
-                style={{
-                  position: "absolute",
-                  top: -2,
-                  right: -2,
-                  minWidth: 18,
-                  height: 18,
-                  borderRadius: 9,
-                  backgroundColor: "#FF3B30",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingHorizontal: 3,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 9,
-                    fontFamily: "Inter-Bold",
-                    color: "#fff",
-                    lineHeight: 12,
-                  }}
-                >
-                  {totalItems}
-                </Text>
-              </View>
-            )}
-          </Touchable>
-        }
       />
 
       <ScrollView
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: "#F9FAFB" }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: bottom + 100 }}
         stickyHeaderIndices={totalSavings > 0 ? [2] : [1]}
@@ -226,30 +223,41 @@ export const MedicineComparisonLayout: React.FC<
           }}
           style={{ padding: 16, paddingBottom: 0 }}
         >
-          {(medicines ?? []).map((item) => (
-            <ComparisonCard
-              key={item.id}
-              item={item}
-              cardWidth={cardWidth}
-              count={item.quantity || 1}
-            />
+          {mergedMedicines.map((item) => (
+            <View key={item.id} style={{ marginBottom: 16 }}>
+              <ComparisonCard
+                item={item}
+                cardWidth={cardWidth}
+                count={item.quantity || 1}
+              />
+            </View>
           ))}
         </View>
 
         {/* Refill Reminder */}
-        <RefillReminder value={refillOn} onToggle={setRefillOn} />
+        <RefillReminder
+          value={refillOn}
+          onToggle={(v) => {
+            if (v) {
+              setShowReminderSheet(true);
+            } else {
+              setRefillOn(false);
+            }
+          }}
+        />
 
         {/* Coupons */}
         <CartCouponSection
           appliedCoupon={appliedCoupon}
           onRemove={removeCoupon}
+          subtotal={subtotal}
         />
 
         {/* Wallet */}
         <CartWalletSection
           value={walletOn}
           walletBalance={walletBalance}
-          onToggle={setWalletOn}
+          onToggle={handleWalletToggle}
         />
 
         {/* Coins */}
@@ -257,8 +265,8 @@ export const MedicineComparisonLayout: React.FC<
           value={coinsOn}
           availableCoins={availableCoins}
           redeemedCoins={coinsOn ? Math.floor(maxCoinsUsable) : 0}
-          onToggle={() => setCoinsOn((v) => !v)}
-          onInfoPress={() => {}}
+          onToggle={handleCoinsToggle}
+          onInfoPress={() => setShowCoinsSheet(true)}
         />
 
         {/* Total Bill */}
@@ -291,7 +299,7 @@ export const MedicineComparisonLayout: React.FC<
       <BillDetailsSheet
         isVisible={showBillDetails}
         onClose={() => setShowBillDetails(false)}
-        linesCount={medicines?.length ?? 0}
+        linesCount={mergedMedicines.length}
         mrpTotal={mrpTotal}
         productSavings={productSavings}
         couponDiscount={COUPON_DISCOUNT}
@@ -302,9 +310,23 @@ export const MedicineComparisonLayout: React.FC<
         toPay={toPay}
       />
 
+      <CareSureCoinsSheet
+        isVisible={showCoinsSheet}
+        onClose={() => setShowCoinsSheet(false)}
+        availableCoins={availableCoins}
+        savedAmount={COINS_DISCOUNT}
+        coinValue={coinValue}
+      />
+
       <LocationBottomSheet
         isVisible={showLocationSheet}
         onClose={() => setShowLocationSheet(false)}
+      />
+
+      <ReminderSheet
+        isVisible={showReminderSheet}
+        onClose={() => setShowReminderSheet(false)}
+        onConfirm={() => setRefillOn(true)}
       />
     </View>
   );

@@ -138,6 +138,7 @@ export interface CartItemsListProps {
 export interface CartCouponSectionProps {
   appliedCoupon: any;
   onRemove: () => void;
+  subtotal: number;
 }
 
 export interface CartWalletSectionProps {

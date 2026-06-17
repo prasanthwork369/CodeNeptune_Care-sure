@@ -41,6 +41,7 @@ export const CartLayout: React.FC = () => {
     showLocationSheet,
     setShowLocationSheet,
     lines,
+    subtotal,
     mrpTotal,
     productSavings,
     coinValue,
@@ -120,6 +121,7 @@ export const CartLayout: React.FC = () => {
         <CartCouponSection
           appliedCoupon={appliedCoupon}
           onRemove={removeCoupon}
+          subtotal={subtotal}
         />
 
         {walletBalance > 0 && (
