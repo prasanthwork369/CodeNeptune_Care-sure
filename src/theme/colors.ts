@@ -40,4 +40,9 @@ export const colors = {
     yellow: '#FFF9EB',
     mint: '#F2FFEB',
   },
+
+  gradients: {
+    savingsBanner: ['#D0EBFE', '#D7FFEA'],
+    brand: ['#0F7635', '#0B5A28'],
+  },
 } as const;
