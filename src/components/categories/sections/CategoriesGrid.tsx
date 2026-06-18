@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ScrollView, Text } from 'react-native';
-import { gridStyles as s } from '../categories.styles';
+import { gridStyles as s, CARD_RADIUS } from '../categories.styles';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { useNav } from '@/src/hooks/useNav';
@@ -12,7 +12,6 @@ interface CategoriesGridProps {
     cards: CategoryCard[];
     cardWidth: number;
     cardHeight: number;
-    gridGap: number;
     padding: number;
     safeAreaBottom: number;
     isLoading?: boolean;
@@ -22,7 +21,6 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
     cards,
     cardWidth,
     cardHeight,
-    gridGap,
     padding,
     safeAreaBottom,
     isLoading,
@@ -39,14 +37,13 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                     paddingBottom: components.tabBar.height + safeAreaBottom + 40,
                 }}
             >
-                <View className="flex-row flex-wrap justify-between">
+                <View style={s.grid}>
                     {Array.from({ length: 6 }).map((_, i) => (
                         <Skeleton
                             key={i}
                             width={cardWidth}
                             height={cardHeight}
-                            borderRadius={16}
-                            style={{ marginBottom: gridGap }}
+                            borderRadius={CARD_RADIUS}
                         />
                     ))}
                 </View>
@@ -63,39 +60,43 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                 paddingBottom: components.tabBar.height + safeAreaBottom + 40,
             }}
         >
-            <View className="flex-row flex-wrap justify-between">
-                {Array.from({ length: Math.max(cards.length, 6) }).map((_, index) => {
-                    const card = cards[index];
-                    if (!card) {
-                        return (
-                            <View
-                                key={`empty-${index}`}
-                                style={{ width: cardWidth, height: cardHeight, marginBottom: gridGap }}
-                            />
-                        );
-                    }
-                    return (
-                        <Touchable
-                            key={card.id}
-                            activeOpacity={0.8}
-                            onPress={() => router.push({
-                                pathname: '/category/[id]',
-                                params: { id: card.id, slug: card.slug, familySlug: card.familySlug, name: card.label.replace('\n', ' ') },
-                            })}
-                            style={{ width: cardWidth, height: cardHeight, backgroundColor: card.bgColor, marginBottom: gridGap }}
-                            className="rounded-[16px] overflow-hidden relative"
-                        >
-                            <Text style={s.cardLabel} className="font-inter-semibold text-brand-text p-3 leading-tight z-10">
-                                {card.label}
-                            </Text>
-                            <Image
-                                source={card.image}
-                                style={{ width: cardWidth * 0.75, height: cardHeight * 0.7, position: 'absolute', bottom: 0, right: 0 }}
-                                contentFit="contain"
-                            />
-                        </Touchable>
-                    );
-                })}
+            <View style={s.column}>
+                {Array.from({ length: Math.ceil(Math.max(cards.length, 6) / 2) }).map((_, rowIndex) => (
+                    <View key={`row-${rowIndex}`} style={s.row}>
+                        {[0, 1].map((col) => {
+                            const index = rowIndex * 2 + col;
+                            const card = cards[index];
+                            if (!card) {
+                                return (
+                                    <View
+                                        key={`empty-${index}`}
+                                        style={{ width: cardWidth, height: cardHeight }}
+                                    />
+                                );
+                            }
+                            return (
+                                <Touchable
+                                    key={card.id}
+                                    activeOpacity={0.8}
+                                    onPress={() => router.push({
+                                        pathname: '/category/[id]',
+                                        params: { id: card.id, slug: card.slug, familySlug: card.familySlug, name: card.label.replace('\n', ' ') },
+                                    })}
+                                    style={[s.card, { width: cardWidth, height: cardHeight, backgroundColor: card.bgColor }]}
+                                >
+                                    <Text style={s.cardLabel} className="font-inter-semibold text-brand-text p-3 z-10">
+                                        {card.label}
+                                    </Text>
+                                    <Image
+                                        source={card.image}
+                                        style={s.cardImage}
+                                        contentFit="contain"
+                                    />
+                                </Touchable>
+                            );
+                        })}
+                    </View>
+                ))}
             </View>
         </ScrollView>
     );

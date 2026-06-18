@@ -26,6 +26,28 @@ export const sidebarStyles = StyleSheet.create({
 });
 
 // CategoriesGrid
+export const CARD_WIDTH    = scale(124);
+export const CARD_HEIGHT   = scale(110);
+export const GRID_GAP      = scale(12);
+export const GRID_PADDING  = scale(10);
+export const CARD_RADIUS   = scale(10);
+
+export const CARD_IMAGE_WIDTH  = scale(91.34);
+export const CARD_IMAGE_HEIGHT = scale(82.02);
+export const CARD_IMAGE_LEFT   = scale(35);
+
 export const gridStyles = StyleSheet.create({
-    cardLabel: { fontSize: moderateScale(14, 0.25) },
+    cardLabel: { fontSize: moderateScale(12, 0.25), lineHeight: moderateScale(18, 0.25), letterSpacing: 0 },
+    card:      { borderRadius: CARD_RADIUS, overflow: 'hidden', position: 'relative' },
+    grid:      { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
+    column:    { gap: GRID_GAP },
+    row:       { flexDirection: 'row', gap: GRID_GAP },
+    cardImage: {
+        position: 'absolute',
+        bottom: scale(-8),
+        left: CARD_IMAGE_LEFT,
+        width: CARD_IMAGE_WIDTH,
+        height: CARD_IMAGE_HEIGHT,
+        opacity: 1,
+    },
 });

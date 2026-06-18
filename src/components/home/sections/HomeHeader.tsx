@@ -62,7 +62,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           accessibilityLabel={`Change delivery location, current ${location.label || location.city}`}
           className="flex-row items-center mt-1.5"
         >
-          <Text style={s.locationText} className="font-inter-medium capitalize">
+          <Text style={s.locationText} className="font-inter-bold capitalize">
             {location.pincode
               ? `${location.city} - ${location.pincode}`
               : location.label &&

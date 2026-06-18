@@ -5,13 +5,13 @@ import { moderateScale, scale } from "react-native-size-matters";
 export const styles = StyleSheet.create({
   deliverLabel: {
     fontSize: moderateScale(12, 0.3),
-    lineHeight: moderateScale(16, 0.3),
-    letterSpacing: 0,
+    lineHeight: moderateScale(14, 0.3),
+    letterSpacing: 0.4,
     color: "#333232",
   },
   locationText: {
     fontSize: moderateScale(16, 0.3),
-    lineHeight: moderateScale(16, 0.3),
+    lineHeight: moderateScale(18, 0.3),
     letterSpacing: 0,
     color: colors.text,
   },
