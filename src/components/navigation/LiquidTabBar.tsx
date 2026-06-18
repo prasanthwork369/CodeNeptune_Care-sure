@@ -34,8 +34,9 @@ const SNAP_SPRING   = { damping: 28, stiffness: 420, mass: 0.5 } as const;
 const TRAIL_SPRING  = { damping: 22, stiffness: 320, mass: 0.6 } as const;
 // Material-style easing for tab bar show/hide
 const SLIDE_EASING  = Easing.bezier(0.4, 0, 0.2, 1);
-// Gentle spring for the upload button's expand/collapse width
-const WIDTH_SPRING = { damping: 20, stiffness: 140, mass: 0.7 } as const;
+// Snappier, tighter spring for the upload button's expand/collapse width —
+// matches SLIDE_SPRING's feel more closely so both stay in sync.
+const WIDTH_SPRING = { damping: 22, stiffness: 260, mass: 0.6 } as const;
 // Gentle spring for the upload button's icon/text slide transitions
 const SLIDE_SPRING = { damping: 18, stiffness: 130, mass: 0.6 } as const;
 // Smooth ease for the upload button's text fade
@@ -68,13 +69,22 @@ const AnimatedUploadButton = React.memo(({ onPress }: { onPress: () => void }) =
         }
     }, []);
 
+    // Single effect drives width, text opacity, and icon/text position
+    // together whenever the collapsed state flips, so they stay in lockstep
+    // instead of two independent effects animating related properties with
+    // different spring/timing configs (which could fall out of sync).
     useEffect(() => {
         let timeout: ReturnType<typeof setTimeout>;
+
+        buttonWidth.value = withSpring(isUploadButtonCollapsed ? PILL_HEIGHT : FAB_WIDTH, WIDTH_SPRING);
+        textOpacity.value = withTiming(isUploadButtonCollapsed ? 0 : 1, { duration: 220, easing: TRANSLATE_EASING });
+
         const tick = (expand: boolean) => {
             if (isUploadButtonCollapsed) return;
             animateTo(expand);
             timeout = setTimeout(() => tick(!expand), expand ? HOLD_EXPANDED_MS : HOLD_COLLAPSED_MS);
         };
+
         if (!isUploadButtonCollapsed) {
             timeout = setTimeout(() => tick(true), AUTO_EXPAND_DELAY);
         } else {
@@ -82,11 +92,6 @@ const AnimatedUploadButton = React.memo(({ onPress }: { onPress: () => void }) =
             textTranslate.value = withSpring(TEXT_OFF_RIGHT, SLIDE_SPRING);
         }
         return () => clearTimeout(timeout);
-    }, [isUploadButtonCollapsed]);
-
-    useEffect(() => {
-        buttonWidth.value  = withSpring(isUploadButtonCollapsed ? PILL_HEIGHT : FAB_WIDTH, WIDTH_SPRING);
-        textOpacity.value  = withTiming(isUploadButtonCollapsed ? 0 : 1, { duration: 220, easing: TRANSLATE_EASING });
     }, [isUploadButtonCollapsed]);
 
     const animatedButtonStyle = useAnimatedStyle(() => ({
