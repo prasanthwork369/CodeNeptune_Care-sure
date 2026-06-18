@@ -141,9 +141,10 @@ export const HomeLayout: React.FC = () => {
     }, [reopenLocationSheet]),
   );
   const heroHeightRef = useRef(0);
+  const heroHeightShared = useSharedValue(0);
   const { scrollY, handleScroll, stickySearchVisible } =
     useHomeScroll(heroHeightRef);
-  const { safeAreaBgStyle } = useScrollStatusBar(scrollY);
+  const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
   const TAB_BAR_HEIGHT = 75 + insets.bottom;
 
   useEffect(() => {
@@ -223,14 +224,11 @@ export const HomeLayout: React.FC = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <Animated.View style={safeAreaBgStyle}>
-        <LinearGradient
-          colors={["#DEF5B0", "#EAF9D1", "#F6FDF0"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={{ flex: 1 }}
-        />
-      </Animated.View>
+      {/* Invisible while the hero (with its own gradient extending up behind
+          the status bar) is still in view — avoids double-painting/seaming
+          against it. Snaps to solid white only once the hero has scrolled
+          past, matching the hero gradient's own end color at that point. */}
+      <Animated.View style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1"
@@ -251,6 +249,7 @@ export const HomeLayout: React.FC = () => {
         <View
           onLayout={(e) => {
             heroHeightRef.current = e.nativeEvent.layout.height;
+            heroHeightShared.value = e.nativeEvent.layout.height;
           }}
         >
           <LinearGradient

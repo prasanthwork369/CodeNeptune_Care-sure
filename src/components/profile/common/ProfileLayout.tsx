@@ -84,7 +84,7 @@ export const ProfileLayout: React.FC = () => {
 
     return (
         <View className="flex-1 bg-[#F5F6FB]">
-            <Animated.View style={safeAreaBgStyle} />
+            <Animated.View style={[safeAreaBgStyle, { backgroundColor: '#F5F6FB' }]} />
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
