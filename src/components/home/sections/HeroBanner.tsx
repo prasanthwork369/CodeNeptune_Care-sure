@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SvgUri } from "react-native-svg";
+import { styles, TITLE_LINE_HEIGHT } from "./HeroBanner.styles";
 
 const ease = Easing.out(Easing.cubic);
 
@@ -70,6 +71,17 @@ interface HeroBannerProps {
   isLoading?: boolean;
 }
 
+// Trims title to "Stop overpaying" (removes "for your" and cycling words)
+const getCleanTitlePart1 = (rawTitle?: string): string => {
+  if (!rawTitle) return "Stop overpaying";
+  const lowercaseTitle = rawTitle.toLowerCase();
+  const forYourIndex = lowercaseTitle.indexOf("for your");
+  if (forYourIndex !== -1) {
+    return rawTitle.substring(0, forYourIndex).trim();
+  }
+  return "Stop overpaying";
+};
+
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   content,
   isLoading,
@@ -84,17 +96,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
   // Never shrink below mobile baseline; scale up gently on large screens
   const scale = Math.max(1, Math.sqrt(bannerWidth / 358));
-  const titleFontSize = Math.min(Math.max(Math.round(21 * scale), 16), 26);
-  const lineHeight = Math.round(titleFontSize * 1.34);
-  const badgeFontSize = Math.min(Math.max(Math.round(13 * scale), 11), 16);
-  const badgeIconSize = Math.min(Math.max(Math.round(16 * scale), 12), 20);
+  const lineHeight = Math.round(
+    Math.min(Math.max(Math.round(21 * scale), 16), 26) * 1.34,
+  );
   const contentPaddingTop = Math.round(32 * scale);
   const badgeMarginTop = Math.round(20 * scale);
-  const badgePaddingH = Math.round(12 * scale);
-  const badgePaddingV = Math.round(6 * scale);
-  const badgeGap = Math.round(10 * scale);
-  const decor1Size = Math.round(28 * scale);
-  const decor2Size = Math.round(24 * scale);
 
   // Hooks must be called before any early return
   const leftAnim = useSlideUp(200);
@@ -104,16 +110,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
   if (isLoading || !content) {
     return (
-      <View
-        style={{
-          height: bannerHeight,
-          borderRadius: 20,
-          borderWidth: 1,
-          borderColor: "#E5E7EB",
-          backgroundColor: "#FAFAFA",
-        }}
-        className="mx-4 mt-5 overflow-hidden"
-      >
+      <View style={styles.skeletonContainer}>
         {/* Left: mirrors flex-[1.2] */}
         <View
           style={{
@@ -142,18 +139,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </View>
 
         {/* Right: person */}
-        <View
-          style={{
-            position: "absolute",
-            right: -10,
-            bottom: -5,
-            width: personWidth,
-            height: personHeight,
-          }}
-        >
+        <View style={styles.avatar}>
           <Skeleton
-            width={personWidth}
-            height={personHeight}
+            width={styles.avatar.width}
+            height={styles.avatar.height}
             borderRadius={16}
           />
         </View>
@@ -167,36 +156,56 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const highlights = content.highlighted_text ?? [];
 
   return (
-    <View
-      style={{
-        height: bannerHeight,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "#00D1501A",
-        overflow: "hidden",
-      }}
-      className="mx-4 mt-5"
-    >
-    <LinearGradient
-      colors={["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={{ flex: 1 }}
-      className="flex-row items-stretch"
-    >
-      {/* ── Right: Person image (rendered first so the text below always stacks above it) ── */}
-      <Animated.View
-        style={[
-          {
-            width: personWidth,
-            height: personHeight,
-            position: "absolute",
-            right: -10,
-            bottom: -5,
-          },
-          rightAnim,
-        ]}
+    <View style={styles.container}>
+      {/* Background Gradient Card */}
+      <LinearGradient
+        colors={["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={{ flex: 1, borderRadius: 12, overflow: "hidden" }}
+        className="flex-row items-stretch"
       >
+        {/* ── Left: Text block ── */}
+        <Animated.View
+          style={[leftAnim, { paddingRight: Math.round(personWidth * 0.82) }]}
+          className="flex-[1.2] pl-3 pt-8 justify-start"
+        >
+          <View>
+            {/* First line (e.g. 'Stop overpaying') */}
+            <Text style={styles.titleText} className="text-brand-text">
+              {getCleanTitlePart1(title)}
+            </Text>
+
+            {/* Second line (inline 'for your' prefix and cycling word cycler) */}
+            <View className="flex-row items-center">
+              <Text style={styles.titleText} className="text-brand-text">
+                for your{" "}
+              </Text>
+              <TextCycler
+                words={highlights}
+                lineHeight={TITLE_LINE_HEIGHT}
+                style={styles.titleText}
+                className="text-brand-primary"
+              />
+            </View>
+          </View>
+
+          {/* Pay less badge */}
+          <View style={styles.badgeContainer}>
+            {content.labelImage ? (
+              <SvgUri
+                uri={content.labelImage}
+                width={styles.badgeIcon.width}
+                height={styles.badgeIcon.height}
+              />
+            ) : null}
+            <Text style={styles.badgeText}>{badgeText}</Text>
+          </View>
+        </Animated.View>
+      </LinearGradient>
+
+      {/* ── Right: Person image (positioned absolute, sibling to allow overflow) ── */}
+      <Animated.View style={[styles.avatar, rightAnim]}>
         <Image
           source={mainImage}
           style={{ width: "100%", height: "100%" }}
@@ -205,91 +214,21 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         />
       </Animated.View>
 
-      {/* ── Left: Text block ── */}
-      <Animated.View
-        style={[leftAnim, { paddingRight: Math.round(personWidth * 0.82) }]}
-        className="flex-[1.2] pl-3 pt-8 justify-start"
-      >
-        <View>
-          <Text
-            style={{ fontSize: titleFontSize, lineHeight }}
-            className="font-inter-extrabold text-brand-text"
-          >
-            {title.replace("for your", "").trim()}
-          </Text>
-
-          <View className="flex-row items-center">
-            <Text
-              style={{
-                fontSize: titleFontSize,
-                lineHeight,
-                includeFontPadding: false,
-              }}
-              className="font-inter-extrabold text-brand-text"
-            >
-              for your{" "}
-            </Text>
-            <TextCycler
-              words={highlights}
-              lineHeight={lineHeight}
-              style={{ fontSize: titleFontSize }}
-              className="font-inter-extrabold text-brand-primary"
-            />
-          </View>
-        </View>
-
-        {/* Pay less badge */}
-        <View
-          style={{
-            shadowColor: "#919EAB33",
-            shadowOpacity: 0.06,
-            shadowRadius: 4,
-            elevation: 2,
-          }}
-          className="flex-row items-center bg-white rounded-full px-3 py-1.5 mt-5 self-start gap-2.5"
-        >
-          {content.labelImage ? (
-            <SvgUri
-              uri={content.labelImage}
-              width={badgeIconSize}
-              height={badgeIconSize}
-            />
-          ) : null}
-          <Text
-            style={{ fontSize: badgeFontSize }}
-            className="font-inter-semibold text-brand-primary"
-          >
-            {badgeText}
-          </Text>
-        </View>
-      </Animated.View>
-
       {/* ── Background Decors (floating) ── */}
-      <Animated.View
-        style={[
-          { position: "absolute", top: 30, right: personWidth - 50 },
-          float1Anim,
-        ]}
-      >
+      <Animated.View style={[styles.decorPills, float1Anim]}>
         <Image
           source={HOME_IMAGES.bannerPills}
-          style={{ width: decor1Size, height: decor1Size, opacity: 0.9 }}
+          style={{ width: "100%", height: "100%" }}
           contentFit="contain"
         />
       </Animated.View>
-      <Animated.View
-        style={[
-          { position: "absolute", bottom: 36, right: personWidth - 10 },
-          float2Anim,
-        ]}
-      >
+      <Animated.View style={[styles.decorMedicine, float2Anim]}>
         <Image
           source={HOME_IMAGES.bannerMedicine}
-          style={{ width: decor2Size, height: decor2Size, opacity: 0.8 }}
+          style={{ width: "100%", height: "100%" }}
           contentFit="contain"
         />
       </Animated.View>
-    </LinearGradient>
     </View>
   );
 };

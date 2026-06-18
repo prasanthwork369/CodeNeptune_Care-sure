@@ -1,17 +1,17 @@
 import {
-  BannerCarousel,
-  FloatingBannersCarousel,
-  FrequentSubstitutes,
-  HealthEssentials,
-  HeroBanner,
-  HomeFooter,
-  HomeHeader,
-  LocationBottomSheet,
-  QuickActions,
-  SearchBar,
-  ShopByCategories,
-  SmartSubstitution,
-  WhyFamiliesTrustUs,
+    BannerCarousel,
+    FloatingBannersCarousel,
+    FrequentSubstitutes,
+    HealthEssentials,
+    HeroBanner,
+    HomeFooter,
+    HomeHeader,
+    LocationBottomSheet,
+    QuickActions,
+    SearchBar,
+    ShopByCategories,
+    SmartSubstitution,
+    WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
@@ -34,22 +34,24 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  RefreshControl,
-  ScrollView,
-  View,
-  useWindowDimensions,
+    RefreshControl,
+    ScrollView,
+    View,
+    useWindowDimensions,
 } from "react-native";
 import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withTiming,
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const easeOut = Easing.out(Easing.cubic);
-const EMPTY_BANNERS: NonNullable<ReturnType<typeof useHome>["appContent"]>["banners"] = [];
+const EMPTY_BANNERS: NonNullable<
+  ReturnType<typeof useHome>["appContent"]
+>["banners"] = [];
 
 function useSlideUp(delayMs: number) {
   const opacity = useSharedValue(0);
@@ -228,7 +230,9 @@ export const HomeLayout: React.FC = () => {
           the status bar) is still in view — avoids double-painting/seaming
           against it. Snaps to solid white only once the hero has scrolled
           past, matching the hero gradient's own end color at that point. */}
-      <Animated.View style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]} />
+      <Animated.View
+        style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1"
@@ -265,7 +269,11 @@ export const HomeLayout: React.FC = () => {
             }}
           />
           <HomeHeader
-            location={location ? { ...location, pincode: locationPincode ?? undefined } : DELIVERY_LOCATION}
+            location={
+              location
+                ? { ...location, pincode: locationPincode ?? undefined }
+                : DELIVERY_LOCATION
+            }
             onPressLocation={() => setIsLocationSheetVisible(true)}
           />
           <HeroBanner content={appContent?.hero} isLoading={isHomeLoading} />

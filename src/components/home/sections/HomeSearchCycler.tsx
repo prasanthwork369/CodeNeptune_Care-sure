@@ -114,6 +114,7 @@ export const HomeSearchCycler: React.FC = () => {
         fontFamily: 'Inter-Medium' as const,
         color: '#9CA3AF',
         includeFontPadding: false,
+        verticalAlign: 'middle' as const,
     };
 
     return (
@@ -130,6 +131,6 @@ export const HomeSearchCycler: React.FC = () => {
 
 const styles = StyleSheet.create({
     window: { flex: 1, height: SLOT_H, overflow: 'hidden' },
-    slot:   { position: 'absolute', left: 0 },
+    slot:   { position: 'absolute', left: 0, top: 0, bottom: 0 },
     bold:   { fontFamily: 'Inter-SemiBold', color: '#6B7280' },
 });
