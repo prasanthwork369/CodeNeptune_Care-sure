@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { ANIMATIONS } from "@/src/constants/images";
-import LottieView from "lottie-react-native";
+import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -126,9 +126,9 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
             elevation: 16,
           }}
         >
-          <LottieView
+          <DotLottie
             source={ANIMATIONS.pharmacy}
-            autoPlay
+            autoplay
             loop
             style={{ width: 200, height: 200 }}
           />

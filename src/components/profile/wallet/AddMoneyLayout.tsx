@@ -4,7 +4,7 @@ import { icons } from '@/src/constants/icons';
 import { useWalletBalance, useAddMoney } from '@/src/hooks/queries/useWallet';
 import { useNav } from '@/src/hooks/useNav';
 import { ANIMATIONS } from '@/src/constants/images';
-import LottieView from 'lottie-react-native';
+import { DotLottie, type Dotlottie } from '@lottiefiles/dotlottie-react-native';
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,7 +21,7 @@ export const AddMoneyLayout: React.FC = () => {
     const isBalancePending = balanceLoading || balance == null;
     const { addMoney, loading } = useAddMoney();
     const router = useNav();
-    const confettiRef = useRef<LottieView>(null);
+    const confettiRef = useRef<Dotlottie>(null);
     const inputRef = useRef<TextInput>(null);
 
     const walletBalance = Number(balance?.walletBalance ?? 0);
@@ -182,10 +182,10 @@ export const AddMoneyLayout: React.FC = () => {
 
             {/* Confetti overlay */}
             <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}>
-                <LottieView
+                <DotLottie
                     ref={confettiRef}
                     source={ANIMATIONS.confetti}
-                    autoPlay={false}
+                    autoplay={false}
                     loop={false}
                     style={{ width: '100%', height: '100%' }}
                 />

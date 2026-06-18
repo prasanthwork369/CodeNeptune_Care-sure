@@ -24,24 +24,24 @@ export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = ({ promise,
     return (
         <View className="mb-8">
             <View className="flex-row items-center px-5 mb-4 mt-2">
-                <Text style={s.title} className="font-inter-bold text-[#111827] mx-4">
+                <Text style={s.title} className="ml-1 mr-4 ">
                     {promise.title}
                 </Text>
                 <LinearGradient
-                    colors={['#B2E8FF', 'transparent']}
+                    colors={['#B2E8FF','#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={{ height: 3, width: 170, marginTop: 4, borderRadius: 2 }}
+                    style={{ height: 5, width: 170, marginTop: 4, borderRadius: 1 }}
                 />
             </View>
 
             <View className="flex-row justify-around px-4 mt-1">
                 {promise.items.map((item, idx) => (
                     <View key={idx} className="items-center">
-                        <View className="mb-3">
+                        <View className="mb-3" style={s.iconContainer}>
                             <RemoteIcon uri={item.iconUrl} />
                         </View>
-                        <Text style={s.itemLabel} className="font-inter-semibold text-brand-text text-center leading-tight">
+                        <Text style={s.itemLabel}>
                             {item.label.replace(/\s+/g, ' ')}
                         </Text>
                     </View>

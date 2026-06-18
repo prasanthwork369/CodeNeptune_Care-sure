@@ -20,7 +20,7 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import LottieView from "lottie-react-native";
+import type { Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useMemo, useRef, useState } from "react";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import {
@@ -50,7 +50,7 @@ export const MedicineComparisonLayout: React.FC<
   const cardWidth = width - 32;
 
   const setPrescriptionOrderItems = usePrescriptionOrderStore((s) => s.setItems);
-  const walletConfettiRef = useRef<LottieView>(null);
+  const walletConfettiRef = useRef<Dotlottie>(null);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [walletOn, setWalletOn] = useState(false);

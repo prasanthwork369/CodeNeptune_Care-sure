@@ -104,10 +104,10 @@ export const UPLOAD_IMAGES = {
 } as const;
 
 export const ANIMATIONS = {
-  chemicalBeaker: require("../../assets/animations/chemical-beaker.json"),
-  emptyCart: require("../../assets/animations/emptycart.json"),
-  calendar: require("../../assets/animations/calendar.json"),
-  pharmacy: require("../../assets/animations/pharmacy.json"),
-  orderPlaced: require("../../assets/animations/order-placed.json"),
-  confetti: require("../../assets/animations/confetti.json"),
+  chemicalBeaker: require("../../assets/animations/chemical-beaker.lottie"),
+  emptyCart: require("../../assets/animations/emptycart.lottie"),
+  calendar: require("../../assets/animations/calendar.lottie"),
+  pharmacy: require("../../assets/animations/pharmacy.lottie"),
+  orderPlaced: require("../../assets/animations/order-placed.lottie"),
+  confetti: require("../../assets/animations/confetti.lottie"),
 } as const;

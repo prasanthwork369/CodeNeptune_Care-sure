@@ -1,5 +1,5 @@
 import { HOME_IMAGES, ANIMATIONS } from '@/src/constants/images';
-import LottieView from 'lottie-react-native';
+import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 interface SaltCompositionBannerProps {
@@ -28,12 +28,11 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({ co
             />
             <View className="flex-row items-center relative z-10 w-full h-full mt-1">
                 <View className="items-center justify-center">
-                    <LottieView
+                    <DotLottie
                         source={ANIMATIONS.chemicalBeaker}
-                        autoPlay
+                        autoplay
                         loop
                         style={{ width: 50, height: 75 }}
-                        resizeMode="cover"
                     />
                 </View>
                 <View className="flex-1">

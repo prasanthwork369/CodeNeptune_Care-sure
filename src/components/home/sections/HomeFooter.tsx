@@ -5,6 +5,7 @@ import { Text, View, useWindowDimensions } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 
 import { ApiAppContent } from '@/src/types/home';
+import { styles as s } from './HomeFooter.styles';
 
 interface HomeFooterProps {
     appContent?: ApiAppContent;
@@ -13,14 +14,21 @@ interface HomeFooterProps {
 
 const isSvg = (url: string) => url?.toLowerCase().endsWith('.svg');
 
-const RemoteIcon: React.FC<{ uri: string; size: number }> = ({ uri, size }) => {
+const RemoteIcon: React.FC<{ uri: string; style?: any }> = ({ uri, style }) => {
     if (isSvg(uri)) {
-        return <SvgUri uri={uri} width={size} height={size} />;
+        return (
+            <SvgUri
+                uri={uri}
+                width={style?.width}
+                height={style?.height}
+                style={style}
+            />
+        );
     }
     return (
         <Image
             source={{ uri }}
-            style={{ width: size, height: size }}
+            style={style}
             contentFit="contain"
         />
     );
@@ -69,7 +77,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
                         contentFit="cover"
                         contentPosition="bottom"
                     />
-                    <View style={{ position: 'absolute', bottom: 60, left: 24, gap: 0 }}>
+                    <View style={{ position: 'absolute', bottom: 60, left: 20, gap: 0 }}>
                         {footerWords.map((word, idx) => (
                             <Text
                                 key={idx}
@@ -88,19 +96,25 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
 
             {/* Sub-footer trust labels */}
             <View
-                className="flex-row justify-between items-start w-full px-6 pt-3"
+                className="flex-row justify-between items-start w-full px-5 pt-3"
                 style={{ paddingBottom: 20 }}
             >
-                {(appContent.footer?.labels ?? []).map((label, idx) => (
-                    <View key={idx} className="items-center flex-1">
-                        <View className="h-6 items-center justify-center">
-                            <RemoteIcon uri={label.icon} size={22} />
+                {(appContent.footer?.labels ?? []).map((label, idx) => {
+                    const isLeft = idx === 0;
+                    const isRight = idx === 2;
+                    const textAlign = isLeft ? "left" : (isRight ? "right" : "center");
+
+                    return (
+                        <View key={idx} className='items-start'>
+                            <View className={`h-6 justify-center`}>
+                                <RemoteIcon uri={label.icon} style={s.icon} />
+                            </View>
+                            <Text style={[s.label, { textAlign }]} className="mt-1">
+                                {label.text}
+                            </Text>
                         </View>
-                        <Text className="text-[12px] font-inter-medium text-[#0F1724] mt-1 text-center">
-                            {label.text}
-                        </Text>
-                    </View>
-                ))}
+                    );
+                })}
             </View>
         </View>
     );

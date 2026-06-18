@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import LottieView from 'lottie-react-native';
+import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import { icons } from '@/src/constants/icons';
 import { ANIMATIONS } from '@/src/constants/images';
 import { PreviewSuccessModalProps } from '@/src/types/prescription';
@@ -24,7 +24,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                 className="items-center px-6 pt-8"
                 style={{ paddingBottom: Math.max(safeAreaBottom + 16, 32) }}
             >
-                <LottieView source={ANIMATIONS.orderPlaced} autoPlay loop={false} style={{ width: 160, height: 160 }} />
+                <DotLottie source={ANIMATIONS.orderPlaced} autoplay loop={false} style={{ width: 160, height: 160 }} />
                 <Text style={{ fontSize: 20, fontFamily: 'Inter_700Bold', color: '#1A1C1E', marginTop: 8, marginBottom: 16 }}>
                     Prescription Uploaded!
                 </Text>

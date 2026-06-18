@@ -7,7 +7,7 @@ import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType, WalletLog } from "@/src/types/wallet";
 import { LinearGradient } from "expo-linear-gradient";
-import LottieView from "lottie-react-native";
+import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -119,7 +119,7 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
 export const WalletLayout: React.FC = () => {
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   const [isHistorySheetVisible, setIsHistorySheetVisible] = useState(false);
-  const confettiRef = useRef<LottieView>(null);
+  const confettiRef = useRef<Dotlottie>(null);
   const hasPlayedConfetti = useRef(false);
 
   const router = useNav();
@@ -173,10 +173,10 @@ export const WalletLayout: React.FC = () => {
               zIndex: 10,
             }}
           >
-            <LottieView
+            <DotLottie
               ref={confettiRef}
               source={ANIMATIONS.confetti}
-              autoPlay={false}
+              autoplay={false}
               loop={false}
               style={{ width: "100%", height: "100%" }}
             />

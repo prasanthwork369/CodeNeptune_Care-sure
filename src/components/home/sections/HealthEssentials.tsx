@@ -94,32 +94,31 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <Touchable activeOpacity={0.85} onPress={() => onPress(productId)} style={{ flex: 1 }}>
                     <Text style={s.name} className="font-inter-medium text-brand-text" numberOfLines={1}>{name}</Text>
                     {!!description && (
-                        <Text style={s.description} className="font-inter-medium text-brand-subtext mt-0.5" numberOfLines={1}>{description}</Text>
+                        <Text style={s.description} className="mt-0.5" numberOfLines={1}>{description}</Text>
                     )}
                     <View className="flex-row items-center gap-x-1.5 mt-1.5">
-                        <Text style={s.price} className="font-inter-bold text-[#0F172A]">₹{Number(price).toFixed(2)}</Text>
+                        <Text style={s.price}>₹{Number(price).toFixed(2)}</Text>
                         {mrp > price && (
-                            <Text style={s.mrp} className="font-inter text-brand-subtext line-through">₹{Number(mrp).toFixed(2)}</Text>
+                            <Text style={s.mrp}>₹{Number(mrp).toFixed(2)}</Text>
                         )}
                     </View>
                 </Touchable>
 
                 {/* Button — fixed padding, always at bottom */}
-                <View style={{ paddingTop: 6, paddingBottom: 12 }}>
+                <View style={{ paddingTop: 6, paddingBottom: 12, alignItems: 'center' }}>
                     {count === 0 ? (
                         <Touchable
                             onPress={increment}
                             disabled={isPending}
                             activeOpacity={0.85}
-                            className="rounded-[10px] items-center justify-center bg-white"
-                            style={{ height: CART_BUTTON_HEIGHT, borderWidth: 1, borderColor: accentColor }}
+                            style={[s.cartBtn, { borderColor: accentColor }]}
                         >
-                            <Text style={[s.addBtn, { color: accentColor }]} className="font-inter-bold">
+                            <Text style={[s.addBtn, { color: accentColor }]}>
                                 {isPending ? 'Adding...' : 'Add to Cart'}
                             </Text>
                         </Touchable>
                     ) : (
-                        <View className="flex-row items-center justify-between rounded-[10px]" style={{ height: CART_BUTTON_HEIGHT, backgroundColor: accentColor }}>
+                        <View style={[s.cartBtnActive, { backgroundColor: accentColor }]}>
                             <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} className="w-9 h-9 items-center justify-center">
                                 <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                             </Touchable>
@@ -166,61 +165,63 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
 
     return (
         <View className="mb-6">
-            <View style={{ borderTopWidth: 1, borderTopColor: '#919EAB33', borderStyle: 'dashed' }} className="mx-5 mb-8" />
+            <View style={{ borderTopWidth: 1, borderTopColor: '#919EAB33', borderStyle: 'dashed' }} className="mx-5 mb-6" />
 
-            <LinearGradient
-                colors={[gradientStart || '#FFFFFF', gradientEnd || '#FFFFFF']}
-                start={{ x: 0, y: 1 }}
-                end={{ x: 0, y: 0 }}
-                className="absolute top-0 left-0 right-0 bottom-0"
-            />
+            <View style={{ position: 'relative' }}>
+                <LinearGradient
+                    colors={[gradientStart || '#FFFFFF', gradientEnd || '#FFFFFF']}
+                    start={{ x: 0, y: 1 }}
+                    end={{ x: 0, y: 0 }}
+                    className="absolute top-0 left-0 right-0 bottom-0"
+                />
 
-            <View className="pb-8">
-                <View className="px-5 flex-row justify-between items-center mb-6">
-                    <View className="flex-1 pr-2">
-                        <Text style={s.sectionTitle} className="font-inter-bold text-brand-text">{title}</Text>
-                        <View className="mt-1">
-                            <Text className="font-inter-extrabold" style={[s.sectionSubtitle, { color: text2Color }]}>{subtitle}</Text>
-                            <LinearGradient
-                                colors={[lineColor, 'transparent']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={{ height: 3, width: 160, marginTop: 6, borderRadius: 2 }}
-                                className="opacity-60"
-                            />
+                <View className="pt-6 pb-8">
+                    <View className="px-4 flex-row justify-between items-center mb-4">
+                        <View className="flex-1 pr-2">
+                            <Text style={s.sectionTitle} className="font-inter-bold text-brand-text">{title}</Text>
+                            <View className="mt-1">
+                                <Text className="font-inter-extrabold" style={[s.sectionSubtitle, { color: text2Color }]}>{subtitle}</Text>
+                                <LinearGradient
+                                    colors={[lineColor, 'transparent']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={{ height: 3, width: 160, marginTop: 6, borderRadius: 2 }}
+                                    className="opacity-60"
+                                />
+                            </View>
                         </View>
+                        {!!headerImage && (
+                            <Image source={{ uri: headerImage }} style={{ width: '25%', height: 75, }} contentFit="contain" />
+                        )}
                     </View>
-                    {!!headerImage && (
-                        <Image source={{ uri: headerImage }} style={{ width: '25%', height: 75, }} contentFit="contain" />
-                    )}
-                </View>
 
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingLeft: 20, paddingRight: 40, gap: 14 }}
-                >
-                    {subcategory.products.map((p) => {
-                        const packLabel = formatPackLabel({ packSize: p.packSize, unit: p.unit, dosageForm: p.dosageForm });
-                        const displayDesc = packLabel || p.description || '';
-                        return (
-                            <ProductCard
-                                key={p.id}
-                                id={p.id}
-                                productId={p.productId}
-                                name={p.name}
-                                slug={p.slug}
-                                description={displayDesc}
-                                accentColor={lineColor}
-                                price={Number(p.price)}
-                                mrp={Number(p.mrp ?? p.price)}
-                                discountPercentage={Number(p.discountPercentage)}
-                                thumbnailUrl={p.thumbnailUrl}
-                                onPress={onProductPress}
-                            />
-                        );
-                    })}
-                </ScrollView>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ paddingLeft: 20, paddingRight: 40, gap: 14 }}
+                    >
+                        {subcategory.products.map((p) => {
+                            const packLabel = formatPackLabel({ packSize: p.packSize, unit: p.unit, dosageForm: p.dosageForm });
+                            const displayDesc = packLabel || p.description || '';
+                            return (
+                                <ProductCard
+                                    key={p.id}
+                                    id={p.id}
+                                    productId={p.productId}
+                                    name={p.name}
+                                    slug={p.slug}
+                                    description={displayDesc}
+                                    accentColor={lineColor}
+                                    price={Number(p.price)}
+                                    mrp={Number(p.mrp ?? p.price)}
+                                    discountPercentage={Number(p.discountPercentage)}
+                                    thumbnailUrl={p.thumbnailUrl}
+                                    onPress={onProductPress}
+                                />
+                            );
+                        })}
+                    </ScrollView>
+                </View>
             </View>
         </View>
     );

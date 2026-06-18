@@ -12,7 +12,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
-import LottieView from "lottie-react-native";
+import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -464,9 +464,9 @@ export const PreviewLayout: React.FC = () => {
             className="bg-white rounded-t-[28px] items-center px-6 pt-8"
             style={{ paddingBottom: Math.max(insets.bottom + 16, 32) }}
           >
-            <LottieView
+            <DotLottie
               source={ANIMATIONS.orderPlaced}
-              autoPlay
+              autoplay
               loop={false}
               style={{ width: 160, height: 160 }}
             />

@@ -4,7 +4,7 @@ import { ANIMATIONS } from '@/src/constants/images';
 import { useNav } from '@/src/hooks/useNav';
 import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import LottieView from 'lottie-react-native';
+import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -167,9 +167,9 @@ export const OrderSuccessLayout: React.FC = () => {
                     {/* Drag handle */}
                     <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: '#E5E7EB', marginBottom: 24 }} />
 
-                    <LottieView
+                    <DotLottie
                         source={ANIMATIONS.orderPlaced}
-                        autoPlay
+                        autoplay
                         loop={false}
                         style={{ width: scale(160), height: scale(160) }}
                     />

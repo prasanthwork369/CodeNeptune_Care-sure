@@ -16,9 +16,9 @@ export const styles = StyleSheet.create({
     color: colors.text,
   },
   dropDownIcon: {
-    marginLeft: scale(2),
-    width: moderateScale(8.6, 0.3),
-    height: moderateScale(4.7, 0.3),
+    marginLeft: scale(10),
+    width: moderateScale(10, 0.5),
+    height: moderateScale(5, 0.5),
   },
   iconBtn: {
     width: scale(44),
@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   walletBadgeWrap: {
-    width: scale(50),
+    width: scale(54),
     height: scale(15),
     paddingTop: 2,
     paddingRight: 9,

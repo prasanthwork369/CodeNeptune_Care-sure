@@ -6,7 +6,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { usePathname } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import LottieView from "lottie-react-native";
+import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, Image, Modal, Text, View } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
@@ -35,7 +35,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
     testMode ? { wallet: 100, coins: 50 } : null,
   );
   const [showConfetti, setShowConfetti] = useState(testMode);
-  const confettiRef = useRef<LottieView>(null);
+  const confettiRef = useRef<any>(null);
 
   useEffect(() => {
     if (testMode) return;
@@ -442,12 +442,11 @@ export const SignupBonusPopup: React.FC<Props> = ({
               height: SCREEN_H,
             }}
           >
-            <LottieView
+            <DotLottie
               ref={confettiRef}
               source={ANIMATIONS.confetti}
-              autoPlay
+              autoplay
               loop={false}
-              resizeMode="cover"
               style={{ width: SCREEN_W, height: SCREEN_H }}
             />
           </View>

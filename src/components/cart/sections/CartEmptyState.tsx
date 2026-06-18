@@ -3,7 +3,7 @@ import { ANIMATIONS } from "@/src/constants/images";
 import { CartEmptyStateProps } from "@/src/types/cart";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
-import LottieView from "lottie-react-native";
+import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 
@@ -30,9 +30,9 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View className="items-center justify-center px-8 py-6">
-        <LottieView
+        <DotLottie
           source={ANIMATIONS.emptyCart}
-          autoPlay
+          autoplay
           loop
           style={{ width: 140, height: 140 }}
         />

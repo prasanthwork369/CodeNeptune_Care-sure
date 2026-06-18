@@ -1,10 +1,37 @@
-import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { StyleSheet } from "react-native";
 
-export const iconSize = moderateScale(52, 0.3);
+export const iconSize = 64;
 
 export const styles = StyleSheet.create({
-    title: { fontSize: moderateScale(16, 0.3) },
-    icon: { width: iconSize, height: iconSize },
-    itemLabel: { fontSize: moderateScale(13, 0.3) },
+  title: {
+    fontFamily: "Inter-Bold",
+    fontSize: 16,
+    lineHeight: 14,
+    letterSpacing: 0,
+    verticalAlign: "middle",
+    color: "#222222",
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  icon: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    opacity: 1,
+  },
+  itemLabel: {
+    fontFamily: "Inter-Medium",
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0,
+    textAlign: "center",
+    verticalAlign: "middle",
+    color: "#0F1724",
+  },
 });

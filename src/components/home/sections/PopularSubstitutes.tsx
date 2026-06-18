@@ -74,20 +74,20 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                     onPress={() => onProductPress?.(product.productId ?? product.id)}
                     style={{ flex: 1 }}
                 >
-                    <Text style={s.name} className="font-inter-medium text-brand-text" numberOfLines={1}>
+                    <Text style={s.name} className="text-brand-text" numberOfLines={1}>
                         {product.name}
                     </Text>
                     {!!product.description && (
-                        <Text style={s.description} className="font-inter-medium text-brand-subtext mt-0.5" numberOfLines={1}>
+                        <Text style={s.description} className="mt-0.5" numberOfLines={1}>
                             {product.description}
                         </Text>
                     )}
                     <View className="flex-row items-center gap-x-1.5 mt-1.5">
-                        <Text style={s.price} className="font-inter-bold text-[#0F172A]">
+                        <Text style={s.price}>
                             ₹{Number(product.price).toFixed(2)}
                         </Text>
                         {!!product.originalPrice && product.originalPrice > product.price && (
-                            <Text style={s.mrp} className="font-inter text-brand-subtext line-through">
+                            <Text style={s.mrp}>
                                 ₹{Number(product.originalPrice).toFixed(2)}
                             </Text>
                         )}
@@ -95,21 +95,20 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                 </Touchable>
 
                 {/* Button — fixed padding top & bottom, always at bottom */}
-                <View style={{ paddingTop: 6, paddingBottom: 12 }}>
+                <View style={{ paddingTop: 6, paddingBottom: 12, alignItems: 'center' }}>
                     {count === 0 ? (
                         <Touchable
                             onPress={increment}
                             disabled={isPending}
                             activeOpacity={0.85}
-                            className="rounded-[10px] items-center justify-center bg-white"
-                            style={{ height: CART_BUTTON_HEIGHT, borderWidth: 1, borderColor: ACCENT }}
+                            style={s.cartBtn}
                         >
-                            <Text style={[s.addBtn, { color: ACCENT }]} className="font-inter-bold">
+                            <Text style={s.addBtn}>
                                 {isPending ? 'Adding...' : 'Add to Cart'}
                             </Text>
                         </Touchable>
                     ) : (
-                        <View className="flex-row items-center justify-between rounded-[10px]" style={{ height: CART_BUTTON_HEIGHT, backgroundColor: ACCENT }}>
+                        <View style={s.cartBtnActive}>
                             <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} className="w-9 h-9 items-center justify-center">
                                 <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                             </Touchable>
@@ -138,7 +137,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
 
 export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products, isLoading, onProductPress }) => {
     return (
-        <View className="mt-8 py-6" style={{ position: 'relative' }}>
+        <View className="mt-4 py-6" style={{ position: 'relative' }}>
             <LinearGradient
                 colors={['#F2FAF7', '#FFFFFF']}
                 start={{ x: 0, y: 0 }}
@@ -147,16 +146,16 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
             />
             <View className="flex-row justify-between items-center mb-4 px-4">
                 <View>
-                    <Text style={s.sectionTitle} className="font-inter-semibold text-brand-text">
+                    <Text style={s.sectionTitle} className="text-brand-text">
                         Spend Less on What You Need
                     </Text>
-                    <Text style={s.sectionSubtitle} className="font-inter-bold text-[#0F7635] mt-1">
+                    <Text style={s.sectionSubtitle} className="mt-1">
                         More Affordable Choices
                     </Text>
                 </View>
-                <View style={{ width: '24%', height: 60, flexDirection: 'row', alignItems: 'flex-end', gap: 6 }}>
-                    <Image source={HOME_IMAGES.supplements} style={{ flex: 1, aspectRatio: 1, marginBottom: 8 }} contentFit="contain" />
-                    <Image source={HOME_IMAGES.multivitamin} style={{ flex: 1, aspectRatio: 44 / 54 }} contentFit="contain" />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Image source={HOME_IMAGES.supplements} style={s.headerImage} contentFit="contain" />
+                    <Image source={HOME_IMAGES.multivitamin} style={s.headerImage} contentFit="contain" />
                 </View>
             </View>
 

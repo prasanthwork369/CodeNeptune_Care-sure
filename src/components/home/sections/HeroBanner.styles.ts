@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
     verticalAlign: "middle",
   },
   badgeContainer: {
-    width: moderateScale(158, 0.3),
+    width: moderateScale(160, 0.3),
     height: moderateScale(30, 0.3),
     borderRadius: 9999,
     borderWidth: 1,
@@ -55,10 +55,11 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
+    
   },
   badgeText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
-    fontFamily: "Inter-Medium",
+    fontFamily: "Inter-SemiBold",
     fontSize: moderateScale(12, 0.3),
     lineHeight: moderateScale(12, 0.3),
     letterSpacing: 0,

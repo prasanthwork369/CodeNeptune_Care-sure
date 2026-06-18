@@ -10,7 +10,7 @@ import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { CartLine } from "@/src/types/cart";
 import { useFocusEffect } from "expo-router";
-import LottieView from "lottie-react-native";
+import type { Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import { useCallback, useRef, useState } from "react";
 import { useAuthStore } from "@/src/store/authStore";
 
@@ -19,7 +19,7 @@ export function useCartCalculations() {
 
   const [walletOn, setWalletOn] = useState(false);
   const [coinsOn, setCoinsOn] = useState(false);
-  const walletConfettiRef = useRef<LottieView>(null);
+  const walletConfettiRef = useRef<Dotlottie>(null);
 
   const handleWalletToggle = (v: boolean) => {
     setWalletOn(v);

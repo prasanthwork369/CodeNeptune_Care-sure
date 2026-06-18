@@ -1,4 +1,4 @@
-export const LIVE = false;
+export const LIVE = true;
 
 const PROD_URL = "https://care-sure-api-gateway.onrender.com";
 const QA_URL = "https://qa-csapi.codeneptune.com";
@@ -8,7 +8,7 @@ export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
 /** Prefixes a relative backend path (e.g. "/uploads/icon.png") with the API base URL. */
 export const resolveAssetUrl = (path: string) =>
-  path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
+  path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
 
 export const API_ENDPOINTS = {
   // ── Catalog ──────────────────────────────────────────────────────────────
@@ -76,8 +76,10 @@ export const API_ENDPOINTS = {
 
   // ── In-App Notifications ─────────────────────────────────────────────────
   NOTIFICATIONS: "/api/v1/customers/notifications",
-  NOTIFICATION_MARK_READ: (id: string) => `/api/v1/customers/notifications/${id}/read`,
-  NOTIFICATION_DISMISS: (id: string) => `/api/v1/customers/notifications/${id}/dismiss`,
+  NOTIFICATION_MARK_READ: (id: string) =>
+    `/api/v1/customers/notifications/${id}/read`,
+  NOTIFICATION_DISMISS: (id: string) =>
+    `/api/v1/customers/notifications/${id}/dismiss`,
   NOTIFICATIONS_DISMISS_ALL: "/api/v1/customers/notifications/dismiss-all",
 
   // ── Cart ─────────────────────────────────────────────────────────────────

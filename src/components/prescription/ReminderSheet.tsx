@@ -1,7 +1,7 @@
 import { DateWheelPicker } from '@/src/components/ui/DateWheelPicker';
 import { icons } from '@/src/constants/icons';
 import { ANIMATIONS } from '@/src/constants/images';
-import LottieView from 'lottie-react-native';
+import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
@@ -58,9 +58,9 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
 
                         {/* Calendar icon */}
                         <View className="items-center mb-4">
-                            <LottieView
+                            <DotLottie
                                 source={ANIMATIONS.calendar}
-                                autoPlay
+                                autoplay
                                 loop
                                 style={{ width: 180, height: 180 }}
                             />
