@@ -80,7 +80,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     width: moderateScale(20, 0.3),
     height: moderateScale(20, 0.3),
-    top: moderateScale(134, 0.3),
+    top: moderateScale(144, 0.3),
     left: moderateScale(140, 0.3),
   },
   decorPills: {

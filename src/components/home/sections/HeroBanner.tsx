@@ -168,7 +168,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         {/* ── Left: Text block ── */}
         <Animated.View
           style={[leftAnim, { paddingRight: Math.round(personWidth * 0.82) }]}
-          className="flex-[1.2] pl-3 pt-8 justify-start"
+          className="flex-[1.2] pl-3 pt-6 justify-start"
         >
           <View>
             {/* First line (e.g. 'Stop overpaying') */}

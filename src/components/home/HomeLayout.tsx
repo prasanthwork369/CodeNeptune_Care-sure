@@ -282,9 +282,9 @@ export const HomeLayout: React.FC = () => {
         {/* Child 1: Sticky SearchBar Container */}
         <View
           style={{
-            marginTop: -(insets.top + 8) - 40,
+            marginTop: -(insets.top + 8) - 30,
             paddingTop: insets.top + 8,
-            paddingBottom: 16,
+            paddingBottom: 14,
             paddingHorizontal: 36,
             backgroundColor: "transparent",
           }}

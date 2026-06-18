@@ -16,14 +16,14 @@ interface CategoryCardsProps {
 export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress, isLoading }) => {
     const { width } = useWindowDimensions();
     const cardWidth = (width - 48) / 3;
-    const cardHeight = cardWidth * 1.12;
+    const cardHeight = cardWidth * (128 / 114);
     const imgSize = cardWidth * 0.75;
 
     if (isLoading) {
         return (
-            <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3.5">
+            <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3">
                 {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} width={cardWidth} height={cardHeight} borderRadius={8} style={{ marginBottom: 12 }} />
+                    <Skeleton key={i} width={cardWidth} height={cardHeight} borderRadius={10} />
                 ))}
             </View>
         );
@@ -33,7 +33,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
     const placeholders = remainder === 0 ? 0 : 3 - remainder;
 
     return (
-        <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3.5">
+        <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3">
             {cards.map((card) => (
                 <Touchable
                     key={card.id}
@@ -41,8 +41,8 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
                     onPress={() => onCardPress?.(card.id)}
                     accessibilityRole="button"
                     accessibilityLabel={card.label}
-                    style={{ backgroundColor: card.bgColor, width: cardWidth, height: cardHeight }}
-                    className="rounded-lg overflow-hidden justify-start mb-3"
+                    style={{ backgroundColor: card.bgColor, width: cardWidth, height: cardHeight, borderRadius: 10 }}
+                    className="overflow-hidden justify-start"
                 >
                     <Text style={s.cardLabel} className="font-inter-semibold text-brand-text px-2 pt-2.5 leading-tight z-10">
                         {card.label}
@@ -51,20 +51,24 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
                         <Image
                             source={card.image}
                             style={{
-                                width: imgSize,
-                                height: imgSize * 0.9,
+                                width: cardWidth * (77 / 114),
+                                height: cardHeight * (87.106 / 128),
                                 position: 'absolute',
-                                bottom: 0,
-                                right: 0,
+                                top: cardHeight * (48 / 128),
+                                left: cardWidth * (35 / 114),
+                                borderRadius: 8,
                             }}
                             contentFit="contain"
-                            contentPosition="bottom right"
                         />
                     ) : (
                         <icons.placeholder
-                            width={imgSize * 0.65}
-                            height={imgSize * 0.65}
-                            style={{ position: 'absolute', bottom: 4, right: 4 }}
+                            width={cardWidth * (77 / 114) * 0.65}
+                            height={cardHeight * (87.10625457763672 / 128) * 0.65}
+                            style={{
+                                position: 'absolute',
+                                top: cardHeight * (48 / 128) + 4,
+                                left: cardWidth * (43 / 114) + 4,
+                            }}
                         />
                     )}
                 </Touchable>
