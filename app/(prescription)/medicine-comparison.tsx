@@ -2,7 +2,8 @@ import { MedicineComparisonLayout } from '@/src/components/prescription/medicine
 import { usePrescriptionOrderMedicines } from '@/src/hooks/queries/usePrescriptionOrderMedicines';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { Touchable } from '@/src/components/ui/Touchable';
 
 export default function MedicineComparisonScreen() {
     const { prescriptionOrderId, prescriptionId } = useLocalSearchParams<{ prescriptionOrderId: string; prescriptionId?: string }>();
@@ -22,13 +23,13 @@ export default function MedicineComparisonScreen() {
                 <Text style={{ fontSize: 15, fontFamily: 'Inter-Medium', color: '#6B7280', textAlign: 'center', marginBottom: 20 }}>
                     No medicine comparison available for this prescription yet.
                 </Text>
-                <TouchableOpacity
+                <Touchable
                     onPress={() => refetch()}
                     style={{ backgroundColor: '#0F7635', borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 }}
                     activeOpacity={0.85}
                 >
                     <Text style={{ fontSize: 14, fontFamily: 'Inter-SemiBold', color: '#fff' }}>Refresh</Text>
-                </TouchableOpacity>
+                </Touchable>
             </View>
         );
     }

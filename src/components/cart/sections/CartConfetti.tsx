@@ -20,3 +20,5 @@ export const CartConfetti = forwardRef<LottieView>((_, ref) => {
         </View>
     );
 });
+
+CartConfetti.displayName = 'CartConfetti';

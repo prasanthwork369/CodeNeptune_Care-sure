@@ -30,7 +30,7 @@ export const CallMethodCard: React.FC<CallMethodCardProps> = ({ isSelected, onSe
                                 <Image source={HOME_IMAGES.stethoscope} style={{ width: 36, height: 36 }} resizeMode="contain" />
                             </View>
                             <View className="flex-1 ml-3">
-                                <Text className="text-[14px] font-inter-bold text-[#1A1C1E]">Don't have a prescription? Call us</Text>
+                                <Text className="text-[14px] font-inter-bold text-[#1A1C1E]">{"Don't have a prescription? Call us"}</Text>
                                 <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5 leading-[17px]">
                                     Our Pharmacists Will Assist You And Help You Complete Your Order
                                 </Text>

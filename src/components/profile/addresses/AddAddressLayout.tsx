@@ -110,6 +110,7 @@ const Field = React.forwardRef<
     </View>
   ),
 );
+Field.displayName = "Field";
 
 export const AddAddressLayout: React.FC = () => {
   const router = useNav();

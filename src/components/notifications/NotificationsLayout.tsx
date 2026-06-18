@@ -331,7 +331,7 @@ export const NotificationsLayout: React.FC = () => {
               <icons.notification width={s.emptyIcon.width} height={s.emptyIcon.height} fill="#D1D5DB" />
               <Text style={s.emptyTitle} className="font-inter-semibold text-brand-subtext mt-4">No notifications yet</Text>
               <Text style={s.emptySub} className="font-inter text-[#9CA3AF] mt-1 text-center">
-                We'll notify you about orders and offers
+                {"We'll notify you about orders and offers"}
               </Text>
             </View>
           )}

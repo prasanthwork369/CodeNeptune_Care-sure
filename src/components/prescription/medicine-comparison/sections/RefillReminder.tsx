@@ -59,7 +59,7 @@ export const RefillReminder: React.FC<RefillReminderProps> = ({
           marginTop: 10,
         }}
       >
-        We'll send your reminder in 7 days
+        {"We'll send your reminder in 7 days"}
       </Text>
     )}
   </View>

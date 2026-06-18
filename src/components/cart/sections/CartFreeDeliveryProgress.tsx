@@ -23,7 +23,7 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
                         {remainingForFreeDelivery > 0 ? (
                             <>Shop <Text className="font-inter-extrabold">₹{Number(remainingForFreeDelivery).toFixed(2)}</Text> more to free delivery</>
                         ) : (
-                            <Text className="font-inter-semibold">You've unlocked free delivery!</Text>
+                            <Text className="font-inter-semibold">{"You've unlocked free delivery!"}</Text>
                         )}
                     </Text>
                 </View>

@@ -1,4 +1,4 @@
-import { useFlyToCart } from "@/src/components/animations/flyToCart";
+import { useFlyToCartSafe } from "@/src/components/animations/flyToCart";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/hooks/useCartActions";
@@ -18,10 +18,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
   cardWidth,
   onPress,
 }) => {
-  let flyToCartContext: any = null;
-  try {
-    flyToCartContext = useFlyToCart();
-  } catch (e) {}
+  const flyToCartContext = useFlyToCartSafe();
 
   const imageContainerRef = React.useRef<View>(null);
 

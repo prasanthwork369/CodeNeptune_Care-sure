@@ -119,10 +119,10 @@ export const HomeSearchCycler: React.FC = () => {
     return (
         <View style={styles.window}>
             <Animated.Text style={[textStyle, styles.slot, aStyle]} numberOfLines={1}>
-                Search for <Text style={styles.bold}>"{MEDICINES[aIdx.current]}"</Text>
+                Search for <Text style={styles.bold}>&quot;{MEDICINES[aIdx.current]}&quot;</Text>
             </Animated.Text>
             <Animated.Text style={[textStyle, styles.slot, bStyle]} numberOfLines={1}>
-                Search for <Text style={styles.bold}>"{MEDICINES[bIdx.current]}"</Text>
+                Search for <Text style={styles.bold}>&quot;{MEDICINES[bIdx.current]}&quot;</Text>
             </Animated.Text>
         </View>
     );

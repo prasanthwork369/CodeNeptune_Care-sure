@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+// eslint-disable-next-line no-restricted-imports
 import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 

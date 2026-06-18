@@ -1,4 +1,5 @@
 import React, { useCallback, useRef } from "react";
+// eslint-disable-next-line no-restricted-imports
 import { GestureResponderEvent, TouchableOpacity, TouchableOpacityProps } from "react-native";
 
 interface TouchableProps extends TouchableOpacityProps {

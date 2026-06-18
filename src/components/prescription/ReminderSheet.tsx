@@ -68,7 +68,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
 
                         {/* Title */}
                         <Text className="text-[18px] font-inter-bold text-brand-text text-center mb-1">
-                            We'll remind you at the right time
+                            {"We'll remind you at the right time"}
                         </Text>
 
                         {/* Subtitle */}
@@ -132,7 +132,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                         >
                             <icons.verified_user_outline width={16} height={16} />
                             <Text className="text-[12px] font-inter-medium text-[#0F7635] pl-1 flex-1">
-                                You focus on feeling better, we'll handle the rest
+                                {"You focus on feeling better, we'll handle the rest"}
                             </Text>
                         </View>
 

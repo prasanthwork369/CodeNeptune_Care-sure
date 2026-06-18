@@ -178,7 +178,7 @@ export const OrderSuccessLayout: React.FC = () => {
                         Order Placed! 🎉
                     </Text>
                     <Text style={{ fontSize: moderateScale(14, 0.3), fontFamily: 'Inter', color: '#6A6A6A', marginTop: 6, textAlign: 'center', lineHeight: moderateScale(20, 0.3) }}>
-                        Your medicines are on their way.{'\n'}We'll keep you updated.
+                        {"Your medicines are on their way.\nWe'll keep you updated."}
                     </Text>
 
                     <View style={{ width: '100%', marginTop: 24, backgroundColor: '#F8FFF9', borderRadius: 16, borderWidth: 1, borderColor: '#0F763522', padding: 16, gap: 12 }}>

@@ -12,11 +12,9 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
-import {
-    KeyboardEvents,
-    useReanimatedKeyboardAnimation,
-} from "react-native-keyboard-controller";
+import { KeyboardEvents } from "react-native-keyboard-controller";
 import Animated, {
+    Easing,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
@@ -44,38 +42,36 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   const [screenHeight] = React.useState(() => Dimensions.get("window").height);
   const [backgroundHeight] = React.useState(() => screenHeight * 0.6);
 
-  // Real-time, frame-synced keyboard height/progress — smooth, perfectly in
-  // sync with the native keyboard animation. On most devices this alone is
-  // correct. progress goes 0 (closed) -> 1 (open), in lockstep with height.
-  const { height: kbHeight, progress } = useReanimatedKeyboardAnimation();
-
-  // Some Android OEM keyboards (e.g. MIUI's tools row) show an accessory
-  // toolbar without a follow-up resize/inset event, so the real-time height
-  // above can undershoot by the toolbar's height. keyboardDidShow fires once
-  // the keyboard (incl. toolbar) has fully settled, giving the correct
-  // shortfall amount. That shortfall is then scaled by `progress` in the
-  // style below (not animated independently here) so it appears/disappears
-  // exactly in sync with the keyboard's own real-time motion — no separate
-  // timer left running after the keyboard already finished closing.
-  const correctionAmount = useSharedValue(0);
+  // Real-time native tracking (useReanimatedKeyboardAnimation) turned out to
+  // report no movement at all in this app's setup — confirmed by removing
+  // the correction layer and finding the panel didn't move whatsoever. So we
+  // drive the animation ourselves: keyboardWillShow/Hide fire BEFORE the
+  // native transition starts and report both the target height and the
+  // native animation's own duration, so our withTiming runs concurrently
+  // with — and matches the length of — the real keyboard transition.
+  const kbHeight = useSharedValue(0);
   React.useEffect(() => {
-    const showSub = KeyboardEvents.addListener("keyboardDidShow", (e) => {
-      const shortfall = e.height - kbHeight.value;
-      correctionAmount.value =
-        shortfall > 1 ? withTiming(shortfall, { duration: 80 }) : 0;
+    const showSub = KeyboardEvents.addListener("keyboardWillShow", (e) => {
+      kbHeight.value = withTiming(e.height, {
+        duration: e.duration || 250,
+        easing: Easing.out(Easing.ease),
+      });
     });
-    const hideSub = KeyboardEvents.addListener("keyboardDidHide", () => {
-      correctionAmount.value = 0;
+    const hideSub = KeyboardEvents.addListener("keyboardWillHide", (e) => {
+      kbHeight.value = withTiming(0, {
+        duration: e.duration || 250,
+        easing: Easing.out(Easing.ease),
+      });
     });
     return () => {
       showSub.remove();
       hideSub.remove();
     };
-  }, [kbHeight, correctionAmount]);
-  const stickyStyle = useAnimatedStyle(() => {
-    const total = kbHeight.value + correctionAmount.value * progress.value;
-    return { transform: [{ translateY: -Math.max(0, total - insets.bottom) }] };
-  });
+  }, [kbHeight]);
+
+  const stickyStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -Math.max(0, kbHeight.value - insets.bottom) }],
+  }));
 
   const isTablet = width >= 600;
   const panelMaxWidth = isTablet ? 560 : undefined;

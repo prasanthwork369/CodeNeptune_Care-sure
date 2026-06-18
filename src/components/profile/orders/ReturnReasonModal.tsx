@@ -101,7 +101,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
                             )}
 
                             {/* Reason */}
-                            <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">What's the issue with your order?</Text>
+                            <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">{"What's the issue with your order?"}</Text>
                             <Touchable
                                 className="flex-row items-center justify-between p-4 border border-[#919EAB33] rounded-xl mb-5"
                                 activeOpacity={0.7}

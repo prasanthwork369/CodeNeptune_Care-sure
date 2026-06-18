@@ -14,7 +14,7 @@ export const DuplicateFileModal: React.FC<DuplicateFileModalProps> = ({ fileName
                 <View className="bg-white rounded-2xl px-6 py-6 w-full">
                     <Text className="text-[17px] font-inter-bold text-[#0F1724] mb-2">Duplicate File</Text>
                     <Text className="text-[13px] font-inter-medium text-[#6A6A6A] mb-6 leading-5">
-                        <Text className="font-inter-semibold text-[#0F1724]">"{fileName}"</Text> is already in your upload list.
+                        <Text className="font-inter-semibold text-[#0F1724]">&quot;{fileName}&quot;</Text> is already in your upload list.
                     </Text>
                     <View className="items-end">
                         <Touchable activeOpacity={0.85} className="items-center justify-center py-2.5 px-8 rounded-full bg-brand-primary" onPress={onClose}>

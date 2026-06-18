@@ -148,7 +148,7 @@ export const SelectPatientLayout: React.FC = () => {
                   <PatientChipSkeleton />
                 ) : members.length === 0 ? (
                   <Text className="text-[12px] font-inter text-[#919EAB] py-2">
-                    No patients yet. Tap "ADD PATIENT"
+                    No patients yet. Tap &quot;ADD PATIENT&quot;
                   </Text>
                 ) : (
                   members.map((p) => {

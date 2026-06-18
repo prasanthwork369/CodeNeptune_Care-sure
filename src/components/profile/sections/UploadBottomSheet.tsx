@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
     useSharedValue, useAnimatedStyle,
     withTiming, Easing,
@@ -8,6 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Touchable } from '@/src/components/ui/Touchable';
 
 interface UploadBottomSheetProps {
     visible: boolean;
@@ -32,7 +33,7 @@ const ActionRow = ({
 
     return (
         <Animated.View style={animStyle}>
-            <TouchableOpacity
+            <Touchable
                 onPress={onPress}
                 activeOpacity={1}
                 onPressIn={() => { scale.value = withTiming(0.97, { duration: 80 }); }}
@@ -49,7 +50,7 @@ const ActionRow = ({
                 <View style={s.actionArrow}>
                     <Feather name="chevron-right" size={18} color="#C0C0C0" />
                 </View>
-            </TouchableOpacity>
+            </Touchable>
         </Animated.View>
     );
 };
@@ -86,9 +87,9 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
                     />
                 </View>
 
-                <TouchableOpacity onPress={onClose} activeOpacity={0.7} style={s.cancelBtn}>
+                <Touchable onPress={onClose} activeOpacity={0.7} style={s.cancelBtn}>
                     <Text style={s.cancelText}>Cancel</Text>
-                </TouchableOpacity>
+                </Touchable>
             </BottomSheetView>
         </GorhomBottomSheet>
     );

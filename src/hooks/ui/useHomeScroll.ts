@@ -19,10 +19,14 @@ export const useHomeScroll = (heroHeightRef: MutableRefObject<number>) => {
     const { stickySearchVisible, handleScroll: handleStickyScroll } = useStickySearchBar(heroHeightRef);
 
     const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const currentScrollY = event.nativeEvent.contentOffset.y;
+        const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+        const currentScrollY = contentOffset.y;
         scrollY.value = currentScrollY;
 
-        handleTabBarScroll(currentScrollY);
+        const isAtBottom =
+            currentScrollY + layoutMeasurement.height >= contentSize.height - 24;
+
+        handleTabBarScroll(currentScrollY, isAtBottom);
         handleStickyScroll(currentScrollY);
     };
 

@@ -3,8 +3,9 @@ import { HOME_IMAGES } from '@/src/constants/images';
 import { useWalletLogs } from '@/src/hooks/queries/useWallet';
 import { Transaction, TxIconType, WalletLog } from '@/src/types/wallet';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Touchable } from '@/src/components/ui/Touchable';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -123,7 +124,7 @@ export const WalletHistoryLayout: React.FC = () => {
             {/* Tabs */}
             <View style={{ flexDirection: 'row', backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' }}>
                 {TABS.map(tab => (
-                    <TouchableOpacity
+                    <Touchable
                         key={tab}
                         onPress={() => setActiveTab(tab)}
                         activeOpacity={0.8}
@@ -151,7 +152,7 @@ export const WalletHistoryLayout: React.FC = () => {
                   }}
                               />
                         )}
-                    </TouchableOpacity>
+                    </Touchable>
                 ))}
             </View>
 

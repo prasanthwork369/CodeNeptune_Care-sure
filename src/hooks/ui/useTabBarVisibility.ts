@@ -12,7 +12,17 @@ export const useTabBarVisibility = () => {
     const lastScrollY               = useRef(0);
     const isTabBarVisibleShared     = useSharedValue(1);
 
-    const handleScroll = (currentScrollY: number) => {
+    const handleScroll = (currentScrollY: number, isAtBottom = false) => {
+        // Reaching the end of the scrollable content always reveals the tab
+        // bar, even if the user got there by scrolling down.
+        if (isAtBottom) {
+            lastScrollY.current = currentScrollY;
+            setTabBarVisible(true);
+            setUploadButtonCollapsed(false);
+            isTabBarVisibleShared.value = 1;
+            return;
+        }
+
         const delta = currentScrollY - lastScrollY.current;
 
         if (Math.abs(delta) < 5) return;

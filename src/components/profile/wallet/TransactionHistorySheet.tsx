@@ -3,8 +3,9 @@ import { HOME_IMAGES } from '@/src/constants/images';
 import { useNav } from '@/src/hooks/useNav';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import React, { useMemo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { Transaction, TxIconType } from '@/src/types/wallet';
+import { Touchable } from '@/src/components/ui/Touchable';
 
 interface TransactionHistorySheetProps {
     visible: boolean;
@@ -87,9 +88,9 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
 
             {/* See All */}
             <View style={{ borderTopWidth: 1, borderTopColor: '#F3F4F6', paddingVertical: 16, alignItems: 'center' }}>
-                <TouchableOpacity onPress={handleSeeAll} activeOpacity={0.7}>
+                <Touchable onPress={handleSeeAll} activeOpacity={0.7}>
                     <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#FF8A00' }}>See All</Text>
-                </TouchableOpacity>
+                </Touchable>
             </View>
         </GorhomBottomSheet>
     );

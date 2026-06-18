@@ -36,3 +36,5 @@ export const CarouselDot: React.FC<CarouselDotProps> = React.memo(({ index, prog
 
   return <Animated.View style={[{ height: 6, borderRadius: 3 }, style]} />;
 });
+
+CarouselDot.displayName = "CarouselDot";

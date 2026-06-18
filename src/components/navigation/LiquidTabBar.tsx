@@ -118,6 +118,7 @@ const AnimatedUploadButton = React.memo(({ onPress }: { onPress: () => void }) =
         </Pressable>
     );
 });
+AnimatedUploadButton.displayName = 'AnimatedUploadButton';
 
 // ─── Tab Item ─────────────────────────────────────────────────────────────────
 
@@ -185,6 +186,7 @@ const TabItem = React.memo(({ icon: Icon, activeIcon: ActiveIcon, index, label, 
         </View>
     );
 });
+TabItem.displayName = 'TabItem';
 
 // ─── Liquid Tab Bar ───────────────────────────────────────────────────────────
 

@@ -165,3 +165,4 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
         );
     },
 );
+GorhomBottomSheet.displayName = "GorhomBottomSheet";

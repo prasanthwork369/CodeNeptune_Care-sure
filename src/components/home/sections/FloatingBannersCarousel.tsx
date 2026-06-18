@@ -50,6 +50,7 @@ const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
     <Animated.View style={[{ width: 4, height: 4, borderRadius: 2 }, style]} />
   );
 });
+Dot.displayName = "Dot";
 
 export const FloatingBannersCarousel = ({
   isFocused = true,

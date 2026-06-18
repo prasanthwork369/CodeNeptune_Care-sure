@@ -6,7 +6,7 @@ import { useNav } from '@/src/hooks/useNav';
 import { ANIMATIONS } from '@/src/constants/images';
 import LottieView from 'lottie-react-native';
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PRESETS = [500, 1000, 2000];
@@ -57,7 +57,7 @@ export const AddMoneyLayout: React.FC = () => {
                 </Text>
 
                 {/* Editable amount input */}
-                <TouchableOpacity
+                <Touchable
                     activeOpacity={1}
                     onPress={() => inputRef.current?.focus()}
                     style={{ width: '100%', alignItems: 'center', marginBottom: 6 }}
@@ -92,13 +92,13 @@ export const AddMoneyLayout: React.FC = () => {
                                 minWidth: 80,
                                 padding: 0,
                                 includeFontPadding: false,
-                            }}
+                             }}
                         />
                     </View>
                     <Text style={{ fontSize: 12, fontFamily: 'Inter-Medium', color: isAmountFocused ? '#0F7635' : '#9CA3AF', marginTop: 6 }}>
                         Tap to enter a custom amount
                     </Text>
-                </TouchableOpacity>
+                </Touchable>
 
                 {isBalancePending ? (
                     <ActivityIndicator color="#0F7635" size="small" style={{ marginBottom: 20 }} />
@@ -116,7 +116,7 @@ export const AddMoneyLayout: React.FC = () => {
                     {PRESETS.map((preset) => {
                         const isActive = selectedPreset === preset;
                         return (
-                            <TouchableOpacity
+                            <Touchable
                                 key={preset}
                                 onPress={() => handlePreset(preset)}
                                 activeOpacity={0.8}
@@ -136,7 +136,7 @@ export const AddMoneyLayout: React.FC = () => {
                                 }}>
                                     ₹{preset.toLocaleString()}
                                 </Text>
-                            </TouchableOpacity>
+                            </Touchable>
                         );
                     })}
                 </View>
