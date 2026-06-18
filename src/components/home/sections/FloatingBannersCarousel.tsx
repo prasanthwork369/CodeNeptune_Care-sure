@@ -61,8 +61,7 @@ export const FloatingBannersCarousel = ({
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
   const { isTabBarVisible } = useUIStore();
-  const { latestPrescription, hasPendingPrescription, acknowledgeRejectedBanner } =
-    usePrescriptionBanner();
+  const { latestPrescription, hasPendingPrescription, dismissBanner } = usePrescriptionBanner();
   const { isRxFromCartFlow } = useUIStore();
 
   const isCartActive = totalItems > 0;
@@ -189,8 +188,6 @@ export const FloatingBannersCarousel = ({
     if (!latestPrescription) return;
 
     if (latestPrescription.status === PRESCRIPTION_STATUS.CANCELLED) {
-      // Mark as viewed first so the rejected banner never resurfaces for this event
-      acknowledgeRejectedBanner();
       router.push({
         pathname: "/(prescription)/prescription-viewer",
         params: {
@@ -307,6 +304,11 @@ export const FloatingBannersCarousel = ({
                   visible={true}
                   status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
                   onPress={handleRxPress}
+                  onClose={
+                    latestPrescription?.status === PRESCRIPTION_STATUS.CANCELLED
+                      ? dismissBanner
+                      : undefined
+                  }
                 />
               </View>
 
@@ -339,6 +341,11 @@ export const FloatingBannersCarousel = ({
                   visible={true}
                   status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
                   onPress={handleRxPress}
+                  onClose={
+                    latestPrescription?.status === PRESCRIPTION_STATUS.CANCELLED
+                      ? dismissBanner
+                      : undefined
+                  }
                 />
               </View>
 
@@ -405,6 +412,11 @@ export const FloatingBannersCarousel = ({
                 visible={isRxActive}
                 status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
                 onPress={handleRxPress}
+                onClose={
+                  latestPrescription?.status === PRESCRIPTION_STATUS.CANCELLED
+                    ? dismissBanner
+                    : undefined
+                }
               />
             </Animated.View>
           )}

@@ -22,7 +22,22 @@ export const styles = StyleSheet.create({
     emptySub:    { fontSize: moderateScale(13, 0.3) },
     notifIconBox:{ width: scale(40), height: scale(40) },
     notifIcon:   { width: scale(20), height: scale(20) },
-    notifTitle:  { fontSize: moderateScale(14, 0.3) },
-    notifBody:   { fontSize: moderateScale(13, 0.3) },
-    notifTime:   { fontSize: moderateScale(11, 0.25) },
+    notifTitle:  { fontSize: moderateScale(14, 0.3), lineHeight: moderateScale(20, 0.3), fontFamily: 'Inter-SemiBold', color: '#222222', letterSpacing: 0 },
+    notifBody:   { fontSize: moderateScale(12, 0.3), lineHeight: moderateScale(12, 0.3), fontFamily: 'Inter-Regular', color: '#6A6A6A', letterSpacing: 0 },
+    notifTime:   { fontSize: moderateScale(10, 0.25), lineHeight: moderateScale(10, 0.25), fontFamily: 'Inter-Medium', color: '#ADABAB', letterSpacing: 0 },
+
+    // Section header (TODAY / YESTERDAY / THIS WEEK)
+    sectionHeader: { fontSize: moderateScale(14, 0.3), lineHeight: moderateScale(14, 0.3) },
+
+    // Unread dot
+    unreadDot: { width: scale(7), height: scale(7) },
+
+    // Options popover (Clear / Mark as read)
+    popoverWidth:   { width: scale(190) },
+    popoverIcon:    { width: scale(13), height: scale(13) },
+    popoverIconAlt: { width: scale(18), height: scale(18) },
+    popoverText:    { fontSize: moderateScale(15, 0.3) },
+
+    // 3-dot trigger
+    dotsIcon: { width: scale(4), height: scale(15) },
 });

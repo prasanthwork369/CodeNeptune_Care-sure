@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { prescriptionService } from '../../services/prescription.service';
 import { QUERY_KEYS } from '@/src/lib/react-query/queryKeys';
 import { useAuthStore } from '../../store/authStore';
+import { ApiPrescription } from '@/src/types/prescription';
 
 interface UsePrescriptionsParams {
     page?: number;
@@ -27,8 +28,10 @@ export const usePrescriptions = (params: UsePrescriptionsParams = {}) => {
         refetchInterval: refetchInterval ?? false,
     });
 
+    const prescriptions: ApiPrescription[] = data?.success ? data.data : [];
+
     return {
-        prescriptions: data?.data ?? [],
+        prescriptions,
         loading: isLoading,
         refreshing: isRefetching,
         refetch,

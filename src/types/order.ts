@@ -29,6 +29,7 @@ export interface CreateOrderRequest {
   problem?: string | null;
   symptoms?: string | null;
   metadata?: OrderMetadata;
+  isPurchased?: boolean;
 }
 
 export interface OrderMetadata {

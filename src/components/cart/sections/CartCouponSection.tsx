@@ -4,13 +4,15 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useNav } from "@/src/hooks/useNav";
+import { useCouponStore } from "@/src/store/couponStore";
+import { couponService } from "@/src/services/coupon.service";
 import {
     CartCouponSectionProps,
     Coupon,
     COUPON_DISCOUNT_TYPE,
 } from "@/src/types/cart";
-import React from "react";
-import { Image, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Image, Text, View, ActivityIndicator, Alert } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 
 const computeDiscount = (coupon: Coupon, amount: number) => {
@@ -30,6 +32,8 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
 }) => {
   const router = useNav();
   const { data: coupons = [] } = useCoupons();
+  const apply = useCouponStore((s) => s.apply);
+  const [applying, setApplying] = useState(false);
 
   const bestCoupon = coupons.length
     ? coupons.reduce((best, c) => {
@@ -44,6 +48,27 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
         return cSavings > bestSavings ? c : best;
       })
     : null;
+
+  const handleDirectApply = async () => {
+    if (!bestCoupon) return;
+    setApplying(true);
+    try {
+      const result = await couponService.validateCoupon(bestCoupon.code, subtotal);
+      if (result.valid) {
+        apply({
+          code: bestCoupon.code,
+          discount: Number(result.discount) || 0,
+          description: result.message ?? "",
+        });
+      } else {
+        Alert.alert("Coupon Invalid", result.message ?? "This coupon is not valid or has expired.");
+      }
+    } catch {
+      Alert.alert("Error", "Could not validate coupon. Please try again.");
+    } finally {
+      setApplying(false);
+    }
+  };
 
   if (appliedCoupon) {
     return (
@@ -117,37 +142,96 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   const remaining = bestCoupon.minOrderValue - subtotal;
 
   return (
-    <View className="mx-4 mt-3 rounded-[12px] border border-[#BFE3FF] overflow-hidden">
-      <View className="bg-[#EAF6FF] px-4 pt-3 pb-3">
-        <Text className="text-[14px] font-inter-bold text-[#1A1C1E] mb-2">
+    <View className="mx-4 mt-3 rounded-[16px] border border-[#BFE3FF] overflow-hidden bg-white">
+      <View className="bg-[#EAF6FF] px-4 pt-4 pb-4">
+        <Text
+          style={{
+            fontSize: 15,
+            fontFamily: "Inter-Bold",
+            color: "#1A1C1E",
+            marginBottom: 10,
+          }}
+        >
           Coupons & offers
         </Text>
 
         <View className="flex-row items-center">
-          <View className="w-9 h-9 rounded-md bg-[#E1F2FF] items-center justify-center mr-3 border border-[#BFE3FF]">
+          <View
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              backgroundColor: "#E1F2FF",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 12,
+              borderWidth: 1,
+              borderColor: "#BFE3FF",
+            }}
+          >
             <Image
               source={HOME_IMAGES.couponIcon}
-              style={{ width: 22, height: 22 }}
+              style={{ width: 24, height: 24 }}
               resizeMode="contain"
             />
           </View>
-          <View className="flex-1">
-            <Text className="text-[13px] font-inter-bold text-[#1A1C1E]">
+          <View className="flex-1 mr-2">
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "Inter-Bold",
+                color: "#1A1C1E",
+                lineHeight: 18,
+              }}
+            >
               Save ₹{savings.toFixed(0)} with {bestCoupon.code}
             </Text>
             {isLocked && (
-              <Text className="text-[12px] font-inter-semibold text-[#E16D09] mt-0.5">
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: "Inter-SemiBold",
+                  color: "#E16D09",
+                  marginTop: 3,
+                }}
+              >
                 Shop ₹{remaining.toFixed(0)} more to apply
               </Text>
             )}
           </View>
-          {isLocked && (
-            <View className="bg-white border border-[#919EAB33] px-3.5 py-1.5 rounded-sm  shadow-sm">
-              <Text className="text-[12px] font-inter-semibold text-[#6A6A6A]">
-                Locked
+          <Touchable
+            disabled={isLocked || applying}
+            onPress={handleDirectApply}
+            style={{
+              backgroundColor: "white",
+              borderWidth: 1,
+              borderColor: isLocked ? "#E4E7EC" : "#0F7635",
+              borderRadius: 10,
+              width: 76,
+              height: 38,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.04,
+              shadowRadius: 2,
+              elevation: 1,
+            }}
+          >
+            {applying ? (
+              <ActivityIndicator size="small" color="#0F7635" />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Inter-Bold",
+                  color: isLocked ? "#9CA3AF" : "#0F7635",
+                }}
+              >
+                Apply
               </Text>
-            </View>
-          )}
+            )}
+          </Touchable>
         </View>
       </View>
 
@@ -164,12 +248,18 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
       <Touchable
         onPress={() => router.push("/(modal)/coupons")}
         activeOpacity={0.8}
-        className="bg-white flex-row items-center justify-between px-4 py-3"
+        className="bg-white flex-row items-center justify-between px-4 py-3.5"
       >
-        <Text className="text-[13px] font-inter-medium text-[#6A6A6A]">
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Inter-Medium",
+            color: "#6A6A6A",
+          }}
+        >
           View all coupon
         </Text>
-        <icons.arrow_forward_ios width={14} height={14} fill={colors.text} />
+        <icons.arrow_forward_ios width={12} height={12} fill="#6A6A6A" />
       </Touchable>
     </View>
   );

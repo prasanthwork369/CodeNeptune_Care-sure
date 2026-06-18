@@ -3,6 +3,7 @@ import { ProductSkeleton } from '@/src/components/product/ProductSkeleton';
 import { useProductHeroAnimation } from '@/src/hooks/animations/useProductHeroAnimation';
 import { useCart } from '@/src/hooks/queries/useCart';
 import { useProduct } from '@/src/hooks/queries/useProduct';
+import { formatPackLabel } from '@/src/utils/packLabel';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
 import { useLocalSearchParams } from 'expo-router';
@@ -68,6 +69,12 @@ export const ProductDetailsLayout: React.FC = () => {
         price: variantSellingPrice,
         originalPrice: effectiveDiscountPct > 0 ? selectedVariant.price : undefined,
         savingsPercent: effectiveDiscountPct > 0 ? effectiveDiscountPct : undefined,
+        packSize: parseFloat(selectedVariant.packSize) || product.packSize,
+        packLabel: formatPackLabel({
+            packSize: selectedVariant.packSize,
+            unit: selectedVariant.unit,
+            dosageForm: product.dosageForm,
+        }),
     } : product;
 
     // When a variant is selected, use the VARIANT's UUID as medicineId.

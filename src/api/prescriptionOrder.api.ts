@@ -22,10 +22,14 @@ interface ApiPrescriptionMedicine {
 }
 
 export interface ApiPrescriptionOrderItem {
-    original: ApiPrescriptionMedicine;
+    original: ApiPrescriptionMedicine | null;
     recommended: ApiPrescriptionMedicine;
-    medicineQuantity: number;
+    medicineQuantity: number | null;
     recommendationMedicineQuantity: number;
+    isAddedByCaller?: boolean;
+    originalName?: string | null;
+    notes?: string | null;
+    id?: string;
 }
 
 export const prescriptionOrderApi = {

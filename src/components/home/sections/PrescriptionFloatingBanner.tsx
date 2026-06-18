@@ -29,7 +29,6 @@ interface StatusConfig {
   title: string;
   subtitle: string;
   showProgress: boolean;
-  showChevron: boolean;
 }
 
 const STATUS_CONFIG: Record<PrescriptionStatusValue, StatusConfig> = {
@@ -37,19 +36,16 @@ const STATUS_CONFIG: Record<PrescriptionStatusValue, StatusConfig> = {
     title: "Your prescription is under review",
     subtitle: "We'll keep you updated shortly",
     showProgress: true,
-    showChevron: false,
   },
   [PRESCRIPTION_STATUS.APPROVED]: {
     title: "Your prescription has been verified",
     subtitle: "Your Medicines Are Ready To Order",
     showProgress: false,
-    showChevron: true,
   },
   [PRESCRIPTION_STATUS.CANCELLED]: {
     title: "Prescription Rejected",
     subtitle: "Please Re-upload Your Prescription",
     showProgress: false,
-    showChevron: true,
   },
 };
 
@@ -57,12 +53,14 @@ interface PrescriptionFloatingBannerProps {
   visible: boolean;
   status?: PrescriptionStatusValue;
   onPress?: () => void;
+  onClose?: () => void;
 }
 
 export const PrescriptionFloatingBanner = ({
   visible,
   status = PRESCRIPTION_STATUS.NEW,
   onPress,
+  onClose,
 }: PrescriptionFloatingBannerProps) => {
   const { isUploadButtonCollapsed, isTabBarVisible } = useUIStore();
 
@@ -148,9 +146,6 @@ export const PrescriptionFloatingBanner = ({
     };
   });
 
-  const chevronColor =
-    status === PRESCRIPTION_STATUS.CANCELLED ? "#DC2626" : "#0F7635";
-
   const subtitleText = config.subtitle;
 
   return (
@@ -174,13 +169,17 @@ export const PrescriptionFloatingBanner = ({
           }}
           className="border border-[#0000000D]"
         >
+          <View
+            className="flex-row items-center bg-white"
+            style={{ borderRadius: 999, height: 65 }}
+          >
           <Touchable
             activeOpacity={0.7}
             onPress={onPress}
-            style={{ width: "100%" }}
+            style={{ flex: 1 }}
           >
             <View
-              className="flex-row items-center px-3 bg-white"
+              className="flex-row items-center px-3"
               style={{ borderRadius: 999, height: 65 }}
             >
               {/* Rx Icon */}
@@ -255,27 +254,27 @@ export const PrescriptionFloatingBanner = ({
                   )}
                 </View>
               </View>
-
-              {config.showChevron && (
-                <View
-                  style={{
-                    marginLeft: 8,
-                    marginRight: 4,
-                    width: 20,
-                    height: 20,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <icons.arrow_forward_ios
-                    width={14}
-                    height={14}
-                    fill={chevronColor}
-                  />
-                </View>
-              )}
             </View>
           </Touchable>
+
+          {onClose && (
+            <Touchable
+              activeOpacity={0.7}
+              onPress={onClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 8,
+              }}
+            >
+              <icons.close_small width={12} height={12} fill="#9CA3AF" />
+            </Touchable>
+          )}
+          </View>
         </View>
       </View>
     </Animated.View>

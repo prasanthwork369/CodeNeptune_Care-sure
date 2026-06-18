@@ -154,6 +154,7 @@ export const PaymentLayout: React.FC = () => {
       deliveryType: "HOME_DELIVERY" as const,
       patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
       prescriptionId: prescriptionId || undefined,
+      isPurchased: prescriptionId ? true : undefined,
       problem: problem || undefined,
       symptoms: symptoms || undefined,
       metadata: {

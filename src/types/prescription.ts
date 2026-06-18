@@ -1,3 +1,5 @@
+import { PrescriptionStatusValue } from "@/src/constants/prescription-status";
+
 export interface PrescriptionItem {
     localUri: string;
     name: string;
@@ -11,6 +13,27 @@ export interface Prescription {
     date: string;
     patient: string;
     doctor: string;
+}
+
+/**
+ * Shape returned by GET /api/v1/prescriptions (and by id). `isDismissed` and
+ * `isPurchased` are server-computed and read-only from the client — there is
+ * no endpoint to set them. Banner visibility must be derived from these
+ * fields directly, never from local/AsyncStorage state.
+ */
+export interface ApiPrescription {
+    id: string;
+    rxId?: string;
+    status: PrescriptionStatusValue;
+    category?: number;
+    isDismissed: boolean;
+    isPurchased: boolean;
+    prescriptionOrderId?: string | null;
+    imageUrls?: string[];
+    doctorName?: string | null;
+    ocrData?: { patientName?: string } | null;
+    createdAt: string;
+    updatedAt?: string;
 }
 
 export interface RequiresPrescriptionWarningProps {

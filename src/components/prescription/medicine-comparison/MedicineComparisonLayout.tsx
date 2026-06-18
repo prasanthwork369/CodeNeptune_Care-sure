@@ -16,9 +16,9 @@ import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
+import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
-import { usePrescriptionBannerStore } from "@/src/store/prescriptionBannerStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import LottieView from "lottie-react-native";
 import React, { useMemo, useRef, useState } from "react";
@@ -49,8 +49,6 @@ export const MedicineComparisonLayout: React.FC<
   const { width } = useWindowDimensions();
   const cardWidth = width - 32;
 
-  const { markVerifiedBannerCompleted, isVerifiedBannerCompleted } =
-    usePrescriptionBannerStore();
   const setPrescriptionOrderItems = usePrescriptionOrderStore((s) => s.setItems);
   const walletConfettiRef = useRef<LottieView>(null);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
@@ -159,9 +157,6 @@ export const MedicineComparisonLayout: React.FC<
   const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
 
   const handleProceed = () => {
-    if (prescriptionId && !isVerifiedBannerCompleted(prescriptionId)) {
-      markVerifiedBannerCompleted(prescriptionId);
-    }
     setPrescriptionOrderItems(
       mergedMedicines.map((item) => ({
         medicineId: item.recommended.id,
@@ -174,6 +169,24 @@ export const MedicineComparisonLayout: React.FC<
         image: typeof item.recommended.image === "string" ? item.recommended.image : null,
         productId: item.recommended.productId ?? null,
       }))
+    );
+    useCheckoutStore.getState().setBill(
+      {
+        subtotal,
+        productDiscount: productSavings,
+        couponDiscount: COUPON_DISCOUNT,
+        walletDiscount: WALLET_DISCOUNT,
+        coinsDiscount: COINS_DISCOUNT,
+        deliveryFee: 0,
+        handlingCharge: 0,
+        totalSaved: totalSavings,
+        toPay,
+      },
+      {
+        walletUsed: walletOn,
+        coinsUsed: coinsOn,
+        couponCode: appliedCoupon?.code ?? "",
+      }
     );
     router.push({
       pathname: "/(prescription)/select-patient",

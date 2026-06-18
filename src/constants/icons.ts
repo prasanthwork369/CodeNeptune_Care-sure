@@ -17,6 +17,7 @@ import add_circle from "../../assets/icons/add_circle.svg";
 import arrow_back from "../../assets/icons/arrow_back.svg";
 import arrow_down from "../../assets/icons/arrow_down.svg";
 import arrow_down_green from "../../assets/icons/arrow_down_green.svg";
+import arrow_drop_down from "../../assets/icons/arrow_drop_down.svg";
 import arrow_forward from "../../assets/icons/arrow_forward.svg";
 import arrow_forward_gray from "../../assets/icons/arrow_forward_gray.svg";
 import arrow_back_ios from "../../assets/icons/arrow_back_ios.svg";
@@ -31,11 +32,14 @@ import filter_list from "../../assets/icons/filter_list.svg";
 import hourglass_bottom from "../../assets/icons/hourglass_bottom.svg";
 import pill_gray from "../../assets/icons/pill_gray.svg";
 import close_icon from "../../assets/icons/close.svg";
+import close_dark from "../../assets/icons/close_icon.svg";
 import close_small from "../../assets/icons/close_small.svg";
 import credit_card from "../../assets/icons/credit_card.svg";
 import camera_gray from "../../assets/icons/camera_gray.svg";
 import delete_icon from "../../assets/icons/delete.svg";
+import done_all from "../../assets/icons/done_all.svg";
 import delete_red from "../../assets/icons/delete_red.svg";
+import dots from "../../assets/icons/dots.svg";
 
 import edit_icon from "../../assets/icons/edit.svg";
 import info_dark from "../../assets/icons/info_dark.svg";
@@ -159,6 +163,7 @@ export const icons = {
     arrow_back_ios,
     arrow_down,
     arrow_down_green,
+    arrow_drop_down,
     arrow_forward,
     arrow_forward_gray,
     arrow_forward_ios,
@@ -179,7 +184,10 @@ export const icons = {
 
     delete_icon,
     delete_red,
+    done_all,
+    dots,
     close_icon,
+    close_dark,
     close_small,
     telegram,
     percent_discount,
