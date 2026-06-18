@@ -35,7 +35,8 @@ export const ProfileLayout: React.FC = () => {
     const [showUploadSheet, setShowUploadSheet] = useState(false);
     const [localAvatar, setLocalAvatar] = useState<string | null>(null);
     const scrollY = useSharedValue(0);
-    const { safeAreaBgStyle } = useScrollStatusBar(scrollY);
+    const headerHeightShared = useSharedValue(0);
+    const { safeAreaBgStyle } = useScrollStatusBar(scrollY, headerHeightShared);
 
     if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
@@ -97,13 +98,19 @@ export const ProfileLayout: React.FC = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={refreshProfile} colors={['#0F7635']} tintColor="#0F7635" />
                 }
             >
-                <ProfileHeader
-                    profile={profile}
-                    localAvatar={localAvatar}
-                    avatarUploading={avatarUploading}
-                    onPickAvatar={() => setShowUploadSheet(true)}
-                    safeAreaTop={insets.top}
-                />
+                <View
+                    onLayout={(e) => {
+                        headerHeightShared.value = e.nativeEvent.layout.height;
+                    }}
+                >
+                    <ProfileHeader
+                        profile={profile}
+                        localAvatar={localAvatar}
+                        avatarUploading={avatarUploading}
+                        onPickAvatar={() => setShowUploadSheet(true)}
+                        safeAreaTop={insets.top}
+                    />
+                </View>
 
                 <ProfileQuickTiles />
 
