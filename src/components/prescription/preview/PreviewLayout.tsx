@@ -8,7 +8,7 @@ import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { MAX_FILES, MAX_SIZE_BYTES, validatePrescriptionFile } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
@@ -17,6 +17,7 @@ import { View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   DuplicateFileModal,
+  FileTooLargeModal,
   InfoModal,
   PendingPrescriptionModal,
   PreviewDisplay,
@@ -90,6 +91,8 @@ export const PreviewLayout: React.FC = () => {
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [duplicateFileName, setDuplicateFileName] = useState("");
+  const [duplicateFileSize, setDuplicateFileSize] = useState<number | undefined>(undefined);
+  const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
   const [infoModal, setInfoModal] = useState<{
     title: string;
     message: string;
@@ -110,7 +113,7 @@ export const PreviewLayout: React.FC = () => {
     const newItems: PrescriptionItem[] = [];
     const currentItems = usePrescriptionDraftStore.getState().items;
     for (const asset of assets) {
-      const item = await validatePrescriptionFile(asset, showInfo);
+      const item = await validatePrescriptionFile(asset, showInfo, setTooLargeSizeMB);
       if (!item) continue;
       const isDuplicate =
         currentItems.some(
@@ -127,6 +130,7 @@ export const PreviewLayout: React.FC = () => {
         );
       if (isDuplicate) {
         setDuplicateFileName(item.name);
+        setDuplicateFileSize(item.size);
         continue;
       }
       if (currentItems.length + newItems.length >= MAX_FILES) {
@@ -329,7 +333,31 @@ export const PreviewLayout: React.FC = () => {
 
       <DuplicateFileModal
         fileName={duplicateFileName}
-        onClose={() => setDuplicateFileName("")}
+        fileSizeLabel={
+          duplicateFileSize != null
+            ? `${(duplicateFileSize / (1024 * 1024)).toFixed(1)} MB`
+            : undefined
+        }
+        onClose={() => {
+          setDuplicateFileName("");
+          setDuplicateFileSize(undefined);
+        }}
+        onChooseAnother={() => {
+          setDuplicateFileName("");
+          setDuplicateFileSize(undefined);
+          setShowAddSheet(true);
+        }}
+      />
+
+      <FileTooLargeModal
+        visible={!!tooLargeSizeMB}
+        selectedSizeLabel={`${tooLargeSizeMB} MB`}
+        maxSizeLabel={`${(MAX_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB`}
+        onClose={() => setTooLargeSizeMB(null)}
+        onChooseAnother={() => {
+          setTooLargeSizeMB(null);
+          setShowAddSheet(true);
+        }}
       />
 
       <PendingPrescriptionModal

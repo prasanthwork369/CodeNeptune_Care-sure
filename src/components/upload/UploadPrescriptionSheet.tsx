@@ -1,4 +1,5 @@
-import { InfoModal } from "@/src/components/prescription/preview/sections";
+import { DuplicateFileModal, FileTooLargeModal, InfoModal } from "@/src/components/prescription/preview/sections";
+import { MAX_SIZE_BYTES } from "@/src/utils/prescription";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -76,11 +77,15 @@ export const UploadPrescriptionSheet: React.FC<
     message: string;
     onDismiss?: () => void;
   } | null>(null);
+  const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
+  const [duplicateFile, setDuplicateFile] = useState<{ name: string; size?: number } | null>(null);
   const { pickImages, pickPdf, takePhoto } = usePrescriptionPicker(
     onClose,
     toPay,
     patientMemberId,
     (title, message, onDismiss) => setInfoModal({ title, message, onDismiss }),
+    setTooLargeSizeMB,
+    (name, size) => setDuplicateFile({ name, size }),
   );
 
   const handleUploadFile = onUploadFile ?? pickImages;
@@ -116,6 +121,23 @@ export const UploadPrescriptionSheet: React.FC<
         />
       )}
 
+      <FileTooLargeModal
+        visible={!!tooLargeSizeMB}
+        selectedSizeLabel={`${tooLargeSizeMB} MB`}
+        maxSizeLabel={`${(MAX_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB`}
+        onClose={() => setTooLargeSizeMB(null)}
+      />
+
+      <DuplicateFileModal
+        fileName={duplicateFile?.name ?? ""}
+        fileSizeLabel={
+          duplicateFile?.size != null
+            ? `${(duplicateFile.size / (1024 * 1024)).toFixed(1)} MB`
+            : undefined
+        }
+        onClose={() => setDuplicateFile(null)}
+      />
+
       <GorhomBottomSheet
         ref={sheetRef}
         isVisible={isVisible}
@@ -144,10 +166,10 @@ export const UploadPrescriptionSheet: React.FC<
               activeOpacity={0.85}
               onPress={handleUploadFile}
               style={{ borderColor: "#919EAB33" }}
-              className="flex-1 items-center border rounded-2xl py-5 bg-white"
+              className="flex-1 items-center border rounded-[8px] py-5 bg-white"
             >
               <View
-                className="w-12 h-12 rounded-xl items-center justify-center mb-2"
+                className="w-12 h-12 rounded-[6px] items-center justify-center mb-2"
                 style={{ backgroundColor: "#E6F4EA" }}
               >
                 <icons.upload_file width={24} height={24} />
@@ -164,10 +186,10 @@ export const UploadPrescriptionSheet: React.FC<
                 setTimeout(handleTakePhoto, 400);
               }}
               style={{ borderColor: "#919EAB33" }}
-              className="flex-1 items-center border rounded-2xl py-5 bg-white"
+              className="flex-1 items-center border rounded-[8px] py-5 bg-white"
             >
               <View
-                className="w-12 h-12 rounded-xl items-center justify-center mb-2"
+                className="w-12 h-12 rounded-[6px] items-center justify-center mb-2"
                 style={{ backgroundColor: "#E6F4EA" }}
               >
                 <icons.photo_camera_green width={24} height={24} />
@@ -181,10 +203,10 @@ export const UploadPrescriptionSheet: React.FC<
               activeOpacity={0.85}
               onPress={handleUploadPdf}
               style={{ borderColor: "#919EAB33" }}
-              className="flex-1 items-center border rounded-2xl py-5 bg-white"
+              className="flex-1 items-center border rounded-[8px] py-5 bg-white"
             >
               <View
-                className="w-12 h-12 rounded-xl items-center justify-center mb-2"
+                className="w-12 h-12 rounded-[6px] items-center justify-center mb-2"
                 style={{ backgroundColor: "#E6F4EA" }}
               >
                 <icons.upload_pdf width={24} height={24} />
@@ -207,18 +229,14 @@ export const UploadPrescriptionSheet: React.FC<
             }}
             activeOpacity={0.85}
             style={{
-              borderColor: "#919EAB22",
+              borderWidth: 1,
+              borderColor: "#00000014",
               backgroundColor: "#FFFFFF",
-              shadowColor: "#919EAB",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.08,
-              shadowRadius: 12,
-              elevation: 2,
             }}
-            className="flex-row items-center border rounded-2xl px-4 py-3.5 mt-4"
+            className="flex-row items-center rounded-[6px] px-4 py-3.5 mt-4"
           >
             <View
-              className="w-12 h-12 rounded-xl items-center justify-center"
+              className="w-12 h-12 rounded-[8px] items-center justify-center"
               style={{ backgroundColor: "#E6F4EA" }}
             >
               <icons.prescription_green width={24} height={24} />

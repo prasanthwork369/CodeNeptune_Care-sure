@@ -10,7 +10,9 @@ export function usePrescriptionPicker(
     onClose: () => void,
     toPay?: string,
     patientMemberId?: string,
-    onError?: (title: string, message: string, onDismiss?: () => void) => void
+    onError?: (title: string, message: string, onDismiss?: () => void) => void,
+    onSizeExceeded?: (sizeMB: string) => void,
+    onDuplicate?: (fileName: string, fileSize?: number) => void
 ) {
     const router = useNav();
     const { addItems } = usePrescriptionDraftStore();
@@ -23,11 +25,13 @@ export function usePrescriptionPicker(
         const seenKeys = new Set(existingKeys);
         const uniqueInSelection: PrescriptionItem[] = [];
         const skippedCount = { internal: 0, existing: 0 };
+        let firstDuplicate: PrescriptionItem | null = null;
 
         for (const f of files) {
             const key = `${f.name}-${f.size}-${f.type}`;
             if (seenKeys.has(key)) {
                 existingKeys.has(key) ? skippedCount.existing++ : skippedCount.internal++;
+                if (!firstDuplicate) firstDuplicate = f;
             } else {
                 uniqueInSelection.push(f);
                 seenKeys.add(key);
@@ -35,11 +39,15 @@ export function usePrescriptionPicker(
         }
 
         if (skippedCount.existing > 0 || skippedCount.internal > 0) {
-            const onDismiss = currentItems.length > 0 ? () => router.push({
-                pathname: '/(prescription)/preview',
-                params: { toPay: toPay ?? '0', patientMemberId: patientMemberId ?? '', source: 'cart' },
-            }) : undefined;
-            showErr('Duplicate Files', 'Some identical files were detected and skipped.', onDismiss);
+            if (onDuplicate && firstDuplicate) {
+                onDuplicate(firstDuplicate.name, firstDuplicate.size);
+            } else {
+                const onDismiss = currentItems.length > 0 ? () => router.push({
+                    pathname: '/(prescription)/preview',
+                    params: { toPay: toPay ?? '0', patientMemberId: patientMemberId ?? '', source: 'cart' },
+                }) : undefined;
+                showErr('Duplicate Files', 'Some identical files were detected and skipped.', onDismiss);
+            }
         }
 
         if (uniqueInSelection.length === 0) return;
@@ -56,7 +64,7 @@ export function usePrescriptionPicker(
     ): Promise<PrescriptionItem[]> => {
         const validated: PrescriptionItem[] = [];
         for (const asset of assets) {
-            const item = await validatePrescriptionFile(asset, onError);
+            const item = await validatePrescriptionFile(asset, onError, onSizeExceeded);
             if (item) validated.push(item);
         }
         return validated;

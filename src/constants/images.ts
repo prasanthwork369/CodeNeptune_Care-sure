@@ -95,6 +95,9 @@ export const HOME_IMAGES = {
   blockIcon: require("../../assets/images/icons/block.png"),
   notiHistoryIcon: require("../../assets/images/icons/Noti_history.png"),
   bucketCheckIcon: require("../../assets/images/icons/bucket_check.png"),
+  prescriptionInfo: require("../../assets/trial/prescription-info.png"),
+  prescriptionInstructions: require("../../assets/trial/prescription-instructions.png"),
+  prescriptionMedicine: require("../../assets/trial/prescription-medicine.png"),
 } as const;
 
 export const UPLOAD_IMAGES = {

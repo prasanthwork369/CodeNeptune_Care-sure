@@ -79,7 +79,8 @@ const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
 
 export async function validatePrescriptionFile(
     asset: DocumentPicker.DocumentPickerAsset | ImagePicker.ImagePickerAsset,
-    onError?: (title: string, message: string) => void
+    onError?: (title: string, message: string) => void,
+    onSizeExceeded?: (sizeMB: string) => void
 ): Promise<PrescriptionItem | null> {
     const uri = asset.uri;
     const name =
@@ -103,7 +104,8 @@ export async function validatePrescriptionFile(
     // to avoid the expensive copy/resolve operation.
     if (size > MAX_SIZE_BYTES) {
         const sizeMB = (size / (1024 * 1024)).toFixed(2);
-        onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is 5 MB.`);
+        if (onSizeExceeded) onSizeExceeded(sizeMB);
+        else onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is 5 MB.`);
         return null;
     }
 
@@ -150,7 +152,8 @@ export async function validatePrescriptionFile(
     if (size > MAX_SIZE_BYTES) {
         cleanup();
         const sizeMB = (size / (1024 * 1024)).toFixed(2);
-        onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is 5 MB.`);
+        if (onSizeExceeded) onSizeExceeded(sizeMB);
+        else onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is 5 MB.`);
         return null;
     }
 

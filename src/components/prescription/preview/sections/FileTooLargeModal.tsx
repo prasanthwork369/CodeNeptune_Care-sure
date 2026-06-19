@@ -4,22 +4,22 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
 import { Image, Modal, Pressable, Text, View } from 'react-native';
 
-interface DuplicateFileModalProps {
-    fileName: string;
-    fileSizeLabel?: string;
-    uploadedLabel?: string;
+interface FileTooLargeModalProps {
+    visible: boolean;
+    selectedSizeLabel: string;
+    maxSizeLabel: string;
     onClose: () => void;
     onChooseAnother?: () => void;
 }
 
-export const DuplicateFileModal: React.FC<DuplicateFileModalProps> = ({
-    fileName,
-    fileSizeLabel,
-    uploadedLabel = 'Uploaded just now',
+export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
+    visible,
+    selectedSizeLabel,
+    maxSizeLabel,
     onClose,
     onChooseAnother,
 }) => (
-    <Modal visible={!!fileName} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
         <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={onClose}>
             <Pressable onPress={e => e.stopPropagation()} className="w-full">
                 <View className="bg-white rounded-[20px] px-5 pt-6 pb-5 w-full items-center relative">
@@ -35,23 +35,30 @@ export const DuplicateFileModal: React.FC<DuplicateFileModalProps> = ({
                     </View>
 
                     <Text className="text-[18px] font-inter-bold text-[#0F1724] mb-1.5 text-center">
-                        Duplicate File
+                        Oops! File is too large
                     </Text>
                     <Text className="text-[13px] font-inter-medium text-[#6A6A6A] text-center leading-5 mb-5">
-                        A file with the same name(&quot;{fileName}&quot;) has already been uploaded
+                        Upload a file under {maxSizeLabel} to continue
                     </Text>
 
-                    <View className="w-full flex-row items-center bg-white border border-[#919EAB33] rounded-[12px] px-3 py-3 mb-5">
-                        <View className="w-10 h-10 rounded-[8px] bg-[#FDEAEA] items-center justify-center mr-3">
-                            <Image source={HOME_IMAGES.prescriptionMedicine} style={{ width: 22, height: 22 }} resizeMode="contain" />
+                    <View className="w-full bg-white border border-[#919EAB33] rounded-[12px] px-4 mb-5">
+                        <View className="flex-row items-center justify-between py-3 border-b border-[#F0F0F0]">
+                            <View className="flex-row items-center">
+                                <View className="w-7 h-7 rounded-[6px] bg-[#FDEAEA] items-center justify-center mr-2.5">
+                                    <Image source={HOME_IMAGES.prescriptionInstructions} style={{ width: 16, height: 16 }} resizeMode="contain" />
+                                </View>
+                                <Text className="text-[13px] font-inter-medium text-[#0F1724]">Selected file size</Text>
+                            </View>
+                            <Text className="text-[13px] font-inter-bold text-[#E0383D]">{selectedSizeLabel}</Text>
                         </View>
-                        <View className="flex-1">
-                            <Text numberOfLines={1} className="text-[13px] font-inter-semibold text-[#0F1724]">
-                                {fileName}
-                            </Text>
-                            <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5">
-                                {[fileSizeLabel, uploadedLabel].filter(Boolean).join(' | ')}
-                            </Text>
+                        <View className="flex-row items-center justify-between py-3">
+                            <View className="flex-row items-center">
+                                <View className="w-7 h-7 rounded-full bg-[#E8F5E9] items-center justify-center mr-2.5">
+                                    <icons.verified_user width={16} height={16} fill="#0F7635" />
+                                </View>
+                                <Text className="text-[13px] font-inter-medium text-[#0F1724]">Maximum allowed</Text>
+                            </View>
+                            <Text className="text-[13px] font-inter-bold text-brand-primary">{maxSizeLabel}</Text>
                         </View>
                     </View>
 
