@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
     },
     cartBtn: {
         width: 137,
-        height: 38,
+        height: 40,
         borderRadius: 6,
         borderWidth: 1,
         borderColor: '#0F7635',

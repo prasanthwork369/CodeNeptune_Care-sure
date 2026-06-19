@@ -230,7 +230,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 )}
               </View>
               <Text
-                className="text-[15px] font-inter-bold text-[#111827] mb-1 leading-[20px]"
+                className="text-[15px] font-inter-bold text-[#111827] mb-1 leading-[17px]"
                 numberOfLines={2}
               >
                 {searched.name}
@@ -270,7 +270,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
           {/* Status Slot Container at the bottom (aligned with Add Button) */}
           <View
-            className="px-[12px] pb-[8px] pt-[8px]"
+            className="px-[12px] pt-6"
             style={{ height: 62, justifyContent: "center" }}
           >
             <Text className="text-[12px] font-inter-semibold text-[#EF4444]">
@@ -342,7 +342,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       )}
                     </View>
                     <Text
-                      className="text-[15px] font-inter-bold text-[#111827] leading-[20px]"
+                      className="text-[15px] font-inter-bold text-[#111827] leading-[17px]"
                       numberOfLines={2}
                     >
                       {recommended.name}
@@ -433,7 +433,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     width: cardWidth / 2,
                     opacity: expandAnim,
                   }}
-                  className="px-[12px] pt-7 pb-0 flex-col justify-between"
+                  className="px-[12px] pt-10 pb-0 flex-col justify-between"
                 >
                   <View
                     className="flex-1 rounded-[12px] overflow-hidden"
@@ -451,7 +451,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       resizeMode="contain"
                     />
                     <View className="px-3 pt-3 z-10 w-[70%]">
-                      <Text className="text-[13px] font-inter-extrabold text-brand-text leading-[17px]">
+                      <Text className="text-[14px] font-inter-extrabold text-brand-text leading-[18px]">
                         Doctor{"\n"}Trusted{"\n"}Medicines
                       </Text>
                     </View>
@@ -469,13 +469,13 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     />
                   </View>
 
-                  <View className="mt-3 flex-row items-center justify-center bg-white rounded-[8px] border border-[#919EAB33] py-1.5">
+                  <View className="mt-3 flex-row items-center justify-center bg-white rounded-[8px] border border-[#919EAB33] py-2">
                     <Image
                       source={HOME_IMAGES.shield}
                       style={{ width: 18, height: 18, marginRight: 4 }}
                       resizeMode="contain"
                     />
-                    <Text className="text-[11px] font-inter-medium text-brand-text">
+                    <Text className="text-[12px] font-inter-medium text-brand-text">
                       CareSure Assured
                     </Text>
                   </View>
@@ -487,8 +487,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             <View
               style={{
                 paddingHorizontal: 12,
-                paddingBottom: 8,
-                paddingTop: 8,
+                paddingBottom: 10,
+                paddingTop:2,
               }}
             >
               {count === 0 ? (

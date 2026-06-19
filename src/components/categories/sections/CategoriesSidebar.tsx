@@ -30,6 +30,8 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
   isLoading,
 }) => {
   const tabLayouts = useRef<Record<string, { y: number; height: number }>>({});
+  const scrollViewRef = useRef<ScrollView>(null);
+  const viewportHeight = useRef(0);
   const indicatorY = useSharedValue(-INDICATOR_HEIGHT);
 
   const moveIndicator = (tabId: string) => {
@@ -44,6 +46,13 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
         duration: 250,
         easing: Easing.out(Easing.cubic),
       });
+    }
+
+    if (viewportHeight.current > 0) {
+      const targetScrollY = layout.y - (viewportHeight.current - layout.height) / 2;
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({ y: Math.max(0, targetScrollY), animated: true });
+      }, 50);
     }
   };
 
@@ -82,8 +91,12 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
       style={{ width, boxShadow: "4px 0px 20px 0px #0000000D" } as any}
     >
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingVertical: 10 }}
+        onLayout={(e) => {
+          viewportHeight.current = e.nativeEvent.layout.height;
+        }}
       >
         <Animated.View
           style={[

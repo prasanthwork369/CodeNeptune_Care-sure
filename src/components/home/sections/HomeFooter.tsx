@@ -77,7 +77,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
                         contentFit="cover"
                         contentPosition="bottom"
                     />
-                    <View style={{ position: 'absolute', bottom: 60, left: 20, gap: 0 }}>
+                    <View style={{ position: 'absolute', bottom: 70, left: 20, gap: 0 }}>
                         {footerWords.map((word, idx) => (
                             <Text
                                 key={idx}

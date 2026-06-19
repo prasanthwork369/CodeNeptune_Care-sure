@@ -103,6 +103,7 @@ export const CartLayout: React.FC = () => {
               : "No address saved")
           }
           onChange={() => setShowLocationSheet(true)}
+          flat
         />
 
         <CartSavingsBanner firstName={firstName} totalSavings={totalSavings} />

@@ -27,7 +27,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
             onPress={() => inputRefs.current[index]?.focus()}
             className="w-[14%] aspect-square rounded-lg bg-white items-center justify-center"
             style={{
-              borderWidth: focusedIndex === index ? 2 : 1,
+              borderWidth: focusedIndex === index ? 1.5 : 1.5,
               borderColor: otpError || error ? "#EF4444" : focusedIndex === index ? "#0F7635" : "#919EAB22",
             }}
           >

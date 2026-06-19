@@ -64,6 +64,7 @@ const toRecommendData = (item: ApiSearchMedicine) => ({
     id: item.id,
     productId: item.productId ?? item.id,
     name: item.name,
+    manufacturer: item.brand?.name ?? '',
     packSize: item.packSize ?? '',
     unit: item.unit ?? '',
     dosageForm: item.dosageForm ?? '',

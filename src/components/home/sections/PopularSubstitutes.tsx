@@ -52,7 +52,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                 onPress={() => onProductPress?.(product.productId ?? product.id)}
                 style={{ height: half, backgroundColor: CONTENT_BG, paddingBottom: 4 }}
             >
-                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
+                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12,alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
                     {!!product.discount && (
                         <View style={{ backgroundColor: DISCOUNT_BG, position: 'absolute', top: 6, left: 8, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
                             <Text style={[s.badge, { color: ACCENT, fontFamily: 'Inter-ExtraBold' }]}>{product.discount}</Text>

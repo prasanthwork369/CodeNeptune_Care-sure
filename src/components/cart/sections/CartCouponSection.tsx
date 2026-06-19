@@ -177,6 +177,8 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
           </View>
           <View className="flex-1 mr-2">
             <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
               style={{
                 fontSize: 14,
                 fontFamily: "Inter-Bold",

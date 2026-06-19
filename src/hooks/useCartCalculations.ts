@@ -21,15 +21,20 @@ export function useCartCalculations() {
   const [coinsOn, setCoinsOn] = useState(false);
   const walletConfettiRef = useRef<Dotlottie>(null);
 
+  const playConfetti = () => {
+    walletConfettiRef.current?.stop();
+    walletConfettiRef.current?.play();
+  };
+
   const handleWalletToggle = (v: boolean) => {
     setWalletOn(v);
-    if (v) walletConfettiRef.current?.play();
+    if (v) playConfetti();
   };
 
   const handleCoinsToggle = () => {
     setCoinsOn((v) => {
       const next = !v;
-      if (next) walletConfettiRef.current?.play();
+      if (next) playConfetti();
       return next;
     });
   };

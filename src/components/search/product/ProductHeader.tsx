@@ -6,6 +6,7 @@ import { useNav } from "@/src/hooks/useNav";
 import React from "react";
 import { Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { searchHeaderStyles as hs } from "@/src/components/search/search.styles";
 
 interface ProductHeaderProps {
   cartCount?: number;
@@ -42,16 +43,8 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           onPress={
             onQueryChange ? undefined : () => router.push("/search" as any)
           }
-          style={{
-            shadowColor: "#919EAB0A",
-            shadowOffset: { width: 0, height: 6 },
-            shadowRadius: 10,
-            shadowOpacity: 0.1,
-            elevation: 4,
-            flex: 1,
-            marginRight: 12,
-          }}
-          className="flex-row border border-[#919EAB33] items-center bg-white rounded-lg px-4 py-3.5"
+          style={[hs.box, { flex: 1, marginRight: 12 }]}
+          className="flex-row items-center bg-white"
         >
           <Touchable
             onPress={handleBack}
@@ -84,16 +77,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                     : ""
                 }
                 placeholderTextColor="#6A6A6A"
-                style={{
-                  fontSize: 13,
-                  fontFamily: "Inter",
-                  color: "#222222",
-                  padding: 0,
-                  margin: 0,
-                  height: 28,
-                  lineHeight: 20,
-                  includeFontPadding: false,
-                }}
+                style={hs.inputText}
                 autoFocus
                 returnKeyType="search"
               />
@@ -106,7 +90,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               className="ml-2"
             >
-              <icons.close_small width={15} height={15} fill="#6A6A6A" />
+              <icons.close_dark width={15} height={15} fill="#6A6A6A" />
             </Touchable>
           )}
 
@@ -141,10 +125,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             }}
             className="bg-white items-center justify-center aspect-square rounded-[12px] relative"
           >
-            <icons.Add_Cart width={24} height={24} />
+            <icons.Add_Cart width={30} height={30} />
             {cartCount > 0 && (
-              <View className="absolute -top-2 -right-2 w-[18px] h-[18px] rounded-full bg-[#C22923] items-center justify-center">
-                <Text className="text-[9px] font-inter-bold text-white leading-none">
+              <View className="absolute -top-1 -right-1 w-[20px] h-[20px] rounded-full bg-[#C22923] items-center justify-center">
+                <Text className="text-[12px] font-inter-bold text-white leading-none">
                   {cartCount}
                 </Text>
               </View>

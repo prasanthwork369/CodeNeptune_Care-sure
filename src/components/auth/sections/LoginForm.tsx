@@ -16,7 +16,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View>
             <View
                 className="flex-row items-center rounded-lg px-4 bg-white"
-                style={[s.inputWrap, { borderWidth: 1, borderColor: phoneError ? '#EF4444' : isFocused ? '#0F7635' : '#919EAB22' }]}
+                style={[s.inputWrap, { borderWidth: 0.75, borderColor: phoneError ? '#EF4444' : isFocused ? '#0F7635' : '#919EAB33' }]}
             >
                 <Text style={s.prefix}>+91</Text>
                 <View style={{ width: 1, height: 20, backgroundColor: '#919EAB', marginHorizontal: 10 }} />
@@ -27,7 +27,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     textContentType="telephoneNumber"
                     autoComplete="tel"
                     accessibilityLabel="Mobile number"
-                    className="flex-1 font-inter-regular text-brand-text"
+                    className="flex-1 font-inter-normal text-brand-text"
                     style={s.input}
                     cursorColor="#0F7635"
                     value={phoneNumber}

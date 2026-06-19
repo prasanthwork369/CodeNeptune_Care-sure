@@ -10,7 +10,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({ co
     return (
         <View
             style={{
-                height: 66,
+                height: 54,
                 borderRadius: 12,
                 overflow: 'hidden',
                 paddingHorizontal: 16,
@@ -32,7 +32,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({ co
                         source={ANIMATIONS.chemicalBeaker}
                         autoplay
                         loop
-                        style={{ width: 50, height: 75 }}
+                        style={{ width: 40, height: 60 }}
                     />
                 </View>
                 <View className="flex-1">

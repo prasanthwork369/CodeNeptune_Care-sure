@@ -27,7 +27,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
         borderBottomColor: "#919EAB33",
         borderStyle: "dashed",
         backgroundColor: "#14835A",
-        minHeight: 66,
+        minHeight: 40,
       }}
       className="mx-4 my-4"
     >
@@ -46,14 +46,14 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
       />
       <View
         className="flex-row items-center relative z-10 w-full"
-        style={{ minHeight: 56, paddingVertical: 8 }}
+        style={{ minHeight: 46, paddingVertical: 6 }}
       >
         <View className="items-center justify-center">
           <DotLottie
             source={ANIMATIONS.chemicalBeaker}
             autoplay
             loop
-            style={{ width: 50, height: 75 }}
+            style={{ width: 40, height: 60 }}
           />
         </View>
         <View style={{ flex: 1, marginRight: isTruncatable ? 8 : 0 }}>

@@ -107,7 +107,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onPress={() => setQuery("")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <icons.close_small width={15} height={15} fill="#6A6A6A" />
+          <icons.close_dark width={15} height={15} fill="#6A6A6A" />
         </Touchable>
       )}
       {rightSlot && <View className="ml-2">{rightSlot}</View>}

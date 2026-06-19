@@ -1,8 +1,9 @@
-import { LocationBottomSheet } from '@/src/components/home/sections';
+import { LocationBottomSheet, WhyFamiliesTrustUs } from '@/src/components/home/sections';
 import { ProductDetailsFooter, LogisticsBar, TrustBadge, KnowYourMedicine, SaltCompositionBanner } from '@/src/components/product/details/sections';
 import { ProductHeader } from '@/src/components/search/product/ProductHeader';
 import { ComparisonBoard, ProductDetailsSkeleton, MoreAboutSection } from './sections';
 import { useCart } from '@/src/hooks/queries/useCart';
+import { useHome } from '@/src/hooks/queries/useHome';
 import { useProduct } from '@/src/hooks/queries/useProduct';
 import { useProductHeroAnimation } from '@/src/hooks/animations/useProductHeroAnimation';
 import { useLocationStore } from '@/src/store/locationStore';
@@ -28,8 +29,12 @@ export const ProductComparisonLayout: React.FC<ProductComparisonLayoutProps> = (
         useProductHeroAnimation(goBack);
 
     const { product, recommendation, saltComposition, raw, isLoading } = useProduct(id);
-    const { totalItems: cartCount } = useCart();
+    const { appContent, isLoading: isHomeLoading } = useHome();
+    const { items: cartItems, totalItems: cartCount } = useCart();
     const storePincode = useLocationStore((s) => s.pincode);
+
+    const recMedicineId = recommendation?.id ?? raw?.id;
+    const isRecommendedInCart = !!recMedicineId && cartItems.some((i) => i.medicineId === recMedicineId);
 
     const searched: SearchedProduct | null = product ? {
         image: product.image,
@@ -108,7 +113,7 @@ export const ProductComparisonLayout: React.FC<ProductComparisonLayoutProps> = (
                         ) : (
                             <ScrollView
                                 showsVerticalScrollIndicator={false}
-                                contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+                                contentContainerStyle={{ paddingBottom: isRecommendedInCart ? insets.bottom + 100 : insets.bottom + 24 }}
                                 style={{ flex: 1 }}
                                 bounces={false}
                                 overScrollMode="never"
@@ -141,6 +146,12 @@ export const ProductComparisonLayout: React.FC<ProductComparisonLayoutProps> = (
                                 )}
 
                                 <KnowYourMedicine manufacturer={manufacturer} />
+
+                                <WhyFamiliesTrustUs
+                                    promise={appContent?.promise}
+                                    isLoading={isHomeLoading}
+                                    showTitle={false}
+                                />
 
                                 <MoreAboutSection medicineName={medicineName} mobileAdditionalData={raw?.mobileAdditionalData} />
                             </ScrollView>

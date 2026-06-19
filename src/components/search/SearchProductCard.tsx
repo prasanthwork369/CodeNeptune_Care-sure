@@ -118,7 +118,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         </View>
                         {data.recommended.savings > 0 && (
                             <View className="flex-row items-center mt-0.5">
-                                <icons.sell width={14} height={14} fill="#0F7635" />
+                                 <icons.sell width={15} height={15} fill="#0F7635" style={s.sellIcon} />
                                 <Text style={s.savings} className="font-inter-bold text-brand-primary ml-1.5 tracking-tight">
                                     Save ₹{Number(data.recommended.savings).toFixed(2)}
                                 </Text>
@@ -146,8 +146,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         onPress={handleIncrement}
                         disabled={isPending}
                         activeOpacity={0.85}
-                        className="rounded-[10px] px-8 py-[9px] items-center justify-center bg-white"
-                        style={{ borderWidth: 1, borderColor: '#0F7635', minWidth: 72 }}
+                        style={cc.addBtn}
                     >
                         {isPending
                             ? <ActivityIndicator size="small" color="#0F7635" />
@@ -155,7 +154,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         }
                     </Touchable>
                 ) : (
-                    <View className="flex-row items-center justify-between rounded-[10px] overflow-hidden" style={[cc.wrap, { backgroundColor: '#0F7635' }]}>
+                    <View className="flex-row items-center justify-between rounded-[10px] overflow-hidden" style={cc.wrapActive}>
                         <Touchable
                             onPress={handleDecrement}
                             disabled={isPending}
@@ -164,7 +163,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         >
                             <Text style={cc.plusMinus} className="font-inter-medium text-white leading-none">−</Text>
                         </Touchable>
-                        <View style={{ flex: 1, paddingVertical: 9, alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={cc.countContainer}>
                             {isPending ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" />
                             ) : (

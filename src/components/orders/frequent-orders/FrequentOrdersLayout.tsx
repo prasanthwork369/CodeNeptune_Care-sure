@@ -150,7 +150,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                 onPress={() => setSearch("")}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <icons.close_small width={16} height={16} fill="#919EAB" />
+                <icons.close_dark width={16} height={16} fill="#919EAB" />
               </Touchable>
             )}
           </View>

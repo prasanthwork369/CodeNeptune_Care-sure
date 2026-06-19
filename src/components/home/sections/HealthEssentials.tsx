@@ -74,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 onPress={() => onPress(productId)}
                 style={{ height: half, backgroundColor: contentBg, paddingBottom: 4 }}
             >
-                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
+                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
                     {!!discountLabel && (
                         <View style={{ backgroundColor: discountBg, position: 'absolute', top: 6, left: 8, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
                             <Text style={[s.badge, { color: accentColor, fontFamily: 'Inter-ExtraBold' }]}>{discountLabel}</Text>

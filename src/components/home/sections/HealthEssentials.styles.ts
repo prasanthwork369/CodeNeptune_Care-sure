@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
     sectionSubtitle: { fontSize: moderateScale(22, 0.25), lineHeight: moderateScale(30, 0.25) },
     cartBtn: {
         width: 137,
-        height: 38,
+        height: 40,
         borderRadius: 6,
         borderWidth: 1,
         backgroundColor: '#FFFFFF',
