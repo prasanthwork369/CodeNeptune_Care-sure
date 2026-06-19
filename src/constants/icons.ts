@@ -45,6 +45,7 @@ import edit_icon from "../../assets/icons/edit.svg";
 import info_dark from "../../assets/icons/info_dark.svg";
 import internet from "../../assets/icons/internet.svg";
 import info_outline from "../../assets/icons/info_outline.svg";
+import info_gray from "../../assets/icons/info_gray.svg";
 import location from "../../assets/icons/location.svg";
 import moped_package from "../../assets/icons/moped_package.svg";
 import my_location from "../../assets/icons/my_location.svg";
@@ -193,6 +194,7 @@ export const icons = {
     percent_discount,
     info_dark,
     info_outline,
+    info_gray,
     internet,
     upload_file,
     pickup,

@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { cartStyles as s } from '../cart.styles';
 import { useMobileAppLinks } from '@/src/hooks/queries/useSettings';
 import { PolicyLink } from '@/src/components/auth/PolicyLink';
+import { icons } from '@/src/constants/icons';
 
 export const CartTerms: React.FC = () => {
     const { data: links } = useMobileAppLinks();
@@ -10,9 +11,7 @@ export const CartTerms: React.FC = () => {
 
     return (
         <View className="mx-4 mt-4 bg-white border border-[#919EAB33] rounded-md px-4 py-5 flex-row items-center">
-            <View style={[s.termsCircle, { borderRadius: 9, backgroundColor: '#6A6A6A', alignItems: 'center', justifyContent: 'center' }]}>
-                <Text style={[s.termsBadgeTxt, { color: 'white', fontWeight: '700', lineHeight: 14 }]}>i</Text>
-            </View>
+            <icons.info_gray width={20} height={20} />
             <Text style={s.termsText} className="flex-1 ml-3 font-inter-medium text-[#6A6A6A] leading-[18px]">
                 Please Review And Accept{' '}
                 <Text

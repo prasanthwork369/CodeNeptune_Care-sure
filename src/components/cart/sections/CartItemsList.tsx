@@ -16,7 +16,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
     return (
         <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 pt-4 pb-2">
             <Text style={s.listTitle} className="font-inter-bold text-brand-text mb-3">Cart Items</Text>
-            <View style={{ borderTopWidth: 1, borderColor: '#E5E7EB' }} />
+            <View style={{ borderTopWidth: 1, borderColor: '#E5E7EB', marginHorizontal: -16 }} />
             {lines.map((line, idx) => (
                 <View key={line.id}>
                     {idx > 0 && (

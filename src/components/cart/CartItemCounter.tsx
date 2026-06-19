@@ -24,17 +24,17 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({ item, updateIt
     };
 
     return (
-        <View className="flex-row items-center justify-between rounded-[10px] overflow-hidden" style={{ backgroundColor: '#0F7635', width: COUNTER_W }}>
+        <View className="flex-row items-center justify-between rounded-[10px] overflow-hidden bg-white" style={{ borderWidth: 1.5, borderColor: '#919EAB33', width: COUNTER_W }}>
             <Touchable onPress={() => handleChange(item.qty - 1)} disabled={isPending} activeOpacity={0.7} style={{ width: COUNTER_BTN, paddingVertical: 6, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={s.counterPlusMinus} className="font-inter-medium text-white leading-none">−</Text>
+                <Text style={s.counterPlusMinus} className="font-inter-medium text-brand-text leading-none">−</Text>
             </Touchable>
             <View style={{ flex: 1, paddingVertical: 9, alignItems: 'center', justifyContent: 'center' }}>
-                {isPending ? <ActivityIndicator size="small" color="#FFFFFF" /> : (
-                    <Text style={s.counterVal} className="font-inter-bold text-white text-center">{item.qty}</Text>
+                {isPending ? <ActivityIndicator size="small" color="#222222" /> : (
+                    <Text style={s.counterVal} className="font-inter-bold text-brand-text text-center">{item.qty}</Text>
                 )}
             </View>
             <Touchable onPress={() => handleChange(item.qty + 1)} disabled={isPending} activeOpacity={0.7} style={{ width: COUNTER_BTN, paddingVertical: 6, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={s.counterPlusMinus} className="font-inter-medium text-white leading-none">+</Text>
+                <Text style={s.counterPlusMinus} className="font-inter-medium text-brand-text leading-none">+</Text>
             </Touchable>
         </View>
     );

@@ -80,7 +80,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         ) : null}
                     </View>
                     <View className="mt-auto">
-                        {data.searched.price != null && data.searched.price > 0 && (
+                        {data.searched.price != null && (
                             <Text style={s.price} className="font-inter-extrabold text-brand-text mb-1 tracking-tight">
                                 ₹{Number(data.searched.price).toFixed(2)}
                             </Text>
@@ -105,7 +105,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                     </View>
                     <View className="mt-auto">
                         <View className="flex-row items-baseline gap-x-2 mb-1.5">
-                            {data.recommended.price != null && data.recommended.price > 0 && (
+                            {data.recommended.price != null && (
                                 <Text style={s.price} className="font-inter-extrabold text-brand-text tracking-tight">
                                     ₹{Number(data.recommended.price).toFixed(2)}
                                 </Text>
