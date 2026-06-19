@@ -45,12 +45,12 @@ export const CartFloatingBanner = ({
     handleSlide,
     handleSnapBack,
     handleClosePress,
-    triggerRemoveAnimation,
     bannerStyle,
     containerStyle,
     buttonAnimatedStyle,
     buttonTextAnimatedStyle,
     itemCountAnimatedStyle,
+    hideAnimationDuration,
   } = useCartFloatingBannerAnimation({
     visible,
     totalItems,
@@ -103,8 +103,10 @@ export const CartFloatingBanner = ({
     setIsClearing(true);
     onInteractionChange?.(true);
     try {
-      await triggerRemoveAnimation();
       await clearCart();
+      // totalItems hitting 0 triggers the hook's hide animation; wait for it
+      // to finish before letting the banner unmount.
+      await new Promise((resolve) => setTimeout(resolve, hideAnimationDuration));
       setTabBarVisible(true);
       setUploadButtonCollapsed(false);
     } catch (error) {
@@ -113,7 +115,7 @@ export const CartFloatingBanner = ({
       setIsClearing(false);
       onInteractionChange?.(false);
     }
-  }, [clearCart, onInteractionChange, triggerRemoveAnimation, setTabBarVisible, setUploadButtonCollapsed]);
+  }, [clearCart, onInteractionChange, hideAnimationDuration, setTabBarVisible, setUploadButtonCollapsed]);
 
   return (
     <Animated.View style={containerStyle}>

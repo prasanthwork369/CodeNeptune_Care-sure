@@ -89,15 +89,6 @@ export const useCartFloatingBannerAnimation = ({
     else handleSlide();
   }, [handleSlide, handleSnapBack]);
 
-  const triggerRemoveAnimation = useCallback(async () => {
-    opacity.value = withTiming(0, { duration: DURATION });
-    slideY.value = withTiming(200, {
-      duration: DURATION,
-      easing: EASE_IN_OUT,
-    });
-    await new Promise((resolve) => setTimeout(resolve, DURATION));
-  }, []);
-
   const bannerStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
@@ -138,11 +129,11 @@ export const useCartFloatingBannerAnimation = ({
     handleSlide,
     handleSnapBack,
     handleClosePress,
-    triggerRemoveAnimation,
     bannerStyle,
     containerStyle,
     buttonAnimatedStyle,
     buttonTextAnimatedStyle,
     itemCountAnimatedStyle,
+    hideAnimationDuration: DURATION,
   };
 };

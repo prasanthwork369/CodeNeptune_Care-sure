@@ -65,10 +65,13 @@ export const FloatingBannersCarousel = ({
   const { latestPrescription, hasPendingPrescription, dismissBanner } = usePrescriptionBanner();
   const { isRxFromCartFlow } = useUIStore();
 
-  const isCartActive = totalItems > 0;
+  const [isCartInteracting, setIsCartInteracting] = useState(false);
+  // Keep the banner mounted through a Remove tap (totalItems hits 0 before
+  // the close animation finishes) so it can hide smoothly instead of
+  // snapping out instantly.
+  const isCartActive = totalItems > 0 || isCartInteracting;
   const isRxActive = hasPendingPrescription;
   const bothActive = isCartActive && isRxActive;
-  const [isCartInteracting, setIsCartInteracting] = useState(false);
   const [activeBannerIndex, setActiveBannerIndex] = useState(
     bothActive ? 1 : 0,
   );
@@ -439,6 +442,7 @@ export const FloatingBannersCarousel = ({
               <CartFloatingBanner
                 visible={isCartActive}
                 onViewCart={() => router.push("/(modal)/cart")}
+                onInteractionChange={setIsCartInteracting}
               />
             </Animated.View>
           )}
