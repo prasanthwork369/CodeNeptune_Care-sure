@@ -183,6 +183,14 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     outputRange: ["#FEFFF9", "#FEFFF9"],
   });
 
+  // Matches the recommended box's actual visible width (recWidth minus its
+  // paddingLeft) so the info column's right padding isn't clipped by the
+  // box's own overflow:hidden when collapsed.
+  const leftColWidth = expandAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [cardWidth / 2 - 4, cardWidth / 2],
+  });
+
   return (
     <View
       className="mx-4 mb-2 overflow-hidden"
@@ -211,7 +219,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
           }}
         >
           <View className="px-[12px] pt-[12px] pb-0 flex-1 flex-col justify-between">
-            <View style={{ height: 210 }}>
+            <View>
               <Text
                 className="text-[11px] font-inter-bold text-[#4B5563] uppercase tracking-[0.8px] mb-2"
                 style={{ height: 16, lineHeight: 16 }}
@@ -319,11 +327,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               {/* TOP INNER ROW HOLDING COLUMNS */}
               <View className="flex-row">
                 {/* LEFT PRODUCT INFO COLUMN */}
-                <View
-                  style={{ width: cardWidth / 2 }}
+                <Animated.View
+                  style={{ width: leftColWidth }}
                   className="px-[12px] pt-[12px] pb-0 flex-col"
                 >
-                  <View style={{ height: 210 }}>
+                  <View>
                     <Text
                       className="text-[11px] font-inter-bold text-[#0F7635] uppercase tracking-[0.8px] mb-2"
                       style={{ height: 16, lineHeight: 16 }}
@@ -425,7 +433,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     {/* Unit price spacer to align with left card */}
                     <View style={{ height: 14 }} />
                   </View>
-                </View>
+                </Animated.View>
 
                 {/* RIGHT DOCTOR TRUSTED GRAPHIC COLUMN */}
                 <Animated.View
