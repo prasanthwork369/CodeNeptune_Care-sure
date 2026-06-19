@@ -461,7 +461,7 @@ export const PreviewLayout: React.FC = () => {
             </Touchable>
           </View>
           <View
-            className="bg-white rounded-t-[32px] items-center px-6 pt-8"
+            className="bg-white rounded-t-[12px] items-center px-6 pt-8"
             style={{ paddingBottom: Math.max(insets.bottom + 16, 32) }}
           >
             <DotLottie

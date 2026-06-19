@@ -83,8 +83,8 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
       onClose={onClose}
       backgroundStyle={{
         backgroundColor: "#F5F5F7",
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
       }}
     >
       <BottomSheetView

@@ -47,7 +47,7 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
             onClose={onClose}
             snapPoints={snapPoints}
             closeButtonOffset="50%"
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
             {/* Title */}
             <View style={{ alignItems: 'center', paddingTop: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>

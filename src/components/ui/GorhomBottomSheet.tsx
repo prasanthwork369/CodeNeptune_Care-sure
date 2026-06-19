@@ -44,8 +44,8 @@ interface GorhomBottomSheetProps
 
 const DEFAULT_BACKGROUND_STYLE = {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
 };
 
 const DEFAULT_HANDLE_INDICATOR_STYLE = {

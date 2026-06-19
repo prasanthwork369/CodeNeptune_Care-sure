@@ -86,7 +86,7 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
         <GorhomBottomSheet
             isVisible={visible}
             onClose={onClose}
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
                 <BottomSheetView
                     style={{

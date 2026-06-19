@@ -28,7 +28,11 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
     <GorhomBottomSheet
       isVisible={isVisible}
       onClose={onClose}
-      backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
+      backgroundStyle={{ 
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+         }}
     >
       <BottomSheetView style={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: Math.max(insets.bottom, 16) + 16 }}>
       <View className="border border-[#919EAB33] rounded-[20px] overflow-hidden bg-white">

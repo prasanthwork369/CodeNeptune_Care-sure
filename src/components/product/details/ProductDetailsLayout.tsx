@@ -1,4 +1,4 @@
-import { LocationBottomSheet } from '@/src/components/home/sections';
+import { LocationBottomSheet, WhyFamiliesTrustUs } from '@/src/components/home/sections';
 import { ProductSkeleton } from '@/src/components/product/ProductSkeleton';
 import { useProductHeroAnimation } from '@/src/hooks/animations/useProductHeroAnimation';
 import { useCart } from '@/src/hooks/queries/useCart';
@@ -21,6 +21,7 @@ import {
     SaltCompositionBanner,
     TrustBadge,
 } from './sections';
+import { useHome } from '@/src/hooks/queries/useHome';
 
 export const ProductDetailsLayout: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,6 +29,8 @@ export const ProductDetailsLayout: React.FC = () => {
     const insets = useSafeAreaInsets();
     const { product, recommendation, saltComposition, variants, raw, isLoading } = useProduct(id);
     const { items: cartItems } = useCart();
+        const { appContent, isLoading: isHomeLoading } = useHome();
+    
 
     const [locationSheetVisible, setLocationSheetVisible] = useState(false);
     const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
@@ -161,6 +164,12 @@ export const ProductDetailsLayout: React.FC = () => {
                                 )}
 
                                 <KnowYourMedicine manufacturer={manufacturer} />
+                                
+                                                                <WhyFamiliesTrustUs
+                                                                    promise={appContent?.promise}
+                                                                    isLoading={isHomeLoading}
+                                                                    showTitle={false}
+                                                                />
 
                                 <MoreAboutSection medicineName={medicineName} mobileAdditionalData={raw?.mobileAdditionalData} />
                             </ScrollView>

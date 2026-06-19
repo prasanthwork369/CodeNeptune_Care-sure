@@ -76,7 +76,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
             onClose={onClose}
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
                         <BottomSheetScrollView
                             style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 16 }}

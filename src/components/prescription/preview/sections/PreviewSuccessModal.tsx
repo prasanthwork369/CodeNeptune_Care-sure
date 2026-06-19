@@ -18,7 +18,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
         <GorhomBottomSheet
             isVisible={visible}
             onClose={onClose}
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
             <BottomSheetView
                 className="items-center px-6 pt-8"

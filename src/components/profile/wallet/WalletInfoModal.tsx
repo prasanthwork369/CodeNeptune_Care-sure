@@ -16,7 +16,7 @@ export const WalletInfoModal: React.FC<WalletInfoModalProps> = ({ isVisible, onC
         <GorhomBottomSheet
             isVisible={isVisible}
             onClose={onClose}
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
             <BottomSheetView className="p-8" style={{ paddingBottom: Math.max(bottom + 24, 40) }}>
                 <Text className="text-[18px] font-inter-bold text-[#212B36] mb-6">

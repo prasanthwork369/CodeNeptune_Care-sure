@@ -40,8 +40,8 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
       onClose={onClose}
       backgroundStyle={{
         backgroundColor: "#fff",
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
       }}
     >
       <BottomSheetView

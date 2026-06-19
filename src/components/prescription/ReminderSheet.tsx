@@ -173,7 +173,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                     </View>
 
                     {/* Sheet */}
-                    <View className="bg-white rounded-t-[32px] px-6 pt-6 pb-8">
+                    <View className="bg-white rounded-t-[12px] px-6 pt-6 pb-8">
                         <Text className="text-[16px] font-inter-bold text-brand-text mb-4">
                             Remind me at
                         </Text>
