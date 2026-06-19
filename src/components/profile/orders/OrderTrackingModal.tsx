@@ -203,8 +203,8 @@ export function OrderTrackingModal({ visible, onClose, steps }: Props) {
       closeButtonOffset="50%"
       backgroundStyle={{
         backgroundColor: "#fff",
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
       }}
     >
       <BottomSheetView

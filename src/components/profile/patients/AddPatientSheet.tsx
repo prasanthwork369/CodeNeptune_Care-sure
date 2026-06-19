@@ -110,7 +110,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
             onClose={onClose}
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32 }}
         >
                     <BottomSheetScrollView style={{ paddingHorizontal: 20 }}
                         contentContainerStyle={{ paddingTop: 24, paddingBottom: insets.bottom + 24 }}

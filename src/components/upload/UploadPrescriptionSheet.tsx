@@ -124,8 +124,8 @@ export const UploadPrescriptionSheet: React.FC<
         closeButtonOffset="40%"
         backgroundStyle={{
           backgroundColor: "#fff",
-          borderTopLeftRadius: 28,
-          borderTopRightRadius: 28,
+          borderTopLeftRadius: 32,
+          borderTopRightRadius: 32,
         }}
       >
         <BeforeUploadSync onExpandChange={setShowBeforeUpload} />
