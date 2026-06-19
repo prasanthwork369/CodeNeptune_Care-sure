@@ -129,7 +129,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               value={customText}
               onChangeText={setCustomText}
               placeholder="E.g., Back pain, acidity, etc."
-              placeholderTextColor="#919EAB"
+              placeholderTextColor="#6A6A6A"
               autoFocus
               style={{
                 borderWidth: 1,
@@ -137,7 +137,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 borderRadius: 8,
                 padding: 14,
                 fontSize: 15,
-                fontFamily: "Inter-Medium",
+                fontFamily: "Inter-Regular",
                 color: "#1A1C1E",
                 backgroundColor: "#fff",
               }}
@@ -177,7 +177,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               <Text
                 style={{
                   color: "#6A6A6A",
-                  fontFamily: "Inter-Medium",
+                  fontFamily: "Inter-SemiBold",
                   fontSize: 14,
                 }}
               >
@@ -205,13 +205,13 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 value={query}
                 onChangeText={setQuery}
                 placeholder="Search health problem..."
-                placeholderTextColor="#919EAB"
+                placeholderTextColor="#6A6A6A"
                 style={{
                   flex: 1,
                   paddingVertical: 12,
                   paddingHorizontal: 8,
                   fontSize: 14,
-                  fontFamily: "Inter",
+                  fontFamily: "Inter-Regular",
                   color: "#1A1C1E",
                 }}
               />

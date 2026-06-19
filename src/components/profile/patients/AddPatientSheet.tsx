@@ -124,7 +124,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         </View>
 
                         <Text className="text-[14px] font-inter-bold text-brand-text mb-2">Name</Text>
-                        <BottomSheetTextInput placeholder="Enter the name" placeholderTextColor="#919EAB" style={[input, errors.name ? { borderColor: '#EF4444' } : {}]}
+                        <BottomSheetTextInput placeholder="Enter the name" placeholderTextColor="#6A6A6A" style={[input, errors.name ? { borderColor: '#EF4444' } : {}]}
                             value={name} onChangeText={t => { setName(t); setErrors(e => ({ ...e, name: undefined })); }}
                             returnKeyType="next" blurOnSubmit={false} onSubmitEditing={() => mobileRef.current?.focus()} autoCorrect={false} />
                         {errors.name && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: -12, marginBottom: 12 }}>{errors.name}</Text>}
@@ -132,8 +132,8 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         <Text className="text-[14px] font-inter-bold text-brand-text mb-2">Mobile Number</Text>
                         <View style={[{ flexDirection: 'row', alignItems: 'center', height: 52 }, input, errors.mobile ? { borderColor: '#EF4444' } : {}, { paddingVertical: 0, paddingHorizontal: 16, marginBottom: 18 }]}>
                             <Text style={{ fontSize: 14, fontFamily: 'Inter-Medium', color: '#1A1C1E', marginRight: 8 }}>+91 |</Text>
-                            <BottomSheetTextInput ref={mobileRef} placeholder="10 digit number" placeholderTextColor="#919EAB" keyboardType="phone-pad" maxLength={10} returnKeyType="done"
-                                style={{ flex: 1, fontSize: 14, fontFamily: 'Inter-Medium', color: '#1A1C1E', height: '100%' }}
+                            <BottomSheetTextInput ref={mobileRef} placeholder="Enter The number" placeholderTextColor="#6A6A6A" keyboardType="phone-pad" maxLength={10} returnKeyType="done"
+                                style={{ flex: 1, fontSize: 14, fontFamily: 'Inter-Regular', color: '#1A1C1E', height: '100%' }}
                                 value={mobile} onChangeText={t => { const d = t.replace(/\D/g, ''); setMobile(d); setErrors(e => ({ ...e, mobile: undefined })); }} />
                         </View>
                         {errors.mobile && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: -12, marginBottom: 12 }}>{errors.mobile}</Text>}
@@ -153,7 +153,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         {errors.relationship && relationship !== 'Other' && <Text style={{ color: '#EF4444', fontSize: 12, marginBottom: 12 }}>{errors.relationship}</Text>}
                         {relationship === 'Other' && (
                             <>
-                                <BottomSheetTextInput placeholder="Specify relationship" placeholderTextColor="#919EAB"
+                                <BottomSheetTextInput placeholder="Specify relationship" placeholderTextColor="#6A6A6A"
                                     style={[input, { marginTop: -10, marginBottom: errors.relationship ? 6 : 18 }, errors.relationship ? { borderColor: '#EF4444' } : {}]}
                                     value={otherRelationship} onChangeText={t => { setOtherRelationship(t); setErrors(e => ({ ...e, relationship: undefined })); }}
                                     autoCorrect={false} autoFocus />
@@ -165,7 +165,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
                         {errors.dob && <Text style={{ color: '#EF4444', fontSize: 12, marginBottom: 6 }}>{errors.dob}</Text>}
                         <Touchable onPress={() => { setShowDatePicker(true); setErrors(e => ({ ...e, dob: undefined })); }}
                             style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: errors.dob ? '#EF4444' : '#919EAB33', borderRadius: 12, paddingHorizontal: 16, backgroundColor: '#fff', marginBottom: 18 }} activeOpacity={0.8}>
-                            <Text style={{ flex: 1, paddingVertical: 14, fontSize: 14, fontFamily: 'Inter-Medium', color: dob ? '#1A1C1E' : '#919EAB' }}>
+                            <Text style={{ flex: 1, paddingVertical: 14, fontSize: 14, fontFamily: 'Inter-Regular', color: dob ? '#1A1C1E' : '#6A6A6A' }}>
                                 {formatDobDisplay(dob) || 'DD-MM-YYYY'}
                             </Text>
                             <icons.calendar_month width={20} height={20} fill="#919EAB" />
@@ -215,6 +215,7 @@ export function AddPatientSheet({ isVisible, onClose, onAdd, editPatient, onEdit
 const input: object = {
     borderWidth: 1, borderColor: '#919EAB33', borderRadius: 12,
     paddingHorizontal: 16, paddingVertical: 14,
-    fontSize: 14, fontFamily: 'Inter-Medium', color: '#1A1C1E',
+    fontSize: 14, fontFamily: 'Inter-Regular', 
+    color: '#6A6A6A',
     backgroundColor: '#fff', marginBottom: 18,
 };

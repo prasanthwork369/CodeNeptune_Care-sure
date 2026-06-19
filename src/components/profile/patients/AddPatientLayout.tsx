@@ -96,7 +96,7 @@ export const AddPatientLayout: React.FC = () => {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 90 }} className="flex-1">
                     <Text className={labelStyle}>Name</Text>
-                    <TextInput placeholder="Enter the name" placeholderTextColor="#919EAB" value={name} onChangeText={(t) => { setName(t); setErrors((e) => ({ ...e, name: undefined })); }} style={[input, errors.name ? { borderColor: '#EF4444' } : {}]} />
+                    <TextInput placeholder="Enter the name"  value={name} onChangeText={(t) => { setName(t); setErrors((e) => ({ ...e, name: undefined })); }} style={[input, errors.name ? { borderColor: '#EF4444' } : {}]} />
                     {errors.name && <Text style={errorText}>{errors.name}</Text>}
 
                     <Text className={labelStyle}>Mobile Number</Text>

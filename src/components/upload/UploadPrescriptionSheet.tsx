@@ -169,7 +169,7 @@ export const UploadPrescriptionSheet: React.FC<
               className="flex-1 items-center border rounded-[8px] py-5 bg-white"
             >
               <View
-                className="w-12 h-12 rounded-[6px] items-center justify-center mb-2"
+                className="w-16 h-16 rounded-full items-center justify-center mb-2"
                 style={{ backgroundColor: "#E6F4EA" }}
               >
                 <icons.upload_file width={24} height={24} />
@@ -189,7 +189,7 @@ export const UploadPrescriptionSheet: React.FC<
               className="flex-1 items-center border rounded-[8px] py-5 bg-white"
             >
               <View
-                className="w-12 h-12 rounded-[6px] items-center justify-center mb-2"
+                className="w-16 h-16 rounded-full items-center justify-center mb-2"
                 style={{ backgroundColor: "#E6F4EA" }}
               >
                 <icons.photo_camera_green width={24} height={24} />
@@ -206,7 +206,7 @@ export const UploadPrescriptionSheet: React.FC<
               className="flex-1 items-center border rounded-[8px] py-5 bg-white"
             >
               <View
-                className="w-12 h-12 rounded-[6px] items-center justify-center mb-2"
+                className="w-16 h-16 rounded-full items-center justify-center mb-2"
                 style={{ backgroundColor: "#E6F4EA" }}
               >
                 <icons.upload_pdf width={24} height={24} />
@@ -236,7 +236,7 @@ export const UploadPrescriptionSheet: React.FC<
             className="flex-row items-center rounded-[6px] px-4 py-3.5 mt-4"
           >
             <View
-              className="w-12 h-12 rounded-[8px] items-center justify-center"
+              className="w-16 h-16 rounded-full items-center justify-center"
               style={{ backgroundColor: "#E6F4EA" }}
             >
               <icons.prescription_green width={24} height={24} />

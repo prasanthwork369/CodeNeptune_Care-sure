@@ -89,7 +89,7 @@ export const styles = StyleSheet.create({
     width: moderateScale(27.2, 0.3),
     height: moderateScale(27.2, 0.3),
     top: moderateScale(26.52, 0.3),
-    left: moderateScale(190, 0.3),
+    right: moderateScale(15, 0.3),
     transform: [{ rotate: "-36.76deg" }],
   },
 });

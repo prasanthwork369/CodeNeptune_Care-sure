@@ -8,7 +8,7 @@ export const PatientSymptomsInput: React.FC<PatientSymptomsInputProps> = ({ valu
             <Text className="text-[13px] font-inter-semibold text-[#1A1C1E] mb-2">Help us understand your symptoms</Text>
             <TextInput 
                 placeholder="Eg: Mild fever and body pain" 
-                placeholderTextColor="#919EAB" 
+                placeholderTextColor="#6A6A6A" 
                 multiline 
                 value={value} 
                 onChangeText={onChangeText} 

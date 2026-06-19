@@ -293,7 +293,7 @@ export const SelectPatientLayout: React.FC = () => {
                   </Text>
                 </View>
               ) : (
-                <Text className="text-[14px] font-inter text-[#919EAB]">
+                <Text className="text-[14px] font-inter text-[#6A6A6A]">
                   Select
                 </Text>
               )}
