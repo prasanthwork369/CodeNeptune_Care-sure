@@ -8,9 +8,11 @@ import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
 import { useNav } from "@/src/hooks/useNav";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
 import { downloadLocalAsset } from "@/src/utils/fileDownload";
 import { buildCartInputs } from "@/src/utils/reorderCart";
+import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -124,7 +126,7 @@ function SectionCard({
 }) {
   return (
     <View
-      className={`bg-white rounded-xl mx-base ${className}`}
+      className={`bg-white rounded-lg mx-base ${className}`}
       style={{ borderWidth: 1, borderColor: "#F0F1F3", elevation: 0 }}
     >
       {children}
@@ -154,6 +156,7 @@ function formatDateTime(iso?: string | null) {
 
 export const OrderTrackLayout: React.FC = () => {
   const router = useNav();
+  const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const { order, loading } = useOrderById(orderId);
@@ -226,6 +229,11 @@ export const OrderTrackLayout: React.FC = () => {
     try {
       await orderApi.cancelOrder(orderId, reason);
       setCancelDialogVisible(false);
+      // The detail query has a 60s staleTime, so without this the cancelled
+      // status wouldn't show until that cache naturally expired — invalidate
+      // both this order and the orders list so they reflect it immediately.
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId) });
+      queryClient.invalidateQueries({ queryKey: ['customer', 'orders', 'list'] });
       setAlertState({
         visible: true,
         icon: 'check-green',
@@ -400,7 +408,7 @@ export const OrderTrackLayout: React.FC = () => {
         <View className="px-4 py-3 mx-base">
           <Text
             style={s.labelSm}
-            className="font-inter-medium text-brand-subtext tracking-[0.5px]"
+            className="font-inter-medium text-brand-text tracking-[0.5px]"
           >
             {order?.status === 7 ? "Order Delivered on" : "Order placed on"}
           </Text>
@@ -421,7 +429,7 @@ export const OrderTrackLayout: React.FC = () => {
                 borderColor: statusInfo?.border ?? "#E5E7EB",
                 backgroundColor: statusInfo?.bg ?? "#F3F4F6",
               }}
-              className="px-2.5 py-0.5 ml-3"
+              className="px-2 py-1.5 ml-3"
             >
               <Text
                 style={[
@@ -518,6 +526,7 @@ export const OrderTrackLayout: React.FC = () => {
                   onPress={() => setCancelDialogVisible(true)}
                   disabled={isCancelling || cancelDialogVisible}
                 >
+                  <icons.return_package width={14} height={14} fill="#DC2626" />
                   <Text
                     style={s.labelSm}
                     className="font-inter-semibold text-brand-text ml-1.5"
@@ -632,35 +641,6 @@ export const OrderTrackLayout: React.FC = () => {
             </View>
           ))}
         </SectionCard>
-
-        <View className="mx-base">
-          <Touchable
-            className="bg-brand-primary rounded-lg py-[15px] items-center"
-            activeOpacity={0.85}
-            onPress={handleReOrder}
-            disabled={isProceeding}
-            style={{ opacity: isProceeding ? 0.75 : 1 }}
-          >
-            {isProceeding ? (
-              <View className="flex-row items-center gap-2">
-                <ActivityIndicator size="small" color="#fff" />
-                <Text
-                  style={s.labelMd}
-                  className="font-inter-semibold text-white"
-                >
-                  Adding to cart...
-                </Text>
-              </View>
-            ) : (
-              <Text
-                style={s.labelMd}
-                className="font-inter-semibold text-white"
-              >
-                Re Order
-              </Text>
-            )}
-          </Touchable>
-        </View>
 
         <SectionCard>
           <Touchable
@@ -946,6 +926,33 @@ export const OrderTrackLayout: React.FC = () => {
           </SectionCard>
         )}
       </ScrollView>
+
+      <View
+        className="bg-white border-t border-[#919EAB33] px-4"
+        style={{ paddingTop: 12, paddingBottom: Math.max(insets.bottom, 16) }}
+      >
+        <Touchable
+          className="bg-brand-primary rounded-lg py-[15px] items-center"
+          activeOpacity={0.85}
+          onPress={handleReOrder}
+          disabled={isProceeding}
+          style={{ opacity: isProceeding ? 0.75 : 1 }}
+        >
+          {isProceeding ? (
+            <View className="flex-row items-center gap-2">
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={s.labelMd} className="font-inter-semibold text-white">
+                Adding to cart...
+              </Text>
+            </View>
+          ) : (
+            <Text style={s.labelMd} className="font-inter-semibold text-white">
+              Re Order
+            </Text>
+          )}
+        </Touchable>
+      </View>
+
       <OrderTrackingModal
         visible={trackingModalVisible}
         onClose={() => setTrackingModalVisible(false)}

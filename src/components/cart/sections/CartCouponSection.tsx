@@ -208,16 +208,11 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               backgroundColor: "white",
               borderWidth: 1,
               borderColor: isLocked ? "#E4E7EC" : "#0F7635",
-              borderRadius: 10,
-              width: 76,
-              height: 38,
+              borderRadius:6,
+              width: 74,
+              height: 30,
               alignItems: "center",
               justifyContent: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.04,
-              shadowRadius: 2,
-              elevation: 1,
             }}
           >
             {applying ? (

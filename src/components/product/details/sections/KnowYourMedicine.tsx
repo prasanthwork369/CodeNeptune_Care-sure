@@ -25,9 +25,9 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                 Know Your Medicine
             </Text>
 
-            <View className="bg-white rounded-[20px] px-5 py-6 mb-7 border border-[#E5E7EB]">
+            <View className="bg-white rounded-[12px] px-5 py-6 mb-7 border border-[#E5E7EB]">
                 <View className="flex-row items-center mb-6">
-                    <View className="w-[48px] h-[48px] bg-[#F1F7FF] rounded-[14px] items-center justify-center mr-4">
+                    <View className="w-[48px] h-[48px] bg-[#F1F7FF] rounded-[6px] items-center justify-center mr-4">
                         <Image source={HOME_IMAGES.chemical} style={{ width: 24, height: 24 }} resizeMode="contain" />
                     </View>
                     <View className="flex-1">
@@ -37,7 +37,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                 </View>
 
                 <View className="flex-row items-center mb-6">
-                    <View className="w-[48px] h-[48px] bg-[#F4F1FF] rounded-[14px] items-center justify-center mr-4">
+                    <View className="w-[48px] h-[48px] bg-[#F4F1FF] rounded-[6px] items-center justify-center mr-4">
                         <Image source={HOME_IMAGES.medicine} style={{ width: 24, height: 24 }} resizeMode="contain" />
                     </View>
                     <View className="flex-1">
@@ -47,7 +47,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                 </View>
 
                 <View className="flex-row items-center">
-                    <View className="w-[48px] h-[48px] bg-[#F1F7FF] rounded-[14px] items-center justify-center mr-4">
+                    <View className="w-[48px] h-[48px] bg-[#F1F7FF] rounded-[6px] items-center justify-center mr-4">
                         <Image source={HOME_IMAGES.deliveryBox} style={{ width: 24, height: 24 }} resizeMode="contain" />
                     </View>
                     <View className="flex-1">

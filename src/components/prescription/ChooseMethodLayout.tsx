@@ -145,7 +145,7 @@ export const ChooseMethodLayout: React.FC = () => {
               className="rounded px-2 py-0.5"
             >
               <Text
-                style={{ color: "#1A1C1E", fontSize: 10 }}
+                style={{ color: "#222222", fontSize: 10 }}
                 className="font-inter-semibold uppercase tracking-wider"
               >
                 Order Now
@@ -159,7 +159,7 @@ export const ChooseMethodLayout: React.FC = () => {
                   resizeMode="contain"
                 />
                 <View className="flex-1 ml-3">
-                  <Text className="text-[14px] font-inter-bold text-[#1A1C1E]">
+                  <Text className="text-[14px] font-inter-bold text-[#222222]">
                     Upload Prescription
                   </Text>
                   <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5 leading-[17px]">
@@ -200,7 +200,7 @@ export const ChooseMethodLayout: React.FC = () => {
                 className="rounded px-2 py-0.5"
               >
                 <Text
-                  style={{ color: "#1A1C1E", fontSize: 10 }}
+                  style={{ color: "#222222", fontSize: 10 }}
                   className="font-inter-semibold uppercase tracking-wider"
                 >
                   Call Us
@@ -216,7 +216,7 @@ export const ChooseMethodLayout: React.FC = () => {
                     />
                   </View>
                   <View className="flex-1 ml-3">
-                    <Text className="text-[14px] font-inter-bold text-[#1A1C1E]">
+                    <Text className="text-[14px] font-inter-bold text-[#222222]">
                       {"Don't have a prescription? Call us"}
                     </Text>
                     <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5 leading-[17px]">

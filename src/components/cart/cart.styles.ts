@@ -27,7 +27,7 @@ export const cartStyles = StyleSheet.create({
     footerBtn:    { fontSize: moderateScale(15, 0.3) },
 
     // CartBillSummary
-    billIconBox:  { width: scale(40), height: scale(40) },
+    billIconBox:  { width: scale(36), height: scale(36) },
     billTitle:    { fontSize: moderateScale(14, 0.3) },
     billSub:      { fontSize: moderateScale(12, 0.3) },
     billMrp:      { fontSize: moderateScale(12, 0.3) },
@@ -49,7 +49,7 @@ export const cartStyles = StyleSheet.create({
     couponTitle:  { fontSize: moderateScale(14, 0.3) },
 
     // CartDeliveringTo
-    deliverIconBox: { width: scale(40), height: scale(40) },
+    deliverIconBox: { width: scale(36), height: scale(36) },
     deliverTitle:   { fontSize: moderateScale(14, 0.3) },
     deliverSub:     { fontSize: moderateScale(12, 0.3) },
     deliverChange:  { fontSize: moderateScale(14, 0.3) },

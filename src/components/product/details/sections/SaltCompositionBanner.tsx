@@ -60,9 +60,18 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
           <Text className="text-[10px] font-inter-semibold text-white uppercase tracking-[1px] mb-0.5">
             SALT COMPOSITION IN BOTH
           </Text>
-          {/* Hidden measurement text — detects if composition overflows one line */}
+          {/* Hidden measurement text — detects if composition overflows one
+              line. Must match the visible text's width and font exactly,
+              otherwise it wraps differently and reports the wrong line
+              count (e.g. always >1 with no width constraint). */}
           <Text
-            style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+            className="text-[15px] font-inter-bold"
+            style={{
+              position: "absolute",
+              width: "100%",
+              opacity: 0,
+              pointerEvents: "none",
+            }}
             onTextLayout={(e) =>
               setIsTruncatable(e.nativeEvent.lines.length > 1)
             }

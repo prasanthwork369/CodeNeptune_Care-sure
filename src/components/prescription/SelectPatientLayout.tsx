@@ -178,7 +178,7 @@ export const SelectPatientLayout: React.FC = () => {
               </View>
             </ScrollView>
 
-            <Text className="text-[13px] font-inter-semibold text-[#222222] mb-2">
+            <Text className="text-[13px] font-inter-bold text-[#222222] mb-2">
               Doctor will reach you at
             </Text>
             <View
@@ -187,7 +187,7 @@ export const SelectPatientLayout: React.FC = () => {
             >
               {editingPhone ? (
                 <TextInput
-                  className="flex-1 text-[14px] font-inter-semibold text-[#1A1C1E] py-3"
+                  className="flex-1 text-[14px] font-inter-semibold text-[#222222] py-3"
                   value={phoneValue}
                   onChangeText={setPhoneValue}
                   keyboardType="phone-pad"
@@ -206,7 +206,7 @@ export const SelectPatientLayout: React.FC = () => {
                         : "Inter_400Regular",
                     color:
                       phoneValue || selectedPatient?.phone
-                        ? "#1A1C1E"
+                        ? "#222222"
                         : "#919EAB",
                   }}
                 >
@@ -233,28 +233,44 @@ export const SelectPatientLayout: React.FC = () => {
 
             <View className="flex-row mb-4" style={{ gap: 12 }}>
               <View className="flex-1">
-                <Text className="text-[13px] font-inter-semibold text-[#1A1C1E] mb-2">
+                <Text className="text-[13px] font-inter-bold text-[#222222] mb-2">
                   Age
                 </Text>
                 <View className="border border-[#919EAB33] rounded-md px-[14px] py-[14px] bg-white">
-                  <Text className="text-[14px] font-inter-semibold text-[#1A1C1E]">
-                    {selectedPatient?.dateOfBirth
-                      ? getAge(selectedPatient.dateOfBirth)
-                      : "—"}
-                  </Text>
+                  {selectedPatient?.dateOfBirth ? (
+                    (() => {
+                      const [, value, unit] =
+                        getAge(selectedPatient.dateOfBirth).match(/^(\d+)\s*(.+)$/) ?? [];
+                      const unitLabel = unit?.startsWith("yr")
+                        ? "Years old"
+                        : unit?.startsWith("month")
+                          ? "Months old"
+                          : unit?.startsWith("day")
+                            ? "Days old"
+                            : unit;
+                      return (
+                        <Text className="text-[14px]">
+                          <Text className="font-inter-bold text-[#222222]">{value}</Text>
+                          <Text className="font-inter-medium text-[#919EAB]"> {unitLabel}</Text>
+                        </Text>
+                      );
+                    })()
+                  ) : (
+                    <Text className="text-[14px] font-inter-bold text-[#222222]">—</Text>
+                  )}
                 </View>
               </View>
               <View>
-                <Text className="text-[13px] font-inter-semibold text-[#1A1C1E] mb-2">
+                <Text className="text-[13px] font-inter-bold text-[#222222] mb-2">
                   Gender
                 </Text>
-                <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-md px-4 py-[12px]">
+                <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-full px-6 py-[14px]">
                   {selectedPatient?.gender === "FEMALE" ? (
                     <icons.female width={18} height={18} color="#0F7635" />
                   ) : (
                     <icons.male width={18} height={18} color="#0F7635" />
                   )}
-                  <Text className="ml-1.5 text-[13px] font-inter-semibold text-[#0F7635]">
+                  <Text className="ml-1.5 text-[13px] font-inter-bold text-[#0F7635]">
                     {selectedPatient?.gender
                       ? selectedPatient.gender.charAt(0) +
                         selectedPatient.gender.slice(1).toLowerCase()
@@ -264,7 +280,7 @@ export const SelectPatientLayout: React.FC = () => {
               </View>
             </View>
 
-            <Text className="text-[13px] font-inter-semibold text-[#1A1C1E] mb-2">
+            <Text className="text-[13px] font-inter-bold text-[#222222] mb-2">
               Select Your Health Problem
             </Text>
             <Touchable
@@ -297,7 +313,7 @@ export const SelectPatientLayout: React.FC = () => {
                   Select
                 </Text>
               )}
-              <icons.down_arrow width={16} height={16} />
+              <icons.down_arrow width={14} height={14} />
             </Touchable>
 
             {selectedHealthProblem?.id === "other" && (
@@ -312,7 +328,7 @@ export const SelectPatientLayout: React.FC = () => {
               </View>
             )}
 
-            <Text className="text-[13px] font-inter-semibold text-[#1A1C1E] mb-2">
+            <Text className="text-[13px] font-inter-bold text-[#222222] mb-2">
               Help us understand your symptoms
             </Text>
             <TextInput

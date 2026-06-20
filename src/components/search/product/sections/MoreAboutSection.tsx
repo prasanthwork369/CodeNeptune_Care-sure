@@ -82,16 +82,22 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
       0,
       { duration: 120, easing: Easing.out(Easing.quad) },
       (finished) => {
-        if (finished) {
-          runOnJS(setSelectedTabId)(tabId);
-          contentOpacity.value = withTiming(1, {
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-          });
-        }
+        if (finished) runOnJS(setSelectedTabId)(tabId);
       },
     );
   };
+
+  // Fades back in only after React has actually re-rendered with the new
+  // tab's content (this effect runs post-commit) — starting the fade-in
+  // from inside the reanimated callback above would race ahead of the
+  // re-render, since runOnJS doesn't wait for it, making the new content
+  // visibly pop in partway through the animation instead of crossfading.
+  useEffect(() => {
+    contentOpacity.value = withTiming(1, {
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+    });
+  }, [selectedTabId]);
 
   const toggleExpand = (id: string) => {
     const isExpanding = expandedCardId !== id;
@@ -110,8 +116,8 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
   };
 
   return (
-    <View className="mx-4 mb-6 mt-2">
-      <Text className="text-[17px] font-inter-bold text-brand-text mb-4">
+    <View className="mx-4 mb-6 ">
+      <Text className="text-[17px] bg-white py-1 pb-4 font-inter-bold text-brand-text mb-4">
         More About {medicineName}
       </Text>
 
@@ -124,7 +130,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
           horizontal
           showsHorizontalScrollIndicator={false}
           style={{ backgroundColor: "#F4F7FC" }}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 14 }}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
           bounces={false}
           overScrollMode="never"
         >
@@ -166,7 +172,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                 {
                   position: "absolute",
                   bottom: 0,
-                  height: 3,
+                  height: 3.2,
                   borderRadius: 2,
                   backgroundColor: "#0F7635",
                 },
@@ -180,6 +186,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
           className="px-2 pt-4 pb-5"
           style={[contentAnimStyle, { minHeight: contentMinHeight }]}
           onLayout={handleContentLayout}
+          layout={LinearTransition.duration(220).easing(Easing.out(Easing.quad))}
         >
           {activeTabData?.heading ? (
             <Text className="text-[16px] font-inter-medium text-brand-text mb-2">

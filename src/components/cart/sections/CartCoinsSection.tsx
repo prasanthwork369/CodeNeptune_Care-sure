@@ -16,7 +16,9 @@ export const CartCoinsSection: React.FC<CartCoinsSectionProps> = ({ value, avail
                     <icons.info_outline width={17} height={17} />
                 </View>
                 <Text style={s.coinsSub} className="font-inter-medium text-brand-subtext mt-0.5">
-                    {availableCoins} coins available
+                    {value
+                        ? `${Math.max(0, availableCoins - redeemedCoins)} coins remaining`
+                        : `${availableCoins} coins available`}
                 </Text>
             </Touchable>
             <Touchable

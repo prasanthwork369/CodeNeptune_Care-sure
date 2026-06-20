@@ -92,6 +92,9 @@ export const API_ENDPOINTS = {
   COUPONS_ACTIVE: "/api/v1/coupons/active",
   COUPONS_VALIDATE: "/api/v1/coupons/validate",
 
+  // ── Cancellation Reasons ─────────────────────────────────────────────────
+  CANCELLATION_REASONS: "/api/v1/reasons/cancellation-reasons",
+
   // ── Pincodes ─────────────────────────────────────────────────────────────
   PINCODE_CHECK: (pincode: string) => `/api/v1/pincodes/check/${pincode}`,
 

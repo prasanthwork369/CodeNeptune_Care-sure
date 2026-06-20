@@ -37,4 +37,7 @@ export const QUERY_KEYS = {
         HISTORY:      (params?: { limit?: number; offset?: number })     => ['search', 'history', params] as const,
         TRENDING:     (limit?: number)                                   => ['search', 'trending', limit] as const,
     },
+    CANCELLATION_REASONS: {
+        LIST: (params?: any) => ['cancellation-reasons', 'list', params] as const,
+    },
 } as const;

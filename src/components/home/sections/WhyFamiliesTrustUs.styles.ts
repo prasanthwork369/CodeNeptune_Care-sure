@@ -33,5 +33,9 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     verticalAlign: "middle",
     color: "#0F1724",
+    // Constrains the label to roughly the icon's width so short two-word
+    // labels reliably wrap to two lines (per design) instead of fitting on
+    // one line, since each item otherwise has plenty of row width to spare.
+    width: iconSize,
   },
 });
