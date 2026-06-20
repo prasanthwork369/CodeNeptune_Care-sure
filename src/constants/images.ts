@@ -92,6 +92,8 @@ export const HOME_IMAGES = {
   prescriptionRejected: require("../../assets/images/prescription/prescription-rejected.png"),
   prescriptionApproved: require("../../assets/images/prescription/prescription-approved.png"),
   warningIcon: require("../../assets/images/icons/warning.png"),
+  leaveWarning: require("../../assets/images/icons/leave_warning.png"),
+  presSuccess: require("../../assets/images/icons/pres_success.png"),
   blockIcon: require("../../assets/images/icons/block.png"),
   notiHistoryIcon: require("../../assets/images/icons/Noti_history.png"),
   bucketCheckIcon: require("../../assets/images/icons/bucket_check.png"),

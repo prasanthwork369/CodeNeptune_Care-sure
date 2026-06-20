@@ -2,6 +2,8 @@ import React from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
+import { HOME_IMAGES } from '@/src/constants/images';
+import { Image } from 'expo-image';
 import { PreviewSuccessModalProps } from '@/src/types/prescription';
 
 export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
@@ -20,11 +22,11 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                             <icons.close_dark width={14} height={14} />
                         </Touchable>
 
-                        <View className="w-20 h-20 rounded-full bg-[#E8F5E9] items-center justify-center mb-4">
-                            <icons.check_circle width={36} height={36} fill="#0F7635" />
+                        <View className="w-28 h-28 rounded-full bg-[#F6FFF1] items-center justify-center mb-4">
+                            <Image source={HOME_IMAGES.presSuccess} style={{ width: 36, height: 36 }} contentFit="contain" />
                         </View>
 
-                        <Text className="text-[18px] font-inter-bold text-[#0F1724] mb-1.5 text-center">
+                        <Text className="text-[18px] font-inter-bold text-[#222222] mb-1.5 text-center">
                             Upload Successful!
                         </Text>
                         <Text className="text-[13px] font-inter-medium text-[#6A6A6A] text-center leading-5 mb-6">
@@ -32,7 +34,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                         </Text>
 
                         <Touchable
-                            className="w-full items-center justify-center py-4 rounded-xl"
+                            className="w-full items-center justify-center py-4 rounded-lg"
                             style={{ backgroundColor: '#0F7635' }}
                             activeOpacity={0.85}
                             onPress={onContinue}

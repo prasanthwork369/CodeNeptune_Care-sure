@@ -1,5 +1,6 @@
 import { icons } from '@/src/constants/icons';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { Image, type ImageSource } from 'expo-image';
 import React from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 
@@ -10,6 +11,10 @@ interface RemoveConfirmModalProps {
     title?: string;
     message?: string;
     confirmLabel?: string;
+    cancelLabel?: string;
+    icon?: ImageSource;
+    iconBg?: string;
+    confirmBg?: string;
 }
 
 export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
@@ -19,29 +24,58 @@ export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
     title = 'Remove Prescription',
     message = 'Are you sure you want to remove this prescription from your list?',
     confirmLabel = 'Remove',
+    cancelLabel = 'Cancel',
+    icon,
+    iconBg = '#FDEAEA',
+    confirmBg = '#C22923',
 }) => (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onCancel}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onCancel}>
         <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={onCancel}>
-            <Pressable onPress={e => e.stopPropagation()}>
-                <View className="bg-white rounded-2xl px-6 py-6 w-full">
-                    <Text className="text-[17px] font-inter-bold text-[#0F1724] mb-2">{title}</Text>
-                    <Text className="text-[13px] font-inter-medium text-[#6A6A6A] mb-6 leading-5">
+            <Pressable onPress={e => e.stopPropagation()} className="w-full">
+                <View className="bg-white rounded-2xl px-6 py-6 w-full relative">
+                    {icon && (
+                        <Touchable
+                            onPress={onCancel}
+                            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F1F2F4] items-center justify-center"
+                        >
+                            <icons.close_dark width={14} height={14} />
+                        </Touchable>
+                    )}
+
+                    {icon && (
+                        <View
+                            className="self-center w-28 h-28 rounded-full items-center justify-center mb-4"
+                            style={{ backgroundColor: iconBg }}
+                        >
+                            <Image source={icon} style={{ width: 36, height: 36 }} contentFit="contain" />
+                        </View>
+                    )}
+
+                    <Text
+                        className={`text-[17px] font-inter-bold text-[#222222] mb-2 ${icon ? 'text-center' : ''}`}
+                    >
+                        {title}
+                    </Text>
+                    <Text
+                        className={`text-[13px] font-inter-medium text-[#6A6A6A] mb-6 leading-5 ${icon ? 'text-center' : ''}`}
+                    >
                         {message}
                     </Text>
-                    <View className="flex-row gap-3">
+                    <View className="flex-row gap-4">
                         <Touchable
                             activeOpacity={0.7}
-                            className="flex-1 items-center justify-center py-3.5 rounded-xl border border-[#919EAB33]"
+                            className="flex-1 items-center justify-center py-3.5 rounded-lg border border-[#919EAB33]"
                             onPress={onCancel}
                         >
-                            <Text className="text-[14px] font-inter-semibold text-[#6A6A6A]">Cancel</Text>
+                            <Text className="text-[14px] font-inter-semibold text-[#222222]">{cancelLabel}</Text>
                         </Touchable>
                         <Touchable
                             activeOpacity={0.85}
-                            className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-xl bg-[#C22923]"
+                            className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-lg"
+                            style={{ backgroundColor: confirmBg }}
                             onPress={onConfirm}
                         >
-                            <icons.delete_red width={16} height={16} fill="#FFFFFF" />
+                            {!icon && <icons.delete_red width={16} height={16} fill="#FFFFFF" />}
                             <Text className="text-[14px] font-inter-semibold text-white">{confirmLabel}</Text>
                         </Touchable>
                     </View>

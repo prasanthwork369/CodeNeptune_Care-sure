@@ -2,6 +2,7 @@ import { storageApi } from "@/src/api/storage.api";
 import { PrescriptionReviewSheet } from "@/src/components/prescription/PrescriptionReviewSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
+import { HOME_IMAGES } from "@/src/constants/images";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
@@ -352,8 +353,12 @@ export const PreviewLayout: React.FC = () => {
 
       <RemoveConfirmModal
         visible={showLeaveConfirm}
-        title="Leave Without Saving?"
-        message="Going back will clear all the prescription files you've added. Are you sure you want to leave?"
+        title="Leave this page?"
+        message="Uploaded prescriptions will be removed"
+        icon={HOME_IMAGES.leaveWarning}
+        iconBg="#FFF1F1"
+        confirmBg="#E02D5B"
+        cancelLabel="Great"
         confirmLabel="Leave"
         onConfirm={() => {
           setShowLeaveConfirm(false);
