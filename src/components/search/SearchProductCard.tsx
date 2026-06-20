@@ -81,11 +81,11 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                     </View>
                     <View className="mt-auto">
                         {data.searched.price != null && (
-                            <Text style={s.price} className="font-inter-extrabold text-brand-text mb-1 tracking-tight">
+                            <Text style={s.price} className="font-inter-extrabold text-brand-text mb-1.5 tracking-tight">
                                 ₹{Number(data.searched.price).toFixed(2)}
                             </Text>
                         )}
-                        <Text style={s.savings} className="font-inter-semibold text-[#FF383C]">
+                        <Text style={s.savings} className="font-inter-semibold text-[#FF383C] mt-1">
                             {data.searched.status}
                         </Text>
                     </View>
@@ -104,14 +104,14 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         ) : null}
                     </View>
                     <View className="mt-auto">
-                        <View className="flex-row items-baseline gap-x-2 mb-1.5">
+                        <View className="flex-row items-baseline flex-wrap gap-x-2 mb-1.5">
                             {data.recommended.price != null && (
                                 <Text style={s.price} className="font-inter-extrabold text-brand-text tracking-tight">
                                     ₹{Number(data.recommended.price).toFixed(2)}
                                 </Text>
                             )}
                             {data.recommended.originalPrice != null && data.recommended.originalPrice > data.recommended.price && (
-                                <Text style={s.mrp} className="font-inter-semibold text-brand-subtext line-through">
+                                <Text style={s.mrp} className="font-inter-semibold text-brand-subtext line-through" numberOfLines={1}>
                                     ₹{Number(data.recommended.originalPrice).toFixed(2)}
                                 </Text>
                             )}
@@ -119,7 +119,7 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
                         {data.recommended.savings > 0 && (
                             <View className="flex-row items-center mt-0.5">
                                  <icons.sell width={15} height={15} fill="#0F7635" style={s.sellIcon} />
-                                <Text style={s.savings} className="font-inter-bold text-brand-primary ml-1.5 tracking-tight">
+                                <Text style={s.savings} className="font-inter-bold text-brand-primary ml-1.5 tracking-tight mt-1">
                                     Save ₹{Number(data.recommended.savings).toFixed(2)}
                                 </Text>
                             </View>

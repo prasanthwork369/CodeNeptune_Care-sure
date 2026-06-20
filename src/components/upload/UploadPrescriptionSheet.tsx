@@ -25,6 +25,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 interface UploadPrescriptionSheetProps {
   isVisible: boolean;
   onClose: () => void;
+  onReopen?: () => void;
   toPay?: string;
   patientMemberId?: string;
   onUploadFile?: () => void;
@@ -64,6 +65,7 @@ export const UploadPrescriptionSheet: React.FC<
 > = ({
   isVisible,
   onClose,
+  onReopen,
   toPay,
   patientMemberId,
   onUploadFile,
@@ -78,14 +80,14 @@ export const UploadPrescriptionSheet: React.FC<
     onDismiss?: () => void;
   } | null>(null);
   const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
-  const [duplicateFile, setDuplicateFile] = useState<{ name: string; size?: number } | null>(null);
+  const [duplicateFile, setDuplicateFile] = useState<{ name: string; size?: number; proceed: () => void } | null>(null);
   const { pickImages, pickPdf, takePhoto } = usePrescriptionPicker(
     onClose,
     toPay,
     patientMemberId,
     (title, message, onDismiss) => setInfoModal({ title, message, onDismiss }),
     setTooLargeSizeMB,
-    (name, size) => setDuplicateFile({ name, size }),
+    (name, size, proceed) => setDuplicateFile({ name, size, proceed }),
   );
 
   const handleUploadFile = onUploadFile ?? pickImages;
@@ -126,6 +128,10 @@ export const UploadPrescriptionSheet: React.FC<
         selectedSizeLabel={`${tooLargeSizeMB} MB`}
         maxSizeLabel={`${(MAX_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB`}
         onClose={() => setTooLargeSizeMB(null)}
+        onChooseAnother={() => {
+          setTooLargeSizeMB(null);
+          onReopen?.();
+        }}
       />
 
       <DuplicateFileModal
@@ -135,7 +141,15 @@ export const UploadPrescriptionSheet: React.FC<
             ? `${(duplicateFile.size / (1024 * 1024)).toFixed(1)} MB`
             : undefined
         }
-        onClose={() => setDuplicateFile(null)}
+        onClose={() => {
+          const proceed = duplicateFile?.proceed;
+          setDuplicateFile(null);
+          proceed?.();
+        }}
+        onChooseAnother={() => {
+          setDuplicateFile(null);
+          onReopen?.();
+        }}
       />
 
       <GorhomBottomSheet

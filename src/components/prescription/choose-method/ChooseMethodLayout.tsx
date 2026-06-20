@@ -111,6 +111,7 @@ export const ChooseMethodLayout: React.FC = () => {
       <UploadPrescriptionSheet
         isVisible={isUploadSheetVisible}
         onClose={() => setIsUploadSheetVisible(false)}
+        onReopen={() => setIsUploadSheetVisible(true)}
         toPay={toPay}
         patientMemberId={selectedPatient?.id}
       />

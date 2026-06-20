@@ -1,8 +1,9 @@
 import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { Image } from 'expo-image';
 import React from 'react';
-import { Image, Modal, Pressable, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 
 interface FileTooLargeModalProps {
     visible: boolean;
@@ -19,7 +20,7 @@ export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
     onClose,
     onChooseAnother,
 }) => (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
         <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={onClose}>
             <Pressable onPress={e => e.stopPropagation()} className="w-full">
                 <View className="bg-white rounded-[20px] px-5 pt-6 pb-5 w-full items-center relative">
@@ -31,7 +32,7 @@ export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
                     </Touchable>
 
                     <View className="w-20 h-20 rounded-full bg-[#FDEAEA] items-center justify-center mb-4">
-                        <Image source={HOME_IMAGES.prescriptionInfo} style={{ width: 36, height: 36 }} resizeMode="contain" />
+                        <Image source={HOME_IMAGES.prescriptionInfo} style={{ width: 36, height: 36 }} contentFit="contain" />
                     </View>
 
                     <Text className="text-[18px] font-inter-bold text-[#0F1724] mb-1.5 text-center">
@@ -45,7 +46,7 @@ export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
                         <View className="flex-row items-center justify-between py-3 border-b border-[#F0F0F0]">
                             <View className="flex-row items-center">
                                 <View className="w-7 h-7 rounded-[6px] bg-[#FDEAEA] items-center justify-center mr-2.5">
-                                    <Image source={HOME_IMAGES.prescriptionInstructions} style={{ width: 16, height: 16 }} resizeMode="contain" />
+                                    <Image source={HOME_IMAGES.prescriptionInstructions} style={{ width: 16, height: 16 }} contentFit="contain" />
                                 </View>
                                 <Text className="text-[13px] font-inter-medium text-[#0F1724]">Selected file size</Text>
                             </View>

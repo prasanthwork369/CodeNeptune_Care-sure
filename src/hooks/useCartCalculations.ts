@@ -20,10 +20,22 @@ export function useCartCalculations() {
   const [walletOn, setWalletOn] = useState(false);
   const [coinsOn, setCoinsOn] = useState(false);
   const walletConfettiRef = useRef<Dotlottie>(null);
+  const confettiRestartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Wallet, coins, and "coupon just applied" all share this single Lottie
+  // instance. Calling stop() then play() back to back races when two
+  // triggers fire close together (e.g. enabling wallet then coins right
+  // after) — the native player needs a beat to actually process the stop
+  // before it'll restart from play(), otherwise the second play() silently
+  // no-ops. A single-frame defer wasn't enough, so this uses a short timeout
+  // and cancels any already-pending restart to avoid stacking calls.
   const playConfetti = () => {
+    if (confettiRestartTimer.current) clearTimeout(confettiRestartTimer.current);
     walletConfettiRef.current?.stop();
-    walletConfettiRef.current?.play();
+    confettiRestartTimer.current = setTimeout(() => {
+      walletConfettiRef.current?.play();
+      confettiRestartTimer.current = null;
+    }, 60);
   };
 
   const handleWalletToggle = (v: boolean) => {
@@ -73,7 +85,7 @@ export function useCartCalculations() {
         setReopenLocationSheet(false);
       }
       if (justApplied) {
-        walletConfettiRef.current?.play();
+        playConfetti();
         clearJustApplied();
       }
     }, [reopenLocationSheet, justApplied]),

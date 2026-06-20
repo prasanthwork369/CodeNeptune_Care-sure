@@ -12,7 +12,7 @@ export function usePrescriptionPicker(
     patientMemberId?: string,
     onError?: (title: string, message: string, onDismiss?: () => void) => void,
     onSizeExceeded?: (sizeMB: string) => void,
-    onDuplicate?: (fileName: string, fileSize?: number) => void
+    onDuplicate?: (fileName: string, fileSize: number | undefined, proceed: () => void) => void
 ) {
     const router = useNav();
     const { addItems } = usePrescriptionDraftStore();
@@ -38,25 +38,29 @@ export function usePrescriptionPicker(
             }
         }
 
+        // Deferred until the duplicate notice (modal/info dialog) is dismissed,
+        // so the preview screen never appears underneath it before the user
+        // has acknowledged the duplicate.
+        const goToPreview = () => {
+            if (uniqueInSelection.length === 0) return;
+            addItems(uniqueInSelection);
+            router.push({
+                pathname: '/(prescription)/preview',
+                params: { toPay: toPay ?? '0', patientMemberId: patientMemberId ?? '', source: 'cart' },
+            });
+        };
+
         if (skippedCount.existing > 0 || skippedCount.internal > 0) {
             if (onDuplicate && firstDuplicate) {
-                onDuplicate(firstDuplicate.name, firstDuplicate.size);
+                onDuplicate(firstDuplicate.name, firstDuplicate.size, goToPreview);
             } else {
-                const onDismiss = currentItems.length > 0 ? () => router.push({
-                    pathname: '/(prescription)/preview',
-                    params: { toPay: toPay ?? '0', patientMemberId: patientMemberId ?? '', source: 'cart' },
-                }) : undefined;
+                const onDismiss = currentItems.length > 0 ? goToPreview : undefined;
                 showErr('Duplicate Files', 'Some identical files were detected and skipped.', onDismiss);
             }
+            return;
         }
 
-        if (uniqueInSelection.length === 0) return;
-
-        addItems(uniqueInSelection);
-        router.push({
-            pathname: '/(prescription)/preview',
-            params: { toPay: toPay ?? '0', patientMemberId: patientMemberId ?? '', source: 'cart' },
-        });
+        goToPreview();
     };
 
     const processAssets = async (

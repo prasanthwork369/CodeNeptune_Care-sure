@@ -11,9 +11,10 @@ import { PrescriptionItem } from "@/src/types/prescription";
 import { MAX_FILES, MAX_SIZE_BYTES, validatePrescriptionFile } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { BackHandler, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   DuplicateFileModal,
@@ -98,11 +99,29 @@ export const PreviewLayout: React.FC = () => {
     message: string;
   } | null>(null);
   const [showRemoveModal, setShowRemoveModal] = useState<number | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const showInfo = (title: string, message: string) =>
     setInfoModal({ title, message });
   const [createdPrescriptionId, setCreatedPrescriptionId] = useState("");
   const uploadedSnapshot = useRef<PrescriptionItem[]>([]);
   const activeItem = items[activeIndex] ?? items[0];
+
+  const handleBackPress = useCallback(() => {
+    if (items.length > 0) setShowLeaveConfirm(true);
+    else router.back();
+  }, [items.length, router]);
+
+  // Intercepts the Android hardware back button too, so it shows the same
+  // warning instead of leaving (and silently dropping the draft) unprompted.
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+        handleBackPress();
+        return true;
+      });
+      return () => subscription.remove();
+    }, [handleBackPress]),
+  );
 
   const processAndAdd = async (
     assets: (
@@ -242,7 +261,7 @@ export const PreviewLayout: React.FC = () => {
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
-      <ScreenHeader title="Upload Prescription" />
+      <ScreenHeader title="Upload Prescription" onBack={handleBackPress} />
 
       <View
         style={{
@@ -331,6 +350,19 @@ export const PreviewLayout: React.FC = () => {
         onCancel={() => setShowRemoveModal(null)}
       />
 
+      <RemoveConfirmModal
+        visible={showLeaveConfirm}
+        title="Leave Without Saving?"
+        message="Going back will clear all the prescription files you've added. Are you sure you want to leave?"
+        confirmLabel="Leave"
+        onConfirm={() => {
+          setShowLeaveConfirm(false);
+          clearItems();
+          router.back();
+        }}
+        onCancel={() => setShowLeaveConfirm(false)}
+      />
+
       <DuplicateFileModal
         fileName={duplicateFileName}
         fileSizeLabel={
@@ -376,7 +408,6 @@ export const PreviewLayout: React.FC = () => {
         visible={showConfirmed}
         onClose={() => setShowConfirmed(false)}
         onContinue={() => {
-          setShowConfirmed(false);
           router.replace({
             pathname: "/(prescription)/select-patient",
             params: {
@@ -385,6 +416,7 @@ export const PreviewLayout: React.FC = () => {
               files: JSON.stringify(uploadedSnapshot.current),
             },
           });
+          setShowConfirmed(false);
         }}
         safeAreaBottom={insets.bottom}
       />
