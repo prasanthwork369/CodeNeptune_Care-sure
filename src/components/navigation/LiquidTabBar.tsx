@@ -23,7 +23,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Image, LayoutChangeEvent, Pressable, Text, View } from "react-native";
+import { Image, LayoutChangeEvent, Platform, Pressable, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Easing,
@@ -323,6 +323,9 @@ TabItem.displayName = "TabItem";
 
 const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const insets = useSafeAreaInsets();
+  const adjustedBottom = Platform.OS === 'android'
+    ? (insets.bottom > 24 ? insets.bottom - 8 : insets.bottom)
+    : insets.bottom;
   const router = useNav();
   const { isTabBarVisible } = useUIStore();
   const { setTabBarHeight } = useTabBarStore();
@@ -512,29 +515,12 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     <View
       className="absolute bottom-0 left-0 right-0 flex-row items-center pl-3 pr-0"
       style={{
-        height: BAR_HEIGHT + insets.bottom,
-        paddingBottom: insets.bottom,
+        height: BAR_HEIGHT + adjustedBottom,
+        paddingBottom: adjustedBottom,
       }}
       pointerEvents="box-none"
       onLayout={handleLayout}
     >
-      <LinearGradient
-        colors={[
-          "rgba(255,255,255,0)",
-          "rgba(255,255,255,0.9)",
-          "rgba(255,255,255,0.95)",
-          "#FFFFFF",
-        ]}
-        locations={[0, 0.25, 0.6, 1]}
-        pointerEvents="none"
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: insets.bottom + 15,
-        }}
-      />
       <Animated.View
         style={[{ flex: 1, height: PILL_HEIGHT }, animatedTabBarContainerStyle]}
         pointerEvents="box-none"

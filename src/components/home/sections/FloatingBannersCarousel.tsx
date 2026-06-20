@@ -4,7 +4,7 @@ import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { Platform, ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
   interpolateColor,
@@ -245,7 +245,10 @@ export const FloatingBannersCarousel = ({
 
   if (!isCartActive && !isRxActive) return null;
 
-  const TAB_BAR_HEIGHT = 75 + insets.bottom;
+  const adjustedBottom = Platform.OS === 'android'
+    ? (insets.bottom > 24 ? insets.bottom - 8 : insets.bottom)
+    : insets.bottom;
+  const TAB_BAR_HEIGHT = 75 + adjustedBottom;
 
   return (
     <>

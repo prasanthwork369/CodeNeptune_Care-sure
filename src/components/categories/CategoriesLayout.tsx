@@ -2,6 +2,7 @@ import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { useCategories } from '@/src/hooks/queries/useCategories';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { TabBarFadeGradient } from '@/src/components/navigation/TabBarFadeGradient';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CategoriesSidebar, CategoriesGrid, CategoriesHeaderActions } from './sections';
@@ -49,6 +50,8 @@ export const CategoriesLayout: React.FC = () => {
                     isLoading={isLoading}
                 />
             </View>
+
+            <TabBarFadeGradient />
         </View>
     );
 };

@@ -16,6 +16,7 @@ import {
     Text,
     View,
 } from 'react-native';
+import { TabBarFadeGradient } from '@/src/components/navigation/TabBarFadeGradient';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -134,6 +135,7 @@ export const ProfileLayout: React.FC = () => {
                 onSelectLibrary={handleSelectLibrary}
             />
 
+            <TabBarFadeGradient />
         </View>
     );
 };

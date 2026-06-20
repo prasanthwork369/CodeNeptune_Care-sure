@@ -13,6 +13,7 @@ import {
     SmartSubstitution,
     WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
+import { TabBarFadeGradient } from "@/src/components/navigation/TabBarFadeGradient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
@@ -34,6 +35,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+    Platform,
     RefreshControl,
     ScrollView,
     View,
@@ -147,7 +149,10 @@ export const HomeLayout: React.FC = () => {
   const { scrollY, handleScroll, stickySearchVisible } =
     useHomeScroll(heroHeightRef);
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
-  const TAB_BAR_HEIGHT = 75 + insets.bottom;
+  const adjustedBottom = Platform.OS === 'android'
+    ? (insets.bottom > 24 ? insets.bottom - 8 : insets.bottom)
+    : insets.bottom;
+  const TAB_BAR_HEIGHT = 75 + adjustedBottom;
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -372,6 +377,8 @@ export const HomeLayout: React.FC = () => {
         isVisible={isLocationSheetVisible}
         onClose={() => setIsLocationSheetVisible(false)}
       />
+
+      <TabBarFadeGradient />
 
       <FloatingBannersCarousel isFocused={isScreenFocused} />
     </View>

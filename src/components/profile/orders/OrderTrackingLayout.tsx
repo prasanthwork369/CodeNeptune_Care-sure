@@ -616,7 +616,7 @@ export const OrderTrackLayout: React.FC = () => {
                         borderColor: "#E2E8F0",
                         backgroundColor: "#F3F4F6",
                       }}
-                      className="rounded-sm px-2.5 py-1"
+                      className="rounded-sm px-2.5 py-0.5"
                     >
                       <Text
                         style={s.statusBadge}
@@ -684,7 +684,7 @@ export const OrderTrackLayout: React.FC = () => {
           </Touchable>
         </SectionCard>
 
-        <View className="mx-base rounded-xl overflow-hidden border border-[#919EAB33] bg-white">
+        <View className="mx-base rounded-lg overflow-hidden border border-[#919EAB33] bg-white">
           <LinearGradient
             colors={["#FBFEFC", "#EBFAF0"]}
             start={{ x: 0.5, y: 1 }}
