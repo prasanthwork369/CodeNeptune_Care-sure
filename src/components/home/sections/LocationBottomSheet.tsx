@@ -34,6 +34,8 @@ interface LocationBottomSheetProps {
 interface GooglePrediction {
   description: string;
   place_id: string;
+  mainText: string;
+  secondaryText: string;
 }
 
 const labelToIcon = (label: string) => {
@@ -87,6 +89,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
             (json.predictions ?? []).map((p: any) => ({
               description: p.description,
               place_id: p.place_id,
+              mainText: p.structured_formatting?.main_text ?? p.description,
+              secondaryText: p.structured_formatting?.secondary_text ?? "",
             })),
           );
         } else {
@@ -287,7 +291,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       snapPoints={snapPoints}
       closeButtonOffset="70%"
       keyboardBehavior="interactive"
-      keyboardBlurBehavior="restore"
+      keyboardBlurBehavior="none"
       style={{ zIndex: 999 }}
     >
       <View
@@ -297,7 +301,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           Change Location
         </Text>
 
-        {/* Search Box + Cancel */}
+        {/* Search Box */}
         <View className="flex-row items-center gap-x-3 mb-4">
           <View
             style={{
@@ -310,12 +314,12 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               borderWidth: 1.05,
               borderColor: "#919EAB33",
             }}
-            className="flex-row items-center bg-white rounded-lg px-4 py-2.5"
+            className="flex-row items-center bg-white rounded-md px-4 py-2.5"
           >
             {isSearching ? (
               <ActivityIndicator size="small" color="#0F7635" />
             ) : (
-              <icons.search width={18} height={18} />
+              <icons.search_grey width={18} height={18} />
             )}
             <BottomSheetTextInput
               value={searchQuery}
@@ -339,25 +343,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                 }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <icons.close_dark width={16} height={16} fill="#919EAB" />
+                <icons.close_dark width={14} height={14} fill="#222222" />
               </Touchable>
             )}
           </View>
-          {(!!searchQuery || isSearchFocused) && (
-            <Touchable
-              onPress={() => {
-                setSearchQuery("");
-                setPredictions([]);
-                setIsSearchFocused(false);
-                Keyboard.dismiss();
-              }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Text className="text-[13px] font-inter-semibold text-brand-primary">
-                Cancel
-              </Text>
-            </Touchable>
-          )}
         </View>
 
         {/* Current location + Add new — hidden while searching or focused */}
@@ -425,25 +414,41 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           isSearching && predictions.length === 0 ? (
             <ActivityIndicator color="#0F7635" style={{ marginVertical: 24 }} />
           ) : (
-            predictions.map((p) => (
-              <Touchable
-                key={p.place_id}
-                onPress={() => handlePredictionSelect(p)}
-                disabled={isSearching || isChecking}
-                activeOpacity={0.75}
-                className="flex-row items-start py-3 border-b border-[#F3F4F6]"
-              >
-                <View className="mt-0.5 mr-3">
-                  <icons.location_pin width={16} height={16} fill="#6B7280" />
-                </View>
-                <Text
-                  className="flex-1 text-[13px] font-inter-medium text-brand-text leading-5"
-                  numberOfLines={2}
+            <View className="border border-[#919EAB33] rounded-lg px-4">
+              {predictions.map((p, index) => (
+                <Touchable
+                  key={p.place_id}
+                  onPress={() => handlePredictionSelect(p)}
+                  disabled={isSearching || isChecking}
+                  activeOpacity={0.75}
+                  style={
+                    index < predictions.length - 1
+                      ? {
+                          borderBottomWidth: 1,
+                          borderColor: "#E5E7EB",
+                          borderStyle: "dashed",
+                        }
+                      : undefined
+                  }
+                  className="flex-row items-start py-4"
                 >
-                  {p.description}
-                </Text>
-              </Touchable>
-            ))
+                  <View className="mt-0.5 mr-3">
+                    <icons.location_on width={20} height={20} fill="#1A1C1E" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-[15px] font-inter-semibold text-brand-text mb-1">
+                      {p.mainText}
+                    </Text>
+                    <Text
+                      className="text-[13px] font-inter-regular text-brand-subtext leading-5"
+                      numberOfLines={2}
+                    >
+                      {p.description}
+                    </Text>
+                  </View>
+                </Touchable>
+              ))}
+            </View>
           )
         ) : /* Saved addresses */
         addressesLoading ? (

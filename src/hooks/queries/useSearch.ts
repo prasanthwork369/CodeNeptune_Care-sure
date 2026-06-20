@@ -109,6 +109,7 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
         recordHistory: (query: string, productId?: string) =>
             recordMutation.mutate({ query, productId }),
         clearHistory: () => clearMutation.mutate(),
+        isClearingHistory: clearMutation.isPending,
         deleteHistoryItem: (id: string) => deleteItemMutation.mutate(id),
     };
 };

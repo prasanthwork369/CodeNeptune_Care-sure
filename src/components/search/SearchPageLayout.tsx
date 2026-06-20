@@ -94,7 +94,7 @@ export const SearchPageLayout = () => {
         debouncedQuery,
     } = useSearch();
 
-    const { history, recordHistory, clearHistory, deleteHistoryItem } = useSearchHistory(5);
+    const { history, recordHistory, clearHistory, isClearingHistory, deleteHistoryItem } = useSearchHistory(5);
     const { suggestions } = useSearchSuggestions(query, 5);
     const { trending } = useTrendingSearches(5);
 
@@ -126,6 +126,7 @@ export const SearchPageLayout = () => {
                     trending={trendingTerms}
                     onTermPress={(term) => { recordHistory(term); setQuery(term); }}
                     onClear={clearHistory}
+                    isClearing={isClearingHistory}
                     onDeleteHistoryItem={deleteHistoryItem}
                     onProductPress={(id) => router.push({ pathname: '/product/[id]', params: { id } })}
                     onViewAllFrequent={() => router.push('/profile/orders/frequent' as any)}

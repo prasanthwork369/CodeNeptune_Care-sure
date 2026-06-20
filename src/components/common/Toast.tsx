@@ -1,6 +1,6 @@
 import { useToastStore } from '@/src/store/toastStore';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Pressable, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Keyboard, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
@@ -26,9 +26,29 @@ const CONFIG = {
 export const Toast: React.FC = () => {
   const { visible, message, type, hide } = useToastStore();
   const insets = useSafeAreaInsets();
-  const translateY = useRef(new Animated.Value(120)).current;
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  // Hidden resting position: below the screen when anchored to the bottom,
+  // above it when anchored to the top (keyboard open) — so the slide
+  // direction always matches which edge the toast is docked to.
+  const offScreenY = keyboardVisible ? -120 : 120;
+  const translateY = useRef(new Animated.Value(offScreenY)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setKeyboardVisible(true),
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardVisible(false),
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -41,12 +61,12 @@ export const Toast: React.FC = () => {
 
       timerRef.current = setTimeout(() => {
         Animated.parallel([
-          Animated.timing(translateY, { toValue: 120, duration: 280, useNativeDriver: true }),
+          Animated.timing(translateY, { toValue: offScreenY, duration: 280, useNativeDriver: true }),
           Animated.timing(opacity, { toValue: 0, duration: 280, useNativeDriver: true }),
         ]).start(() => hide());
       }, 3200);
     } else {
-      translateY.setValue(120);
+      translateY.setValue(offScreenY);
       opacity.setValue(0);
     }
 
@@ -62,7 +82,9 @@ export const Toast: React.FC = () => {
       pointerEvents="box-none"
       style={{
         position: 'absolute',
-        bottom: insets.bottom + 100,
+        ...(keyboardVisible
+          ? { top: insets.top + 12 }
+          : { bottom: insets.bottom + 100 }),
         left: 0,
         right: 0,
         alignItems: 'center',
@@ -89,12 +111,12 @@ export const Toast: React.FC = () => {
           elevation: 4,
         }}
       >
-        {/* Outer rounded-square wrapper — matches web icon container */}
+        {/* Outer rounded wrapper — matches web icon container */}
         <View
           style={{
             width: 34,
             height: 34,
-            borderRadius: 9,
+            borderRadius: 17,
             backgroundColor: c.wrapBg,
             alignItems: 'center',
             justifyContent: 'center',

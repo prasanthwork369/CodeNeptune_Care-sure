@@ -4,7 +4,7 @@ import { ApiSearchHistoryItem } from '@/src/api/search.api';
 import { useFrequentlyOrdered } from '@/src/hooks/queries/useOrders';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { searchRecentStyles as s } from '../search.styles';
 
 const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
@@ -35,6 +35,7 @@ export const SearchRecentSection = ({
     trending,
     onTermPress,
     onClear,
+    isClearing = false,
     onDeleteHistoryItem,
     onProductPress,
     onViewAllFrequent,
@@ -44,6 +45,7 @@ export const SearchRecentSection = ({
     trending: string[];
     onTermPress: (term: string) => void;
     onClear: () => void;
+    isClearing?: boolean;
     onDeleteHistoryItem: (id: string) => void;
     onProductPress: (id: string) => void;
     onViewAllFrequent?: () => void;
@@ -59,8 +61,12 @@ export const SearchRecentSection = ({
                 <View className="px-4 pt-5">
                     <View className="flex-row justify-between items-center mb-3">
                         <Text style={s.sectionTitle} className="font-inter-bold text-brand-text">Recent Searches</Text>
-                        <Touchable onPress={onClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                            <Text style={s.clearBtn} className="font-inter-semibold text-brand-primary">Clear All</Text>
+                        <Touchable onPress={onClear} disabled={isClearing} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            {isClearing ? (
+                                <ActivityIndicator size="small" color="#0F7635" />
+                            ) : (
+                                <Text style={s.clearBtn} className="font-inter-semibold text-brand-primary">Clear All</Text>
+                            )}
                         </Touchable>
                     </View>
                     <View className="flex-row flex-wrap gap-2">

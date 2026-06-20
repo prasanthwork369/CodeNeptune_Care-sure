@@ -58,6 +58,7 @@ import photo_camera from "../../assets/icons/photo_camera.svg";
 import photo_camera_green from "../../assets/icons/photo_camera_green.svg";
 import pickup from "../../assets/icons/pickup.svg";
 import search from "../../assets/icons/search.svg";
+import search_grey from "../../assets/icons/search_grey.svg";
 import resent from "../../assets/icons/resent.svg";
 import sell from "../../assets/icons/sell.svg";
 import shopping_bag from "../../assets/icons/shopping_bag.svg";
@@ -151,6 +152,7 @@ export const icons = {
 
     // SVG Actions/UI
     search,
+    search_grey,
     notification,
     notifications,
     faq_info,

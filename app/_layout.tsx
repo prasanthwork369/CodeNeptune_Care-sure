@@ -118,8 +118,8 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <KeyboardProvider>
         <SafeAreaProvider>
-          <BottomSheetModalProvider>
-            <View style={{ flex: 1, backgroundColor: "#fff" }}>
+          <View style={{ flex: 1, backgroundColor: "#fff" }}>
+            <BottomSheetModalProvider>
               <StatusBar style="dark" />
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" />
@@ -135,11 +135,14 @@ export default function RootLayout() {
               </Stack>
               <CartSyncProvider />
               <PushNotificationProvider />
-              <NetworkToast />
-              <Toast />
-              <SignupBonusPopup />
-            </View>
-          </BottomSheetModalProvider>
+            </BottomSheetModalProvider>
+            {/* Rendered after BottomSheetModalProvider closes (not inside it),
+                so these always paint above any open bottom sheet's portal —
+                otherwise a sheet's native overlay covers them. */}
+            <NetworkToast />
+            <Toast />
+            <SignupBonusPopup />
+          </View>
         </SafeAreaProvider>
         </KeyboardProvider>
       </GestureHandlerRootView>
