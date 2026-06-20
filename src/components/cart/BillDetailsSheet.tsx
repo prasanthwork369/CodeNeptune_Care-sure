@@ -161,13 +161,13 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
         <View className="flex-row justify-between items-center">
           <Text
             style={s.billSheetTotal}
-            className="font-inter-bold text-[#1A1C1E]"
+            className="font-inter-bold text-[#222222]"
           >
             To Pay
           </Text>
           <Text
             style={s.billSheetGrand}
-            className="font-inter-extrabold text-[#1A1C1E]"
+            className="font-inter-extrabold text-[#222222]"
           >
             ₹{Number(toPay).toFixed(2)}
           </Text>

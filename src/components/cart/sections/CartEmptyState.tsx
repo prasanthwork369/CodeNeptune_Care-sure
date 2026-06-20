@@ -79,14 +79,9 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                 {/* Unified Premium Card Wrapper */}
                 <View
                   style={{
-                    height: 305,
-                    borderRadius: 16,
+                    height: 300,
+                    borderRadius: 12,
                     backgroundColor: '#FFFFFF',
-                    shadowColor: '#919EAB',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 6,
-                    elevation: 2,
                     overflow: 'hidden',
                   }}
                 >
@@ -122,9 +117,9 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                       <Text
                         numberOfLines={2}
                         style={{
-                          fontSize: 13,
-                          fontFamily: "Inter-SemiBold",
-                          color: "#0F1724",
+                          fontSize: 13.5,
+                          fontFamily: "Inter-Medium",
+                          color: "#222222",
                           lineHeight: 18,
                         }}
                       >
@@ -133,7 +128,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                       <Text
                         numberOfLines={1}
                         style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           fontFamily: "Inter-Bold",
                           color: "#009989",
                           marginTop: 2,
@@ -145,8 +140,8 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         numberOfLines={1}
                         style={{
                           fontSize: 11,
-                          fontFamily: "Inter-Regular",
-                          color: "#637381",
+                          fontFamily: "Inter-Medium",
+                          color: "#6A6A6A",
                           marginTop: 1,
                         }}
                       >

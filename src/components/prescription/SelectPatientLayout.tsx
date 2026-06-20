@@ -352,10 +352,10 @@ export const SelectPatientLayout: React.FC = () => {
             <View style={{ height: 1, backgroundColor: "#919EAB22" }} />
             <View className="flex-row items-center pt-4">
               <View className="mr-4">
-                <Text className="text-[11px] font-inter-medium text-[#6A6A6A]">
+                <Text className="text-[11px] font-inter-medium text-[#222222]">
                   To Pay
                 </Text>
-                <Text className="text-[18px] font-inter-extrabold text-[#1A1C1E]">
+                <Text className="text-[18px] font-inter-extrabold text-[#222222]">
                   ₹{Number(toPay).toFixed(2)}
                 </Text>
               </View>
