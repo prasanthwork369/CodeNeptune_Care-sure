@@ -1,15 +1,5 @@
-import {
-  Inter_100Thin,
-  Inter_200ExtraLight,
-  Inter_300Light,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_800ExtraBold,
-  Inter_900Black,
-  useFonts,
-} from "@expo-google-fonts/inter";
+import "../src/utils/patchText";
+import "../src/utils/logBoxIgnore";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as NavigationBar from 'expo-navigation-bar';
@@ -17,18 +7,11 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Image, LogBox, Platform, View } from "react-native";
+import { Image, Platform, View } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
-LogBox.ignoreLogs([
-  'Cannot record touch end without a touch start',
-  '`setPositionAsync` is not supported with edge-to-edge enabled.',
-  '`setBackgroundColorAsync` is not supported with edge-to-edge enabled.',
-  'Looks like you have configured linking in multiple places.',
-]);
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
@@ -38,10 +21,15 @@ import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
+import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useAuthStore } from "@/src/store/authStore";
+import { disableTextInputFontScaling } from "@/src/utils/disableFontScaling";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
 import "../global.css";
+
+// Text scaling is already forced off in patchText.ts; TextInput needs its own opt-out.
+disableTextInputFontScaling();
 
 initDb();
 
@@ -61,20 +49,11 @@ const SPLASH_LOGO = require('../assets/images/splash-icon.png');
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    "Inter-Thin": Inter_100Thin,
-    "Inter-ExtraLight": Inter_200ExtraLight,
-    "Inter-Light": Inter_300Light,
-    "Inter-Regular": Inter_400Regular,
-    "Inter-Medium": Inter_500Medium,
-    "Inter-SemiBold": Inter_600SemiBold,
-    "Inter-Bold": Inter_700Bold,
-    "Inter-ExtraBold": Inter_800ExtraBold,
-    "Inter-Black": Inter_900Black,
-  });
 
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
+
+  const interFontsLoaded = useAndroidInterFonts();
 
   useEffect(() => {
     initialize();
@@ -100,12 +79,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if ((loaded || error) && isAuthLoaded) {
+    if (isAuthLoaded && interFontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error, isAuthLoaded]);
+  }, [isAuthLoaded, interFontsLoaded]);
 
-  if ((!loaded && !error) || !isAuthLoaded) {
+  if (!isAuthLoaded || !interFontsLoaded) {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
         <Image source={SPLASH_LOGO} style={{ width: 200, height: 200 }} resizeMode="contain" />

@@ -63,21 +63,21 @@ module.exports = {
         "body-lg": ["17px", { lineHeight: "24px" }],
         body: ["15px", { lineHeight: "22px" }],
         "body-sm": ["13px", { lineHeight: "20px" }],
-        caption: ["12px", { lineHeight: "18px" }],
-        button: ["16px", { lineHeight: "22px", letterSpacing: "0.2px" }],
+      // Removed custom fontFamily configurations. 
+      // The app now uses the default system fonts (SF Pro on iOS, Roboto on Android).
       },
-      fontFamily: {
-        "inter-thin": ["Inter-Thin"],
-        "inter-extralight": ["Inter-ExtraLight"],
-        "inter-light": ["Inter-Light"],
-        "inter": ["Inter-Regular"],
-        "inter-medium": ["Inter-Medium"],
-        "inter-semibold": ["Inter-SemiBold"],
-        "inter-bold": ["Inter-Bold"],
-        "inter-extrabold": ["Inter-ExtraBold"],
-        "inter-black": ["Inter-Black"],
+      fontWeight: {
+        "inter-thin": "100",
+        "inter-extralight": "200",
+        "inter-light": "300",
+        "inter": "400",
+        "inter-medium": "500",
+        "inter-semibold": "600",
+        "inter-bold": "700",
+        "inter-extrabold": "800",
+        "inter-black": "900",
       },
     },
   },
   plugins: [],
-}
+};

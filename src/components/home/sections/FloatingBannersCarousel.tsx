@@ -15,6 +15,7 @@ import Animated, {
   withTiming
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
@@ -58,7 +59,7 @@ export const FloatingBannersCarousel = ({
   isFocused?: boolean;
 }) => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
   const { isTabBarVisible } = useUIStore();
@@ -245,9 +246,6 @@ export const FloatingBannersCarousel = ({
 
   if (!isCartActive && !isRxActive) return null;
 
-  const adjustedBottom = Platform.OS === 'android'
-    ? (insets.bottom > 24 ? insets.bottom - 8 : insets.bottom)
-    : insets.bottom;
   const TAB_BAR_HEIGHT = 75 + adjustedBottom;
 
   return (

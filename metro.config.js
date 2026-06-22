@@ -37,4 +37,45 @@ config.resolver.assetExts.push('lottie');
 config.resolver.unstable_enablePackageExports = true;
 config.resolver.unstable_conditionNames = ['react-native', 'browser', 'import'];
 
+const defaultGetModulesRunBeforeMainModule = config.serializer?.getModulesRunBeforeMainModule;
+config.serializer = {
+  ...config.serializer,
+  getModulesRunBeforeMainModule: (entryPoint) => {
+    const defaultModules = typeof defaultGetModulesRunBeforeMainModule === 'function'
+      ? defaultGetModulesRunBeforeMainModule(entryPoint)
+      : [];
+    return [
+      ...defaultModules,
+      require.resolve('./src/utils/patchText.ts'),
+    ];
+  },
+};
+
+const PATCH_TEXT_PATH = path.resolve(__dirname, 'src/utils/patchText.ts');
+// Matches node_modules/react-native/Libraries/Text/Text.js regardless of how it was required
+// (deep import like 'react-native/Libraries/Text/Text', or the relative require inside
+// react-native's own index.js, e.g. require('./Libraries/Text/Text')).
+const RN_TEXT_FILE = /[\\/]react-native[\\/]Libraries[\\/]Text[\\/]Text\.js$/;
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // If the request is coming from our patch utility itself, do NOT redirect it!
+  // This breaks the loop when the utility imports the original Text component.
+  // Normalize to forward slashes first -- on Windows originModulePath uses backslashes,
+  // which would silently never match a forward-slash literal.
+  const origin = context.originModulePath ? context.originModulePath.replace(/\\/g, '/') : '';
+  if (origin.includes('src/utils/patchText')) {
+    return context.resolveRequest(context, moduleName, platform);
+  }
+
+  const result = context.resolveRequest(context, moduleName, platform);
+
+  // Redirect any resolution that lands on react-native's Text.js directly to our patch file,
+  // no matter whether the original request was a deep absolute import or a relative require.
+  if (result.type === 'sourceFile' && RN_TEXT_FILE.test(result.filePath)) {
+    return context.resolveRequest(context, PATCH_TEXT_PATH, platform);
+  }
+
+  return result;
+};
+
 module.exports = withNativeWind(config, { input: './global.css' });

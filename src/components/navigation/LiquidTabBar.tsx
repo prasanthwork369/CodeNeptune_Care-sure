@@ -1,21 +1,12 @@
 import { tabs } from "@/src/constants/data";
-import { useTabBarStore } from "@/src/store/useTabBarStore";
-import {
-  PILL_HEIGHT,
-  FAB_WIDTH,
-  BAR_HEIGHT,
-  ICON_SIZE,
-  UPLOAD_ICON,
-  ACTIVE_HEIGHT,
-  ACTIVE_RADIUS,
-  styles as tabStyles,
-} from "./LiquidTabBar.styles";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
+import { useTabBarStore } from "@/src/store/useTabBarStore";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNav } from "@/src/hooks/useNav";
 import React, {
   useCallback,
   useEffect,
@@ -23,7 +14,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Image, LayoutChangeEvent, Platform, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  LayoutChangeEvent,
+  Platform,
+  Pressable,
+  Text,
+  View
+} from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Easing,
@@ -37,7 +35,16 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  ACTIVE_HEIGHT,
+  ACTIVE_RADIUS,
+  BAR_HEIGHT,
+  FAB_WIDTH,
+  ICON_SIZE,
+  PILL_HEIGHT,
+  styles as tabStyles,
+  UPLOAD_ICON,
+} from "./LiquidTabBar.styles";
 
 const ACTIVE_BG = "#ECFDF5";
 const ACTIVE_ICON_COLOR = "#0F7635";
@@ -260,7 +267,18 @@ const TabItem = React.memo(
           [INACTIVE_ICON_COLOR, ACTIVE_ICON_COLOR],
         ),
         fontSize: tabStyles.tabLabel.fontSize,
-        fontFamily: w > 0.5 ? "Inter-Bold" : "Inter-Medium",
+        // This style is written straight to the native view from the UI thread, bypassing
+        // the global Text patch (src/utils/patchText.ts) -- so unlike everywhere else in the
+        // app, the real loaded font name must be set here directly instead of a numeric
+        // fontWeight. iOS keeps numeric fontWeight since SF Pro honors it natively.
+        fontFamily:
+          Platform.OS === "android"
+            ? w > 0.5
+              ? "Inter_700Bold"
+              : "Inter_500Medium"
+            : undefined,
+        fontWeight:
+          Platform.OS === "android" ? "normal" : w > 0.5 ? "700" : "500",
         marginTop: 4,
         textAlign: "center",
         width: "100%",
@@ -322,10 +340,7 @@ TabItem.displayName = "TabItem";
 // ─── Liquid Tab Bar ───────────────────────────────────────────────────────────
 
 const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
-  const insets = useSafeAreaInsets();
-  const adjustedBottom = Platform.OS === 'android'
-    ? (insets.bottom > 24 ? insets.bottom - 8 : insets.bottom)
-    : insets.bottom;
+  const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
   const { isTabBarVisible } = useUIStore();
   const { setTabBarHeight } = useTabBarStore();
@@ -454,25 +469,25 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     const gap = (PILL_HEIGHT - ACTIVE_HEIGHT) / 2;
     const start = Math.min(leaderX.value, followerX.value);
     const end = Math.max(leaderX.value, followerX.value);
-    
+
     // Interpolate left offset: corner gap on leftmost tab, small padding on middle/right tabs
     const startOffset = interpolate(
       start,
       [0, 1, 2],
       [gap, 3, 3],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
-    
+
     // Interpolate right offset: small padding on left/middle tabs, corner gap on rightmost tab
     const endOffset = interpolate(
       end,
       [0, 1, 2],
       [3, 3, gap],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
-    
+
     const stretch = (end - start) * tw;
-    
+
     return {
       transform: [
         { translateX: start * tw + startOffset },
@@ -525,61 +540,71 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
         style={[{ flex: 1, height: PILL_HEIGHT }, animatedTabBarContainerStyle]}
         pointerEvents="box-none"
       >
-        <GestureDetector gesture={gesture}>
-          <View
-            onLayout={onLayout}
-            style={{
-              height: PILL_HEIGHT,
-              borderRadius: PILL_HEIGHT / 2,
-              backgroundColor: "#fff",
-              shadowColor: "#919EAB",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.18,
-              shadowRadius: 12,
-              elevation: 4,
-              overflow: "hidden",
-            }}
-            className="flex-1 flex-row items-center mr-2.5"
-          >
-            {barWidth > 0 && (
-              <View
-                pointerEvents="none"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  borderRadius: PILL_HEIGHT / 2,
-                  overflow: "hidden",
-                }}
-              >
-                <Animated.View
-                  style={[
-                    animatedPillStyle,
-                    {
-                      position: "absolute",
-                      height: ACTIVE_HEIGHT,
-                      borderRadius: ACTIVE_RADIUS,
-                      top: (PILL_HEIGHT - ACTIVE_HEIGHT) / 2,
-                    },
-                  ]}
+        {/* Shadow lives on this outer view -- a sibling view with overflow:hidden would
+            clip its own shadow, so the rounded-corner clipping happens one level in.
+            boxShadow is used here instead of shadowColor/elevation because Android's
+            elevation only ever renders a directional drop shadow -- it can't produce
+            the even, all-around glow box-shadow: 0px 0px 20px 0px #00000026 calls for. */}
+        <View
+          style={{
+            height: PILL_HEIGHT,
+            borderRadius: PILL_HEIGHT / 2,
+            backgroundColor: "#fff",
+            boxShadow: "0px 0px 20px 0px #00000026",
+
+          }}
+          className="flex-1 mr-2.5"
+        >
+          <GestureDetector gesture={gesture}>
+            <View
+              onLayout={onLayout}
+              style={{
+                height: PILL_HEIGHT,
+                borderRadius: PILL_HEIGHT / 2,
+                overflow: "hidden",
+              }}
+              className="flex-1 flex-row items-center"
+            >
+              {barWidth > 0 && (
+                <View
+                  pointerEvents="none"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: PILL_HEIGHT / 2,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Animated.View
+                    style={[
+                      animatedPillStyle,
+                      {
+                        position: "absolute",
+                        height: ACTIVE_HEIGHT,
+                        borderRadius: ACTIVE_RADIUS,
+                        top: (PILL_HEIGHT - ACTIVE_HEIGHT) / 2,
+                      },
+                    ]}
+                  />
+                </View>
+              )}
+              {tabItems.map(({ route, index, tab }) => (
+                <TabItem
+                  key={route.key}
+                  index={index}
+                  icon={tab!.icon}
+                  activeIcon={tab!.activeIcon}
+                  label={tab!.title}
+                  followerX={followerX}
+                  pillOpacity={pillOpacity}
                 />
-              </View>
-            )}
-            {tabItems.map(({ route, index, tab }) => (
-              <TabItem
-                key={route.key}
-                index={index}
-                icon={tab!.icon}
-                activeIcon={tab!.activeIcon}
-                label={tab!.title}
-                followerX={followerX}
-                pillOpacity={pillOpacity}
-              />
-            ))}
-          </View>
-        </GestureDetector>
+              ))}
+            </View>
+          </GestureDetector>
+        </View>
       </Animated.View>
 
       <AnimatedUploadButton onPress={handleUploadPress} />

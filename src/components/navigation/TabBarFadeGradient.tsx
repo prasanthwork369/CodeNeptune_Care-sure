@@ -1,18 +1,10 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Platform } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 export const TabBarFadeGradient: React.FC = () => {
-  const insets = useSafeAreaInsets();
-
-  // Calculate adjusted bottom safe inset matching our tab bar alignment
-  const adjustedBottom =
-    Platform.OS === "android"
-      ? insets.bottom > 24
-        ? insets.bottom - 8
-        : insets.bottom
-      : insets.bottom;
+  const adjustedBottom = useAdjustedBottomInset();
 
   return (
     <LinearGradient
@@ -31,7 +23,7 @@ export const TabBarFadeGradient: React.FC = () => {
         right: 0,
         height:
           adjustedBottom +
-          (Platform.OS === "android" && insets.bottom > 24 ? 34 : 24),
+          (Platform.OS === "android" ? 34 : 24),
       }}
     />
   );
