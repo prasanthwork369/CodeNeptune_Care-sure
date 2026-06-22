@@ -1,17 +1,19 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { useCouponStore } from '@/src/store/couponStore';
+import { useToastStore } from '@/src/store/toastStore';
 import { useNav } from '@/src/hooks/useNav';
 import { useCoupons } from '@/src/hooks/queries/useCoupons';
 import { couponService } from '@/src/services/coupon.service';
 import { useCart } from '@/src/hooks/queries/useCart';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { CouponInput, CouponCard } from './sections';
 
 export const CouponsLayout: React.FC = () => {
     const [couponCode, setCouponCode] = useState('');
     const [validating, setValidating] = useState(false);
     const { apply } = useCouponStore();
+    const toast = useToastStore();
     const router = useNav();
     const { totalPrice: subtotal } = useCart();
     const { data: coupons = [], isLoading } = useCoupons();
@@ -26,10 +28,10 @@ export const CouponsLayout: React.FC = () => {
                 apply({ code: trimmed, discount: Number(result.discount) || 0, description: result.message ?? '' });
                 router.back();
             } else {
-                Alert.alert('Coupon Invalid', result.message ?? 'This coupon is not valid or has expired.');
+                toast.show(result.message ?? 'This coupon is not valid or has expired.', 'error');
             }
         } catch {
-            Alert.alert('Error', 'Could not validate coupon. Please try again.');
+            toast.show('Could not validate coupon. Please try again.', 'error');
         } finally {
             setValidating(false);
         }
