@@ -4,7 +4,7 @@ export const iconSize = 64;
 
 export const styles = StyleSheet.create({
   title: {
-    fontFamily: "Inter-Bold",
+    fontWeight: "700",
     fontSize: 16,
     lineHeight: 14,
     letterSpacing: 0,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   itemLabel: {
-    fontFamily: "Inter-Medium",
+    fontWeight: "500",
     fontSize: 14,
     lineHeight: 20,
     letterSpacing: 0,

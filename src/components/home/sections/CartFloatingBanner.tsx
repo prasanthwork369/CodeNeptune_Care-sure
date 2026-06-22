@@ -208,7 +208,7 @@ export const CartFloatingBanner = ({
                     <Animated.View style={[BUTTON_STATIC, buttonAnimatedStyle]}>
                       <AnimatedText
                         style={[
-                          { color: "white", fontFamily: "Inter-Bold" },
+                          { color: "white", fontWeight: "700" },
                           buttonTextAnimatedStyle,
                         ]}
                       >
@@ -216,7 +216,7 @@ export const CartFloatingBanner = ({
                       </AnimatedText>
                       <AnimatedText
                         style={[
-                          { color: "white", fontFamily: "Inter-SemiBold" },
+                          { color: "white", fontWeight: "600" },
                           itemCountAnimatedStyle,
                         ]}
                       >

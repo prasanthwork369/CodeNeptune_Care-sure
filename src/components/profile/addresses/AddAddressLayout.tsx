@@ -69,7 +69,7 @@ const Field = React.forwardRef<
       <Text
         style={{
           fontSize: 13,
-          fontFamily: "Inter-SemiBold",
+          fontWeight: "600",
           color: "#222222",
           marginBottom: 8,
         }}
@@ -99,7 +99,7 @@ const Field = React.forwardRef<
         <Text
           style={{
             fontSize: 12,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#EF4444",
             marginTop: 4,
           }}
@@ -456,7 +456,7 @@ export const AddAddressLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#222222",
                 marginBottom: 8,
               }}

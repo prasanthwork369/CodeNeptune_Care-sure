@@ -19,7 +19,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
             colors={['#FCEBFE', '#FFFFFF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
-            className="px-4 pt-4 pb-4"
+            style={{padding: 16 }}
         >
             <Text className="text-[17px] font-inter-bold mb-4 pl-1" style={{ color: '#6B2A75' }}>
                 Know Your Medicine

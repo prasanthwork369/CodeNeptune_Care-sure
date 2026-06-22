@@ -1,9 +1,19 @@
-export const LIVE = false;
+// Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
+// Set EXPO_PUBLIC_API_ENV=production in .env.local to point the app at the live API.
+// Unset (or any other value) falls back to QA, so this stays safe by default.
+const PROD_URL = process.env.EXPO_PUBLIC_API_BASE_URL_PROD;
+const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
 
-const PROD_URL = "https://care-sure-api-gateway.onrender.com";
-const QA_URL = "https://qa-csapi.codeneptune.com";
+const resolvedBaseUrl =
+  process.env.EXPO_PUBLIC_API_ENV === "qa" ? PROD_URL : QA_URL;
 
-export const API_BASE_URL = LIVE ? PROD_URL : QA_URL;
+if (!resolvedBaseUrl) {
+  throw new Error(
+    "Missing API base URL: set EXPO_PUBLIC_API_BASE_URL_PROD and EXPO_PUBLIC_API_BASE_URL_QA in .env.local (see .env.example).",
+  );
+}
+
+export const API_BASE_URL = resolvedBaseUrl;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
 /** Prefixes a relative backend path (e.g. "/uploads/icon.png") with the API base URL. */

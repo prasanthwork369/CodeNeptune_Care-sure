@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 // ─── Data transformers ────────────────────────────────────────────────────────
 
@@ -78,7 +78,7 @@ const toRecommendData = (item: ApiSearchMedicine) => ({
 
 export const SearchPageLayout = () => {
     const router = useNav();
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
     const { width } = useWindowDimensions();
     const colWidth = (width - 32) / 2;
 
@@ -149,7 +149,7 @@ export const SearchPageLayout = () => {
                 <SearchResultsList
                     results={results}
                     colWidth={colWidth}
-                    bottomPad={insets.bottom + 24}
+                    bottomPad={adjustedBottom + 24}
                     toComparisonData={toComparisonData}
                     toRecommendData={toRecommendData}
                     onRecommendPress={(productId) => router.push({ pathname: '/product/[id]', params: { id: productId } } as any)}

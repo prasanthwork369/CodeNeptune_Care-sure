@@ -5,7 +5,7 @@ import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
@@ -18,7 +18,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const RELATIONSHIPS = ["Self", "Wife", "Husband", "Mother", "Father", "Other"];
 const GENDERS = [
@@ -42,7 +42,7 @@ const input: object = {
   paddingHorizontal: 16,
   paddingVertical: 14,
   fontSize: 14,
-  fontFamily: "Inter_500Medium",
+  fontWeight: "500",
   color: "#1A1C1E",
   backgroundColor: "#fff",
   marginBottom: 18,
@@ -57,7 +57,7 @@ const errorText: object = {
 
 export const AddPatientLayout: React.FC = () => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { members, addMember, updateMember } = useFamilyMembers();
   const isOffline = useIsOffline();
@@ -158,7 +158,7 @@ export const AddPatientLayout: React.FC = () => {
           contentContainerStyle={{
             paddingHorizontal: 20,
             paddingTop: 8,
-            paddingBottom: insets.bottom + 90,
+            paddingBottom: adjustedBottom + 90,
           }}
           className="flex-1"
         >
@@ -187,7 +187,7 @@ export const AddPatientLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Inter_500Medium",
+                fontWeight: "500",
                 color: "#1A1C1E",
                 marginRight: 8,
               }}
@@ -207,7 +207,7 @@ export const AddPatientLayout: React.FC = () => {
               style={{
                 flex: 1,
                 fontSize: 14,
-                fontFamily: "Inter_500Medium",
+                fontWeight: "500",
                 color: "#1A1C1E",
                 height: "100%",
               }}
@@ -249,7 +249,7 @@ export const AddPatientLayout: React.FC = () => {
                   <Text
                     style={{
                       fontSize: 13,
-                      fontFamily: "Inter_500Medium",
+                      fontWeight: "500",
                       color: sel ? "#0F7635" : "#6A6A6A",
                     }}
                   >
@@ -306,7 +306,7 @@ export const AddPatientLayout: React.FC = () => {
               style={{
                 flex: 1,
                 fontSize: 14,
-                fontFamily: "Inter_500Medium",
+                fontWeight: "500",
                 color: dob ? "#1A1C1E" : "#919EAB",
               }}
             >
@@ -315,25 +315,18 @@ export const AddPatientLayout: React.FC = () => {
             <icons.calendar_month width={20} height={20} fill="#919EAB" />
           </Touchable>
           {errors.dob && <Text style={errorText}>{errors.dob}</Text>}
-          {showDatePicker && (
-            <DateTimePicker
-              value={dobDate}
-              mode="date"
-              display="default"
-              maximumDate={maxDob}
-              onChange={(_, selected) => {
-                setShowDatePicker(false);
-                if (selected) {
-                  setDobDate(selected);
-                  const d = selected.getDate().toString().padStart(2, "0");
-                  const m = (selected.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0");
-                  setDob(`${selected.getFullYear()}-${m}-${d}`);
-                }
-              }}
-            />
-          )}
+          <DatePickerModal
+            visible={showDatePicker}
+            value={dobDate}
+            maximumDate={maxDob}
+            onClose={() => setShowDatePicker(false)}
+            onChange={(selected) => {
+              setDobDate(selected);
+              const d = selected.getDate().toString().padStart(2, "0");
+              const m = (selected.getMonth() + 1).toString().padStart(2, "0");
+              setDob(`${selected.getFullYear()}-${m}-${d}`);
+            }}
+          />
 
           <Text className={labelStyle}>Gender</Text>
           <View
@@ -372,7 +365,7 @@ export const AddPatientLayout: React.FC = () => {
                   <Text
                     style={{
                       fontSize: 11,
-                      fontFamily: "Inter_500Medium",
+                      fontWeight: "500",
                       color: sel ? "#0F7635" : "#6A6A6A",
                     }}
                   >
@@ -398,7 +391,7 @@ export const AddPatientLayout: React.FC = () => {
 
         <View
           className="absolute bottom-0 left-0 right-0 px-5 bg-[#F5F6FB]"
-          style={{ paddingBottom: Math.max(insets.bottom, 20) + 4 }}
+          style={{ paddingBottom: Math.max(adjustedBottom, 20) + 4 }}
         >
           <Touchable
             activeOpacity={0.85}
@@ -415,7 +408,7 @@ export const AddPatientLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 15,
-                fontFamily: "Inter_600SemiBold",
+                fontWeight: "600",
                 color: "#fff",
               }}
             >

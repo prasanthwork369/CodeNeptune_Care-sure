@@ -20,6 +20,7 @@ import {
     View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const PAYMENT_METHODS = [
   {
@@ -63,6 +64,7 @@ const RadioDot = ({ selected }: { selected: boolean }) => (
 export const PaymentLayout: React.FC = () => {
   const router = useNav();
   const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const {
     toPay = "0",
     patientMemberId = "",
@@ -204,7 +206,7 @@ export const PaymentLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           padding: 16,
-          paddingBottom: insets.bottom + 100,
+          paddingBottom: adjustedBottom + 100,
         }}
       >
         <View
@@ -236,7 +238,7 @@ export const PaymentLayout: React.FC = () => {
           <Text
             style={{
               fontSize: 18,
-              fontFamily: "Inter-Bold",
+              fontWeight: "700",
               color: "#1A1C1E",
             }}
           >
@@ -263,7 +265,7 @@ export const PaymentLayout: React.FC = () => {
           <Text
             style={{
               fontSize: 14,
-              fontFamily: "Inter-Medium",
+              fontWeight: "500",
               color: "rgba(255,255,255,0.8)",
               letterSpacing: 0.5,
             }}
@@ -280,7 +282,7 @@ export const PaymentLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 24,
-                fontFamily: "Inter-Bold",
+                fontWeight: "700",
                 color: "#fff",
                 marginRight: 4,
               }}
@@ -290,7 +292,7 @@ export const PaymentLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 42,
-                fontFamily: "Inter-ExtraBold",
+                fontWeight: "800",
                 color: "#fff",
               }}
             >
@@ -311,7 +313,7 @@ export const PaymentLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#fff",
                 marginLeft: 8,
               }}
@@ -325,7 +327,7 @@ export const PaymentLayout: React.FC = () => {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Inter-Bold",
+              fontWeight: "700",
               color: "#1A1C1E",
               marginBottom: 12,
               marginLeft: 4,
@@ -371,7 +373,7 @@ export const PaymentLayout: React.FC = () => {
               <Text
                 style={{
                   fontSize: 14,
-                  fontFamily: "Inter-Bold",
+                  fontWeight: "700",
                   color: "#1A1C1E",
                 }}
               >
@@ -382,7 +384,7 @@ export const PaymentLayout: React.FC = () => {
               <Text
                 style={{
                   fontSize: 13,
-                  fontFamily: "Inter-Medium",
+                  fontWeight: "500",
                   color: "#6B7280",
                   marginTop: 4,
                 }}
@@ -412,7 +414,7 @@ export const PaymentLayout: React.FC = () => {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Inter-Bold",
+              fontWeight: "700",
               color: "#1A1C1E",
               marginBottom: 12,
               marginLeft: 4,
@@ -457,7 +459,7 @@ export const PaymentLayout: React.FC = () => {
                   <Text
                     style={{
                       fontSize: 15,
-                      fontFamily: "Inter-Bold",
+                      fontWeight: "700",
                       color: "#1A1C1E",
                     }}
                   >
@@ -466,7 +468,7 @@ export const PaymentLayout: React.FC = () => {
                   <Text
                     style={{
                       fontSize: 12,
-                      fontFamily: "Inter-Medium",
+                      fontWeight: "500",
                       color: "#6B7280",
                       marginTop: 4,
                     }}
@@ -488,7 +490,7 @@ export const PaymentLayout: React.FC = () => {
           left: 0,
           right: 0,
           padding: 20,
-          paddingBottom: insets.bottom + 10,
+          paddingBottom: adjustedBottom + 10,
           backgroundColor: "#fff",
           borderTopLeftRadius: 32,
           borderTopRightRadius: 32,
@@ -524,7 +526,7 @@ export const PaymentLayout: React.FC = () => {
                 <Text
                   style={{
                     fontSize: 17,
-                    fontFamily: "Inter-Bold",
+                    fontWeight: "700",
                     color: "#fff",
                   }}
                 >

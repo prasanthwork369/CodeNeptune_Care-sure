@@ -17,7 +17,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { MyOrdersSkeleton } from "./MyOrdersSkeleton";
 import { orderStyles as s } from "./orders.styles";
 
@@ -244,7 +244,7 @@ function OrderCard({ order }: { order: Order }) {
                   style={[
                     s.labelMd,
                     {
-                      fontFamily: "Inter_600SemiBold",
+                      fontWeight: "600",
                       color: "#222222",
                     },
                   ]}
@@ -351,7 +351,7 @@ function OrderCard({ order }: { order: Order }) {
 }
 
 export const MyOrdersLayout: React.FC = () => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const [activeTab, setActiveTab] = useState<OrderTabKey>("all");
 
   const statusParam =
@@ -399,7 +399,7 @@ export const MyOrdersLayout: React.FC = () => {
                 style={[
                   s.labelMd,
                   {
-                    fontFamily: isActive ? "Inter-Bold" : "Inter-Medium",
+                    fontWeight: isActive ? "700" : "500",
                     color: isActive ? "#0F7635" : "#6A6A6A",
                   },
                 ]}
@@ -432,7 +432,7 @@ export const MyOrdersLayout: React.FC = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingTop: 12,
-            paddingBottom: insets.bottom + 24,
+            paddingBottom: adjustedBottom + 24,
             flexGrow: 1,
           }}
           refreshControl={
@@ -457,7 +457,7 @@ export const MyOrdersLayout: React.FC = () => {
                 style={[
                   s.labelLg,
                   {
-                    fontFamily: "Inter_600SemiBold",
+                    fontWeight: "600",
                     color: "#6A6A6A",
                   },
                 ]}
@@ -468,7 +468,7 @@ export const MyOrdersLayout: React.FC = () => {
                 style={[
                   s.labelSm,
                   {
-                    fontFamily: "Inter_400Regular",
+                    fontWeight: "400",
                     color: "#6A6A6A",
                     marginTop: 6,
                   },

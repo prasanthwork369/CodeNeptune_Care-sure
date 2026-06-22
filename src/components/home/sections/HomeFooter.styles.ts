@@ -3,7 +3,7 @@ import { moderateScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     label: {
-        fontFamily: 'Inter-Medium',
+        fontWeight: '500',
         fontSize: 14,
         lineHeight: 20,
         letterSpacing: 0,

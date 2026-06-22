@@ -9,7 +9,7 @@ import { FamilyMember } from "@/src/types/familyMember";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
     CallMethodCard,
     ChooseMethodFooter,
@@ -19,7 +19,7 @@ import {
 
 export const ChooseMethodLayout: React.FC = () => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { toPay = "1100", skipRx } = useLocalSearchParams<{
     toPay: string;
     skipRx?: string;
@@ -100,7 +100,7 @@ export const ChooseMethodLayout: React.FC = () => {
 
       <ChooseMethodFooter
         toPay={toPay}
-        safeAreaBottom={insets.bottom}
+        safeAreaBottom={adjustedBottom}
         canProceed={
           !!selectedOption && (selectedOption === "upload" || !membersLoading)
         }

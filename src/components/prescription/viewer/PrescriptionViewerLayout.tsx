@@ -16,11 +16,11 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 export const PrescriptionViewerLayout: React.FC = () => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width, height } = useWindowDimensions();
   const [containerHeight, setContainerHeight] = useState(0);
   const onContainerLayout = (e: LayoutChangeEvent) =>
@@ -174,7 +174,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
       {source !== "view_only" && (
         <View
           className="flex-row gap-3 px-5 pt-3 bg-white border-t border-[#EEEFF1]"
-          style={{ paddingBottom: insets.bottom + 12 }}
+          style={{ paddingBottom: adjustedBottom + 12 }}
         >
           <Touchable
             onPress={handleSelect}

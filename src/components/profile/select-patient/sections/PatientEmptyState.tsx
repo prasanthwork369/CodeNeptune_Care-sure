@@ -14,10 +14,10 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
                 style={{ width: 220, height: 220, marginBottom: 24 }}
                 resizeMode="contain"
             />
-            <Text style={{ fontSize: 22, fontFamily: 'Inter-Bold', color: '#1C2024', marginBottom: 10, textAlign: 'center' }}>
+            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C2024', marginBottom: 10, textAlign: 'center' }}>
                 No Patients Added Yet
             </Text>
-            <Text style={{ fontSize: 14, fontFamily: 'Inter-Regular', color: '#637381', textAlign: 'center', lineHeight: 20, marginBottom: 28, maxWidth: 280 }}>
+            <Text style={{ fontSize: 14, fontWeight: '400', color: '#637381', textAlign: 'center', lineHeight: 20, marginBottom: 28, maxWidth: 280 }}>
                 Patient details help doctors provide better care
             </Text>
             <Touchable
@@ -38,8 +38,8 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
                     elevation: 4,
                 }}
             >
-                <Text style={{ fontSize: 18, color: '#fff', fontFamily: 'Inter-Bold', marginTop: -2 }}>+</Text>
-                <Text style={{ fontSize: 15, fontFamily: 'Inter-SemiBold', color: '#fff' }}>
+                <Text style={{ fontSize: 18, color: '#fff', fontWeight: '700', marginTop: -2 }}>+</Text>
+                <Text style={{ fontSize: 15, fontWeight: '600', color: '#fff' }}>
                     Add Patient
                 </Text>
             </Touchable>

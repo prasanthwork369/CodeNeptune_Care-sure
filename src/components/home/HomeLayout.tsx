@@ -1,17 +1,17 @@
 import {
-    BannerCarousel,
-    FloatingBannersCarousel,
-    FrequentSubstitutes,
-    HealthEssentials,
-    HeroBanner,
-    HomeFooter,
-    HomeHeader,
-    LocationBottomSheet,
-    QuickActions,
-    SearchBar,
-    ShopByCategories,
-    SmartSubstitution,
-    WhyFamiliesTrustUs,
+  BannerCarousel,
+  FloatingBannersCarousel,
+  FrequentSubstitutes,
+  HealthEssentials,
+  HeroBanner,
+  HomeFooter,
+  HomeHeader,
+  LocationBottomSheet,
+  QuickActions,
+  SearchBar,
+  ShopByCategories,
+  SmartSubstitution,
+  WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { TabBarFadeGradient } from "@/src/components/navigation/TabBarFadeGradient";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -23,6 +23,7 @@ import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useFeaturedSubcategories } from "@/src/hooks/queries/useFeaturedSubcategories";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { useHomeScroll } from "@/src/hooks/ui/useHomeScroll";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
@@ -35,18 +36,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-    Platform,
-    RefreshControl,
-    ScrollView,
-    View,
-    useWindowDimensions,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -77,6 +78,7 @@ function useSlideUp(delayMs: number) {
 export const HomeLayout: React.FC = () => {
   const router = useNav();
   const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width, height } = useWindowDimensions();
 
   const [isLocationSheetVisible, setIsLocationSheetVisible] = useState(false);
@@ -149,9 +151,12 @@ export const HomeLayout: React.FC = () => {
   const { scrollY, handleScroll, stickySearchVisible } =
     useHomeScroll(heroHeightRef);
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
-  const adjustedBottom = Platform.OS === 'android'
-    ? (insets.bottom > 24 ? insets.bottom - 8 : insets.bottom)
-    : insets.bottom;
+  const adjustedBottoms =
+    Platform.OS === "android"
+      ? adjustedBottom > 24
+        ? adjustedBottom - 8
+        : adjustedBottom
+      : adjustedBottom;
   const TAB_BAR_HEIGHT = 75 + adjustedBottom;
 
   useEffect(() => {
@@ -241,6 +246,11 @@ export const HomeLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1"
+        bounces={false}
+        alwaysBounceVertical={false}
+        overScrollMode="never"
+        style={{ backgroundColor: "#FFFFFF" }}
+        contentContainerStyle={{ backgroundColor: "#FFFFFF", flexGrow: 1 }}
         onScroll={handleCombinedScroll}
         scrollEventThrottle={16}
         stickyHeaderIndices={[1]}
@@ -250,6 +260,7 @@ export const HomeLayout: React.FC = () => {
             onRefresh={onRefresh}
             tintColor="#36B37E"
             colors={["#36B37E"]}
+            progressBackgroundColor="#FFFFFF"
             progressViewOffset={insets.top + 30}
           />
         }

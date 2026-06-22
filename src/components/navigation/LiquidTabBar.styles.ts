@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
   uploadText: {
     fontSize: moderateScale(13, 0.25),
     color: "white",
-    fontFamily: "Inter-Bold",
+    fontWeight: "700",
     textAlign: "center",
     lineHeight: moderateScale(16, 0.25),
   },

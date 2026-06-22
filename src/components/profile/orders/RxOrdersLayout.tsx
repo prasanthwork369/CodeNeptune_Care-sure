@@ -35,7 +35,6 @@ const GradientText: React.FC<{ text: string }> = ({ text }) => {
         fill="url(#rg)"
         stroke="url(#rg)"
         strokeWidth={0.3}
-        fontFamily="Inter"
         fontWeight="700"
         x={0}
         y={12}
@@ -192,7 +191,7 @@ const OptionsPanel: React.FC<{
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#222222",
             marginLeft: 12,
           }}
@@ -215,7 +214,7 @@ const OptionsPanel: React.FC<{
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#222222",
             marginLeft: 12,
           }}
@@ -238,7 +237,7 @@ const OptionsPanel: React.FC<{
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#222222",
             marginLeft: 12,
           }}
@@ -263,7 +262,7 @@ const OptionsPanel: React.FC<{
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#C22307",
             marginLeft: 12,
           }}
@@ -365,7 +364,7 @@ const PrescriptionCard = ({
           <Text
             style={{
               fontSize: 11,
-              fontFamily: "Inter-SemiBold",
+              fontWeight: "600",
               color: statusStyle.text,
             }}
           >

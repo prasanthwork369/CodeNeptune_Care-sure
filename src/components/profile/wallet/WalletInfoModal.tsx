@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface WalletInfoModalProps {
     isVisible: boolean;
@@ -10,7 +10,7 @@ interface WalletInfoModalProps {
 }
 
 export const WalletInfoModal: React.FC<WalletInfoModalProps> = ({ isVisible, onClose }) => {
-    const { bottom } = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
 
     return (
         <GorhomBottomSheet
@@ -18,7 +18,7 @@ export const WalletInfoModal: React.FC<WalletInfoModalProps> = ({ isVisible, onC
             onClose={onClose}
             backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
-            <BottomSheetView className="p-8" style={{ paddingBottom: Math.max(bottom + 24, 40) }}>
+            <BottomSheetView className="p-8" style={{ paddingBottom: Math.max(adjustedBottom + 24, 40) }}>
                 <Text className="text-[18px] font-inter-bold text-[#212B36] mb-6">
                     How Your Balance Is Used
                 </Text>

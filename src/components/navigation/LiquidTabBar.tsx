@@ -375,6 +375,21 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     });
   }, [isTabBarVisible]);
 
+  // Android: the active tab label's custom Inter typeface (set via useAnimatedStyle in
+  // TabItem) can fail to resolve on the very first paint -- the native Text view is
+  // created before the font is queryable in Android's typeface cache, and only a real
+  // prop update (like tapping a tab) re-resolves it correctly. Nudging followerX by an
+  // imperceptible amount forces that same native update once, right after mount, so the
+  // active label renders bold immediately instead of only after the first tap.
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    const id = requestAnimationFrame(() => {
+      followerX.value = lastValidIndex.current + 0.0001;
+      followerX.value = lastValidIndex.current;
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   useEffect(() => {
     if (activePillIndex !== -1) {
       pillOpacity.value = withSpring(1, SNAP_SPRING);

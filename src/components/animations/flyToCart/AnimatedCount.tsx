@@ -43,7 +43,7 @@ export const AnimatedCount: React.FC<AnimatedCountProps> = ({ count }) => {
           {
             color: "#fff",
             fontSize: 11.5,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             opacity: 0.9,
             lineHeight: 14,
           },
@@ -55,7 +55,7 @@ export const AnimatedCount: React.FC<AnimatedCountProps> = ({ count }) => {
         style={{
           color: "#fff",
           fontSize: 11.5,
-          fontFamily: "Inter-Medium",
+          fontWeight: "500",
           opacity: 0.9,
           marginLeft: 4,
           lineHeight: 14,

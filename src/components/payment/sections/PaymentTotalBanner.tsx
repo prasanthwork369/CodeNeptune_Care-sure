@@ -21,16 +21,16 @@ export const PaymentTotalBanner: React.FC<PaymentTotalBannerProps> = ({ toPay })
                 elevation: 8 
             }}
         >
-            <Text style={{ fontSize: 14, fontFamily: 'Inter-Medium', color: 'rgba(255,255,255,0.8)', letterSpacing: 0.5 }}>
+            <Text style={{ fontSize: 14, fontWeight: '500', color: 'rgba(255,255,255,0.8)', letterSpacing: 0.5 }}>
                 Total Amount to Pay
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 8 }}>
-                <Text style={{ fontSize: 24, fontFamily: 'Inter-Bold', color: '#fff', marginRight: 4 }}>₹</Text>
-                <Text style={{ fontSize: 42, fontFamily: 'Inter-ExtraBold', color: '#fff' }}>{toPay}</Text>
+                <Text style={{ fontSize: 24, fontWeight: '700', color: '#fff', marginRight: 4 }}>₹</Text>
+                <Text style={{ fontSize: 42, fontWeight: '800', color: '#fff' }}>{toPay}</Text>
             </View>
             <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.15)', flexDirection: 'row', alignItems: 'center' }}>
                 <MaterialIcons name="verified-user" size={16} color="#fff" />
-                <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: '#fff', marginLeft: 8 }}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#fff', marginLeft: 8 }}>
                     Safe & Secure Transaction
                 </Text>
             </View>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { Skeleton } from '@/src/components/ui/Skeleton';
 
 function OrderCardSkeleton() {
@@ -69,7 +69,7 @@ function OrderCardSkeleton() {
 }
 
 export const MyOrdersSkeleton: React.FC = () => {
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
 
     return (
         <ScrollView
@@ -77,7 +77,7 @@ export const MyOrdersSkeleton: React.FC = () => {
             scrollEnabled={false}
             contentContainerStyle={{
                 paddingTop: 12,
-                paddingBottom: insets.bottom + 24,
+                paddingBottom: adjustedBottom + 24,
             }}
         >
             <OrderCardSkeleton />

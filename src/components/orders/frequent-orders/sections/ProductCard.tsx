@@ -171,7 +171,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#1C2024",
                 flex: 1,
                 paddingRight: 8,
@@ -185,7 +185,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
               <Text
                 style={{
                   fontSize: 14,
-                  fontFamily: "Inter-Bold",
+                  fontWeight: "700",
                   color: "#0F7635",
                 }}
               >
@@ -196,7 +196,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
                   <Text
                     style={{
                       fontSize: 11,
-                      fontFamily: "Inter-Regular",
+                      fontWeight: "400",
                       color: "#919EAB",
                       textDecorationLine: "line-through",
                       marginTop: 2,
@@ -213,7 +213,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: 11,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#637381",
                 marginTop: 4,
                 marginBottom: 8,
@@ -238,7 +238,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#1C2024",
               }}
             >
@@ -263,16 +263,16 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
       {cartItem ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635', height: CART_BUTTON_HEIGHT }}>
           <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 20, color: '#fff', fontFamily: 'Inter-Medium', lineHeight: 24 }}>−</Text>
+            <Text style={{ fontSize: 20, color: '#fff', fontWeight: '500', lineHeight: 24 }}>−</Text>
           </Touchable>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             {counterPending
               ? <ActivityIndicator size="small" color="#fff" />
-              : <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#fff' }}>{cartItem.quantity}</Text>
+              : <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>{cartItem.quantity}</Text>
             }
           </View>
           <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 20, color: '#fff', fontFamily: 'Inter-Medium', lineHeight: 24 }}>+</Text>
+            <Text style={{ fontSize: 20, color: '#fff', fontWeight: '500', lineHeight: 24 }}>+</Text>
           </Touchable>
         </View>
       ) : (
@@ -284,7 +284,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
         >
           {isAdding
             ? <ActivityIndicator size="small" color="#0F7635" />
-            : <Text style={{ fontSize: 14, fontFamily: 'Inter-SemiBold', color: '#0F7635' }}>Add to cart</Text>
+            : <Text style={{ fontSize: 14, fontWeight: '600', color: '#0F7635' }}>Add to cart</Text>
           }
         </Touchable>
       )}
@@ -304,7 +304,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#0F7635",
               }}
             >
@@ -315,7 +315,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#637381",
                 marginLeft: item.orderedTimes ? 8 : 0,
               }}

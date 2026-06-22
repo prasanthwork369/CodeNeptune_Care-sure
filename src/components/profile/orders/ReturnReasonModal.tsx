@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Image, Text, View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 export type ReturnReason = {
     reason: string;
@@ -36,7 +36,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
     const [details, setDetails] = useState(initialData?.details || '');
     const [images, setImages] = useState<string[]>(initialData?.images || []);
 
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
 
     useEffect(() => {
         if (isVisible) {
@@ -79,7 +79,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
             backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
                         <BottomSheetScrollView
-                            style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 16 }}
+                            style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: Math.max(adjustedBottom, 16) + 16 }}
                             showsVerticalScrollIndicator={false}
                         >
 

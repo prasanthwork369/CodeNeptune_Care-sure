@@ -26,10 +26,10 @@ export const SavingsBanner: React.FC<SavingsBannerProps> = ({ amount }) => (
       resizeMode="contain"
     />
     <Text
-      style={{ fontSize: 14, fontFamily: "Inter-SemiBold", color: "#0A0A0A" }}
+      style={{ fontSize: 14, fontWeight: "600", color: "#0A0A0A" }}
     >
       {"You saved  "}
-      <Text style={{ fontFamily: "Inter-ExtraBold" }}>
+      <Text style={{ fontWeight: "800" }}>
         ₹{Number(amount).toFixed(0)}
       </Text>
       {" on this Order"}

@@ -18,7 +18,7 @@ import Animated, {
     withSpring,
     withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale, scale } from 'react-native-size-matters';
 
 // ── Confetti ──────────────────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ const ConfettiPiece: React.FC<PieceConfig & { screenH: number }> = ({
 
 export const OrderSuccessLayout: React.FC = () => {
     const router = useNav();
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
     const { width, height } = useWindowDimensions();
     const { orderId = '', total = '0' } = useLocalSearchParams<{ orderId: string; total: string }>();
 
@@ -154,7 +154,7 @@ export const OrderSuccessLayout: React.FC = () => {
                     overflow: 'hidden',
                     paddingTop: 28,
                     paddingHorizontal: 24,
-                    paddingBottom: insets.bottom + 24,
+                    paddingBottom: adjustedBottom + 24,
                     alignItems: 'center',
                 }]}>
                     {/* Confetti — clipped inside sheet by overflow:hidden */}
@@ -174,27 +174,27 @@ export const OrderSuccessLayout: React.FC = () => {
                         style={{ width: scale(160), height: scale(160) }}
                     />
 
-                    <Text style={{ fontSize: moderateScale(22, 0.3), fontFamily: 'Inter-ExtraBold', color: '#0F1724', marginTop: 8, textAlign: 'center' }}>
+                    <Text style={{ fontSize: moderateScale(22, 0.3), fontWeight: '800', color: '#0F1724', marginTop: 8, textAlign: 'center' }}>
                         Order Placed! 🎉
                     </Text>
-                    <Text style={{ fontSize: moderateScale(14, 0.3), fontFamily: 'Inter', color: '#6A6A6A', marginTop: 6, textAlign: 'center', lineHeight: moderateScale(20, 0.3) }}>
+                    <Text style={{ fontSize: moderateScale(14, 0.3), color: '#6A6A6A', marginTop: 6, textAlign: 'center', lineHeight: moderateScale(20, 0.3) }}>
                         {"Your medicines are on their way.\nWe'll keep you updated."}
                     </Text>
 
                     <View style={{ width: '100%', marginTop: 24, backgroundColor: '#F8FFF9', borderRadius: 16, borderWidth: 1, borderColor: '#0F763522', padding: 16, gap: 12 }}>
                         {orderId ? (
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Medium', color: '#6A6A6A' }}>Order ID</Text>
-                                <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Bold', color: '#1A1C1E' }}>{orderId.slice(-8).toUpperCase()}</Text>
+                                <Text style={{ fontSize: moderateScale(13, 0.3), fontWeight: '500', color: '#6A6A6A' }}>Order ID</Text>
+                                <Text style={{ fontSize: moderateScale(13, 0.3), fontWeight: '700', color: '#1A1C1E' }}>{orderId.slice(-8).toUpperCase()}</Text>
                             </View>
                         ) : null}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Medium', color: '#6A6A6A' }}>Amount Paid</Text>
-                            <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Bold', color: '#0F7635' }}>₹{Number(total).toFixed(2)}</Text>
+                            <Text style={{ fontSize: moderateScale(13, 0.3), fontWeight: '500', color: '#6A6A6A' }}>Amount Paid</Text>
+                            <Text style={{ fontSize: moderateScale(13, 0.3), fontWeight: '700', color: '#0F7635' }}>₹{Number(total).toFixed(2)}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Medium', color: '#6A6A6A' }}>Delivery</Text>
-                            <Text style={{ fontSize: moderateScale(13, 0.3), fontFamily: 'Inter-Bold', color: '#1A1C1E' }}>2–4 Business Days</Text>
+                            <Text style={{ fontSize: moderateScale(13, 0.3), fontWeight: '500', color: '#6A6A6A' }}>Delivery</Text>
+                            <Text style={{ fontSize: moderateScale(13, 0.3), fontWeight: '700', color: '#1A1C1E' }}>2–4 Business Days</Text>
                         </View>
                     </View>
 
@@ -204,14 +204,14 @@ export const OrderSuccessLayout: React.FC = () => {
                             onPress={() => router.replace('/profile/orders' as any)}
                             style={{ backgroundColor: '#0F7635', borderRadius: 14, paddingVertical: 16, alignItems: 'center' }}
                         >
-                            <Text style={{ fontSize: moderateScale(15, 0.3), fontFamily: 'Inter-Bold', color: '#fff' }}>Track My Order</Text>
+                            <Text style={{ fontSize: moderateScale(15, 0.3), fontWeight: '700', color: '#fff' }}>Track My Order</Text>
                         </Touchable>
                         <Touchable
                             activeOpacity={0.5}
                             onPress={() => router.replace('/(tabs)')}
                             style={{ borderRadius: 14, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' }}
                         >
-                            <Text style={{ fontSize: moderateScale(14, 0.3), fontFamily: 'Inter-SemiBold', color: '#374151' }}>Continue Shopping</Text>
+                            <Text style={{ fontSize: moderateScale(14, 0.3), fontWeight: '600', color: '#374151' }}>Continue Shopping</Text>
                             <icons.arrow_forward_ios width={12} height={12} fill="#374151" />
                         </Touchable>
                     </Animated.View>

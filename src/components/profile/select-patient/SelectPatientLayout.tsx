@@ -11,7 +11,7 @@ import { useLocalSearchParams } from "expo-router";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
     PatientContactInfo,
     PatientEmptyState,
@@ -26,7 +26,7 @@ import {
 
 export const SelectPatientLayout: React.FC = () => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const {
     toPay = "0",
     prescriptionId = "",
@@ -133,7 +133,7 @@ export const SelectPatientLayout: React.FC = () => {
             className="flex-1"
             contentContainerStyle={{
               padding: 16,
-              paddingBottom: insets.bottom + 90,
+              paddingBottom: adjustedBottom + 90,
             }}
           >
             <PatientPrescriptionPreview
@@ -196,7 +196,7 @@ export const SelectPatientLayout: React.FC = () => {
           <PatientSelectionFooter
             toPay={toPay}
             patientName={selectedPatient?.name ?? null}
-            safeAreaBottom={insets.bottom}
+            safeAreaBottom={adjustedBottom}
             onProceed={handleProceed}
           />
         </>

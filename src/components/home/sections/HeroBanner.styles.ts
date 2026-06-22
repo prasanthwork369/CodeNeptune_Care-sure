@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
   },
   titleText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
-    fontFamily: "Inter-ExtraBold",
+    fontWeight: "800",
     fontSize: moderateScale(20, 0.3),
     lineHeight: TITLE_LINE_HEIGHT,
     letterSpacing: 0,
@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
   },
   badgeText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
-    fontFamily: "Inter-SemiBold",
+    fontWeight: "600",
     fontSize: moderateScale(12, 0.3),
     lineHeight: moderateScale(12, 0.3),
     letterSpacing: 0,

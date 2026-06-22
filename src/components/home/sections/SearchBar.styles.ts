@@ -5,21 +5,21 @@ export const SEARCH_ICON_SIZE = scale(18);
 
 export const styles = StyleSheet.create({
   cyclerText: {
-    fontFamily: "Inter-Medium",
+    fontWeight: "500",
     fontSize: moderateScale(14, 0.3),
     lineHeight: moderateScale(18, 0.3),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   placeholderText: {
-    fontFamily: "Inter-Medium",
+    fontWeight: "500",
     fontSize: moderateScale(14, 0.3),
     lineHeight: moderateScale(18, 0.3),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   inputText: {
-    fontFamily: "Inter-Medium",
+    fontWeight: "500",
     fontSize: moderateScale(14, 0.3),
     lineHeight: moderateScale(18, 0.3),
     letterSpacing: 0,

@@ -5,7 +5,7 @@ import { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface CareSureCoinsSheetProps {
   isVisible: boolean;
@@ -22,7 +22,7 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
   savedAmount = 50,
   coinValue = 1,
 }) => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
 
   return (
     <GorhomBottomSheet
@@ -34,7 +34,7 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
         borderTopRightRadius: 12,
          }}
     >
-      <BottomSheetView style={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: Math.max(insets.bottom, 16) + 16 }}>
+      <BottomSheetView style={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: Math.max(adjustedBottom, 16) + 16 }}>
       <View className="border border-[#919EAB33] rounded-[20px] overflow-hidden bg-white">
         {/* Header Part with Gradient */}
         <LinearGradient

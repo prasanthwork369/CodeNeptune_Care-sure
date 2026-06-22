@@ -14,7 +14,7 @@ export const CartTerms: React.FC = () => {
     const [pressedLink, setPressedLink] = useState<LinkKey | null>(null);
 
     const linkStyle = (key: LinkKey, enabled?: string) => [
-        { fontFamily: 'Inter-Bold', color: '#222222', textDecorationLine: 'underline' as const },
+        { fontWeight: '700' as const, color: '#222222', textDecorationLine: 'underline' as const },
         {
             opacity: enabled ? 1 : 0.5,
             borderRadius: 6,

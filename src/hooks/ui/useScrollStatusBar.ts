@@ -22,8 +22,9 @@ export const useScrollStatusBar = (
 
   const safeAreaBgStyle = useAnimatedStyle(() => {
     const threshold = revealAfter ? revealAfter.value : 0;
+    const shouldShow = scrollY.value >= threshold || scrollY.value < 0;
     return {
-      opacity: scrollY.value >= threshold ? 1 : 0,
+      opacity: shouldShow ? 1 : 0,
       position: "absolute",
       top: 0,
       left: 0,

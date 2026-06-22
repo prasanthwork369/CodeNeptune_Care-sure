@@ -39,7 +39,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                             activeOpacity={0.85}
                             onPress={onContinue}
                         >
-                            <Text style={{ fontSize: 15, fontFamily: 'Inter_600SemiBold', color: '#fff', letterSpacing: 0.5 }}>
+                            <Text style={{ fontSize: 15, fontWeight: '600', color: '#fff', letterSpacing: 0.5 }}>
                                 Great
                             </Text>
                         </Touchable>

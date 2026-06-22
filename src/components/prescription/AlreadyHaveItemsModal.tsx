@@ -96,7 +96,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
           <Text
             style={{
               fontSize: 21,
-              fontFamily: "Inter-Bold",
+              fontWeight: "700",
               color: "#111827",
               textAlign: "center",
               marginBottom: 10,
@@ -111,7 +111,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
           <Text
             style={{
               fontSize: 14.5,
-              fontFamily: "Inter-Regular",
+              fontWeight: "400",
               color: "#6B7280",
               textAlign: "center",
               lineHeight: 22,
@@ -151,7 +151,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
                 <Text
                   style={{
                     fontSize: 15.5,
-                    fontFamily: "Inter-SemiBold",
+                    fontWeight: "600",
                     color: "#fff",
                   }}
                 >
@@ -179,7 +179,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
                 <Text
                   style={{
                     fontSize: 15.5,
-                    fontFamily: "Inter-SemiBold",
+                    fontWeight: "600",
                     color: "#1D4ED8",
                   }}
                 >

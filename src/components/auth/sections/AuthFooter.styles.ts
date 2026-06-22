@@ -6,12 +6,12 @@ export const styles = StyleSheet.create({
   icon: { width: scale(15), height: scale(15) },
   secureText: {
     fontSize: moderateScale(13, 0.3),
-    fontFamily: "Inter_500Medium",
+    fontWeight: "500",
     color: "#637381",
   },
   policyText: {
     fontSize: moderateScale(12, 0.3),
-    fontFamily: "Inter_500Medium",
+    fontWeight: "500",
     color: "#637381",
     textAlign: "center",
     paddingHorizontal: 8,
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
   },
   link: {
     color: "#0F7635",
-    fontFamily: "Inter_500Medium",
+    fontWeight: "500",
     textDecorationLine: "underline",
     fontSize: moderateScale(12, 0.3)
   },

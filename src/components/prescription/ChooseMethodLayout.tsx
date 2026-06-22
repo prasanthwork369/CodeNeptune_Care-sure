@@ -3,6 +3,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useChooseMethod } from "@/src/hooks/useChooseMethod";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -54,6 +55,7 @@ export const ChooseMethodLayout: React.FC = () => {
     handleEditPatient,
     handleDeletePatient,
   } = useChooseMethod();
+  const adjustedBottom = useAdjustedBottomInset();
 
   return (
     <View className="flex-1 bg-white">
@@ -88,7 +90,7 @@ export const ChooseMethodLayout: React.FC = () => {
                   style={{
                     color: "#fff",
                     fontSize: 12,
-                    fontFamily: "Inter_700Bold",
+                    fontWeight: "700",
                     lineHeight: 14,
                   }}
                 >
@@ -234,7 +236,7 @@ export const ChooseMethodLayout: React.FC = () => {
 
       <View
         className="bg-white border-t border-[#919EAB33] px-4 flex-row items-center justify-between"
-        style={{ paddingTop: 12, paddingBottom: insets.bottom + 12 }}
+        style={{ paddingTop: 12, paddingBottom: adjustedBottom + 12 }}
       >
         <View>
           <Text className="text-[11px] font-inter-medium text-brand-text">

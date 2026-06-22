@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { Skeleton } from '@/src/components/ui/Skeleton';
 
 const LINE_HEIGHT = 32;
@@ -77,7 +77,7 @@ function ItemRowSkeleton({ isLast }: { isLast: boolean }) {
 }
 
 export const OrderTrackingSkeleton: React.FC = () => {
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
 
     return (
         <ScrollView
@@ -85,7 +85,7 @@ export const OrderTrackingSkeleton: React.FC = () => {
             scrollEnabled={false}
             contentContainerStyle={{
                 paddingTop: 12,
-                paddingBottom: Math.max(insets.bottom, 16) + 16,
+                paddingBottom: Math.max(adjustedBottom, 16) + 16,
                 gap: 10,
             }}
         >

@@ -55,7 +55,7 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
               <Text
                 style={{
                   fontSize: 17,
-                  fontFamily: "Inter_700Bold",
+                  fontWeight: "700",
                   color: "#fff",
                 }}
               >

@@ -111,7 +111,7 @@ export const HomeSearchCycler: React.FC = () => {
   const textStyle = {
     fontSize: moderateScale(14, 0.3),
     lineHeight: SLOT_H,
-    fontFamily: "Inter-Medium" as const,
+    fontWeight: "500" as const,
     color: "#9CA3AF",
     includeFontPadding: false,
     verticalAlign: "middle" as const,
@@ -134,5 +134,5 @@ export const HomeSearchCycler: React.FC = () => {
 const styles = StyleSheet.create({
   window: { flex: 1, height: SLOT_H, overflow: "hidden" },
   slot: { position: "absolute", left: 0, top: 0, bottom: 0 },
-  bold: { fontFamily: "Inter-SemiBold", color: "#6B7280" },
+  bold: { fontWeight: "600", color: "#6B7280" },
 });

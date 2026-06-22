@@ -94,7 +94,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                 <Text
                   style={{
                     fontSize: 10,
-                    fontFamily: "Inter-Bold",
+                    fontWeight: "700",
                     color: "#fff",
                   }}
                 >
@@ -137,7 +137,7 @@ export const FrequentOrdersLayout: React.FC = () => {
               style={{
                 flex: 1,
                 fontSize: 14,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#1C2024",
                 paddingVertical: 0,
               }}
@@ -188,7 +188,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                   <Text
                     style={{
                       fontSize: 13,
-                      fontFamily: active ? "Inter-SemiBold" : "Inter-Medium",
+                      fontWeight: active ? "600" : "500",
                       color: active ? "#fff" : "#637381",
                     }}
                   >
@@ -226,7 +226,7 @@ export const FrequentOrdersLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 16,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#637381",
                 textAlign: "center",
               }}
@@ -238,7 +238,7 @@ export const FrequentOrdersLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#919EAB",
                 marginTop: 6,
                 textAlign: "center",

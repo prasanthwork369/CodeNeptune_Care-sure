@@ -2,7 +2,7 @@ import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React from "react";
 import { Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { cartStyles as s } from "./cart.styles";
 
 interface BillDetailsSheetProps {
@@ -32,7 +32,7 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
   handlingCharge,
   toPay,
 }) => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
 
   return (
     <GorhomBottomSheet
@@ -48,7 +48,7 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
         style={{
           paddingHorizontal: 24,
           paddingTop: 24,
-          paddingBottom: Math.max(insets.bottom, 16) + 16,
+          paddingBottom: Math.max(adjustedBottom, 16) + 16,
         }}
       >
         <Text

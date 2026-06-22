@@ -21,7 +21,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
     ComparisonBoard,
     MoreAboutSection,
@@ -36,7 +36,7 @@ export const ProductComparisonLayout: React.FC<
   ProductComparisonLayoutProps
 > = ({ id }) => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const [locationSheetVisible, setLocationSheetVisible] = useState(false);
 
   const goBack = useCallback(() => router.back(), [router]);
@@ -173,8 +173,8 @@ export const ProductComparisonLayout: React.FC<
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
                   paddingBottom: isRecommendedInCart
-                    ? insets.bottom + 100
-                    : insets.bottom + 24,
+                    ? adjustedBottom + 100
+                    : adjustedBottom + 24,
                 }}
                 style={{ flex: 1 }}
                 bounces={false}
@@ -236,7 +236,7 @@ export const ProductComparisonLayout: React.FC<
                   savingsPercent: recommended.savingsPercent ?? undefined,
                   requiresPrescription: raw?.requiresPrescription,
                 }}
-                safeAreaBottom={insets.bottom}
+                safeAreaBottom={adjustedBottom}
                 onViewCart={() => router.push("/(modal)/cart")}
                 hideAddButton
               />

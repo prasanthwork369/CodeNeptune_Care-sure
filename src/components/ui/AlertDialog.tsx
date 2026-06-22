@@ -86,7 +86,7 @@ export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDia
                     <Text
                         style={{
                             fontSize: 16,
-                            fontFamily: 'Inter_700Bold',
+                            fontWeight: '700',
                             color: '#1A1C1E',
                             textAlign: 'center',
                             marginBottom: 24,
@@ -129,7 +129,7 @@ export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDia
                             >
                                 <Text
                                     style={[
-                                        { fontSize: 14, fontFamily: 'Inter_600SemiBold' },
+                                        { fontSize: 14, fontWeight: '600' },
                                         (btn.variant === 'green' || btn.variant === 'red') && { color: '#fff' },
                                         btn.variant === 'outline' && { color: '#374151' },
                                     ]}

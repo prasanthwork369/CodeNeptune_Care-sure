@@ -20,7 +20,7 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface UploadPrescriptionSheetProps {
   isVisible: boolean;
@@ -101,7 +101,7 @@ export const UploadPrescriptionSheet: React.FC<
     }
   }, [isVisible]);
 
-  const { bottom } = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const sheetRef = useRef<BottomSheetModal>(null);
 
   const handleToggleBeforeUpload = () => {
@@ -171,7 +171,7 @@ export const UploadPrescriptionSheet: React.FC<
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 20,
-            paddingBottom: bottom + 16,
+            paddingBottom: adjustedBottom + 16,
           }}
         >
           {/* Top action cards */}

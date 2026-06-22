@@ -192,7 +192,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                       <Text
                         style={{
                           fontSize: 14,
-                          fontFamily: "Inter-SemiBold",
+                          fontWeight: "600",
                           color: isSelected ? "#0F7635" : "#9CA3AF",
                         }}
                       >
@@ -219,7 +219,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                       <Text
                         style={{
                           fontSize: 15,
-                          fontFamily: "Inter-Bold",
+                          fontWeight: "700",
                           color: "#111827",
                           marginBottom: 2,
                         }}
@@ -230,7 +230,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                         <Text
                           style={{
                             fontSize: 12,
-                            fontFamily: "Inter-Regular",
+                            fontWeight: "400",
                             color: "#6B7280",
                           }}
                         >

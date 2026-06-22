@@ -21,6 +21,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface AuthScreenShellProps {
   children?: React.ReactNode;
@@ -35,6 +36,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 }) => {
   const router = useNav();
   const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
 
   // Captured once (non-reactive) so a stray native window resize never
@@ -70,7 +72,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   }, [kbHeight]);
 
   const stickyStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: -Math.max(0, kbHeight.value - insets.bottom) }],
+    transform: [{ translateY: -Math.max(0, kbHeight.value - adjustedBottom) }],
   }));
 
   const isTablet = width >= 600;
@@ -151,7 +153,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
               width: "100%",
               alignSelf: "center",
               paddingTop: 32,
-              paddingBottom: footer ? 0 : insets.bottom + 24,
+              paddingBottom: footer ? 0 : adjustedBottom + 24,
             }}
           >
             {children}
@@ -162,7 +164,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
               style={{
                 backgroundColor: "white",
                 paddingHorizontal: panelPaddingH,
-                paddingBottom: insets.bottom + 16,
+                paddingBottom: adjustedBottom + 16,
                 maxWidth: panelMaxWidth,
                 width: "100%",
                 alignSelf: "center",

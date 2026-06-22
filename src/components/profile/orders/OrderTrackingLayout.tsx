@@ -24,7 +24,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CancelOrderDialog } from "./CancelOrderDialog";
 import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
 import { orderStyles as s } from "./orders.styles";
@@ -68,7 +68,7 @@ function TrackingStepRow({
     if (step.cancelled) {
       return (
         <View style={{ width: 18, height: 18, borderRadius: 12, backgroundColor: "#DC2626", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#FFF", fontSize: 9, fontFamily: "Inter-Bold", lineHeight: 11 }}>✕</Text>
+          <Text style={{ color: "#FFF", fontSize: 9, fontWeight: "700", lineHeight: 11 }}>✕</Text>
         </View>
       );
     }
@@ -83,7 +83,7 @@ function TrackingStepRow({
     if (step.completed) {
       return (
         <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: "#16A34A", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#fff", fontSize: 9, fontFamily: "Inter-Bold", lineHeight: 11 }}>✓</Text>
+          <Text style={{ color: "#fff", fontSize: 9, fontWeight: "700", lineHeight: 11 }}>✓</Text>
         </View>
       );
     }
@@ -157,7 +157,7 @@ function formatDateTime(iso?: string | null) {
 export const OrderTrackLayout: React.FC = () => {
   const router = useNav();
   const queryClient = useQueryClient();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const { order, loading } = useOrderById(orderId);
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
@@ -401,7 +401,7 @@ export const OrderTrackLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 12,
-          paddingBottom: Math.max(insets.bottom, 16) + 16,
+          paddingBottom: Math.max(adjustedBottom, 16) + 16,
           gap: 10,
         }}
       >
@@ -929,7 +929,7 @@ export const OrderTrackLayout: React.FC = () => {
 
       <View
         className="bg-white border-t border-[#919EAB33] px-4"
-        style={{ paddingTop: 12, paddingBottom: Math.max(insets.bottom, 16) }}
+        style={{ paddingTop: 12, paddingBottom: Math.max(adjustedBottom, 16) }}
       >
         <Touchable
           className="bg-brand-primary rounded-lg py-[15px] items-center"

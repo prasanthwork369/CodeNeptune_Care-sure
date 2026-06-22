@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { TabBarFadeGradient } from '@/src/components/navigation/TabBarFadeGradient';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CategoriesSidebar, CategoriesGrid, CategoriesHeaderActions } from './sections';
 import { CARD_HEIGHT, CARD_WIDTH, GRID_PADDING } from './categories.styles';
 
@@ -12,7 +12,7 @@ const SIDEBAR_WIDTH = 76;
 
 export const CategoriesLayout: React.FC = () => {
     const [activeTabId, setActiveTabId] = useState('');
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
 
     const { tabs, cards, isLoading } = useCategories();
 
@@ -46,7 +46,7 @@ export const CategoriesLayout: React.FC = () => {
                     cardWidth={CARD_WIDTH}
                     cardHeight={CARD_HEIGHT}
                     padding={GRID_PADDING}
-                    safeAreaBottom={insets.bottom}
+                    safeAreaBottom={adjustedBottom}
                     isLoading={isLoading}
                 />
             </View>

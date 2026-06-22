@@ -13,14 +13,14 @@ export const CategoriesHeaderActions: React.FC = () => {
         <View className="flex-row items-center gap-2.5">
             <Touchable
                 onPress={() => router.push('/search')}
-                className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center shadow-sm"
+                className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center"
             >
                 <icons.search width={20} height={20} />
             </Touchable>
             <View className="relative">
                 <Touchable
                     onPress={() => router.push('/(modal)/cart')}
-                    className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center shadow-sm"
+                    className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center"
                 >
                     <icons.cart_outline width={22} height={22} />
                 </Touchable>

@@ -4,7 +4,9 @@ import { ANIMATIONS } from '@/src/constants/images';
 import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { DatePickerModal } from '@/src/components/ui/DatePickerModal';
+import { Modal, Pressable, Text, View, Platform } from 'react-native';
 
 interface ReminderSheetProps {
     isVisible: boolean;
@@ -148,52 +150,68 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                         </Touchable>
                     </View>
                 </View>
-            </Modal>
 
-            {/* ── Date picker bottom sheet ── */}
-            <Modal
-                visible={showPicker}
-                transparent
-                animationType="slide"
-                statusBarTranslucent
-                navigationBarTranslucent
-                onRequestClose={() => setShowPicker(false)}
-            >
-                <View className="flex-1 bg-black/60 justify-end">
-                    <Pressable className="absolute inset-0" onPress={() => setShowPicker(false)} />
+                {/* ── Date picker bottom sheet ── */}
+                <DatePickerModal
+                    visible={showPicker}
+                    value={tempDate}
+                    minimumDate={new Date()}
+                    mode="datetime"
+                    display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                    onClose={() => setShowPicker(false)}
+                    onChange={(date: Date) => {
+                        setTempDate(date);
+                        setCustomDate(date);
+                        setSelectedDays(null);
+                        setShowPicker(false);
+                    }}
+                />
 
-                    {/* Close button */}
-                    <View className="items-center mb-4 z-10">
-                        <Touchable
-                            onPress={() => setShowPicker(false)}
-                            className="bg-[#424242] w-10 h-10 rounded-full items-center justify-center"
-                        >
-                            <icons.close_icon width={14} height={14} fill="#FFFFFF" />
-                        </Touchable>
-                    </View>
+                {/* Android custom wheel picker modal - hidden for now as native picker is active */}
+                {/* 
+                <Modal
+                    visible={showPicker}
+                    transparent
+                    animationType="slide"
+                    statusBarTranslucent
+                    navigationBarTranslucent
+                    onRequestClose={() => setShowPicker(false)}
+                >
+                    <View className="flex-1 bg-black/60 justify-end">
+                        <Pressable className="absolute inset-0" onPress={() => setShowPicker(false)} />
 
-                    {/* Sheet */}
-                    <View className="bg-white rounded-t-[12px] px-6 pt-6 pb-8">
-                        <Text className="text-[16px] font-inter-bold text-brand-text mb-4">
-                            Remind me at
-                        </Text>
+                        <View className="items-center mb-4 z-10">
+                            <Touchable
+                                onPress={() => setShowPicker(false)}
+                                className="bg-[#424242] w-10 h-10 rounded-full items-center justify-center"
+                            >
+                                <icons.close_icon width={14} height={14} fill="#FFFFFF" />
+                            </Touchable>
+                        </View>
 
-                        <DateWheelPicker
-                            value={tempDate}
-                            onChange={setTempDate}
-                        />
-
-                        <Touchable
-                            activeOpacity={0.85}
-                            onPress={handleSetReminder}
-                            className="bg-[#0F7635] rounded-xl py-4 items-center mt-5"
-                        >
-                            <Text className="text-[16px] font-inter-semibold text-white">
-                                Set Reminder
+                        <View className="bg-white rounded-t-[12px] px-6 pt-6 pb-8">
+                            <Text className="text-[16px] font-inter-bold text-brand-text mb-4">
+                                Remind me at
                             </Text>
-                        </Touchable>
+
+                            <DateWheelPicker
+                                value={tempDate}
+                                onChange={setTempDate}
+                            />
+
+                            <Touchable
+                                activeOpacity={0.85}
+                                onPress={handleSetReminder}
+                                className="bg-[#0F7635] rounded-xl py-4 items-center mt-5"
+                            >
+                                <Text className="text-[16px] font-inter-semibold text-white">
+                                    Set Reminder
+                                </Text>
+                            </Touchable>
+                        </View>
                     </View>
-                </View>
+                </Modal>
+                */}
             </Modal>
         </>
     );

@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     },
     label: {
         flex: 1,
-        fontFamily: 'Inter-SemiBold',
+        fontWeight: '600',
         fontSize: moderateScale(14, 0.3),
         color: '#0F172A',
         lineHeight: moderateScale(20, 0.3),

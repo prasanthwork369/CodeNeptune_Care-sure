@@ -55,7 +55,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                 <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12,alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
                     {!!product.discount && (
                         <View style={{ backgroundColor: DISCOUNT_BG, position: 'absolute', top: 6, left: 8, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
-                            <Text style={[s.badge, { color: ACCENT, fontFamily: 'Inter-ExtraBold' }]}>{product.discount}</Text>
+                            <Text style={[s.badge, { color: ACCENT, fontWeight: '800' }]}>{product.discount}</Text>
                         </View>
                     )}
                     <Image
@@ -146,7 +146,7 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
             />
             <View className="flex-row justify-between items-center mb-4 px-4">
                 <View>
-                    <Text style={s.sectionTitle} className="text-brand-text">
+                    <Text style={s.sectionTitle} className="text-brand-text ">
                         Spend Less on What You Need
                     </Text>
                     <Text style={s.sectionSubtitle} className="mt-1">

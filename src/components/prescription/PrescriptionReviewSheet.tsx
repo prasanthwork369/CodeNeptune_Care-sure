@@ -11,7 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface Props {
   isVisible: boolean;
@@ -26,7 +26,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
   onNotify,
   onClosed,
 }) => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
 
   // Single value drives backdrop + card opacity + card scale together.
   // One animation = one visual event, no perception of "double open".
@@ -104,7 +104,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
           alignItems: "center",
           justifyContent: "center",
           paddingHorizontal: 24,
-          paddingBottom: insets.bottom,
+          paddingBottom: adjustedBottom,
         }}
         pointerEvents="box-none"
       >
@@ -136,7 +136,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
           <Text
             style={{
               fontSize: 20,
-              fontFamily: "Inter-Bold",
+              fontWeight: "700",
               color: "#111827",
               textAlign: "center",
               marginTop: 4,
@@ -149,7 +149,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
           <Text
             style={{
               fontSize: 13,
-              fontFamily: "Inter-Regular",
+              fontWeight: "400",
               color: "#6B7280",
               textAlign: "center",
               lineHeight: 20,
@@ -186,7 +186,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
               <Text
                 style={{
                   fontSize: 15,
-                  fontFamily: "Inter-SemiBold",
+                  fontWeight: "600",
                   color: "#FFFFFF",
                 }}
               >

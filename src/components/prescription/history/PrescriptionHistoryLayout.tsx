@@ -10,7 +10,7 @@ import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { PrescriptionHistoryItem } from "./sections";
 
 const formatDate = (iso: string) => {
@@ -24,7 +24,7 @@ const formatDate = (iso: string) => {
 };
 
 export const PrescriptionHistoryLayout: React.FC = () => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { source, toPay } = useLocalSearchParams<{
     source?: string;
     toPay?: string;
@@ -96,7 +96,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           renderItem={({ item }) => <PrescriptionHistoryItem item={item} />}
           contentContainerStyle={{
             padding: 20,
-            paddingBottom: insets.bottom + 20,
+            paddingBottom: adjustedBottom + 20,
             flexGrow: 1,
           }}
           showsVerticalScrollIndicator={false}

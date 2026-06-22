@@ -2,10 +2,10 @@ import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
 import { LocationBottomSheet } from "@/src/components/home/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     CartBillSummary,
     CartCoinsSection,
@@ -23,7 +23,7 @@ import {
 } from "./sections";
 
 export const CartLayout: React.FC = () => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const {
     walletOn,
     coinsOn,
@@ -154,7 +154,7 @@ export const CartLayout: React.FC = () => {
 
       <CartFooter
         toPay={toPay}
-        safeAreaBottom={insets.bottom}
+        safeAreaBottom={adjustedBottom}
         onProceed={handleProceed}
       />
 

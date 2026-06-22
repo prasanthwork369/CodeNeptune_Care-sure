@@ -10,7 +10,7 @@ import { AddressType } from '@/src/types/address';
 import { useNav } from '@/src/hooks/useNav';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const labelToType = (label: string): AddressType => {
     const l = label.toUpperCase();
@@ -52,7 +52,7 @@ const AddressCard = ({ item, onEdit, onDelete, deleting }: { item: Address; onEd
 };
 
 export const MyAddressesLayout: React.FC = () => {
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
     const router = useNav();
     const { addresses, loading, refreshing, error, deleteAddress } = useAddress();
     const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export const MyAddressesLayout: React.FC = () => {
                 </Touchable>
                 <View style={{ borderBottomWidth: 1, borderColor: '#E0E0E0', borderStyle: 'dashed', marginTop: 16 }} />
             </View>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24, flexGrow: 1 }} className="flex-1">
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: adjustedBottom + 24, flexGrow: 1 }} className="flex-1">
                 <Text style={s.addrAddBtn} className="font-inter-bold text-brand-text mb-3">Saved Addresses</Text>
                 {error ? <Text style={s.addrAction} className="text-red-500 font-inter-medium mb-3">{error}</Text> : null}
                 {loading || refreshing ? <AddressSkeleton /> : (

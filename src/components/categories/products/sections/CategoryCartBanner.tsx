@@ -197,7 +197,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
 
           {/* "View cart" + count — fade in mid-expansion */}
           <Animated.View style={[{ flex: 1, marginLeft: 10, justifyContent: "center" }, textStyle]}>
-            <Text style={{ color: "#fff", fontSize: 14.5, fontFamily: "Inter-Bold", lineHeight: 18 }}>
+            <Text style={{ color: "#fff", fontSize: 14.5, fontWeight: "700", lineHeight: 18 }}>
               View cart
             </Text>
             <AnimatedCount count={visualCartCount} />

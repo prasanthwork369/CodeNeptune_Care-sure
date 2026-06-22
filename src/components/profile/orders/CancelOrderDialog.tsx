@@ -140,7 +140,7 @@ export function CancelOrderDialog({
                     <Text
                         style={{
                             fontSize: 13,
-                            fontFamily: 'Inter_400Regular',
+                            fontWeight: '400',
                             color: '#6A6A6A',
                             textAlign: 'center',
                             marginBottom: 16,
@@ -176,7 +176,7 @@ export function CancelOrderDialog({
                                     style={{
                                         flex: 1,
                                         fontSize: 13,
-                                        fontFamily: 'Inter_500Medium',
+                                        fontWeight: '500',
                                         color: selectedLabel ? '#1A1C1E' : '#9CA3AF',
                                     }}
                                     numberOfLines={1}
@@ -239,7 +239,7 @@ export function CancelOrderDialog({
                                                         style={{
                                                             flex: 1,
                                                             fontSize: 13,
-                                                            fontFamily: 'Inter_500Medium',
+                                                            fontWeight: '500',
                                                             color: isSelected ? '#0F7635' : '#1A1C1E',
                                                         }}
                                                     >
@@ -268,7 +268,7 @@ export function CancelOrderDialog({
                                                 style={{
                                                     flex: 1,
                                                     fontSize: 13,
-                                                    fontFamily: 'Inter_500Medium',
+                                                    fontWeight: '500',
                                                     color: isOtherSelected ? '#0F7635' : '#1A1C1E',
                                                 }}
                                             >
@@ -309,7 +309,7 @@ export function CancelOrderDialog({
                                 borderRadius: 10,
                                 paddingHorizontal: 14,
                                 paddingVertical: 12,
-                                fontFamily: 'Inter_400Regular',
+                                fontWeight: '400',
                                 fontSize: 13,
                                 color: '#1A1C1E',
                                 textAlignVertical: 'top',
@@ -325,7 +325,7 @@ export function CancelOrderDialog({
                                 width: '100%',
                                 marginTop: 8,
                                 marginBottom: 4,
-                                fontFamily: 'Inter_400Regular',
+                                fontWeight: '400',
                                 fontSize: 12,
                                 color: '#DC2626',
                             }}
@@ -364,7 +364,7 @@ export function CancelOrderDialog({
                             <Text
                                 style={{
                                     fontSize: 15,
-                                    fontFamily: 'Inter_700Bold',
+                                    fontWeight: '700',
                                     color: '#111827',
                                 }}
                             >
@@ -391,7 +391,7 @@ export function CancelOrderDialog({
                             <Text
                                 style={{
                                     fontSize: 15,
-                                    fontFamily: 'Inter_700Bold',
+                                    fontWeight: '700',
                                     color: '#fff',
                                 }}
                             >

@@ -7,10 +7,10 @@ import {
     BottomSheetScrollView,
     BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ActivityIndicator, Text, View, Platform } from "react-native";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { profileStyles as s } from "../profile.styles";
 
 interface AddPatientSheetProps {
@@ -46,7 +46,7 @@ export function AddPatientSheet({
   onEdit,
   onDelete,
 }: AddPatientSheetProps) {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
 
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -152,7 +152,7 @@ export function AddPatientSheet({
           style={{ paddingHorizontal: 20 }}
           contentContainerStyle={{
             paddingTop: 24,
-            paddingBottom: insets.bottom + 24,
+            paddingBottom: adjustedBottom + 24,
           }}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -190,7 +190,7 @@ export function AddPatientSheet({
               placeholderTextColor="#6A6A6A"
               style={{
                 fontSize: 14,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#1A1C1E",
                 padding: 0,
                 margin: 0,
@@ -233,7 +233,7 @@ export function AddPatientSheet({
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#1A1C1E",
                 marginRight: 8,
               }}
@@ -250,7 +250,7 @@ export function AddPatientSheet({
               style={{
                 flex: 1,
                 fontSize: 14,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#1A1C1E",
                 height: "100%",
               }}
@@ -385,7 +385,7 @@ export function AddPatientSheet({
                 flex: 1,
                 paddingVertical: 14,
                 fontSize: 14,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: dob ? "#1A1C1E" : "#6A6A6A",
               }}
             >
@@ -393,26 +393,19 @@ export function AddPatientSheet({
             </Text>
             <icons.calendar_month width={20} height={20} fill="#919EAB" />
           </Touchable>
-          {showDatePicker && (
-            <DateTimePicker
-              value={dobDate}
-              mode="date"
-              display="default"
-              maximumDate={maxDob}
-              onChange={(_, selected) => {
-                setShowDatePicker(false);
-                if (selected) {
-                  setDobDate(selected);
-                  const d = selected.getDate().toString().padStart(2, "0");
-                  const m = (selected.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0");
-                  const y = selected.getFullYear();
-                  setDob(`${y}-${m}-${d}`);
-                }
-              }}
-            />
-          )}
+          <DatePickerModal
+            visible={showDatePicker}
+            value={dobDate}
+            maximumDate={maxDob}
+            onClose={() => setShowDatePicker(false)}
+            onChange={(selected) => {
+              setDobDate(selected);
+              const d = selected.getDate().toString().padStart(2, "0");
+              const m = (selected.getMonth() + 1).toString().padStart(2, "0");
+              const y = selected.getFullYear();
+              setDob(`${y}-${m}-${d}`);
+            }}
+          />
 
           <Text className="text-[14px] font-inter-bold text-brand-text mb-2">
             Gender
@@ -491,7 +484,7 @@ export function AddPatientSheet({
               <Text
                 style={{
                   fontSize: 15,
-                  fontFamily: "Inter-SemiBold",
+                  fontWeight: "600",
                   color: "#fff",
                 }}
               >
@@ -512,7 +505,7 @@ const input: object = {
   paddingHorizontal: 16,
   paddingVertical: 14,
   fontSize: 14,
-  fontFamily: "Inter-Regular",
+  fontWeight: "400",
   color: "#6A6A6A",
   backgroundColor: "#fff",
   marginBottom: 18,

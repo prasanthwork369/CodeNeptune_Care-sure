@@ -23,7 +23,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface LocationBottomSheetProps {
   isVisible: boolean;
@@ -53,7 +53,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
   onSelect,
 }) => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { setLocation, selectedAddressId } = useLocationStore();
   const showToast = useToastStore((s) => s.show);
   const [isLocating, setIsLocating] = useState(false);
@@ -406,7 +406,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           paddingHorizontal: 20,
-          paddingBottom: Math.max(insets.bottom, 24),
+          paddingBottom: Math.max(adjustedBottom, 24),
         }}
       >
         {/* Predictions list */}

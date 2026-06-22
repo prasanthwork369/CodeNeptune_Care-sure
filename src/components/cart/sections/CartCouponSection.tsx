@@ -147,7 +147,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
         <Text
           style={{
             fontSize: 15,
-            fontFamily: "Inter-Bold",
+            fontWeight: "700",
             color: "#1A1C1E",
             marginBottom: 10,
           }}
@@ -181,7 +181,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               ellipsizeMode="tail"
               style={{
                 fontSize: 14,
-                fontFamily: "Inter-Bold",
+                fontWeight: "700",
                 color: "#1A1C1E",
                 lineHeight: 18,
               }}
@@ -192,7 +192,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: "Inter-SemiBold",
+                  fontWeight: "600",
                   color: "#E16D09",
                   marginTop: 3,
                 }}
@@ -221,7 +221,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               <Text
                 style={{
                   fontSize: 13,
-                  fontFamily: "Inter-Bold",
+                  fontWeight: "700",
                   color: isLocked ? "#9CA3AF" : "#0F7635",
                 }}
               >
@@ -250,7 +250,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#6A6A6A",
           }}
         >

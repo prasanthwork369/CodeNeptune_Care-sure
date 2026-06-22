@@ -80,10 +80,10 @@ export const NotificationSettingsLayout: React.FC = () => {
                                 }}
                             >
                                 <View style={{ flex: 1, marginRight: 16 }}>
-                                    <Text style={{ fontSize: 15, fontFamily: 'Inter-Bold', color: '#111827', marginBottom: 3 }}>
+                                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 3 }}>
                                         {item.label}
                                     </Text>
-                                    <Text style={{ fontSize: 13, fontFamily: 'Inter', color: '#6B7280', lineHeight: 18 }}>
+                                    <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 18 }}>
                                         {item.desc}
                                     </Text>
                                 </View>

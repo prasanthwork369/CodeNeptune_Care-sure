@@ -20,7 +20,7 @@ export default function MedicineComparisonScreen() {
     if (medicines.length === 0) {
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F9FAFB', padding: 24 }}>
-                <Text style={{ fontSize: 15, fontFamily: 'Inter-Medium', color: '#6B7280', textAlign: 'center', marginBottom: 20 }}>
+                <Text style={{ fontSize: 15, fontWeight: '500', color: '#6B7280', textAlign: 'center', marginBottom: 20 }}>
                     No medicine comparison available for this prescription yet.
                 </Text>
                 <Touchable
@@ -28,7 +28,7 @@ export default function MedicineComparisonScreen() {
                     style={{ backgroundColor: '#0F7635', borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 }}
                     activeOpacity={0.85}
                 >
-                    <Text style={{ fontSize: 14, fontFamily: 'Inter-SemiBold', color: '#fff' }}>Refresh</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Refresh</Text>
                 </Touchable>
             </View>
         );

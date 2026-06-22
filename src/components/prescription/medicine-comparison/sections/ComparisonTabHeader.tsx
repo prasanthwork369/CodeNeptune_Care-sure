@@ -21,7 +21,7 @@ export const ComparisonTabHeader: React.FC = () => (
       <Text
         style={{
           fontSize: 13,
-          fontFamily: "Inter-Medium",
+          fontWeight: "500",
           color: "#6B7280",
         }}
       >
@@ -39,7 +39,7 @@ export const ComparisonTabHeader: React.FC = () => (
       <Text
         style={{
           fontSize: 13,
-          fontFamily: "Inter-SemiBold",
+          fontWeight: "600",
           color: "#0F7635",
         }}
       >

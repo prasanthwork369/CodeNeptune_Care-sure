@@ -114,7 +114,7 @@ export const searchHeaderStyles = StyleSheet.create({
   },
   inputText: {
     fontSize: moderateScale(13, 0.3),
-    fontFamily: "Inter-regular",
+    fontWeight: "400",
     color: "#222222",
     padding: 0,
     margin: 0,

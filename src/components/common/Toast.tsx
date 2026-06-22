@@ -2,6 +2,7 @@ import { useToastStore } from '@/src/store/toastStore';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Keyboard, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ const CONFIG = {
 export const Toast: React.FC = () => {
   const { visible, message, type, hide } = useToastStore();
   const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   // Hidden resting position: below the screen when anchored to the bottom,
   // above it when anchored to the top (keyboard open) — so the slide
@@ -84,7 +86,7 @@ export const Toast: React.FC = () => {
         position: 'absolute',
         ...(keyboardVisible
           ? { top: insets.top + 12 }
-          : { bottom: insets.bottom + 100 }),
+          : { bottom: adjustedBottom + 100 }),
         left: 0,
         right: 0,
         alignItems: 'center',
@@ -135,14 +137,14 @@ export const Toast: React.FC = () => {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: c.iconColor, fontSize: 11, fontFamily: 'Inter-Bold', lineHeight: 13 }}>
+            <Text style={{ color: c.iconColor, fontSize: 11, fontWeight: '700', lineHeight: 13 }}>
               {c.icon}
             </Text>
           </View>
         </View>
 
         <Text
-          style={{ flex: 1, fontSize: 12.5, fontFamily: 'Inter-Medium', color: '#1A1A1A', lineHeight: 18 }}
+          style={{ flex: 1, fontSize: 12.5, fontWeight: '500', color: '#1A1A1A', lineHeight: 18 }}
           numberOfLines={3}
         >
           {message}
@@ -159,7 +161,7 @@ export const Toast: React.FC = () => {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{ marginLeft: 10, padding: 4 }}
         >
-          <Text style={{ fontSize: 14, color: '#9CA3AF', fontFamily: 'Inter-Bold', lineHeight: 16 }}>✕</Text>
+          <Text style={{ fontSize: 14, color: '#9CA3AF', fontWeight: '700', lineHeight: 16 }}>✕</Text>
         </Pressable>
       </View>
     </Animated.View>

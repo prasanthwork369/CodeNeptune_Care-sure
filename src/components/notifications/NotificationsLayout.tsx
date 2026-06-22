@@ -14,7 +14,7 @@ import { styles as s } from './notifications.styles';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import { Image, Modal, RefreshControl, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -151,7 +151,7 @@ const OptionsPanel: React.FC<{
         style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 }}
       >
         <icons.close_dark width={s.popoverIcon.width} height={s.popoverIcon.height} />
-        <Text style={[s.popoverText, { fontFamily: 'Inter-SemiBold', color: '#111827', marginLeft: 14 }]}>
+        <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: 14 }]}>
           Clear
         </Text>
       </Touchable>
@@ -162,7 +162,7 @@ const OptionsPanel: React.FC<{
           style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 }}
         >
           <icons.done_all width={s.popoverIconAlt.width} height={s.popoverIconAlt.height} fill="#111827" />
-          <Text style={[s.popoverText, { fontFamily: 'Inter-SemiBold', color: '#111827', marginLeft: 14 }]}>
+          <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: 14 }]}>
             Mark as read
           </Text>
         </Touchable>
@@ -232,7 +232,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
             {body.substring(0, 100)}...{' '}
             <Text
               onPress={(e) => { e.stopPropagation?.(); setExpanded(true); }}
-              style={{ color: '#0F7635', fontFamily: 'Inter-SemiBold' }}
+              style={{ color: '#0F7635', fontWeight: '600' }}
             >
               View More
             </Text>
@@ -274,7 +274,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
 // ─── Main layout ──────────────────────────────────────────────────────────────
 
 export const NotificationsLayout: React.FC = () => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
 
   const { notifications, isLoading, isRefetching, refetch } = useNotifications();
@@ -320,7 +320,7 @@ export const NotificationsLayout: React.FC = () => {
       ) : (
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 16, flexGrow: 1 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: adjustedBottom + 16, flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#0F7635" colors={['#0F7635']} />
@@ -338,7 +338,7 @@ export const NotificationsLayout: React.FC = () => {
 
           {sections.map((section) => (
             <View key={section.key} style={{ marginTop: 18 }}>
-              <Text style={[s.sectionHeader, { fontFamily: 'Inter-SemiBold', color: '#6A6A6A', letterSpacing: 0, textTransform: 'uppercase', marginBottom: 10 }]}>
+              <Text style={[s.sectionHeader, { fontWeight: '600', color: '#6A6A6A', letterSpacing: 0, textTransform: 'uppercase', marginBottom: 10 }]}>
                 {section.key}
               </Text>
               {section.items.map((notification, idx) => (

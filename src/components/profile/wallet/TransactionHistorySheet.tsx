@@ -51,13 +51,13 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
         >
             {/* Title */}
             <View style={{ alignItems: 'center', paddingTop: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>
-                <Text style={{ fontSize: 16, fontFamily: 'Inter-Bold', color: '#111827' }}>Transaction History</Text>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>Transaction History</Text>
             </View>
 
             {/* Rows */}
             <BottomSheetScrollView showsVerticalScrollIndicator={false} bounces={false} style={{ flex: 1 }}>
                 {transactions.length === 0 ? (
-                    <Text style={{ textAlign: 'center', color: '#9CA3AF', fontFamily: 'Inter-Medium', fontSize: 14, paddingVertical: 32 }}>
+                    <Text style={{ textAlign: 'center', color: '#9CA3AF', fontWeight: '500', fontSize: 14, paddingVertical: 32 }}>
                         No transactions yet
                     </Text>
                 ) : (
@@ -66,16 +66,16 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
                             <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14 }}>
                                 <TransactionIcon type={tx.iconType} />
                                 <View style={{ flex: 1, marginLeft: 14 }}>
-                                    <Text style={{ fontSize: 14, fontFamily: 'Inter-SemiBold', color: '#111827' }}>{tx.title}</Text>
-                                    <Text style={{ fontSize: 12, fontFamily: 'Inter', color: '#6B7280', marginTop: 2 }}>{tx.date}</Text>
+                                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#111827' }}>{tx.title}</Text>
+                                    <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{tx.date}</Text>
                                 </View>
                                 {tx.isCoin ? (
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Image source={HOME_IMAGES.dollarCoins} style={{ width: 16, height: 16 }} resizeMode="contain" />
-                                        <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: tx.amountColor }}>{tx.amount}</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
                                     </View>
                                 ) : (
-                                    <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: tx.amountColor }}>{tx.amount}</Text>
+                                    <Text style={{ fontSize: 14, fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
                                 )}
                             </View>
                             {idx < transactions.length - 1 && (
@@ -89,7 +89,7 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
             {/* See All */}
             <View style={{ borderTopWidth: 1, borderTopColor: '#F3F4F6', paddingVertical: 16, alignItems: 'center' }}>
                 <Touchable onPress={handleSeeAll} activeOpacity={0.7}>
-                    <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: '#FF8A00' }}>See All</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF8A00' }}>See All</Text>
                 </Touchable>
             </View>
         </GorhomBottomSheet>

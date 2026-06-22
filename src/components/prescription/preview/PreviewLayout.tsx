@@ -16,7 +16,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
   DuplicateFileModal,
   FileTooLargeModal,
@@ -42,7 +42,7 @@ const showPermissionAlert = (
 
 export const PreviewLayout: React.FC = () => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
   const {
@@ -293,7 +293,7 @@ export const PreviewLayout: React.FC = () => {
         onRemove={removeItem}
         onSubmit={handleSubmit}
         submitting={submitting}
-        safeAreaBottom={insets.bottom}
+        safeAreaBottom={adjustedBottom}
       />
 
       <UploadPrescriptionSheet
@@ -423,7 +423,7 @@ export const PreviewLayout: React.FC = () => {
           });
           setShowConfirmed(false);
         }}
-        safeAreaBottom={insets.bottom}
+        safeAreaBottom={adjustedBottom}
       />
 
       <PrescriptionReviewSheet

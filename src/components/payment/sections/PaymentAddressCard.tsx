@@ -15,7 +15,7 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
       <Text
         style={{
           fontSize: 16,
-          fontFamily: "Inter_700Bold",
+          fontWeight: "700",
           color: "#1A1C1E",
           marginBottom: 12,
           marginLeft: 4,
@@ -61,7 +61,7 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
           <Text
             style={{
               fontSize: 14,
-              fontFamily: "Inter_700Bold",
+              fontWeight: "700",
               color: "#1A1C1E",
             }}
           >
@@ -72,7 +72,7 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
           <Text
             style={{
               fontSize: 13,
-              fontFamily: "Inter_500Medium",
+              fontWeight: "500",
               color: "#6B7280",
               marginTop: 4,
             }}

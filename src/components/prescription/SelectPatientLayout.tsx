@@ -7,6 +7,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useSelectPatient } from "@/src/hooks/useSelectPatient";
 import { getAge } from "@/src/utils/patient";
 import { resolveAssetUrl } from "@/src/utils/urls";
@@ -56,6 +57,7 @@ export const SelectPatientLayout: React.FC = () => {
     handleDeletePatient,
     handleProceed,
   } = useSelectPatient();
+  const adjustedBottom = useAdjustedBottomInset();
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -92,7 +94,7 @@ export const SelectPatientLayout: React.FC = () => {
             className="flex-1"
             contentContainerStyle={{
               padding: 16,
-              paddingBottom: insets.bottom + 90,
+              paddingBottom: adjustedBottom + 90,
             }}
           >
             {prescriptionItems.length > 0 && (
@@ -219,7 +221,7 @@ export const SelectPatientLayout: React.FC = () => {
                 onPress={handleUpdatePhone}
                 disabled={savingPhone}
                 activeOpacity={0.7}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                // hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 {savingPhone ? (
                   <ActivityIndicator size="small" color="#0F7635" />
@@ -240,7 +242,9 @@ export const SelectPatientLayout: React.FC = () => {
                   {selectedPatient?.dateOfBirth ? (
                     (() => {
                       const [, value, unit] =
-                        getAge(selectedPatient.dateOfBirth).match(/^(\d+)\s*(.+)$/) ?? [];
+                        getAge(selectedPatient.dateOfBirth).match(
+                          /^(\d+)\s*(.+)$/,
+                        ) ?? [];
                       const unitLabel = unit?.startsWith("yr")
                         ? "Years old"
                         : unit?.startsWith("month")
@@ -250,13 +254,20 @@ export const SelectPatientLayout: React.FC = () => {
                             : unit;
                       return (
                         <Text className="text-[14px]">
-                          <Text className="font-inter-bold text-[#222222]">{value}</Text>
-                          <Text className="font-inter-medium text-[#919EAB]"> {unitLabel}</Text>
+                          <Text className="font-inter-bold text-[#222222]">
+                            {value}
+                          </Text>
+                          <Text className="font-inter-medium text-[#919EAB]">
+                            {" "}
+                            {unitLabel}
+                          </Text>
                         </Text>
                       );
                     })()
                   ) : (
-                    <Text className="text-[14px] font-inter-bold text-[#222222]">—</Text>
+                    <Text className="text-[14px] font-inter-bold text-[#222222]">
+                      —
+                    </Text>
                   )}
                 </View>
               </View>
@@ -347,7 +358,7 @@ export const SelectPatientLayout: React.FC = () => {
             style={{
               borderTopWidth: 1,
               borderTopColor: "#919EAB22",
-              paddingBottom: insets.bottom + 16,
+              paddingBottom: adjustedBottom + 16,
             }}
           >
             <View className="flex-row items-center pb-4">
@@ -378,7 +389,7 @@ export const SelectPatientLayout: React.FC = () => {
               <Touchable
                 activeOpacity={0.85}
                 onPress={handleProceed}
-                className="flex-1 items-center ml-5 justify-center py-4 rounded-xl bg-[#0F7635]"
+                className="flex-1 items-center ml-5 justify-center py-4 rounded-lg bg-[#0F7635]"
               >
                 <Text className="text-[15px] font-inter-semibold text-white">
                   Proceed

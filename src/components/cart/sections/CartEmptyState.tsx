@@ -96,7 +96,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     {/* Discount badge */}
                     {!!product.discount && (
                       <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, backgroundColor: '#008097' }}>
-                        <Text style={{ fontSize: 10, fontFamily: 'Inter-Bold', color: '#fff' }}>
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>
                           {String(product.discount).toUpperCase()}
                         </Text>
                       </View>
@@ -118,7 +118,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         numberOfLines={2}
                         style={{
                           fontSize: 13.5,
-                          fontFamily: "Inter-Medium",
+                          fontWeight: "500",
                           color: "#222222",
                           lineHeight: 18,
                         }}
@@ -129,7 +129,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         numberOfLines={1}
                         style={{
                           fontSize: 12,
-                          fontFamily: "Inter-Bold",
+                          fontWeight: "700",
                           color: "#009989",
                           marginTop: 2,
                         }}
@@ -140,7 +140,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         numberOfLines={1}
                         style={{
                           fontSize: 11,
-                          fontFamily: "Inter-Medium",
+                          fontWeight: "500",
                           color: "#6A6A6A",
                           marginTop: 1,
                         }}
@@ -161,7 +161,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         <Text
                           style={{
                             fontSize: 15,
-                            fontFamily: "Inter-Bold",
+                            fontWeight: "700",
                             color: "#0F172A",
                           }}
                         >
@@ -171,7 +171,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                           <Text
                             style={{
                               fontSize: 11,
-                              fontFamily: "Inter-Regular",
+                              fontWeight: "400",
                               color: "#637381",
                               textDecorationLine: "line-through",
                               marginLeft: 6,
@@ -207,7 +207,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                             <Text
                               style={{
                                 fontSize: 14,
-                                fontFamily: "Inter-Bold",
+                                fontWeight: "700",
                                 color: "#0F7635",
                               }}
                             >

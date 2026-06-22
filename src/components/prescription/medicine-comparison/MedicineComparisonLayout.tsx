@@ -21,16 +21,16 @@ import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import React, { useMemo, useState } from "react";
-import Animated, { useSharedValue } from "react-native-reanimated";
+import { ScrollView, View, useWindowDimensions } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import {
-    ScrollView,
-    Text,
-    View,
-    useWindowDimensions
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ComparisonCard, AnimatedComparisonHeader, RefillReminder, SavingsBanner } from "./sections";
+  AnimatedComparisonHeader,
+  ComparisonCard,
+  RefillReminder,
+  SavingsBanner,
+} from "./sections";
 
 import { ComparisonMedicine } from "./types";
 
@@ -45,11 +45,13 @@ export const MedicineComparisonLayout: React.FC<
   MedicineComparisonLayoutProps
 > = ({ medicines, prescriptionId }) => {
   const router = useNav();
-  const { bottom } = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
   const cardWidth = width - 32;
 
-  const setPrescriptionOrderItems = usePrescriptionOrderStore((s) => s.setItems);
+  const setPrescriptionOrderItems = usePrescriptionOrderStore(
+    (s) => s.setItems,
+  );
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
@@ -58,7 +60,10 @@ export const MedicineComparisonLayout: React.FC<
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
   const [refillOn, setRefillOn] = useState(false);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
-  const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({ y: 0, height: 0 });
+  const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({
+    y: 0,
+    height: 0,
+  });
   const scrollYShared = useSharedValue(0);
 
   const handleScroll = (event: any) => {
@@ -113,7 +118,10 @@ export const MedicineComparisonLayout: React.FC<
       const key = med.recommended.id;
       const existing = map.get(key);
       if (existing) {
-        map.set(key, { ...existing, quantity: (existing.quantity || 1) + (med.quantity || 1) });
+        map.set(key, {
+          ...existing,
+          quantity: (existing.quantity || 1) + (med.quantity || 1),
+        });
       } else {
         map.set(key, { ...med });
       }
@@ -123,11 +131,11 @@ export const MedicineComparisonLayout: React.FC<
 
   // Pricing — qty based on recommended medicine quantity
   const subtotal = mergedMedicines.reduce(
-    (sum, item) => sum + (item.recommended.price * (item.quantity || 1)),
+    (sum, item) => sum + item.recommended.price * (item.quantity || 1),
     0,
   );
   const mrpTotal = mergedMedicines.reduce(
-    (sum, item) => sum + (item.recommended.mrp * (item.quantity || 1)),
+    (sum, item) => sum + item.recommended.mrp * (item.quantity || 1),
     0,
   );
   const productSavings = Math.max(0, mrpTotal - subtotal);
@@ -168,9 +176,12 @@ export const MedicineComparisonLayout: React.FC<
         mrp: item.recommended.mrp,
         discountPercent: item.recommended.discountPercent,
         quantity: item.quantity || 1,
-        image: typeof item.recommended.image === "string" ? item.recommended.image : null,
+        image:
+          typeof item.recommended.image === "string"
+            ? item.recommended.image
+            : null,
         productId: item.recommended.productId ?? null,
-      }))
+      })),
     );
     useCheckoutStore.getState().setBill(
       {
@@ -188,7 +199,7 @@ export const MedicineComparisonLayout: React.FC<
         walletUsed: walletOn,
         coinsUsed: coinsOn,
         couponCode: appliedCoupon?.code ?? "",
-      }
+      },
     );
     router.push({
       pathname: "/(prescription)/select-patient",
@@ -201,16 +212,12 @@ export const MedicineComparisonLayout: React.FC<
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
-
-      <ScreenHeader
-        title="Medicine Comparison"
-        showBorder
-      />
+      <ScreenHeader title="Medicine Comparison" showBorder />
 
       <ScrollView
         style={{ flex: 1, backgroundColor: "#F9FAFB" }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: bottom + 100 }}
+        contentContainerStyle={{ paddingBottom: adjustedBottom + 100 }}
         stickyHeaderIndices={totalSavings > 0 ? [2] : [1]}
         scrollEventThrottle={16}
         onScroll={handleScroll}
@@ -305,7 +312,7 @@ export const MedicineComparisonLayout: React.FC<
       {/* Footer */}
       <CartFooter
         toPay={toPay}
-        safeAreaBottom={bottom}
+        safeAreaBottom={adjustedBottom}
         onProceed={handleProceed}
       />
 

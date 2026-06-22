@@ -146,7 +146,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
               <Text
                 style={{
                   fontSize: s.labelXs.fontSize,
-                  fontFamily: "Inter-ExtraBold",
+                  fontWeight: "800",
                   color: "#0F7635",
                 }}
               >
@@ -185,7 +185,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.labelMd.fontSize,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#1C2024",
                 flex: 1,
                 paddingRight: 8,
@@ -198,7 +198,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
               <Text
                 style={{
                   fontSize: s.labelMd.fontSize,
-                  fontFamily: "Inter-Bold",
+                  fontWeight: "700",
                   color: "#1C2024",
                 }}
               >
@@ -209,7 +209,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
                   <Text
                     style={{
                       fontSize: s.statusBadge.fontSize,
-                      fontFamily: "Inter-Regular",
+                      fontWeight: "400",
                       color: "#919EAB",
                       textDecorationLine: "line-through",
                       marginTop: 2,
@@ -224,7 +224,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.statusBadge.fontSize,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#637381",
                 marginTop: 3,
                 marginBottom: 1,
@@ -238,7 +238,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.statusBadge.fontSize,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#919EAB",
                 marginTop: 2,
                 marginBottom: 2,
@@ -284,7 +284,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.label20.fontSize,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#1C2024",
               }}
             >
@@ -294,7 +294,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
           <Text
             style={{
               fontSize: s.labelMd.fontSize,
-              fontFamily: "Inter-SemiBold",
+              fontWeight: "600",
               color: "#1C2024",
               paddingHorizontal: 8,
             }}
@@ -313,7 +313,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.label20.fontSize,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#1C2024",
               }}
             >
@@ -342,7 +342,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.labelSm.fontSize,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#0F7635",
               }}
             >
@@ -366,7 +366,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.labelSm.fontSize,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#0F7635",
               }}
             >
@@ -377,7 +377,7 @@ function ProductCard({ item, index }: { item: any; index: number }) {
             <Text
               style={{
                 fontSize: s.labelSm.fontSize,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#637381",
                 marginLeft: item.orderedTimes ? 8 : 0,
               }}
@@ -444,7 +444,7 @@ export const FrequentlyOrderedLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: s.labelXl.fontSize,
-                fontFamily: "Inter-SemiBold",
+                fontWeight: "600",
                 color: "#637381",
                 textAlign: "center",
               }}
@@ -454,7 +454,7 @@ export const FrequentlyOrderedLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: s.labelSm.fontSize,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#919EAB",
                 marginTop: 6,
                 textAlign: "center",

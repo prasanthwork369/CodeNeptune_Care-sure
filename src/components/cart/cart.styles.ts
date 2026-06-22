@@ -14,7 +14,7 @@ export const cartStyles = StyleSheet.create({
     itemImg:      { width: scale(64), height: scale(64) },
     itemRxBadge:  { width: scale(23), height: scale(23) },
     itemRxText:   { fontSize: moderateScale(11, 0.25) },
-    itemTitle:    { fontSize: moderateScale(15, 0.3) },
+    itemTitle:    { fontSize: moderateScale(13, 0.3) },
     itemSub:      { fontSize: moderateScale(12, 0.3) },
     itemDiscount: { fontSize: moderateScale(13, 0.3) },
     itemMrp:      { fontSize: moderateScale(12, 0.3) },

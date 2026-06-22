@@ -7,13 +7,13 @@ import NetInfo from '@react-native-community/netinfo';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Dimensions, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const { width } = Dimensions.get('window');
 
 const NetworkToast = () => {
     const { isConnected, isInternetReachable, setIsConnected, offlineAlertVisible, hideOfflineAlert } = useNetworkStore();
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
 
     const [isLoading, setIsLoading] = useState(false);
     const translateY = useRef(new Animated.Value(300)).current;
@@ -87,7 +87,7 @@ const NetworkToast = () => {
             className="absolute left-0 right-0 items-center z-[1000000]"
             style={[
                 {
-                    bottom: insets.bottom + 90,
+                    bottom: adjustedBottom + 90,
                     transform: [{ translateY }]
                 }
             ]}

@@ -35,7 +35,6 @@ export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
             stroke="url(#grad)"
             strokeWidth={0.3}
             fontSize={11}
-            fontFamily="Inter-Normal"
             fontWeight="700"
             letterSpacing={0.5}
             x={safeColWidth / 2}

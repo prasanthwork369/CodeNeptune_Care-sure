@@ -5,25 +5,25 @@ import RenderHtml from 'react-native-render-html';
 const HTML_TAG_RE = /<[a-z][\s\S]*?>/i;
 
 const tagsStyles = {
-    p:      { color: '#6A6A6A', fontSize: 13, fontFamily: 'Inter-Medium', lineHeight: 20, marginTop: 0, marginBottom: 4 },
-    b:      { fontFamily: 'Inter-Bold', color: '#222222' },
-    strong: { fontFamily: 'Inter-Bold', color: '#222222' },
+    p:      { color: '#6A6A6A', fontSize: 13, fontWeight: '500', lineHeight: 20, marginTop: 0, marginBottom: 4 },
+    b:      { fontWeight: '700', color: '#222222' },
+    strong: { fontWeight: '700', color: '#222222' },
     i:      { fontStyle: 'italic' as const },
     em:     { fontStyle: 'italic' as const },
-    h1:     { fontFamily: 'Inter-Bold', color: '#222222', fontSize: 16, marginTop: 0, marginBottom: 2 },
-    h2:     { fontFamily: 'Inter-Bold', color: '#222222', fontSize: 15, marginTop: 0, marginBottom: 2 },
-    h3:     { fontFamily: 'Inter-SemiBold', color: '#222222', fontSize: 14, marginTop: 0, marginBottom: 2 },
-    li:     { color: '#6A6A6A', fontSize: 13, fontFamily: 'Inter-Medium', lineHeight: 20 },
+    h1:     { fontWeight: '700', color: '#222222', fontSize: 16, marginTop: 0, marginBottom: 2 },
+    h2:     { fontWeight: '700', color: '#222222', fontSize: 15, marginTop: 0, marginBottom: 2 },
+    h3:     { fontWeight: '600', color: '#222222', fontSize: 14, marginTop: 0, marginBottom: 2 },
+    li:     { color: '#6A6A6A', fontSize: 13, fontWeight: '500', lineHeight: 20 },
     ul:     { marginTop: 0, marginBottom: 4 },
     ol:     { marginTop: 0, marginBottom: 4 },
-};
+} as const;
 
 const baseStyle = {
     color: '#6A6A6A',
     fontSize: 13,
-    fontFamily: 'Inter-Medium',
+    fontWeight: '500',
     lineHeight: 20,
-};
+} as const;
 
 interface HtmlContentProps {
     content: string;

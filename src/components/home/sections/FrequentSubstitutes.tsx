@@ -39,7 +39,7 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                 <View style={[s.imgBox, { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#919EAB1A', alignItems: 'center', justifyContent: 'center', marginRight: 12 }]}>
                     {!!item.discount && (
                         <View style={{ position: 'absolute', top: 6, left: 6, backgroundColor: '#E8F5E9', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
-                            <Text style={[s.badge, { fontFamily: 'Inter-ExtraBold', color: '#0F7635' }]}>{item.discount}</Text>
+                            <Text style={[s.badge, { fontWeight: '800', color: '#0F7635' }]}>{item.discount}</Text>
                         </View>
                     )}
                     <Image source={item.image?.uri ? item.image : undefined} style={[s.imgInner, { marginTop: IMG_SIZE * 0.3 }]} contentFit="contain" />

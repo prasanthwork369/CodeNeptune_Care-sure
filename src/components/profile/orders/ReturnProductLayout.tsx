@@ -9,7 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useNav } from '@/src/hooks/useNav';
 import React, { useState } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const ITEMS = [
     { id: '1', name: 'Paracip 650mg Tablet 10s', brand: 'Cipla', pack: 'Strip of 10 tablets', image: HOME_IMAGES.medicineStrip },
@@ -23,7 +23,7 @@ function SectionCard({ children, className = '' }: { children: React.ReactNode; 
 }
 
 export const ReturnProductLayout: React.FC = () => {
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
     const router = useNav();
     const [quantities, setQuantities] = useState<Record<string, number>>(Object.fromEntries(ITEMS.map(i => [i.id, 1])));
     const [checked, setChecked] = useState<Record<string, boolean>>(Object.fromEntries(ITEMS.map(i => [i.id, false])));
@@ -47,7 +47,7 @@ export const ReturnProductLayout: React.FC = () => {
                     {refundMethod === method && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#0F7635' }} />}
                 </View>
                 <View className="flex-1">
-                    <Text style={[s.labelMd, { fontFamily: 'Inter-Bold', color: refundMethod === method ? '#0F7635' : '#0F1724' }]}>{method === 'wallet' ? 'CareSure Wallet' : 'Original Payment Method'}</Text>
+                    <Text style={[s.labelMd, { fontWeight: '700', color: refundMethod === method ? '#0F7635' : '#0F1724' }]}>{method === 'wallet' ? 'CareSure Wallet' : 'Original Payment Method'}</Text>
                     <Text style={s.labelSm} className="font-inter-medium text-brand-subtext mt-0.5">{method === 'wallet' ? 'Instant refund once the item is picked up successfully' : 'Refund will refelect in 5-7 business days after pickup'}</Text>
                 </View>
             </View>
@@ -109,7 +109,7 @@ export const ReturnProductLayout: React.FC = () => {
                 <RadioOption method="original" />
             </ScrollView>
 
-            <View className="bg-white px-base border-t border-[#F0F0F0]" style={{ paddingTop: 16, paddingBottom: insets.bottom + 16 }}>
+            <View className="bg-white px-base border-t border-[#F0F0F0]" style={{ paddingTop: 16, paddingBottom: adjustedBottom + 16 }}>
                 <View className="mb-4">
                     <Text style={s.labelMd} className="font-inter-bold text-[#222222] mb-1">Pickup Address</Text>
                     <Text style={s.labelSm} className="font-inter-medium text-brand-subtext leading-5">First Floor, 61/30, Nesapakkam, Chennai, TAMIL NADU, 600078{' '}

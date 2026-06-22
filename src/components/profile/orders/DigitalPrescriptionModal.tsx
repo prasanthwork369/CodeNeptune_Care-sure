@@ -8,7 +8,7 @@ import {
     Image,
     useWindowDimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { icons } from '@/src/constants/icons';
 
 interface MedicineItem {
@@ -75,7 +75,7 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
     onClose,
     clinicalData,
 }) => {
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
     const { height: screenHeight } = useWindowDimensions();
 
     const docName = clinicalData.doctorSnapshot?.name ?? clinicalData.doctorName ?? 'Medical Practitioner';
@@ -92,7 +92,7 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
                     style={{
                         paddingHorizontal: 20,
                         paddingTop: 22,
-                        paddingBottom: Math.max(insets.bottom, 16) + 16,
+                        paddingBottom: Math.max(adjustedBottom, 16) + 16,
                     }}
                 >
                     {/* Header Row with Title and Close Button */}
@@ -118,7 +118,7 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
 
                     <BottomSheetScrollView
                         showsVerticalScrollIndicator={false}
-                        style={{ maxHeight: Math.min(500, screenHeight - insets.bottom - 220) }}
+                        style={{ maxHeight: Math.min(500, screenHeight - adjustedBottom - 220) }}
                         className="pb-4"
                     >
                         {/* Prescription Card Box */}

@@ -36,7 +36,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
       <Text
         style={{
           fontSize: 16,
-          fontFamily: "Inter_700Bold",
+          fontWeight: "700",
           color: "#1A1C1E",
           marginBottom: 12,
           marginLeft: 4,
@@ -81,7 +81,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
               <Text
                 style={{
                   fontSize: 15,
-                  fontFamily: "Inter_700Bold",
+                  fontWeight: "700",
                   color: "#1A1C1E",
                 }}
               >
@@ -90,7 +90,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: "Inter_500Medium",
+                  fontWeight: "500",
                   color: "#6B7280",
                   marginTop: 4,
                 }}

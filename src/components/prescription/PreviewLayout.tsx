@@ -28,7 +28,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import Pdf from "react-native-pdf";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 const FOLDER = "customers/prescriptions";
 const isPdf = (uri: string, type?: string) =>
@@ -47,7 +47,7 @@ function showPermissionAlert(feature: "photo library" | "camera") {
 
 export const PreviewLayout: React.FC = () => {
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
   const {
@@ -385,7 +385,7 @@ export const PreviewLayout: React.FC = () => {
         </ScrollView>
         <View
           className="px-3 py-4 border-t border-[#919EAB1A] flex-row items-center justify-between"
-          style={{ paddingBottom: Math.max(insets.bottom + 8, 24) }}
+          style={{ paddingBottom: Math.max(adjustedBottom + 8, 24) }}
         >
           <Text className="text-[14px] font-inter-medium text-[#000000]">
             {items.length} / {MAX_FILES} Prescription
@@ -462,7 +462,7 @@ export const PreviewLayout: React.FC = () => {
           </View>
           <View
             className="bg-white rounded-t-[12px] items-center px-6 pt-8"
-            style={{ paddingBottom: Math.max(insets.bottom + 16, 32) }}
+            style={{ paddingBottom: Math.max(adjustedBottom + 16, 32) }}
           >
             <DotLottie
               source={ANIMATIONS.orderPlaced}
@@ -473,7 +473,7 @@ export const PreviewLayout: React.FC = () => {
             <Text
               style={{
                 fontSize: 20,
-                fontFamily: "Inter_700Bold",
+                fontWeight: "700",
                 color: "#1A1C1E",
                 marginTop: 8,
                 marginBottom: 16,
@@ -493,7 +493,7 @@ export const PreviewLayout: React.FC = () => {
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: "Inter_500Medium",
+                  fontWeight: "500",
                   color: "#0F7635",
                   marginLeft: 6,
                 }}
@@ -520,7 +520,7 @@ export const PreviewLayout: React.FC = () => {
               <Text
                 style={{
                   fontSize: 15,
-                  fontFamily: "Inter_600SemiBold",
+                  fontWeight: "600",
                   color: "#fff",
                   letterSpacing: 0.5,
                 }}

@@ -4,14 +4,14 @@ import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useHealthProblems } from "@/src/hooks/queries/useHealthProblems";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import {
-    BottomSheetFlatList,
-    BottomSheetTextInput,
+  BottomSheetFlatList,
+  BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HealthProblemSheetProps {
   isVisible: boolean;
@@ -26,7 +26,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
   onSelect,
   onClose,
 }) => {
-  const { bottom } = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const [query, setQuery] = useState("");
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customText, setCustomText] = useState("");
@@ -104,9 +104,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
             paddingBottom: 12,
           }}
         >
-          <Text
-            style={{ fontSize: 17, fontFamily: "Inter-Bold", color: "#1A1C1E" }}
-          >
+          <Text style={{ fontSize: 17, fontWeight: "700", color: "#1A1C1E" }}>
             {isCustomMode ? "Enter Health Problem" : "Select Health Problem"}
           </Text>
           <Touchable
@@ -122,7 +120,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
             style={{
               paddingHorizontal: 20,
               paddingTop: 10,
-              paddingBottom: Math.max(bottom, 20),
+              paddingBottom: Math.max(adjustedBottom, 20),
             }}
           >
             <BottomSheetTextInput
@@ -137,7 +135,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 borderRadius: 8,
                 padding: 14,
                 fontSize: 15,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#1A1C1E",
                 backgroundColor: "#fff",
               }}
@@ -158,7 +156,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               <Text
                 style={{
                   color: "#fff",
-                  fontFamily: "Inter-Bold",
+                  fontWeight: "700",
                   fontSize: 15,
                 }}
               >
@@ -177,7 +175,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               <Text
                 style={{
                   color: "#6A6A6A",
-                  fontFamily: "Inter-SemiBold",
+                  fontWeight: "600",
                   fontSize: 14,
                 }}
               >
@@ -211,7 +209,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                   paddingVertical: 12,
                   paddingHorizontal: 8,
                   fontSize: 14,
-                  fontFamily: "Inter-Regular",
+                  fontWeight: "400",
                   color: "#1A1C1E",
                 }}
               />
@@ -231,7 +229,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                   style={{
                     marginTop: 12,
                     fontSize: 14,
-                    fontFamily: "Inter-Medium",
+                    fontWeight: "500",
                     color: "#6A6A6A",
                   }}
                 >
@@ -245,7 +243,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{
                   paddingHorizontal: 16,
-                  paddingBottom: Math.max(bottom, 16) + 8,
+                  paddingBottom: Math.max(adjustedBottom, 16) + 8,
                 }}
                 columnWrapperStyle={{ gap: 10, marginBottom: 10 }}
                 showsVerticalScrollIndicator={false}
@@ -298,9 +296,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                           fontSize: 13,
                           textAlign: "center",
                           lineHeight: 16,
-                          fontFamily: isSelected
-                            ? "Inter-SemiBold"
-                            : "Inter-Medium",
+                          fontWeight: isSelected ? "600" : "500",
                           color: isSelected ? "#0F7635" : "#1A1C1E",
                         }}
                       >

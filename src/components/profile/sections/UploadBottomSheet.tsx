@@ -10,7 +10,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface UploadBottomSheetProps {
   visible: boolean;
@@ -75,7 +75,7 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
   onSelectCamera,
   onSelectLibrary,
 }) => {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
 
   return (
     <GorhomBottomSheet
@@ -91,7 +91,7 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
         style={{
           paddingHorizontal: 20,
           paddingTop: 12,
-          paddingBottom: Math.max(insets.bottom, 24),
+          paddingBottom: Math.max(adjustedBottom, 24),
         }}
       >
         <View style={s.actionsCard}>
@@ -151,10 +151,9 @@ const s = StyleSheet.create({
     marginRight: 14,
   },
   actionText: { flex: 1 },
-  actionLabel: { fontSize: 15, fontFamily: "Inter-SemiBold", color: "#111" },
+  actionLabel: { fontSize: 15, fontWeight: "600", color: "#111" },
   actionSublabel: {
     fontSize: 12,
-    fontFamily: "Inter",
     color: "#9CA3AF",
     marginTop: 2,
   },
@@ -175,7 +174,7 @@ const s = StyleSheet.create({
     borderColor: "#EBEBEB",
     marginBottom: 4,
   },
-  cancelText: { fontSize: 15, fontFamily: "Inter-SemiBold", color: "#CF1A1A" },
+  cancelText: { fontSize: 15, fontWeight: "600", color: "#CF1A1A" },
 });
 
 export default UploadBottomSheet;

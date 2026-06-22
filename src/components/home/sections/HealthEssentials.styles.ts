@@ -4,14 +4,14 @@ import { moderateScale } from 'react-native-size-matters';
 export const styles = StyleSheet.create({
     badge:           { fontSize: moderateScale(11, 0.25) },
     name: {
-        fontFamily: 'Inter-Medium',
+        fontWeight: '500',
         fontSize: moderateScale(14, 0.25),
         lineHeight: moderateScale(20, 0.25),
         verticalAlign: 'middle',
         letterSpacing: 0,
     },
     description: {
-        fontFamily: 'Inter-Regular',
+        fontWeight: '400',
         fontSize: 12,
         lineHeight: 18,
         letterSpacing: 0,
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
         color: '#6A6A6A',
     },
     price: {
-        fontFamily: 'Inter-Bold',
+        fontWeight: '700',
         fontSize: 16,
         lineHeight: 22.5,
         letterSpacing: 0,
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
         color: '#0F172A',
     },
     mrp: {
-        fontFamily: 'Inter-Regular',
+        fontWeight: '400',
         fontSize: 12,
         lineHeight: 18,
         letterSpacing: 0,
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
         color: '#6A6A6A',
     },
     addBtn: {
-        fontFamily: 'Inter-SemiBold',
+        fontWeight: '600',
         fontSize: 14,
         lineHeight: 16.84,
         letterSpacing: 0,

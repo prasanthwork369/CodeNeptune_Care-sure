@@ -9,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Redirect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
     UploadActions,
     ValidPrescriptionInfo,
@@ -18,7 +18,7 @@ import {
 } from './sections';
 
 export const UploadLayout: React.FC = () => {
-    const insets = useSafeAreaInsets();
+    const adjustedBottom = useAdjustedBottomInset();
     const { isAuthenticated } = useAuthStore();
     const { clearItems } = usePrescriptionDraftStore();
 
@@ -87,7 +87,7 @@ export const UploadLayout: React.FC = () => {
                 contentContainerStyle={{
                     padding: 16,
                     gap: 12,
-                    paddingBottom: components.tabBar.height + insets.bottom + 40,
+                    paddingBottom: components.tabBar.height + adjustedBottom + 40,
                 }}
             >
                 <UploadActions

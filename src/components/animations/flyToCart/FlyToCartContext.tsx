@@ -1,7 +1,7 @@
 import { useCart } from "@/src/hooks/queries/useCart";
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { Dimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import Animated, {
   SharedValue,
   useSharedValue,
@@ -48,13 +48,13 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { totalItems, items } = useCart();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
   // Default targets the center of the circle (first-item state)
   const defaultCoords = {
     x: screenWidth / 2,
-    y: screenHeight - insets.bottom - 8 - 30,
+    y: screenHeight - adjustedBottom - 8 - 30,
   };
 
   const [destinationCoords, setDestinationCoordsState] = useState<{

@@ -14,7 +14,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
     KnowYourMedicine,
     LogisticsBar,
@@ -29,7 +29,7 @@ import {
 export const ProductDetailsLayout: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { product, recommendation, saltComposition, variants, raw, isLoading } =
     useProduct(id);
   const { items: cartItems } = useCart();
@@ -179,7 +179,7 @@ export const ProductDetailsLayout: React.FC = () => {
             ) : (
               <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+                contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
                 style={{ flex: 1 }}
                 bounces={false}
                 overScrollMode="never"
@@ -249,7 +249,7 @@ export const ProductDetailsLayout: React.FC = () => {
                       : undefined,
                   unit: selectedVariant?.unit,
                 }}
-                safeAreaBottom={insets.bottom}
+                safeAreaBottom={adjustedBottom}
                 onViewCart={() => router.push("/(modal)/cart")}
               />
             )}

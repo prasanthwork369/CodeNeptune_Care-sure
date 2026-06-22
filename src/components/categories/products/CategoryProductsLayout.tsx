@@ -14,7 +14,7 @@ import {
     View,
     useWindowDimensions,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CategoryProductCard, CategoryCartBanner } from "./sections";
 import { FlyToCartProvider, FlyToCartOverlay } from "@/src/components/animations/flyToCart";
 
@@ -28,7 +28,7 @@ const CategoryProductsContent: React.FC = () => {
     familySlug?: string;
   }>();
   const router = useNav();
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
 
@@ -46,14 +46,14 @@ const CategoryProductsContent: React.FC = () => {
           <View className="flex-row items-center gap-2.5">
             <Touchable
               onPress={() => router.push("/search")}
-              className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center shadow-sm"
+              className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center "
             >
               <icons.search width={20} height={20} />
             </Touchable>
             <View className="relative">
               <Touchable
                 onPress={() => router.push("/(modal)/cart")}
-                className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center shadow-sm"
+                className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center "
               >
                 <icons.cart_outline width={22} height={22} />
               </Touchable>
@@ -72,7 +72,7 @@ const CategoryProductsContent: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           padding: GRID_PADDING,
-          paddingBottom: totalItems > 0 ? insets.bottom + 90 : insets.bottom + 24,
+          paddingBottom: totalItems > 0 ? adjustedBottom + 90 : adjustedBottom + 24,
           flexGrow: 1,
         }}
         refreshControl={
@@ -142,7 +142,7 @@ const CategoryProductsContent: React.FC = () => {
         pointerEvents={totalItems > 0 ? "box-none" : "none"}
         style={{
           position: "absolute",
-          bottom: insets.bottom + 8,
+          bottom: adjustedBottom + 8,
           left: 0,
           right: 0,
           zIndex: 50,

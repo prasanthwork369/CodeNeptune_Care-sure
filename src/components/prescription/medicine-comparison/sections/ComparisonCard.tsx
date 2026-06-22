@@ -46,7 +46,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         <Text
           style={{
             fontSize: 11,
-            fontFamily: "Inter-Medium",
+            fontWeight: "500",
             color: "#6B7280",
             letterSpacing: 0.4,
           }}
@@ -57,7 +57,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
       <Text
         style={{
           fontSize: 13,
-          fontFamily: "Inter-SemiBold",
+          fontWeight: "600",
           color: "#111827",
           paddingHorizontal: 14,
           paddingBottom: 12,
@@ -116,7 +116,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 15,
-                fontFamily: "Inter-Bold",
+                fontWeight: "700",
                 color: "#111827",
                 lineHeight: 20,
                 marginBottom: 4,
@@ -129,7 +129,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#6B7280",
                 marginBottom: 2,
               }}
@@ -140,7 +140,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#6B7280",
               }}
               numberOfLines={1}
@@ -152,7 +152,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#6B7280",
                 marginBottom: 2,
               }}
@@ -162,7 +162,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 18,
-                fontFamily: "Inter-ExtraBold",
+                fontWeight: "800",
                 color: "#111827",
               }}
             >
@@ -214,7 +214,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
                 <Text
                   style={{
                     fontSize: 11,
-                    fontFamily: "Inter-Bold",
+                    fontWeight: "700",
                     color: "#fff",
                     textAlign: "center",
                     lineHeight: 12,
@@ -225,7 +225,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
                 <Text
                   style={{
                     fontSize: 8,
-                    fontFamily: "Inter-Bold",
+                    fontWeight: "700",
                     color: "#fff",
                     textAlign: "center",
                     lineHeight: 9,
@@ -268,7 +268,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 15,
-                fontFamily: "Inter-Bold",
+                fontWeight: "700",
                 color: "#111827",
                 lineHeight: 20,
                 marginBottom: 4,
@@ -281,7 +281,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Medium",
+                fontWeight: "500",
                 color: "#6B7280",
                 marginBottom: 2,
               }}
@@ -292,7 +292,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Inter-Regular",
+                fontWeight: "400",
                 color: "#6B7280",
               }}
               numberOfLines={1}
@@ -313,7 +313,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               <Text
                 style={{
                   fontSize: 18,
-                  fontFamily: "Inter-ExtraBold",
+                  fontWeight: "800",
                   color: "#111827",
                 }}
               >
@@ -323,7 +323,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
                 <Text
                   style={{
                     fontSize: 12,
-                    fontFamily: "Inter-Medium",
+                    fontWeight: "500",
                     color: "#9CA3AF",
                     textDecorationLine: "line-through",
                     marginLeft: 4,
@@ -349,7 +349,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               <Text
                 style={{
                   fontSize: 15,
-                  fontFamily: "Inter-Bold",
+                  fontWeight: "700",
                   color: "#111827",
                 }}
               >

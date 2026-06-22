@@ -36,7 +36,7 @@ export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
         <icons.arrow_back width={20} height={20} fill="#1A1C1E" />
       </Touchable>
       <Text
-        style={{ fontSize: 18, fontFamily: "Inter-Bold", color: "#1A1C1E" }}
+        style={{ fontSize: 18, fontWeight: "700", color: "#1A1C1E" }}
       >
         {title}
       </Text>

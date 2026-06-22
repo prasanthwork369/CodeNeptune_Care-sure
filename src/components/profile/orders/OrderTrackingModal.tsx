@@ -11,7 +11,7 @@ import Animated, {
     withDelay,
     withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
@@ -121,7 +121,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
             style={{
               color: "#fff",
               fontSize: 9,
-              fontFamily: "Inter-Bold",
+              fontWeight: "700",
               lineHeight: 11,
             }}
           >
@@ -160,7 +160,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Inter-SemiBold",
+            fontWeight: "600",
             color: textColor,
           }}
         >
@@ -170,7 +170,6 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
           <Text
             style={{
               fontSize: 12,
-              fontFamily: "Inter",
               color: "#6A6A6A",
               marginTop: 3,
             }}
@@ -192,7 +191,7 @@ interface Props {
 }
 
 export function OrderTrackingModal({ visible, onClose, steps }: Props) {
-  const insets = useSafeAreaInsets();
+  const adjustedBottom = useAdjustedBottomInset();
   const snapPoints = useMemo(() => ["50%", "75%"], []);
 
   return (
@@ -212,13 +211,13 @@ export function OrderTrackingModal({ visible, onClose, steps }: Props) {
           flex: 1,
           paddingHorizontal: 20,
           paddingTop: 20,
-          paddingBottom: Math.max(insets.bottom, 16) + 16,
+          paddingBottom: Math.max(adjustedBottom, 16) + 16,
         }}
       >
         <Text
           style={{
             fontSize: 18,
-            fontFamily: "Inter_700Bold",
+            fontWeight: "700",
             color: "#1A1C1E",
             marginBottom: 20,
           }}
