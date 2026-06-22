@@ -20,8 +20,8 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import type { Dotlottie } from "@lottiefiles/dotlottie-react-native";
-import React, { useMemo, useRef, useState } from "react";
+
+import React, { useMemo, useState } from "react";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import {
     ScrollView,
@@ -50,7 +50,7 @@ export const MedicineComparisonLayout: React.FC<
   const cardWidth = width - 32;
 
   const setPrescriptionOrderItems = usePrescriptionOrderStore((s) => s.setItems);
-  const walletConfettiRef = useRef<Dotlottie>(null);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [walletOn, setWalletOn] = useState(false);
@@ -66,10 +66,7 @@ export const MedicineComparisonLayout: React.FC<
     scrollYShared.value = y;
   };
 
-  const playConfetti = () => {
-    walletConfettiRef.current?.stop();
-    walletConfettiRef.current?.play();
-  };
+  const playConfetti = () => setConfettiTrigger((n) => n + 1);
 
   const handleWalletToggle = (v: boolean) => {
     setWalletOn(v);
@@ -204,7 +201,6 @@ export const MedicineComparisonLayout: React.FC<
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
-      <CartConfetti ref={walletConfettiRef} />
 
       <ScreenHeader
         title="Medicine Comparison"
@@ -346,6 +342,8 @@ export const MedicineComparisonLayout: React.FC<
         onClose={() => setShowReminderSheet(false)}
         onConfirm={() => setRefillOn(true)}
       />
+
+      <CartConfetti trigger={confettiTrigger} />
     </View>
   );
 };

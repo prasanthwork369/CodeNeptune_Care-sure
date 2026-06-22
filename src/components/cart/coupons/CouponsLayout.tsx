@@ -60,6 +60,7 @@ export const CouponsLayout: React.FC = () => {
                             key={coupon.id}
                             coupon={coupon}
                             onApply={applyCode}
+                            disabled={subtotal < coupon.minOrderValue}
                         />
                     ))
                 )}

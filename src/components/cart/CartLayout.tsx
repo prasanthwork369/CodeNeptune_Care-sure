@@ -27,7 +27,7 @@ export const CartLayout: React.FC = () => {
   const {
     walletOn,
     coinsOn,
-    walletConfettiRef,
+    confettiTrigger,
     handleWalletToggle,
     handleCoinsToggle,
     appliedCoupon,
@@ -81,8 +81,6 @@ export const CartLayout: React.FC = () => {
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="Cart" />
-
-      <CartConfetti ref={walletConfettiRef} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -185,6 +183,8 @@ export const CartLayout: React.FC = () => {
         onClose={() => setShowLocationSheet(false)}
         onSelect={(label, city) => setSelectedLocation({ label, city })}
       />
+
+      <CartConfetti trigger={confettiTrigger} />
     </View>
   );
 };

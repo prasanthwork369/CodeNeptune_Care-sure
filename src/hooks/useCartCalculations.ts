@@ -5,37 +5,37 @@ import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
+import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { CartLine } from "@/src/types/cart";
 import { useFocusEffect } from "expo-router";
-import type { Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import { useCallback, useRef, useState } from "react";
-import { useAuthStore } from "@/src/store/authStore";
 
 export function useCartCalculations() {
   const router = useNav();
 
   const [walletOn, setWalletOn] = useState(false);
   const [coinsOn, setCoinsOn] = useState(false);
-  const walletConfettiRef = useRef<Dotlottie>(null);
-  const confettiRestartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Wallet, coins, and "coupon just applied" all share this single Lottie
-  // instance. Calling stop() then play() back to back races when two
-  // triggers fire close together (e.g. enabling wallet then coins right
-  // after) — the native player needs a beat to actually process the stop
-  // before it'll restart from play(), otherwise the second play() silently
-  // no-ops. A single-frame defer wasn't enough, so this uses a short timeout
-  // and cancels any already-pending restart to avoid stacking calls.
-  const playConfetti = () => {
-    if (confettiRestartTimer.current) clearTimeout(confettiRestartTimer.current);
-    walletConfettiRef.current?.stop();
-    confettiRestartTimer.current = setTimeout(() => {
-      walletConfettiRef.current?.play();
-      confettiRestartTimer.current = null;
-    }, 60);
+  // Confetti trigger: incrementing this counter causes CartConfetti to remount
+  // with a fresh DotLottie instance (autoplay=true), which is the only reliable
+  // way to replay a loop=false animation on both iOS and Android. Using
+  // ref.play() after the animation has already finished is a no-op on Android.
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+  const confettiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const playConfetti = (delayMs = 0) => {
+    if (confettiTimer.current) clearTimeout(confettiTimer.current);
+    if (delayMs > 0) {
+      confettiTimer.current = setTimeout(() => {
+        setConfettiTrigger((n) => n + 1);
+        confettiTimer.current = null;
+      }, delayMs);
+    } else {
+      setConfettiTrigger((n) => n + 1);
+    }
   };
 
   const handleWalletToggle = (v: boolean) => {
@@ -85,7 +85,9 @@ export function useCartCalculations() {
         setReopenLocationSheet(false);
       }
       if (justApplied) {
-        playConfetti();
+        // Delay by 350ms to let the screen pop transition finish first,
+        // then bump trigger so CartConfetti remounts with autoplay=true.
+        playConfetti(350);
         clearJustApplied();
       }
     }, [reopenLocationSheet, justApplied]),
@@ -238,7 +240,9 @@ export function useCartCalculations() {
       },
     );
     const hasRxItem = lines.some((l) => l.rx);
-    const targetPath = hasRxItem ? "/(prescription)/choose-method" : "/(prescription)/select-patient";
+    const targetPath = hasRxItem
+      ? "/(prescription)/choose-method"
+      : "/(prescription)/select-patient";
     const targetParams = { toPay: String(toPay) };
 
     if (!useAuthStore.getState().isAuthenticated) {
@@ -256,7 +260,7 @@ export function useCartCalculations() {
     router,
     walletOn,
     coinsOn,
-    walletConfettiRef,
+    confettiTrigger,
     handleWalletToggle,
     handleCoinsToggle,
     setCoinsOn,

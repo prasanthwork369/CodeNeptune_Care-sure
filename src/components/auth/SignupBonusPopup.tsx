@@ -8,7 +8,7 @@ import { usePathname } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, Image, Modal, Text, View } from "react-native";
+import { Dimensions, Image, Modal, Text, View, Pressable, TouchableWithoutFeedback } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
@@ -105,13 +105,26 @@ export const SignupBonusPopup: React.FC<Props> = ({
         onClose?.();
       }}
     >
-      <View className="flex-1 items-center justify-center bg-black/60 px-6">
-        <LinearGradient
-          colors={["#F3F9FF", "#FDF5FF", "#F1E6FF"]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 1, y: 0 }}
-          style={{ width: "100%", borderRadius: 24, overflow: "hidden" }}
-        >
+      <Pressable
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 24,
+        }}
+        onPress={() => {
+          setIsOpen(false);
+          onClose?.();
+        }}
+      >
+        <TouchableWithoutFeedback>
+          <LinearGradient
+            colors={["#F3F9FF", "#FDF5FF", "#F1E6FF"]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 1, y: 0 }}
+            style={{ width: "100%", borderRadius: 24, overflow: "hidden" }}
+          >
           {/* Header */}
           <View
             style={{
@@ -429,29 +442,30 @@ export const SignupBonusPopup: React.FC<Props> = ({
             </Touchable>
           </View>
         </LinearGradient>
+      </TouchableWithoutFeedback>
 
-        {/* Confetti — rendered AFTER card so it paints on top */}
-        {showConfetti && (
-          <View
-            pointerEvents="none"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: SCREEN_W,
-              height: SCREEN_H,
-            }}
-          >
-            <DotLottie
-              ref={confettiRef}
-              source={ANIMATIONS.confetti}
-              autoplay
-              loop={false}
-              style={{ width: SCREEN_W, height: SCREEN_H }}
-            />
-          </View>
-        )}
-      </View>
-    </Modal>
+      {/* Confetti — rendered AFTER card so it paints on top */}
+      {showConfetti && (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: SCREEN_W,
+            height: SCREEN_H,
+          }}
+        >
+          <DotLottie
+            ref={confettiRef}
+            source={ANIMATIONS.confetti}
+            autoplay
+            loop={false}
+            style={{ width: SCREEN_W, height: SCREEN_H }}
+          />
+        </View>
+      )}
+    </Pressable>
+  </Modal>
   );
 };

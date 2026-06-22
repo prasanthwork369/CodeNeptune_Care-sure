@@ -1,19 +1,23 @@
 import { ANIMATIONS } from "@/src/constants/images";
-import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import { DotLottie } from "@lottiefiles/dotlottie-react-native";
+import React from "react";
 import { Dimensions, View } from "react-native";
 
 const { width: SCREEN_W } = Dimensions.get("screen");
 const SIZE = SCREEN_W;
 
-export const CartConfetti = forwardRef<Dotlottie | null, {}>((_, ref) => {
-  const animationRef = useRef<Dotlottie | null>(null);
+interface CartConfettiProps {
+  /** Increment this number each time you want to play the animation.
+   *  The component will remount from scratch with autoplay=true,
+   *  which is the only reliable cross-platform way to replay a
+   *  loop=false DotLottie animation after it has already finished. */
+  trigger: number;
+}
 
-  useImperativeHandle<Dotlottie | null, Dotlottie | null>(
-    ref,
-    () => animationRef.current,
-    [],
-  );
+export const CartConfetti: React.FC<CartConfettiProps> = ({ trigger }) => {
+  // When trigger is 0 (initial mount, nothing happened yet) render nothing
+  // so we don't flash an idle animation frame on screen.
+  if (trigger === 0) return null;
 
   return (
     <View
@@ -30,15 +34,17 @@ export const CartConfetti = forwardRef<Dotlottie | null, {}>((_, ref) => {
         justifyContent: "center",
       }}
     >
+      {/* key forces a full remount every time trigger changes,
+          giving us a brand-new native player that starts from frame 0 */}
       <DotLottie
-        ref={animationRef}
+        key={trigger}
         source={ANIMATIONS.confetti}
-        autoplay={false}
+        autoplay
         loop={false}
         style={{ width: SIZE, height: SIZE, opacity: 0.9 }}
       />
     </View>
   );
-});
+};
 
 CartConfetti.displayName = "CartConfetti";

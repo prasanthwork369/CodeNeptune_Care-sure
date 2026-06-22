@@ -6,10 +6,10 @@ import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useNav } from "@/src/hooks/useNav";
 import { useCouponStore } from "@/src/store/couponStore";
 import { couponService } from "@/src/services/coupon.service";
+import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import {
     CartCouponSectionProps,
     Coupon,
-    COUPON_DISCOUNT_TYPE,
 } from "@/src/types/cart";
 import React, { useState } from "react";
 import { Image, Text, View, ActivityIndicator, Alert } from "react-native";

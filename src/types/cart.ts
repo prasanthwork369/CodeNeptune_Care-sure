@@ -177,10 +177,7 @@ export interface CartFooterProps {
   onProceed: () => void;
 }
 
-export const COUPON_DISCOUNT_TYPE = {
-  PERCENTAGE: 1,
-  FLAT: 2,
-} as const;
+
 
 export interface Coupon {
   id: string;
@@ -216,4 +213,5 @@ export interface CouponInputProps {
 export interface CouponCardProps {
   coupon: Coupon;
   onApply: (code: string) => void;
+  disabled?: boolean;
 }

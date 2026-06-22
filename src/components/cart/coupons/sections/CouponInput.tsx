@@ -20,7 +20,7 @@ export const CouponInput: React.FC<CouponInputProps> = ({ value, onChangeText, o
                 onPress={onApply}
                 disabled={loading}
                 style={{ backgroundColor: colors.primary }}
-                className="px-3 py-2 rounded-md"
+                className="px-3 py-2 rounded-sm"
             >
                 {loading
                     ? <ActivityIndicator size="small" color="#fff" />
