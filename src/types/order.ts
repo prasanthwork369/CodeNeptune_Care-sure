@@ -115,6 +115,7 @@ export interface Order {
   shippedAt?: string;
   deliveredAt?: string;
   items?: OrderItem[];
+  returns?: { id: string; status: number }[];
   statusLogs?: StatusLog[];
   clinicalData?: ClinicalData;
   metadata?: OrderMetadata;

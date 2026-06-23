@@ -11,11 +11,11 @@ export const profileStyles = StyleSheet.create({
     personPhone:    { fontSize: moderateScale(14, 0.1) },
 
     // ProfileCoinsCard
-    coinsTitle:     { fontSize: moderateScale(24, 0.1) },
-    coinsSub:       { fontSize: moderateScale(16, 0.1) },
-    coinsLabel:     { fontSize: moderateScale(16, 0.1) },
-    coinsBold:      { fontSize: moderateScale(16, 0.1) },
-    coinsSaved:     { fontSize: moderateScale(14, 0.1) },
+    coinsTitle:     { fontSize: moderateScale(18, 0.3) },
+    coinsSub:       { fontSize: moderateScale(15, 0.3) },
+    coinsLabel:     { fontSize: moderateScale(15, 0.3) },
+    coinsBold:      { fontSize: moderateScale(15, 0.3) },
+    coinsSaved:     { fontSize: moderateScale(13, 0.3) },
 
     // ProfileInfoList
     sectionTitle:   { fontSize: moderateScale(16, 0.1) },

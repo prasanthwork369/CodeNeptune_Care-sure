@@ -7,7 +7,6 @@ import { useOrders } from "@/src/hooks/queries/useOrders";
 import { useNav } from "@/src/hooks/useNav";
 import { Order, ORDER_STATUS, OrderTabKey } from "@/src/types/order";
 import { buildCartInputs } from "@/src/utils/reorderCart";
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -370,7 +369,6 @@ export const MyOrdersLayout: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
-      <StatusBar style="dark" backgroundColor="#FFFFFF" />
       <ScreenHeader
         title="My Orders"
         showBorder={true}

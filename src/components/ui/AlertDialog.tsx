@@ -1,7 +1,8 @@
 import { icons } from '@/src/constants/icons';
+import { HOME_IMAGES } from '@/src/constants/images';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
-import { Modal, Text, View } from 'react-native';
+import { Image, Modal, Text, View } from 'react-native';
 
 type IconVariant = 'package' | 'check' | 'check-green' | 'delete' | 'pdf' | 'no_internet';
 type ButtonVariant = 'green' | 'red' | 'outline';
@@ -24,7 +25,7 @@ function AlertIcon({ variant }: { variant: IconVariant }) {
     if (variant === 'check-green') {
         return (
             <View style={{ marginBottom: 18 }}>
-                <icons.check_circle width={72} height={72} fill="#16A34A" />
+                <Image source={HOME_IMAGES.successTick} style={{ width: 72, height: 72 }} resizeMode="contain" />
             </View>
         );
     }

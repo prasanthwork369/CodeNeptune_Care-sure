@@ -5,7 +5,7 @@ import { ApiHero } from "@/src/types/home";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -89,14 +89,28 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const { width } = useWindowDimensions();
 
   const bannerWidth = width - 32;
-  // Reserve space based on the avatar's *actual* rendered width (styles.avatar.width)
-  // -- a separately-calculated value here previously drifted from the avatar's real
-  // size, so the image visually overlapped further into the text column than the
-  // padding accounted for, cropping the end of the cycling word behind it.
-  const personWidth = styles.avatar.width;
 
-  // Never shrink below mobile baseline; scale up gently on large screens
-  const scale = Math.max(1, Math.sqrt(bannerWidth / 358));
+  // Scale down on smaller devices (down to 0.8), but do not scale up on larger devices (cap at 1.0)
+  const scale = Math.min(Math.max(0.8, bannerWidth / 358), 1.0);
+
+  // Dynamically calculate the avatar size and text properties
+  const dynamicAvatarWidth = Math.round(styles.avatar.width * scale);
+  const dynamicAvatarHeight = Math.round(styles.avatar.height * scale);
+  const dynamicAvatarTop = Math.round(styles.avatar.top * scale);
+  const personWidth = dynamicAvatarWidth;
+
+  const dynamicFontSize = Math.round(20 * scale);
+  const dynamicLineHeight = Math.round(30 * scale);
+
+  // Dynamically calculate badge dimensions and text styling
+  const dynamicBadgeWidth = Math.round(160 * scale);
+  const dynamicBadgeHeight = Math.round(30 * scale);
+  const dynamicBadgeMarginTop = Math.round(10 * scale);
+  const dynamicBadgeIconWidth = Math.round(16.6 * scale);
+  const dynamicBadgeIconHeight = Math.round(20.5 * scale);
+  const dynamicBadgeFontSize = Math.round(12 * scale);
+  const dynamicBadgeLineHeight = Math.round(12 * scale);
+
   const lineHeight = Math.round(
     Math.min(Math.max(Math.round(21 * scale), 16), 26) * 1.34,
   );
@@ -140,10 +154,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </View>
 
         {/* Right: person */}
-        <View style={styles.avatar}>
+        <View style={[styles.avatar, { width: dynamicAvatarWidth, height: dynamicAvatarHeight, top: dynamicAvatarTop }]}>
           <Skeleton
-            width={styles.avatar.width}
-            height={styles.avatar.height}
+            width={dynamicAvatarWidth}
+            height={dynamicAvatarHeight}
             borderRadius={16}
           />
         </View>
@@ -173,43 +187,57 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         >
           <View>
             {/* First line (e.g. 'Stop overpaying') */}
-            <Text style={styles.titleText} className="text-brand-text">
+            <Text style={[styles.titleText, { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }]} className="text-brand-text">
               {getCleanTitlePart1(title)}
             </Text>
 
             {/* Second line (inline 'for your' prefix and cycling word cycler) */}
             <View className="flex-row items-center" style={{ minWidth: 0 }}>
               <Text
-                style={[styles.titleText, { flexShrink: 0 }]}
+                style={[styles.titleText, { flexShrink: 0, fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }]}
                 className="text-brand-text"
               >
                 for your{" "}
               </Text>
               <TextCycler
                 words={highlights}
-                lineHeight={TITLE_LINE_HEIGHT}
-                style={styles.titleText}
+                lineHeight={dynamicLineHeight}
+                style={StyleSheet.flatten([styles.titleText, { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }])}
                 className="text-brand-primary"
               />
             </View>
           </View>
 
           {/* Pay less badge */}
-          <View style={styles.badgeContainer}>
+          <View
+            style={[
+              styles.badgeContainer,
+              {
+                width: dynamicBadgeWidth,
+                height: dynamicBadgeHeight,
+                marginTop: dynamicBadgeMarginTop,
+                paddingLeft: Math.round(7 * scale),
+                paddingRight: Math.round(7 * scale),
+                gap: Math.round(6 * scale),
+              },
+            ]}
+          >
             {content.labelImage ? (
               <SvgUri
                 uri={content.labelImage}
-                width={styles.badgeIcon.width}
-                height={styles.badgeIcon.height}
+                width={dynamicBadgeIconWidth}
+                height={dynamicBadgeIconHeight}
               />
             ) : null}
-            <Text style={styles.badgeText}>{badgeText}</Text>
+            <Text style={[styles.badgeText, { fontSize: dynamicBadgeFontSize, lineHeight: dynamicBadgeLineHeight }]}>
+              {badgeText}
+            </Text>
           </View>
         </Animated.View>
       </LinearGradient>
 
       {/* ── Right: Person image (positioned absolute, sibling to allow overflow) ── */}
-      <Animated.View style={[styles.avatar, rightAnim]}>
+      <Animated.View style={[styles.avatar, { width: dynamicAvatarWidth, height: dynamicAvatarHeight, top: dynamicAvatarTop }, rightAnim]}>
         <Image
           source={mainImage}
           style={{ width: "100%", height: "100%" }}

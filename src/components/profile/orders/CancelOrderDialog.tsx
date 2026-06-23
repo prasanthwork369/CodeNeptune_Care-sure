@@ -1,11 +1,11 @@
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
+import { ReasonDropdown } from '@/src/components/ui/ReasonDropdown';
 import { useCancellationReasons } from '@/src/hooks/queries/useCancellationReasons';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Modal,
-    ScrollView,
     Text,
     TextInput,
     View,
@@ -153,135 +153,18 @@ export function CancelOrderDialog({
                     {reasonsLoading ? (
                         <ActivityIndicator color="#0F7635" style={{ marginBottom: 20 }} />
                     ) : (
-                        // zIndex container so the floating dropdown overlays sibling Views below
-                        <View style={{ width: '100%', zIndex: 10 }}>
-                            {/* Dropdown trigger */}
-                            <Touchable
-                                onPress={() => setIsDropdownOpen((v) => !v)}
-                                disabled={loading}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    width: '100%',
-                                    borderWidth: 1,
-                                    borderColor: isDropdownOpen ? '#0F7635' : '#E5E7EB',
-                                    backgroundColor: '#fff',
-                                    borderRadius: 10,
-                                    paddingVertical: 14,
-                                    paddingHorizontal: 14,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        flex: 1,
-                                        fontSize: 13,
-                                        fontWeight: '500',
-                                        color: selectedLabel ? '#1A1C1E' : '#9CA3AF',
-                                    }}
-                                    numberOfLines={1}
-                                >
-                                    {selectedLabel ?? 'Select a reason'}
-                                </Text>
-                                <icons.down_arrow
-                                    width={14}
-                                    height={14}
-                                    fill="#6B7280"
-                                    style={{ transform: [{ rotate: isDropdownOpen ? '180deg' : '0deg' }] }}
-                                />
-                            </Touchable>
-
-                            {/* Floating dropdown list — absolute positioned so it overlays
-                                content below without pushing or expanding the modal card */}
-                            {isDropdownOpen && (
-                                <View
-                                    style={{
-                                        position: 'absolute',
-                                        top: 52, // sits just below the trigger button
-                                        left: 0,
-                                        right: 0,
-                                        zIndex: 999,
-                                        elevation: 10,
-                                        backgroundColor: '#fff',
-                                        borderRadius: 10,
-                                        borderWidth: 1,
-                                        borderColor: '#E5E7EB',
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 4 },
-                                        shadowOpacity: 0.08,
-                                        shadowRadius: 12,
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    <ScrollView
-                                        keyboardShouldPersistTaps="handled"
-                                        showsVerticalScrollIndicator={false}
-                                        style={{ maxHeight: 220 }}
-                                    >
-                                        {reasons.map((item) => {
-                                            const isSelected = selectedReasonId === item.id;
-                                            return (
-                                                <Touchable
-                                                    key={item.id}
-                                                    onPress={() => selectReason(item.id)}
-                                                    disabled={loading}
-                                                    style={{
-                                                        flexDirection: 'row',
-                                                        alignItems: 'center',
-                                                        paddingVertical: 13,
-                                                        paddingHorizontal: 14,
-                                                        backgroundColor: isSelected ? '#F1FFF6' : '#fff',
-                                                        borderBottomWidth: 1,
-                                                        borderBottomColor: '#F3F4F6',
-                                                    }}
-                                                >
-                                                    <Text
-                                                        style={{
-                                                            flex: 1,
-                                                            fontSize: 13,
-                                                            fontWeight: '500',
-                                                            color: isSelected ? '#0F7635' : '#1A1C1E',
-                                                        }}
-                                                    >
-                                                        {item.label}
-                                                    </Text>
-                                                    {isSelected && (
-                                                        <icons.check_circle width={16} height={16} fill="#0F7635" />
-                                                    )}
-                                                </Touchable>
-                                            );
-                                        })}
-
-                                        {/* "Other" option */}
-                                        <Touchable
-                                            onPress={() => selectReason(OTHER_OPTION)}
-                                            disabled={loading}
-                                            style={{
-                                                flexDirection: 'row',
-                                                alignItems: 'center',
-                                                paddingVertical: 13,
-                                                paddingHorizontal: 14,
-                                                backgroundColor: isOtherSelected ? '#F1FFF6' : '#fff',
-                                            }}
-                                        >
-                                            <Text
-                                                style={{
-                                                    flex: 1,
-                                                    fontSize: 13,
-                                                    fontWeight: '500',
-                                                    color: isOtherSelected ? '#0F7635' : '#1A1C1E',
-                                                }}
-                                            >
-                                                Other
-                                            </Text>
-                                            {isOtherSelected && (
-                                                <icons.check_circle width={16} height={16} fill="#0F7635" />
-                                            )}
-                                        </Touchable>
-                                    </ScrollView>
-                                </View>
-                            )}
-                        </View>
+                        <ReasonDropdown
+                            options={reasons}
+                            isOpen={isDropdownOpen}
+                            onToggle={() => setIsDropdownOpen((v) => !v)}
+                            selectedLabel={selectedLabel}
+                            selectedId={selectedReasonId}
+                            onSelect={(id) => selectReason(id as number)}
+                            includeOther
+                            isOtherSelected={isOtherSelected}
+                            onSelectOther={() => selectReason(OTHER_OPTION)}
+                            disabled={loading}
+                        />
                     )}
 
                     {/* Spacer so dropdown has room to float over buttons */}

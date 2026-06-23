@@ -33,6 +33,12 @@ export interface Settings {
     mapsApiKey?: string;
 }
 
+export interface PaymentSettings {
+    active_payment_methods?: number[];
+    active_return_methods?: number[];
+    [key: string]: any;
+}
+
 // Public axios instance — no auth headers, used for endpoints accessible without login
 const publicAxios = axios.create({
     baseURL: API_BASE_URL,
@@ -58,6 +64,11 @@ export const settingsApi = {
 
     getSettings: async (): Promise<Settings> => {
         const response = await apiClient.get('/api/v1/settings/customer-website');
+        return response.data.data;
+    },
+
+    getPaymentSettings: async (): Promise<PaymentSettings> => {
+        const response = await apiClient.get(API_ENDPOINTS.SETTINGS_PAYMENT);
         return response.data.data;
     },
 };

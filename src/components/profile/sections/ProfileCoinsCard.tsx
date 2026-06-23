@@ -32,7 +32,7 @@ export const ProfileCoinsCard: React.FC = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         className="flex-row items-center justify-between px-5 pt-5 pb-7"
-        style={{ minHeight: 104,padding:10 }}
+        style={{ minHeight: 104 }}
       >
         <View className="flex-1 pr-20">
           <Text
@@ -50,7 +50,7 @@ export const ProfileCoinsCard: React.FC = () => {
         </View>
         <Image
           source={HOME_IMAGES.moneyBag}
-          style={{ width: 96, height: 96, position: "absolute", right: 0, bottom: 0 }}
+          style={{ width: 96, height: 96, position: "absolute", right: 0, bottom: -5 }}
           contentFit="contain"
         />
       </LinearGradient>

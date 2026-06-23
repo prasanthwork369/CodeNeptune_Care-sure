@@ -2,8 +2,12 @@ import { icons } from '@/src/constants/icons';
 import { orderStyles as s } from './orders.styles';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { ReasonDropdown } from '@/src/components/ui/ReasonDropdown';
+import { useCancellationReasons } from '@/src/hooks/queries/useCancellationReasons';
+import { ReturnItemImages } from '@/src/types/return';
 import { BottomSheetScrollView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import React, { useState, useEffect } from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useEffect, useState } from 'react';
 import {
     Image, Text, View,
 } from 'react-native';
@@ -12,7 +16,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 export type ReturnReason = {
     reason: string;
     details: string;
-    images: string[];
+    images: ReturnItemImages;
 };
 
 interface ReturnReasonModalProps {
@@ -24,44 +28,104 @@ interface ReturnReasonModalProps {
     onSave: (data: ReturnReason) => void;
 }
 
-const PHOTO_SLOTS = [
-    { label: 'Front View', type: 'camera' },
-    { label: 'Back View', type: 'camera' },
-    { label: 'Packaging', type: 'package' },
-    { label: 'Issue Photo', type: 'photo' },
+type SlotKey = keyof ReturnItemImages;
+
+const PHOTO_SLOTS: { key: SlotKey; label: string; type: string }[] = [
+    { key: 'front', label: 'Front View', type: 'camera' },
+    { key: 'back', label: 'Back View', type: 'camera' },
+    { key: 'packaging', label: 'Packaging', type: 'package' },
+    { key: 'issue', label: 'Issue Photo', type: 'photo' },
 ];
 
+const OTHER_OPTION = '__other__';
+
 export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialData, onSave }: ReturnReasonModalProps) {
-    const [reason, setReason] = useState(initialData?.reason || '');
     const [details, setDetails] = useState(initialData?.details || '');
-    const [images, setImages] = useState<string[]>(initialData?.images || []);
+    // Holds local file:// URIs until final submission, when ReturnProductLayout
+    // uploads them all at once and swaps these for the real hosted URLs.
+    const [images, setImages] = useState<ReturnItemImages>(initialData?.images || {});
+    const [isReasonOpen, setIsReasonOpen] = useState(false);
+    const [error, setError] = useState('');
+
+    const { data: reasons = [], isLoading: reasonsLoading } = useCancellationReasons({ applicable_to: 2 });
+
+    const [selectedReasonId, setSelectedReasonId] = useState<number | typeof OTHER_OPTION | null>(null);
+    const [otherReason, setOtherReason] = useState('');
 
     const adjustedBottom = useAdjustedBottomInset();
 
     useEffect(() => {
         if (isVisible) {
-            setReason(initialData?.reason || '');
+            const matched = reasons.find((r) => r.label === initialData?.reason);
+            setSelectedReasonId(matched ? matched.id : initialData?.reason ? OTHER_OPTION : null);
+            setOtherReason(matched ? '' : initialData?.reason || '');
             setDetails(initialData?.details || '');
-            setImages(initialData?.images || []);
+            setImages(initialData?.images || {});
+            setIsReasonOpen(false);
+            setError('');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isVisible, initialData]);
+
+    const isOtherSelected = selectedReasonId === OTHER_OPTION;
+    const selectedReason = reasons.find((r) => r.id === selectedReasonId);
+    const selectedLabel = isOtherSelected ? 'Other' : selectedReason?.label;
+
+    const selectReason = (id: number | typeof OTHER_OPTION) => {
+        setSelectedReasonId(id);
+        setIsReasonOpen(false);
+        if (error) setError('');
+    };
 
     const handleClose = () => {
         onClose();
     };
 
     const handleSave = () => {
-        onSave({
-            reason: reason || 'Damaged Product',
-            details: details || 'The packaging was torn when it arrived.',
-            images: images.length > 0 ? images : [
-                'https://picsum.photos/200/200?random=1',
-                'https://picsum.photos/200/200?random=2',
-                'https://picsum.photos/200/200?random=3',
-                'https://picsum.photos/200/200?random=4',
-            ]
-        });
+        const finalReason = isOtherSelected ? otherReason.trim() : selectedReason?.label;
+        if (!finalReason) {
+            setError(
+                isOtherSelected
+                    ? 'Please describe the issue with this return.'
+                    : 'Please select a reason for this return.',
+            );
+            return;
+        }
+        const missingSlot = PHOTO_SLOTS.find((slot) => !images[slot.key]);
+        if (missingSlot) {
+            setError(`Please upload a photo for "${missingSlot.label}" -- all 4 photos are required.`);
+            return;
+        }
+        onSave({ reason: finalReason, details, images });
         handleClose();
+    };
+
+    const pickImage = async (slot: SlotKey) => {
+        try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') return;
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ['images'] as ImagePicker.MediaType[],
+                quality: 0.8,
+                allowsMultipleSelection: false,
+            });
+            if (result.canceled || result.assets.length === 0) return;
+
+            // Just store the local URI -- no upload yet. The actual upload
+            // happens once, for all items, when the user taps "Request Return".
+            setImages((prev) => ({ ...prev, [slot]: result.assets[0].uri }));
+        } catch {
+            // Silently ignore -- the slot just stays empty and the user can retry
+        }
+    };
+
+    const removeImage = (slot: SlotKey) => {
+        setImages((prev) => {
+            const next = { ...prev };
+            delete next[slot];
+            return next;
+        });
     };
 
     function SlotIcon({ type }: { type: string }) {
@@ -102,16 +166,39 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
 
                             {/* Reason */}
                             <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">{"What's the issue with your order?"}</Text>
-                            <Touchable
-                                className="flex-row items-center justify-between p-4 border border-[#919EAB33] rounded-xl mb-5"
-                                activeOpacity={0.7}
-                                style={{ backgroundColor: '#FFFFFF' }}
-                            >
-                                <Text style={s.labelMd} className="font-inter-medium text-[#222222]">
-                                    {reason || 'Select the reason'}
-                                </Text>
-                                <icons.down_arrow width={16} height={16} fill="#222222" />
-                            </Touchable>
+                            <ReasonDropdown
+                                options={reasons}
+                                loading={reasonsLoading}
+                                isOpen={isReasonOpen}
+                                onToggle={() => setIsReasonOpen((v) => !v)}
+                                selectedLabel={selectedLabel}
+                                selectedId={selectedReasonId}
+                                onSelect={(id) => selectReason(id as number)}
+                                includeOther
+                                isOtherSelected={isOtherSelected}
+                                onSelectOther={() => selectReason(OTHER_OPTION)}
+                                placeholder="Select the reason"
+                            />
+
+                            {/* Spacer so dropdown has room to float over content below */}
+                            <View style={{ height: isReasonOpen ? 220 : 0 }} />
+
+                            {isOtherSelected && (
+                                <BottomSheetTextInput
+                                    placeholder="Describe the issue..."
+                                    placeholderTextColor="#919EAB"
+                                    value={otherReason}
+                                    onChangeText={(value) => { setOtherReason(value); if (error) setError(''); }}
+                                    multiline
+                                    numberOfLines={3}
+                                    className="p-4 border border-[#919EAB33] rounded-xl text-[14px] font-inter-medium min-h-[80px] mt-2"
+                                    style={{ textAlignVertical: 'top', backgroundColor: '#FFFFFF' }}
+                                />
+                            )}
+
+                            {!!error && (
+                                <Text className="text-[12px] font-inter-medium text-[#DC2626] mt-3 mb-3">{error}</Text>
+                            )}
 
                             {/* Details */}
                             <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">Add details</Text>
@@ -128,35 +215,35 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
 
                             {/* Photo Grid */}
                             <View className="flex-row flex-wrap gap-3 mb-4">
-                                {PHOTO_SLOTS.map((slot, idx) => (
-                                    <Touchable
-                                        key={idx}
-                                        className="w-[47.5%] h-24 rounded-xl border border-[#919EAB33] items-center justify-center bg-[#FAFAFA] relative overflow-hidden"
-                                        activeOpacity={0.7}
-                                    >
-                                        {images[idx] ? (
-                                            <>
-                                                <Image source={{ uri: images[idx] }} className="w-full h-full" resizeMode="cover" />
-                                                <Touchable
-                                                    onPress={() => {
-                                                        const newImages = [...images];
-                                                        newImages.splice(idx, 1);
-                                                        setImages(newImages);
-                                                    }}
-                                                    className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white items-center justify-center shadow-md"
-                                                    style={{ elevation: 4 }}
-                                                >
-                                                    <icons.delete_red width={14} height={14} />
-                                                </Touchable>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <SlotIcon type={slot.type} />
-                                                <Text style={s.labelSm} className="font-inter-medium text-brand-subtext mt-2">{slot.label}</Text>
-                                            </>
-                                        )}
-                                    </Touchable>
-                                ))}
+                                {PHOTO_SLOTS.map((slot) => {
+                                    const uri = images[slot.key];
+                                    return (
+                                        <Touchable
+                                            key={slot.key}
+                                            className="w-[47.5%] h-24 rounded-xl border border-[#919EAB33] items-center justify-center bg-[#FAFAFA] relative overflow-hidden"
+                                            activeOpacity={0.7}
+                                            onPress={() => pickImage(slot.key)}
+                                        >
+                                            {uri ? (
+                                                <>
+                                                    <Image source={{ uri }} className="w-full h-full" resizeMode="cover" />
+                                                    <Touchable
+                                                        onPress={() => removeImage(slot.key)}
+                                                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white items-center justify-center shadow-md"
+                                                        style={{ elevation: 4 }}
+                                                    >
+                                                        <icons.delete_red width={14} height={14} />
+                                                    </Touchable>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <SlotIcon type={slot.type} />
+                                                    <Text style={s.labelSm} className="font-inter-medium text-brand-subtext mt-2">{slot.label}</Text>
+                                                </>
+                                            )}
+                                        </Touchable>
+                                    );
+                                })}
                             </View>
 
                             {/* Action Button */}

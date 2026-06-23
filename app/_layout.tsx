@@ -99,7 +99,7 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <BottomSheetModalProvider>
-              <StatusBar style="dark" />
+              <StatusBar style="dark" translucent backgroundColor="transparent" />
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="(auth)" />

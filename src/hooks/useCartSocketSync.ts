@@ -80,6 +80,7 @@ export const useCartSocketSync = () => {
         if (__DEV__) console.log("[Socket] Settings update:", data);
         queryClient.invalidateQueries({ queryKey: ["platform-settings"] });
         queryClient.invalidateQueries({ queryKey: ["cart-wallet-settings"] });
+        queryClient.invalidateQueries({ queryKey: ["payment-settings"] });
       });
 
       socket.on("disconnect", (reason) => {

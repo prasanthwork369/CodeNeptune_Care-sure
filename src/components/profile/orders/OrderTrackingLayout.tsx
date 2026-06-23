@@ -503,7 +503,12 @@ export const OrderTrackLayout: React.FC = () => {
                     backgroundColor: "#FEF9C3",
                   }}
                   activeOpacity={0.7}
-                  onPress={() => router.push("/profile/orders/return" as any)}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/profile/orders/return",
+                      params: { orderId },
+                    } as any)
+                  }
                 >
                   <icons.package_icon width={14} height={14} fill="#854D0E" />
                   <Text

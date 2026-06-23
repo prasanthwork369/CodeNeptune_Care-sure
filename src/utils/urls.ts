@@ -1,6 +1,6 @@
 // Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
 // Flip LIVE to switch the app between the live API and QA.
-const LIVE = true;
+const LIVE = false;
 const PROD_URL = process.env.EXPO_PUBLIC_API_BASE_URL_PROD;
 const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
 
@@ -75,6 +75,10 @@ export const API_ENDPOINTS = {
   ORDER_BY_ID: (id: string) => `/api/v1/orders/${id}`,
   ORDER_CANCEL: (id: string) => `/api/v1/orders/${id}/cancel`,
 
+  // ── Returns ──────────────────────────────────────────────────────────────
+  RETURNS: "/api/v1/returns",
+  RETURN_BY_ID: (id: string) => `/api/v1/returns/${id}`,
+
   // ── Wallet ───────────────────────────────────────────────────────────────
   WALLET_BALANCE: "/api/v1/customers/wallet/balance",
   WALLET_LOGS: "/api/v1/customers/wallet/logs",
@@ -110,4 +114,5 @@ export const API_ENDPOINTS = {
   // ── Settings ─────────────────────────────────────────────────────────────
   SETTINGS_MOBILE_APP_LINKS: "/api/v1/settings/mobile-app-links",
   SETTINGS_CART_WALLET: "/api/v1/settings/public/customer/cart-wallet",
+  SETTINGS_PAYMENT: "/api/v1/settings/public/customer/payment-settings",
 };

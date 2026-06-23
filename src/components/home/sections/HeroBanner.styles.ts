@@ -42,10 +42,10 @@ export const styles = StyleSheet.create({
     borderColor: "#919EAB33",
     backgroundColor: "#FFFFFF",
     opacity: 1,
-    paddingTop: moderateScale(5, 0.3),
-    paddingRight: moderateScale(8, 0.3),
-    paddingBottom: moderateScale(5, 0.3),
-    paddingLeft: moderateScale(8, 0.3),
+    paddingTop: moderateScale(4, 0.3),
+    paddingRight: moderateScale(7, 0.3),
+    paddingBottom: moderateScale(4, 0.3),
+    paddingLeft: moderateScale(7, 0.3),
     gap: moderateScale(6, 0.3),
     flexDirection: "row",
     alignItems: "center",
@@ -55,7 +55,6 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
-    
   },
   badgeText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
@@ -72,7 +71,7 @@ export const styles = StyleSheet.create({
   },
   avatar: {
     position: "absolute",
-    width: moderateScale(184, 0.1),
+    width: moderateScale(184, 0.3),
     height: moderateScale(211, 0.3),
     top: moderateScale(-21, 0.3),
     right: moderateScale(-2, 0.3),

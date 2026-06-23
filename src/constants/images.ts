@@ -52,8 +52,6 @@ export const HOME_IMAGES = {
   verifiedUser: require("../../assets/images/icons/verified-user.png"),
   dollarCoins: require("../../assets/images/wallet/dollar-coins.png"),
   rupeeCoin: require("../../assets/images/wallet/rupee-coin.png"),
-  cash: require("../../assets/images/wallet/cash.png"),
-  bonusGift: require("../../assets/images/wallet/bonus_gift.png"),
   accountBalanceCredit: require("../../assets/images/icons/account-balance-credit.png"),
   accountBalanceDebit: require("../../assets/images/icons/account-balance-debit.png"),
   coinCredit: require("../../assets/images/icons/coin-credit.png"),
@@ -97,9 +95,9 @@ export const HOME_IMAGES = {
   blockIcon: require("../../assets/images/icons/block.png"),
   notiHistoryIcon: require("../../assets/images/icons/Noti_history.png"),
   bucketCheckIcon: require("../../assets/images/icons/bucket_check.png"),
-  prescriptionInfo: require("../../assets/trial/prescription-info.png"),
-  prescriptionInstructions: require("../../assets/trial/prescription-instructions.png"),
-  prescriptionMedicine: require("../../assets/trial/prescription-medicine.png"),
+  prescriptionInfo: require("../../assets/images/prescription/prescription-info.png"),
+  prescriptionInstructions: require("../../assets/images/prescription/prescription-instructions.png"),
+  prescriptionMedicine: require("../../assets/images/prescription/prescription-medicine.png"),
 } as const;
 
 export const UPLOAD_IMAGES = {

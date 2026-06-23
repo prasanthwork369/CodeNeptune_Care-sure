@@ -30,3 +30,13 @@ export function useSettings() {
         refetchOnWindowFocus: false,
     });
 }
+
+export function usePaymentSettings() {
+    return useQuery({
+        queryKey: ['payment-settings'],
+        queryFn: () => settingsService.getPaymentSettings(),
+        staleTime: 5 * 60 * 1000, // 5 minutes cache
+        retry: 1,
+        refetchOnWindowFocus: false,
+    });
+}
