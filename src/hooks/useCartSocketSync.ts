@@ -34,11 +34,11 @@ export const useCartSocketSync = () => {
       });
 
       socket.on("connect", () => {
-        if (__DEV__) console.log("[CartSocket] Connected");
+        if (__DEV__) console.log("[Socket] Connected");
       });
 
       socket.on("connect_error", (err) => {
-        if (__DEV__) console.warn("[CartSocket] Error:", err.message);
+        if (__DEV__) console.warn("[Socket] Error:", err.message);
       });
 
       socket.on("cart_update", (data: { action: string; cart: any }) => {
@@ -51,12 +51,39 @@ export const useCartSocketSync = () => {
           queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, data.cart);
 
           if (__DEV__)
-            console.log("[CartSocket] Cart synced from server:", data.action);
+            console.log("[Socket] Cart synced from server:", data.action);
         }
       });
 
+      socket.on("coupon_update", (data: { action: string; coupon: any }) => {
+        if (__DEV__) console.log("[Socket] Coupon update:", data);
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.COUPONS });
+      });
+
+      socket.on("wallet_update", (data: { customerId: string }) => {
+        if (__DEV__) console.log("[Socket] Wallet update:", data);
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.WALLET.BALANCE });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.WALLET.LOGS({}) });
+      });
+
+      socket.on("profile_update", (data: { customerId: string }) => {
+        if (__DEV__) console.log("[Socket] Profile update:", data);
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.PROFILE });
+      });
+
+      socket.on("notification", (data: any) => {
+        if (__DEV__) console.log("[Socket] Notification:", data);
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.NOTIFICATIONS });
+      });
+
+      socket.on("settings_update", (data: { action: string; settings: any }) => {
+        if (__DEV__) console.log("[Socket] Settings update:", data);
+        queryClient.invalidateQueries({ queryKey: ["platform-settings"] });
+        queryClient.invalidateQueries({ queryKey: ["cart-wallet-settings"] });
+      });
+
       socket.on("disconnect", (reason) => {
-        if (__DEV__) console.log("[CartSocket] Disconnected:", reason);
+        if (__DEV__) console.log("[Socket] Disconnected:", reason);
       });
 
       socketRef.current = socket;

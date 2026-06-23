@@ -19,6 +19,7 @@ export interface WalletBalance {
     customerId: string;
     walletBalance: number | string;
     coinsBalance: number;
+    walletCreditsBalance?: number | string;
     corporateCredits?: number | string;
     createdAt: string;
     updatedAt: string;

@@ -5,7 +5,12 @@ import { WalletBalance, WalletLog, AddMoneyPayload, WalletBalanceResponse } from
 export const walletApi = {
     getBalance: async (): Promise<WalletBalance> => {
         const response = await apiClient.get(API_ENDPOINTS.WALLET_BALANCE);
-        return response.data.data;
+        const raw = response.data.data;
+        // Backend names the corporate credits field walletCreditsBalance.
+        return {
+            ...raw,
+            corporateCredits: raw.walletCreditsBalance,
+        };
     },
 
     getLogs: async (limit: number = 10, offset: number = 0): Promise<WalletLog[]> => {

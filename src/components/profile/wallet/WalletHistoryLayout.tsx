@@ -1,6 +1,6 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { HOME_IMAGES } from '@/src/constants/images';
-import { useWalletLogs } from '@/src/hooks/queries/useWallet';
+import { useInfiniteWalletLogs } from '@/src/hooks/queries/useWallet';
 import { Transaction, TxIconType, WalletLog } from '@/src/types/wallet';
 import React, { useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
@@ -108,7 +108,7 @@ type Tab = typeof TABS[number];
 export const WalletHistoryLayout: React.FC = () => {
     const adjustedBottom = useAdjustedBottomInset();
     const [activeTab, setActiveTab] = useState<Tab>('All');
-    const { logs, loading } = useWalletLogs(50, 0);
+    const { logs, loading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteWalletLogs();
 
     const all = logs.flatMap(logToTransactions);
     const filtered = activeTab === 'All'
@@ -167,10 +167,21 @@ export const WalletHistoryLayout: React.FC = () => {
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: adjustedBottom + 24, backgroundColor: '#FFFFFF' }}
+                    onScroll={({ nativeEvent }) => {
+                        const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+                        const reachedEnd = contentOffset.y + layoutMeasurement.height >= contentSize.height - 100;
+                        if (reachedEnd && hasNextPage && !isFetchingNextPage) {
+                            fetchNextPage();
+                        }
+                    }}
+                    scrollEventThrottle={200}
                 >
                     {filtered.map((tx, idx) => (
                         <TxRow key={tx.id} tx={tx} isLast={idx === filtered.length - 1} />
                     ))}
+                    {isFetchingNextPage && (
+                        <ActivityIndicator color="#0F7635" style={{ paddingVertical: 16 }} />
+                    )}
                 </ScrollView>
             )}
         </View>

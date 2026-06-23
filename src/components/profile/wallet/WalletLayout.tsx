@@ -213,13 +213,13 @@ export const WalletLayout: React.FC = () => {
                 <Text style={s.walletBalance} className="font-inter-bold text-brand-text leading-none mt-1">
                   ₹{Number(balance?.walletBalance ?? 0).toFixed(2)}
                 </Text>
-                {balance != null && Number(balance.corporateCredits ?? 0) > 0 && (
+                {balance != null && (
                   <View
                     className="self-start mt-2 px-3 py-1 rounded-sm"
                     style={{ borderWidth: 1, borderColor: '#919EAB33', backgroundColor: '#FEFFF3' }}
                   >
                     <Text style={s.walletSub} className="font-inter-medium text-[#454545]">
-                      Including Corporate Credits (₹{Number(balance.corporateCredits).toFixed(0)})
+                      Including Corporate Credits (₹{Number(balance.corporateCredits ?? 0).toFixed(0)})
                     </Text>
                   </View>
                 )}
