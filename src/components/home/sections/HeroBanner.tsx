@@ -89,10 +89,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const { width } = useWindowDimensions();
 
   const bannerWidth = width - 32;
-  const bannerHeight = Math.round(bannerWidth * 0.59);
-  const calculatedHeight = bannerWidth * 0.48 * 1.2;
-  const personHeight = Math.min(calculatedHeight, bannerWidth * 0.6);
-  const personWidth = personHeight / 1.2;
+  // Reserve space based on the avatar's *actual* rendered width (styles.avatar.width)
+  // -- a separately-calculated value here previously drifted from the avatar's real
+  // size, so the image visually overlapped further into the text column than the
+  // padding accounted for, cropping the end of the cycling word behind it.
+  const personWidth = styles.avatar.width;
 
   // Never shrink below mobile baseline; scale up gently on large screens
   const scale = Math.max(1, Math.sqrt(bannerWidth / 358));
@@ -114,9 +115,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         {/* Left: mirrors flex-[1.2] */}
         <View
           style={{
-            paddingLeft: 20,
+            paddingLeft: 10,
             paddingTop: contentPaddingTop,
-            paddingRight: Math.round(personWidth * 0.82),
+            paddingRight: Math.round(personWidth * 0.4),
           }}
         >
           <Skeleton
@@ -167,7 +168,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       >
         {/* ── Left: Text block ── */}
         <Animated.View
-          style={[leftAnim, { paddingRight: Math.round(personWidth * 0.82) }]}
+          style={[leftAnim, { paddingRight: Math.round(personWidth * 0.6) }]}
           className="flex-[1.2] pl-3 pt-6 justify-start"
         >
           <View>
@@ -177,8 +178,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             </Text>
 
             {/* Second line (inline 'for your' prefix and cycling word cycler) */}
-            <View className="flex-row items-center">
-              <Text style={styles.titleText} className="text-brand-text">
+            <View className="flex-row items-center" style={{ minWidth: 0 }}>
+              <Text
+                style={[styles.titleText, { flexShrink: 0 }]}
+                className="text-brand-text"
+              >
                 for your{" "}
               </Text>
               <TextCycler

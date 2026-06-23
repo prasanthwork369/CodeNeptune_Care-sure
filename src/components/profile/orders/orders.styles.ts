@@ -4,13 +4,13 @@ import { moderateScale, scale } from 'react-native-size-matters';
 // Shared across all order components
 export const orderStyles = StyleSheet.create({
     // MyOrdersLayout
-    statusBadge:   { fontSize: moderateScale(11, 0.25) },
-    labelXs:       { fontSize: moderateScale(10, 0.25) },
-    labelSm:       { fontSize: moderateScale(13, 0.3) },
-    labelMd:       { fontSize: moderateScale(14, 0.3) },
-    labelLg:       { fontSize: moderateScale(15, 0.3) },
-    labelXl:       { fontSize: moderateScale(16, 0.3) },
-    label20:       { fontSize: moderateScale(20, 0.3) },
+    statusBadge:   { fontSize: moderateScale(11, 0.08) },
+    labelXs:       { fontSize: moderateScale(10, 0.08) },
+    labelSm:       { fontSize: moderateScale(13, 0.1) },
+    labelMd:       { fontSize: moderateScale(14, 0.1) },
+    labelLg:       { fontSize: moderateScale(15, 0.1) },
+    labelXl:       { fontSize: moderateScale(16, 0.1) },
+    label20:       { fontSize: moderateScale(20, 0.1) },
     productImg52:  { width: scale(52), height: scale(52) },
     productImg50:  { width: scale(50), height: scale(50) },
     productImg62:  { width: scale(62), height: scale(62) },
@@ -33,7 +33,7 @@ export const orderStyles = StyleSheet.create({
     // FrequentlyOrderedLayout counter
     freqCounter:   { width: scale(90) },
     freqCounterBtn:{ width: scale(44), height: scale(44) },
-    freqCounterVal:{ fontSize: moderateScale(13, 0.3) },
+    freqCounterVal:{ fontSize: moderateScale(13, 0.1) },
     freqImgBox:    { width: scale(100), height: scale(100) },
     freqImg:       { width: scale(54), height: scale(54) },
 });

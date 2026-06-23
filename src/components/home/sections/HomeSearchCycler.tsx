@@ -109,7 +109,7 @@ export const HomeSearchCycler: React.FC = () => {
   }, []);
 
   const textStyle = {
-    fontSize: moderateScale(14, 0.3),
+    fontSize: moderateScale(14, 0.1),
     lineHeight: SLOT_H,
     fontWeight: "500" as const,
     color: "#9CA3AF",

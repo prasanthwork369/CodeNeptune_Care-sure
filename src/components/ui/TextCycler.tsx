@@ -43,12 +43,22 @@ const WordItem: React.FC<{
     }));
 
     return (
-        <Animated.Text
-            style={[{ position: 'absolute', top: 0, left: 0, lineHeight, includeFontPadding: false }, style, animStyle]}
-            className={className}
+        // Animation lives on the View, not the Text -- Animated.Text doesn't
+        // reliably support adjustsFontSizeToFit, so the word itself is a plain
+        // Text that can actually shrink to fit instead of clipping a letter.
+        <Animated.View
+            style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: lineHeight }, animStyle]}
         >
-            {word}
-        </Animated.Text>
+            <Text
+                style={[{ lineHeight, includeFontPadding: false }, style]}
+                className={className}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.6}
+            >
+                {word}
+            </Text>
+        </Animated.View>
     );
 };
 
@@ -77,7 +87,13 @@ export const TextCycler: React.FC<TextCyclerProps> = ({
 
     if (words.length === 1) {
         return (
-            <Text style={[{ lineHeight }, style]} className={className}>
+            <Text
+                style={[{ lineHeight, flexShrink: 1 }, style]}
+                className={className}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+            >
                 {words[0]}
             </Text>
         );
@@ -86,11 +102,14 @@ export const TextCycler: React.FC<TextCyclerProps> = ({
     const longestWord = [...words].sort((a, b) => b.length - a.length)[0];
 
     return (
-        <View style={{ height: lineHeight, overflow: 'hidden', flexShrink: 0 }}>
-            {/* reserves width without visible text */}
+        <View style={{ height: lineHeight, overflow: 'hidden', flexShrink: 1, minWidth: 0 }}>
+            {/* reserves width without visible text -- shrinks/ellipsizes instead of
+                overflowing past the available space when the longest cycling word
+                doesn't fit (e.g. a long CMS-driven highlight word on a narrow screen) */}
             <Text
                 style={[{ lineHeight, opacity: 0, includeFontPadding: false }, style]}
                 className={className}
+                numberOfLines={1}
                 pointerEvents="none"
             >
                 {longestWord}

@@ -6,7 +6,7 @@ export const TITLE_LINE_HEIGHT = moderateScale(30, 0.3);
 export const styles = StyleSheet.create({
   container: {
     height: moderateScale(190, 0.3),
-    marginHorizontal: scale(16),
+    marginHorizontal: scale(12),
     marginTop: scale(20),
     borderRadius: 12,
     borderWidth: 1,
@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   },
   skeletonContainer: {
     height: moderateScale(190, 0.3),
-    marginHorizontal: scale(16),
+    marginHorizontal: scale(12),
     marginTop: scale(20),
     borderRadius: 12,
     borderWidth: 1,
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
   titleText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "800",
-    fontSize: moderateScale(20, 0.3),
+    fontSize: moderateScale(20, 0.1),
     lineHeight: TITLE_LINE_HEIGHT,
     letterSpacing: 0,
     includeFontPadding: false,
@@ -60,8 +60,8 @@ export const styles = StyleSheet.create({
   badgeText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "600",
-    fontSize: moderateScale(12, 0.3),
-    lineHeight: moderateScale(12, 0.3),
+    fontSize: moderateScale(12, 0.1),
+    lineHeight: moderateScale(12, 0.1),
     letterSpacing: 0,
     color: "#0F7635",
     verticalAlign: "middle",
@@ -72,10 +72,10 @@ export const styles = StyleSheet.create({
   },
   avatar: {
     position: "absolute",
-    width: moderateScale(184, 0.3),
+    width: moderateScale(184, 0.1),
     height: moderateScale(211, 0.3),
     top: moderateScale(-21, 0.3),
-    right: 0,
+    right: moderateScale(-2, 0.3),
   },
   decorMedicine: {
     position: "absolute",

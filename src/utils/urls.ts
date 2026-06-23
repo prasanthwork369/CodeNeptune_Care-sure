@@ -1,11 +1,10 @@
 // Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
-// Set EXPO_PUBLIC_API_ENV=production in .env.local to point the app at the live API.
-// Unset (or any other value) falls back to QA, so this stays safe by default.
+// Flip LIVE to switch the app between the live API and QA.
+const LIVE = true;
 const PROD_URL = process.env.EXPO_PUBLIC_API_BASE_URL_PROD;
 const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
 
-const resolvedBaseUrl =
-  process.env.EXPO_PUBLIC_API_ENV === "qa" ? PROD_URL : QA_URL;
+const resolvedBaseUrl = LIVE ? PROD_URL : QA_URL;
 
 if (!resolvedBaseUrl) {
   throw new Error(

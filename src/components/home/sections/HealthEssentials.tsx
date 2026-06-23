@@ -45,9 +45,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
     const { width } = useWindowDimensions();
     const cardWidth = (width - 20 - 14 - 36) / 2;
-    const cardHeight = cardWidth * 1.75;
-    const half = cardHeight / 2;
-    const imageSize = half * 0.65;
+    // Image area height is tied to card width; the details area below it
+    // sizes itself to its own content instead of a forced half-split (see
+    // PopularSubstitutes.tsx for the same fix and why).
+    const imageAreaHeight = cardWidth * 0.875;
+    const imageSize = imageAreaHeight * 0.65;
 
     const { count, increment, decrement, animations, isPending } = useCartActions({
         medicineId: id,
@@ -66,13 +68,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return (
         <View
             className="bg-white rounded-[12px] overflow-hidden"
-            style={{ width: cardWidth, height: cardHeight, borderWidth: 0.77, borderColor: '#919EAB33' }}
+            style={{ width: cardWidth, borderWidth: 0.77, borderColor: '#919EAB33' }}
         >
-            {/* Top 50% — image */}
+            {/* Image area — fixed height, tied to card width */}
             <Touchable
                 activeOpacity={0.85}
                 onPress={() => onPress(productId)}
-                style={{ height: half, backgroundColor: contentBg, paddingBottom: 4 }}
+                style={{ height: imageAreaHeight, backgroundColor: contentBg, paddingBottom: 4 }}
             >
                 <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
                     {!!discountLabel && (
@@ -88,15 +90,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </View>
             </Touchable>
 
-            {/* Bottom 50% — details + button */}
-            <View style={{ height: half, backgroundColor: contentBg, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingTop: 12, flexDirection: 'column' }}>
-                {/* Info — flex:1 absorbs leftover space */}
-                <Touchable activeOpacity={0.85} onPress={() => onPress(productId)} style={{ flex: 1 }}>
+            {/* Details area — sized to its own content, not a forced half-split */}
+            <View style={{ backgroundColor: contentBg, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingTop: 12, flexDirection: 'column' }}>
+                <Touchable activeOpacity={0.85} onPress={() => onPress(productId)}>
                     <Text style={s.name} className="font-inter-medium text-brand-text" numberOfLines={1}>{name}</Text>
                     {!!description && (
                         <Text style={s.description} className="mt-0.5" numberOfLines={1}>{description}</Text>
                     )}
-                    <View className="flex-row items-center gap-x-1.5 mt-1.5">
+                    <View className="flex-row items-center gap-x-1.5 mt-1.5" style={{ marginBottom: 8 }}>
                         <Text style={s.price}>₹{Number(price).toFixed(2)}</Text>
                         {mrp > price && (
                             <Text style={s.mrp}>₹{Number(mrp).toFixed(2)}</Text>

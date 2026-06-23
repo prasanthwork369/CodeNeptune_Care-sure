@@ -41,9 +41,9 @@ export const styles = StyleSheet.create({
     label: {
         flex: 1,
         fontWeight: '600',
-        fontSize: moderateScale(14, 0.3),
+        fontSize: moderateScale(14, 0.1),
         color: '#0F172A',
-        lineHeight: moderateScale(20, 0.3),
+        lineHeight: moderateScale(20, 0.1),
         verticalAlign: 'middle',
     },
 });

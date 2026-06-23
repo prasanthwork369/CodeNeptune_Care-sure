@@ -6,22 +6,22 @@ export const SEARCH_ICON_SIZE = scale(18);
 export const styles = StyleSheet.create({
   cyclerText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: moderateScale(14, 0.1),
+    lineHeight: moderateScale(18, 0.1),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   placeholderText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: moderateScale(14, 0.1),
+    lineHeight: moderateScale(18, 0.1),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   inputText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: moderateScale(14, 0.1),
+    lineHeight: moderateScale(18, 0.1),
     letterSpacing: 0,
     verticalAlign: "middle",
   },

@@ -2,11 +2,11 @@ import { StyleSheet } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
-    badge:           { fontSize: moderateScale(11, 0.25) },
+    badge:           { fontSize: moderateScale(11, 0.08) },
     name: {
         fontWeight: '500',
-        fontSize: moderateScale(14, 0.25),
-        lineHeight: moderateScale(20, 0.25),
+        fontSize: moderateScale(14, 0.08),
+        lineHeight: moderateScale(20, 0.08),
         verticalAlign: 'middle',
         letterSpacing: 0,
     },
@@ -42,10 +42,10 @@ export const styles = StyleSheet.create({
         letterSpacing: 0,
         verticalAlign: 'middle',
     },
-    counter:         { fontSize: moderateScale(20, 0.25) },
-    counterVal:      { fontSize: moderateScale(14, 0.25) },
-    sectionTitle:    { fontSize: moderateScale(16, 0.25) },
-    sectionSubtitle: { fontSize: moderateScale(22, 0.25), lineHeight: moderateScale(30, 0.25) },
+    counter:         { fontSize: moderateScale(20, 0.08) },
+    counterVal:      { fontSize: moderateScale(14, 0.08) },
+    sectionTitle:    { fontSize: moderateScale(16, 0.08) },
+    sectionSubtitle: { fontSize: moderateScale(22, 0.08), lineHeight: moderateScale(30, 0.08) },
     cartBtn: {
         width: 137,
         height: 40,
