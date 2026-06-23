@@ -10,6 +10,7 @@ export interface CustomerProfile {
   avatarUrl?: string;
   dateOfBirth?: string;
   gender?: string;
+  isFirstTimeLogin?: boolean;
 }
 
 export interface UpdateProfilePayload {

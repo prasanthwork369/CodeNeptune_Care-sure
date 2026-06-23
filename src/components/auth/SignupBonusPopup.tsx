@@ -1,11 +1,14 @@
 import { Touchable } from "@/src/components/ui/Touchable";
-import { icons } from "@/src/constants/icons";
-import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
+import { ANIMATIONS } from "@/src/constants/images";
+import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
+import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { walletService } from "@/src/services/wallet.service";
 import { useAuthStore } from "@/src/store/authStore";
+import { SignupBonusPopupContent } from "@/src/types/signupBonus";
+import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { usePathname } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, Image, Modal, Text, View, Pressable, TouchableWithoutFeedback } from "react-native";
@@ -19,6 +22,13 @@ interface BonusData {
   coins: number;
 }
 
+const BADGE_ICON_BG = ["#FDF5FF", "#FFF8EC", "#E9F5FF"];
+
+// Badge icons are always remote URLs from the CMS -- no local fallback.
+const BadgeIcon = ({ icon }: { icon: string }) => (
+  <Image source={{ uri: icon }} style={{ width: 16, height: 16 }} resizeMode="contain" />
+);
+
 interface Props {
   testMode?: boolean;
   onClose?: () => void;
@@ -28,8 +38,17 @@ export const SignupBonusPopup: React.FC<Props> = ({
   testMode = false,
   onClose,
 }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, setUser } = useAuthStore();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
+  const { data: content } = useWebsiteContent('signup_bonus_popup') as {
+    data?: SignupBonusPopupContent;
+  };
+  const { data: cartWalletSettings } = useCartWalletSettings();
+  const walletSettings = cartWalletSettings?.wallet;
+  const isBonusOn = walletSettings
+    ? walletSettings.isWalletBonusActive || walletSettings.isCoinsBonusActive
+    : true;
   const [isOpen, setIsOpen] = useState(testMode);
   const [bonusData, setBonusData] = useState<BonusData | null>(
     testMode ? { wallet: 100, coins: 50 } : null,
@@ -42,6 +61,12 @@ export const SignupBonusPopup: React.FC<Props> = ({
 
     if (!isAuthenticated || !user?.id) return;
 
+    // isFirstTimeLogin is set by the backend and shared across web and
+    // mobile -- once either platform has shown the popup (or skipped it
+    // because bonuses are off), the backend flips it to false so it never
+    // shows again on any device.
+    if (user.isFirstTimeLogin === false) return;
+
     // Wait until we've actually landed on the Home screen before
     // checking/showing the bonus — avoids it popping up mid-navigation
     // (OTP screen -> Home transition).
@@ -51,9 +76,13 @@ export const SignupBonusPopup: React.FC<Props> = ({
     let confettiTimer: ReturnType<typeof setTimeout> | null = null;
 
     const checkBonus = async () => {
-      const storageKey = `caresure.bonus.shown.${user.id}`;
-      const alreadyShown = await SecureStore.getItemAsync(storageKey);
-      if (alreadyShown || cancelled) return;
+      // Wait for wallet/coins bonus settings to load before deciding whether
+      // to fetch logs — if admin has disabled both bonuses, skip entirely.
+      if (!cartWalletSettings) return;
+      if (!isBonusOn) {
+        markShown();
+        return;
+      }
 
       try {
         const logs = await walletService.getLogs(5, 0);
@@ -74,12 +103,21 @@ export const SignupBonusPopup: React.FC<Props> = ({
             setIsOpen(true);
             confettiTimer = setTimeout(() => setShowConfetti(false), 5000);
           }
-          await SecureStore.setItemAsync(storageKey, "true");
+          markShown();
         }
       } catch (err) {
         if (__DEV__)
           console.error("[SignupBonusPopup] failed to check wallet logs", err);
       }
+    };
+
+    // Mirrors the backend, which already flips isFirstTimeLogin to false on
+    // the first profile fetch -- this just keeps local state (and the
+    // profile query cache) in sync so this session doesn't re-check.
+    const markShown = () => {
+      const updatedUser = { ...user, isFirstTimeLogin: false };
+      setUser(updatedUser);
+      queryClient.setQueryData(QUERY_KEYS.CUSTOMER.PROFILE, updatedUser);
     };
 
     checkBonus();
@@ -88,7 +126,16 @@ export const SignupBonusPopup: React.FC<Props> = ({
       cancelled = true;
       if (confettiTimer) clearTimeout(confettiTimer);
     };
-  }, [isAuthenticated, user?.id, pathname]);
+  }, [
+    isAuthenticated,
+    user?.id,
+    user?.isFirstTimeLogin,
+    pathname,
+    cartWalletSettings,
+    isBonusOn,
+    setUser,
+    queryClient,
+  ]);
 
   const hasWallet = bonusData && bonusData.wallet > 0;
   const hasCoins = bonusData && bonusData.coins > 0;
@@ -138,19 +185,19 @@ export const SignupBonusPopup: React.FC<Props> = ({
               className="font-medium text-[#222222]"
               style={{ fontSize: 14 }}
             >
-              Hi there!
+              {content?.greeting || "Hi there!"}
             </Text>
             <Text
               className="font-inter-extrabold text-[#222222]"
               style={{ fontSize: 19, marginTop: 2 }}
             >
-              Welcome to CareSure
+              {content?.title || "Welcome to CareSure"}
             </Text>
             <Text
               className="font-inter text-[#6A6A6A]"
               style={{ fontSize: 12, marginTop: 3 }}
             >
-              You&apos;ve got rewards waiting for you
+              {content?.subtitle || "You've got rewards waiting for you"}
             </Text>
 
             <Svg
@@ -167,17 +214,19 @@ export const SignupBonusPopup: React.FC<Props> = ({
               <Rect width={200} height={200} fill="url(#giftGlow)" />
             </Svg>
 
-            <Image
-              source={HOME_IMAGES.bonusGift}
-              style={{
-                position: "absolute",
-                top: -6,
-                right: -8,
-                width: 145,
-                height: 115,
-              }}
-              resizeMode="contain"
-            />
+            {!!content?.giftImage && (
+              <Image
+                source={{ uri: content.giftImage }}
+                style={{
+                  position: "absolute",
+                  top: -6,
+                  right: -8,
+                  width: 145,
+                  height: 115,
+                }}
+                resizeMode="contain"
+              />
+            )}
           </View>
 
           {/* Wallet card */}
@@ -197,8 +246,22 @@ export const SignupBonusPopup: React.FC<Props> = ({
               className="font-inter-semibold text-[#222222]"
               style={{ fontSize: 14, marginBottom: 10 }}
             >
-              Your Wallet
+              {content?.walletTitle || "Your Wallet"}
             </Text>
+
+            {content?.coinImage && (
+              <Image
+                source={{ uri: content.coinImage }}
+                style={{
+                  position: "absolute",
+                  top: -28,
+                  right: 14,
+                  width: 56,
+                  height: 56,
+                }}
+                resizeMode="contain"
+              />
+            )}
 
             <View className="flex-row" style={{ gap: 10, marginBottom: 12 }}>
               {hasCoins && (
@@ -224,18 +287,20 @@ export const SignupBonusPopup: React.FC<Props> = ({
                         marginRight: 8,
                       }}
                     >
-                      <Image
-                        source={HOME_IMAGES.rupeeCoin}
-                        style={{ width: 38, height: 38 }}
-                        resizeMode="contain"
-                      />
+                      {!!content?.coinsIcon && (
+                        <Image
+                          source={{ uri: content.coinsIcon }}
+                          style={{ width: 38, height: 38 }}
+                          resizeMode="contain"
+                        />
+                      )}
                     </View>
                     <View>
                       <Text
                         className="font-inter-medium text-[#222222]"
                         style={{ fontSize: 10, letterSpacing: 1 }}
                       >
-                        COINS
+                        {(content?.coinsLabel || "COINS").toUpperCase()}
                       </Text>
                       <Text
                         className="font-inter-extrabold "
@@ -271,18 +336,20 @@ export const SignupBonusPopup: React.FC<Props> = ({
                         marginRight: 8,
                       }}
                     >
-                      <Image
-                        source={HOME_IMAGES.cash}
-                                                style={{ width: 38, height: 38 }}
-                        resizeMode="contain"
-                      />
+                      {!!content?.balanceIcon && (
+                        <Image
+                          source={{ uri: content.balanceIcon }}
+                          style={{ width: 38, height: 38 }}
+                          resizeMode="contain"
+                        />
+                      )}
                     </View>
                     <View>
                       <Text
                         className="font-inter-medium text-[#222222]"
                         style={{ fontSize: 10, letterSpacing: 1 }}
                       >
-                        BALANCE
+                        {(content?.balanceLabel || "BALANCE").toUpperCase()}
                       </Text>
                       <Text
                         className="font-inter-bold text-[#0F7635]"
@@ -296,126 +363,65 @@ export const SignupBonusPopup: React.FC<Props> = ({
               )}
             </View>
 
-            {/* Feature highlights */}
-            <LinearGradient
-              colors={["#FDF5FF", "#F3F9FF"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 16, marginTop: 2 }}
-            >
-              <View
-                className="flex-row items-center"
-                style={{ paddingVertical: 10, paddingHorizontal: 8 }}
+            {/* Feature highlights — API-driven only, no local fallback */}
+            {!!content?.badges?.length && (
+              <LinearGradient
+                colors={["#FDF5FF", "#F3F9FF"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ borderRadius: 16, marginTop: 2 }}
               >
-                <View className="flex-1 items-center">
-                  <View
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 10,
-                      backgroundColor: "#FDF5FF",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 4,
-                    }}
-                  >
-                    <icons.bonus_coins width={16} height={18} />
-                  </View>
-                  <Text
-                    className="font-inter-semibold text-[#222222] text-center"
-                    style={{ fontSize: 11 }}
-                    numberOfLines={1}
-                  >
-                    Earn coins
-                  </Text>
-                  <Text
-                    className="font-inter-medium text-[#6A6A6A] text-center"
-                    style={{ fontSize: 9, marginTop: 1 }}
-                    numberOfLines={1}
-                  >
-                    on every order
-                  </Text>
-                </View>
-
                 <View
-                  style={{
-                    width: 1,
-                    height: 32,
-                    backgroundColor: "#919EAB33",
-                    marginHorizontal: 6,
-                  }}
-                />
+                  className="flex-row items-center"
+                  style={{ paddingVertical: 10, paddingHorizontal: 8 }}
+                >
+                  {content.badges.map((badge, index, arr) => (
+                    <React.Fragment key={index}>
+                      <View className="flex-1 items-center">
+                        <View
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 10,
+                            backgroundColor: BADGE_ICON_BG[index % BADGE_ICON_BG.length],
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginBottom: 4,
+                          }}
+                        >
+                          <BadgeIcon icon={badge.icon} />
+                        </View>
+                        <Text
+                          className="font-inter-semibold text-[#222222] text-center"
+                          style={{ fontSize: 11 }}
+                          numberOfLines={1}
+                        >
+                          {badge.label}
+                        </Text>
+                        <Text
+                          className="font-inter-medium text-[#6A6A6A] text-center"
+                          style={{ fontSize: 9, marginTop: 1 }}
+                          numberOfLines={1}
+                        >
+                          {badge.description}
+                        </Text>
+                      </View>
 
-                <View className="flex-1 items-center">
-                  <View
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 10,
-                      backgroundColor: "#FFF8EC",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 4,
-                    }}
-                  >
-                    <icons.bonus_discount width={18} height={12} />
-                  </View>
-                  <Text
-                    className="font-inter-semibold text-[#222222] text-center"
-                    style={{ fontSize: 11 }}
-                    numberOfLines={1}
-                  >
-                    Use coins
-                  </Text>
-                  <Text
-                    className="font-inter-medium text-[#6A6A6A] text-center"
-                    style={{ fontSize: 9, marginTop: 1 }}
-                    numberOfLines={1}
-                  >
-                    for discounts
-                  </Text>
+                      {index < arr.length - 1 && (
+                        <View
+                          style={{
+                            width: 1,
+                            height: 32,
+                            backgroundColor: "#919EAB33",
+                            marginHorizontal: 6,
+                          }}
+                        />
+                      )}
+                    </React.Fragment>
+                  ))}
                 </View>
-
-                <View
-                  style={{
-                    width: 1,
-                    height: 32,
-                    backgroundColor: "#919EAB33",
-                    marginHorizontal: 6,
-                  }}
-                />
-
-                <View className="flex-1 items-center">
-                  <View
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 10,
-                      backgroundColor: "#E9F5FF",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 4,
-                    }}
-                  >
-                    <icons.bonus_gift width={16} height={16} />
-                  </View>
-                  <Text
-                    className="font-inter-semibold text-[#222222] text-center"
-                    style={{ fontSize: 11 }}
-                    numberOfLines={1}
-                  >
-                    More benefits
-                  </Text>
-                  <Text
-                    className="font-inter-medium text-[#6A6A6A] text-center"
-                    style={{ fontSize: 9, marginTop: 1 }}
-                    numberOfLines={1}
-                  >
-                    exclusive for you
-                  </Text>
-                </View>
-              </View>
-            </LinearGradient>
+              </LinearGradient>
+            )}
           </View>
 
           {/* CTA */}
@@ -437,7 +443,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
                 className="font-inter-bold text-white"
                 style={{ fontSize: 15 }}
               >
-                Start Shopping
+                {content?.buttonText || "Start Shopping"}
               </Text>
             </Touchable>
           </View>
