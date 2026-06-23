@@ -32,6 +32,7 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
@@ -378,16 +379,20 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   // Android: the active tab label's custom Inter typeface (set via useAnimatedStyle in
   // TabItem) can fail to resolve on the very first paint -- the native Text view is
   // created before the font is queryable in Android's typeface cache, and only a real
-  // prop update (like tapping a tab) re-resolves it correctly. Nudging followerX by an
-  // imperceptible amount forces that same native update once, right after mount, so the
-  // active label renders bold immediately instead of only after the first tap.
+  // prop update (like tapping a tab) re-resolves it correctly. Setting followerX to the
+  // same value it already holds is a no-op (Reanimated skips pushing an update when the
+  // value doesn't change), so we animate it away and back over real frames -- after a
+  // short delay for the typeface cache to warm up -- which forces genuine native style
+  // recomputes and lets the active label land on the bold weight without needing a tap.
   useEffect(() => {
     if (Platform.OS !== "android") return;
-    const id = requestAnimationFrame(() => {
-      followerX.value = lastValidIndex.current + 0.0001;
-      followerX.value = lastValidIndex.current;
-    });
-    return () => cancelAnimationFrame(id);
+    const id = setTimeout(() => {
+      followerX.value = withSequence(
+        withTiming(lastValidIndex.current + 0.01, { duration: 16 }),
+        withTiming(lastValidIndex.current, { duration: 16 }),
+      );
+    }, 80);
+    return () => clearTimeout(id);
   }, []);
 
   useEffect(() => {
