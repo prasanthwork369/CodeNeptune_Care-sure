@@ -50,6 +50,8 @@ import Animated, {
   useSharedValue,
   withDelay,
   withTiming,
+  useAnimatedRef,
+  useScrollViewOffset,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -88,7 +90,7 @@ export const HomeLayout: React.FC = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [carouselY, setCarouselY] = useState(0);
   const [carouselHeight, setCarouselHeight] = useState(0);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
   const currentScrollY = useRef(0);
 
   useEffect(() => {
@@ -158,8 +160,9 @@ export const HomeLayout: React.FC = () => {
   );
   const heroHeightRef = useRef(0);
   const heroHeightShared = useSharedValue(0);
-  const { scrollY, handleScroll, stickySearchVisible } =
-    useHomeScroll(heroHeightRef);
+  const scrollY = useScrollViewOffset(scrollViewRef);
+  const { handleScroll, stickySearchVisible } =
+    useHomeScroll(scrollY, heroHeightShared);
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
   const adjustedBottoms =
     Platform.OS === "android"
@@ -253,8 +256,8 @@ export const HomeLayout: React.FC = () => {
       <Animated.View
         style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]}
       />
-      <ScrollView
-        ref={scrollViewRef}
+      <Animated.ScrollView
+        ref={scrollViewRef as any}
         showsVerticalScrollIndicator={false}
         className="flex-1"
         bounces={false}
@@ -392,7 +395,7 @@ export const HomeLayout: React.FC = () => {
 
           <HomeFooter appContent={appContent} isLoading={isHomeLoading} />
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <StickySearchHeader
         visible={stickySearchVisible}
