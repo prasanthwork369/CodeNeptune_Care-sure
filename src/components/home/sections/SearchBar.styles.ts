@@ -1,4 +1,4 @@
-import { moderateScale } from "react-native-size-matters";
+
 import { StyleSheet } from "react-native";
 import { exactScale } from "@/src/utils/exactScale";
 
@@ -7,22 +7,22 @@ export const SEARCH_ICON_SIZE = exactScale(18);
 export const styles = StyleSheet.create({
   cyclerText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   placeholderText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   inputText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
