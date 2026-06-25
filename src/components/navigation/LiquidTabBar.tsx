@@ -37,8 +37,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import {
 import { exactScale } from "@/src/utils/exactScale";
+import {
   ACTIVE_HEIGHT,
   ACTIVE_RADIUS,
   BAR_HEIGHT,
