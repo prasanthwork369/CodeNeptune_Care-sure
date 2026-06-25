@@ -70,13 +70,13 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
         {/* Softens the blur's bottom edge into the white page content below
             instead of cutting off sharply */}
         <LinearGradient
-          colors={["transparent", "#FFFFFF",]}
+          colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
           style={{
             position: "absolute",
             left: 0,
             right: 0,
             bottom: 0,
-            height: 24,
+            height: 32,
           }}
           pointerEvents="none"
         />

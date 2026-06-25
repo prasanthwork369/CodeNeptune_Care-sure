@@ -2,6 +2,7 @@ import { useCartPendingStore } from "@/src/store/cartStore";
 import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
 import { useCart } from "./queries/useCart";
+import { useAuthStore } from "@/src/store/authStore";
 
 /**
  * Product identity for cart operations.
@@ -43,6 +44,7 @@ export const useCartActions = (product: CartActionProduct) => {
 
   const count = cartItem?.quantity ?? 0;
   const { pendingIds, setPending } = useCartPendingStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isPending = pendingIds[pendingKey] ?? false;
 
   const prevCountRef = useRef(count);
@@ -82,7 +84,7 @@ export const useCartActions = (product: CartActionProduct) => {
 
   const increment = async () => {
     if (isPending) return;
-    setPending(pendingKey, true);
+    if (isAuthenticated) setPending(pendingKey, true);
     try {
       if (cartItem) {
         await updateItem(cartItem.id, { quantity: count + 1 });
@@ -141,13 +143,13 @@ export const useCartActions = (product: CartActionProduct) => {
         });
       }
     } finally {
-      setPending(pendingKey, false);
+      if (isAuthenticated) setPending(pendingKey, false);
     }
   };
 
   const decrement = async () => {
     if (isPending || count <= 0) return;
-    setPending(pendingKey, true);
+    if (isAuthenticated) setPending(pendingKey, true);
     try {
       if (count === 1) {
         await removeItem(cartItem!.id);
@@ -155,7 +157,7 @@ export const useCartActions = (product: CartActionProduct) => {
         await updateItem(cartItem!.id, { quantity: count - 1 });
       }
     } finally {
-      setPending(pendingKey, false);
+      if (isAuthenticated) setPending(pendingKey, false);
     }
   };
 
