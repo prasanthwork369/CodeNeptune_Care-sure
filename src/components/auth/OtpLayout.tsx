@@ -3,7 +3,7 @@ import { icons } from "@/src/constants/icons";
 import { useOtp } from "@/src/hooks/useOtp";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { scale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 import { styles as s } from "./OtpLayout.styles";
 import { AuthFooter } from "./sections/AuthFooter";
 import { AuthScreenShell } from "./sections/AuthScreenShell";

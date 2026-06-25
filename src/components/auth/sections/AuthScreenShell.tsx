@@ -14,7 +14,7 @@ import {
     View,
 } from "react-native";
 import { KeyboardEvents } from "react-native-keyboard-controller";
-import { moderateScale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -79,7 +79,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 
   const isTablet = width >= 600;
   const panelMaxWidth = isTablet ? 560 : undefined;
-  const panelPaddingH = isTablet ? Math.round(width * 0.08) : moderateScale(32, 0.3);
+  const panelPaddingH = isTablet ? Math.round(width * 0.08) : exactScale(32);
   const skipScale = useSharedValue(1);
   const skipStyle = useAnimatedStyle(() => ({
     transform: [{ scale: skipScale.value }],
@@ -110,8 +110,8 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
         style={[
           styles.skipWrapper,
           {
-            top: insets.top > 0 ? insets.top + moderateScale(10, 0.3) : moderateScale(53, 0.3),
-            right: width >= 390 ? moderateScale(13, 0.3) : moderateScale(16, 0.3),
+            top: insets.top > 0 ? insets.top + exactScale(10) : exactScale(53),
+            right: width >= 390 ? exactScale(13) : exactScale(16),
           },
           skipStyle,
         ]}
@@ -148,7 +148,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
               {
                 paddingHorizontal: panelPaddingH,
                 maxWidth: panelMaxWidth,
-                paddingBottom: footer ? 0 : adjustedBottom + moderateScale(24, 0.3),
+                paddingBottom: footer ? 0 : adjustedBottom + exactScale(24),
               },
             ]}
           >
@@ -161,7 +161,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                 styles.footer,
                 {
                   paddingHorizontal: panelPaddingH,
-                  paddingBottom: adjustedBottom + moderateScale(16, 0.3),
+                  paddingBottom: adjustedBottom + exactScale(16),
                   maxWidth: panelMaxWidth,
                 },
               ]}
@@ -192,26 +192,26 @@ const styles = StyleSheet.create({
     zIndex: 50,
   },
   skipBtn: {
-    width: moderateScale(70, 0.3),
-    height: moderateScale(30, 0.3),
+    width: exactScale(70),
+    height: exactScale(30),
     borderWidth: 1,
     borderColor: "#919EAB33",
-    borderRadius: moderateScale(20, 0.3),
+    borderRadius: exactScale(20),
     backgroundColor: "#FFFFFF",
-    paddingTop: moderateScale(6, 0.3),
-    paddingBottom: moderateScale(6, 0.3),
-    paddingLeft: moderateScale(10, 0.3),
-    paddingRight: moderateScale(10, 0.3),
+    paddingTop: exactScale(6),
+    paddingBottom: exactScale(6),
+    paddingLeft: exactScale(10),
+    paddingRight: exactScale(10),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: moderateScale(8, 0.3),
+    gap: exactScale(8),
   },
   skipText: {
     fontFamily: "Inter",
     fontWeight: "500",
-    fontSize: moderateScale(12, 0.1),
-    lineHeight: moderateScale(12, 0.1),
+    fontSize: exactScale(12),
+    lineHeight: exactScale(12),
     letterSpacing: 0,
     textAlign: "center",
     textAlignVertical: "center",
@@ -226,11 +226,11 @@ const styles = StyleSheet.create({
   },
   panel: {
     backgroundColor: "white",
-    borderTopLeftRadius: moderateScale(24, 0.3),
-    borderTopRightRadius: moderateScale(24, 0.3),
+    borderTopLeftRadius: exactScale(24),
+    borderTopRightRadius: exactScale(24),
     width: "100%",
     alignSelf: "center",
-    paddingTop: moderateScale(32, 0.3),
+    paddingTop: exactScale(32),
   },
   footer: {
     backgroundColor: "white",

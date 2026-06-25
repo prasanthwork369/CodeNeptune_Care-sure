@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { exactScale } from '@/src/utils/exactScale';
 
 export const styles = StyleSheet.create({
-    title: { fontSize: moderateScale(26, 0.1), lineHeight: moderateScale(34, 0.1) },
-    headerContainer: { marginBottom: moderateScale(16, 0.3) },
+    title: { fontSize: exactScale(26), lineHeight: exactScale(34) },
+    headerContainer: { marginBottom: exactScale(16) },
 });
