@@ -2,6 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import Animated, {
@@ -76,7 +77,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            height: 32,
+            height: exactScale(32),
           }}
           pointerEvents="none"
         />
@@ -84,22 +85,22 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: 10,
-            paddingTop: insets.top + 5,
-            paddingBottom: 14,
-            paddingHorizontal: 16,
+            gap: exactScale(10),
+            paddingTop: insets.top + exactScale(5),
+            paddingBottom: exactScale(14),
+            paddingHorizontal: exactScale(16),
             // No fill here -- the Figma spec is backdrop-filter: blur() only,
             // so the BlurView itself is the entire background treatment.
           }}
         >
           <View
             style={{
-              width: 55,
-              height: 55,
+              width: exactScale(55),
+              height: exactScale(55),
               borderRadius: 10,
               borderWidth: 1.05,
               borderColor: "#919EAB33",
-              paddingVertical: 10,
+              paddingVertical: exactScale(10),
               backgroundColor: "#FFFFFF",
               alignItems: "center",
               justifyContent: "center",
@@ -110,7 +111,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
               elevation: 1,
             }}
           >
-            <icons.logo width={32} height={32} />
+            <icons.logo width={exactScale(32)} height={exactScale(32)} />
           </View>
 
           <Touchable
@@ -120,11 +121,11 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
               flex: 1,
               flexDirection: "row",
               alignItems: "center",
-              height: 55,
+              height: exactScale(55),
               borderRadius: 10,
               borderWidth: 1.05,
               borderColor: "#919EAB33",
-              paddingHorizontal: 10,
+              paddingHorizontal: exactScale(10),
               backgroundColor: "#FFFFFF",
               shadowColor: "#919EAB0A",
               shadowOffset: { width: 0, height: 10 },
@@ -133,13 +134,13 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
               elevation: 1,
             }}
           >
-            <icons.search width={18} height={18} />
+            <icons.search width={exactScale(18)} height={exactScale(18)} />
             <Text
               numberOfLines={1}
               style={{
                 flex: 1,
-                marginLeft: 8,
-                fontSize: 14,
+                marginLeft: exactScale(8),
+                fontSize: exactScale(14),
                 fontWeight: "500",
                 color: "#6A6A6A",
               }}
@@ -150,7 +151,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
               onPress={onPressUpload}
               className="border-l border-[#919EAB33] pl-3 ml-1"
             >
-              <icons.uploadActive width={22} height={22} />
+              <icons.uploadActive width={exactScale(22)} height={exactScale(22)} />
             </Touchable>
           </Touchable>
         </View>
