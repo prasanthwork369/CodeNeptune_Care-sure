@@ -2,7 +2,7 @@ import { apiClient } from '@/src/api/client';
 import { AlertDialog } from '@/src/components/ui/AlertDialog';
 import { useNetworkStore } from '@/src/store/useNetworkStore';
 import { requestQueue } from '@/src/utils/requestQueue';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { icons } from '@/src/constants/icons';
 import NetInfo from '@react-native-community/netinfo';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
@@ -112,11 +112,10 @@ const NetworkToast = () => {
                         </View>
                         {isLowNetwork ? (
                             <View className="ml-4">
-                                <MaterialCommunityIcons
-                                    name={`wifi-strength-${signalStep}` as any}
-                                    size={22}
-                                    color="#10B981"
-                                />
+                                {(() => {
+                                    const WifiIcon = icons[`wifi_${signalStep}` as keyof typeof icons] || icons.wifi_1;
+                                    return <WifiIcon width={22} height={22} color="#10B981" />;
+                                })()}
                             </View>
                         ) : (
                             <Touchable

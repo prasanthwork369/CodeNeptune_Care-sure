@@ -1,6 +1,6 @@
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { Feather } from "@expo/vector-icons";
+import { icons } from "@/src/constants/icons";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -20,7 +20,7 @@ interface UploadBottomSheetProps {
 }
 
 const ActionRow = ({
-  iconName,
+  IconComponent,
   label,
   sublabel,
   onPress,
@@ -28,7 +28,7 @@ const ActionRow = ({
   iconColor,
   last = false,
 }: {
-  iconName: React.ComponentProps<typeof Feather>["name"];
+  IconComponent: React.FC<import("react-native-svg").SvgProps>;
   label: string;
   sublabel: string;
   onPress: () => void;
@@ -58,7 +58,7 @@ const ActionRow = ({
         style={[s.actionRow, !last && s.actionRowBorder]}
       >
         <View style={[s.actionIcon, { backgroundColor: iconBg }]}>
-          <Feather name={iconName} size={20} color={iconColor} />
+          <IconComponent width={20} height={20} color={iconColor} />
         </View>
         <View style={s.actionText}>
           <Text style={s.actionLabel}>{label}</Text>
@@ -96,7 +96,7 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
       >
         <View style={s.actionsCard}>
           <ActionRow
-            iconName="camera"
+            IconComponent={icons.photo_camera}
             label="Take a Photo"
             sublabel="Use your device camera"
             onPress={onSelectCamera}
@@ -104,7 +104,7 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
             iconColor="#0F7635"
           />
           <ActionRow
-            iconName="image"
+            IconComponent={icons.outline_gallery}
             label="Choose from Gallery"
             sublabel="Pick from your photo library"
             onPress={onSelectLibrary}

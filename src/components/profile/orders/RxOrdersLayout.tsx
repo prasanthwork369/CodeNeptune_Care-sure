@@ -10,7 +10,6 @@ import {
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useNav } from "@/src/hooks/useNav";
 import { downloadFile } from "@/src/utils/fileDownload";
-import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Animated, FlatList, Share, Text, View } from "react-native";
 import Svg, {
@@ -379,7 +378,7 @@ const PrescriptionCard = ({
           className="p-1"
           onPress={() => setShowOptions(true)}
         >
-          <Ionicons name="ellipsis-vertical" size={20} color="#6A6A6A" />
+          <icons.ellipsis_vertical width={20} height={20} color="#6A6A6A" />
         </Touchable>
       </View>
 

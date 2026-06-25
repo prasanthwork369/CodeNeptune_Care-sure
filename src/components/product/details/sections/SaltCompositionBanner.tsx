@@ -1,10 +1,11 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
 import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useState } from "react";
 import { Image, Text, View } from "react-native";
 
+// Displays product salt composition with an expand/collapse toggle
 interface SaltCompositionBannerProps {
   composition: string;
 }
@@ -86,6 +87,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
             {composition}
           </Text>
         </View>
+        {/* Expand/Collapse Toggle Button */}
         {isTruncatable && (
           <View
             style={{
@@ -98,11 +100,11 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
               flexShrink: 0,
             }}
           >
-            <MaterialCommunityIcons
-              name={expanded ? "arrow-up-circle" : "arrow-down-circle"}
-              size={24}
-              color="#FFFFFF"
-            />
+            {expanded ? (
+              <icons.arrow_up_circle width={24} height={24} color="#FFFFFF" />
+            ) : (
+              <icons.arrow_down_circle width={24} height={24} color="#FFFFFF" />
+            )}
           </View>
         )}
       </View>

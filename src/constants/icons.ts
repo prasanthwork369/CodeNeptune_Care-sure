@@ -129,7 +129,13 @@ import upload_pdf from "../../assets/icons/upload_pdf.svg";
 import manufacturer from "../../assets/icons/manufacturer.svg";
 import wallet from "../../assets/icons/wallet.svg";
 import rupee_circle from "../../assets/icons/rupee_circle.svg";
-
+import wifi_1 from "../../assets/icons/wifi_1.svg";
+import wifi_2 from "../../assets/icons/wifi_2.svg";
+import wifi_3 from "../../assets/icons/wifi_3.svg";
+import wifi_4 from "../../assets/icons/wifi_4.svg";
+import arrow_up_circle from "../../assets/icons/arrow_up_circle.svg";
+import arrow_down_circle from "../../assets/icons/arrow_down_circle.svg";
+import ellipsis_vertical from "../../assets/icons/ellipsis_vertical.svg";
 
 // Font Icons (for Expo Vector Icons)
 export const ICONS = {
@@ -271,6 +277,13 @@ export const icons = {
     manufacturer,
     wallet,
     rupee_circle,
+    wifi_1,
+    wifi_2,
+    wifi_3,
+    wifi_4,
+    arrow_up_circle,
+    arrow_down_circle,
+    ellipsis_vertical,
 } as const;
 
 

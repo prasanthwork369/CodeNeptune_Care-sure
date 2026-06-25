@@ -37,7 +37,7 @@ const ensureViewBox = (svg: string): string => {
     return svg.replace(tag, patchedTag);
 };
 
-/** Renders a remote icon: embedded raster image-fills, vector SVGs, and plain images. */
+/** Renders a remote icon: embedded raster image-fills SVGs, and plain images. */
 export const RemoteIcon: React.FC<RemoteIconProps> = ({ uri, size, style }) => {
     const isSvg = uri.toLowerCase().endsWith('.svg');
     const [resolved, setResolved] = useState<ResolvedSvg | null>(() => svgCache.get(uri) ?? null);

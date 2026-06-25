@@ -34,7 +34,7 @@ export const useStickySearchBar = (heroHeightRef: MutableRefObject<number>) => {
             // takes the same ~220ms regardless of how fast the user flicks
             // past the threshold, instead of snapping within a few pixels.
             stickySearchVisible.value = withTiming(shouldShow ? 1 : 0, {
-                duration: 220,
+                duration: 200,
                 easing: Easing.out(Easing.quad),
             });
         }
