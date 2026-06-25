@@ -1,25 +1,25 @@
 import { StyleSheet } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 
-export const PILL_HEIGHT = moderateScale(65, 0.25);
-export const FAB_WIDTH = moderateScale(115, 0.25);
-export const BAR_HEIGHT = moderateScale(85, 0.25);
-export const ICON_SIZE = moderateScale(23, 0.25);
-export const UPLOAD_ICON = moderateScale(35, 0.25);
-export const ACTIVE_HEIGHT = moderateScale(55, 0.25);
-export const ACTIVE_RADIUS = moderateScale(25, 0.25);
+export const PILL_HEIGHT = exactScale(65);
+export const FAB_WIDTH = exactScale(115);
+export const BAR_HEIGHT = exactScale(85);
+export const ICON_SIZE = exactScale(23);
+export const UPLOAD_ICON = exactScale(35);
+export const ACTIVE_HEIGHT = exactScale(55);
+export const ACTIVE_RADIUS = exactScale(25);
 
 export const styles = StyleSheet.create({
   uploadText: {
-    fontSize: moderateScale(13, 0.08),
+    fontSize: exactScale(13),
     color: "white",
     fontWeight: "700",
     textAlign: "center",
-    lineHeight: moderateScale(16, 0.08),
+    lineHeight: exactScale(16),
   },
   tabLabel: {
-    fontSize: moderateScale(11, 0.07),
-    marginTop: 4,
+    fontSize: exactScale(11),
+    marginTop: exactScale(4),
     textAlign: "center",
     width: "100%",
   },

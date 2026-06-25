@@ -38,6 +38,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import {
+import { exactScale } from "@/src/utils/exactScale";
   ACTIVE_HEIGHT,
   ACTIVE_RADIUS,
   BAR_HEIGHT,
@@ -281,7 +282,7 @@ const TabItem = React.memo(
             : undefined,
         fontWeight:
           Platform.OS === "android" ? "normal" : w > 0.5 ? "700" : "500",
-        marginTop: 4,
+        marginTop: exactScale(4),
         textAlign: "center",
         width: "100%",
       };
@@ -293,7 +294,7 @@ const TabItem = React.memo(
           flex: 1,
           alignItems: "center",
           justifyContent: "center",
-          paddingHorizontal: 6,
+          paddingHorizontal: exactScale(6),
         }}
         className="py-2 h-full z-10"
       >
