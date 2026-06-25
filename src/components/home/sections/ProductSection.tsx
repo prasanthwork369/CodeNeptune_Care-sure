@@ -41,6 +41,8 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
 }) => {
     const { width } = useWindowDimensions();
     const cardWidth = width * 0.42;
+    const imageSize = cardWidth * 0.69;
+    const cardHeight = imageSize * 1.5 + 160;
 
     return (
         <View className="mb-6">
@@ -91,6 +93,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
+                    style={{ height: cardHeight }}
                     contentContainerStyle={{ paddingLeft: 20, paddingRight: 40, gap: 14 }}
                 >
                     {products.map((item) => (
@@ -98,6 +101,8 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                             key={item.id}
                             item={item}
                             cardWidth={cardWidth}
+                            cardHeight={cardHeight}
+                            imageSize={imageSize}
                             badgeBgColor={badgeBgColor}
                             badgeTextColor={badgeTextColor}
                             detailsBgColor={detailsBgColor}

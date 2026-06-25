@@ -6,8 +6,7 @@ export const TITLE_LINE_HEIGHT = exactScale(30);
 
 export const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    aspectRatio: 358 / 190,
+    height: exactScale(190),
     marginHorizontal: exactScale(12),
     marginTop: exactScale(20),
     borderRadius: 12,
@@ -17,8 +16,7 @@ export const styles = StyleSheet.create({
     overflow: "visible",
   },
   skeletonContainer: {
-    width: "100%",
-    aspectRatio: 358 / 190,
+    height: exactScale(190),
     marginHorizontal: exactScale(12),
     marginTop: exactScale(20),
     borderRadius: 12,

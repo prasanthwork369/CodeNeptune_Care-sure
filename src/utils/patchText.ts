@@ -85,9 +85,6 @@ function sanitizeStyle(styleProp: any): any {
     cleanStyle.fontWeight = "normal";
   }
 
-  // 3. Ensure consistent text padding on Android
-  cleanStyle.includeFontPadding = false;
-
   return cleanStyle;
 }
 
