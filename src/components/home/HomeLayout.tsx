@@ -54,6 +54,7 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { exactScale } from "@/src/utils/exactScale";
 
 const easeOut = Easing.out(Easing.cubic);
 const EMPTY_BANNERS: NonNullable<
@@ -294,7 +295,7 @@ export const HomeLayout: React.FC = () => {
               top: -insets.top,
               left: 0,
               right: 0,
-              height: 350 + insets.top,
+              height: exactScale(350) + insets.top,
             }}
           />
           <HomeHeader
@@ -313,8 +314,8 @@ export const HomeLayout: React.FC = () => {
           style={{
             marginTop: -(insets.top + 8) - 30,
             paddingTop: insets.top + 8,
-            paddingBottom: 14,
-            paddingHorizontal: 36,
+            paddingBottom: exactScale(14),
+            paddingHorizontal: exactScale(36),
             backgroundColor: "transparent",
           }}
         >
@@ -328,7 +329,7 @@ export const HomeLayout: React.FC = () => {
                   onPress={() => router.push("/upload")}
                   className="border-l border-[#919EAB33] pl-3 ml-1"
                 >
-                  <icons.uploadActive width={22} height={22} />
+                  <icons.uploadActive width={exactScale(22)} height={exactScale(22)} />
                 </Touchable>
               }
             />

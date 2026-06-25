@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { HomeProductCardSkeleton } from './HomeProductCardSkeleton';
 import { styles as s } from './HealthEssentials.styles';
+import { exactScale } from "@/src/utils/exactScale";
 
 const FALLBACK_THEMES = [
     { gradientStart: '#F2FAF7', gradientEnd: '#FFFFFF', text2Color: '#12975E', lineColor: '#12975E' },
@@ -74,11 +75,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <Touchable
                 activeOpacity={0.85}
                 onPress={() => onPress(productId)}
-                style={{ height: imageAreaHeight, backgroundColor: contentBg, paddingBottom: 4 }}
+                style={{ height: imageAreaHeight, backgroundColor: contentBg, paddingBottom: exactScale(4) }}
             >
-                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
+                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center', paddingTop: exactScale(24) }}>
                     {!!discountLabel && (
-                        <View style={{ backgroundColor: discountBg, position: 'absolute', top: 6, left: 8, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
+                        <View style={{ backgroundColor: discountBg, position: 'absolute', top: exactScale(6), left: exactScale(8), paddingHorizontal: exactScale(6), paddingVertical: exactScale(3), borderRadius: exactScale(4) }}>
                             <Text style={[s.badge, { color: accentColor, fontWeight: '800' }]}>{discountLabel}</Text>
                         </View>
                     )}
@@ -91,13 +92,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </Touchable>
 
             {/* Details area — sized to its own content, not a forced half-split */}
-            <View style={{ backgroundColor: contentBg, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingTop: 12, flexDirection: 'column' }}>
+            <View style={{ backgroundColor: contentBg, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: exactScale(12), paddingTop: exactScale(12), flexDirection: 'column' }}>
                 <Touchable activeOpacity={0.85} onPress={() => onPress(productId)}>
                     <Text style={s.name} className="font-inter-medium text-brand-text" numberOfLines={1}>{name}</Text>
                     {!!description && (
                         <Text style={s.description} className="mt-0.5" numberOfLines={1}>{description}</Text>
                     )}
-                    <View className="flex-row items-center gap-x-1.5 mt-1.5" style={{ marginBottom: 8 }}>
+                    <View className="flex-row items-center gap-x-1.5 mt-1.5" style={{ marginBottom: exactScale(8) }}>
                         <Text style={s.price}>₹{Number(price).toFixed(2)}</Text>
                         {mrp > price && (
                             <Text style={s.mrp}>₹{Number(mrp).toFixed(2)}</Text>
@@ -106,7 +107,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </Touchable>
 
                 {/* Button — fixed padding, always at bottom */}
-                <View style={{ paddingTop: 6, paddingBottom: 12, alignItems: 'center' }}>
+                <View style={{ paddingTop: exactScale(6), paddingBottom: exactScale(12), alignItems: 'center' }}>
                     {count === 0 ? (
                         <Touchable
                             onPress={increment}
@@ -123,7 +124,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                             <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} className="w-9 h-9 items-center justify-center">
                                 <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                             </Touchable>
-                            <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ width: exactScale(24), height: exactScale(24), alignItems: 'center', justifyContent: 'center' }}>
                                 {isPending ? (
                                     <ActivityIndicator size="small" color="#FFFFFF" />
                                 ) : (
@@ -186,20 +187,20 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
                                     colors={[lineColor, 'transparent']}
                                     start={{ x: 0, y: 0 }}
                                     end={{ x: 1, y: 0 }}
-                                    style={{ height: 3, width: 160, marginTop: 6, borderRadius: 2 }}
+                                    style={{ height: exactScale(3), width: exactScale(160), marginTop: exactScale(6), borderRadius: exactScale(2) }}
                                     className="opacity-60"
                                 />
                             </View>
                         </View>
                         {!!headerImage && (
-                            <Image source={{ uri: headerImage }} style={{ width: '25%', height: 75, }} contentFit="contain" />
+                            <Image source={{ uri: headerImage }} style={{ width: '25%', height: exactScale(75), }} contentFit="contain" />
                         )}
                     </View>
 
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ paddingLeft: 20, paddingRight: 40, gap: 14 }}
+                        contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40), gap: exactScale(14) }}
                     >
                         {subcategory.products.map((p) => {
                             const packLabel = formatPackLabel({ packSize: p.packSize, unit: p.unit, dosageForm: p.dosageForm });

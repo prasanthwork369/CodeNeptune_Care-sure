@@ -5,6 +5,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { SvgUri } from "react-native-svg";
 import { iconSize, styles as s } from "./WhyFamiliesTrustUs.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 interface WhyFamiliesTrustUsProps {
   promise?: ApiAppContent["promise"];
@@ -38,7 +39,7 @@ export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = ({
             colors={["#B2E8FF", "#FFFFFF"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{ height: 5, width: 170, marginTop: 4, borderRadius: 1 }}
+            style={{ height: exactScale(5), width: exactScale(170), marginTop: exactScale(4), borderRadius: 1 }}
           />
         </View>
       )}

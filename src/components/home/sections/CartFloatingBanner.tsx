@@ -6,6 +6,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { exactScale } from "@/src/utils/exactScale";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -20,7 +21,7 @@ interface CartFloatingBannerProps {
 // Static styles outside component — never recreated
 const BUTTON_STATIC = {
   backgroundColor: "#0F7635",
-  borderRadius: 28,
+  borderRadius: exactScale(28),
   alignItems: "center" as const,
   justifyContent: "center" as const,
 };
@@ -122,17 +123,17 @@ export const CartFloatingBanner = ({
       <View
         style={{
           shadowColor: "#919EAB",
-          shadowOffset: { width: 0, height: 4 },
+          shadowOffset: { width: 0, height: exactScale(4) },
           shadowOpacity: 0.2,
           shadowRadius: 10,
           elevation: 4,
-          borderRadius: 999,
+          borderRadius: exactScale(999),
           backgroundColor: "white",
         }}
       >
         <View
           style={{
-            borderRadius: 999,
+            borderRadius: exactScale(999),
             overflow: "hidden",
             backgroundColor: "white",
           }}
@@ -148,33 +149,33 @@ export const CartFloatingBanner = ({
             >
               <View
                 className="flex-row items-center px-3 bg-white"
-                style={{ borderRadius: 999, height: 65 }}
+                style={{ borderRadius: exactScale(999), height: exactScale(65) }}
               >
                 <View
                   className="mr-3 justify-center"
-                  style={{ width: totalItems > 1 ? 52 : 44, height: 48 }}
+                  style={{ width: totalItems > 1 ? 52 : 44, height: exactScale(48) }}
                 >
                   {totalItems > 1 && (
                     <View
                       className="absolute left-0 bg-white rounded-full border border-[#919EAB33] items-center justify-center"
-                      style={{ width: 44, height: 44 }}
+                      style={{ width: exactScale(44), height: exactScale(44) }}
                     >
                       {secondImage ? (
                         <Image
                           source={secondImage}
-                          style={{ width: 30, height: 30 }}
+                          style={{ width: exactScale(30), height: exactScale(30) }}
                           resizeMode="contain"
                         />
                       ) : (
-                        <icons.placeholder width={30} height={30} />
+                        <icons.placeholder width={exactScale(30)} height={exactScale(30)} />
                       )}
                     </View>
                   )}
                   <View
                     className="bg-white rounded-full border border-[#919EAB33] items-center justify-center"
                     style={{
-                      width: 44,
-                      height: 44,
+                      width: exactScale(44),
+                      height: exactScale(44),
                       position: totalItems > 1 ? "absolute" : "relative",
                       left: totalItems > 1 ? 8 : 0,
                     }}
@@ -182,11 +183,11 @@ export const CartFloatingBanner = ({
                     {displayImage ? (
                       <Image
                         source={displayImage}
-                        style={{ width: 30, height: 30 }}
+                        style={{ width: exactScale(30), height: exactScale(30) }}
                         resizeMode="contain"
                       />
                     ) : (
-                      <icons.placeholder width={30} height={30} />
+                      <icons.placeholder width={exactScale(30)} height={exactScale(30)} />
                     )}
                   </View>
                 </View>
@@ -230,7 +231,7 @@ export const CartFloatingBanner = ({
                     activeOpacity={0.7}
                     className="w-[30px] h-[30px] rounded-full bg-[#F3F4F6] items-center justify-center"
                   >
-                    <icons.close_small width={12} height={12} fill="#6A6A6A" />
+                    <icons.close_small width={exactScale(12)} height={exactScale(12)} fill="#6A6A6A" />
                   </Touchable>
                 </View>
               </View>
@@ -243,12 +244,12 @@ export const CartFloatingBanner = ({
               style={{
                 position: "absolute",
                 right: -90,
-                width: 90,
+                width: exactScale(90),
                 height: "100%",
                 backgroundColor: "#ECFDF5",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRadius: 999,
+                borderRadius: exactScale(999),
               }}
             >
               {isClearing ? (

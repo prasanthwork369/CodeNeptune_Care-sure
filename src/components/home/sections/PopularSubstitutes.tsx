@@ -10,6 +10,7 @@ import React from 'react';
 import { ActivityIndicator, Animated, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { HomeProductCardSkeleton } from './HomeProductCardSkeleton';
 import { styles as s } from './PopularSubstitutes.styles';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface PopularSubstitutesProps {
     products: Product[];
@@ -54,11 +55,11 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
             <Touchable
                 activeOpacity={0.85}
                 onPress={() => onProductPress?.(product.productId ?? product.id)}
-                style={{ height: imageAreaHeight, backgroundColor: CONTENT_BG, paddingBottom: 4 }}
+                style={{ height: imageAreaHeight, backgroundColor: CONTENT_BG, paddingBottom: exactScale(4) }}
             >
-                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12,alignItems: 'center', justifyContent: 'center', paddingTop: 24 }}>
+                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12,alignItems: 'center', justifyContent: 'center', paddingTop: exactScale(24) }}>
                     {!!product.discount && (
-                        <View style={{ backgroundColor: DISCOUNT_BG, position: 'absolute', top: 6, left: 8, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
+                        <View style={{ backgroundColor: DISCOUNT_BG, position: 'absolute', top: exactScale(6), left: exactScale(8), paddingHorizontal: exactScale(6), paddingVertical: exactScale(3), borderRadius: exactScale(4) }}>
                             <Text style={[s.badge, { color: ACCENT, fontWeight: '800' }]}>{product.discount}</Text>
                         </View>
                     )}
@@ -71,7 +72,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
             </Touchable>
 
             {/* Details area — sized to its own content, not a forced half-split */}
-            <View style={{ backgroundColor: CONTENT_BG, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingTop: 12, flexDirection: 'column' }}>
+            <View style={{ backgroundColor: CONTENT_BG, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: exactScale(12), paddingTop: exactScale(12), flexDirection: 'column' }}>
                 <Touchable
                     activeOpacity={0.85}
                     onPress={() => onProductPress?.(product.productId ?? product.id)}
@@ -84,7 +85,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                             {product.description}
                         </Text>
                     )}
-                    <View className="flex-row items-center gap-x-1.5 mt-1.5" style={{ marginBottom: 8 }}>
+                    <View className="flex-row items-center gap-x-1.5 mt-1.5" style={{ marginBottom: exactScale(8) }}>
                         <Text style={s.price}>
                             ₹{Number(product.price).toFixed(2)}
                         </Text>
@@ -97,7 +98,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                 </Touchable>
 
                 {/* Button — fixed padding top & bottom, always at bottom */}
-                <View style={{ paddingTop: 6, paddingBottom: 12, alignItems: 'center' }}>
+                <View style={{ paddingTop: exactScale(6), paddingBottom: exactScale(12), alignItems: 'center' }}>
                     {count === 0 ? (
                         <Touchable
                             onPress={increment}
@@ -114,7 +115,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                             <Touchable onPress={decrement} disabled={isPending} activeOpacity={0.7} className="w-9 h-9 items-center justify-center">
                                 <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                             </Touchable>
-                            <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ width: exactScale(24), height: exactScale(24), alignItems: 'center', justifyContent: 'center' }}>
                                 {isPending ? (
                                     <ActivityIndicator size="small" color="#FFFFFF" />
                                 ) : (
@@ -155,7 +156,7 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
                         More Affordable Choices
                     </Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: exactScale(6) }}>
                     <Image source={HOME_IMAGES.supplements} style={s.headerImage} contentFit="contain" />
                     <Image source={HOME_IMAGES.multivitamin} style={s.headerImage} contentFit="contain" />
                 </View>
@@ -167,7 +168,7 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingLeft: 20, paddingRight: 40, gap: 14 }}
+                    contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40), gap: exactScale(14) }}
                 >
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} onProductPress={onProductPress} />

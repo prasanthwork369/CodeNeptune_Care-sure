@@ -6,6 +6,7 @@ import { Image } from 'expo-image';
 import { icons } from '@/src/constants/icons';
 import type { CategoryCard } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface CategoryCardsProps {
     cards: CategoryCard[];
@@ -23,7 +24,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
         return (
             <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3">
                 {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} width={cardWidth} height={cardHeight} borderRadius={10} />
+                    <Skeleton key={i} width={cardWidth} height={cardHeight} borderRadius={exactScale(10)} />
                 ))}
             </View>
         );
@@ -41,7 +42,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
                     onPress={() => onCardPress?.(card.id)}
                     accessibilityRole="button"
                     accessibilityLabel={card.label}
-                    style={{ backgroundColor: card.bgColor, width: cardWidth, height: cardHeight, borderRadius: 10 }}
+                    style={{ backgroundColor: card.bgColor, width: cardWidth, height: cardHeight, borderRadius: exactScale(10) }}
                     className="overflow-hidden justify-start"
                 >
                     <Text style={s.cardLabel} className="font-inter-semibold text-brand-text px-2 pt-2.5 leading-tight z-10">
@@ -56,7 +57,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
                                 position: 'absolute',
                                 top: cardHeight * (48 / 128),
                                 left: cardWidth * (35 / 114),
-                                borderRadius: 8,
+                                borderRadius: exactScale(8),
                             }}
                             contentFit="contain"
                         />

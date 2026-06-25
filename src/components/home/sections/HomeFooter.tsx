@@ -6,6 +6,7 @@ import { SvgUri } from 'react-native-svg';
 
 import { ApiAppContent } from '@/src/types/home';
 import { styles as s } from './HomeFooter.styles';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface HomeFooterProps {
     appContent?: ApiAppContent;
@@ -54,7 +55,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
 
             {/* Always With You Banner */}
             {footerHeartUrl ? (
-                <View style={{ paddingTop: width * 0.10, paddingBottom: 0, paddingHorizontal: 20 }}>
+                <View style={{ paddingTop: width * 0.10, paddingBottom: 0, paddingHorizontal: exactScale(20) }}>
                     {isSvg(footerHeartUrl) ? (
                         <SvgUri uri={footerHeartUrl} width={width * 0.38} height={width * 0.30} />
                     ) : (
@@ -70,14 +71,14 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
 
             {/* Skyline with text overlay at bottom-left */}
             {footerImageUrl ? (
-                <View style={{ width: width, height: width * 0.7, marginTop: 10 }}>
+                <View style={{ width: width, height: width * 0.7, marginTop: exactScale(10) }}>
                     <Image
                         source={{ uri: footerImageUrl }}
                         style={{ width: width, height: width * 0.8 }}
                         contentFit="cover"
                         contentPosition="bottom"
                     />
-                    <View style={{ position: 'absolute', bottom: 70, left: 20, gap: 0 }}>
+                    <View style={{ position: 'absolute', bottom: exactScale(70), left: exactScale(20), gap: 0 }}>
                         {footerWords.map((word, idx) => (
                             <Text
                                 key={idx}
@@ -97,7 +98,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
             {/* Sub-footer trust labels */}
             <View
                 className="flex-row justify-between items-start w-full px-5 pt-3"
-                style={{ paddingBottom: 20 }}
+                style={{ paddingBottom: exactScale(20) }}
             >
                 {(appContent.footer?.labels ?? []).map((label, idx) => {
                     const isLeft = idx === 0;

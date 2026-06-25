@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { HomeSearchCycler } from "./HomeSearchCycler";
 import { styles as s, SEARCH_ICON_SIZE } from "./SearchBar.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 const PLACEHOLDER_LINE_HEIGHT = 18;
 
@@ -21,7 +22,7 @@ interface SearchBarProps {
 
 const containerStyle = {
   shadowColor: "#919EAB",
-  shadowOffset: { width: 0, height: 16 },
+  shadowOffset: { width: 0, height: exactScale(16) },
   shadowRadius: 20,
   shadowOpacity: 0.04,
   elevation: 1,
@@ -105,9 +106,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {query.length > 0 && (
         <Touchable
           onPress={() => setQuery("")}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          hitSlop={{ top: exactScale(8), bottom: exactScale(8), left: exactScale(8), right: exactScale(8) }}
         >
-          <icons.close_dark width={15} height={15} fill="#6A6A6A" />
+          <icons.close_dark width={exactScale(15)} height={exactScale(15)} fill="#6A6A6A" />
         </Touchable>
       )}
       {rightSlot && <View className="ml-2">{rightSlot}</View>}

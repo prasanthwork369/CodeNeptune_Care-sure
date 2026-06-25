@@ -5,6 +5,7 @@ import React from 'react';
 import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
 
 import { Product } from '@/src/types/home';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface ProductSectionProps {
     title: string;
@@ -77,14 +78,14 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                                 colors={[subtitleColor, 'transparent'] as any}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
-                                style={{ height: 3, width: 140, marginTop: 4, borderRadius: 2 }}
+                                style={{ height: exactScale(3), width: exactScale(140), marginTop: exactScale(4), borderRadius: exactScale(2) }}
                                 className="opacity-60"
                             />
                         </View>
                     </View>
                     <View className="flex-row items-center gap-x-1">
                         {headerImages.map((img, idx) => (
-                            <Image key={idx} source={img as any} style={{ width: 55, height: 55 }} contentFit="contain" />
+                            <Image key={idx} source={img as any} style={{ width: exactScale(55), height: exactScale(55) }} contentFit="contain" />
                         ))}
                     </View>
                 </View>
@@ -94,7 +95,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     style={{ height: cardHeight }}
-                    contentContainerStyle={{ paddingLeft: 20, paddingRight: 40, gap: 14 }}
+                    contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40), gap: exactScale(14) }}
                 >
                     {products.map((item) => (
                         <HomeProductCard

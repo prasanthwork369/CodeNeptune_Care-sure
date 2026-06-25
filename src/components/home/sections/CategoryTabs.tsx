@@ -5,6 +5,7 @@ import type { CategoryTab } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { TabItem } from './TabItem';
 import { useTabIndicator } from '@/src/hooks/animations/useTabIndicator';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface CategoryTabsProps {
     tabs: CategoryTab[];
@@ -27,12 +28,12 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ tabs, activeId, onTa
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     scrollEnabled={false}
-                    contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12, gap: 32 }}
+                    contentContainerStyle={{ paddingHorizontal: exactScale(16), paddingTop: exactScale(14), paddingBottom: exactScale(12), gap: exactScale(32) }}
                 >
                     {Array.from({ length: 5 }).map((_, i) => (
                         <View key={i} className="items-center gap-y-2">
-                            <Skeleton width={40} height={40} borderRadius={20} />
-                            <Skeleton width={48} height={10} borderRadius={4} />
+                            <Skeleton width={exactScale(40)} height={exactScale(40)} borderRadius={exactScale(20)} />
+                            <Skeleton width={exactScale(48)} height={exactScale(10)} borderRadius={exactScale(4)} />
                         </View>
                     ))}
                 </ScrollView>
@@ -47,8 +48,8 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ tabs, activeId, onTa
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{
-                    paddingHorizontal: 16,
-                    paddingTop: 14,
+                    paddingHorizontal: exactScale(16),
+                    paddingTop: exactScale(14),
                     paddingBottom: 0,
                 }}
             >
@@ -65,7 +66,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ tabs, activeId, onTa
                 <Animated.View
                     style={[
                         {
-                            height: 5,
+                            height: exactScale(5),
                             position: 'absolute',
                             bottom: 0,
                             borderTopLeftRadius: 8,

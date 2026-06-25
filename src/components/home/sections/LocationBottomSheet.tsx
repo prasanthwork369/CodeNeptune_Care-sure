@@ -24,6 +24,7 @@ import {
   View,
 } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale } from "@/src/utils/exactScale";
 
 interface LocationBottomSheetProps {
   isVisible: boolean;
@@ -41,10 +42,10 @@ interface GooglePrediction {
 const labelToIcon = (label: string) => {
   const l = label.toUpperCase();
   if (l === "HOME")
-    return <icons.home_add width={16} height={16} fill="#0F7635" />;
+    return <icons.home_add width={exactScale(16)} height={exactScale(16)} fill="#0F7635" />;
   if (l === "WORK" || l === "OFFICE")
-    return <icons.business width={16} height={16} fill="#0F7635" />;
-  return <icons.location_pin width={16} height={16} fill="#0F7635" />;
+    return <icons.business width={exactScale(16)} height={exactScale(16)} fill="#0F7635" />;
+  return <icons.location_pin width={exactScale(16)} height={exactScale(16)} fill="#0F7635" />;
 };
 
 export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
@@ -295,7 +296,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       style={{ zIndex: 999 }}
     >
       <View
-        style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 10 }}
+        style={{ paddingHorizontal: exactScale(20), paddingTop: exactScale(10), paddingBottom: exactScale(10) }}
       >
         <Text className="text-[16px] font-inter-bold text-brand-text mb-5">
           Change Location
@@ -307,7 +308,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
             style={{
               flex: 1,
               shadowColor: "#919EAB0A",
-              shadowOffset: { width: 0, height: 10 },
+              shadowOffset: { width: 0, height: exactScale(10) },
               shadowOpacity: 0.04,
               shadowRadius: 20,
               elevation: 2,
@@ -319,7 +320,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
             {isSearching ? (
               <ActivityIndicator size="small" color="#0F7635" />
             ) : (
-              <icons.search_grey width={18} height={18} />
+              <icons.search_grey width={exactScale(18)} height={exactScale(18)} />
             )}
             <BottomSheetTextInput
               value={searchQuery}
@@ -341,9 +342,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                   setSearchQuery("");
                   setPredictions([]);
                 }}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                hitSlop={{ top: exactScale(8), bottom: exactScale(8), left: exactScale(8), right: exactScale(8) }}
               >
-                <icons.close_dark width={14} height={14} fill="#222222" />
+                <icons.close_dark width={exactScale(14)} height={exactScale(14)} fill="#222222" />
               </Touchable>
             )}
           </View>
@@ -361,7 +362,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                 {isLocating ? (
                   <ActivityIndicator size="small" color="#059669" />
                 ) : (
-                  <icons.my_location width={21} height={21} fill="#059669" />
+                  <icons.my_location width={exactScale(21)} height={exactScale(21)} fill="#059669" />
                 )}
               </View>
               <View className="ml-3">
@@ -378,7 +379,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
             >
               <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
-                <icons.add_circle width={21} height={21} fill="#059669" />
+                <icons.add_circle width={exactScale(21)} height={exactScale(21)} fill="#059669" />
               </View>
               <View className="ml-3">
                 <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
@@ -405,14 +406,14 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         bounces={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          paddingHorizontal: 20,
+          paddingHorizontal: exactScale(20),
           paddingBottom: Math.max(adjustedBottom, 24),
         }}
       >
         {/* Predictions list */}
         {showPredictions ? (
           isSearching && predictions.length === 0 ? (
-            <ActivityIndicator color="#0F7635" style={{ marginVertical: 24 }} />
+            <ActivityIndicator color="#0F7635" style={{ marginVertical: exactScale(24) }} />
           ) : (
             <View className="border border-[#919EAB33] rounded-lg px-4">
               {predictions.map((p, index) => (
@@ -433,7 +434,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                   className="flex-row items-start py-4"
                 >
                   <View className="mt-0.5 mr-3">
-                    <icons.location_on width={20} height={20} fill="#1A1C1E" />
+                    <icons.location_on width={exactScale(20)} height={exactScale(20)} fill="#1A1C1E" />
                   </View>
                   <View className="flex-1">
                     <Text className="text-[15px] font-inter-semibold text-brand-text mb-1">
@@ -452,7 +453,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           )
         ) : /* Saved addresses */
         addressesLoading ? (
-          <ActivityIndicator color="#0F7635" style={{ marginVertical: 24 }} />
+          <ActivityIndicator color="#0F7635" style={{ marginVertical: exactScale(24) }} />
         ) : addresses.length === 0 ? (
           <Text className="text-[13px] font-inter-medium text-brand-subtext text-center py-6">
             No saved addresses yet
@@ -483,8 +484,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                 className="rounded-lg p-5 mb-4"
               >
                 {isSelected && (
-                  <View style={{ position: "absolute", top: 14, right: 14 }}>
-                    <icons.check_circle width={20} height={20} fill="#0F7635" />
+                  <View style={{ position: "absolute", top: exactScale(14), right: exactScale(14) }}>
+                    <icons.check_circle width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
                   </View>
                 )}
                 <View className="flex-row items-center mb-3">

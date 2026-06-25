@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
   uploadIcon: { width: exactScale(22), height: exactScale(22) },
   container: {
     height: exactScale(55),
-    borderRadius: 10,
+    borderRadius: exactScale(10),
     borderWidth: 1.05,
     borderColor: "#919EAB33",
     paddingLeft: exactScale(10),
@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     shadowColor: "#919EAB",
-    shadowOffset: { width: 0, height: 16 },
+    shadowOffset: { width: 0, height: exactScale(16) },
     shadowRadius: 20,
     shadowOpacity: 0.04,
     elevation: 1,

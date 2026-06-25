@@ -1,34 +1,35 @@
 import { StyleSheet } from "react-native";
+import { exactScale } from "@/src/utils/exactScale";
 
 export const iconSize = 64;
 
 export const styles = StyleSheet.create({
   title: {
     fontWeight: "700",
-    fontSize: 16,
-    lineHeight: 14,
+    fontSize: exactScale(16),
+    lineHeight: exactScale(14),
     letterSpacing: 0,
     verticalAlign: "middle",
     color: "#222222",
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
+    width: exactScale(64),
+    height: exactScale(64),
+    borderRadius: exactScale(12),
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
   },
   icon: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
+    width: exactScale(64),
+    height: exactScale(64),
+    borderRadius: exactScale(12),
     opacity: 1,
   },
   itemLabel: {
     fontWeight: "500",
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: exactScale(14),
+    lineHeight: exactScale(20),
     letterSpacing: 0,
     textAlign: "center",
     verticalAlign: "middle",

@@ -5,6 +5,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
 import { ActivityIndicator, Animated, Text, View } from 'react-native';
 import { styles as s, IMG_SIZE } from './FrequentSubstitutes.styles';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface FrequentSubstitutesProps {
     substitutes: SubstituteProduct[];
@@ -36,9 +37,9 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                 onPress={() => onProductPress?.(item.productId ?? item.id)}
                 className="flex-row items-center flex-1"
             >
-                <View style={[s.imgBox, { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#919EAB1A', alignItems: 'center', justifyContent: 'center', marginRight: 12 }]}>
+                <View style={[s.imgBox, { backgroundColor: '#fff', borderRadius: exactScale(12), borderWidth: 1, borderColor: '#919EAB1A', alignItems: 'center', justifyContent: 'center', marginRight: exactScale(12) }]}>
                     {!!item.discount && (
-                        <View style={{ position: 'absolute', top: 6, left: 6, backgroundColor: '#E8F5E9', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                        <View style={{ position: 'absolute', top: exactScale(6), left: exactScale(6), backgroundColor: '#E8F5E9', paddingHorizontal: exactScale(5), paddingVertical: exactScale(2), borderRadius: exactScale(4) }}>
                             <Text style={[s.badge, { fontWeight: '800', color: '#0F7635' }]}>{item.discount}</Text>
                         </View>
                     )}
@@ -70,7 +71,7 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                     disabled={isPending || disableCart}
                     activeOpacity={0.85}
                     className="rounded-[8px] bg-white ml-3"
-                    style={{ borderWidth: 1, borderColor: '#0F7635', width: 72, height: 36, alignItems: 'center', justifyContent: 'center' }}
+                    style={{ borderWidth: 1, borderColor: '#0F7635', width: exactScale(72), height: exactScale(36), alignItems: 'center', justifyContent: 'center' }}
                 >
                     {isPending
                         ? <ActivityIndicator size="small" color="#0F7635" />
@@ -82,10 +83,10 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                     className="flex-row items-center rounded-[8px] overflow-hidden ml-3"
                     style={{ backgroundColor: '#0F7635', minWidth: 72 }}
                 >
-                    <Touchable onPress={disableCart ? undefined : decrement} disabled={isPending || disableCart} activeOpacity={0.7} style={{ width: 32, paddingVertical: 8, alignItems: 'center', justifyContent: 'center' }}>
+                    <Touchable onPress={disableCart ? undefined : decrement} disabled={isPending || disableCart} activeOpacity={0.7} style={{ width: exactScale(32), paddingVertical: exactScale(8), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={s.counter} className="font-inter-medium text-white leading-none">−</Text>
                     </Touchable>
-                    <View style={{ flex: 1, paddingVertical: 8, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ flex: 1, paddingVertical: exactScale(8), alignItems: 'center', justifyContent: 'center' }}>
                         {isPending ? (
                             <ActivityIndicator size="small" color="#FFFFFF" />
                         ) : (
@@ -97,7 +98,7 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                             </Animated.Text>
                         )}
                     </View>
-                    <Touchable onPress={disableCart ? undefined : increment} disabled={isPending || disableCart} activeOpacity={0.7} style={{ width: 32, paddingVertical: 8, alignItems: 'center', justifyContent: 'center' }}>
+                    <Touchable onPress={disableCart ? undefined : increment} disabled={isPending || disableCart} activeOpacity={0.7} style={{ width: exactScale(32), paddingVertical: exactScale(8), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={s.counter} className="font-inter-medium text-white leading-none">+</Text>
                     </Touchable>
                 </View>

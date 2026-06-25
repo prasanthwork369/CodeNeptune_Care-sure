@@ -17,6 +17,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { SvgUri } from "react-native-svg";
 import { styles, TITLE_LINE_HEIGHT } from "./HeroBanner.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 const ease = Easing.out(Easing.cubic);
 
@@ -129,7 +130,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         {/* Left: mirrors flex-[1.2] */}
         <View
           style={{
-            paddingLeft: 10,
+            paddingLeft: exactScale(10),
             paddingTop: contentPaddingTop,
             paddingRight: Math.round(personWidth * 0.4),
           }}
@@ -137,19 +138,19 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           <Skeleton
             width="80%"
             height={lineHeight}
-            borderRadius={8}
-            style={{ marginBottom: 6 }}
+            borderRadius={exactScale(8)}
+            style={{ marginBottom: exactScale(6) }}
           />
           <Skeleton
             width="65%"
             height={lineHeight}
-            borderRadius={8}
+            borderRadius={exactScale(8)}
             style={{ marginBottom: badgeMarginTop }}
           />
           <Skeleton
             width={Math.round(120 * scale)}
             height={Math.round(32 * scale)}
-            borderRadius={999}
+            borderRadius={exactScale(999)}
           />
         </View>
 
@@ -158,7 +159,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           <Skeleton
             width={dynamicAvatarWidth}
             height={dynamicAvatarHeight}
-            borderRadius={16}
+            borderRadius={exactScale(16)}
           />
         </View>
       </View>
@@ -177,7 +178,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         colors={["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
-        style={{ flex: 1, borderRadius: 12, overflow: "hidden" }}
+        style={{ flex: 1, borderRadius: exactScale(12), overflow: "hidden" }}
         className="flex-row items-stretch"
       >
         {/* ── Left: Text block ── */}

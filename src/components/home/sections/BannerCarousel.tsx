@@ -8,6 +8,7 @@ import { ApiBanner, CategoryCard } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import { CarouselDot } from '@/src/components/animations/carousel';
+import { exactScale } from "@/src/utils/exactScale";
 
 interface BannerCarouselProps {
     banners: ApiBanner[];
@@ -108,7 +109,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners, categor
         >
             <Image
                 source={{ uri: item.imageUrl }}
-                style={{ width: '100%', height: '100%', borderRadius: 16 }}
+                style={{ width: '100%', height: '100%', borderRadius: exactScale(16) }}
                 contentFit="cover"
                 cachePolicy="memory-disk"
             />
@@ -118,7 +119,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners, categor
     if (isLoading) {
         return (
             <View className="mt-4 px-4">
-                <Skeleton width="100%" height={bannerHeight} borderRadius={16} />
+                <Skeleton width="100%" height={bannerHeight} borderRadius={exactScale(16)} />
             </View>
         );
     }

@@ -20,6 +20,7 @@ import Animated, {
 
 import { HOME_IMAGES } from "@/src/constants/images";
 import PRESCRIPTION_ICON from "../../../../assets/images/prescription/prescription-pending.png";
+import { exactScale } from "@/src/utils/exactScale";
 
 const DURATION = 250;
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
@@ -153,17 +154,17 @@ export const PrescriptionFloatingBanner = ({
       <View
         style={{
           shadowColor: "#919EAB",
-          shadowOffset: { width: 0, height: 4 },
+          shadowOffset: { width: 0, height: exactScale(4) },
           shadowOpacity: 0.2,
           shadowRadius: 10,
           elevation: 4,
-          borderRadius: 999,
+          borderRadius: exactScale(999),
           backgroundColor: "white",
         }}
       >
         <View
           style={{
-            borderRadius: 999,
+            borderRadius: exactScale(999),
             overflow: "hidden",
             backgroundColor: "white",
           }}
@@ -171,7 +172,7 @@ export const PrescriptionFloatingBanner = ({
         >
           <View
             className="flex-row items-center bg-white"
-            style={{ borderRadius: 999, height: 65 }}
+            style={{ borderRadius: exactScale(999), height: exactScale(65) }}
           >
           <Touchable
             activeOpacity={0.7}
@@ -180,26 +181,26 @@ export const PrescriptionFloatingBanner = ({
           >
             <View
               className="flex-row items-center px-3"
-              style={{ borderRadius: 999, height: 65 }}
+              style={{ borderRadius: exactScale(999), height: exactScale(65) }}
             >
               {/* Rx Icon */}
               <View className="mr-3 items-center justify-center">
                 {status === PRESCRIPTION_STATUS.APPROVED ? (
                   <Image
                     source={HOME_IMAGES.prescriptionApproved}
-                    style={{ width: 44, height: 44 }}
+                    style={{ width: exactScale(44), height: exactScale(44) }}
                     resizeMode="contain"
                   />
                 ) : status === PRESCRIPTION_STATUS.CANCELLED ? (
                   <Image
                     source={HOME_IMAGES.prescriptionRejected}
-                    style={{ width: 36, height: 36 }}
+                    style={{ width: exactScale(36), height: exactScale(36) }}
                     resizeMode="contain"
                   />
                 ) : (
                   <Image
                     source={PRESCRIPTION_ICON}
-                    style={{ width: 44, height: 44 }}
+                    style={{ width: exactScale(44), height: exactScale(44) }}
                     resizeMode="contain"
                   />
                 )}
@@ -210,7 +211,7 @@ export const PrescriptionFloatingBanner = ({
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  gap: 3,
+                  gap: exactScale(3),
                   minWidth: 0,
                 }}
               >
@@ -222,7 +223,7 @@ export const PrescriptionFloatingBanner = ({
                 </Text>
 
                 {/* Subtitle + inline progress pill */}
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: exactScale(6) }}>
                   <Text
                     className="text-[11px] font-inter-medium text-[#6A6A6A]"
                     numberOfLines={1}
@@ -235,8 +236,8 @@ export const PrescriptionFloatingBanner = ({
                     <Animated.View
                       style={[
                         {
-                          height: 6,
-                          borderRadius: 999,
+                          height: exactScale(6),
+                          borderRadius: exactScale(999),
                           backgroundColor: "#E5E7EB",
                           overflow: "hidden",
                           flexShrink: 0,
@@ -246,7 +247,7 @@ export const PrescriptionFloatingBanner = ({
                     >
                       <Animated.View
                         style={[
-                          { height: 6, borderRadius: 999, backgroundColor: "#0F7635" },
+                          { height: exactScale(6), borderRadius: exactScale(999), backgroundColor: "#0F7635" },
                           progressBarStyle,
                         ]}
                       />
@@ -261,17 +262,17 @@ export const PrescriptionFloatingBanner = ({
             <Touchable
               activeOpacity={0.7}
               onPress={onClose}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={{ top: exactScale(10), bottom: exactScale(10), left: exactScale(10), right: exactScale(10) }}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
+                width: exactScale(32),
+                height: exactScale(32),
+                borderRadius: exactScale(16),
                 alignItems: "center",
                 justifyContent: "center",
-                marginRight: 8,
+                marginRight: exactScale(8),
               }}
             >
-              <icons.close_small width={12} height={12} fill="#9CA3AF" />
+              <icons.close_small width={exactScale(12)} height={exactScale(12)} fill="#9CA3AF" />
             </Touchable>
           )}
           </View>

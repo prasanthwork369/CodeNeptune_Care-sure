@@ -19,6 +19,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
+import { exactScale } from "@/src/utils/exactScale";
 
 interface DotProps {
   index: number;
@@ -48,7 +49,7 @@ const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
     };
   });
   return (
-    <Animated.View style={[{ width: 4, height: 4, borderRadius: 2 }, style]} />
+    <Animated.View style={[{ width: exactScale(4), height: exactScale(4), borderRadius: exactScale(2) }, style]} />
   );
 });
 Dot.displayName = "Dot";
@@ -259,7 +260,7 @@ export const FloatingBannersCarousel = ({
               bottom: TAB_BAR_HEIGHT,
               left: 0,
               width: width,
-              height: 90,
+              height: exactScale(90),
               zIndex: 100,
             },
             animatedContainerStyle,
@@ -270,7 +271,7 @@ export const FloatingBannersCarousel = ({
             pointerEvents="box-none"
             style={{
               width: "100%",
-              height: 82,
+              height: exactScale(82),
               overflow: "hidden",
             }}
           >
@@ -376,16 +377,16 @@ export const FloatingBannersCarousel = ({
               style={[
                 {
                   position: "absolute",
-                  bottom: 3,
+                  bottom: exactScale(3),
                   alignSelf: "center",
-                  height: 12,
-                  paddingHorizontal: 6,
-                  borderRadius: 7,
+                  height: exactScale(12),
+                  paddingHorizontal: exactScale(6),
+                  borderRadius: exactScale(7),
                   backgroundColor: "#9E9E9E",
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: 4,
+                  gap: exactScale(4),
                   zIndex: 20,
                   elevation: 7,
                 },

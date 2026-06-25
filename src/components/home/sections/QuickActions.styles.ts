@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     box: {
         width: '48%',
         height: exactScale(70),
-        borderRadius: 6,
+        borderRadius: exactScale(6),
         borderWidth: 1,
         borderColor: '#919EAB33',
         backgroundColor: '#FFFFFF',
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
         padding: exactScale(12),
         gap: exactScale(12),
         shadowColor: '#919EAB',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: exactScale(4) },
         shadowRadius: 10,
         shadowOpacity: 0.04,
         elevation: 1,
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     iconBox: {
         width: exactScale(36),
         height: exactScale(36),
-        borderRadius: 4,
+        borderRadius: exactScale(4),
         justifyContent: 'center',
         alignItems: 'center',
     },
