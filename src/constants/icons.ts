@@ -91,6 +91,7 @@ import location_on from "../../assets/icons/location_on.svg";
 import location_pin from "../../assets/icons/location_pin.svg";
 import lock from "../../assets/icons/lock.svg";
 import location_pin_light from "../../assets/icons/location_pin_light.svg";
+import logo from "../../assets/icons/logo.svg";
 import logout from "../../assets/icons/logout.svg";
 import mail from "../../assets/icons/mail.svg";
 import note_book from "../../assets/icons/note_book.svg";
@@ -241,6 +242,7 @@ export const icons = {
     description,
     help,
     location_on,
+    logo,
     logout,
     package_icon,
     return_package,

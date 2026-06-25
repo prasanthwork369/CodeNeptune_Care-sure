@@ -11,6 +11,7 @@ import {
   SearchBar,
   ShopByCategories,
   SmartSubstitution,
+  StickySearchHeader,
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { TabBarFadeGradient } from "@/src/components/navigation/TabBarFadeGradient";
@@ -263,7 +264,6 @@ export const HomeLayout: React.FC = () => {
         contentContainerStyle={{ backgroundColor: "#FFFFFF", flexGrow: 1 }}
         onScroll={handleCombinedScroll}
         scrollEventThrottle={16}
-        stickyHeaderIndices={[1]}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -393,6 +393,12 @@ export const HomeLayout: React.FC = () => {
           <HomeFooter appContent={appContent} isLoading={isHomeLoading} />
         </View>
       </ScrollView>
+
+      <StickySearchHeader
+        visible={stickySearchVisible}
+        onPressSearch={() => router.push("/search")}
+        onPressUpload={() => router.push("/upload")}
+      />
 
       <LocationBottomSheet
         isVisible={isLocationSheetVisible}
