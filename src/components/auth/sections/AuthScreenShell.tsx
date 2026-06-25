@@ -8,11 +8,13 @@ import {
     Dimensions,
     Keyboard,
     Pressable,
+    StyleSheet,
     Text,
     useWindowDimensions,
     View,
 } from "react-native";
 import { KeyboardEvents } from "react-native-keyboard-controller";
+import { moderateScale } from "react-native-size-matters";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -77,7 +79,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 
   const isTablet = width >= 600;
   const panelMaxWidth = isTablet ? 560 : undefined;
-  const panelPaddingH = isTablet ? Math.round(width * 0.08) : 32;
+  const panelPaddingH = isTablet ? Math.round(width * 0.08) : moderateScale(32, 0.3);
   const skipScale = useSharedValue(1);
   const skipStyle = useAnimatedStyle(() => ({
     transform: [{ scale: skipScale.value }],
@@ -90,17 +92,15 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    <View style={styles.root}>
       {/* Background illustration — fixed behind everything */}
       <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: backgroundHeight,
-          zIndex: 0,
-        }}
+        style={[
+          styles.bgWrapper,
+          {
+            height: backgroundHeight,
+          },
+        ]}
       >
         <AuthMedicineBackground />
       </View>
@@ -108,17 +108,16 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
       {/* Skip button — fixed top-right */}
       <Animated.View
         style={[
+          styles.skipWrapper,
           {
-            position: "absolute",
-            top: Math.max(insets.top, 20) + 20,
-            right: 24,
-            zIndex: 50,
+            top: insets.top > 0 ? insets.top + moderateScale(10, 0.3) : moderateScale(53, 0.3),
+            right: width >= 390 ? moderateScale(13, 0.3) : moderateScale(16, 0.3),
           },
           skipStyle,
         ]}
       >
         <Pressable
-          className="bg-white px-4 py-2 rounded-full flex-row items-center border border-brand-border"
+          style={styles.skipBtn}
           accessibilityRole="button"
           accessibilityLabel="Skip"
           onPressIn={() => {
@@ -129,46 +128,43 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
           }}
           onPress={handleSkip}
         >
-          <Text className="text-brand-primary font-inter-medium mr-1 leading-none">
+          <Text style={styles.skipText}>
             Skip
           </Text>
-          <icons.arrow_forward_green width={12} height={12} />
+          <icons.arrow_forward_green width={6.09} height={11.08} />
         </Pressable>
       </Animated.View>
 
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+      <View style={styles.container}>
         {/* Tap area above the sticky block — dismiss keyboard */}
-        <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }} />
+        <Pressable onPress={Keyboard.dismiss} style={styles.dismissTapArea} />
 
         {/* Entire bottom block (panel + footer incl. policy links) rides as one unit, translating in sync with the keyboard */}
         <Animated.View style={stickyStyle}>
           {/* White panel */}
           <View
-            style={{
-              backgroundColor: "white",
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
-              paddingHorizontal: panelPaddingH,
-              maxWidth: panelMaxWidth,
-              width: "100%",
-              alignSelf: "center",
-              paddingTop: 32,
-              paddingBottom: footer ? 0 : adjustedBottom + 24,
-            }}
+            style={[
+              styles.panel,
+              {
+                paddingHorizontal: panelPaddingH,
+                maxWidth: panelMaxWidth,
+                paddingBottom: footer ? 0 : adjustedBottom + moderateScale(24, 0.3),
+              },
+            ]}
           >
             {children}
           </View>
 
           {footer && (
             <View
-              style={{
-                backgroundColor: "white",
-                paddingHorizontal: panelPaddingH,
-                paddingBottom: adjustedBottom + 16,
-                maxWidth: panelMaxWidth,
-                width: "100%",
-                alignSelf: "center",
-              }}
+              style={[
+                styles.footer,
+                {
+                  paddingHorizontal: panelPaddingH,
+                  paddingBottom: adjustedBottom + moderateScale(16, 0.3),
+                  maxWidth: panelMaxWidth,
+                },
+              ]}
             >
               {footer}
             </View>
@@ -178,3 +174,67 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  bgWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 0,
+  },
+  skipWrapper: {
+    position: "absolute",
+    zIndex: 50,
+  },
+  skipBtn: {
+    width: moderateScale(70, 0.3),
+    height: moderateScale(30, 0.3),
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+    borderRadius: moderateScale(20, 0.3),
+    backgroundColor: "#FFFFFF",
+    paddingTop: moderateScale(6, 0.3),
+    paddingBottom: moderateScale(6, 0.3),
+    paddingLeft: moderateScale(10, 0.3),
+    paddingRight: moderateScale(10, 0.3),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: moderateScale(8, 0.3),
+  },
+  skipText: {
+    fontFamily: "Inter",
+    fontWeight: "500",
+    fontSize: moderateScale(12, 0.1),
+    lineHeight: moderateScale(12, 0.1),
+    letterSpacing: 0,
+    textAlign: "center",
+    textAlignVertical: "center",
+    color: "#0F7635",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  dismissTapArea: {
+    flex: 1,
+  },
+  panel: {
+    backgroundColor: "white",
+    borderTopLeftRadius: moderateScale(24, 0.3),
+    borderTopRightRadius: moderateScale(24, 0.3),
+    width: "100%",
+    alignSelf: "center",
+    paddingTop: moderateScale(32, 0.3),
+  },
+  footer: {
+    backgroundColor: "white",
+    width: "100%",
+    alignSelf: "center",
+  },
+});

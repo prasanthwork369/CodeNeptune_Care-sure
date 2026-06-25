@@ -20,16 +20,18 @@ export const OtpForm: React.FC<OtpFormProps> = ({
 
   return (
     <View>
-      <View className="flex-row justify-between px-1" style={s.boxRow}>
+      <View style={s.boxRow}>
         {otp.map((digit, index) => (
           <Pressable
             key={index}
             onPress={() => inputRefs.current[index]?.focus()}
-            className="w-[14%] aspect-square rounded-lg bg-white items-center justify-center"
-            style={{
-              borderWidth: focusedIndex === index ? 1.5 : 1.5,
-              borderColor: otpError || error ? "#EF4444" : focusedIndex === index ? "#0F7635" : "#919EAB22",
-            }}
+            style={[
+              s.otpBox,
+              {
+                borderWidth: focusedIndex === index ? 1.5 : 1,
+                borderColor: otpError || error ? "#EF4444" : focusedIndex === index ? "#0F7635" : "#919EAB33",
+              },
+            ]}
           >
             <TextInput
               ref={(el) => {

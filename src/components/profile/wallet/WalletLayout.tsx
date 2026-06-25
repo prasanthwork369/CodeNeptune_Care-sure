@@ -6,35 +6,40 @@ import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType, WalletLog } from "@/src/types/wallet";
-import { LinearGradient } from "expo-linear-gradient";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  LayoutChangeEvent,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { profileStyles as s } from '../profile.styles';
+
+// Same near-critically-damped spring as the bottom LiquidTabBar's snap
+// animation -- fast settle, no visible overshoot/bounce.
+const TAB_SNAP_SPRING = { damping: 28, stiffness: 420, mass: 0.5 } as const;
+import { styles as cardStyles } from "./WalletLayout.styles";
 import { TransactionHistorySheet } from "./TransactionHistorySheet";
 import { WalletInfoModal } from "./WalletInfoModal";
 
+// Calendar months dictionary for localized transaction date formatting
 const MONTH = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
+/**
+ * Formats an ISO date string to a human-readable format: "D MMM YYYY, HH:MM AM/PM"
+ * @param iso ISO datetime string
+ */
 function formatDate(iso: string): string {
   const d = new Date(iso);
   const day = d.getDate();
@@ -47,6 +52,7 @@ function formatDate(iso: string): string {
   return `${day} ${mon} ${yr}, ${hr}:${m} ${ampm}`;
 }
 
+// Maps system-level wallet transaction reference types to front-facing titles
 const TITLE_MAP: Record<WalletLog["referenceType"], string> = {
   signup_bonus: "Welcome Bonus",
   order_purchase: "Medicine Purchase",
@@ -55,6 +61,11 @@ const TITLE_MAP: Record<WalletLog["referenceType"], string> = {
   wallet_topup: "Wallet Top-up",
 };
 
+/**
+ * Converts a backend WalletLog item into display-ready transaction object(s).
+ * Handles separating transaction rows if both cash wallet and coins adjustments co-occur.
+ * @param log System WalletLog record
+ */
 function logToTransactions(log: WalletLog): Transaction[] {
   const isCredit = log.type === "credit";
   const walletAmt = Number(log.walletAmount);
@@ -63,6 +74,7 @@ function logToTransactions(log: WalletLog): Transaction[] {
   const date = formatDate(log.createdAt);
   const results: Transaction[] = [];
 
+  // 1. Process cash wallet ledger records
   if (walletAmt > 0) {
     results.push({
       id: `${log.id}_wallet`,
@@ -75,6 +87,7 @@ function logToTransactions(log: WalletLog): Transaction[] {
     });
   }
 
+  // 2. Process CareSure Coins ledger records
   if (coinsAmt > 0) {
     results.push({
       id: `${log.id}_coins`,
@@ -87,6 +100,7 @@ function logToTransactions(log: WalletLog): Transaction[] {
     });
   }
 
+  // 3. Fallback record if absolute values are zero
   if (results.length === 0) {
     results.push({
       id: log.id,
@@ -102,6 +116,9 @@ function logToTransactions(log: WalletLog): Transaction[] {
   return results;
 }
 
+/**
+ * Renders a stylized circular status badge containing a context icon for transaction rows.
+ */
 const TransactionIcon = ({ type }: { type: TxIconType }) => {
   const isCredit = type === "plus" || type === "coin_credit" || type === "cash";
   const src =
@@ -109,23 +126,62 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
       type === 'coin_debit' ? HOME_IMAGES.coinDebit :
         isCredit ? HOME_IMAGES.accountBalanceCredit :
           HOME_IMAGES.accountBalanceDebit;
+
   return (
-    <View className={`w-10 h-10 rounded-full items-center justify-center ${isCredit ? "bg-[#DFF3E6]" : "bg-[#FCE8E8]"}`}>
-      <Image source={src} style={{ width: 24, height: 24 }} resizeMode="contain" />
+    <View
+      style={[
+        cardStyles.txIconContainer,
+        isCredit ? cardStyles.txIconCreditBg : cardStyles.txIconDebitBg,
+      ]}
+    >
+      <Image source={src} style={cardStyles.txIconImage} resizeMode="contain" />
     </View>
   );
+};
+
+/**
+ * WalletLayout Component
+ * Displays the user's current account balance across Wallet, Credits, and Coins tabs.
+ * Manages tab switching, details rendering, and shows the log of recent transaction history.
+ */
+const TAB_INDEX: Record<"wallet" | "credits" | "coins", number> = {
+  wallet: 0,
+  credits: 1,
+  coins: 2,
 };
 
 export const WalletLayout: React.FC = () => {
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   const [isHistorySheetVisible, setIsHistorySheetVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState<"wallet" | "credits" | "coins">("wallet");
+
   const confettiRef = useRef<Dotlottie>(null);
   const hasPlayedConfetti = useRef(false);
 
+  // Drives the sliding white pill behind the active tab
+  const tabBarWidth = useSharedValue(0);
+  const activeTabIndex = useSharedValue(0);
+
+  const onTabBarLayout = (e: LayoutChangeEvent) => {
+    tabBarWidth.value = e.nativeEvent.layout.width;
+  };
+
+  useEffect(() => {
+    activeTabIndex.value = withSpring(TAB_INDEX[activeTab], TAB_SNAP_SPRING);
+  }, [activeTab]);
+
+  const animatedPillStyle = useAnimatedStyle(() => {
+    const tabWidth = tabBarWidth.value / 3;
+    return {
+      width: tabWidth,
+      transform: [{ translateX: activeTabIndex.value * tabWidth }],
+    };
+  });
+
   const router = useNav();
   const { balance, loading: balanceLoading } = useWalletBalance();
-  // useQuery reports isLoading=false while disabled (pre-auth), so balance
-  // can briefly be null with loading=false — treat that as still pending too.
+  
+  // A null balance with active loading=false still denotes a loading/pre-auth state.
   const isBalancePending = balanceLoading || balance == null;
   const { logs, loading: logsLoading } = useWalletLogs(20, 0);
   const { data: settings } = useCartWalletSettings();
@@ -134,6 +190,7 @@ export const WalletLayout: React.FC = () => {
   const transactions: Transaction[] = logs.flatMap(logToTransactions);
   const previewTxs = transactions.slice(0, 5);
 
+  // Play a one-shot success/welcome confetti trigger upon component mount
   useEffect(() => {
     if (!hasPlayedConfetti.current) {
       hasPlayedConfetti.current = true;
@@ -145,129 +202,191 @@ export const WalletLayout: React.FC = () => {
   }, []);
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={cardStyles.container}>
       <ScreenHeader
-        title="My Wallet /  CareSure Coins"
+        title="My Wallet / CareSure Coins"
         backgroundColor="#FFFFFF"
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={cardStyles.scrollContent}
       >
-        <LinearGradient
-          colors={["rgba(196, 241, 86, 0.2)", "rgba(80, 181, 59, 0.2)"]}
-          locations={[0.1336, 0.9875]}
-          start={{ x: 1, y: 0.5 }}
-          end={{ x: 0, y: 0.5 }}
-          className="rounded-2xl mb-4 overflow-hidden border border-[#919EAB33]"
-          style={{ minHeight: 180 }}
-        >
-          <View
-            pointerEvents="none"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 10,
-            }}
-          >
+        {/* Balance Dashboard Card */}
+        <View style={cardStyles.card}>
+          {/* Confetti animation overlay */}
+          <View pointerEvents="none" style={cardStyles.confettiContainer}>
             <DotLottie
               ref={confettiRef}
               source={ANIMATIONS.confetti}
               autoplay={false}
               loop={false}
-              style={{ width: "100%", height: "100%" }}
+              style={cardStyles.confettiAnim}
             />
           </View>
+
+          {/* 3D Wallet & Shield absolute background artwork */}
           <Image
-            source={HOME_IMAGES.moneyBag}
-            style={{
-              position: "absolute",
-              right: -2,
-              bottom: -2,
-              width: 110,
-              height: 110,
-            }}
+            source={HOME_IMAGES.rupeeMoneyBag}
+            style={cardStyles.walletIllustration}
             resizeMode="contain"
           />
-          <View className="pt-5 px-5 pr-28">
-            <Text style={s.walletLabel} className="font-inter-medium text-brand-text">
-              Available Balance
-            </Text>
+
+          {/* Segmented Tab selector */}
+          <View style={cardStyles.tabBar} onLayout={onTabBarLayout}>
+            <Animated.View style={[cardStyles.tabPill, animatedPillStyle]} />
+
+            {/* Wallet Tab Option */}
             <Touchable
-              onPress={() => setIsInfoModalVisible(true)}
-              className="absolute top-5 right-5"
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.8}
+              onPress={() => setActiveTab("wallet")}
+              style={cardStyles.tabItem}
             >
-              <icons.info_dark width={20} height={20} />
-            </Touchable>
-            {isBalancePending ? (
-              <ActivityIndicator
-                color="#0F7635"
-                style={{ marginTop: 8, alignSelf: "flex-start" }}
+              <icons.wallet
+                width={18}
+                height={18}
+                fill={activeTab === "wallet" ? "#111827" : "#222222"}
               />
-            ) : (
-              <>
-                <Text style={s.walletBalance} className="font-inter-bold text-brand-text leading-none mt-1">
-                  ₹{Number(balance?.walletBalance ?? 0).toFixed(2)}
-                </Text>
-                {balance != null && (
-                  <View
-                    className="self-start mt-2 px-3 py-1 rounded-sm"
-                    style={{ borderWidth: 1, borderColor: '#919EAB33', backgroundColor: '#FEFFF3' }}
-                  >
-                    <Text style={s.walletSub} className="font-inter-medium text-[#454545]">
-                      Including Corporate Credits (₹{Number(balance.corporateCredits ?? 0).toFixed(0)})
-                    </Text>
-                  </View>
-                )}
-              </>
-            )}
-          </View>
-          <View style={{ height: 1, backgroundColor: '#00000033', marginHorizontal: 20, marginVertical: 16 }} />
-          <View className="pb-5 px-5 pr-28">
-            <Text style={s.walletLabel} className="font-inter-medium text-brand-text">
-              CareSure Coins
-            </Text>
-            <View className="flex-row items-center mt-1">
-              <Image
-                source={HOME_IMAGES.dollarCoins}
-                style={{ width: 28, height: 28, marginRight: 6 }}
-                resizeMode="contain"
-              />
-              {isBalancePending ? (
-                <ActivityIndicator color="#0F7635" />
-              ) : (
-                <Text style={s.walletCoins} className="font-inter-bold text-[#0F1724] leading-none">
-                  {balance?.coinsBalance ?? 0}
-                </Text>
-              )}
-            </View>
-            <View
-              className="self-start border border-[#919EAB33] rounded-sm mt-2 px-3 py-0.5"
-              style={{ backgroundColor: "#FEFFF3" }}
-            >
-              <Text style={s.walletSub} className="font-inter-medium text-[#454545]">
-                1 coin = ₹{coinValue} value
+              <Text
+                style={[
+                  cardStyles.tabText,
+                  activeTab === "wallet" && cardStyles.activeTabText,
+                ]}
+              >
+                Wallet
               </Text>
-            </View>
+            </Touchable>
+
+            {/* Credits Tab Option */}
+            <Touchable
+              activeOpacity={0.8}
+              onPress={() => setActiveTab("credits")}
+              style={cardStyles.tabItem}
+            >
+              <icons.manufacturer
+                width={18}
+                height={18}
+                fill={activeTab === "credits" ? "#111827" : "#222222"}
+              />
+              <Text
+                style={[
+                  cardStyles.tabText,
+                  activeTab === "credits" && cardStyles.activeTabText,
+                ]}
+              >
+                Credits
+              </Text>
+            </Touchable>
+
+            {/* CareSure Coins Tab Option */}
+            <Touchable
+              activeOpacity={0.8}
+              onPress={() => setActiveTab("coins")}
+              style={cardStyles.tabItem}
+            >
+              <icons.rupee_circle
+                width={18}
+                height={18}
+                fill={activeTab === "coins" ? "#111827" : "#222222"}
+              />
+              <Text
+                style={[
+                  cardStyles.tabText,
+                  activeTab === "coins" && cardStyles.activeTabText,
+                ]}
+              >
+                Coins
+              </Text>
+            </Touchable>
           </View>
-        </LinearGradient>
 
-        <Touchable
-          onPress={() => router.push('/profile/wallet/add-money' as any)}
-          activeOpacity={0.85}
-          className="bg-[#0F7635] rounded-[14px] py-4 flex-row items-center justify-center mb-6"
-        >
-          <icons.plus_light width={18} height={18} fill="#FFFFFF" />
-          <Text style={s.walletBtn} className="font-inter-semibold text-white ml-2">
-            Add Money
-          </Text>
-        </Touchable>
+          {/* Wallet Active Tab View */}
+          {activeTab === "wallet" && (
+            <View style={cardStyles.cardContent}>
+              <View style={cardStyles.cardInfoSection}>
+                <Text style={cardStyles.cardLabel}>WALLET BALANCE</Text>
+                {isBalancePending ? (
+                  <ActivityIndicator
+                    color="#0F7635"
+                    style={cardStyles.loadingIndicatorLeft}
+                  />
+                ) : (
+                  <Text style={cardStyles.cardValue}>
+                    ₹{Number(balance?.walletBalance ?? 0).toLocaleString()}
+                  </Text>
+                )}
+                <Text style={cardStyles.cardSub}>
+                  Use wallet balance to pay for your healthcare needs
+                </Text>
+              </View>
+              <Touchable
+                onPress={() => router.push("/profile/wallet/add-money" as any)}
+                activeOpacity={0.85}
+                style={cardStyles.addMoneyBtn}
+              >
+                <Image
+                  source={HOME_IMAGES.addCircle}
+                  style={cardStyles.addMoneyIcon}
+                  resizeMode="contain"
+                />
+                <Text style={cardStyles.addMoneyText}>Add Money</Text>
+              </Touchable>
+            </View>
+          )}
 
-        <View className="flex-row items-center justify-between mb-3">
+          {/* Credits Active Tab View */}
+          {activeTab === "credits" && (
+            <View style={cardStyles.cardContent}>
+              <View style={cardStyles.cardInfoSection}>
+                <Text style={cardStyles.cardLabel}>CORPORATE CREDITS</Text>
+                {isBalancePending ? (
+                  <ActivityIndicator
+                    color="#0F7635"
+                    style={cardStyles.loadingIndicatorLeft}
+                  />
+                ) : (
+                  <Text style={cardStyles.cardValue}>
+                    ₹{Number(balance?.corporateCredits ?? 0).toLocaleString()}
+                  </Text>
+                )}
+                <Text style={cardStyles.cardSub}>
+                  Use employer-provided benefits for your healthcare needs
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Coins Active Tab View */}
+          {activeTab === "coins" && (
+            <View style={cardStyles.cardContent}>
+              <View style={cardStyles.cardInfoSection}>
+                <Text style={cardStyles.cardLabel}>CARESURE COINS</Text>
+                <View style={cardStyles.cardValueRow}>
+                  <Image
+                    source={HOME_IMAGES.rupeeCoin}
+                    style={cardStyles.cardCoinIcon}
+                    resizeMode="contain"
+                  />
+                  {isBalancePending ? (
+                    <ActivityIndicator
+                      color="#0F7635"
+                      style={cardStyles.loadingIndicatorInline}
+                    />
+                  ) : (
+                    <Text style={cardStyles.cardValue}>
+                      {balance?.coinsBalance ?? 0}
+                    </Text>
+                  )}
+                </View>
+                <Text style={cardStyles.cardSub}>
+                  Use employer-provided benefits for your healthcare needs
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        {/* Transaction History Section Header */}
+        <View style={cardStyles.historyHeader}>
           <Text style={s.walletTitle} className="font-inter-extrabold text-brand-text">
             Transaction History
           </Text>
@@ -278,11 +397,12 @@ export const WalletLayout: React.FC = () => {
           </Touchable>
         </View>
 
-        <View className="bg-white rounded-xl border border-[#919EAB33] overflow-hidden p-1">
+        {/* Transaction list container card */}
+        <View style={cardStyles.historyCard}>
           {logsLoading ? (
             <ActivityIndicator
               color="#0F7635"
-              style={{ paddingVertical: 24 }}
+              style={cardStyles.loadingIndicatorCenter}
             />
           ) : previewTxs.length === 0 ? (
             <Text style={s.walletLabel} className="font-inter text-brand-subtext text-center py-6">
@@ -291,40 +411,39 @@ export const WalletLayout: React.FC = () => {
           ) : (
             previewTxs.map((tx: Transaction, idx) => (
               <View key={tx.id}>
-                <View className="flex-row items-center px-4 py-3.5">
+                <View style={cardStyles.txRow}>
                   <TransactionIcon type={tx.iconType} />
-                  <View className="flex-1 ml-3">
+                  <View style={cardStyles.txDetails}>
                     <Text style={s.walletTxTitle} className="font-inter-medium text-brand-text">
                       {tx.title}
                     </Text>
-                    <Text style={s.walletSub} className="font-inter text-brand-subtext mt-0.5">
+                    <Text style={[s.walletSub, cardStyles.txDateText]} className="font-inter text-brand-subtext mt-0.5">
                       {tx.date}
                     </Text>
                   </View>
                   {tx.isCoin ? (
-                    <View className="flex-row items-center">
+                    <View style={cardStyles.coinTxContainer}>
                       <Image
                         source={HOME_IMAGES.dollarCoins}
-                        style={{ width: 16, height: 16, marginRight: 4 }}
+                        style={cardStyles.coinTxIcon}
                         resizeMode="contain"
                       />
                       <Text
-                        style={[s.walletTxTitle, { color: tx.amountColor }]}
+                        style={[s.walletTxTitle, cardStyles.txAmountText, { color: tx.amountColor }]}
                       >
                         {tx.amount}
                       </Text>
                     </View>
                   ) : (
                     <Text
-                      className="text-[14px] font-inter-bold"
-                      style={{ color: tx.amountColor }}
+                      style={[cardStyles.txAmountText, { color: tx.amountColor }]}
                     >
                       {tx.amount}
                     </Text>
                   )}
                 </View>
                 {idx < previewTxs.length - 1 && (
-                  <View className="h-px bg-[#919EAB33] mx-4" />
+                  <View style={cardStyles.txSeparator} />
                 )}
               </View>
             ))

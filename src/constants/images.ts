@@ -52,6 +52,8 @@ export const HOME_IMAGES = {
   verifiedUser: require("../../assets/images/icons/verified-user.png"),
   dollarCoins: require("../../assets/images/wallet/dollar-coins.png"),
   rupeeCoin: require("../../assets/images/wallet/rupee-coin.png"),
+  addCircle: require("../../assets/images/wallet/add_circle.png"),
+  rupeeMoneyBag: require("../../assets/images/wallet/rupee_money_bag.png"),
   accountBalanceCredit: require("../../assets/images/icons/account-balance-credit.png"),
   accountBalanceDebit: require("../../assets/images/icons/account-balance-debit.png"),
   coinCredit: require("../../assets/images/icons/coin-credit.png"),

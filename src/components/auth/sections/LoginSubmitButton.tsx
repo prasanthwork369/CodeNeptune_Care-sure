@@ -17,7 +17,6 @@ export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
             disabled={loading || !isValid}
             accessibilityRole="button"
             accessibilityLabel="Get OTP"
-            className="bg-brand-primary rounded-lg items-center justify-center flex-row"
             style={[s.btn, { opacity: loading || !isValid ? 0.6 : 1 }]}
         >
             {loading ? (
@@ -26,8 +25,8 @@ export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
                 <>
                     <Text style={s.btnText}>Get OTP</Text>
                     <icons.arrow_forward_white
-                        width={s.arrow.width}
-                        height={s.arrow.height}
+                        width={13}
+                        height={13}
                         fill="#ffffff"
                     />
                 </>

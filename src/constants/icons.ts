@@ -125,8 +125,9 @@ import eye from "../../assets/icons/visibility.svg";
 import whatsapp from "../../assets/icons/whatsapp.svg";
 import user_active from "../../assets/icons/user_active.svg";
 import upload_pdf from "../../assets/icons/upload_pdf.svg";
-
-
+import manufacturer from "../../assets/icons/manufacturer.svg";
+import wallet from "../../assets/icons/wallet.svg";
+import rupee_circle from "../../assets/icons/rupee_circle.svg";
 
 
 // Font Icons (for Expo Vector Icons)
@@ -265,6 +266,9 @@ export const icons = {
     bonus_coins,
     bonus_discount,
     bonus_gift,
+    manufacturer,
+    wallet,
+    rupee_circle,
 } as const;
 
 
