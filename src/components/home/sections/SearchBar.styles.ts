@@ -1,38 +1,38 @@
 import { StyleSheet } from "react-native";
-import { moderateScale, scale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 
-export const SEARCH_ICON_SIZE = scale(18);
+export const SEARCH_ICON_SIZE = exactScale(18);
 
 export const styles = StyleSheet.create({
   cyclerText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.1),
-    lineHeight: moderateScale(18, 0.1),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   placeholderText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.1),
-    lineHeight: moderateScale(18, 0.1),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   inputText: {
     fontWeight: "500",
-    fontSize: moderateScale(14, 0.1),
-    lineHeight: moderateScale(18, 0.1),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
-  uploadIcon: { width: scale(22), height: scale(22) },
+  uploadIcon: { width: exactScale(22), height: exactScale(22) },
   container: {
-    height: moderateScale(55, 0.3),
+    height: exactScale(55),
     borderRadius: 10,
     borderWidth: 1.05,
     borderColor: "#919EAB33",
-    paddingLeft: moderateScale(10, 0.3),
-    paddingRight: moderateScale(10, 0.3),
+    paddingLeft: exactScale(10),
+    paddingRight: exactScale(10),
     flexDirection: "row",
     alignItems: "center",
     shadowColor: "#919EAB",

@@ -1,28 +1,28 @@
 import { colors } from "@/src/constants/theme";
 import { StyleSheet } from "react-native";
-import { moderateScale, scale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
   deliverLabel: {
-    fontSize: moderateScale(12, 0.1),
-    lineHeight: moderateScale(14, 0.1),
+    fontSize: exactScale(12),
+    lineHeight: exactScale(14),
     letterSpacing: 0.4,
     color: "#333232",
   },
   locationText: {
-    fontSize: moderateScale(16, 0.1),
-    lineHeight: moderateScale(18, 0.1),
+    fontSize: exactScale(16),
+    lineHeight: exactScale(18),
     letterSpacing: 0,
     color: colors.text,
   },
   dropDownIcon: {
-    marginLeft: scale(10),
-    width: moderateScale(10, 0.5),
-    height: moderateScale(5, 0.5),
+    marginLeft: exactScale(10),
+    width: exactScale(10),
+    height: exactScale(5),
   },
   iconBtn: {
-    width: scale(44),
-    height: scale(44),
+    width: exactScale(44),
+    height: exactScale(44),
     borderRadius: 9999,
     opacity: 1,
     shadowColor: "#919EAB",
@@ -34,8 +34,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   notificationBtn: {
-    width: scale(44),
-    height: scale(44),
+    width: exactScale(44),
+    height: exactScale(44),
     borderRadius: 9999,
     opacity: 1,
     shadowColor: "#919EAB",
@@ -47,17 +47,17 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   notificationIcon: {
-    width: moderateScale(24, 0.3),
-    height: moderateScale(26, 0.3),
+    width: exactScale(24),
+    height: exactScale(26),
   },
   walletIcon: {
-    width: moderateScale(32, 0.3),
-    height: moderateScale(32, 0.3),
+    width: exactScale(32),
+    height: exactScale(32),
     opacity: 1,
   },
   walletBadgeWrap: {
-    width: scale(54),
-    height: scale(15),
+    width: exactScale(54),
+    height: exactScale(15),
     paddingTop: 2,
     paddingRight: 9,
     paddingBottom: 2,
@@ -71,12 +71,12 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   walletBadgeText: {
-    fontSize: moderateScale(10, 0.07),
-    lineHeight: moderateScale(10, 0.07),
+    fontSize: exactScale(10),
+    lineHeight: exactScale(10),
     letterSpacing: 0,
     color: colors.text,
     padding: 1,
   },
-  badge: { minWidth: scale(18), height: scale(18) },
-  badgeText: { fontSize: moderateScale(10, 0.07) },
+  badge: { minWidth: exactScale(18), height: exactScale(18) },
+  badgeText: { fontSize: exactScale(10) },
 });

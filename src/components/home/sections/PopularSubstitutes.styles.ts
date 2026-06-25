@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { exactScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
-    badge:       { fontSize: moderateScale(11, 0.08) },
+    badge:       { fontSize: exactScale(11) },
     name: {
         fontWeight: '500',
-        fontSize: moderateScale(14, 0.08),
-        lineHeight: moderateScale(20, 0.08),
+        fontSize: exactScale(14),
+        lineHeight: exactScale(20),
         verticalAlign: 'middle',
         letterSpacing: 0,
     },
@@ -43,27 +43,27 @@ export const styles = StyleSheet.create({
         verticalAlign: 'middle',
         color: '#0F7635',
     },
-    counter:     { fontSize: moderateScale(20, 0.08) },
-    counterVal:  { fontSize: moderateScale(14, 0.08) },
+    counter:     { fontSize: exactScale(20) },
+    counterVal:  { fontSize: exactScale(14) },
     sectionTitle: {
         fontWeight: '600',
-        fontSize: moderateScale(16, 0.08),
-        lineHeight: moderateScale(20, 0.08),
+        fontSize: exactScale(16),
+        lineHeight: exactScale(20),
         letterSpacing: 0,
         verticalAlign: 'middle',
     },
     sectionSubtitle: {
         fontWeight: '700',
-        fontSize: moderateScale(20, 0.08),
-        lineHeight: moderateScale(30, 0.08),
+        fontSize: exactScale(20),
+        lineHeight: exactScale(30),
         color: '#2DAAFF',
         letterSpacing: 0,
         verticalAlign: 'middle',
     },
 
     headerImage: {
-        width: moderateScale(48, 0.25),
-        height: moderateScale(48, 0.25),
+        width: exactScale(48),
+        height: exactScale(48),
         opacity: 1,
     },
     cartBtn: {

@@ -1,24 +1,24 @@
 import { StyleSheet } from "react-native";
-import { moderateScale, scale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 
-export const CART_BTN_HEIGHT = moderateScale(40, 0.25);
-export const COUNTER_HIT = moderateScale(40, 0.25);
+export const CART_BTN_HEIGHT = exactScale(40);
+export const COUNTER_HIT = exactScale(40);
 
 export const styles = StyleSheet.create({
-  badgeText: { fontSize: moderateScale(12, 0.08) },
+  badgeText: { fontSize: exactScale(12) },
   name: {
-    fontSize: moderateScale(14, 0.08),
-    lineHeight: moderateScale(18, 0.08),
+    fontSize: exactScale(14),
+    lineHeight: exactScale(18),
   },
-  description: { fontSize: moderateScale(12, 0.08) },
-  price: { fontSize: moderateScale(16, 0.08) },
-  mrpLabel: { fontSize: moderateScale(12, 0.08) },
-  mrpValue: { fontSize: moderateScale(12, 0.08) },
-  addToCart: { fontSize: moderateScale(14, 0.08) },
-  counter: { fontSize: moderateScale(20, 0.08) },
+  description: { fontSize: exactScale(12) },
+  price: { fontSize: exactScale(16) },
+  mrpLabel: { fontSize: exactScale(12) },
+  mrpValue: { fontSize: exactScale(12) },
+  addToCart: { fontSize: exactScale(14) },
+  counter: { fontSize: exactScale(20) },
   counterVal: {
-    fontSize: moderateScale(14, 0.08),
-    width: scale(24),
+    fontSize: exactScale(14),
+    width: exactScale(24),
     textAlign: "center",
   },
 });

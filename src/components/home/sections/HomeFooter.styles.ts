@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { exactScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
     label: {

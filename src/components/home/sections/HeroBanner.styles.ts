@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
-import { moderateScale, scale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 
-export const TITLE_LINE_HEIGHT = moderateScale(30, 0.3);
+export const TITLE_LINE_HEIGHT = exactScale(30);
 
 export const styles = StyleSheet.create({
   container: {
-    height: moderateScale(190, 0.3),
-    marginHorizontal: scale(12),
-    marginTop: scale(20),
+    height: exactScale(190),
+    marginHorizontal: exactScale(12),
+    marginTop: exactScale(20),
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#00D1501A",
@@ -15,9 +15,9 @@ export const styles = StyleSheet.create({
     overflow: "visible",
   },
   skeletonContainer: {
-    height: moderateScale(190, 0.3),
-    marginHorizontal: scale(12),
-    marginTop: scale(20),
+    height: exactScale(190),
+    marginHorizontal: exactScale(12),
+    marginTop: exactScale(20),
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#E5E7EB",
@@ -28,29 +28,29 @@ export const styles = StyleSheet.create({
   titleText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "800",
-    fontSize: moderateScale(20, 0.1),
+    fontSize: exactScale(20),
     lineHeight: TITLE_LINE_HEIGHT,
     letterSpacing: 0,
     includeFontPadding: false,
     verticalAlign: "middle",
   },
   badgeContainer: {
-    width: moderateScale(160, 0.3),
-    height: moderateScale(30, 0.3),
+    width: exactScale(160),
+    height: exactScale(30),
     borderRadius: 9999,
     borderWidth: 1,
     borderColor: "#919EAB33",
     backgroundColor: "#FFFFFF",
     opacity: 1,
-    paddingTop: moderateScale(4, 0.3),
-    paddingRight: moderateScale(7, 0.3),
-    paddingBottom: moderateScale(4, 0.3),
-    paddingLeft: moderateScale(7, 0.3),
-    gap: moderateScale(6, 0.3),
+    paddingTop: exactScale(4),
+    paddingRight: exactScale(7),
+    paddingBottom: exactScale(4),
+    paddingLeft: exactScale(7),
+    gap: exactScale(6),
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginTop: moderateScale(10, 0.3),
+    marginTop: exactScale(10),
     shadowColor: "#919EAB33",
     shadowOpacity: 0.06,
     shadowRadius: 4,
@@ -59,36 +59,36 @@ export const styles = StyleSheet.create({
   badgeText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "600",
-    fontSize: moderateScale(12, 0.1),
-    lineHeight: moderateScale(12, 0.1),
+    fontSize: exactScale(12),
+    lineHeight: exactScale(12),
     letterSpacing: 0,
     color: "#0F7635",
     verticalAlign: "middle",
   },
   badgeIcon: {
-    width: moderateScale(16.6, 0.3),
-    height: moderateScale(20.5, 0.3),
+    width: exactScale(16.6),
+    height: exactScale(20.5),
   },
   avatar: {
     position: "absolute",
-    width: moderateScale(184, 0.3),
-    height: moderateScale(211, 0.3),
-    top: moderateScale(-21, 0.3),
-    right: moderateScale(-2, 0.3),
+    width: exactScale(184),
+    height: exactScale(211),
+    top: exactScale(-21),
+    right: exactScale(-2),
   },
   decorMedicine: {
     position: "absolute",
-    width: moderateScale(20, 0.3),
-    height: moderateScale(20, 0.3),
-    top: moderateScale(144, 0.3),
-    left: moderateScale(140, 0.3),
+    width: exactScale(20),
+    height: exactScale(20),
+    top: exactScale(144),
+    left: exactScale(140),
   },
   decorPills: {
     position: "absolute",
-    width: moderateScale(27.2, 0.3),
-    height: moderateScale(27.2, 0.3),
-    top: moderateScale(26.52, 0.3),
-    right: moderateScale(15, 0.3),
+    width: exactScale(27.2),
+    height: exactScale(27.2),
+    top: exactScale(26.52),
+    right: exactScale(15),
     transform: [{ rotate: "-36.76deg" }],
   },
 });

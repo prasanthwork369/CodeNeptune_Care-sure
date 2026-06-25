@@ -9,9 +9,9 @@ import Animated, {
     withDelay,
     withTiming,
 } from "react-native-reanimated";
-import { moderateScale } from "react-native-size-matters";
+import { exactScale } from "@/src/utils/exactScale";
 
-const SLOT_H = moderateScale(20, 0.3);
+const SLOT_H = exactScale(20);
 const ANIM_MS = 420;
 const HOLD_MS = 2800;
 // Gentle ease-in-out — soft start AND soft landing, no abrupt movement
@@ -109,7 +109,7 @@ export const HomeSearchCycler: React.FC = () => {
   }, []);
 
   const textStyle = {
-    fontSize: moderateScale(14, 0.1),
+    fontSize: exactScale(14),
     lineHeight: SLOT_H,
     fontWeight: "500" as const,
     color: "#9CA3AF",
