@@ -1,12 +1,13 @@
+import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from 'react-native';
 import { exactScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
-    badge:       { fontSize: exactScale(11) },
+    badge:       { fontSize: moderateScale(11, 0.3) },
     name: {
         fontWeight: '500',
-        fontSize: exactScale(14),
-        lineHeight: exactScale(20),
+        fontSize: moderateScale(14, 0.3),
+        lineHeight: moderateScale(20, 0.3),
         verticalAlign: 'middle',
         letterSpacing: 0,
     },
@@ -43,19 +44,19 @@ export const styles = StyleSheet.create({
         verticalAlign: 'middle',
         color: '#0F7635',
     },
-    counter:     { fontSize: exactScale(20) },
-    counterVal:  { fontSize: exactScale(14) },
+    counter:     { fontSize: moderateScale(20, 0.3) },
+    counterVal:  { fontSize: moderateScale(14, 0.3) },
     sectionTitle: {
         fontWeight: '600',
-        fontSize: exactScale(16),
-        lineHeight: exactScale(20),
+        fontSize: moderateScale(16, 0.3),
+        lineHeight: moderateScale(20, 0.3),
         letterSpacing: 0,
         verticalAlign: 'middle',
     },
     sectionSubtitle: {
         fontWeight: '700',
-        fontSize: exactScale(20),
-        lineHeight: exactScale(30),
+        fontSize: moderateScale(20, 0.3),
+        lineHeight: moderateScale(30, 0.3),
         color: '#2DAAFF',
         letterSpacing: 0,
         verticalAlign: 'middle',

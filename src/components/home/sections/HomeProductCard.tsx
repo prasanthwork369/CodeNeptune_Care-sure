@@ -11,8 +11,6 @@ import { styles as s } from "./HomeProductCard.styles";
 interface Props {
   item: Product;
   cardWidth: number;
-  cardHeight: number;
-  imageSize: number;
   badgeBgColor: string;
   badgeTextColor: string;
   detailsBgColor: string;
@@ -24,8 +22,6 @@ interface Props {
 export const HomeProductCard: React.FC<Props> = ({
   item,
   cardWidth,
-  cardHeight,
-  imageSize,
   badgeBgColor,
   badgeTextColor,
   detailsBgColor,
@@ -67,7 +63,7 @@ export const HomeProductCard: React.FC<Props> = ({
       className="rounded-[12px] overflow-hidden bg-transparent"
       style={{
         width: cardWidth,
-        height: cardHeight,
+        flex: 1, // Let it stretch to parent container height
         borderWidth: 0.77,
         borderColor: "#919EAB33",
       }}
@@ -80,8 +76,8 @@ export const HomeProductCard: React.FC<Props> = ({
       >
         {/* Image */}
         <View
-          style={{ height: imageSize * 1.5 }}
-          className="bg-white items-center justify-center"
+          style={{ aspectRatio: 1, width: "100%" }}
+          className="bg-white items-center justify-center p-3"
         >
           {!!item.discount && (
             <View
@@ -99,13 +95,13 @@ export const HomeProductCard: React.FC<Props> = ({
           {item.image ? (
             <Image
               source={item.image as any}
-              style={{ width: imageSize, height: imageSize }}
+              style={{ width: "100%", height: "100%" }}
               contentFit="contain"
             />
           ) : (
             <icons.placeholder
-              width={imageSize * 0.55}
-              height={imageSize * 0.55}
+              width="60%"
+              height="60%"
             />
           )}
         </View>

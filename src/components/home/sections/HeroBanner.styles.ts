@@ -1,3 +1,4 @@
+import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from "react-native";
 import { exactScale } from "@/src/utils/exactScale";
 
@@ -5,7 +6,8 @@ export const TITLE_LINE_HEIGHT = exactScale(30);
 
 export const styles = StyleSheet.create({
   container: {
-    height: exactScale(190),
+    width: "100%",
+    aspectRatio: 358 / 190,
     marginHorizontal: exactScale(12),
     marginTop: exactScale(20),
     borderRadius: 12,
@@ -15,7 +17,8 @@ export const styles = StyleSheet.create({
     overflow: "visible",
   },
   skeletonContainer: {
-    height: exactScale(190),
+    width: "100%",
+    aspectRatio: 358 / 190,
     marginHorizontal: exactScale(12),
     marginTop: exactScale(20),
     borderRadius: 12,
@@ -28,7 +31,7 @@ export const styles = StyleSheet.create({
   titleText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "800",
-    fontSize: exactScale(20),
+    fontSize: moderateScale(20, 0.3),
     lineHeight: TITLE_LINE_HEIGHT,
     letterSpacing: 0,
     includeFontPadding: false,
@@ -59,8 +62,8 @@ export const styles = StyleSheet.create({
   badgeText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "600",
-    fontSize: exactScale(12),
-    lineHeight: exactScale(12),
+    fontSize: moderateScale(12, 0.3),
+    lineHeight: moderateScale(12, 0.3),
     letterSpacing: 0,
     color: "#0F7635",
     verticalAlign: "middle",
