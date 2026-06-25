@@ -109,7 +109,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           style={{
             paddingLeft: 10,
             paddingTop: contentPaddingTop,
-            paddingRight: Math.round(personWidth * 0.4),
+            paddingRight: "40%",
           }}
         >
           <Skeleton
@@ -125,8 +125,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             style={{ marginBottom: badgeMarginTop }}
           />
           <Skeleton
-            width={Math.round(120 * scale)}
-            height={Math.round(32 * scale)}
+            width={120}
+            height={32}
             borderRadius={999}
           />
         </View>
@@ -142,11 +142,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       </View>
     );
   }
-
-  const title = content.title;
-  const badgeText = content.status_text;
-  const mainImage = { uri: content.image };
-  const highlights = content.highlighted_text ?? [];
 
   return (
     <View style={styles.container}>
