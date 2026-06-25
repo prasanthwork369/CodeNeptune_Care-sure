@@ -23,7 +23,8 @@ export const useProduct = (productId: string) => {
     const price = data ? parseFloat(String(data.price)) : 0;
     const discountPct = data ? parseFloat(String(data.discountPercentage)) : 0;
     const packSizeNum = data ? parsePackSize(data.packSize) : 1;
-    const unitPrice = packSizeNum > 0 ? parseFloat((price / packSizeNum).toFixed(2)) : 0;
+    // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+    const unitPrice = packSizeNum > 0 ? Math.floor((price / packSizeNum) * 100) / 100 : 0;
 
     const product = data ? {
         name: data.name,
@@ -38,7 +39,7 @@ export const useProduct = (productId: string) => {
         // Raw API strings for display
         priceDisplay: data.price,
         mrpDisplay: data.mrp ?? data.price,
-        unitPriceDisplay: unitPrice.toString(),
+        unitPriceDisplay: unitPrice.toFixed(2),
         // Numbers for calculations
         price,
         originalPrice: discountPct > 0 && data.mrp ? parseFloat(String(data.mrp)) : undefined,

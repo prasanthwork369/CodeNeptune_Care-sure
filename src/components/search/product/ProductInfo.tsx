@@ -117,7 +117,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ productId, medicineUui
                 </View>
 
                 <Text className="text-[12px] font-inter-medium text-brand-subtext uppercase tracking-wider">
-                    {product.packLabel ?? `${product.packSize ?? ''} ${product.dosageForm ?? ''}`.trim()}{product.packSize ? ` | ₹${(product.price / product.packSize).toFixed(2)} / UNIT` : ''}{' '}
+                    {product.packLabel ?? `${product.packSize ?? ''} ${product.dosageForm ?? ''}`.trim()}{product.packSize ? ` | ₹${(Math.floor((product.price / product.packSize) * 100) / 100).toFixed(2)} / UNIT` : ''}{' '}
                     <Text className="normal-case tracking-normal text-brand-subtext">(Inclusive of all Taxes)</Text>
                 </Text>
             </View>

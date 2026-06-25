@@ -86,6 +86,8 @@ export const CartLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 24 }}
       >
+        <CartSavingsBanner firstName={firstName} totalSavings={totalSavings} />
+
         <CartDeliveringTo
           label={deliveryLocation?.label ?? defaultAddress?.label ?? "Address"}
           description={
@@ -103,8 +105,6 @@ export const CartLayout: React.FC = () => {
           onChange={() => setShowLocationSheet(true)}
           flat
         />
-
-        <CartSavingsBanner firstName={firstName} totalSavings={totalSavings} />
 
         <CartFreeDeliveryProgress
           remainingForFreeDelivery={remainingForFreeDelivery}

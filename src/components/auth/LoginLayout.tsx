@@ -1,8 +1,8 @@
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import {
-    getPhoneNumberHint,
-    normalizeIndianPhone,
+  getPhoneNumberHint,
+  normalizeIndianPhone,
 } from "@/src/modules/PhoneNumberHint";
 import { sanitize, validate } from "@/src/utils/validation";
 import React, { useRef, useState } from "react";

@@ -6,7 +6,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ArrowForwardIosWhite from "@/assets/icons/arrow_forward_ios_white.svg";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
@@ -532,10 +532,9 @@ export const PaymentLayout: React.FC = () => {
                 >
                   {hasAddress ? "Confirm Order" : "Set Delivery Address"}
                 </Text>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={24}
-                  color="#fff"
+                <ArrowForwardIosWhite
+                  width={14}
+                  height={14}
                 />
               </>
             )}

@@ -137,7 +137,10 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           {product.packLabel ??
             `${product.packSize ?? ""} ${product.dosageForm ?? ""}`.trim()}
           {product.packSize
-            ? ` | ₹${(product.price / product.packSize).toFixed(2)} / UNIT`
+            ? ` | ₹${(
+                // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+                Math.floor((product.price / product.packSize) * 100) / 100
+              ).toFixed(2)} / UNIT`
             : ""}{" "}
           <Text className="normal-case tracking-normal text-brand-subtext">
             (Inclusive of all Taxes)
@@ -165,7 +168,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 const mrp = discountPct > 0 ? v.price.toFixed(0) : null;
                 const packNum = parseFloat(v.packSize);
                 const unitPrice =
-                  packNum > 0 ? (sellingPrice / packNum).toFixed(2) : null;
+                  packNum > 0
+                    ? (
+                        // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+                        Math.floor((sellingPrice / packNum) * 100) / 100
+                      ).toFixed(2)
+                    : null;
 
                 return (
                   <Touchable

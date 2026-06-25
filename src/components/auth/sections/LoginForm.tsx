@@ -32,6 +32,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     cursorColor="#0F7635"
                     value={phoneNumber}
                     onChangeText={onPhoneChange}
+                    // onPhoneFocus triggers the native Android SIM selector hint prompt to pick phone number automatically
                     onFocus={() => { setIsFocused(true); onPhoneFocus?.(); }}
                     onBlur={() => setIsFocused(false)}
                 />

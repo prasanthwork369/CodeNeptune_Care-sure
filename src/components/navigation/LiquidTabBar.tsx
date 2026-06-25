@@ -15,6 +15,7 @@ import React, {
   useState,
 } from "react";
 import {
+  DeviceEventEmitter,
   Image,
   LayoutChangeEvent,
   Platform,
@@ -410,10 +411,16 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       const route = pillRoutes[index];
       if (route) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        navigation.navigate(route.name);
+        if (activePillIndex === index) {
+          if (route.name === "index") {
+            DeviceEventEmitter.emit("home-scroll-to-top");
+          }
+        } else {
+          navigation.navigate(route.name);
+        }
       }
     },
-    [pillRoutes, navigation],
+    [pillRoutes, navigation, activePillIndex],
   );
 
   const onLayout = useCallback(

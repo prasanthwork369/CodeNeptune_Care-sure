@@ -3,6 +3,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
+import { icons } from "@/src/constants/icons";
 import React, { useState } from "react";
 import {
     LayoutChangeEvent,
@@ -26,7 +27,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
   const onContainerLayout = (e: LayoutChangeEvent) =>
     setContainerHeight(e.nativeEvent.layout.height);
 
-  const { imageUrls, doctorName, patientName, uploadedDate, toPay, source } =
+  const { imageUrls, doctorName, patientName, uploadedDate, toPay, source, status, prescriptionOrderId, prescriptionId } =
     useLocalSearchParams<{
       prescriptionId: string;
       imageUrls: string;
@@ -35,6 +36,8 @@ export const PrescriptionViewerLayout: React.FC = () => {
       uploadedDate: string;
       toPay?: string;
       source?: string;
+      status?: string;
+      prescriptionOrderId?: string;
     }>();
 
   const urls: string[] = imageUrls ? JSON.parse(imageUrls) : [];
@@ -171,7 +174,37 @@ export const PrescriptionViewerLayout: React.FC = () => {
           ))}
       </View>
 
-      {source !== "view_only" && (
+      {/* If the prescription is verified, show a custom inline card to directly compare/order medicines */}
+      {status === "Verified" && prescriptionOrderId ? (
+        <View style={{ paddingBottom: adjustedBottom + 12 }} className="px-5 pt-4 bg-white border-t border-[#EEEFF1]">
+          <Touchable
+            activeOpacity={0.85}
+            onPress={() => {
+              router.push({
+                pathname: "/(prescription)/medicine-comparison",
+                params: {
+                  prescriptionOrderId: prescriptionOrderId,
+                  prescriptionId: prescriptionId,
+                },
+              });
+            }}
+            className="flex-row items-center bg-[#F1FEF8] border border-[#0F763533] rounded-xl p-4"
+          >
+            <View className="mr-3 bg-[#D1F2E1] rounded-full p-2 items-center justify-center">
+              <icons.check_circle width={20} height={20} fill="#0F7635" />
+            </View>
+            <View className="flex-1 justify-center">
+              <Text className="text-[14px] font-inter-bold text-[#111827]">
+                Prescription Verified
+              </Text>
+              <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5">
+                Your medicines are ready to order
+              </Text>
+            </View>
+            <icons.arrow_forward_green width={16} height={16} />
+          </Touchable>
+        </View>
+      ) : source !== "view_only" && (
         <View
           className="flex-row gap-3 px-5 pt-3 bg-white border-t border-[#EEEFF1]"
           style={{ paddingBottom: adjustedBottom + 12 }}

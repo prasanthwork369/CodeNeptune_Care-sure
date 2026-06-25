@@ -69,6 +69,7 @@ export interface PrescriptionHistoryItemData {
     image: any;
     source?: string;
     toPay?: string;
+    prescriptionOrderId?: string | null;
 }
 
 export interface PrescriptionHistoryItemProps {

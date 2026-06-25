@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons } from '@expo/vector-icons';
+import VerifiedUserWhiteIcon from '@/assets/icons/VerifiedUserWhiteIcon.svg';
 import { PaymentTotalBannerProps } from '@/src/types/payment';
 
 export const PaymentTotalBanner: React.FC<PaymentTotalBannerProps> = ({ toPay }) => {
@@ -29,7 +29,7 @@ export const PaymentTotalBanner: React.FC<PaymentTotalBannerProps> = ({ toPay })
                 <Text style={{ fontSize: 42, fontWeight: '800', color: '#fff' }}>{toPay}</Text>
             </View>
             <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.15)', flexDirection: 'row', alignItems: 'center' }}>
-                <MaterialIcons name="verified-user" size={16} color="#fff" />
+                <VerifiedUserWhiteIcon width={16} height={16} />
                 <Text style={{ fontSize: 12, fontWeight: '600', color: '#fff', marginLeft: 8 }}>
                     Safe & Secure Transaction
                 </Text>

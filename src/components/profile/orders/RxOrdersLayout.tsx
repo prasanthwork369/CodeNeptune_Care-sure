@@ -298,6 +298,9 @@ const PrescriptionCard = ({
         patientName: item.patient,
         uploadedDate: item.date,
         source: "view_only",
+        // Pass status and order ID so the prescription viewer knows if it is verified
+        status: item.status,
+        prescriptionOrderId: item.prescriptionOrderId ?? "",
       },
     });
   };

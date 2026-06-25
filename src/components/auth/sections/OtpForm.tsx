@@ -41,6 +41,10 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               onFocus={() => setFocusedIndex(index)}
               onBlur={() => setFocusedIndex((cur) => (cur === index ? null : cur))}
               keyboardType="number-pad"
+              // iOS/Android SMS autofill works by pasting the complete 6-digit OTP code into the
+              // very first input field. By setting maxLength=6 on the first field and enabling
+              // oneTimeCode/sms-otp, we allow the OS to auto-paste the full code. handleOtpChange
+              // then splits this 6-digit string across all input boxes.
               maxLength={index === 0 ? 6 : 1}
               textContentType={index === 0 ? "oneTimeCode" : "none"}
               autoComplete={index === 0 ? "sms-otp" : "off"}

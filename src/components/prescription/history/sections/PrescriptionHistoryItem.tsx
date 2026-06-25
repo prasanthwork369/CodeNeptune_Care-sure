@@ -72,6 +72,9 @@ export const PrescriptionHistoryItem: React.FC<
         uploadedDate: item.uploadedDate,
         source: item.source,
         toPay: item.toPay,
+        // Pass status and order ID to the viewer page so it can show the verified banner
+        status: item.status,
+        prescriptionOrderId: item.prescriptionOrderId ?? "",
       },
     });
   };

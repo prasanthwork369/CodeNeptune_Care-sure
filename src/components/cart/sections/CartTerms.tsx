@@ -39,7 +39,7 @@ export const CartTerms: React.FC = () => {
         <View className="mx-4 mt-4 bg-white border border-[#919EAB33] rounded-md px-4 py-5 flex-row items-center">
             <icons.info_gray width={20} height={20} />
             <Text style={s.termsText} className="flex-1 ml-3 font-inter-medium text-[#6A6A6A] leading-[18px]">
-                Please Review And Accept{' '}
+                Please Review{' '}
                 <Text
                     suppressHighlighting
                     style={linkStyle('terms', links?.termsLink)}

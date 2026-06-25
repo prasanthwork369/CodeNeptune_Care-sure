@@ -1,7 +1,7 @@
-import { PaymentFooterProps } from "@/src/types/payment";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { Touchable } from "@/src/components/ui/Touchable";
+import ArrowForwardIosWhite from "@/assets/icons/arrow_forward_ios_white.svg";
+import { PaymentFooterProps } from "@/src/types/payment";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
@@ -61,10 +61,9 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
               >
                 {hasAddress ? "Confirm Order" : "Set Delivery Address"}
               </Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={24}
-                color="#fff"
+              <ArrowForwardIosWhite
+                width={14}
+                height={14}
               />
             </>
           )}

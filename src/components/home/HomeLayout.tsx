@@ -36,6 +36,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  DeviceEventEmitter,
   Platform,
   RefreshControl,
   ScrollView,
@@ -86,7 +87,15 @@ export const HomeLayout: React.FC = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [carouselY, setCarouselY] = useState(0);
   const [carouselHeight, setCarouselHeight] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
   const currentScrollY = useRef(0);
+
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener("home-scroll-to-top", () => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    });
+    return () => sub.remove();
+  }, []);
 
   const searchBarAnim = useSlideUp(350);
   const quickActionsAnim = useSlideUp(500);
@@ -244,6 +253,7 @@ export const HomeLayout: React.FC = () => {
         style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]}
       />
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         className="flex-1"
         bounces={false}

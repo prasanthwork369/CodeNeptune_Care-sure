@@ -18,14 +18,9 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
       style={{
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 14,
+        paddingHorizontal: 16,
         paddingVertical: 12,
         gap: 10,
-        marginHorizontal: 16,
-        marginTop: 14,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#919EAB33",
       }}
     >
       <Image

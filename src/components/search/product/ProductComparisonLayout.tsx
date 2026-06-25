@@ -106,8 +106,12 @@ export const ProductComparisonLayout: React.FC<
   const recPackSize = raw?.recommendation?.packSize
     ? parseInt(String(raw.recommendation.packSize).match(/\d+/)?.[0] ?? "1")
     : 1;
+
   const recUnitPrice = recommendation
-    ? (recommendation.price / Math.max(recPackSize, 1)).toFixed(2)
+    ? (
+        // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+        Math.floor((recommendation.price / Math.max(recPackSize, 1)) * 100) / 100
+      ).toFixed(2)
     : undefined;
 
   return (
