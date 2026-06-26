@@ -25,7 +25,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { CancelOrderDialog } from "./CancelOrderDialog";
+
 import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
 import { orderStyles as s } from "./orders.styles";
 import { OrderTrackingModal } from "./OrderTrackingModal";
@@ -167,7 +167,7 @@ export const OrderTrackLayout: React.FC = () => {
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
   const [isProceeding, setIsProceeding] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
-  const [cancelDialogVisible, setCancelDialogVisible] = useState(false);
+
   const [alertState, setAlertState] = useState<{
     visible: boolean;
     icon: 'check-green' | 'delete' | 'package';
@@ -222,38 +222,7 @@ export const OrderTrackLayout: React.FC = () => {
     }
   };
 
-  const handleCancelOrder = async (reason: string) => {
-    if (!orderId) return;
 
-    setIsCancelling(true);
-    try {
-      await orderApi.cancelOrder(orderId, reason);
-      setCancelDialogVisible(false);
-      // The detail query has a 60s staleTime, so without this the cancelled
-      // status wouldn't show until that cache naturally expired — invalidate
-      // both this order and the orders list so they reflect it immediately.
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId) });
-      queryClient.invalidateQueries({ queryKey: ['customer', 'orders', 'list'] });
-      setAlertState({
-        visible: true,
-        icon: 'check-green',
-        title: 'Order cancelled successfully!',
-        onClose: () => {
-          setTimeout(() => router.back(), 500);
-        },
-      });
-    } catch (error) {
-      if (__DEV__) console.error('[CancelOrder]', error);
-      setCancelDialogVisible(false);
-      setAlertState({
-        visible: true,
-        icon: 'delete',
-        title: 'Failed to cancel order. Please try again.',
-      });
-    } finally {
-      setIsCancelling(false);
-    }
-  };
 
   useEffect(() => {
     if (order && !animTriggered) setAnimTriggered(true);
@@ -532,8 +501,8 @@ export const OrderTrackLayout: React.FC = () => {
                     shadowRadius: 32,
                   }}
                   activeOpacity={0.7}
-                  onPress={() => setCancelDialogVisible(true)}
-                  disabled={isCancelling || cancelDialogVisible}
+                  onPress={() => router.push({ pathname: "/profile/orders/cancel", params: { orderId } } as any)}
+                  disabled={isCancelling}
                 >
                   <Text
                     style={s.labelSm}
@@ -997,20 +966,6 @@ export const OrderTrackLayout: React.FC = () => {
         isProceeding={isProceeding}
       />
 
-      <CancelOrderDialog
-        visible={cancelDialogVisible}
-        onClose={() => setCancelDialogVisible(false)}
-        onConfirm={handleCancelOrder}
-        loading={isCancelling}
-        orderNumber={
-          order?.orderId
-            ? String(order.orderId).replace(/[^a-zA-Z_]/g, "").slice(0, 2).toUpperCase() +
-              String(order.orderId).slice(-5)
-            : undefined
-        }
-        itemsCount={items.length}
-        totalAmount={toPay}
-      />
 
       <AlertDialog
         visible={alertState.visible}
