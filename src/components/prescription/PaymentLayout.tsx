@@ -81,7 +81,7 @@ export const PaymentLayout: React.FC = () => {
     patientPhone?: string;
   }>();
 
-  const { bill, walletUsed, coinsUsed, couponCode, clear: clearCheckout } = useCheckoutStore();
+  const { bill, walletUsed, coinsUsed, corporateCreditsUsed, couponCode, clear: clearCheckout } = useCheckoutStore();
   const removeCoupon = useCouponStore((s) => s.remove);
   const billBreakdown = {
     itemTotal:       bill?.subtotal        ?? 0,
@@ -89,6 +89,7 @@ export const PaymentLayout: React.FC = () => {
     couponDiscount:  bill?.couponDiscount  ?? 0,
     walletDiscount:  bill?.walletDiscount  ?? 0,
     coinsDiscount:   bill?.coinsDiscount   ?? 0,
+    creditsDiscount: bill?.corporateCreditsDiscount ?? 0,
     deliveryFee:     bill?.deliveryFee     ?? 0,
     handlingCharge:  bill?.handlingCharge  ?? 0,
     totalSaved:      bill?.totalSaved      ?? 0,
@@ -164,6 +165,7 @@ export const PaymentLayout: React.FC = () => {
         preferences: {
           walletUsed: walletUsed,
           coinsUsed: coinsUsed,
+          creditsUsed: corporateCreditsUsed,
           livePriceSyncUsed: false,
         },
         couponCode: couponCode ?? '',

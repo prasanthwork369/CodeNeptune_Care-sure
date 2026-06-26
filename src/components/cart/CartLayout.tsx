@@ -62,6 +62,8 @@ export const CartLayout: React.FC = () => {
     availableCoins,
     walletBalance,
     corporateCreditsBalance,
+    corporateCreditsEligible,
+    corporateCreditsRemainingForEligibility,
     handleAddItem,
     handleProceed,
     setSelectedLocation,
@@ -135,6 +137,10 @@ export const CartLayout: React.FC = () => {
             corporateCreditsValue={corporateCreditsOn}
             corporateCreditsBalance={corporateCreditsBalance}
             onCorporateCreditsToggle={handleCorporateCreditsToggle}
+            corporateCreditsEligible={corporateCreditsEligible}
+            corporateCreditsRemainingForEligibility={
+              corporateCreditsRemainingForEligibility
+            }
           />
         )}
 

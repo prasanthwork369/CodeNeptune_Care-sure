@@ -12,6 +12,8 @@ export const CartWalletSection: React.FC<CartWalletSectionProps> = ({
     corporateCreditsValue,
     corporateCreditsBalance,
     onCorporateCreditsToggle,
+    corporateCreditsEligible = true,
+    corporateCreditsRemainingForEligibility = 0,
 }) => {
     const showCorporateCredits = (corporateCreditsBalance ?? 0) > 0 && !!onCorporateCreditsToggle;
 
@@ -35,8 +37,15 @@ export const CartWalletSection: React.FC<CartWalletSectionProps> = ({
                             <Text style={s.walletTitle} className="font-inter-semibold text-brand-[#0F1724]">Corporate Credits</Text>
                             <Text style={s.walletSub} className="font-inter-medium text-brand-subtext mt-0.5">Available Balance: ₹{Number(corporateCreditsBalance).toFixed(2)}</Text>
                         </View>
-                        <CustomSwitch value={!!corporateCreditsValue} onValueChange={onCorporateCreditsToggle} />
+                        {corporateCreditsEligible ? (
+                            <CustomSwitch value={!!corporateCreditsValue} onValueChange={onCorporateCreditsToggle} />
+                        ) : null}
                     </View>
+                    {!corporateCreditsEligible && (
+                        <Text className="font-inter-medium text-[#B45309] text-[12px] pb-3.5">
+                            Add ₹{Number(corporateCreditsRemainingForEligibility).toFixed(2)} more to use Corporate Credits
+                        </Text>
+                    )}
                 </>
             )}
         </View>

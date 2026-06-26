@@ -21,6 +21,8 @@ export interface WalletBalance {
     coinsBalance: number;
     walletCreditsBalance?: number | string;
     corporateCredits?: number | string;
+    maxDiscountPerOrder?: number | string;
+    minOrderValueForDiscount?: number | string;
     createdAt: string;
     updatedAt: string;
 }

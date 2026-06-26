@@ -39,6 +39,7 @@ export interface OrderMetadata {
     couponDiscount: number;
     walletDiscount: number;
     coinsDiscount: number;
+    creditsDiscount: number;
     deliveryFee: number;
     handlingCharge: number;
     totalSaved: number;
@@ -47,6 +48,7 @@ export interface OrderMetadata {
   preferences?: {
     walletUsed: boolean;
     coinsUsed: boolean;
+    creditsUsed: boolean;
     livePriceSyncUsed: boolean;
   };
   [key: string]: any;

@@ -96,7 +96,7 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
       >
         <View style={s.actionsCard}>
           <ActionRow
-            IconComponent={icons.photo_camera}
+            IconComponent={icons.photo_camera_green}
             label="Take a Photo"
             sublabel="Use your device camera"
             onPress={onSelectCamera}

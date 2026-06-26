@@ -50,7 +50,7 @@ export function usePaymentCalculations() {
     couponDiscount: bill?.couponDiscount ?? 0,
     walletDiscount: bill?.walletDiscount ?? 0,
     coinsDiscount: bill?.coinsDiscount ?? 0,
-    corporateCreditsDiscount: bill?.corporateCreditsDiscount ?? 0,
+    creditsDiscount: bill?.corporateCreditsDiscount ?? 0,
     deliveryFee: bill?.deliveryFee ?? 0,
     handlingCharge: bill?.handlingCharge ?? 0,
     totalSaved: bill?.totalSaved ?? 0,
@@ -62,7 +62,7 @@ export function usePaymentCalculations() {
     billBreakdown.couponDiscount +
     billBreakdown.walletDiscount +
     billBreakdown.coinsDiscount +
-    billBreakdown.corporateCreditsDiscount;
+    billBreakdown.creditsDiscount;
 
   const [selectedMethod, setSelectedMethod] = useState("COD");
   const [showLocationSheet, setShowLocationSheet] = useState(false);
@@ -155,7 +155,7 @@ export function usePaymentCalculations() {
         preferences: {
           walletUsed: walletUsed,
           coinsUsed: coinsUsed,
-          corporateCreditsUsed: corporateCreditsUsed,
+          creditsUsed: corporateCreditsUsed,
           livePriceSyncUsed: false,
         },
         couponCode: couponCode ?? "",
@@ -167,6 +167,10 @@ export function usePaymentCalculations() {
         },
       },
     };
+
+    if (__DEV__) {
+      console.log("[handlePlaceOrder] payload:", JSON.stringify(payload, null, 2));
+    }
 
     try {
       const order: any = await createOrder(payload);

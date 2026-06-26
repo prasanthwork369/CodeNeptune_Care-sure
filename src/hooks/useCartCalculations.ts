@@ -113,6 +113,13 @@ export function useCartCalculations() {
   const walletBalance = balance != null ? Number(balance.walletBalance) : 0;
   const corporateCreditsBalance =
     balance != null ? Number(balance.corporateCredits ?? 0) : 0;
+  const corporateCreditsMinOrderValue = Number(
+    balance?.minOrderValueForDiscount ?? 0,
+  );
+  const corporateCreditsMaxDiscount =
+    balance?.maxDiscountPerOrder != null
+      ? Number(balance.maxDiscountPerOrder)
+      : Infinity;
 
   const lines: CartLine[] = cartItems.map((item): CartLine => {
     // unitPrice from the backend is the MRP (strikethrough price); the
@@ -189,16 +196,27 @@ export function useCartCalculations() {
     ? Math.round(Math.min(walletBalance, subtotalBeforeWallet) * 10) / 10
     : 0;
 
-  // 4. Corporate Credits — applied last, covers whatever remains after wallet
+  // 4. Corporate Credits — applied last, covers whatever remains after wallet,
+  // gated by a minimum order value and capped per order (both server-configured)
+  const corporateCreditsEligible = subtotal >= corporateCreditsMinOrderValue;
+  const corporateCreditsRemainingForEligibility = Math.max(
+    0,
+    Math.round((corporateCreditsMinOrderValue - subtotal) * 10) / 10,
+  );
   const subtotalBeforeCorporateCredits = Math.max(
     subtotalBeforeWallet - WALLET_DISCOUNT,
     0,
   );
-  const CORPORATE_CREDITS_DISCOUNT = corporateCreditsOn
-    ? Math.round(
-        Math.min(corporateCreditsBalance, subtotalBeforeCorporateCredits) * 10,
-      ) / 10
-    : 0;
+  const CORPORATE_CREDITS_DISCOUNT =
+    corporateCreditsOn && corporateCreditsEligible
+      ? Math.round(
+          Math.min(
+            corporateCreditsBalance,
+            corporateCreditsMaxDiscount,
+            subtotalBeforeCorporateCredits,
+          ) * 10,
+        ) / 10
+      : 0;
 
   const toPay =
     Math.round(
@@ -326,6 +344,8 @@ export function useCartCalculations() {
     availableCoins,
     walletBalance,
     corporateCreditsBalance,
+    corporateCreditsEligible,
+    corporateCreditsRemainingForEligibility,
     handleAddItem,
     handleProceed,
     setSelectedLocation,

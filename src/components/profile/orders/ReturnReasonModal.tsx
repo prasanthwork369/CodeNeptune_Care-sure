@@ -131,7 +131,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
     function SlotIcon({ type }: { type: string }) {
         if (type === 'camera') return <icons.camera_gray width={24} height={24} />;
         if (type === 'package') return <icons.package_icon width={24} height={24} />;
-        return <icons.outline_gallery width={24} height={24} />;
+        return <icons.outline_gallery width={24} height={24} color="#6A6A6A" />;
     }
 
     return (

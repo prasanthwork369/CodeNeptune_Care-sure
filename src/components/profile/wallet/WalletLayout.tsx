@@ -7,7 +7,8 @@ import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType, WalletLog } from "@/src/types/wallet";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -179,13 +180,22 @@ export const WalletLayout: React.FC = () => {
   });
 
   const router = useNav();
-  const { balance, loading: balanceLoading } = useWalletBalance();
-  
+  const { balance, loading: balanceLoading, refetch: refetchBalance } = useWalletBalance();
+
   // A null balance with active loading=false still denotes a loading/pre-auth state.
   const isBalancePending = balanceLoading || balance == null;
-  const { logs, loading: logsLoading } = useWalletLogs(20, 0);
+  const { logs, loading: logsLoading, refetch: refetchLogs } = useWalletLogs(20, 0);
   const { data: settings } = useCartWalletSettings();
   const coinValue = settings?.wallet?.coinValueInRupees ?? 1;
+
+  // Refetch on every screen focus so balance/transactions don't show stale
+  // cached data when the user navigates back to this tab repeatedly.
+  useFocusEffect(
+    useCallback(() => {
+      refetchBalance();
+      refetchLogs();
+    }, [refetchBalance, refetchLogs]),
+  );
 
   const transactions: Transaction[] = logs.flatMap(logToTransactions);
   const previewTxs = transactions.slice(0, 5);
