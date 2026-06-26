@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 export const profileStyles = StyleSheet.create({
     // ProfileHeader
-    avatarImg:      { width: scale(88), height: scale(88) },
-    avatarIcon:     { width: scale(52), height: scale(52) },
-    avatarEditBtn:  { width: scale(34), height: scale(34) },
-    avatarEditIcon: { width: scale(18), height: scale(18) },
+    avatarImg:      { width: exactScale(88), height: exactScale(88) },
+    avatarIcon:     { width: exactScale(52), height: exactScale(52) },
+    avatarEditBtn:  { width: exactScale(34), height: exactScale(34) },
+    avatarEditIcon: { width: exactScale(18), height: exactScale(18) },
     personName:     { fontSize: moderateScale(20, 0.1) },
     personPhone:    { fontSize: moderateScale(14, 0.1) },
 
@@ -48,10 +48,10 @@ export const profileStyles = StyleSheet.create({
     patientTitle:   { fontSize: moderateScale(18, 0.1) },
     patientLabel:   { fontSize: moderateScale(14, 0.1) },
     patientSub:     { fontSize: moderateScale(13, 0.1) },
-    patientInput:   { height: moderateScale(52, 0.3) },
+    patientInput:   { height: exactScale(52) },
 
     // PatientDetailsLayout
-    patientAvatar:  { width: scale(46), height: scale(46) },
+    patientAvatar:  { width: exactScale(46), height: exactScale(46) },
     patientName:    { fontSize: moderateScale(15, 0.1) },
     patientDob:     { fontSize: moderateScale(12, 0.1) },
     patientTag:     { fontSize: moderateScale(11, 0.08) },
@@ -60,7 +60,7 @@ export const profileStyles = StyleSheet.create({
 
     // MyProfileLayout
     profileLabel:   { fontSize: moderateScale(14, 0.1) },
-    profileInput:   { height: moderateScale(52, 0.3) },
+    profileInput:   { height: exactScale(52) },
     profileBtn:     { fontSize: moderateScale(15, 0.1) },
 
     // HelpLayout / FaqLayout
@@ -71,7 +71,7 @@ export const profileStyles = StyleSheet.create({
     faqBody:        { fontSize: moderateScale(13, 0.1) },
 
     // LogoutConfirmModal
-    logoutImg:      { width: scale(90), height: scale(90) },
+    logoutImg:      { width: exactScale(90), height: exactScale(90) },
     logoutModalBtn: { fontSize: moderateScale(15, 0.1) },
 
     // WalletInfoModal / TransactionHistorySheet
@@ -81,7 +81,7 @@ export const profileStyles = StyleSheet.create({
     txTitle:          { fontSize: moderateScale(16, 0.1) },
     txLabel:          { fontSize: moderateScale(14, 0.1) },
     txSub:            { fontSize: moderateScale(12, 0.1) },
-    txIcon:           { width: scale(16), height: scale(16) },
+    txIcon:           { width: exactScale(16), height: exactScale(16) },
 
     // ProfileQuickTiles
     tileLabel:      { fontSize: moderateScale(12, 0.1) },

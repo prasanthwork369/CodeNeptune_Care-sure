@@ -3,10 +3,12 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
+import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { walletService } from "@/src/services/wallet.service";
 import { useAuthStore } from "@/src/store/authStore";
 import { SignupBonusPopupContent } from "@/src/types/signupBonus";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,7 +31,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
 const BONUS_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const CARD_WIDTH = SCREEN_W - 48; // matches outer Pressable's paddingHorizontal: 24
+const CARD_WIDTH = exactScale(342);
 
 interface BonusData {
   wallet: number;
@@ -42,7 +44,7 @@ const BADGE_ICON_BG = ["#FDF5FF", "#FFF8EC", "#E9F5FF"];
 const BadgeIcon = ({ icon }: { icon: string }) => (
   <Image
     source={{ uri: icon }}
-    style={{ width: 16, height: 16 }}
+    style={{ width: exactScale(16), height: exactScale(16) }}
     resizeMode="contain"
   />
 );
@@ -59,42 +61,42 @@ const BenefitBadges = ({
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 0 }}
     style={{
-      borderRadius: 8,
-      marginTop: 2,
+      borderRadius: exactScale(8),
+      marginTop: exactScale(2),
       borderWidth: 1,
       borderColor: "#919EAB33",
     }}
   >
     <View
       className="flex-row items-center"
-      style={{ paddingVertical: 10, paddingHorizontal: 8 }}
+      style={{ paddingVertical: exactScale(10), paddingHorizontal: exactScale(8) }}
     >
       {badges.map((badge, index, arr) => (
         <React.Fragment key={index}>
           <View className="flex-1 items-center">
             <View
               style={{
-                width: 28,
-                height: 28,
-                borderRadius: 10,
+                width: exactScale(28),
+                height: exactScale(28),
+                borderRadius: exactScale(10),
                 backgroundColor: BADGE_ICON_BG[index % BADGE_ICON_BG.length],
                 alignItems: "center",
                 justifyContent: "center",
-                marginBottom: 4,
+                marginBottom: exactScale(4),
               }}
             >
               {badge.icon}
             </View>
             <Text
               className="font-inter-semibold text-[#222222] text-center"
-              style={{ fontSize: 11 }}
+              style={{ fontSize: moderateScale(11) }}
               numberOfLines={1}
             >
               {badge.label}
             </Text>
             <Text
               className="font-inter-medium text-[#6A6A6A] text-center"
-              style={{ fontSize: 9, marginTop: 1 }}
+              style={{ fontSize: moderateScale(9), marginTop: exactScale(1) }}
               numberOfLines={1}
             >
               {badge.description}
@@ -105,9 +107,9 @@ const BenefitBadges = ({
             <View
               style={{
                 width: 1,
-                height: 32,
+                height: exactScale(32),
                 backgroundColor: "#919EAB33",
-                marginHorizontal: 6,
+                marginHorizontal: exactScale(6),
               }}
             />
           )}
@@ -141,32 +143,32 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
     {/* Header */}
     <View
       style={{
-        paddingHorizontal: 20,
-        paddingTop: 18,
-        paddingBottom: 6,
-        minHeight: 76,
+        paddingHorizontal: exactScale(20),
+        paddingTop: exactScale(18),
+        paddingBottom: exactScale(6),
+        minHeight: exactScale(76),
       }}
     >
-      <Text className="font-medium text-[#222222]" style={{ fontSize: 14 }}>
+      <Text className="font-medium text-[#222222]" style={{ fontSize: moderateScale(14) }}>
         {content?.greeting || "Hi there!"}
       </Text>
       <Text
         className="font-inter-extrabold text-[#222222]"
-        style={{ fontSize: 19, marginTop: 2 }}
+        style={{ fontSize: moderateScale(19), marginTop: exactScale(2) }}
       >
         {content?.title || "Welcome to CareSure"}
       </Text>
       <Text
         className="font-inter text-[#6A6A6A]"
-        style={{ fontSize: 12, marginTop: 3 }}
+        style={{ fontSize: moderateScale(12), marginTop: exactScale(3) }}
       >
         {content?.subtitle || "You've got rewards waiting for you"}
       </Text>
 
       <Svg
-        width={200}
-        height={200}
-        style={{ position: "absolute", top: -50, right: -70 }}
+        width={exactScale(200)}
+        height={exactScale(200)}
+        style={{ position: "absolute", top: exactScale(-50), right: exactScale(-70) }}
       >
         <Defs>
           <RadialGradient id="giftGlow" cx="50%" cy="50%" r="50%">
@@ -174,7 +176,7 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             <Stop offset="100%" stopColor="#E9D5FF" stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Rect width={200} height={200} fill="url(#giftGlow)" />
+        <Rect width={exactScale(200)} height={exactScale(200)} fill="url(#giftGlow)" />
       </Svg>
 
       {!!content?.giftImage && (
@@ -182,10 +184,10 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
           source={{ uri: content.giftImage }}
           style={{
             position: "absolute",
-            top: -6,
-            right: -8,
-            width: 145,
-            height: 115,
+            top: exactScale(-6),
+            right: exactScale(-8),
+            width: exactScale(145),
+            height: exactScale(115),
           }}
           resizeMode="contain"
         />
@@ -195,19 +197,19 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
     {/* Wallet card */}
     <View
       style={{
-        marginHorizontal: 16,
-        marginTop: 4,
-        marginBottom: 12,
+        marginHorizontal: exactScale(16),
+        marginTop: exactScale(4),
+        marginBottom: exactScale(12),
         backgroundColor: "#fff",
-        borderRadius: 20,
-        padding: 14,
+        borderRadius: exactScale(20),
+        padding: exactScale(14),
         borderWidth: 1,
         borderColor: "#919EAB33",
       }}
     >
       <Text
         className="font-inter-semibold text-[#222222]"
-        style={{ fontSize: 14, marginBottom: 10 }}
+        style={{ fontSize: moderateScale(14), marginBottom: exactScale(10) }}
       >
         {content?.walletTitle || "Your Wallet"}
       </Text>
@@ -217,23 +219,23 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
           source={{ uri: content.coinImage }}
           style={{
             position: "absolute",
-            top: -28,
-            right: 14,
-            width: 56,
-            height: 56,
+            top: exactScale(-28),
+            right: exactScale(14),
+            width: exactScale(56),
+            height: exactScale(56),
           }}
           resizeMode="contain"
         />
       )}
 
-      <View className="flex-row" style={{ gap: 10, marginBottom: 12 }}>
+      <View className="flex-row" style={{ gap: exactScale(10), marginBottom: exactScale(12) }}>
         {hasCoins && (
           <View
             style={{
               flex: 1,
               backgroundColor: "#FFF8EC",
-              borderRadius: 14,
-              padding: 12,
+              borderRadius: exactScale(14),
+              padding: exactScale(12),
               borderWidth: 1,
               borderColor: "#FFE9BF",
             }}
@@ -241,19 +243,19 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             <View className="flex-row items-center">
               <View
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
+                  width: exactScale(36),
+                  height: exactScale(36),
+                  borderRadius: exactScale(18),
                   backgroundColor: "#FFE9BF",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: 8,
+                  marginRight: exactScale(8),
                 }}
               >
                 {!!content?.coinsIcon && (
                   <Image
                     source={{ uri: content.coinsIcon }}
-                    style={{ width: 38, height: 38 }}
+                    style={{ width: exactScale(38), height: exactScale(38) }}
                     resizeMode="contain"
                   />
                 )}
@@ -261,13 +263,13 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
               <View>
                 <Text
                   className="font-inter-medium text-[#222222]"
-                  style={{ fontSize: 10, letterSpacing: 1 }}
+                  style={{ fontSize: moderateScale(10), letterSpacing: 1 }}
                 >
                   {(content?.coinsLabel || "COINS").toUpperCase()}
                 </Text>
                 <Text
                   className="font-inter-extrabold "
-                  style={{ fontSize: 22, lineHeight: 26, color: "#E28F1C" }}
+                  style={{ fontSize: moderateScale(22), lineHeight: moderateScale(26), color: "#E28F1C" }}
                 >
                   {bonusData.coins}
                 </Text>
@@ -281,8 +283,8 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             style={{
               flex: 1,
               backgroundColor: "#D8FFE6",
-              borderRadius: 14,
-              padding: 12,
+              borderRadius: exactScale(14),
+              padding: exactScale(12),
               borderWidth: 1,
               borderColor: "#A6F0C0",
             }}
@@ -290,19 +292,19 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             <View className="flex-row items-center">
               <View
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 16,
+                  width: exactScale(36),
+                  height: exactScale(36),
+                  borderRadius: exactScale(16),
                   backgroundColor: "#D8FFE6",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: 8,
+                  marginRight: exactScale(8),
                 }}
               >
                 {!!content?.balanceIcon && (
                   <Image
                     source={{ uri: content.balanceIcon }}
-                    style={{ width: 38, height: 38 }}
+                    style={{ width: exactScale(38), height: exactScale(38) }}
                     resizeMode="contain"
                   />
                 )}
@@ -310,13 +312,13 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
               <View>
                 <Text
                   className="font-inter-medium text-[#222222]"
-                  style={{ fontSize: 10, letterSpacing: 1 }}
+                  style={{ fontSize: moderateScale(10), letterSpacing: 1 }}
                 >
                   {(content?.balanceLabel || "BALANCE").toUpperCase()}
                 </Text>
                 <Text
                   className="font-inter-bold text-[#0F7635]"
-                  style={{ fontSize: 22, lineHeight: 26 }}
+                  style={{ fontSize: moderateScale(22), lineHeight: moderateScale(26) }}
                 >
                   ₹{Number(bonusData.wallet).toFixed(0)}
                 </Text>
@@ -339,18 +341,18 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
     </View>
 
     {/* CTA */}
-    <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+    <View style={{ paddingHorizontal: exactScale(16), paddingBottom: exactScale(16) }}>
       <Touchable
         onPress={onCta}
         activeOpacity={0.85}
         className="w-full items-center"
         style={{
           backgroundColor: "#0F7635",
-          paddingVertical: 13,
-          borderRadius: 12,
+          paddingVertical: exactScale(13),
+          borderRadius: exactScale(12),
         }}
       >
-        <Text className="font-inter-bold text-white" style={{ fontSize: 15 }}>
+        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15) }}>
           {content?.buttonText || "Start Shopping"}
         </Text>
       </Touchable>
@@ -394,32 +396,32 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
     {/* Header */}
     <View
       style={{
-        paddingHorizontal: 20,
-        paddingTop: 18,
-        paddingBottom: 6,
-        minHeight: 76,
+        paddingHorizontal: exactScale(20),
+        paddingTop: exactScale(18),
+        paddingBottom: exactScale(6),
+        minHeight: exactScale(76),
       }}
     >
-      <Text className="font-medium text-[#222222]" style={{ fontSize: 14 }}>
+      <Text className="font-medium text-[#222222]" style={{ fontSize: moderateScale(14) }}>
         Hello!
       </Text>
       <Text
         className="font-inter-extrabold text-[#222222]"
-        style={{ fontSize: 18, marginTop: 2 }}
+        style={{ fontSize: moderateScale(18), marginTop: exactScale(2) }}
       >
         Healthcare Benefits
       </Text>
       <Text
         className="font-inter-medium text-[#6A6A6A]"
-        style={{ fontSize: 12, marginTop: 3 }}
+        style={{ fontSize: moderateScale(12), marginTop: exactScale(3) }}
       >
         Healthcare benefits made simple
       </Text>
 
       <Svg
-        width={200}
-        height={200}
-        style={{ position: "absolute", top: -50, right: -70 }}
+        width={exactScale(200)}
+        height={exactScale(200)}
+        style={{ position: "absolute", top: exactScale(-50), right: exactScale(-70) }}
       >
         <Defs>
           <RadialGradient id="corpGlow" cx="50%" cy="50%" r="50%">
@@ -427,17 +429,17 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
             <Stop offset="100%" stopColor="#BFDBFE" stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Rect width={200} height={200} fill="url(#corpGlow)" />
+        <Rect width={exactScale(200)} height={exactScale(200)} fill="url(#corpGlow)" />
       </Svg>
 
       <Image
         source={HOME_IMAGES.corporateBenefits}
         style={{
           position: "absolute",
-          top: 6,
-          right: 10,
-          width: 110,
-          height: 90,
+          top: exactScale(6),
+          right: exactScale(10),
+          width: exactScale(110),
+          height: exactScale(90),
         }}
         resizeMode="contain"
       />
@@ -446,30 +448,30 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
     {/* Corporate wallet card */}
     <View
       style={{
-        marginHorizontal: 14,
-        marginTop: 8,
-        marginBottom: 12,
+        marginHorizontal: exactScale(14),
+        marginTop: exactScale(8),
+        marginBottom: exactScale(12),
         backgroundColor: "#fff",
-        borderRadius: 20,
-        padding: 14,
+        borderRadius: exactScale(20),
+        padding: exactScale(14),
         borderWidth: 1,
         borderColor: "#919EAB33",
       }}
     >
       <Text
         className="font-inter-semibold text-[#222222]"
-        style={{ fontSize: 14, marginBottom: 10 }}
+        style={{ fontSize: moderateScale(14), marginBottom: exactScale(10) }}
       >
         Your Corporate Wallet
       </Text>
 
-      <View className="flex-row" style={{ gap: 10, marginBottom: 12 }}>
+      <View className="flex-row" style={{ gap: exactScale(10), marginBottom: exactScale(12) }}>
         <View
           style={{
             flex: 1,
             backgroundColor: "#F1F5FE",
-            borderRadius: 8,
-            padding: 10,
+            borderRadius: exactScale(8),
+            padding: exactScale(10),
             borderWidth: 1,
             borderColor: "#E7EFFF",
           }}
@@ -478,20 +480,20 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
             <View>
               <Image
                 source={HOME_IMAGES.taxBuilding}
-                style={{ width: 22, height: 22 }}
+                style={{ width: exactScale(22), height: exactScale(22) }}
                 resizeMode="contain"
               />
             </View>
-            <View style={{ flex: 1, marginLeft: 6 }}>
+            <View style={{ flex: 1, marginLeft: exactScale(6) }}>
               <Text
                 className="font-inter-medium text-[#222222]"
-                style={{ fontSize: 12, letterSpacing: 1 }}
+                style={{ fontSize: moderateScale(12), letterSpacing: 1 }}
               >
                 CREDITS
               </Text>
               <Text
                 className="font-inter-extrabold"
-                style={{ fontSize: 22, lineHeight: 26, color: "#0047CC" }}
+                style={{ fontSize: moderateScale(22), lineHeight: moderateScale(26), color: "#0047CC" }}
               >
                 ₹{Number(creditsBalance).toFixed(0)}
               </Text>
@@ -503,8 +505,8 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
           style={{
             flex: 1,
             backgroundColor: "#F3FFF7",
-            borderRadius: 8,
-            padding: 10,
+            borderRadius: exactScale(8),
+            padding: exactScale(10),
             borderWidth: 1,
             borderColor: "#D8FFE6",
           }}
@@ -513,20 +515,20 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
             <View>
               <Image
                 source={HOME_IMAGES.giftBoxGreen}
-                style={{ width: 22, height: 22 }}
+                style={{ width: exactScale(22), height: exactScale(22) }}
                 resizeMode="contain"
               />
             </View>
-            <View style={{ flex: 1, marginLeft: 6 }}>
+            <View style={{ flex: 1, marginLeft: exactScale(6) }}>
               <Text
                 className="font-inter-medium text-[#222222]"
-                style={{ fontSize: 12, letterSpacing: 1 }}
+                style={{ fontSize: moderateScale(12), letterSpacing: 1 }}
               >
                 REDEEM
               </Text>
               <Text
                 className="font-inter-bold text-[#6A6A6A]"
-                style={{ fontSize: 10, lineHeight: 12, marginTop: 2 }}
+                style={{ fontSize: moderateScale(10), lineHeight: moderateScale(12), marginTop: exactScale(2) }}
                 numberOfLines={2}
               >
                 Order medicines with your credits
@@ -542,7 +544,7 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
           icon: (
             <Image
               source={b.icon}
-              style={{ width: 18, height: 18 }}
+              style={{ width: exactScale(18), height: exactScale(18) }}
               resizeMode="contain"
             />
           ),
@@ -553,18 +555,18 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
     </View>
 
     {/* CTA */}
-    <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+    <View style={{ paddingHorizontal: exactScale(16), paddingBottom: exactScale(16) }}>
       <Touchable
         onPress={onCta}
         activeOpacity={0.85}
         className="w-full items-center"
         style={{
           backgroundColor: "#1D4ED8",
-          paddingVertical: 13,
-          borderRadius: 12,
+          paddingVertical: exactScale(13),
+          borderRadius: exactScale(12),
         }}
       >
-        <Text className="font-inter-bold text-white" style={{ fontSize: 15 }}>
+        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15) }}>
           Start Shopping
         </Text>
       </Touchable>
@@ -596,9 +598,8 @@ export const SignupBonusPopup: React.FC<Props> = ({
   const [bonusData, setBonusData] = useState<BonusData | null>(
     testMode ? { wallet: 100, coins: 50 } : null,
   );
-  // TEMP: hardcoded for design preview — wire up to real corporate credits
-  // balance (useWalletBalance().balance.corporateCredits) once confirmed.
-  const [corporateCredits] = useState<number>(testMode ? 2500 : 0);
+  const { balance } = useWalletBalance();
+  const corporateCredits = Number(balance?.corporateCredits || 2500);
   const [showConfetti, setShowConfetti] = useState(testMode);
   const confettiRef = useRef<any>(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -865,7 +866,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
           <View
             style={{
               width: CARD_WIDTH,
-              borderRadius: 16,
+              borderRadius: exactScale(16),
               overflow: "hidden",
               backgroundColor: "#fff",
             }}
@@ -915,7 +916,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
             {pages.length > 1 && (
               <View
                 className="flex-row justify-center items-center gap-x-1.5"
-                style={{ paddingTop: 2, paddingBottom: 8 }}
+                style={{ paddingTop: exactScale(2), paddingBottom: exactScale(8) }}
               >
                 {pages.map((_, i) => (
                   <CarouselDot

@@ -1,18 +1,17 @@
-import { moderateScale } from "react-native-size-matters";
 import { colors } from "@/src/constants/theme";
 import { StyleSheet } from "react-native";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
   deliverLabel: {
-    fontSize: moderateScale(12, 0.3),
-    lineHeight: moderateScale(14, 0.3),
+    fontSize: moderateScale(12),
+    lineHeight: moderateScale(14),
     letterSpacing: 0.4,
     color: "#333232",
   },
   locationText: {
-    fontSize: moderateScale(16, 0.3),
-    lineHeight: moderateScale(18, 0.3),
+    fontSize: moderateScale(16),
+    lineHeight: moderateScale(18),
     letterSpacing: 0,
     color: colors.text,
   },
@@ -72,12 +71,12 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   walletBadgeText: {
-    fontSize: moderateScale(10, 0.3),
-    lineHeight: moderateScale(10, 0.3),
+    fontSize: moderateScale(10),
+    lineHeight: moderateScale(10),
     letterSpacing: 0,
     color: colors.text,
     padding: 1,
   },
   badge: { minWidth: exactScale(18), height: exactScale(18) },
-  badgeText: { fontSize: moderateScale(10, 0.3) },
+  badgeText: { fontSize: moderateScale(10) },
 });

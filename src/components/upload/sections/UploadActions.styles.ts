@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 export const styles = StyleSheet.create({
-    actionIcon:     { width: scale(28), height: scale(28) },
+    actionIcon:     { width: exactScale(28), height: exactScale(28) },
     actionLabel:    { fontSize: moderateScale(12, 0.1) },
-    historyIconBox: { width: scale(40), height: scale(40) },
-    historyIcon:    { width: scale(22), height: scale(22) },
+    historyIconBox: { width: exactScale(40), height: exactScale(40) },
+    historyIcon:    { width: exactScale(22), height: exactScale(22) },
     historyTitle:   { fontSize: moderateScale(14, 0.1) },
     historyBadge:   { fontSize: moderateScale(10, 0.07) },
-    arrowIcon:      { width: scale(14), height: scale(14) },
+    arrowIcon:      { width: exactScale(14), height: exactScale(14) },
 });

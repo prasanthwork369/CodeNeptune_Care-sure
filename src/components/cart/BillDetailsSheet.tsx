@@ -4,6 +4,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { cartStyles as s } from "./cart.styles";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface BillDetailsSheetProps {
   isVisible: boolean;
@@ -42,20 +43,20 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
       onClose={onClose}
       backgroundStyle={{
         backgroundColor: "#fff",
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: exactScale(12),
+        borderTopRightRadius: exactScale(12),
       }}
     >
       <BottomSheetView
         style={{
-          paddingHorizontal: 24,
-          paddingTop: 24,
-          paddingBottom: Math.max(adjustedBottom, 16) + 16,
+          paddingHorizontal: exactScale(24),
+          paddingTop: exactScale(24),
+          paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
         }}
       >
         <Text
-          style={s.billSheetTitle}
-          className="font-inter-bold text-brand-text mb-6"
+          style={[s.billSheetTitle, { marginBottom: exactScale(24) }]}
+          className="font-inter-bold text-brand-text"
         >
           Bill Details
         </Text>
@@ -77,8 +78,8 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
           </View>
 
           {productSavings > 0 && (
-            <View className="flex-row justify-between mt-4">
-              <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+              <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
                 Product Discount
               </Text>
               <Text
@@ -91,8 +92,8 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
           )}
 
           {couponDiscount > 0 && (
-            <View className="flex-row justify-between mt-4">
-              <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+              <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
                 Coupon Discount
               </Text>
               <Text
@@ -105,8 +106,8 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
           )}
 
           {walletDiscount > 0 && (
-            <View className="flex-row justify-between mt-4">
-              <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+              <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
                 CareSure Wallet
               </Text>
               <Text
@@ -119,8 +120,8 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
           )}
 
           {coinsDiscount > 0 && (
-            <View className="flex-row justify-between mt-4">
-              <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+              <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
                 CareSure Coins
               </Text>
               <Text
@@ -133,8 +134,8 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
           )}
 
           {corporateCreditsDiscount > 0 && (
-            <View className="flex-row justify-between mt-4">
-              <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+              <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
                 Corporate Credits
               </Text>
               <Text
@@ -146,20 +147,20 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
             </View>
           )}
 
-          <View className="flex-row justify-between mt-4">
-            <Text className="text-[14px] font-inter text-[#6A6A6A]">
+          <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+            <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
               Delivery Fee
             </Text>
-            <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
               {deliveryFee > 0 ? `₹${Number(deliveryFee).toFixed(2)}` : "FREE"}
             </Text>
           </View>
 
-          <View className="flex-row justify-between mt-4">
-            <Text className="text-[14px] font-inter text-[#6A6A6A]">
+          <View className="flex-row justify-between" style={{ marginTop: exactScale(16) }}>
+            <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
               Handling Charge
             </Text>
-            <Text className="text-[14px] font-inter text-[#6A6A6A]">
+            <Text className="font-inter text-[#6A6A6A]" style={{ fontSize: moderateScale(14) }}>
               ₹{Number(handlingCharge).toFixed(2)}
             </Text>
           </View>
@@ -167,7 +168,7 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
 
         <View
           style={{
-            marginVertical: 20,
+            marginVertical: exactScale(20),
             borderTopWidth: 1,
             borderColor: "#E5E7EB",
             borderStyle: "dashed",

@@ -1,4 +1,5 @@
 import { BottomSheetCloseButton } from '@/src/components/ui/BottomSheetCloseButton';
+import { exactScale } from '@/src/utils/exactScale';
 import {
     BottomSheetBackdrop,
     BottomSheetBackdropProps,
@@ -44,15 +45,15 @@ interface GorhomBottomSheetProps
 
 const DEFAULT_BACKGROUND_STYLE = {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: exactScale(12),
+    borderTopRightRadius: exactScale(12),
 };
 
 const DEFAULT_HANDLE_INDICATOR_STYLE = {
     backgroundColor: '#D1D5DB',
-    width: 36,
-    height: 4,
-    marginTop: 8,
+    width: exactScale(36),
+    height: exactScale(4),
+    marginTop: exactScale(8),
 };
 
 export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetProps>(

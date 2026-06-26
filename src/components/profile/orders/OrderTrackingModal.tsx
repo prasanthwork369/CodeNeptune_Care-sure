@@ -12,6 +12,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
@@ -65,16 +66,16 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
       return (
         <View
           style={{
-            width: 18,
-            height: 18,
-            borderRadius: 9,
+            width: exactScale(18),
+            height: exactScale(18),
+            borderRadius: exactScale(9),
             backgroundColor: "#DC2626",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 2,
+            marginTop: exactScale(2),
           }}
         >
-          <icons.cancel_white width={10} height={10} />
+          <icons.cancel_white width={exactScale(10)} height={exactScale(10)} />
         </View>
       );
     }
@@ -82,22 +83,22 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
       return (
         <View
           style={{
-            width: 22,
-            height: 22,
-            borderRadius: 11,
+            width: exactScale(22),
+            height: exactScale(22),
+            borderRadius: exactScale(11),
             backgroundColor: "#16A34A",
             borderWidth: 3,
             borderColor: "#DCFCE7",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 1,
+            marginTop: exactScale(1),
           }}
         >
           <View
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: 4,
+              width: exactScale(8),
+              height: exactScale(8),
+              borderRadius: exactScale(4),
               backgroundColor: "#fff",
             }}
           />
@@ -108,21 +109,21 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
       return (
         <View
           style={{
-            width: 18,
-            height: 18,
-            borderRadius: 9,
+            width: exactScale(18),
+            height: exactScale(18),
+            borderRadius: exactScale(9),
             backgroundColor: "#16A34A",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 2,
+            marginTop: exactScale(2),
           }}
         >
           <Text
             style={{
               color: "#fff",
-              fontSize: 9,
+              fontSize: moderateScale(9),
               fontWeight: "700",
-              lineHeight: 11,
+              lineHeight: moderateScale(11),
             }}
           >
             ✓
@@ -133,13 +134,13 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
     return (
       <View
         style={{
-          width: 16,
-          height: 16,
-          borderRadius: 8,
+          width: exactScale(16),
+          height: exactScale(16),
+          borderRadius: exactScale(8),
           borderWidth: 1.5,
           borderColor: "#D1D5DB",
           backgroundColor: "#fff",
-          marginTop: 3,
+          marginTop: exactScale(3),
         }}
       />
     );
@@ -147,7 +148,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
 
   return (
     <Animated.View style={[{ flexDirection: "row" }, rowStyle]}>
-      <View style={{ width: 26, alignItems: "center", alignSelf: "stretch" }}>
+      <View style={{ width: exactScale(26), alignItems: "center", alignSelf: "stretch" }}>
         {renderDot()}
         {!isLast && (
           <View style={{ width: 2, flex: 1, backgroundColor: lineColor }} />
@@ -155,11 +156,11 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
       </View>
 
       <View
-        style={{ flex: 1, paddingLeft: 12, paddingBottom: isLast ? 4 : 24 }}
+        style={{ flex: 1, paddingLeft: exactScale(12), paddingBottom: isLast ? exactScale(4) : exactScale(24) }}
       >
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             fontWeight: "600",
             color: textColor,
           }}
@@ -169,9 +170,9 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
         {(step.completed || step.cancelled) && !!step.time && (
           <Text
             style={{
-              fontSize: 12,
+              fontSize: moderateScale(12),
               color: "#6A6A6A",
-              marginTop: 3,
+              marginTop: exactScale(3),
             }}
           >
             {step.time}
@@ -202,24 +203,24 @@ export function OrderTrackingModal({ visible, onClose, steps }: Props) {
       closeButtonOffset="50%"
       backgroundStyle={{
         backgroundColor: "#fff",
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: exactScale(12),
+        borderTopRightRadius: exactScale(12),
       }}
     >
       <BottomSheetView
         style={{
           flex: 1,
-          paddingHorizontal: 20,
-          paddingTop: 20,
-          paddingBottom: Math.max(adjustedBottom, 16) + 16,
+          paddingHorizontal: exactScale(20),
+          paddingTop: exactScale(20),
+          paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
         }}
       >
         <Text
           style={{
-            fontSize: 18,
+            fontSize: moderateScale(18),
             fontWeight: "700",
             color: "#1A1C1E",
-            marginBottom: 20,
+            marginBottom: exactScale(20),
           }}
         >
           Order Tracking

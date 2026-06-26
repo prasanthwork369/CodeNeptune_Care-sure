@@ -1,4 +1,4 @@
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale } from "@/src/utils/exactScale";
 
 // Standard height for "Add to Cart" / "+ Add" buttons across product cards
 export const CART_BUTTON_HEIGHT = moderateScale(14, 0.25) * 2.8;

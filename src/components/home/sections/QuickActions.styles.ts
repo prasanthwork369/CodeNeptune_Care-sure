@@ -1,6 +1,5 @@
-import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from 'react-native';
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
     container: {
@@ -42,9 +41,9 @@ export const styles = StyleSheet.create({
     label: {
         flex: 1,
         fontWeight: '600',
-        fontSize: moderateScale(14, 0.3),
+        fontSize: moderateScale(14),
         color: '#0F172A',
-        lineHeight: moderateScale(20, 0.3),
+        lineHeight: moderateScale(20),
         verticalAlign: 'middle',
     },
 });

@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 // CategoryProductCard
-export const CARD_BTN_W  = scale(90);
-export const CARD_BTN_H  = scale(36);
-export const CARD_BTN_SW = scale(28);
+export const CARD_BTN_W  = exactScale(90);
+export const CARD_BTN_H  = exactScale(36);
+export const CARD_BTN_SW = exactScale(28);
 
 export const categoryCardStyles = StyleSheet.create({
     addText:    { color: '#0F7635', fontSize: moderateScale(14, 0.08), fontWeight: '700' },
@@ -20,21 +20,21 @@ export const categoryCardStyles = StyleSheet.create({
 
 // CategoriesSidebar
 export const sidebarStyles = StyleSheet.create({
-    icon:   { width: scale(28), height: scale(28) },
-    iconWrap: { width: scale(40), height: scale(40) },
+    icon:   { width: exactScale(28), height: exactScale(28) },
+    iconWrap: { width: exactScale(40), height: exactScale(40) },
     label:  { fontSize: moderateScale(12, 0.08) },
 });
 
 // CategoriesGrid
-export const CARD_WIDTH    = scale(124);
-export const CARD_HEIGHT   = scale(110);
-export const GRID_GAP      = scale(12);
-export const GRID_PADDING  = scale(10);
-export const CARD_RADIUS   = scale(10);
+export const CARD_WIDTH    = exactScale(124);
+export const CARD_HEIGHT   = exactScale(110);
+export const GRID_GAP      = exactScale(12);
+export const GRID_PADDING  = exactScale(10);
+export const CARD_RADIUS   = exactScale(10);
 
-export const CARD_IMAGE_WIDTH  = scale(91.34);
-export const CARD_IMAGE_HEIGHT = scale(82.02);
-export const CARD_IMAGE_LEFT   = scale(35);
+export const CARD_IMAGE_WIDTH  = exactScale(91.34);
+export const CARD_IMAGE_HEIGHT = exactScale(82.02);
+export const CARD_IMAGE_LEFT   = exactScale(35);
 
 export const gridStyles = StyleSheet.create({
     cardLabel: { fontSize: moderateScale(12, 0.08), lineHeight: moderateScale(18, 0.08), letterSpacing: 0 },
@@ -44,7 +44,7 @@ export const gridStyles = StyleSheet.create({
     row:       { flexDirection: 'row', gap: GRID_GAP },
     cardImage: {
         position: 'absolute',
-        bottom: scale(-8),
+        bottom: exactScale(-8),
         left: CARD_IMAGE_LEFT,
         width: CARD_IMAGE_WIDTH,
         height: CARD_IMAGE_HEIGHT,

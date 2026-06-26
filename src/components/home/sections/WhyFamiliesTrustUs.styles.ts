@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const iconSize = 64;
 
 export const styles = StyleSheet.create({
   title: {
     fontWeight: "700",
-    fontSize: exactScale(16),
-    lineHeight: exactScale(14),
+    fontSize: moderateScale(16),
+    lineHeight: moderateScale(14),
     letterSpacing: 0,
     verticalAlign: "middle",
     color: "#222222",
@@ -28,8 +28,8 @@ export const styles = StyleSheet.create({
   },
   itemLabel: {
     fontWeight: "500",
-    fontSize: exactScale(14),
-    lineHeight: exactScale(20),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(20),
     letterSpacing: 0,
     textAlign: "center",
     verticalAlign: "middle",
@@ -37,6 +37,6 @@ export const styles = StyleSheet.create({
     // Constrains the label to roughly the icon's width so short two-word
     // labels reliably wrap to two lines (per design) instead of fitting on
     // one line, since each item otherwise has plenty of row width to spare.
-    width: iconSize,
+    width: exactScale(iconSize),
   },
 });

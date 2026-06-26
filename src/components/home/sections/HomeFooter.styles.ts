@@ -1,11 +1,11 @@
 import { StyleSheet } from 'react-native';
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
     label: {
         fontWeight: '500',
-        fontSize: exactScale(14),
-        lineHeight: exactScale(20),
+        fontSize: moderateScale(14),
+        lineHeight: moderateScale(20),
         letterSpacing: 0,
         textAlign: 'left',
         verticalAlign: 'middle',

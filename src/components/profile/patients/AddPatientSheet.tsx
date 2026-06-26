@@ -9,6 +9,7 @@ import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface AddPatientSheetProps {
   isVisible: boolean;
@@ -22,16 +23,16 @@ interface AddPatientSheetProps {
 const RELATIONSHIPS = ["Self", "Wife", "Husband", "Mother", "Father", "Other"];
 
 const GENDERS = [
-  { label: "Male", value: "MALE", icon: <icons.male width={16} height={16} /> },
+  { label: "Male", value: "MALE", icon: <icons.male width={exactScale(16)} height={exactScale(16)} /> },
   {
     label: "Female",
     value: "FEMALE",
-    icon: <icons.female width={16} height={16} />,
+    icon: <icons.female width={exactScale(16)} height={exactScale(16)} />,
   },
   {
     label: "Prefer not to say",
     value: "OTHER",
-    icon: <icons.back_hand width={16} height={16} />,
+    icon: <icons.back_hand width={exactScale(16)} height={exactScale(16)} />,
   },
 ];
 
@@ -144,15 +145,15 @@ export function AddPatientSheet({
         keyboardBlurBehavior="none"
         backgroundStyle={{
           backgroundColor: "#fff",
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
+          borderTopLeftRadius: exactScale(12),
+          borderTopRightRadius: exactScale(12),
         }}
       >
         <BottomSheetScrollView
-          style={{ flex: 1, paddingHorizontal: 20 }}
+          style={{ flex: 1, paddingHorizontal: exactScale(20) }}
           contentContainerStyle={{
-            paddingTop: 24,
-            paddingBottom: adjustedBottom + 24,
+            paddingTop: exactScale(24),
+            paddingBottom: adjustedBottom + exactScale(24),
           }}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -163,7 +164,7 @@ export function AddPatientSheet({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 20,
+              marginBottom: exactScale(20),
             }}
           >
             <Text
@@ -174,13 +175,13 @@ export function AddPatientSheet({
             </Text>
           </View>
 
-          <Text className="text-[14px] font-inter-bold text-brand-text mb-2">
+          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Name
           </Text>
           <View
             style={[
-              { height: 52, justifyContent: "center" },
-              input,
+              { height: exactScale(52), justifyContent: "center" },
+              inputStyle,
               { paddingVertical: 0 },
               errors.name ? { borderColor: "#EF4444" } : {},
             ]}
@@ -189,7 +190,7 @@ export function AddPatientSheet({
               placeholder="Enter the name"
               placeholderTextColor="#6A6A6A"
               style={{
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "400",
                 color: "#1A1C1E",
                 padding: 0,
@@ -210,32 +211,32 @@ export function AddPatientSheet({
             <Text
               style={{
                 color: "#EF4444",
-                fontSize: 12,
-                marginTop: -12,
-                marginBottom: 12,
+                fontSize: moderateScale(12),
+                marginTop: exactScale(-12),
+                marginBottom: exactScale(12),
               }}
             >
               {errors.name}
             </Text>
           )}
 
-          <Text className="text-[14px] font-inter-bold text-brand-text mb-2">
+          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Mobile Number
           </Text>
           <View
             style={[
-              { flexDirection: "row", alignItems: "center", height: 52 },
-              input,
+              { flexDirection: "row", alignItems: "center", height: exactScale(52) },
+              inputStyle,
               errors.mobile ? { borderColor: "#EF4444" } : {},
-              { paddingVertical: 0, paddingHorizontal: 16, marginBottom: 18 },
+              { paddingVertical: 0, paddingHorizontal: exactScale(16), marginBottom: exactScale(18) },
             ]}
           >
             <Text
               style={{
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "500",
                 color: "#1A1C1E",
-                marginRight: 8,
+                marginRight: exactScale(8),
               }}
             >
               +91 |
@@ -249,7 +250,7 @@ export function AddPatientSheet({
               returnKeyType="done"
               style={{
                 flex: 1,
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "400",
                 color: "#1A1C1E",
                 height: "100%",
@@ -266,25 +267,25 @@ export function AddPatientSheet({
             <Text
               style={{
                 color: "#EF4444",
-                fontSize: 12,
-                marginTop: -12,
-                marginBottom: 12,
+                fontSize: moderateScale(12),
+                marginTop: exactScale(-12),
+                marginBottom: exactScale(12),
               }}
             >
               {errors.mobile}
             </Text>
           )}
 
-          <Text className="text-[14px] font-inter-bold text-brand-text mb-2">
+          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Relationship
           </Text>
           <View
             style={{
               flexDirection: "row",
               flexWrap: "wrap",
-              gap: 8,
+              gap: exactScale(8),
               marginBottom:
-                errors.relationship && relationship !== "Other" ? 6 : 18,
+                errors.relationship && relationship !== "Other" ? exactScale(6) : exactScale(18),
             }}
           >
             {RELATIONSHIPS.map((item) => {
@@ -301,17 +302,17 @@ export function AddPatientSheet({
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
-                    paddingVertical: 7,
-                    paddingHorizontal: 14,
+                    paddingVertical: exactScale(7),
+                    paddingHorizontal: exactScale(14),
                     borderWidth: 1,
                     borderColor: sel ? "#0F763533" : "#919EAB33",
                     backgroundColor: sel ? "#F1FFF6" : "#fff",
-                    gap: 5,
+                    gap: exactScale(5),
                   }}
                 >
                   <Text
-                    className="text-[13px] font-inter-medium"
-                    style={{ color: sel ? "#0F7635" : "#6A6A6A" }}
+                    className="font-inter-medium"
+                    style={{ fontSize: moderateScale(13), color: sel ? "#0F7635" : "#6A6A6A" }}
                   >
                     {item}
                   </Text>
@@ -320,7 +321,7 @@ export function AddPatientSheet({
             })}
           </View>
           {errors.relationship && relationship !== "Other" && (
-            <Text style={{ color: "#EF4444", fontSize: 12, marginBottom: 12 }}>
+            <Text style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(12) }}>
               {errors.relationship}
             </Text>
           )}
@@ -330,10 +331,10 @@ export function AddPatientSheet({
                 placeholder="Specify relationship"
                 placeholderTextColor="#6A6A6A"
                 style={[
-                  input,
+                  inputStyle,
                   {
-                    marginTop: -10,
-                    marginBottom: errors.relationship ? 6 : 18,
+                    marginTop: exactScale(-10),
+                    marginBottom: errors.relationship ? exactScale(6) : exactScale(18),
                   },
                   errors.relationship ? { borderColor: "#EF4444" } : {},
                 ]}
@@ -349,7 +350,7 @@ export function AddPatientSheet({
               />
               {errors.relationship && (
                 <Text
-                  style={{ color: "#EF4444", fontSize: 12, marginBottom: 12 }}
+                  style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(12) }}
                 >
                   {errors.relationship}
                 </Text>
@@ -357,11 +358,11 @@ export function AddPatientSheet({
             </>
           )}
 
-          <Text className="text-[14px] font-inter-bold text-brand-text mb-2">
+          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Date Of Birth
           </Text>
           {errors.dob && (
-            <Text style={{ color: "#EF4444", fontSize: 12, marginBottom: 6 }}>
+            <Text style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(6) }}>
               {errors.dob}
             </Text>
           )}
@@ -375,25 +376,25 @@ export function AddPatientSheet({
               alignItems: "center",
               borderWidth: 1,
               borderColor: errors.dob ? "#EF4444" : "#919EAB33",
-              borderRadius: 8,
-              paddingHorizontal: 16,
+              borderRadius: exactScale(8),
+              paddingHorizontal: exactScale(16),
               backgroundColor: "#fff",
-              marginBottom: 18,
+              marginBottom: exactScale(18),
             }}
             activeOpacity={0.8}
           >
             <Text
               style={{
                 flex: 1,
-                paddingVertical: 14,
-                fontSize: 14,
+                paddingVertical: exactScale(14),
+                fontSize: moderateScale(14),
                 fontWeight: "400",
                 color: dob ? "#1A1C1E" : "#6A6A6A",
               }}
             >
               {formatDobDisplay(dob) || "DD-MM-YYYY"}
             </Text>
-            <icons.calendar_month width={20} height={20} fill="#919EAB" />
+            <icons.calendar_month width={exactScale(20)} height={exactScale(20)} fill="#919EAB" />
           </Touchable>
           <DatePickerModal
             visible={showDatePicker}
@@ -409,15 +410,15 @@ export function AddPatientSheet({
             }}
           />
 
-          <Text className="text-[14px] font-inter-bold text-brand-text mb-2">
+          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Gender
           </Text>
           <View
             style={{
               flexDirection: "row",
               flexWrap: "wrap",
-              gap: 6,
-              marginBottom: errors.gender ? 6 : 28,
+              gap: exactScale(6),
+              marginBottom: errors.gender ? exactScale(6) : exactScale(28),
             }}
           >
             {GENDERS.map(({ label: g, value: gVal, icon }) => {
@@ -434,12 +435,12 @@ export function AddPatientSheet({
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
-                    paddingVertical: 10,
-                    paddingHorizontal: 10,
+                    paddingVertical: exactScale(10),
+                    paddingHorizontal: exactScale(10),
                     borderWidth: 1,
                     borderColor: sel ? "#0F763533" : "#919EAB33",
                     backgroundColor: sel ? "#F1FFF6" : "#fff",
-                    gap: 4,
+                    gap: exactScale(4),
                   }}
                 >
                   {React.cloneElement(icon as React.ReactElement<any>, {
@@ -447,7 +448,7 @@ export function AddPatientSheet({
                   })}
                   <Text
                     className="font-inter-medium"
-                    style={{ fontSize: 12, color: sel ? "#0F7635" : "#6A6A6A" }}
+                    style={{ fontSize: moderateScale(12), color: sel ? "#0F7635" : "#6A6A6A" }}
                   >
                     {g}
                   </Text>
@@ -459,9 +460,9 @@ export function AddPatientSheet({
             <Text
               style={{
                 color: "#EF4444",
-                fontSize: 12,
-                marginTop: -4,
-                marginBottom: 16,
+                fontSize: moderateScale(12),
+                marginTop: exactScale(-4),
+                marginBottom: exactScale(16),
               }}
             >
               {errors.gender}
@@ -474,8 +475,8 @@ export function AddPatientSheet({
             activeOpacity={0.85}
             style={{
               backgroundColor: "#0F7635",
-              borderRadius: 14,
-              paddingVertical: 16,
+              borderRadius: exactScale(14),
+              paddingVertical: exactScale(16),
               alignItems: "center",
               opacity: isSubmitting ? 0.75 : 1,
             }}
@@ -485,7 +486,7 @@ export function AddPatientSheet({
             ) : (
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: moderateScale(15),
                   fontWeight: "600",
                   color: "#fff",
                 }}
@@ -500,15 +501,15 @@ export function AddPatientSheet({
   );
 }
 
-const input: object = {
+const inputStyle: object = {
   borderWidth: 1,
   borderColor: "#919EAB33",
-  borderRadius: 8,
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-  fontSize: 14,
+  borderRadius: exactScale(8),
+  paddingHorizontal: exactScale(16),
+  paddingVertical: exactScale(14),
+  fontSize: moderateScale(14),
   fontWeight: "400",
   color: "#6A6A6A",
   backgroundColor: "#fff",
-  marginBottom: 18,
+  marginBottom: exactScale(18),
 };

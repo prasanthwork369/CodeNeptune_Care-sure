@@ -21,6 +21,7 @@ import Animated, {
   useAnimatedReaction,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface UploadPrescriptionSheetProps {
   isVisible: boolean;
@@ -160,8 +161,8 @@ export const UploadPrescriptionSheet: React.FC<
         closeButtonOffset="40%"
         backgroundStyle={{
           backgroundColor: "#fff",
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
+          borderTopLeftRadius: exactScale(12),
+          borderTopRightRadius: exactScale(12),
         }}
       >
         <BeforeUploadSync onExpandChange={setShowBeforeUpload} />
@@ -169,26 +170,26 @@ export const UploadPrescriptionSheet: React.FC<
           showsVerticalScrollIndicator={false}
           bounces={false}
           contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 20,
-            paddingBottom: adjustedBottom + 16,
+            paddingHorizontal: exactScale(16),
+            paddingTop: exactScale(20),
+            paddingBottom: adjustedBottom + exactScale(16),
           }}
         >
           {/* Top action cards */}
-          <View className="flex-row gap-3">
+          <View className="flex-row" style={{ gap: exactScale(12) }}>
             <Touchable
               activeOpacity={0.85}
               onPress={handleUploadFile}
-              style={{ borderColor: "#919EAB33" }}
-              className="flex-1 items-center border rounded-[8px] py-5 bg-white"
+              style={{ borderColor: "#919EAB33", borderRadius: exactScale(8), paddingVertical: exactScale(20) }}
+              className="flex-1 items-center border bg-white"
             >
               <View
-                className="w-16 h-16 rounded-full items-center justify-center mb-2"
-                style={{ backgroundColor: "#E6F4EA" }}
+                className="items-center justify-center"
+                style={{ width: exactScale(64), height: exactScale(64), borderRadius: exactScale(32), marginBottom: exactScale(8), backgroundColor: "#E6F4EA" }}
               >
-                <icons.upload_file width={24} height={24} />
+                <icons.upload_file width={exactScale(24)} height={exactScale(24)} />
               </View>
-              <Text className="text-[13px] font-inter-medium text-brand-text">
+              <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(13) }}>
                 Upload Images
               </Text>
             </Touchable>
@@ -199,16 +200,16 @@ export const UploadPrescriptionSheet: React.FC<
                 onClose();
                 setTimeout(handleTakePhoto, 400);
               }}
-              style={{ borderColor: "#919EAB33" }}
-              className="flex-1 items-center border rounded-[8px] py-5 bg-white"
+              style={{ borderColor: "#919EAB33", borderRadius: exactScale(8), paddingVertical: exactScale(20) }}
+              className="flex-1 items-center border bg-white"
             >
               <View
-                className="w-16 h-16 rounded-full items-center justify-center mb-2"
-                style={{ backgroundColor: "#E6F4EA" }}
+                className="items-center justify-center"
+                style={{ width: exactScale(64), height: exactScale(64), borderRadius: exactScale(32), marginBottom: exactScale(8), backgroundColor: "#E6F4EA" }}
               >
-                <icons.photo_camera_green width={24} height={24} />
+                <icons.photo_camera_green width={exactScale(24)} height={exactScale(24)} />
               </View>
-              <Text className="text-[13px] font-inter-medium text-brand-text">
+              <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(13) }}>
                 Take a Photo
               </Text>
             </Touchable>
@@ -216,16 +217,16 @@ export const UploadPrescriptionSheet: React.FC<
             <Touchable
               activeOpacity={0.85}
               onPress={handleUploadPdf}
-              style={{ borderColor: "#919EAB33" }}
-              className="flex-1 items-center border rounded-[8px] py-5 bg-white"
+              style={{ borderColor: "#919EAB33", borderRadius: exactScale(8), paddingVertical: exactScale(20) }}
+              className="flex-1 items-center border bg-white"
             >
               <View
-                className="w-16 h-16 rounded-full items-center justify-center mb-2"
-                style={{ backgroundColor: "#E6F4EA" }}
+                className="items-center justify-center"
+                style={{ width: exactScale(64), height: exactScale(64), borderRadius: exactScale(32), marginBottom: exactScale(8), backgroundColor: "#E6F4EA" }}
               >
-                <icons.upload_pdf width={24} height={24} />
+                <icons.upload_pdf width={exactScale(24)} height={exactScale(24)} />
               </View>
-              <Text className="text-[13px] font-inter-medium text-brand-text">
+              <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(13) }}>
                 Upload PDF
               </Text>
             </Touchable>
@@ -246,45 +247,50 @@ export const UploadPrescriptionSheet: React.FC<
               borderWidth: 1,
               borderColor: "#00000014",
               backgroundColor: "#FFFFFF",
+              borderRadius: exactScale(6),
+              paddingHorizontal: exactScale(16),
+              paddingVertical: exactScale(14),
+              marginTop: exactScale(16),
             }}
-            className="flex-row items-center rounded-[6px] px-4 py-3.5 mt-4"
+            className="flex-row items-center"
           >
             <View
-              className="w-16 h-16 rounded-full items-center justify-center"
-              style={{ backgroundColor: "#E6F4EA" }}
+              className="items-center justify-center"
+              style={{ width: exactScale(64), height: exactScale(64), borderRadius: exactScale(32), backgroundColor: "#E6F4EA" }}
             >
-              <icons.prescription_green width={24} height={24} />
+              <icons.prescription_green width={exactScale(24)} height={exactScale(24)} />
             </View>
-            <View className="flex-1 ml-3">
-              <Text className="text-[14px] font-inter-medium text-[#0F2B22]">
+            <View className="flex-1" style={{ marginLeft: exactScale(12) }}>
+              <Text className="font-inter-medium text-[#0F2B22]" style={{ fontSize: moderateScale(14) }}>
                 Select from My Prescriptions
               </Text>
               <Text
-                style={{ color: colors.primary }}
-                className="self-start text-[10px] bg-[#F3FAF7] px-3 py-1 rounded-lg font-inter-semibold tracking-wider mt-1"
+                style={{ color: colors.primary, fontSize: moderateScale(10), paddingHorizontal: exactScale(12), paddingVertical: exactScale(4), borderRadius: exactScale(8), marginTop: exactScale(4) }}
+                className="self-start bg-[#F3FAF7] font-inter-semibold tracking-wider"
               >
                 FASTER VERIFICATION
               </Text>
             </View>
-            <icons.arrow_forward_ios width={14} height={14} fill="#9CA3AF" />
+            <icons.arrow_forward_ios width={exactScale(14)} height={exactScale(14)} fill="#9CA3AF" />
           </Touchable>
 
           {/* Before You Upload header */}
           <Touchable
             activeOpacity={0.8}
             onPress={handleToggleBeforeUpload}
-            className="flex-row items-center mt-5"
+            className="flex-row items-center"
+            style={{ marginTop: exactScale(20) }}
           >
-            <Text className="text-[14px] font-inter-semibold text-brand-text">
+            <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(14) }}>
               Before You Upload
             </Text>
             <View
               style={{
                 transform: [{ rotate: showBeforeUpload ? "0deg" : "-90deg" }],
-                marginLeft: 6,
+                marginLeft: exactScale(6),
               }}
             >
-              <icons.down_arrow width={14} height={14} fill="#1A1C1E" />
+              <icons.down_arrow width={exactScale(14)} height={exactScale(14)} fill="#1A1C1E" />
             </View>
           </Touchable>
 
@@ -292,35 +298,35 @@ export const UploadPrescriptionSheet: React.FC<
             <Animated.View
               entering={FadeIn.duration(200)}
               exiting={FadeOut.duration(150)}
-              style={{ borderColor: "#0F763522" }}
-              className="border rounded-2xl p-4 mt-3"
+              style={{ borderColor: "#0F763522", borderRadius: exactScale(16), padding: exactScale(16), marginTop: exactScale(12) }}
+              className="border"
             >
               <View className="flex-row">
                 <View
-                  className="w-[130px] h-[130px] rounded-xl border border-[#919EAB33] items-center justify-center"
-                  style={{ backgroundColor: "#F2FFFA" }}
+                  className="items-center justify-center border border-[#919EAB33]"
+                  style={{ width: exactScale(130), height: exactScale(130), borderRadius: exactScale(12), backgroundColor: "#F2FFFA" }}
                 >
                   <Image
                     source={HOME_IMAGES.samplePrescription}
-                    style={{ width: 120, height: 120 }}
+                    style={{ width: exactScale(120), height: exactScale(120) }}
                     resizeMode="contain"
                   />
                 </View>
-                <View className="flex-1 ml-4">
-                  <Text className="text-[14px] font-inter-semibold text-brand-text mb-2">
+                <View className="flex-1" style={{ marginLeft: exactScale(16) }}>
+                  <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
                     Valid prescription includes:
                   </Text>
                   {VALID_ITEMS.map((label, idx) => (
-                    <View key={label} className="flex-row items-center mb-1.5">
+                    <View key={label} className="flex-row items-center" style={{ marginBottom: exactScale(6) }}>
                       <View
-                        className="w-[18px] h-[18px] rounded-full items-center justify-center mr-2"
-                        style={{ backgroundColor: "#0F7635" }}
+                        className="items-center justify-center"
+                        style={{ width: exactScale(18), height: exactScale(18), borderRadius: exactScale(9), marginRight: exactScale(8), backgroundColor: "#0F7635" }}
                       >
-                        <Text className="text-[10px] font-inter-bold text-white">
+                        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(10) }}>
                           {idx + 1}
                         </Text>
                       </View>
-                      <Text className="text-[12px] font-inter-medium text-brand-text">
+                      <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(12) }}>
                         {label}
                       </Text>
                     </View>
@@ -329,18 +335,19 @@ export const UploadPrescriptionSheet: React.FC<
               </View>
 
               <View
-                className="mt-3 mb-3"
                 style={{
                   borderTopWidth: 1,
                   borderColor: "#0F763544",
                   borderStyle: "dotted",
+                  marginTop: exactScale(12),
+                  marginBottom: exactScale(12),
                 }}
               />
 
-              <Text className="text-[12px] font-inter text-brand-subtext mb-1">
+              <Text className="font-inter text-brand-subtext" style={{ fontSize: moderateScale(12), marginBottom: exactScale(4) }}>
                 File size should be less than 5 MB
               </Text>
-              <Text className="text-[12px] font-inter text-brand-subtext mb-1">
+              <Text className="font-inter text-brand-subtext" style={{ fontSize: moderateScale(12), marginBottom: exactScale(4) }}>
                 Supported formats: PDF, JPG, JPEG, PNG
               </Text>
             </Animated.View>

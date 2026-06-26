@@ -1,7 +1,8 @@
 import React from "react";
-import { ActivityIndicator, Text, View, ViewStyle, TextStyle } from "react-native";
+import { ActivityIndicator, Text, View, ViewStyle, TextStyle, StyleSheet } from "react-native";
 import { Touchable } from "./Touchable";
 import { colors } from "@/src/theme/colors";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -41,7 +42,7 @@ export const AppButton: React.FC<AppButtonProps> = ({
   activeOpacity = 0.85,
   children,
 }) => {
-  // Variant container classes
+  // Variant container classes (excluding padding and border radius which are scaled below)
   const getVariantContainerClass = () => {
     switch (variant) {
       case "primary":
@@ -75,32 +76,6 @@ export const AppButton: React.FC<AppButtonProps> = ({
     }
   };
 
-  // Size padding classes
-  const getSizeContainerClass = () => {
-    switch (size) {
-      case "sm":
-        return "py-2 px-3 rounded-md";
-      case "lg":
-        return "py-4.5 px-6 rounded-xl";
-      case "md":
-      default:
-        return "py-3.5 px-5 rounded-lg";
-    }
-  };
-
-  // Size text scale classes
-  const getSizeTextClass = () => {
-    switch (size) {
-      case "sm":
-        return "text-sm";
-      case "lg":
-        return "text-lg";
-      case "md":
-      default:
-        return "text-base";
-    }
-  };
-
   // Spinner indicator color matching the variant
   const getSpinnerColor = () => {
     switch (variant) {
@@ -118,16 +93,49 @@ export const AppButton: React.FC<AppButtonProps> = ({
 
   const isBtnDisabled = disabled || loading;
 
+  const sizeStyles = {
+    sm: {
+      height: exactScale(36),
+      paddingHorizontal: exactScale(12),
+      borderRadius: exactScale(6),
+    },
+    md: {
+      height: exactScale(48),
+      paddingHorizontal: exactScale(20),
+      borderRadius: exactScale(10),
+    },
+    lg: {
+      height: exactScale(56),
+      paddingHorizontal: exactScale(24),
+      borderRadius: exactScale(12),
+    },
+  };
+
+  const textSizeStyles = {
+    sm: {
+      fontSize: moderateScale(13),
+    },
+    md: {
+      fontSize: moderateScale(15),
+    },
+    lg: {
+      fontSize: moderateScale(17),
+    },
+  };
+
+  const combinedButtonStyle = StyleSheet.flatten([sizeStyles[size], style]);
+  const combinedTextStyle = StyleSheet.flatten([textSizeStyles[size], textStyle]);
+
   return (
     <Touchable
       onPress={onPress}
       disabled={isBtnDisabled}
       throttleMs={throttleMs}
       activeOpacity={activeOpacity}
-      className={`flex-row items-center justify-center ${getVariantContainerClass()} ${getSizeContainerClass()} ${
+      className={`flex-row items-center justify-center ${getVariantContainerClass()} ${
         isBtnDisabled ? "opacity-60" : ""
       } ${className}`}
-      style={style}
+      style={combinedButtonStyle}
     >
       {loading ? (
         <ActivityIndicator size="small" color={getSpinnerColor()} />
@@ -138,8 +146,8 @@ export const AppButton: React.FC<AppButtonProps> = ({
             children
           ) : (
             <Text
-              className={`${getVariantTextClass()} ${getSizeTextClass()} text-center ${textClassName}`}
-              style={textStyle}
+              className={`${getVariantTextClass()} text-center ${textClassName}`}
+              style={combinedTextStyle}
             >
               {title}
             </Text>

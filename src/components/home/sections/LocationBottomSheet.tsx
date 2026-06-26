@@ -24,7 +24,7 @@ import {
   View,
 } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface LocationBottomSheetProps {
   isVisible: boolean;
@@ -298,24 +298,27 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       <View
         style={{ paddingHorizontal: exactScale(20), paddingTop: exactScale(10), paddingBottom: exactScale(10) }}
       >
-        <Text className="text-[16px] font-inter-bold text-brand-text mb-5">
+        <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(16), marginBottom: exactScale(20) }}>
           Change Location
         </Text>
 
         {/* Search Box */}
-        <View className="flex-row items-center gap-x-3 mb-4">
+        <View className="flex-row items-center" style={{ gap: exactScale(12), marginBottom: exactScale(16) }}>
           <View
             style={{
               flex: 1,
               shadowColor: "#919EAB0A",
               shadowOffset: { width: 0, height: exactScale(10) },
               shadowOpacity: 0.04,
-              shadowRadius: 20,
+              shadowRadius: exactScale(20),
               elevation: 2,
               borderWidth: 1.05,
               borderColor: "#919EAB33",
+              borderRadius: exactScale(6),
+              paddingHorizontal: exactScale(16),
+              paddingVertical: exactScale(10),
             }}
-            className="flex-row items-center bg-white rounded-md px-4 py-2.5"
+            className="flex-row items-center bg-white"
           >
             {isSearching ? (
               <ActivityIndicator size="small" color="#0F7635" />
@@ -330,7 +333,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               autoCorrect={false}
               placeholder="Search for area, street name"
               placeholderTextColor="#6A6A6A"
-              className="flex-1 ml-3 text-[14px] font-inter text-brand-text"
+              className="flex-1 font-inter text-brand-text"
+              style={{ marginLeft: exactScale(12), fontSize: moderateScale(14) }}
               onFocus={() => {
                 setIsSearchFocused(true);
               }}
@@ -352,40 +356,42 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
 
         {/* Current location + Add new — hidden while searching or focused */}
         {!searchQuery && !isSearchFocused && (
-          <View className="flex-row gap-x-3 mb-2">
+          <View className="flex-row" style={{ gap: exactScale(12), marginBottom: exactScale(8) }}>
             <Touchable
               onPress={handleUseCurrentLocation}
               disabled={isLocating}
-              className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
+              className="flex-1 flex-row items-center border border-[#919EAB33] bg-white"
+              style={{ borderRadius: exactScale(16), paddingHorizontal: exactScale(14), paddingVertical: exactScale(16) }}
             >
-              <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
+              <View className="items-center justify-center" style={{ width: exactScale(40), height: exactScale(40), borderRadius: exactScale(20), backgroundColor: "#ECFDF5" }}>
                 {isLocating ? (
                   <ActivityIndicator size="small" color="#059669" />
                 ) : (
                   <icons.my_location width={exactScale(21)} height={exactScale(21)} fill="#059669" />
                 )}
               </View>
-              <View className="ml-3">
-                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+              <View style={{ marginLeft: exactScale(12) }}>
+                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
                   {isLocating ? "Fetching" : "Use Current"}
                 </Text>
-                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
                   Location
                 </Text>
               </View>
             </Touchable>
             <Touchable
               onPress={handleAddNewAddress}
-              className="flex-1 flex-row items-center border border-[#919EAB33] rounded-[16px] px-3.5 py-4 bg-white"
+              className="flex-1 flex-row items-center border border-[#919EAB33] bg-white"
+              style={{ borderRadius: exactScale(16), paddingHorizontal: exactScale(14), paddingVertical: exactScale(16) }}
             >
-              <View className="w-10 h-10 rounded-full bg-[#ECFDF5] items-center justify-center">
+              <View className="items-center justify-center" style={{ width: exactScale(40), height: exactScale(40), borderRadius: exactScale(20), backgroundColor: "#ECFDF5" }}>
                 <icons.add_circle width={exactScale(21)} height={exactScale(21)} fill="#059669" />
               </View>
-              <View className="ml-3">
-                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+              <View style={{ marginLeft: exactScale(12) }}>
+                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
                   Add New
                 </Text>
-                <Text className="text-[15px] font-inter-semibold text-brand-text leading-tight">
+                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
                   Addresses
                 </Text>
               </View>
@@ -394,7 +400,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         )}
 
         {!showPredictions && (
-          <Text className="text-[15px] font-inter-bold text-brand-text mb-4">
+          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(15), marginBottom: exactScale(16) }}>
             Your Saved Addresses
           </Text>
         )}
@@ -407,7 +413,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           paddingHorizontal: exactScale(20),
-          paddingBottom: Math.max(adjustedBottom, 24),
+          paddingBottom: Math.max(adjustedBottom, exactScale(24)),
         }}
       >
         {/* Predictions list */}
@@ -415,7 +421,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           isSearching && predictions.length === 0 ? (
             <ActivityIndicator color="#0F7635" style={{ marginVertical: exactScale(24) }} />
           ) : (
-            <View className="border border-[#919EAB33] rounded-lg px-4">
+            <View className="border border-[#919EAB33] bg-white" style={{ borderRadius: exactScale(8), paddingHorizontal: exactScale(16) }}>
               {predictions.map((p, index) => (
                 <Touchable
                   key={p.place_id}
@@ -428,20 +434,22 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                           borderBottomWidth: 1,
                           borderColor: "#E5E7EB",
                           borderStyle: "dashed",
+                          paddingVertical: exactScale(16),
                         }
-                      : undefined
+                      : { paddingVertical: exactScale(16) }
                   }
-                  className="flex-row items-start py-4"
+                  className="flex-row items-start"
                 >
-                  <View className="mt-0.5 mr-3">
+                  <View style={{ marginTop: exactScale(2), marginRight: exactScale(12) }}>
                     <icons.location_on width={exactScale(20)} height={exactScale(20)} fill="#1A1C1E" />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-[15px] font-inter-semibold text-brand-text mb-1">
+                    <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(15), marginBottom: exactScale(4) }}>
                       {p.mainText}
                     </Text>
                     <Text
-                      className="text-[13px] font-inter-regular text-brand-subtext leading-5"
+                      className="font-inter-regular text-brand-subtext"
+                      style={{ fontSize: moderateScale(13), lineHeight: moderateScale(20) }}
                       numberOfLines={2}
                     >
                       {p.description}
@@ -455,7 +463,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         addressesLoading ? (
           <ActivityIndicator color="#0F7635" style={{ marginVertical: exactScale(24) }} />
         ) : addresses.length === 0 ? (
-          <Text className="text-[13px] font-inter-medium text-brand-subtext text-center py-6">
+          <Text className="font-inter-medium text-brand-subtext text-center" style={{ fontSize: moderateScale(13), paddingVertical: exactScale(24) }}>
             No saved addresses yet
           </Text>
         ) : (
@@ -480,35 +488,40 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                   borderColor: isSelected ? "#0F7635" : "#919EAB33",
                   backgroundColor: isSelected ? "#F2FFF7" : "#FFFFFF",
                   position: "relative",
+                  borderRadius: exactScale(8),
+                  padding: exactScale(20),
+                  marginBottom: exactScale(16),
                 }}
-                className="rounded-lg p-5 mb-4"
               >
                 {isSelected && (
                   <View style={{ position: "absolute", top: exactScale(14), right: exactScale(14) }}>
                     <icons.check_circle width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
                   </View>
                 )}
-                <View className="flex-row items-center mb-3">
+                <View className="flex-row items-center" style={{ marginBottom: exactScale(12) }}>
                   <View
-                    className="w-8 h-8 rounded-full items-center justify-center"
+                    className="items-center justify-center"
                     style={{
+                      width: exactScale(32),
+                      height: exactScale(32),
+                      borderRadius: exactScale(16),
                       backgroundColor: isSelected ? "#DCFCE7" : "#F9FAFB",
                     }}
                   >
                     {labelToIcon(addr.label)}
                   </View>
-                  <Text className="ml-3 text-[14px] font-inter-semibold text-brand-text capitalize">
+                  <Text className="font-inter-semibold text-brand-text capitalize" style={{ marginLeft: exactScale(12), fontSize: moderateScale(14) }}>
                     {addr.label.charAt(0) + addr.label.slice(1).toLowerCase()}
                   </Text>
                   {addr.isDefault && (
-                    <View className="ml-2 bg-[#ECFDF5] px-2 py-0.5 rounded-full">
-                      <Text className="text-[11px] font-inter-semibold text-[#0F7635]">
+                    <View className="bg-[#ECFDF5] rounded-full" style={{ marginLeft: exactScale(8), paddingHorizontal: exactScale(8), paddingVertical: exactScale(2) }}>
+                      <Text className="font-inter-semibold text-[#0F7635]" style={{ fontSize: moderateScale(11) }}>
                         Default
                       </Text>
                     </View>
                   )}
                 </View>
-                <Text className="text-[14px] font-inter text-brand-subtext leading-[20px]">
+                <Text className="font-inter text-brand-subtext" style={{ fontSize: moderateScale(14), lineHeight: moderateScale(20) }}>
                   {fullAddress}
                 </Text>
               </Touchable>

@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
 import { Transaction, TxIconType } from '@/src/types/wallet';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 interface TransactionHistorySheetProps {
     visible: boolean;
@@ -21,8 +22,8 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
         isCredit               ? HOME_IMAGES.accountBalanceCredit :
                                  HOME_IMAGES.accountBalanceDebit;
     return (
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: isCredit ? '#DFF3E6' : '#FCE8E8', alignItems: 'center', justifyContent: 'center' }}>
-            <Image source={src} style={{ width: 26, height: 26 }} resizeMode="contain" />
+        <View style={{ width: exactScale(44), height: exactScale(44), borderRadius: exactScale(22), backgroundColor: isCredit ? '#DFF3E6' : '#FCE8E8', alignItems: 'center', justifyContent: 'center' }}>
+            <Image source={src} style={{ width: exactScale(26), height: exactScale(26) }} resizeMode="contain" />
         </View>
     );
 };
@@ -47,39 +48,39 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
             onClose={onClose}
             snapPoints={snapPoints}
             closeButtonOffset="50%"
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: exactScale(12), borderTopRightRadius: exactScale(12) }}
         >
             {/* Title */}
-            <View style={{ alignItems: 'center', paddingTop: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>Transaction History</Text>
+            <View style={{ alignItems: 'center', paddingTop: exactScale(24), paddingBottom: exactScale(16), borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>
+                <Text style={{ fontSize: moderateScale(16), fontWeight: '700', color: '#111827' }}>Transaction History</Text>
             </View>
 
             {/* Rows */}
             <BottomSheetScrollView showsVerticalScrollIndicator={false} bounces={false} style={{ flex: 1 }}>
                 {transactions.length === 0 ? (
-                    <Text style={{ textAlign: 'center', color: '#9CA3AF', fontWeight: '500', fontSize: 14, paddingVertical: 32 }}>
+                    <Text style={{ textAlign: 'center', color: '#9CA3AF', fontWeight: '500', fontSize: moderateScale(14), paddingVertical: exactScale(32) }}>
                         No transactions yet
                     </Text>
                 ) : (
                     transactions.map((tx, idx) => (
                         <View key={tx.id}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(20), paddingVertical: exactScale(14) }}>
                                 <TransactionIcon type={tx.iconType} />
-                                <View style={{ flex: 1, marginLeft: 14 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#111827' }}>{tx.title}</Text>
-                                    <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{tx.date}</Text>
+                                <View style={{ flex: 1, marginLeft: exactScale(14) }}>
+                                    <Text style={{ fontSize: moderateScale(14), fontWeight: '600', color: '#111827' }}>{tx.title}</Text>
+                                    <Text style={{ fontSize: moderateScale(12), color: '#6B7280', marginTop: exactScale(2) }}>{tx.date}</Text>
                                 </View>
                                 {tx.isCoin ? (
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                        <Image source={HOME_IMAGES.dollarCoins} style={{ width: 16, height: 16 }} resizeMode="contain" />
-                                        <Text style={{ fontSize: 14, fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: exactScale(4) }}>
+                                        <Image source={HOME_IMAGES.dollarCoins} style={{ width: exactScale(16), height: exactScale(16) }} resizeMode="contain" />
+                                        <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
                                     </View>
                                 ) : (
-                                    <Text style={{ fontSize: 14, fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
+                                    <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
                                 )}
                             </View>
                             {idx < transactions.length - 1 && (
-                                <View style={{ height: 1, backgroundColor: '#F3F4F6', marginHorizontal: 20 }} />
+                                <View style={{ height: 1, backgroundColor: '#F3F4F6', marginHorizontal: exactScale(20) }} />
                             )}
                         </View>
                     ))
@@ -87,9 +88,9 @@ export const TransactionHistorySheet: React.FC<TransactionHistorySheetProps> = (
             </BottomSheetScrollView>
 
             {/* See All */}
-            <View style={{ borderTopWidth: 1, borderTopColor: '#F3F4F6', paddingVertical: 16, alignItems: 'center' }}>
+            <View style={{ borderTopWidth: 1, borderTopColor: '#F3F4F6', paddingVertical: exactScale(16), alignItems: 'center' }}>
                 <Touchable onPress={handleSeeAll} activeOpacity={0.7}>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF8A00' }}>See All</Text>
+                    <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#FF8A00' }}>See All</Text>
                 </Touchable>
             </View>
         </GorhomBottomSheet>

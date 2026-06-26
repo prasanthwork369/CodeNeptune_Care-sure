@@ -19,7 +19,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale, scale } from 'react-native-size-matters';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 // ── Confetti ──────────────────────────────────────────────────────────────────
 
@@ -149,12 +149,12 @@ export const OrderSuccessLayout: React.FC = () => {
             <GestureDetector gesture={panGesture}>
                 <Animated.View style={[cardStyle, {
                     backgroundColor: '#fff',
-                    borderTopLeftRadius: 32,
-                    borderTopRightRadius: 32,
+                    borderTopLeftRadius: exactScale(32),
+                    borderTopRightRadius: exactScale(32),
                     overflow: 'hidden',
-                    paddingTop: 28,
-                    paddingHorizontal: 24,
-                    paddingBottom: adjustedBottom + 24,
+                    paddingTop: exactScale(28),
+                    paddingHorizontal: exactScale(24),
+                    paddingBottom: adjustedBottom + exactScale(24),
                     alignItems: 'center',
                 }]}>
                     {/* Confetti — clipped inside sheet by overflow:hidden */}
@@ -165,23 +165,23 @@ export const OrderSuccessLayout: React.FC = () => {
                     </View>
 
                     {/* Drag handle */}
-                    <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: '#E5E7EB', marginBottom: 24 }} />
+                    <View style={{ width: exactScale(40), height: exactScale(4), borderRadius: exactScale(2), backgroundColor: '#E5E7EB', marginBottom: exactScale(24) }} />
 
                     <DotLottie
                         source={ANIMATIONS.orderPlaced}
                         autoplay
                         loop={false}
-                        style={{ width: scale(160), height: scale(160) }}
+                        style={{ width: exactScale(160), height: exactScale(160) }}
                     />
 
-                    <Text style={{ fontSize: moderateScale(22, 0.1), fontWeight: '800', color: '#0F1724', marginTop: 8, textAlign: 'center' }}>
+                    <Text style={{ fontSize: moderateScale(22, 0.1), fontWeight: '800', color: '#0F1724', marginTop: exactScale(8), textAlign: 'center' }}>
                         Order Placed! 🎉
                     </Text>
-                    <Text style={{ fontSize: moderateScale(14, 0.1), color: '#6A6A6A', marginTop: 6, textAlign: 'center', lineHeight: moderateScale(20, 0.1) }}>
+                    <Text style={{ fontSize: moderateScale(14, 0.1), color: '#6A6A6A', marginTop: exactScale(6), textAlign: 'center', lineHeight: moderateScale(20, 0.1) }}>
                         {"Your medicines are on their way.\nWe'll keep you updated."}
                     </Text>
 
-                    <View style={{ width: '100%', marginTop: 24, backgroundColor: '#F8FFF9', borderRadius: 16, borderWidth: 1, borderColor: '#0F763522', padding: 16, gap: 12 }}>
+                    <View style={{ width: '100%', marginTop: exactScale(24), backgroundColor: '#F8FFF9', borderRadius: exactScale(16), borderWidth: 1, borderColor: '#0F763522', padding: exactScale(16), gap: exactScale(12) }}>
                         {orderId ? (
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '500', color: '#6A6A6A' }}>Order ID</Text>
@@ -198,21 +198,21 @@ export const OrderSuccessLayout: React.FC = () => {
                         </View>
                     </View>
 
-                    <Animated.View style={[btnStyle, { width: '100%', marginTop: 24, gap: 12 }]}>
+                    <Animated.View style={[btnStyle, { width: '100%', marginTop: exactScale(24), gap: exactScale(12) }]}>
                         <Touchable
                             activeOpacity={0.88}
                             onPress={() => router.replace('/profile/orders' as any)}
-                            style={{ backgroundColor: '#0F7635', borderRadius: 14, paddingVertical: 16, alignItems: 'center' }}
+                            style={{ backgroundColor: '#0F7635', borderRadius: exactScale(14), paddingVertical: exactScale(16), alignItems: 'center' }}
                         >
                             <Text style={{ fontSize: moderateScale(15, 0.1), fontWeight: '700', color: '#fff' }}>Track My Order</Text>
                         </Touchable>
                         <Touchable
                             activeOpacity={0.5}
                             onPress={() => router.replace('/(tabs)')}
-                            style={{ borderRadius: 14, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' }}
+                            style={{ borderRadius: exactScale(14), paddingVertical: exactScale(14), alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: exactScale(6), borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' }}
                         >
                             <Text style={{ fontSize: moderateScale(14, 0.1), fontWeight: '600', color: '#374151' }}>Continue Shopping</Text>
-                            <icons.arrow_forward_ios width={12} height={12} fill="#374151" />
+                            <icons.arrow_forward_ios width={exactScale(12)} height={exactScale(12)} fill="#374151" />
                         </Touchable>
                     </Animated.View>
                 </Animated.View>

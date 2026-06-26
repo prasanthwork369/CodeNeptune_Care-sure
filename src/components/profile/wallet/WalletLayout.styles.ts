@@ -1,10 +1,10 @@
 import { Platform, StyleSheet } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 /**
  * Stylesheet for the Wallet layout component.
  * Organizes design tokens, card layouts, tab bars, transaction lists,
- * and responsive typography using moderateScale for cross-device consistency.
+ * and responsive typography using exactScale for UI dimensions and moderateScale for typography.
  */
 export const styles = StyleSheet.create({
   // Main screen container
@@ -14,21 +14,21 @@ export const styles = StyleSheet.create({
   },
   // ScrollView inner content container
   scrollContent: {
-    padding: moderateScale(16, 0.3),
-    paddingBottom: moderateScale(40, 0.3),
+    padding: exactScale(16),
+    paddingBottom: exactScale(40),
   },
   // Main wallet/credits/coins dashboard card
   card: {
     backgroundColor: "#F7FFE1",
-    borderRadius: moderateScale(26, 0.3),
+    borderRadius: exactScale(26),
     borderWidth: 1,
     borderColor: "#919EAB24", // Subtle border that blends in with card background
-    paddingHorizontal: moderateScale(20, 0.3),
-    paddingVertical: moderateScale(16, 0.3),
-    height: moderateScale(242, 0.3),
+    paddingHorizontal: exactScale(20),
+    paddingVertical: exactScale(16),
+    height: exactScale(242),
     position: "relative",
     overflow: "hidden",
-    marginBottom: moderateScale(16, 0.3),
+    marginBottom: exactScale(16),
   },
   // Container overlay for confetti animation
   confettiContainer: {
@@ -48,8 +48,8 @@ export const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     backgroundColor: "#ECF7E4",
-    borderRadius: moderateScale(100, 0.3), // Perfect capsule layout matching Figma
-    marginBottom: moderateScale(12, 0.3),
+    borderRadius: exactScale(100), // Perfect capsule layout matching Figma
+    marginBottom: exactScale(12),
     zIndex: 20, // Ensure tabs sit above absolute illustrations
     position: "relative",
   },
@@ -59,16 +59,16 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    height: moderateScale(38, 0.3),
-    borderRadius: moderateScale(100, 0.3), // Perfect capsule layout matching Figma
-    gap: moderateScale(6, 0.3),
+    height: exactScale(38),
+    borderRadius: exactScale(100), // Perfect capsule layout matching Figma
+    gap: exactScale(6),
   },
   // Sliding white pill that animates behind the active tab item
   tabPill: {
     position: "absolute",
     top: 0,
-    height: moderateScale(38, 0.3),
-    borderRadius: moderateScale(100, 0.3), // Perfect capsule layout matching Figma
+    height: exactScale(38),
+    borderRadius: exactScale(100), // Perfect capsule layout matching Figma
     backgroundColor: "#FFFFFF",
     ...Platform.select({
       ios: {
@@ -84,7 +84,7 @@ export const styles = StyleSheet.create({
   },
   // Unselected tab label typography
   tabText: {
-    fontSize: moderateScale(13, 0.1),
+    fontSize: moderateScale(13),
     fontFamily: "Inter",
     fontWeight: "500",
     color: "#222222", // Matches dark charcoal unselected text in mockup
@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
     justifyContent: "space-between",
-    paddingRight: moderateScale(120, 0.3), // Keeps text from overlapping wallet illustration
+    paddingRight: exactScale(120), // Keeps text from overlapping wallet illustration
   },
   // Info section wrapper
   cardInfoSection: {
@@ -107,109 +107,109 @@ export const styles = StyleSheet.create({
   },
   // Card title label (e.g. WALLET BALANCE)
   cardLabel: {
-    fontSize: moderateScale(12, 0.1),
+    fontSize: moderateScale(12),
     fontFamily: "Inter",
     fontWeight: "700", // Figma Bold/SemiBold
     color: "#222222", // Figma neutral muted header color
     letterSpacing: 0.5,
-    lineHeight: moderateScale(16, 0.1),
-    marginBottom: moderateScale(4, 0.3),
+    lineHeight: moderateScale(16),
+    marginBottom: exactScale(4),
   },
   // Row wrapper for coins icon and balance value
   cardValueRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: moderateScale(8, 0.3),
+    marginBottom: exactScale(8),
   },
   // Main numeric balances
   cardValue: {
-    fontSize: moderateScale(32, 0.1),
+    fontSize: moderateScale(32),
     fontFamily: "Inter",
     fontWeight: "800", // Figma Extra Bold / Heavy
     color: "#0F7635",
-    lineHeight: moderateScale(38, 0.1),
+    lineHeight: moderateScale(38),
   },
   // Yellow coin icon inside Coins tab value row
   cardCoinIcon: {
-    width: moderateScale(28, 0.3),
-    height: moderateScale(28, 0.3),
-    marginRight: moderateScale(6, 0.3),
+    width: exactScale(28),
+    height: exactScale(28),
+    marginRight: exactScale(6),
   },
   // Subtext description inside the card
   cardSub: {
-    fontSize: moderateScale(12, 0.1),
+    fontSize: moderateScale(12),
     fontFamily: "Inter",
     fontWeight: "500",
-    lineHeight: moderateScale(18, 0.1),
+    lineHeight: moderateScale(18),
     color: "#565656",
-    marginBottom: moderateScale(8, 0.3),
+    marginBottom: exactScale(8),
   },
   // Green Add Money touchable button
   addMoneyBtn: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#0F7635",
-    paddingHorizontal: moderateScale(16, 0.3),
-    paddingVertical: moderateScale(8, 0.3),
-    borderRadius: moderateScale(20, 0.3),
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(8),
+    borderRadius: exactScale(20),
     alignSelf: "flex-start",
-    gap: moderateScale(8, 0.3),
+    gap: exactScale(8),
   },
   // Add Money button icon style
   addMoneyIcon: {
-    width: moderateScale(18, 0.3),
-    height: moderateScale(18, 0.3),
+    width: exactScale(18),
+    height: exactScale(18),
   },
   // Add Money button label typography
   addMoneyText: {
     color: "#FFFFFF",
-    fontSize: moderateScale(13, 0.1),
+    fontSize: moderateScale(13),
     fontFamily: "Inter",
     fontWeight: "700",
   },
   // Absolute positioned 3D wallet illustration on the right
   walletIllustration: {
     position: "absolute",
-    right: moderateScale(10, 0.3),
-    bottom: moderateScale(10, 0.3),
-    width: moderateScale(130, 0.3),
-    height: moderateScale(130, 0.3),
+    right: exactScale(10),
+    bottom: exactScale(10),
+    width: exactScale(130),
+    height: exactScale(130),
   },
   // Header section for Transaction list
   historyHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: moderateScale(12, 0.3),
+    marginBottom: exactScale(12),
   },
   // Container wrapper for transaction list items
   historyCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: moderateScale(12, 0.3),
+    borderRadius: exactScale(12),
     borderWidth: 1,
     borderColor: "#919EAB33",
     overflow: "hidden",
-    padding: moderateScale(4, 0.3),
+    padding: exactScale(4),
   },
   // Individual transaction item row
   txRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: moderateScale(16, 0.3),
-    paddingVertical: moderateScale(14, 0.3),
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(14),
   },
   // Transaction description details block
   txDetails: {
     flex: 1,
-    marginLeft: moderateScale(12, 0.3),
+    marginLeft: exactScale(12),
   },
   // Date subtitle in transaction item
   txDateText: {
-    marginTop: moderateScale(2, 0.3),
+    marginTop: exactScale(2),
   },
   // Amount adjusting display text (wallet/credits/coins)
   txAmountText: {
-    fontSize: moderateScale(14, 0.1),
+    fontSize: moderateScale(14),
     fontFamily: "Inter",
     fontWeight: "700",
   },
@@ -220,21 +220,21 @@ export const styles = StyleSheet.create({
   },
   // Dollar Coins image in transaction list row
   coinTxIcon: {
-    width: moderateScale(16, 0.3),
-    height: moderateScale(16, 0.3),
-    marginRight: moderateScale(4, 0.3),
+    width: exactScale(16),
+    height: exactScale(16),
+    marginRight: exactScale(4),
   },
   // Line separator between transaction list rows
   txSeparator: {
     height: 1,
     backgroundColor: "#919EAB33",
-    marginHorizontal: moderateScale(16, 0.3),
+    marginHorizontal: exactScale(16),
   },
   // Transaction circular icon wrapper
   txIconContainer: {
-    width: moderateScale(40, 0.3),
-    height: moderateScale(40, 0.3),
-    borderRadius: moderateScale(20, 0.3),
+    width: exactScale(40),
+    height: exactScale(40),
+    borderRadius: exactScale(20),
     alignItems: "center",
     justifyContent: "center",
   },
@@ -248,20 +248,20 @@ export const styles = StyleSheet.create({
   },
   // Transaction icon image inside the circle
   txIconImage: {
-    width: moderateScale(24, 0.3),
-    height: moderateScale(24, 0.3),
+    width: exactScale(24),
+    height: exactScale(24),
   },
   // Centered loading indicator inside transaction logs
   loadingIndicatorCenter: {
-    paddingVertical: moderateScale(24, 0.3),
+    paddingVertical: exactScale(24),
   },
   // Left aligned loading indicator inside dashboard info card
   loadingIndicatorLeft: {
     alignSelf: "flex-start",
-    marginVertical: moderateScale(4, 0.3),
+    marginVertical: exactScale(4),
   },
   // Inline loading indicator for coins tab balance
   loadingIndicatorInline: {
-    marginLeft: moderateScale(4, 0.3),
+    marginLeft: exactScale(4),
   },
 });

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextInput, Text, View, TextInputProps, ViewStyle, TextStyle } from "react-native";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export interface AppInputProps extends TextInputProps {
   label?: string;
@@ -53,42 +54,56 @@ export const AppInput = React.forwardRef<TextInput, AppInputProps>(({
   const hasError = !!error;
 
   return (
-    <View className={`w-full mb-4 ${containerClassName}`} style={containerStyle}>
+    <View className={`w-full ${containerClassName}`} style={[{ marginBottom: exactScale(16) }, containerStyle]}>
       {label && (
         <Text
-          className={`font-inter-medium text-[#222222] text-sm mb-1.5 ${labelClassName}`}
-          style={labelStyle}
+          className={`font-inter-medium text-[#222222] ${labelClassName}`}
+          style={[{ fontSize: moderateScale(14), marginBottom: exactScale(6) }, labelStyle]}
         >
           {label}
         </Text>
       )}
       <View
-        className={`flex-row items-center rounded-lg border px-3.5 py-3.5 bg-white ${
+        className={`flex-row items-center border bg-white ${
           hasError
             ? "border-[#DC2626]"
             : isFocused
             ? "border-[#0F7635]"
             : "border-[#919EAB33]"
         } ${!editable ? "bg-[#F9FAFB] opacity-60" : ""} ${inputContainerClassName}`}
-        style={inputContainerStyle}
+        style={[
+          {
+            height: exactScale(48),
+            borderRadius: exactScale(8),
+            paddingHorizontal: exactScale(14),
+          },
+          inputContainerStyle,
+        ]}
       >
-        {leftIcon && <View className="mr-2.5 justify-center items-center">{leftIcon}</View>}
+        {leftIcon && <View style={{ marginRight: exactScale(10) }} className="justify-center items-center">{leftIcon}</View>}
         <TextInput
           ref={ref}
           editable={editable}
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholderTextColor="#6A6A6A"
-          className={`flex-1 font-inter text-[#222222] text-[15px] p-0 m-0 ${inputClassName}`}
-          style={[{ textAlignVertical: "center" }, inputStyle]}
+          className={`flex-1 font-inter text-[#222222] p-0 m-0 ${inputClassName}`}
+          style={[
+            {
+              textAlignVertical: "center",
+              fontSize: moderateScale(15),
+              height: "100%",
+            },
+            inputStyle,
+          ]}
           {...props}
         />
-        {rightIcon && <View className="ml-2.5 justify-center items-center">{rightIcon}</View>}
+        {rightIcon && <View style={{ marginLeft: exactScale(10) }} className="justify-center items-center">{rightIcon}</View>}
       </View>
       {hasError && (
         <Text
-          className={`font-inter text-[#DC2626] text-xs mt-1.5 ${errorClassName}`}
-          style={errorStyle}
+          className={`font-inter text-[#DC2626] ${errorClassName}`}
+          style={[{ fontSize: moderateScale(12), marginTop: exactScale(6) }, errorStyle]}
         >
           {error}
         </Text>

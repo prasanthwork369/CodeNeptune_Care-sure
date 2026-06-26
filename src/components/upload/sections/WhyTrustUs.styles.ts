@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 export const styles = StyleSheet.create({
     sectionTitle: { fontSize: moderateScale(14, 0.1) },
-    icon:         { width: scale(28), height: scale(28) },
+    icon:         { width: exactScale(28), height: exactScale(28) },
     label:        { fontSize: moderateScale(13, 0.1) },
 });

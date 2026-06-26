@@ -1,5 +1,6 @@
 import { ReasonDropdown } from "@/src/components/ui/ReasonDropdown";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReasons";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
@@ -119,9 +120,9 @@ export function CancelOrderLayout() {
       
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 24,
-          paddingBottom: Math.max(bottomInset, 24) + 120, // Extra padding for absolute footer
+          paddingHorizontal: exactScale(20),
+          paddingTop: exactScale(24),
+          paddingBottom: Math.max(bottomInset, exactScale(24)) + exactScale(120), // Extra padding for absolute footer
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -130,27 +131,27 @@ export function CancelOrderLayout() {
           {/* Cancel Icon */}
           <View
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 32,
+              width: exactScale(64),
+              height: exactScale(64),
+              borderRadius: exactScale(32),
               backgroundColor: "#FFF1F1",
               alignItems: "center",
               justifyContent: "center",
-              marginBottom: 18,
+              marginBottom: exactScale(18),
             }}
           >
-            <icons.return_package width={30} height={30} />
+            <icons.return_package width={exactScale(30)} height={exactScale(30)} />
           </View>
 
           {/* Title */}
           <Text
             style={{
-              fontSize: 19,
+              fontSize: moderateScale(19),
               fontWeight: "700",
               color: "#222222",
               textAlign: "center",
-              marginBottom: 8,
-              lineHeight: 24,
+              marginBottom: exactScale(8),
+              lineHeight: moderateScale(24),
             }}
           >
             Cancel this order?
@@ -159,12 +160,12 @@ export function CancelOrderLayout() {
           {/* Subtitle */}
           <Text
             style={{
-              fontSize: 13,
+              fontSize: moderateScale(13),
               fontWeight: "400",
               color: "#6A6A6A",
               textAlign: "center",
-              marginBottom: 24,
-              lineHeight: 18,
+              marginBottom: exactScale(24),
+              lineHeight: moderateScale(18),
             }}
           >
             Please share the reason for cancellation
@@ -179,35 +180,35 @@ export function CancelOrderLayout() {
                 borderWidth: 1,
                 borderColor: "#E5E7EB",
                 backgroundColor: "#fff",
-                borderRadius: 14,
-                paddingVertical: 12,
-                paddingHorizontal: 14,
-                marginBottom: 20,
+                borderRadius: exactScale(14),
+                paddingVertical: exactScale(12),
+                paddingHorizontal: exactScale(14),
+                marginBottom: exactScale(20),
               }}
             >
               <View
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
+                  width: exactScale(40),
+                  height: exactScale(40),
+                  borderRadius: exactScale(20),
                   backgroundColor: "#FFF1F1",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: 12,
+                  marginRight: exactScale(12),
                 }}
               >
-                <icons.return_package width={18} height={18} />
+                <icons.return_package width={exactScale(18)} height={exactScale(18)} />
               </View>
               <View>
-                <Text style={{ fontSize: 14, fontWeight: "700", color: "#222222" }}>
+                <Text style={{ fontSize: moderateScale(14), fontWeight: "700", color: "#222222" }}>
                   Order #{orderNumber}
                 </Text>
                 <Text
                   style={{
-                    fontSize: 12,
+                    fontSize: moderateScale(12),
                     fontWeight: "400",
                     color: "#6A6A6A",
-                    marginTop: 2,
+                    marginTop: exactScale(2),
                   }}
                 >
                   {itemsCount} Items • ₹{totalAmount.toFixed(0)}
@@ -217,7 +218,7 @@ export function CancelOrderLayout() {
           )}
 
           {reasonsLoading ? (
-            <ActivityIndicator color="#0F7635" style={{ marginBottom: 20 }} />
+            <ActivityIndicator color="#0F7635" style={{ marginBottom: exactScale(20) }} />
           ) : (
             <View style={{ width: "100%", zIndex: 10 }}>
               <ReasonDropdown
@@ -250,19 +251,19 @@ export function CancelOrderLayout() {
               numberOfLines={3}
               style={{
                 width: "100%",
-                minHeight: 80,
+                minHeight: exactScale(80),
                 backgroundColor: "#fff",
                 borderWidth: 1,
                 borderColor: "#E5E7EB",
-                borderRadius: 10,
-                paddingHorizontal: 14,
-                paddingVertical: 12,
+                borderRadius: exactScale(10),
+                paddingHorizontal: exactScale(14),
+                paddingVertical: exactScale(12),
                 fontWeight: "400",
-                fontSize: 13,
+                fontSize: moderateScale(13),
                 color: "#1A1C1E",
                 textAlignVertical: "top",
-                marginTop: 12,
-                marginBottom: 4,
+                marginTop: exactScale(12),
+                marginBottom: exactScale(4),
               }}
             />
           )}
@@ -271,10 +272,10 @@ export function CancelOrderLayout() {
             <Text
               style={{
                 width: "100%",
-                marginTop: 8,
-                marginBottom: 4,
+                marginTop: exactScale(8),
+                marginBottom: exactScale(4),
                 fontWeight: "400",
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 color: "#DC2626",
               }}
             >
@@ -291,15 +292,15 @@ export function CancelOrderLayout() {
           bottom: 0,
           left: 0,
           right: 0,
-          paddingHorizontal: 20,
-          paddingTop: 16,
-          paddingBottom: Math.max(bottomInset, 20),
+          paddingHorizontal: exactScale(20),
+          paddingTop: exactScale(16),
+          paddingBottom: Math.max(bottomInset, exactScale(20)),
           backgroundColor: "#fff",
           borderTopWidth: 1,
           borderTopColor: "#F3F4F6",
         }}
       >
-        <View style={{ flexDirection: "row", gap: 10 }}>
+        <View style={{ flexDirection: "row", gap: exactScale(10) }}>
           <Touchable
             onPress={() => router.back()}
             activeOpacity={0.85}
@@ -307,8 +308,8 @@ export function CancelOrderLayout() {
             style={[
               {
                 flex: 1,
-                paddingVertical: 13,
-                borderRadius: 10,
+                paddingVertical: exactScale(13),
+                borderRadius: exactScale(10),
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: "#fff",
@@ -318,7 +319,7 @@ export function CancelOrderLayout() {
               isCancelling && { opacity: 0.5 },
             ]}
           >
-            <Text style={{ fontSize: 14, fontWeight: "400", color: "#111827" }}>
+            <Text style={{ fontSize: moderateScale(14), fontWeight: "400", color: "#111827" }}>
               Keep Order
             </Text>
           </Touchable>
@@ -330,8 +331,8 @@ export function CancelOrderLayout() {
             style={[
               {
                 flex: 1,
-                paddingVertical: 13,
-                borderRadius: 10,
+                paddingVertical: exactScale(13),
+                borderRadius: exactScale(10),
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: "#EF4444",
@@ -339,7 +340,7 @@ export function CancelOrderLayout() {
               isCancelling && { opacity: 0.7 },
             ]}
           >
-            <Text style={{ fontSize: 15, fontWeight: "700", color: "#fff" }}>
+            <Text style={{ fontSize: moderateScale(15), fontWeight: "700", color: "#fff" }}>
               {isCancelling ? "Cancelling..." : "Cancel Order"}
             </Text>
           </Touchable>
@@ -349,12 +350,12 @@ export function CancelOrderLayout() {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 14,
-            gap: 5,
+            marginTop: exactScale(14),
+            gap: exactScale(5),
           }}
         >
-          <icons.lock_grey width={14} height={14} />
-          <Text style={{ fontSize: 12, fontWeight: "400", color: "#9CA3AF" }}>
+          <icons.lock_grey width={exactScale(14)} height={exactScale(14)} />
+          <Text style={{ fontSize: moderateScale(12), fontWeight: "400", color: "#9CA3AF" }}>
             This action cannot be undone
           </Text>
         </View>

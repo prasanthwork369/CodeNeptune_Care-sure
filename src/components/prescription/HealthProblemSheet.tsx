@@ -12,6 +12,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface HealthProblemSheetProps {
   isVisible: boolean;
@@ -94,33 +95,33 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
       snapPoints={snapPoints}
       closeButtonOffset="75%"
     >
-      <View style={{ flex: 1, paddingTop: 8 }}>
+      <View style={{ flex: 1, paddingTop: exactScale(8) }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingHorizontal: 20,
-            paddingBottom: 12,
+            paddingHorizontal: exactScale(20),
+            paddingBottom: exactScale(12),
           }}
         >
-          <Text style={{ fontSize: 17, fontWeight: "700", color: "#1A1C1E" }}>
+          <Text style={{ fontSize: moderateScale(17), fontWeight: "700", color: "#1A1C1E" }}>
             {isCustomMode ? "Enter Health Problem" : "Select Health Problem"}
           </Text>
           <Touchable
             onPress={handleClose}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{ top: exactScale(10), bottom: exactScale(10), left: exactScale(10), right: exactScale(10) }}
           >
-            <icons.close_icon width={18} height={18} fill="#6A6A6A" />
+            <icons.close_icon width={exactScale(18)} height={exactScale(18)} fill="#6A6A6A" />
           </Touchable>
         </View>
 
         {isCustomMode ? (
           <View
             style={{
-              paddingHorizontal: 20,
-              paddingTop: 10,
-              paddingBottom: Math.max(adjustedBottom, 20),
+              paddingHorizontal: exactScale(20),
+              paddingTop: exactScale(10),
+              paddingBottom: Math.max(adjustedBottom, exactScale(20)),
             }}
           >
             <BottomSheetTextInput
@@ -132,9 +133,9 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               style={{
                 borderWidth: 1,
                 borderColor: "#E5E7EB",
-                borderRadius: 8,
-                padding: 14,
-                fontSize: 15,
+                borderRadius: exactScale(8),
+                padding: exactScale(14),
+                fontSize: moderateScale(15),
                 fontWeight: "400",
                 color: "#1A1C1E",
                 backgroundColor: "#fff",
@@ -145,9 +146,9 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               onPress={handleCustomSubmit}
               style={{
                 backgroundColor: "#0F7635",
-                borderRadius: 8,
-                paddingVertical: 14,
-                marginTop: 16,
+                borderRadius: exactScale(8),
+                paddingVertical: exactScale(14),
+                marginTop: exactScale(16),
                 alignItems: "center",
                 opacity: customText.trim() ? 1 : 0.5,
               }}
@@ -157,7 +158,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 style={{
                   color: "#fff",
                   fontWeight: "700",
-                  fontSize: 15,
+                  fontSize: moderateScale(15),
                 }}
               >
                 Confirm
@@ -167,8 +168,8 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               activeOpacity={0.8}
               onPress={() => setIsCustomMode(false)}
               style={{
-                marginTop: 12,
-                paddingVertical: 12,
+                marginTop: exactScale(12),
+                paddingVertical: exactScale(12),
                 alignItems: "center",
               }}
             >
@@ -176,7 +177,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 style={{
                   color: "#6A6A6A",
                   fontWeight: "600",
-                  fontSize: 14,
+                  fontSize: moderateScale(14),
                 }}
               >
                 Back to list
@@ -187,18 +188,18 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
           <>
             <View
               style={{
-                marginHorizontal: 20,
-                marginBottom: 12,
+                marginHorizontal: exactScale(20),
+                marginBottom: exactScale(12),
                 flexDirection: "row",
                 alignItems: "center",
                 borderWidth: 1,
                 borderColor: "#E5E7EB",
-                borderRadius: 12,
-                paddingHorizontal: 14,
+                borderRadius: exactScale(12),
+                paddingHorizontal: exactScale(14),
                 backgroundColor: "#fff",
               }}
             >
-              <icons.search width={16} height={16} />
+              <icons.search width={exactScale(16)} height={exactScale(16)} />
               <BottomSheetTextInput
                 value={query}
                 onChangeText={setQuery}
@@ -206,9 +207,9 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 placeholderTextColor="#6A6A6A"
                 style={{
                   flex: 1,
-                  paddingVertical: 12,
-                  paddingHorizontal: 8,
-                  fontSize: 14,
+                  paddingVertical: exactScale(12),
+                  paddingHorizontal: exactScale(8),
+                  fontSize: moderateScale(14),
                   fontWeight: "400",
                   color: "#1A1C1E",
                 }}
@@ -221,14 +222,14 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                   flex: 1,
                   alignItems: "center",
                   justifyContent: "center",
-                  minHeight: 200,
+                  minHeight: exactScale(200),
                 }}
               >
                 <ActivityIndicator size="large" color="#0F7635" />
                 <Text
                   style={{
-                    marginTop: 12,
-                    fontSize: 14,
+                    marginTop: exactScale(12),
+                    fontSize: moderateScale(14),
                     fontWeight: "500",
                     color: "#6A6A6A",
                   }}
@@ -242,10 +243,10 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 numColumns={3}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{
-                  paddingHorizontal: 16,
-                  paddingBottom: Math.max(adjustedBottom, 16) + 8,
+                  paddingHorizontal: exactScale(16),
+                  paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(8),
                 }}
-                columnWrapperStyle={{ gap: 10, marginBottom: 10 }}
+                columnWrapperStyle={{ gap: exactScale(10), marginBottom: exactScale(10) }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 renderItem={({ item }) => {
@@ -256,11 +257,11 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                       onPress={() => handleSelect(item)}
                       style={{
                         flex: 1,
-                        borderRadius: 14,
+                        borderRadius: exactScale(14),
                         alignItems: "center",
-                        paddingVertical: 12,
-                        paddingHorizontal: 8,
-                        gap: 8,
+                        paddingVertical: exactScale(12),
+                        paddingHorizontal: exactScale(8),
+                        gap: exactScale(8),
                         borderWidth: isSelected ? 1.5 : 1,
                         borderColor: isSelected ? "#0F7635" : "#E5E7EB",
                         backgroundColor: isSelected ? "#F0FFF6" : "#fff",
@@ -269,8 +270,8 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                       <View style={{ position: "relative" }}>
                         <View
                           style={{
-                            width: 44,
-                            height: 44,
+                            width: exactScale(44),
+                            height: exactScale(44),
                             alignItems: "center",
                             justifyContent: "center",
                           }}
@@ -281,10 +282,10 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                             item.icon.includes(".")) ? (
                             <RemoteIcon
                               uri={resolveAssetUrl(item.icon)}
-                              size={44}
+                              size={exactScale(44)}
                             />
                           ) : (
-                            <Text style={{ fontSize: 22, lineHeight: 28 }}>
+                            <Text style={{ fontSize: moderateScale(22), lineHeight: moderateScale(28) }}>
                               {item.icon}
                             </Text>
                           )}
@@ -293,9 +294,9 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                       <Text
                         numberOfLines={2}
                         style={{
-                          fontSize: 13,
+                          fontSize: moderateScale(13),
                           textAlign: "center",
-                          lineHeight: 16,
+                          lineHeight: moderateScale(16),
                           fontWeight: isSelected ? "600" : "500",
                           color: isSelected ? "#0F7635" : "#1A1C1E",
                         }}

@@ -1,36 +1,35 @@
-import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from 'react-native';
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
-    badge:           { fontSize: moderateScale(11, 0.3) },
+    badge:           { fontSize: moderateScale(11) },
     name: {
         fontWeight: '500',
-        fontSize: moderateScale(14, 0.3),
-        lineHeight: moderateScale(20, 0.3),
+        fontSize: moderateScale(14),
+        lineHeight: moderateScale(20),
         verticalAlign: 'middle',
         letterSpacing: 0,
     },
     description: {
         fontWeight: '400',
-        fontSize: exactScale(12),
-        lineHeight: exactScale(18),
+        fontSize: moderateScale(12),
+        lineHeight: moderateScale(18),
         letterSpacing: 0,
         verticalAlign: 'middle',
         color: '#6A6A6A',
     },
     price: {
         fontWeight: '700',
-        fontSize: exactScale(16),
-        lineHeight: exactScale(22.5),
+        fontSize: moderateScale(16),
+        lineHeight: moderateScale(22.5),
         letterSpacing: 0,
         verticalAlign: 'middle',
         color: '#0F172A',
     },
     mrp: {
         fontWeight: '400',
-        fontSize: exactScale(12),
-        lineHeight: exactScale(18),
+        fontSize: moderateScale(12),
+        lineHeight: moderateScale(18),
         letterSpacing: 0,
         verticalAlign: 'middle',
         textDecorationLine: 'line-through',
@@ -38,15 +37,15 @@ export const styles = StyleSheet.create({
     },
     addBtn: {
         fontWeight: '600',
-        fontSize: exactScale(14),
-        lineHeight: exactScale(16.84),
+        fontSize: moderateScale(14),
+        lineHeight: moderateScale(16.84),
         letterSpacing: 0,
         verticalAlign: 'middle',
     },
-    counter:         { fontSize: moderateScale(20, 0.3) },
-    counterVal:      { fontSize: moderateScale(14, 0.3) },
-    sectionTitle:    { fontSize: moderateScale(16, 0.3) },
-    sectionSubtitle: { fontSize: moderateScale(22, 0.3), lineHeight: moderateScale(30, 0.3) },
+    counter:         { fontSize: moderateScale(20) },
+    counterVal:      { fontSize: moderateScale(14) },
+    sectionTitle:    { fontSize: moderateScale(16) },
+    sectionSubtitle: { fontSize: moderateScale(22), lineHeight: moderateScale(30) },
     cartBtn: {
         width: exactScale(137),
         height: exactScale(40),

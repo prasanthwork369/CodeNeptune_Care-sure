@@ -25,8 +25,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-
 import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { orderStyles as s } from "./orders.styles";
 import { OrderTrackingModal } from "./OrderTrackingModal";
 import { OrderTrackingSkeleton } from "./OrderTrackingSkeleton";
@@ -67,43 +67,43 @@ function TrackingStepRow({
   const renderDot = () => {
     if (step.cancelled) {
       return (
-        <View style={{ width: 18, height: 18, borderRadius: 12, backgroundColor: "#DC2626", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#FFF", fontSize: 9, fontWeight: "700", lineHeight: 11 }}>✕</Text>
+        <View style={{ width: exactScale(18), height: exactScale(18), borderRadius: exactScale(9), backgroundColor: "#DC2626", alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: "#FFF", fontSize: moderateScale(9), fontWeight: "700", lineHeight: moderateScale(11) }}>✕</Text>
         </View>
       );
     }
     if (step.isActive) {
       // Current stop — solid green with white ring: clearly marks "you are here"
       return (
-        <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: "#16A34A", borderWidth: 3, borderColor: "#DCFCE7", alignItems: "center", justifyContent: "center" }}>
-          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#fff" }} />
+        <View style={{ width: exactScale(22), height: exactScale(22), borderRadius: exactScale(11), backgroundColor: "#16A34A", borderWidth: exactScale(3), borderColor: "#DCFCE7", alignItems: "center", justifyContent: "center" }}>
+          <View style={{ width: exactScale(8), height: exactScale(8), borderRadius: exactScale(4), backgroundColor: "#fff" }} />
         </View>
       );
     }
     if (step.completed) {
       return (
-        <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: "#16A34A", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#fff", fontSize: 9, fontWeight: "700", lineHeight: 11 }}>✓</Text>
+        <View style={{ width: exactScale(18), height: exactScale(18), borderRadius: exactScale(9), backgroundColor: "#16A34A", alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: "#fff", fontSize: moderateScale(9), fontWeight: "700", lineHeight: moderateScale(11) }}>✓</Text>
         </View>
       );
     }
     // Pending — empty grey ring
     return (
-      <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1.5, borderColor: "#D1D5DB", backgroundColor: "#fff" }} />
+      <View style={{ width: exactScale(16), height: exactScale(16), borderRadius: exactScale(8), borderWidth: exactScale(1.5), borderColor: "#D1D5DB", backgroundColor: "#fff" }} />
     );
   };
 
   return (
-    <Animated.View style={[{ flexDirection: "row", paddingHorizontal: 16 }, rowStyle]}>
-      <View style={{ width: 26, alignItems: "center", alignSelf: 'stretch' }}>
-        <View style={{ height: 24, justifyContent: "center", alignItems: "center" }}>
+    <Animated.View style={[{ flexDirection: "row", paddingHorizontal: exactScale(16) }, rowStyle]}>
+      <View style={{ width: exactScale(26), alignItems: "center", alignSelf: 'stretch' }}>
+        <View style={{ height: exactScale(24), justifyContent: "center", alignItems: "center" }}>
           {renderDot()}
         </View>
         {!isLast && (
-          <View style={{ width: 2, flex: 1, backgroundColor: lineColor }} />
+          <View style={{ width: exactScale(2), flex: 1, backgroundColor: lineColor }} />
         )}
       </View>
-      <View style={{ flex: 1, paddingLeft: 10, paddingBottom: isLast ? 4 : 10 }}>
+      <View style={{ flex: 1, paddingLeft: exactScale(10), paddingBottom: isLast ? exactScale(4) : exactScale(10) }}>
         <Text style={[s.labelSm, { color: textColor }]} className="font-inter-semibold">
           {step.title}
         </Text>
@@ -120,14 +120,16 @@ function TrackingStepRow({
 function SectionCard({
   children,
   className = "",
+  style,
 }: {
   children: React.ReactNode;
   className?: string;
+  style?: any;
 }) {
   return (
     <View
       className={`bg-white rounded-lg mx-base ${className}`}
-      style={{ borderWidth: 1, borderColor: "#F0F1F3", elevation: 0 }}
+      style={[{ borderWidth: 1, borderColor: "#F0F1F3", elevation: 0 }, style]}
     >
       {children}
     </View>
@@ -352,7 +354,8 @@ export const OrderTrackLayout: React.FC = () => {
         showBorder
         rightSlot={
           <Touchable
-            className="flex-row items-center gap-1"
+            className="flex-row items-center"
+            style={{ gap: exactScale(4) }}
             activeOpacity={0.7}
             onPress={() => downloadLocalAsset(invoiceAsset, "Invoice")}
           >
@@ -362,16 +365,16 @@ export const OrderTrackLayout: React.FC = () => {
             >
               Get Invoice
             </Text>
-            <icons.download width={20} height={20} fill="#0F7635" />
+            <icons.download width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
           </Touchable>
         }
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: 12,
-          paddingBottom: Math.max(adjustedBottom, 16) + 16,
-          gap: 10,
+          paddingTop: exactScale(12),
+          paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
+          gap: exactScale(10),
         }}
       >
         <View className="px-4 py-3 mx-base">
@@ -435,41 +438,52 @@ export const OrderTrackLayout: React.FC = () => {
                 style={{
                   borderTopWidth: 1,
                   borderColor: "#E5E7EB",
-                  marginHorizontal: 10,
+                  marginHorizontal: exactScale(10),
                   borderStyle: "dashed",
-                  marginTop: 4,
+                  marginTop: exactScale(4),
                 }}
               />
               <Touchable
-                className="flex-row items-center justify-center py-3"
+                className="flex-row items-center justify-center"
+                style={{ paddingVertical: exactScale(12) }}
                 activeOpacity={0.7}
                 onPress={() => setTrackingModalVisible(true)}
               >
                 <Text
-                  style={s.labelSm}
-                  className="font-inter-semibold text-brand-primary mr-1"
+                  style={[s.labelSm, { marginRight: exactScale(4) }]}
+                  className="font-inter-semibold text-brand-primary"
                 >
                   View all updates
                 </Text>
-                <icons.arrow_down_green width={18} height={18} />
+                <icons.arrow_down_green width={exactScale(18)} height={exactScale(18)} />
               </Touchable>
             </>
           )}
         </SectionCard>
 
         <SectionCard>
-          <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
+          <View
+            className="flex-row items-center justify-between"
+            style={{
+              paddingHorizontal: exactScale(16),
+              paddingTop: exactScale(16),
+              paddingBottom: exactScale(12),
+            }}
+          >
             <Text style={s.labelMd} className="font-inter-bold text-brand-text">
               Items Ordered ({items.length})
             </Text>
-            <View className="flex-row gap-2">
+            <View className="flex-row" style={{ gap: exactScale(8) }}>
               {order?.status === 7 && (
                 <Touchable
-                  className="rounded-full px-3 py-1 flex-row items-center"
+                  className="flex-row items-center"
                   style={{
-                    borderWidth: 1.33,
+                    borderWidth: exactScale(1.33),
                     borderColor: "#FDE047",
                     backgroundColor: "#FEF9C3",
+                    borderRadius: exactScale(20),
+                    paddingHorizontal: exactScale(12),
+                    paddingVertical: exactScale(4),
                   }}
                   activeOpacity={0.7}
                   onPress={() =>
@@ -479,10 +493,10 @@ export const OrderTrackLayout: React.FC = () => {
                     } as any)
                   }
                 >
-                  <icons.package_icon width={14} height={14} fill="#854D0E" />
+                  <icons.package_icon width={exactScale(14)} height={exactScale(14)} fill="#854D0E" />
                   <Text
-                    style={s.labelSm}
-                    className="font-inter-semibold text-brand-text ml-1.5"
+                    style={[s.labelSm, { marginLeft: exactScale(6) }]}
+                    className="font-inter-semibold text-brand-text"
                   >
                     Return
                   </Text>
@@ -490,23 +504,26 @@ export const OrderTrackLayout: React.FC = () => {
               )}
               {order?.status !== 7 && order?.status !== 0 && (
                 <Touchable
-                  className="rounded-full px-3 py-1 flex-row items-center"
+                  className="flex-row items-center"
                   style={{
-                    borderWidth: 1.33,
+                    borderWidth: exactScale(1.33),
                     borderColor: "#515F0014",
                     backgroundColor: "#FFFFDC",
+                    borderRadius: exactScale(20),
+                    paddingHorizontal: exactScale(12),
+                    paddingVertical: exactScale(4),
                     shadowColor: "#000000",
-                    shadowOffset: { width: 0, height: 5.33 },
+                    shadowOffset: { width: 0, height: exactScale(5.33) },
                     shadowOpacity: 0.05,
-                    shadowRadius: 32,
+                    shadowRadius: exactScale(32),
                   }}
                   activeOpacity={0.7}
                   onPress={() => router.push({ pathname: "/profile/orders/cancel", params: { orderId } } as any)}
                   disabled={isCancelling}
                 >
                   <Text
-                    style={s.labelSm}
-                    className="font-inter-semibold text-brand-text ml-1.5"
+                    style={[s.labelSm, { marginLeft: exactScale(6) }]}
+                    className="font-inter-semibold text-brand-text"
                   >
                     {isCancelling ? 'Cancelling...' : 'Cancel Order'}
                   </Text>
@@ -529,9 +546,18 @@ export const OrderTrackLayout: React.FC = () => {
                       params: { id: productId },
                     } as any);
                 }}
-                className="flex-row px-4 py-3"
+                className="flex-row"
+                style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(12) }}
               >
-                <View className="w-18 h-18 rounded-md border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center mr-3 overflow-hidden">
+                <View
+                  className="border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center overflow-hidden"
+                  style={{
+                    width: exactScale(72),
+                    height: exactScale(72),
+                    borderRadius: exactScale(8),
+                    marginRight: exactScale(12),
+                  }}
+                >
                   {item.medicineSnapshot?.image ? (
                     <Image
                       source={{ uri: item.medicineSnapshot.image }}
@@ -539,14 +565,14 @@ export const OrderTrackLayout: React.FC = () => {
                       resizeMode="contain"
                     />
                   ) : (
-                    <icons.placeholder width={50} height={50} />
+                    <icons.placeholder width={exactScale(50)} height={exactScale(50)} />
                   )}
                 </View>
                 <View className="flex-1">
                   <View className="flex-row justify-between items-start">
                     <Text
-                      style={s.labelSm}
-                      className="font-inter-semibold text-brand-text flex-1 pr-2"
+                      style={[s.labelSm, { paddingRight: exactScale(8) }]}
+                      className="font-inter-semibold text-brand-text flex-1"
                       numberOfLines={2}
                     >
                       {item.medicineSnapshot?.name ?? item.medicineId}
@@ -562,8 +588,8 @@ export const OrderTrackLayout: React.FC = () => {
                       </Text>
                       {item.medicineSnapshot?.mrp != null && (
                         <Text
-                          style={s.statusBadge}
-                          className="font-inter text-brand-subtext line-through mt-0.5"
+                          style={[s.statusBadge, { marginTop: exactScale(2) }]}
+                          className="font-inter text-brand-subtext line-through"
                         >
                           ₹
                           {parseFloat(
@@ -578,22 +604,24 @@ export const OrderTrackLayout: React.FC = () => {
                   {(item.medicineSnapshot?.brand ||
                     item.medicineSnapshot?.pack) && (
                       <Text
-                        style={s.labelSm}
-                        className="font-inter-medium text-brand-subtext mt-0.5"
+                        style={[s.labelSm, { marginTop: exactScale(2) }]}
+                        className="font-inter-medium text-brand-subtext"
                       >
                         {[item.medicineSnapshot.brand, item.medicineSnapshot.pack]
                           .filter(Boolean)
                           .join(" • ")}
                       </Text>
                     )}
-                  <View className="flex-row mt-2">
+                  <View className="flex-row" style={{ marginTop: exactScale(8) }}>
                     <View
                       style={{
-                        borderWidth: 1,
+                        borderWidth: exactScale(1),
                         borderColor: "#E2E8F0",
                         backgroundColor: "#F3F4F6",
+                        borderRadius: exactScale(4),
+                        paddingHorizontal: exactScale(10),
+                        paddingVertical: exactScale(2),
                       }}
-                      className="rounded-sm px-2.5 py-0.5"
                     >
                       <Text
                         style={s.statusBadge}
@@ -610,7 +638,7 @@ export const OrderTrackLayout: React.FC = () => {
                   style={{
                     borderTopWidth: 1,
                     borderColor: "#E5E7EB",
-                    marginHorizontal: 20,
+                    marginHorizontal: exactScale(20),
                     borderStyle: "dashed",
                   }}
                 />
@@ -621,16 +649,17 @@ export const OrderTrackLayout: React.FC = () => {
 
         <SectionCard>
           <Touchable
-            className="flex-row items-center justify-between px-4 py-4"
+            className="flex-row items-center justify-between"
+            style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}
             activeOpacity={0.7}
             onPress={() => setBillSheetVisible(true)}
           >
-            <View className="flex-row items-center gap-3">
+            <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
               <View
-                style={{ borderWidth: 1, borderColor: "#E2E8F0" }}
-                className="w-10 h-10 rounded-sm bg-[#F8FAFC] items-center justify-center"
+                style={{ borderWidth: 1, borderColor: "#E2E8F0", width: exactScale(40), height: exactScale(40), borderRadius: exactScale(4) }}
+                className="bg-[#F8FAFC] items-center justify-center"
               >
-                <icons.description width={20} height={20} fill="#64748B" />
+                <icons.description width={exactScale(20)} height={exactScale(20)} fill="#64748B" />
               </View>
               <View>
                 <Text
@@ -647,7 +676,7 @@ export const OrderTrackLayout: React.FC = () => {
                 </Text>
               </View>
             </View>
-            <View className="flex-row items-center gap-2">
+            <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
               <Text
                 style={s.labelLg}
                 className="font-inter-bold text-brand-text"
@@ -656,7 +685,7 @@ export const OrderTrackLayout: React.FC = () => {
                   ? `₹${Number(order.total).toFixed(2)}`
                   : "—"}
               </Text>
-              <icons.arrow_forward_ios width={14} height={14} fill="#6A6A6A" />
+              <icons.arrow_forward_ios width={exactScale(14)} height={exactScale(14)} fill="#6A6A6A" />
             </View>
           </Touchable>
         </SectionCard>
@@ -667,9 +696,12 @@ export const OrderTrackLayout: React.FC = () => {
             start={{ x: 0.5, y: 1 }}
             end={{ x: 0.5, y: 0 }}
           >
-            <View className="px-4 py-3 flex-row items-center justify-between">
-              <View className="flex-row items-center gap-2">
-                <icons.percent_discount width={18} height={18} fill="#0F7635" />
+            <View
+              className="flex-row items-center justify-between"
+              style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(12) }}
+            >
+              <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
+                <icons.percent_discount width={exactScale(18)} height={exactScale(18)} fill="#0F7635" />
                 <Text
                   style={s.labelMd}
                   className="font-inter-bold text-brand-text"
@@ -681,9 +713,9 @@ export const OrderTrackLayout: React.FC = () => {
                 colors={["#68D36C", "#329939"]}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
-                style={{ borderRadius: 6 }}
+                style={{ borderRadius: exactScale(6) }}
               >
-                <View className="px-2.5 py-1">
+                <View style={{ paddingHorizontal: exactScale(10), paddingVertical: exactScale(4) }}>
                   <Text
                     style={s.labelSm}
                     className="font-inter-bold text-white"
@@ -697,9 +729,9 @@ export const OrderTrackLayout: React.FC = () => {
               </LinearGradient>
             </View>
           </LinearGradient>
-          <View className="px-4 py-2">
+          <View style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(8) }}>
             {productDiscount > 0 && (
-              <View className="flex-row justify-between items-center py-2">
+              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
                 <Text
                   style={s.labelSm}
                   className="font-inter-medium text-[#6A6A6A]"
@@ -715,7 +747,7 @@ export const OrderTrackLayout: React.FC = () => {
               </View>
             )}
             {couponDiscount > 0 && (
-              <View className="flex-row justify-between items-center py-2">
+              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
                 <Text
                   style={s.labelSm}
                   className="font-inter-medium text-[#6A6A6A]"
@@ -731,7 +763,7 @@ export const OrderTrackLayout: React.FC = () => {
               </View>
             )}
             {walletDiscount > 0 && (
-              <View className="flex-row justify-between items-center py-2">
+              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
                 <Text
                   style={s.labelSm}
                   className="font-inter-medium text-[#6A6A6A]"
@@ -747,7 +779,7 @@ export const OrderTrackLayout: React.FC = () => {
               </View>
             )}
             {coinsDiscount > 0 && (
-              <View className="flex-row justify-between items-center py-2">
+              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
                 <Text
                   style={s.labelSm}
                   className="font-inter-medium text-[#6A6A6A]"
@@ -766,7 +798,7 @@ export const OrderTrackLayout: React.FC = () => {
               couponDiscount === 0 &&
               walletDiscount === 0 &&
               coinsDiscount === 0 && (
-                <View className="flex-row justify-between items-center py-2">
+                <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
                   <Text
                     style={s.labelSm}
                     className="font-inter-medium text-[#6A6A6A]"
@@ -784,12 +816,15 @@ export const OrderTrackLayout: React.FC = () => {
           </View>
         </View>
 
-        <SectionCard className="px-4 py-4">
-          <Text className="text-[14px] font-inter-semibold text-brand-text mb-3">
+        <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}>
+          <Text
+            className="font-inter-semibold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(12) }}
+          >
             Deliver To
           </Text>
           {order?.deliveryAddress ? (
-            <View style={{ gap: 2 }}>
+            <View style={{ gap: exactScale(2) }}>
               <Text
                 style={s.labelSm}
                 className="font-inter-bold text-brand-text"
@@ -797,8 +832,8 @@ export const OrderTrackLayout: React.FC = () => {
                 {order.deliveryAddress.name}
               </Text>
               <Text
-                style={s.labelSm}
-                className="font-inter text-brand-subtext leading-[18px] mt-1"
+                style={[s.labelSm, { lineHeight: moderateScale(18), marginTop: exactScale(4) }]}
+                className="font-inter text-brand-subtext"
               >
                 {[order.deliveryAddress.line1, order.deliveryAddress.line2]
                   .filter(Boolean)
@@ -819,13 +854,19 @@ export const OrderTrackLayout: React.FC = () => {
           )}
         </SectionCard>
 
-        <SectionCard className="px-4 py-4">
-          <Text className="text-[14px] font-inter-semibold text-brand-text mb-3">
+        <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}>
+          <Text
+            className="font-inter-semibold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(12) }}
+          >
             Payment Method
           </Text>
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 items-center justify-center bg-[#FFFFFF]">
-              <icons.credit_card width={24} height={24} fill="#0F7635" />
+          <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
+            <View
+              className="items-center justify-center bg-[#FFFFFF]"
+              style={{ width: exactScale(40), height: exactScale(40) }}
+            >
+              <icons.credit_card width={exactScale(24)} height={exactScale(24)} fill="#0F7635" />
             </View>
             <View>
               <Text
@@ -845,24 +886,27 @@ export const OrderTrackLayout: React.FC = () => {
         </SectionCard>
 
         {order?.clinicalData && (
-          <SectionCard className="px-4 py-4 mb-2">
+          <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16), marginBottom: exactScale(8) }}>
             <Text
-              style={s.labelMd}
-              className="font-inter-semibold text-[#0F1724] mb-3"
+              style={[s.labelMd, { color: "#0F1724", marginBottom: exactScale(12) }]}
+              className="font-inter-semibold"
             >
               Prescription Details
             </Text>
             <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-3">
+              <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
                 <View
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderWidth: 1,
+                    borderWidth: exactScale(1),
                     borderColor: "#919EAB33",
+                    width: exactScale(40),
+                    height: exactScale(40),
+                    borderRadius: exactScale(4),
                   }}
-                  className="w-10 h-10 rounded-sm items-center justify-center"
+                  className="items-center justify-center"
                 >
-                  <icons.prescription_green width={22} height={22} />
+                  <icons.prescription_green width={exactScale(22)} height={exactScale(22)} />
                 </View>
                 <View>
                   <Text
@@ -871,8 +915,8 @@ export const OrderTrackLayout: React.FC = () => {
                   >
                     Prescription Attached
                   </Text>
-                  <View className="flex-row items-center gap-1 mt-0.5">
-                    <icons.verified_user_round width={14} height={14} />
+                  <View className="flex-row items-center" style={{ gap: exactScale(4), marginTop: exactScale(2) }}>
+                    <icons.verified_user_round width={exactScale(14)} height={exactScale(14)} />
                     <Text
                       style={s.labelSm}
                       className="font-inter-medium text-[#16A34A]"
@@ -886,10 +930,12 @@ export const OrderTrackLayout: React.FC = () => {
                 onPress={() => setRxModalVisible(true)}
                 style={{
                   backgroundColor: "#FFFFFF",
-                  borderWidth: 1,
+                  borderWidth: exactScale(1),
                   borderColor: "#00000014",
+                  borderRadius: exactScale(6),
+                  paddingHorizontal: exactScale(16),
+                  paddingVertical: exactScale(6),
                 }}
-                className="rounded-md px-4 py-1.5"
                 activeOpacity={0.5}
               >
                 <Text
@@ -905,18 +951,23 @@ export const OrderTrackLayout: React.FC = () => {
       </ScrollView>
 
       <View
-        className="bg-white border-t border-[#919EAB33] px-4"
-        style={{ paddingTop: 12, paddingBottom: Math.max(adjustedBottom, 16) }}
+        className="bg-white border-t border-[#919EAB33]"
+        style={{ paddingHorizontal: exactScale(16), paddingTop: exactScale(12), paddingBottom: Math.max(adjustedBottom, exactScale(16)) }}
       >
         <Touchable
-          className="bg-brand-primary rounded-lg py-[15px] items-center"
+          className="items-center"
           activeOpacity={0.85}
           onPress={handleReOrder}
           disabled={isProceeding}
-          style={{ opacity: isProceeding ? 0.75 : 1 }}
+          style={{
+            backgroundColor: "#0F7635",
+            borderRadius: exactScale(8),
+            paddingVertical: exactScale(15),
+            opacity: isProceeding ? 0.75 : 1,
+          }}
         >
           {isProceeding ? (
-            <View className="flex-row items-center gap-2">
+            <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
               <ActivityIndicator size="small" color="#fff" />
               <Text style={s.labelMd} className="font-inter-semibold text-white">
                 Adding to cart...

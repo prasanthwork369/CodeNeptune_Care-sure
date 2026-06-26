@@ -96,7 +96,7 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
     ref,
     allowFontScaling: false,
     style: [
-      { fontFamily: undefined }, // Default reset
+      { fontFamily: undefined, includeFontPadding: false }, // Default reset
       sanitizedStyle,
     ],
   });

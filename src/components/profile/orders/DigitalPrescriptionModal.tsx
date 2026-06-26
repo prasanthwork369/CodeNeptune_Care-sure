@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { icons } from '@/src/constants/icons';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 interface MedicineItem {
     name: string;
@@ -86,71 +87,71 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
         <GorhomBottomSheet
             isVisible={visible}
             onClose={onClose}
-            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+            backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: exactScale(12), borderTopRightRadius: exactScale(12) }}
         >
                 <BottomSheetView
                     style={{
-                        paddingHorizontal: 20,
-                        paddingTop: 22,
-                        paddingBottom: Math.max(adjustedBottom, 16) + 16,
+                        paddingHorizontal: exactScale(20),
+                        paddingTop: exactScale(22),
+                        paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
                     }}
                 >
                     {/* Header Row with Title and Close Button */}
-                    <View className="flex-row justify-between items-center mb-5">
-                        <Text className="text-[18px] font-inter-bold text-[#1A1C1E]">
+                    <View className="flex-row justify-between items-center" style={{ marginBottom: exactScale(20) }}>
+                        <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(18) }}>
                             Verified Digital Prescription
                         </Text>
                         <Touchable
                             onPress={onClose}
                             activeOpacity={0.7}
                             style={{
-                                width: 30,
-                                height: 30,
-                                borderRadius: 15,
+                                width: exactScale(30),
+                                height: exactScale(30),
+                                borderRadius: exactScale(15),
                                 backgroundColor: 'rgba(0, 0, 0, 0.45)',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}
                         >
-                            <icons.close_icon width={11} height={11} fill="#FFFFFF" />
+                            <icons.close_icon width={exactScale(11)} height={exactScale(11)} fill="#FFFFFF" />
                         </Touchable>
                     </View>
 
                     <BottomSheetScrollView
                         showsVerticalScrollIndicator={false}
-                        style={{ maxHeight: Math.min(500, screenHeight - adjustedBottom - 220) }}
-                        className="pb-4"
+                        style={{ maxHeight: Math.min(exactScale(500), screenHeight - adjustedBottom - exactScale(220)) }}
+                        contentContainerStyle={{ paddingBottom: exactScale(16) }}
                     >
                         {/* Prescription Card Box */}
-                        <View className="bg-white rounded-[16px] border border-[#919EAB33] overflow-hidden shadow-sm mb-4">
+                        <View className="bg-white border border-[#919EAB33] overflow-hidden shadow-sm" style={{ borderRadius: exactScale(16), marginBottom: exactScale(16) }}>
                             {/* Green Top Border/Accent Band */}
-                            <View className="h-[6px] bg-[#0F7635]" />
+                            <View style={{ height: exactScale(6), backgroundColor: '#0F7635' }} />
 
-                            <View className="p-4">
+                            <View style={{ padding: exactScale(16) }}>
                                 {/* Doctor / Clinic Row */}
-                                <View className="flex-row justify-between items-start mb-4">
+                                <View className="flex-row justify-between items-start" style={{ marginBottom: exactScale(16) }}>
                                     {/* Left: Doctor Information */}
-                                    <View className="flex-1 pr-4">
-                                        <Text className="text-[15px] font-inter-bold text-[#1A1C1E]">
+                                    <View className="flex-1" style={{ paddingRight: exactScale(16) }}>
+                                        <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(15) }}>
                                             Dr. {docName}
                                         </Text>
-                                        <Text className="text-[9px] font-inter-semibold text-brand-subtext uppercase tracking-[0.5px] mt-0.5">
+                                        <Text className="font-inter-semibold text-brand-subtext uppercase" style={{ fontSize: moderateScale(9), letterSpacing: 0.5, marginTop: exactScale(2) }}>
                                             MEDICAL PRACTITIONER
                                         </Text>
-                                        <Text className="text-[11px] font-inter-semibold text-brand-text mt-2">
+                                        <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(11), marginTop: exactScale(8) }}>
                                             Reg No: {regNo}
                                         </Text>
                                     </View>
 
                                     {/* Right: Caresure Clinics Info */}
                                     <View className="items-end">
-                                        <Text className="text-[13px] font-inter-bold text-[#0F7635]">
+                                        <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(13) }}>
                                             CARESURE CLINICS
                                         </Text>
-                                        <Text className="text-[9px] font-inter-semibold text-brand-subtext mt-0.5">
+                                        <Text className="font-inter-semibold text-brand-subtext" style={{ fontSize: moderateScale(9), marginTop: exactScale(2) }}>
                                             Digital Health Service
                                         </Text>
-                                        <Text className="text-[9px] font-inter-semibold text-brand-subtext">
+                                        <Text className="font-inter-semibold text-brand-subtext" style={{ fontSize: moderateScale(9) }}>
                                             support@caresure.com
                                         </Text>
                                     </View>
@@ -174,61 +175,61 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
                                     }
 
                                     return (
-                                        <View key={pIndex} style={pIndex > 0 ? { marginTop: 22, borderTopWidth: 1, borderColor: '#EEEFF1', borderStyle: 'dashed', paddingTop: 18 } : {}}>
+                                        <View key={pIndex} style={pIndex > 0 ? { marginTop: exactScale(22), borderTopWidth: 1, borderColor: '#EEEFF1', borderStyle: 'dashed', paddingTop: exactScale(18) } : {}}>
                                             {/* Patient Details Grid Columns */}
-                                            <View className="bg-[#FAFAFA] border border-[#EEEFF1] rounded-xl px-3 py-2.5 flex-row justify-between">
+                                            <View className="bg-[#FAFAFA] border border-[#EEEFF1] flex-row justify-between" style={{ borderRadius: exactScale(12), paddingHorizontal: exactScale(12), paddingVertical: exactScale(10) }}>
                                                 {/* Column 1: Patient Name */}
                                                 <View className="flex-1">
-                                                    <Text className="text-[10px] font-inter-semibold text-brand-subtext uppercase tracking-[0.5px] mb-1">
+                                                    <Text className="font-inter-semibold text-brand-subtext uppercase" style={{ fontSize: moderateScale(10), letterSpacing: 0.5, marginBottom: exactScale(4) }}>
                                                         PATIENT NAME
                                                     </Text>
-                                                    <Text className="text-[13px] font-inter-bold text-[#1A1C1E]" numberOfLines={1}>
+                                                    <Text className="font-inter-bold text-[#1A1C1E]" numberOfLines={1} style={{ fontSize: moderateScale(13) }}>
                                                         {patientName}
                                                     </Text>
                                                 </View>
 
                                                 {/* Column 2: Age / Gender */}
-                                                <View className="flex-1 px-2 border-l border-r border-[#EEEFF1]">
-                                                    <Text className="text-[10px] font-inter-semibold text-brand-subtext uppercase tracking-[0.5px] mb-1">
+                                                <View className="flex-1 border-l border-r border-[#EEEFF1]" style={{ paddingHorizontal: exactScale(8) }}>
+                                                    <Text className="font-inter-semibold text-brand-subtext uppercase" style={{ fontSize: moderateScale(10), letterSpacing: 0.5, marginBottom: exactScale(4) }}>
                                                         AGE / GENDER
                                                     </Text>
-                                                    <Text className="text-[13px] font-inter-bold text-[#1A1C1E]">
+                                                    <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(13) }}>
                                                         {ageGenderDisplay}
                                                     </Text>
                                                 </View>
 
                                                 {/* Column 3: Date & Time */}
-                                                <View className="flex-1 pl-2">
-                                                    <Text className="text-[10px] font-inter-semibold text-brand-subtext uppercase tracking-[0.5px] mb-1">
+                                                <View className="flex-1" style={{ paddingLeft: exactScale(8) }}>
+                                                    <Text className="font-inter-semibold text-brand-subtext uppercase" style={{ fontSize: moderateScale(10), letterSpacing: 0.5, marginBottom: exactScale(4) }}>
                                                         DATE & TIME
                                                     </Text>
-                                                    <Text className="text-[11px] font-inter-bold text-[#1A1C1E]" numberOfLines={2}>
+                                                    <Text className="font-inter-bold text-[#1A1C1E]" numberOfLines={2} style={{ fontSize: moderateScale(11) }}>
                                                         {formatDate(clinicalData.approvedAt ?? clinicalData.timestamp)}
                                                     </Text>
                                                 </View>
                                             </View>
 
                                             {/* Prescription Green Symbol */}
-                                            <Text className="text-[24px] font-inter-extrabold text-[#0F7635] mt-3 mb-1.5 ml-1">
+                                            <Text className="font-inter-extrabold text-[#0F7635]" style={{ fontSize: moderateScale(24), marginTop: exactScale(12), marginBottom: exactScale(6), marginLeft: exactScale(4) }}>
                                                 Rₓ
                                             </Text>
 
                                             {/* Medicines Listing */}
-                                            <View className="gap-y-3">
+                                            <View style={{ gap: exactScale(12) }}>
                                                 {medicines.map((med, index) => (
                                                     <View key={index}>
-                                                        <View className="flex-row items-center justify-between py-1">
-                                                            <Text className="text-[14px] font-inter-bold text-[#1A1C1E] flex-1 pr-3" numberOfLines={2}>
+                                                        <View className="flex-row items-center justify-between" style={{ paddingVertical: exactScale(4) }}>
+                                                            <Text className="font-inter-bold text-[#1A1C1E] flex-1" numberOfLines={2} style={{ fontSize: moderateScale(14), paddingRight: exactScale(12) }}>
                                                                 {med.name}
                                                             </Text>
-                                                            <View className="bg-[#F4F6F8] rounded-[6px] px-2.5 py-1">
-                                                                <Text className="text-[11px] font-inter-bold text-[#6A6A6A]">
+                                                            <View className="bg-[#F4F6F8]" style={{ borderRadius: exactScale(6), paddingHorizontal: exactScale(10), paddingVertical: exactScale(4) }}>
+                                                                <Text className="font-inter-bold text-[#6A6A6A]" style={{ fontSize: moderateScale(11) }}>
                                                                     QTY: {med.quantity}
                                                                 </Text>
                                                             </View>
                                                         </View>
                                                         {index < medicines.length - 1 && (
-                                                            <View className="h-px bg-[#F4F6F8] mt-3" />
+                                                            <View style={{ height: 1, backgroundColor: '#F4F6F8', marginTop: exactScale(12) }} />
                                                         )}
                                                     </View>
                                                 ))}
@@ -238,17 +239,17 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
                                 })}
 
                                 {/* Compact Digitally Signed Rx Footer */}
-                                <View style={{ borderTopWidth: 1, borderColor: '#EEEFF1', borderStyle: 'solid', marginTop: 14, paddingTop: 12 }}>
-                                    <View className="flex-row justify-between items-center gap-3">
+                                <View style={{ borderTopWidth: 1, borderColor: '#EEEFF1', borderStyle: 'solid', marginTop: exactScale(14), paddingTop: exactScale(12) }}>
+                                    <View className="flex-row justify-between items-center" style={{ gap: exactScale(12) }}>
                                         {/* Left Side: Digitally Signed Label & Disclaimer */}
                                         <View className="flex-1">
-                                            <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763522] rounded-full px-2 py-0.5 self-start mb-1.5">
-                                                <icons.verified_user_round width={12} height={12} fill="#0F7635" />
-                                                <Text className="text-[9px] font-inter-bold text-[#0F7635] ml-1 uppercase tracking-[0.3px]">
+                                            <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763522]" style={{ borderRadius: exactScale(12), paddingHorizontal: exactScale(8), paddingVertical: exactScale(2), alignSelf: 'flex-start', marginBottom: exactScale(6) }}>
+                                                <icons.verified_user_round width={exactScale(12)} height={exactScale(12)} fill="#0F7635" />
+                                                <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(9), marginLeft: exactScale(4), letterSpacing: 0.3 }}>
                                                     DIGITALLY SIGNED RX
                                                 </Text>
                                             </View>
-                                            <Text className="text-[9px] font-inter text-brand-subtext leading-[13px]">
+                                            <Text className="font-inter text-brand-subtext" style={{ fontSize: moderateScale(9), lineHeight: moderateScale(13) }}>
                                                 This is a computer-generated prescription verified via CareSure Digital Health and does not require a physical signature.
                                             </Text>
                                         </View>
@@ -259,19 +260,19 @@ export const DigitalPrescriptionModal: React.FC<DigitalPrescriptionModalProps> =
                                                 <View className="items-center">
                                                     <Image
                                                         source={{ uri: signatureUrl }}
-                                                        style={{ width: 135, height: 46 }}
+                                                        style={{ width: exactScale(135), height: exactScale(46) }}
                                                         resizeMode="contain"
                                                     />
-                                                    <Text className="text-[7.5px] font-inter-bold text-[#919EAB] uppercase tracking-[0.5px] mt-1 text-center">
+                                                    <Text className="font-inter-bold text-[#919EAB] text-center" style={{ fontSize: moderateScale(7.5), letterSpacing: 0.5, marginTop: exactScale(4) }}>
                                                         AUTHORIZED SIGNATORY
                                                     </Text>
                                                 </View>
                                             ) : (
                                                 <View className="items-center">
-                                                    <Text className="text-[11px] font-inter-bold text-brand-text">
+                                                    <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(11) }}>
                                                         Dr. {docName}
                                                     </Text>
-                                                    <Text className="text-[7.5px] font-inter-bold text-[#919EAB] uppercase tracking-[0.5px] mt-0.5 text-center">
+                                                    <Text className="font-inter-bold text-[#919EAB] text-center" style={{ fontSize: moderateScale(7.5), letterSpacing: 0.5, marginTop: exactScale(2) }}>
                                                         AUTHORIZED SIGNATORY
                                                     </Text>
                                                 </View>

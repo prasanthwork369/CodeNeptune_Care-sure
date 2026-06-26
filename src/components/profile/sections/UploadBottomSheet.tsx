@@ -11,6 +11,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface UploadBottomSheetProps {
   visible: boolean;
@@ -58,7 +59,7 @@ const ActionRow = ({
         style={[s.actionRow, !last && s.actionRowBorder]}
       >
         <View style={[s.actionIcon, { backgroundColor: iconBg }]}>
-          <IconComponent width={20} height={20} color={iconColor} />
+          <IconComponent width={exactScale(20)} height={exactScale(20)} color={iconColor} />
         </View>
         <View style={s.actionText}>
           <Text style={s.actionLabel}>{label}</Text>
@@ -83,15 +84,15 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
       onClose={onClose}
       backgroundStyle={{
         backgroundColor: "#F5F5F7",
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: exactScale(12),
+        borderTopRightRadius: exactScale(12),
       }}
     >
       <BottomSheetView
         style={{
-          paddingHorizontal: 20,
-          paddingTop: 12,
-          paddingBottom: Math.max(adjustedBottom, 24),
+          paddingHorizontal: exactScale(20),
+          paddingTop: exactScale(12),
+          paddingBottom: Math.max(adjustedBottom, exactScale(24)),
         }}
       >
         <View style={s.actionsCard}>
@@ -125,17 +126,17 @@ const UploadBottomSheet: React.FC<UploadBottomSheetProps> = ({
 const s = StyleSheet.create({
   actionsCard: {
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderRadius: exactScale(20),
     overflow: "hidden",
-    marginBottom: 12,
+    marginBottom: exactScale(12),
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#EBEBEB",
   },
   actionRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(14),
     backgroundColor: "#fff",
   },
   actionRowBorder: {
@@ -143,38 +144,38 @@ const s = StyleSheet.create({
     borderBottomColor: "#F0F0F0",
   },
   actionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: exactScale(44),
+    height: exactScale(44),
+    borderRadius: exactScale(14),
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 14,
+    marginRight: exactScale(14),
   },
   actionText: { flex: 1 },
-  actionLabel: { fontSize: 15, fontWeight: "600", color: "#111" },
+  actionLabel: { fontSize: moderateScale(15), fontWeight: "600", color: "#111" },
   actionSublabel: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: "#9CA3AF",
-    marginTop: 2,
+    marginTop: exactScale(2),
   },
   actionArrow: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
+    width: exactScale(28),
+    height: exactScale(28),
+    borderRadius: exactScale(8),
     backgroundColor: "#F5F5F5",
     alignItems: "center",
     justifyContent: "center",
   },
   cancelBtn: {
     backgroundColor: "#fff",
-    borderRadius: 16,
-    paddingVertical: 15,
+    borderRadius: exactScale(16),
+    paddingVertical: exactScale(15),
     alignItems: "center",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#EBEBEB",
-    marginBottom: 4,
+    marginBottom: exactScale(4),
   },
-  cancelText: { fontSize: 15, fontWeight: "600", color: "#CF1A1A" },
+  cancelText: { fontSize: moderateScale(15), fontWeight: "600", color: "#CF1A1A" },
 });
 
 export default UploadBottomSheet;

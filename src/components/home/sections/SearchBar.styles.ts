@@ -1,28 +1,27 @@
-
 import { StyleSheet } from "react-native";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const SEARCH_ICON_SIZE = exactScale(18);
 
 export const styles = StyleSheet.create({
   cyclerText: {
     fontWeight: "500",
-    fontSize: exactScale(14),
-    lineHeight: exactScale(18),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   placeholderText: {
     fontWeight: "500",
-    fontSize: exactScale(14),
-    lineHeight: exactScale(18),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
   inputText: {
     fontWeight: "500",
-    fontSize: exactScale(14),
-    lineHeight: exactScale(18),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(18),
     letterSpacing: 0,
     verticalAlign: "middle",
   },
@@ -38,7 +37,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     shadowColor: "#919EAB",
     shadowOffset: { width: 0, height: exactScale(16) },
-    shadowRadius: 20,
+    shadowRadius: exactScale(20),
     shadowOpacity: 0.04,
     elevation: 1,
     opacity: 1,

@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 interface DatePickerModalProps {
   visible: boolean;
@@ -45,9 +46,9 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
       <GorhomBottomSheet
         isVisible={visible}
         onClose={onClose}
-        backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+        backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: exactScale(12), borderTopRightRadius: exactScale(12) }}
       >
-        <BottomSheetView style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }}>
+        <BottomSheetView style={{ paddingHorizontal: exactScale(20), paddingTop: exactScale(16), paddingBottom: exactScale(32) }}>
           <View style={s.header}>
             <Touchable onPress={onClose}>
               <Text style={s.cancelText}>Cancel</Text>
@@ -145,20 +146,20 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: exactScale(16),
   },
   cancelText: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '500',
     color: '#6B7280',
   },
   title: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
     color: '#111827',
   },
   doneText: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '600',
     color: '#0F7635',
   },
