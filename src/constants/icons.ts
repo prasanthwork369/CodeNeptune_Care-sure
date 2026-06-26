@@ -90,6 +90,7 @@ import home_add_light from "../../assets/icons/home_add_light.svg";
 import location_on from "../../assets/icons/location_on.svg";
 import location_pin from "../../assets/icons/location_pin.svg";
 import lock from "../../assets/icons/lock.svg";
+import lock_grey from "../../assets/icons/lock_grey.svg";
 import location_pin_light from "../../assets/icons/location_pin_light.svg";
 import logo from "../../assets/icons/logo.svg";
 import logout from "../../assets/icons/logout.svg";
@@ -231,6 +232,7 @@ export const icons = {
     location_pin,
     location_pin_light,
     lock,
+    lock_grey,
     business,
     business_light,
     note_book,

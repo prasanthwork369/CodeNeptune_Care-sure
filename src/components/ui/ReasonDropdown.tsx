@@ -1,7 +1,7 @@
-import { icons } from '@/src/constants/icons';
-import { Touchable } from '@/src/components/ui/Touchable';
-import React from 'react';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
+import React from "react";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 export interface ReasonOption {
   id: number | string;
@@ -38,22 +38,22 @@ export function ReasonDropdown({
   isOtherSelected = false,
   onSelectOther,
   disabled,
-  placeholder = 'Select a reason',
+  placeholder = "Select a reason",
   maxListHeight = 220,
 }: ReasonDropdownProps) {
   return (
-    <View style={{ width: '100%', zIndex: 10 }}>
+    <View style={{ width: "100%", zIndex: 10 }}>
       <Touchable
         onPress={onToggle}
         disabled={disabled || loading}
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
           borderWidth: 1,
-          borderColor: isOpen ? '#0F7635' : '#E5E7EB',
-          backgroundColor: '#fff',
+          borderColor: isOpen ? "#0F7635" : "#E5E7EB",
+          backgroundColor: "#fff",
           borderRadius: 10,
           paddingVertical: 14,
           paddingHorizontal: 14,
@@ -61,7 +61,12 @@ export function ReasonDropdown({
       >
         <Text
           numberOfLines={1}
-          style={{ flex: 1, fontSize: 13, fontWeight: '500', color: selectedLabel ? '#1A1C1E' : '#9CA3AF' }}
+          style={{
+            flex: 1,
+            fontSize: 13,
+            fontWeight: "500",
+            color: selectedLabel ? "#1A1C1E" : "#9CA3AF",
+          }}
         >
           {selectedLabel ?? placeholder}
         </Text>
@@ -72,7 +77,7 @@ export function ReasonDropdown({
             width={14}
             height={14}
             fill="#6B7280"
-            style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}
+            style={{ transform: [{ rotate: isOpen ? "180deg" : "0deg" }] }}
           />
         )}
       </Touchable>
@@ -80,24 +85,25 @@ export function ReasonDropdown({
       {isOpen && (
         <View
           style={{
-            position: 'absolute',
-            top: 52,
+            position: "absolute",
+            top: 54,
             left: 0,
             right: 0,
             zIndex: 999,
-            elevation: 10,
-            backgroundColor: '#fff',
-            borderRadius: 10,
+            elevation: 10, // needed on Android to float above sibling buttons
+            backgroundColor: "#fff",
+            borderRadius: 16,
             borderWidth: 1,
-            borderColor: '#E5E7EB',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.08,
-            shadowRadius: 12,
-            overflow: 'hidden',
+            borderColor: "#E5E7EB",
+            overflow: "hidden",
           }}
         >
-          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} nestedScrollEnabled style={{ maxHeight: maxListHeight }}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
+            style={{ maxHeight: maxListHeight }}
+          >
             {options.map((item) => {
               const isSelected = selectedId === item.id;
               return (
@@ -106,19 +112,28 @@ export function ReasonDropdown({
                   onPress={() => onSelect(item.id)}
                   disabled={disabled}
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingVertical: 13,
-                    paddingHorizontal: 14,
-                    backgroundColor: isSelected ? '#F1FFF6' : '#fff',
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 18,
+                    paddingHorizontal: 20,
+                    backgroundColor: isSelected ? "#F1FFF6" : "#fff",
                     borderBottomWidth: 1,
-                    borderBottomColor: '#F3F4F6',
+                    borderBottomColor: "#E5E7EB",
                   }}
                 >
-                  <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: isSelected ? '#0F7635' : '#1A1C1E' }}>
+                  <Text
+                    style={{
+                      flex: 1,
+                      fontSize: 16,
+                      fontWeight: "400",
+                      color: isSelected ? "#0F7635" : "#1A1C1E",
+                    }}
+                  >
                     {item.label}
                   </Text>
-                  {isSelected && <icons.check_circle width={16} height={16} fill="#0F7635" />}
+                  {isSelected && (
+                    <icons.check_circle width={18} height={18} fill="#0F7635" />
+                  )}
                 </Touchable>
               );
             })}
@@ -133,19 +148,26 @@ export function ReasonDropdown({
               onPress={onSelectOther}
               disabled={disabled}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingVertical: 13,
-                paddingHorizontal: 14,
-                backgroundColor: isOtherSelected ? '#F1FFF6' : '#fff',
-                borderTopWidth: 1,
-                borderTopColor: '#E5E7EB',
+                flexDirection: "row",
+                alignItems: "center",
+                paddingVertical: 18,
+                paddingHorizontal: 20,
+                backgroundColor: isOtherSelected ? "#F1FFF6" : "#fff",
               }}
             >
-              <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: isOtherSelected ? '#0F7635' : '#1A1C1E' }}>
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: 16,
+                  fontWeight: "400",
+                  color: isOtherSelected ? "#0F7635" : "#1A1C1E",
+                }}
+              >
                 Other
               </Text>
-              {isOtherSelected && <icons.check_circle width={16} height={16} fill="#0F7635" />}
+              {isOtherSelected && (
+                <icons.check_circle width={18} height={18} fill="#0F7635" />
+              )}
             </Touchable>
           )}
         </View>

@@ -524,14 +524,17 @@ export const OrderTrackLayout: React.FC = () => {
                   className="rounded-full px-3 py-1 flex-row items-center"
                   style={{
                     borderWidth: 1.33,
-                    borderColor: "#FEE2E2",
-                    backgroundColor: "#FEF2F2",
+                    borderColor: "#515F0014",
+                    backgroundColor: "#FFFFDC",
+                    shadowColor: "#000000",
+                    shadowOffset: { width: 0, height: 5.33 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 32,
                   }}
                   activeOpacity={0.7}
                   onPress={() => setCancelDialogVisible(true)}
                   disabled={isCancelling || cancelDialogVisible}
                 >
-                  <icons.return_package width={14} height={14} fill="#DC2626" />
                   <Text
                     style={s.labelSm}
                     className="font-inter-semibold text-brand-text ml-1.5"
@@ -999,6 +1002,14 @@ export const OrderTrackLayout: React.FC = () => {
         onClose={() => setCancelDialogVisible(false)}
         onConfirm={handleCancelOrder}
         loading={isCancelling}
+        orderNumber={
+          order?.orderId
+            ? String(order.orderId).replace(/[^a-zA-Z_]/g, "").slice(0, 2).toUpperCase() +
+              String(order.orderId).slice(-5)
+            : undefined
+        }
+        itemsCount={items.length}
+        totalAmount={toPay}
       />
 
       <AlertDialog
