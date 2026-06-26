@@ -11,6 +11,7 @@ export interface CustomerProfile {
   dateOfBirth?: string;
   gender?: string;
   isFirstTimeLogin?: boolean;
+  isCorporateUser?: boolean;
 }
 
 export interface UpdateProfilePayload {

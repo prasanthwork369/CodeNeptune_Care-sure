@@ -66,6 +66,7 @@ export function useCartCalculations() {
   const setBill = useCheckoutStore((s) => s.setBill);
   const { profile } = useProfile();
   const firstName = profile?.firstName ?? "You";
+  const isCorporateUser = profile?.isCorporateUser ?? false;
   const {
     location: storeLocation,
     reopenLocationSheet,
@@ -111,8 +112,11 @@ export function useCartCalculations() {
   const { data: settings } = useCartWalletSettings();
   const availableCoins = balance?.coinsBalance ?? 0;
   const walletBalance = balance != null ? Number(balance.walletBalance) : 0;
+  // Corporate Credits only ever apply to corporate users — gate on the
+  // profile flag so the section never appears for a regular customer even
+  // if a stray balance value exists.
   const corporateCreditsBalance =
-    balance != null ? Number(balance.corporateCredits ?? 0) : 0;
+    isCorporateUser && balance != null ? Number(balance.corporateCredits ?? 0) : 0;
   const corporateCreditsMinOrderValue = Number(
     balance?.minOrderValueForDiscount ?? 0,
   );
