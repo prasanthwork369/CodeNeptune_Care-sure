@@ -14,6 +14,7 @@ interface BillDetailsSheetProps {
   couponDiscount: number;
   walletDiscount: number;
   coinsDiscount: number;
+  corporateCreditsDiscount?: number;
   deliveryFee: number;
   handlingCharge: number;
   toPay: number;
@@ -28,6 +29,7 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
   couponDiscount,
   walletDiscount,
   coinsDiscount,
+  corporateCreditsDiscount = 0,
   deliveryFee,
   handlingCharge,
   toPay,
@@ -126,6 +128,20 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
                 className="font-inter-semibold text-[#0F7635]"
               >
                 - ₹{Number(coinsDiscount).toFixed(2)}
+              </Text>
+            </View>
+          )}
+
+          {corporateCreditsDiscount > 0 && (
+            <View className="flex-row justify-between mt-4">
+              <Text className="text-[14px] font-inter text-[#6A6A6A]">
+                Corporate Credits
+              </Text>
+              <Text
+                style={s.billSheetLabel}
+                className="font-inter-semibold text-[#0F7635]"
+              >
+                - ₹{Number(corporateCreditsDiscount).toFixed(2)}
               </Text>
             </View>
           )}

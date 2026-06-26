@@ -145,6 +145,9 @@ export interface CartWalletSectionProps {
   value: boolean;
   walletBalance: number;
   onToggle: (v: boolean) => void;
+  corporateCreditsValue?: boolean;
+  corporateCreditsBalance?: number;
+  onCorporateCreditsToggle?: (v: boolean) => void;
 }
 
 export interface CartCoinsSectionProps {

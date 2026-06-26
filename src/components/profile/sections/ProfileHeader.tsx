@@ -29,7 +29,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             style={{ alignItems: 'center', paddingTop: safeAreaTop + 8, paddingBottom: 60 }}
         >
             <View className="relative">
-                <View className="w-[88px] h-[88px] rounded-full bg-[#D0E8DA] items-center justify-center overflow-hidden border-2 border-white">
+                <View style={s.avatarImg} className="rounded-full bg-[#D0E8DA] items-center justify-center overflow-hidden border-2 border-white">
                     {localAvatar || profile?.avatarUrl ? (
                         <Image
                             source={{ uri: localAvatar ?? `${profile!.avatarUrl!}?v=${profile?.updatedAt ?? ''}` }}

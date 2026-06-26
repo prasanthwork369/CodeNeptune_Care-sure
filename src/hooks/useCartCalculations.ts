@@ -18,6 +18,7 @@ export function useCartCalculations() {
 
   const [walletOn, setWalletOn] = useState(false);
   const [coinsOn, setCoinsOn] = useState(false);
+  const [corporateCreditsOn, setCorporateCreditsOn] = useState(false);
 
   // Confetti trigger: incrementing this counter causes CartConfetti to remount
   // with a fresh DotLottie instance (autoplay=true), which is the only reliable
@@ -40,6 +41,11 @@ export function useCartCalculations() {
 
   const handleWalletToggle = (v: boolean) => {
     setWalletOn(v);
+    if (v) playConfetti();
+  };
+
+  const handleCorporateCreditsToggle = (v: boolean) => {
+    setCorporateCreditsOn(v);
     if (v) playConfetti();
   };
 
@@ -105,6 +111,8 @@ export function useCartCalculations() {
   const { data: settings } = useCartWalletSettings();
   const availableCoins = balance?.coinsBalance ?? 0;
   const walletBalance = balance != null ? Number(balance.walletBalance) : 0;
+  const corporateCreditsBalance =
+    balance != null ? Number(balance.corporateCredits ?? 0) : 0;
 
   const lines: CartLine[] = cartItems.map((item): CartLine => {
     // unitPrice from the backend is the MRP (strikethrough price); the
@@ -181,14 +189,31 @@ export function useCartCalculations() {
     ? Math.round(Math.min(walletBalance, subtotalBeforeWallet) * 10) / 10
     : 0;
 
+  // 4. Corporate Credits — applied last, covers whatever remains after wallet
+  const subtotalBeforeCorporateCredits = Math.max(
+    subtotalBeforeWallet - WALLET_DISCOUNT,
+    0,
+  );
+  const CORPORATE_CREDITS_DISCOUNT = corporateCreditsOn
+    ? Math.round(
+        Math.min(corporateCreditsBalance, subtotalBeforeCorporateCredits) * 10,
+      ) / 10
+    : 0;
+
   const toPay =
-    Math.round(Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0) * 10) / 10;
+    Math.round(
+      Math.max(
+        subtotalBeforeCorporateCredits - CORPORATE_CREDITS_DISCOUNT,
+        0,
+      ) * 10,
+    ) / 10;
 
   const savingsRows = [
     { label: "Product Discount", value: productSavings },
     { label: "Coupon Discount", value: COUPON_DISCOUNT },
     { label: "CareSure Coins", value: COINS_DISCOUNT },
     { label: "CareSure Wallet", value: WALLET_DISCOUNT },
+    { label: "Corporate Credits", value: CORPORATE_CREDITS_DISCOUNT },
   ];
   const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
   const remainingForFreeDelivery = Math.max(
@@ -228,6 +253,7 @@ export function useCartCalculations() {
         couponDiscount: COUPON_DISCOUNT,
         walletDiscount: WALLET_DISCOUNT,
         coinsDiscount: COINS_DISCOUNT,
+        corporateCreditsDiscount: CORPORATE_CREDITS_DISCOUNT,
         deliveryFee: DELIVERY_FEE,
         handlingCharge: HANDLING_CHARGE,
         totalSaved: totalSavings,
@@ -236,6 +262,7 @@ export function useCartCalculations() {
       {
         walletUsed: walletOn,
         coinsUsed: coinsOn,
+        corporateCreditsUsed: corporateCreditsOn,
         couponCode: appliedCoupon?.code ?? "",
       },
     );
@@ -260,9 +287,11 @@ export function useCartCalculations() {
     router,
     walletOn,
     coinsOn,
+    corporateCreditsOn,
     confettiTrigger,
     handleWalletToggle,
     handleCoinsToggle,
+    handleCorporateCreditsToggle,
     setCoinsOn,
     appliedCoupon,
     removeCoupon,
@@ -287,6 +316,7 @@ export function useCartCalculations() {
     coinsUsed,
     COINS_DISCOUNT,
     WALLET_DISCOUNT,
+    CORPORATE_CREDITS_DISCOUNT,
     toPay,
     savingsRows,
     totalSavings,
@@ -295,6 +325,7 @@ export function useCartCalculations() {
     featuredProducts,
     availableCoins,
     walletBalance,
+    corporateCreditsBalance,
     handleAddItem,
     handleProceed,
     setSelectedLocation,

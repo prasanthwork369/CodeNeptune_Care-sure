@@ -190,6 +190,7 @@ export const MedicineComparisonLayout: React.FC<
         couponDiscount: COUPON_DISCOUNT,
         walletDiscount: WALLET_DISCOUNT,
         coinsDiscount: COINS_DISCOUNT,
+        corporateCreditsDiscount: 0,
         deliveryFee: 0,
         handlingCharge: 0,
         totalSaved: totalSavings,
@@ -198,6 +199,7 @@ export const MedicineComparisonLayout: React.FC<
       {
         walletUsed: walletOn,
         coinsUsed: coinsOn,
+        corporateCreditsUsed: false,
         couponCode: appliedCoupon?.code ?? "",
       },
     );

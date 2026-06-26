@@ -1,16 +1,13 @@
+import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
-import {
-    BottomSheetScrollView,
-    BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
-import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
-import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Text, View, Platform } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
 
 interface AddPatientSheetProps {
@@ -47,6 +44,7 @@ export function AddPatientSheet({
   onDelete,
 }: AddPatientSheetProps) {
   const adjustedBottom = useAdjustedBottomInset();
+  const snapPoints = useMemo(() => ["80%"], []);
 
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -67,7 +65,7 @@ export function AddPatientSheet({
   const inFlight = useRef(false);
 
   const isEditMode = !!editPatient;
-  const mobileRef = useRef<React.ElementRef<typeof BottomSheetTextInput>>(null);
+  const mobileRef = useRef<React.ElementRef<typeof TextInput>>(null);
   const maxDob = getMaxDob();
 
   useEffect(() => {
@@ -140,8 +138,10 @@ export function AddPatientSheet({
       <GorhomBottomSheet
         isVisible={isVisible}
         onClose={onClose}
+        snapPoints={snapPoints}
+        closeButtonOffset="80%"
         keyboardBehavior="interactive"
-        keyboardBlurBehavior="restore"
+        keyboardBlurBehavior="none"
         backgroundStyle={{
           backgroundColor: "#fff",
           borderTopLeftRadius: 12,
@@ -149,7 +149,7 @@ export function AddPatientSheet({
         }}
       >
         <BottomSheetScrollView
-          style={{ paddingHorizontal: 20 }}
+          style={{ flex: 1, paddingHorizontal: 20 }}
           contentContainerStyle={{
             paddingTop: 24,
             paddingBottom: adjustedBottom + 24,
@@ -185,7 +185,7 @@ export function AddPatientSheet({
               errors.name ? { borderColor: "#EF4444" } : {},
             ]}
           >
-            <BottomSheetTextInput
+            <TextInput
               placeholder="Enter the name"
               placeholderTextColor="#6A6A6A"
               style={{
@@ -198,7 +198,7 @@ export function AddPatientSheet({
               value={name}
               onChangeText={(t) => {
                 setName(t);
-                setErrors((e) => ({ ...e, name: undefined }));
+                setErrors((e) => (e.name ? { ...e, name: undefined } : e));
               }}
               returnKeyType="next"
               blurOnSubmit={false}
@@ -240,7 +240,7 @@ export function AddPatientSheet({
             >
               +91 |
             </Text>
-            <BottomSheetTextInput
+            <TextInput
               ref={mobileRef}
               placeholder="Enter The number"
               placeholderTextColor="#6A6A6A"
@@ -258,7 +258,7 @@ export function AddPatientSheet({
               onChangeText={(t) => {
                 const d = t.replace(/\D/g, "");
                 setMobile(d);
-                setErrors((e) => ({ ...e, mobile: undefined }));
+                setErrors((e) => (e.mobile ? { ...e, mobile: undefined } : e));
               }}
             />
           </View>
@@ -326,7 +326,7 @@ export function AddPatientSheet({
           )}
           {relationship === "Other" && (
             <>
-              <BottomSheetTextInput
+              <TextInput
                 placeholder="Specify relationship"
                 placeholderTextColor="#6A6A6A"
                 style={[
@@ -340,7 +340,9 @@ export function AddPatientSheet({
                 value={otherRelationship}
                 onChangeText={(t) => {
                   setOtherRelationship(t);
-                  setErrors((e) => ({ ...e, relationship: undefined }));
+                  setErrors((e) =>
+                    e.relationship ? { ...e, relationship: undefined } : e,
+                  );
                 }}
                 autoCorrect={false}
                 autoFocus

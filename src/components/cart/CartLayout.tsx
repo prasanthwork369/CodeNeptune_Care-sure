@@ -27,9 +27,11 @@ export const CartLayout: React.FC = () => {
   const {
     walletOn,
     coinsOn,
+    corporateCreditsOn,
     confettiTrigger,
     handleWalletToggle,
     handleCoinsToggle,
+    handleCorporateCreditsToggle,
     appliedCoupon,
     removeCoupon,
     deliveryLocation,
@@ -50,6 +52,7 @@ export const CartLayout: React.FC = () => {
     COUPON_DISCOUNT,
     COINS_DISCOUNT,
     WALLET_DISCOUNT,
+    CORPORATE_CREDITS_DISCOUNT,
     toPay,
     savingsRows,
     totalSavings,
@@ -58,6 +61,7 @@ export const CartLayout: React.FC = () => {
     featuredProducts,
     availableCoins,
     walletBalance,
+    corporateCreditsBalance,
     handleAddItem,
     handleProceed,
     setSelectedLocation,
@@ -128,6 +132,9 @@ export const CartLayout: React.FC = () => {
             value={walletOn}
             walletBalance={walletBalance}
             onToggle={handleWalletToggle}
+            corporateCreditsValue={corporateCreditsOn}
+            corporateCreditsBalance={corporateCreditsBalance}
+            onCorporateCreditsToggle={handleCorporateCreditsToggle}
           />
         )}
 
@@ -167,6 +174,7 @@ export const CartLayout: React.FC = () => {
         couponDiscount={COUPON_DISCOUNT}
         walletDiscount={WALLET_DISCOUNT}
         coinsDiscount={COINS_DISCOUNT}
+        corporateCreditsDiscount={CORPORATE_CREDITS_DISCOUNT}
         deliveryFee={DELIVERY_FEE}
         handlingCharge={HANDLING_CHARGE}
         toPay={toPay}

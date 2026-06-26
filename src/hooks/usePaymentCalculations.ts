@@ -38,6 +38,7 @@ export function usePaymentCalculations() {
     bill,
     walletUsed,
     coinsUsed,
+    corporateCreditsUsed,
     couponCode,
     clear: clearCheckout,
   } = useCheckoutStore();
@@ -49,6 +50,7 @@ export function usePaymentCalculations() {
     couponDiscount: bill?.couponDiscount ?? 0,
     walletDiscount: bill?.walletDiscount ?? 0,
     coinsDiscount: bill?.coinsDiscount ?? 0,
+    corporateCreditsDiscount: bill?.corporateCreditsDiscount ?? 0,
     deliveryFee: bill?.deliveryFee ?? 0,
     handlingCharge: bill?.handlingCharge ?? 0,
     totalSaved: bill?.totalSaved ?? 0,
@@ -59,7 +61,8 @@ export function usePaymentCalculations() {
     billBreakdown.productDiscount +
     billBreakdown.couponDiscount +
     billBreakdown.walletDiscount +
-    billBreakdown.coinsDiscount;
+    billBreakdown.coinsDiscount +
+    billBreakdown.corporateCreditsDiscount;
 
   const [selectedMethod, setSelectedMethod] = useState("COD");
   const [showLocationSheet, setShowLocationSheet] = useState(false);
@@ -152,6 +155,7 @@ export function usePaymentCalculations() {
         preferences: {
           walletUsed: walletUsed,
           coinsUsed: coinsUsed,
+          corporateCreditsUsed: corporateCreditsUsed,
           livePriceSyncUsed: false,
         },
         couponCode: couponCode ?? "",

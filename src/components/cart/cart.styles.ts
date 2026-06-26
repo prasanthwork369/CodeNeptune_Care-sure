@@ -37,6 +37,7 @@ export const cartStyles = StyleSheet.create({
     walletIcon:   { width: scale(28), height: scale(28) },
     walletTitle:  { fontSize: moderateScale(14, 0.1) },
     walletSub:    { fontSize: moderateScale(12, 0.1) },
+    creditsRowDivider: { height: 1, backgroundColor: '#919EAB33' },
 
     // CartCoinsSection
     coinsTitle:   { fontSize: moderateScale(14, 0.1) },

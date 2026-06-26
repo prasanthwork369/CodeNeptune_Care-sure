@@ -47,6 +47,7 @@ export const HOME_IMAGES = {
   whatsapp: require("../../assets/images/icons/whatsapp.png"),
   wallet: require("../../assets/images/icons/wallet.png"),
   walletCredit: require("../../assets/images/wallet/wallet-credit.png"),
+  corporateCredit: require("../../assets/images/wallet/corporate-credit.png"),
   swap: require("../../assets/images/icons/swap.png"),
   prescriptions: require("../../assets/images/icons/prescriptions.png"),
   verifiedUser: require("../../assets/images/icons/verified-user.png"),
