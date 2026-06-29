@@ -65,6 +65,15 @@ import shopping_bag from "../../assets/icons/shopping_bag.svg";
 import telegram from "../../assets/icons/telegram.svg";
 import upload_file from "../../assets/icons/upload_file.svg";
 
+// Cancellation reasons SVGs
+import cancel_order_bag from "../../assets/icons/cancel_order_bag.svg";
+import cancel_mistake from "../../assets/icons/cancel_mistake.svg";
+import cancel_better_price from "../../assets/icons/cancel_better_price.svg";
+import cancel_delivery_long from "../../assets/icons/cancel_delivery_long.svg";
+import cancel_no_longer_needed from "../../assets/icons/cancel_no_longer_needed.svg";
+import cancel_item_not_required from "../../assets/icons/cancel_item_not_required.svg";
+import cancel_other_reason from "../../assets/icons/cancel_other_reason.svg";
+
 import account_balance_wallet from "../../assets/icons/account_balance_wallet.svg";
 import account_balance_wallet_green from "../../assets/icons/account_balance_wallet_green.svg";
 import add_photo from "../../assets/icons/add_photo.svg";
@@ -193,6 +202,13 @@ export const icons = {
     edit_icon,
     credit_card,
     camera_gray,
+    cancel_order_bag,
+    cancel_mistake,
+    cancel_better_price,
+    cancel_delivery_long,
+    cancel_no_longer_needed,
+    cancel_item_not_required,
+    cancel_other_reason,
 
     delete_icon,
     delete_red,

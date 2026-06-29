@@ -1,12 +1,11 @@
 import React from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { Skeleton } from '../../ui/Skeleton';
 import { exactScale } from "@/src/utils/exactScale";
 
 const CardSkeleton = () => {
-    const { width } = useWindowDimensions();
-    const cardWidth = width * 0.42;
+    const cardWidth = exactScale(164);
     const imageSize = cardWidth * 0.69;
     const cardHeight = imageSize * 1.5 + 160;
 

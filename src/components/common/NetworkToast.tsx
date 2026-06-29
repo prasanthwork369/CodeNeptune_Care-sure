@@ -6,10 +6,9 @@ import { icons } from '@/src/constants/icons';
 import NetInfo from '@react-native-community/netinfo';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Dimensions, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Text, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-
-const { width } = Dimensions.get('window');
+import { exactScale } from "@/src/utils/exactScale";
 
 const NetworkToast = () => {
     const { isConnected, isInternetReachable, setIsConnected, offlineAlertVisible, hideOfflineAlert } = useNetworkStore();
@@ -94,7 +93,7 @@ const NetworkToast = () => {
         >
             <View
                 className="bg-[#333333] flex-row items-center justify-between py-3 px-5 rounded-lg shadow-lg shadow-black/30"
-                style={{ width: width * 0.94 }}
+                style={{ width: exactScale(367) }}
             >
                 {isLoading ? (
                     <View className="flex-row items-center flex-1">

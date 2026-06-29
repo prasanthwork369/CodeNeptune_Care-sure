@@ -9,6 +9,7 @@ import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
 import { useNav } from "@/src/hooks/useNav";
 import { formatPackLabel } from "@/src/utils/packLabel";
+import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -151,7 +152,7 @@ export const ProductDetailsLayout: React.FC = () => {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: 180,
+                height: exactScale(180),
               }}
             />
 

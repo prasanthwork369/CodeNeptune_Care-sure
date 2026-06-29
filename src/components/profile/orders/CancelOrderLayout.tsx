@@ -1,6 +1,5 @@
-import { ReasonDropdown } from "@/src/components/ui/ReasonDropdown";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReasons";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
@@ -14,6 +13,97 @@ import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, TextInput, View, ScrollView } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+
+interface ReasonConfig {
+  icon: any;
+  bgColor: string;
+  iconColor: string;
+  defaultDescription: string;
+}
+
+const REASON_CONFIGS: Record<string, ReasonConfig> = {
+  "order by mistake": {
+    icon: icons.cancel_mistake,
+    bgColor: "#EAF7EE",
+    iconColor: "#0F7635",
+    defaultDescription: "I placed this order by mistake",
+  },
+  "found better price elsewhere": {
+    icon: icons.cancel_better_price,
+    bgColor: "#EEF4FF",
+    iconColor: "#3B82F6",
+    defaultDescription: "I found a better price",
+  },
+  "delivery time is too long": {
+    icon: icons.cancel_delivery_long,
+    bgColor: "#FFF3E6",
+    iconColor: "#F97316",
+    defaultDescription: "Delivery is longer than expected",
+  },
+  "no longer needed": {
+    icon: icons.cancel_no_longer_needed,
+    bgColor: "#F5F3FF",
+    iconColor: "#8B5CF6",
+    defaultDescription: "I no longer need these medicines",
+  },
+  "item(s) not required": {
+    icon: icons.cancel_item_not_required,
+    bgColor: "#FEF9C3",
+    iconColor: "#CA8A04",
+    defaultDescription: "I want to remove some or all item",
+  },
+  "item not required": {
+    icon: icons.cancel_item_not_required,
+    bgColor: "#FEF9C3",
+    iconColor: "#CA8A04",
+    defaultDescription: "I want to remove some or all item",
+  },
+  "other reason": {
+    icon: icons.cancel_other_reason,
+    bgColor: "#F3F4F6",
+    iconColor: "#4B5563",
+    defaultDescription: "Something else",
+  },
+  "other": {
+    icon: icons.cancel_other_reason,
+    bgColor: "#F3F4F6",
+    iconColor: "#4B5563",
+    defaultDescription: "Something else",
+  },
+  "customer request": {
+    icon: icons.cancel_mistake,
+    bgColor: "#EAF7EE",
+    iconColor: "#0F7635",
+    defaultDescription: "Customer no longer wants the order",
+  },
+  "wrong address": {
+    icon: icons.location_pin,
+    bgColor: "#EEF4FF",
+    iconColor: "#3B82F6",
+    defaultDescription: "Delivery address is incorrect or unreachable",
+  },
+  "duplicate order": {
+    icon: icons.cancel_item_not_required,
+    bgColor: "#FFF3E6",
+    iconColor: "#F97316",
+    defaultDescription: "Customer placed the same order twice",
+  },
+};
+
+function getReasonConfig(label: string) {
+  const normalized = label.toLowerCase().trim();
+  for (const key of Object.keys(REASON_CONFIGS)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return REASON_CONFIGS[key];
+    }
+  }
+  return {
+    icon: icons.cancel_other_reason,
+    bgColor: "#F3F4F6",
+    iconColor: "#4B5563",
+    defaultDescription: "Something else",
+  };
+}
 
 const OTHER_OPTION = "__other__";
 
@@ -120,242 +210,291 @@ export function CancelOrderLayout() {
       
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: exactScale(20),
-          paddingTop: exactScale(24),
-          paddingBottom: Math.max(bottomInset, exactScale(24)) + exactScale(120), // Extra padding for absolute footer
+          paddingHorizontal: scale(20),
+          paddingTop: verticalScale(24),
+          paddingBottom: Math.max(bottomInset, verticalScale(24)) + verticalScale(120), // Extra padding for absolute footer
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ alignItems: "center" }}>
-          {/* Cancel Icon */}
+        {/* Main Card */}
+        {!!orderNumber && (
           <View
             style={{
-              width: exactScale(64),
-              height: exactScale(64),
-              borderRadius: exactScale(32),
-              backgroundColor: "#FFF1F1",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: exactScale(18),
+              backgroundColor: "#fff",
+              borderRadius: scale(16),
+              padding: scale(20),
+              width: "100%",
+              borderWidth: 1,
+              borderColor: "#E5E7EB",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.03,
+              shadowRadius: 6,
+              elevation: 1,
             }}
           >
-            <icons.return_package width={exactScale(30)} height={exactScale(30)} />
-          </View>
-
-          {/* Title */}
-          <Text
-            style={{
-              fontSize: moderateScale(19),
-              fontWeight: "700",
-              color: "#222222",
-              textAlign: "center",
-              marginBottom: exactScale(8),
-              lineHeight: moderateScale(24),
-            }}
-          >
-            Cancel this order?
-          </Text>
-
-          {/* Subtitle */}
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              fontWeight: "400",
-              color: "#6A6A6A",
-              textAlign: "center",
-              marginBottom: exactScale(24),
-              lineHeight: moderateScale(18),
-            }}
-          >
-            Please share the reason for cancellation
-          </Text>
-
-          {!!orderNumber && (
+            {/* Top Order summary section */}
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 width: "100%",
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                backgroundColor: "#fff",
-                borderRadius: exactScale(14),
-                paddingVertical: exactScale(12),
-                paddingHorizontal: exactScale(14),
-                marginBottom: exactScale(20),
+                paddingBottom: verticalScale(16),
+                borderBottomWidth: 1,
+                borderBottomColor: "#F3F4F6",
               }}
             >
               <View
                 style={{
-                  width: exactScale(40),
-                  height: exactScale(40),
-                  borderRadius: exactScale(20),
-                  backgroundColor: "#FFF1F1",
+                  width: scale(40),
+                  height: scale(40),
+                  borderRadius: scale(20),
+                  backgroundColor: "#FFF1F2", // light pink bg
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: exactScale(12),
+                  marginRight: scale(12),
                 }}
               >
-                <icons.return_package width={exactScale(18)} height={exactScale(18)} />
+                <icons.cancel_order_bag width={moderateScale(20, 0.3)} height={moderateScale(20, 0.3)} fill="#E11D48" />
               </View>
               <View>
-                <Text style={{ fontSize: moderateScale(14), fontWeight: "700", color: "#222222" }}>
+                <Text style={{ fontSize: moderateScale(15, 0.3), fontWeight: "700", color: "#222222" }}>
                   Order #{orderNumber}
                 </Text>
                 <Text
                   style={{
-                    fontSize: moderateScale(12),
+                    fontSize: moderateScale(12, 0.3),
                     fontWeight: "400",
                     color: "#6A6A6A",
-                    marginTop: exactScale(2),
+                    marginTop: verticalScale(2),
                   }}
                 >
                   {itemsCount} Items • ₹{totalAmount.toFixed(0)}
                 </Text>
               </View>
             </View>
-          )}
 
-          {reasonsLoading ? (
-            <ActivityIndicator color="#0F7635" style={{ marginBottom: exactScale(20) }} />
-          ) : (
-            <View style={{ width: "100%", zIndex: 10 }}>
-              <ReasonDropdown
-                options={reasons}
-                isOpen={isDropdownOpen}
-                onToggle={() => setIsDropdownOpen((v) => !v)}
-                selectedLabel={selectedLabel}
-                selectedId={selectedReasonId}
-                onSelect={(id) => selectReason(id as number)}
-                includeOther
-                isOtherSelected={isOtherSelected}
-                onSelectOther={() => selectReason(OTHER_OPTION)}
-                disabled={isCancelling}
-                placeholder="Select the reason"
-              />
-            </View>
-          )}
-
-          {isOtherSelected && (
-            <TextInput
-              placeholder="Enter cancellation reason..."
-              placeholderTextColor="#9CA3AF"
-              value={otherReason}
-              onChangeText={(value) => {
-                setOtherReason(value);
-                if (error && value.trim()) setError("");
-              }}
-              editable={!isCancelling}
-              multiline
-              numberOfLines={3}
-              style={{
-                width: "100%",
-                minHeight: exactScale(80),
-                backgroundColor: "#fff",
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                borderRadius: exactScale(10),
-                paddingHorizontal: exactScale(14),
-                paddingVertical: exactScale(12),
-                fontWeight: "400",
-                fontSize: moderateScale(13),
-                color: "#1A1C1E",
-                textAlignVertical: "top",
-                marginTop: exactScale(12),
-                marginBottom: exactScale(4),
-              }}
-            />
-          )}
-
-          {!!error && (
+            {/* Title / Question */}
             <Text
               style={{
-                width: "100%",
-                marginTop: exactScale(8),
-                marginBottom: exactScale(4),
-                fontWeight: "400",
-                fontSize: moderateScale(12),
-                color: "#DC2626",
+                fontSize: moderateScale(14, 0.3),
+                fontWeight: "700",
+                color: "#222222",
+                marginTop: verticalScale(18),
+                marginBottom: verticalScale(12),
               }}
             >
-              {error}
+              Why do you want to cancel this order?
             </Text>
-          )}
-        </View>
+
+            {/* Options List */}
+            {reasonsLoading ? (
+              <ActivityIndicator color="#0F7635" style={{ marginVertical: verticalScale(20) }} />
+            ) : (
+              <View style={{ width: "100%" }}>
+                {(() => {
+                  const hasOther = reasons.some(
+                    (r) => r.label.toLowerCase().includes("other") || (r.id as any) === OTHER_OPTION
+                  );
+                  const displayReasons = [...reasons];
+                  if (!hasOther) {
+                    displayReasons.push({
+                      id: OTHER_OPTION,
+                      label: "Other Reason",
+                      description: "Something else",
+                    } as any);
+                  }
+
+                  return displayReasons.map((reason) => {
+                    const isSelected = selectedReasonId === reason.id;
+                    const config = getReasonConfig(reason.label);
+                    const IconComponent = config.icon;
+
+                    return (
+                      <View key={reason.id} style={{ width: "100%" }}>
+                        <Touchable
+                          onPress={() => selectReason(reason.id)}
+                          activeOpacity={0.7}
+                          disabled={isCancelling}
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            paddingVertical: verticalScale(12),
+                            width: "100%",
+                          }}
+                        >
+                          {/* Icon container */}
+                          <View
+                            style={{
+                              width: scale(40),
+                              height: scale(40),
+                              borderRadius: scale(20),
+                              backgroundColor: config.bgColor,
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginRight: scale(12),
+                            }}
+                          >
+                            {IconComponent && (
+                              <IconComponent
+                                width={moderateScale(20, 0.3)}
+                                height={moderateScale(20, 0.3)}
+                                fill={config.iconColor}
+                              />
+                            )}
+                          </View>
+
+                          {/* Labels */}
+                          <View style={{ flex: 1, marginRight: scale(8) }}>
+                            <Text
+                              style={{
+                                fontSize: moderateScale(14, 0.3),
+                                fontWeight: "600",
+                                color: "#222222",
+                              }}
+                            >
+                              {reason.label}
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: moderateScale(12, 0.3),
+                                color: "#9CA3AF",
+                                marginTop: verticalScale(2),
+                              }}
+                            >
+                              {reason.description || config.defaultDescription}
+                            </Text>
+                          </View>
+
+                          {/* Radio circle */}
+                          <View
+                            style={{
+                              width: scale(22),
+                              height: scale(22),
+                              borderRadius: scale(11),
+                              borderWidth: 1.5,
+                              borderColor: isSelected ? "#0F7635" : "#D1D5DB",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              backgroundColor: "#fff",
+                            }}
+                          >
+                            {isSelected && (
+                              <View
+                                style={{
+                                  width: scale(12),
+                                  height: scale(12),
+                                  borderRadius: scale(6),
+                                  backgroundColor: "#0F7635",
+                                }}
+                              />
+                            )}
+                          </View>
+                        </Touchable>
+
+                        {/* If this specific option is selected and it is Other, show input field inside the card */}
+                        {isSelected && isOtherSelected && (
+                          <TextInput
+                            placeholder="Enter cancellation reason..."
+                            placeholderTextColor="#9CA3AF"
+                            value={otherReason}
+                            onChangeText={(value) => {
+                              setOtherReason(value);
+                              if (error && value.trim()) setError("");
+                            }}
+                            editable={!isCancelling}
+                            multiline
+                            numberOfLines={3}
+                            style={{
+                              width: "100%",
+                              minHeight: verticalScale(80),
+                              backgroundColor: "#fff",
+                              borderWidth: 1,
+                              borderColor: "#E5E7EB",
+                              borderRadius: scale(10),
+                              paddingHorizontal: scale(14),
+                              paddingVertical: verticalScale(12),
+                              fontWeight: "400",
+                              fontSize: moderateScale(13, 0.3),
+                              color: "#1A1C1E",
+                              textAlignVertical: "top",
+                              marginTop: verticalScale(4),
+                              marginBottom: verticalScale(12),
+                            }}
+                          />
+                        )}
+                      </View>
+                    );
+                  });
+                })()}
+              </View>
+            )}
+
+            {/* Error display inside the card */}
+            {!!error && (
+              <Text
+                style={{
+                  width: "100%",
+                  marginTop: verticalScale(8),
+                  fontWeight: "400",
+                  fontSize: moderateScale(12, 0.3),
+                  color: "#DC2626",
+                }}
+              >
+                {error}
+              </Text>
+            )}
+          </View>
+        )}
       </ScrollView>
 
-      {/* Action buttons — Fixed Footer */}
+      {/* Action button — Fixed Footer */}
       <View
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          paddingHorizontal: exactScale(20),
-          paddingTop: exactScale(16),
-          paddingBottom: Math.max(bottomInset, exactScale(20)),
+          paddingHorizontal: scale(20),
+          paddingTop: verticalScale(16),
+          paddingBottom: Math.max(bottomInset, verticalScale(20)),
           backgroundColor: "#fff",
           borderTopWidth: 1,
           borderTopColor: "#F3F4F6",
         }}
       >
-        <View style={{ flexDirection: "row", gap: exactScale(10) }}>
-          <Touchable
-            onPress={() => router.back()}
-            activeOpacity={0.85}
-            disabled={isCancelling}
-            style={[
-              {
-                flex: 1,
-                paddingVertical: exactScale(13),
-                borderRadius: exactScale(10),
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#fff",
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-              },
-              isCancelling && { opacity: 0.5 },
-            ]}
-          >
-            <Text style={{ fontSize: moderateScale(14), fontWeight: "400", color: "#111827" }}>
-              Keep Order
-            </Text>
-          </Touchable>
-
-          <Touchable
-            onPress={handleConfirm}
-            activeOpacity={0.85}
-            disabled={isCancelling}
-            style={[
-              {
-                flex: 1,
-                paddingVertical: exactScale(13),
-                borderRadius: exactScale(10),
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#EF4444",
-              },
-              isCancelling && { opacity: 0.7 },
-            ]}
-          >
-            <Text style={{ fontSize: moderateScale(15), fontWeight: "700", color: "#fff" }}>
-              {isCancelling ? "Cancelling..." : "Cancel Order"}
-            </Text>
-          </Touchable>
-        </View>
+        <Touchable
+          onPress={handleConfirm}
+          activeOpacity={0.85}
+          disabled={isCancelling}
+          style={[
+            {
+              width: "100%",
+              paddingVertical: verticalScale(14),
+              borderRadius: scale(12),
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#D32F2F", // brand/mockup red
+            },
+            isCancelling && { opacity: 0.7 },
+          ]}
+        >
+          <Text style={{ fontSize: moderateScale(16, 0.3), fontWeight: "700", color: "#fff" }}>
+            {isCancelling ? "Cancelling..." : "Cancel Order"}
+          </Text>
+        </Touchable>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: exactScale(14),
-            gap: exactScale(5),
+            marginTop: verticalScale(14),
+            gap: scale(5),
           }}
         >
-          <icons.lock_grey width={exactScale(14)} height={exactScale(14)} />
-          <Text style={{ fontSize: moderateScale(12), fontWeight: "400", color: "#9CA3AF" }}>
+          <icons.lock_grey width={moderateScale(14, 0.3)} height={moderateScale(14, 0.3)} />
+          <Text style={{ fontSize: moderateScale(12, 0.3), fontWeight: "400", color: "#9CA3AF" }}>
             This action cannot be undone
           </Text>
         </View>

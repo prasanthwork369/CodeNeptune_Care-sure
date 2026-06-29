@@ -2,6 +2,7 @@ import { ApiMobileAdditionalData } from "@/src/api/medicine.api";
 import { HtmlContent } from "@/src/components/ui/HtmlContent";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useRef, useState } from "react";
 import {
     Dimensions,
@@ -18,6 +19,9 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { buildMoreAboutData } from "./useMoreAboutData";
+
+const CARD_WIDTH_COLLAPSED = exactScale(175);
+const CARD_WIDTH_EXPANDED = exactScale(280);
 
 interface MoreAboutSectionProps {
   medicineName: string;
@@ -109,10 +113,9 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
     if (isExpanding && cardXOffsets.current[id] !== undefined) {
       setTimeout(() => {
         const screenWidth = Dimensions.get("window").width;
-        const expandedWidth = 280;
         const centeredX = Math.max(
           0,
-          cardXOffsets.current[id] - (screenWidth - expandedWidth) / 2,
+          cardXOffsets.current[id] - (screenWidth - CARD_WIDTH_EXPANDED) / 2,
         );
         cardsScrollRef.current?.scrollTo({ x: centeredX, animated: true });
       }, 80);
@@ -123,7 +126,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
 
   return (
     <View className="mx-4 mb-6 mt-2">
-      <Text className="text-[17px] font-inter-bold text-brand-text mb-4">
+      <Text className="font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(17, 0.1) }}>
         More About {medicineName}
       </Text>
 
@@ -165,7 +168,8 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                   }}
                 >
                   <Text
-                    className={`text-[14px] font-inter-medium ${activeTab === tab.id ? "text-brand-primary" : "text-brand-subtext"}`}
+                    className={`font-inter-medium ${activeTab === tab.id ? "text-brand-primary" : "text-brand-subtext"}`}
+                    style={{ fontSize: moderateScale(14, 0.1) }}
                   >
                     {tab.label}
                   </Text>
@@ -178,8 +182,8 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                 {
                   position: "absolute",
                   bottom: 0,
-                  height: 3,
-                  borderRadius: 2,
+                  height: exactScale(3),
+                  borderRadius: exactScale(2),
                   backgroundColor: "#0F7635",
                 },
                 indicatorStyle,
@@ -195,7 +199,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
           layout={LinearTransition.duration(220).easing(Easing.out(Easing.quad))}
         >
           {activeTabData.heading ? (
-            <Text className="text-[16px] font-inter-medium text-brand-text mb-2">
+            <Text className="font-inter-medium text-brand-text mb-2" style={{ fontSize: moderateScale(16, 0.1) }}>
               {activeTabData.heading}
             </Text>
           ) : null}
@@ -208,7 +212,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
               horizontal
               showsHorizontalScrollIndicator={false}
               className="mt-4 pb-2"
-              contentContainerStyle={{ paddingRight: 16 }}
+              contentContainerStyle={{ paddingRight: exactScale(16) }}
               bounces={false}
               overScrollMode="never"
             >
@@ -222,17 +226,20 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                         Easing.out(Easing.quad),
                       )}
                       className="border border-[#919EAB33] rounded-[12px] p-3 mr-3 bg-white"
-                      style={{ width: isExpanded ? 280 : 175 }}
+                      style={{ width: isExpanded ? CARD_WIDTH_EXPANDED : CARD_WIDTH_COLLAPSED }}
                       onLayout={(e) => {
                         cardXOffsets.current[item.id] = e.nativeEvent.layout.x;
                       }}
                     >
-                      <View className="w-14 h-14 rounded-[8px] bg-[#F1EDFD] items-center justify-center mb-3">
+                      <View
+                        className="rounded-[8px] bg-[#F1EDFD] items-center justify-center mb-3"
+                        style={{ width: exactScale(56), height: exactScale(56) }}
+                      >
                         {item.image ? (
-                          <RemoteIcon uri={item.image} size={60} />
+                          <RemoteIcon uri={item.image} size={exactScale(60)} />
                         ) : null}
                       </View>
-                      <Text className="text-[14px] font-inter-semibold text-brand-text mb-2">
+                      <Text className="font-inter-semibold text-brand-text mb-2" style={{ fontSize: moderateScale(14, 0.1) }}>
                         {item.title}
                       </Text>
                       <View
@@ -240,22 +247,23 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                         style={{ backgroundColor: item.statusBg }}
                       >
                         <Text
-                          className="text-[10px] font-inter-semibold"
+                          className="font-inter-semibold"
                           numberOfLines={1}
                           adjustsFontSizeToFit
-                          style={{ color: item.statusColor }}
+                          style={{ color: item.statusColor, fontSize: moderateScale(10, 0.1) }}
                         >
                           {item.status}
                         </Text>
                       </View>
-                      <Text className="text-[12px] font-inter-medium text-brand-subtext leading-[18px]">
+                      <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(18, 0.1) }}>
                         {isExpanded
                           ? item.fullDescription
                           : item.shortDescription}
                         {item.expandable && (
                           <Text
                             onPress={() => toggleExpand(item.id)}
-                            className="text-[#0F7635] font-inter-bold text-sm"
+                            className="text-[#0F7635] font-inter-bold"
+                            style={{ fontSize: moderateScale(14, 0.1) }}
                           >
                             {isExpanded ? " Show less" : " Read More"}
                           </Text>

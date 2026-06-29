@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, ScrollView, useWindowDimensions } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { Skeleton } from '../ui/Skeleton';
+import { exactScale } from '@/src/utils/exactScale';
 
 export const ProductSkeleton = () => {
-    const { width } = useWindowDimensions();
-    const imgSize = width * 0.55;
+    const imgSize = exactScale(215);
 
     return (
         <ScrollView 

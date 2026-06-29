@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DatePickerModal } from '@/src/components/ui/DatePickerModal';
 import { Modal, Pressable, Text, View, Platform } from 'react-native';
+import { moderateScale } from '@/src/utils/exactScale';
 
 interface ReminderSheetProps {
     isVisible: boolean;
@@ -69,12 +70,12 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                         </View>
 
                         {/* Title */}
-                        <Text className="text-[18px] font-inter-bold text-brand-text text-center mb-1">
+                        <Text className="font-inter-bold text-brand-text text-center mb-1" style={{ fontSize: moderateScale(18, 0.1) }}>
                             {"We'll remind you at the right time"}
                         </Text>
 
                         {/* Subtitle */}
-                        <Text className="text-[13px] font-inter-medium text-brand-subtext text-center mb-5">
+                        <Text className="font-inter-medium text-brand-subtext text-center mb-5" style={{ fontSize: moderateScale(13, 0.1) }}>
                             When should we remind you
                         </Text>
 
@@ -95,8 +96,8 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                                         }}
                                     >
                                         <Text
-                                            className="text-[13px] font-inter-semibold"
-                                            style={{ color: isSelected ? '#FFFFFF' : '#222222' }}
+                                            className="font-inter-semibold"
+                                            style={{ color: isSelected ? '#FFFFFF' : '#222222', fontSize: moderateScale(13, 0.1) }}
                                         >
                                             {day} D
                                         </Text>
@@ -119,8 +120,8 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                                 }}
                             >
                                 <Text
-                                    className="text-[13px] font-inter-semibold"
-                                    style={{ color: selectedDays === null ? '#FFFFFF' : '#222222' }}
+                                    className="font-inter-semibold"
+                                    style={{ color: selectedDays === null ? '#FFFFFF' : '#222222', fontSize: moderateScale(13, 0.1) }}
                                 >
                                     Custom
                                 </Text>
@@ -133,7 +134,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                             style={{ backgroundColor: '#ECFDF5' }}
                         >
                             <icons.verified_user_outline width={16} height={16} />
-                            <Text className="text-[12px] font-inter-medium text-[#0F7635] pl-1 flex-1">
+                            <Text className="font-inter-medium text-[#0F7635] pl-1 flex-1" style={{ fontSize: moderateScale(12, 0.1) }}>
                                 {"You focus on feeling better, we'll handle the rest"}
                             </Text>
                         </View>
@@ -144,7 +145,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                             onPress={() => { onConfirm?.(reminderDate); onClose(); }}
                             className="bg-[#0F7635] rounded-xl py-4 items-center"
                         >
-                            <Text className="text-[16px] font-inter-semibold text-white">
+                            <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(16, 0.1) }}>
                                 Yes, Remind me
                             </Text>
                         </Touchable>

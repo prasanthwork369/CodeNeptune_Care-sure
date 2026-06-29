@@ -14,7 +14,7 @@ export const cartCounterStyles = StyleSheet.create({
     justifyContent: "center",
   },
   addBtn: {
-    width: exactScale(78),
+    minWidth: exactScale(78),
     height: exactScale(35),
     alignSelf: "flex-start",
     borderRadius: exactScale(6),

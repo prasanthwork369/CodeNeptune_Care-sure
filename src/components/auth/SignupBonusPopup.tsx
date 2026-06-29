@@ -599,7 +599,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
     testMode ? { wallet: 100, coins: 50 } : null,
   );
   const { balance } = useWalletBalance();
-  const corporateCredits = Number(balance?.corporateCredits || 2500);
+  const corporateCredits = Number(balance?.corporateCredits || 0);
   const [showConfetti, setShowConfetti] = useState(testMode);
   const confettiRef = useRef<any>(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -705,7 +705,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
 
   const hasWallet = !!bonusData && bonusData.wallet > 0;
   const hasCoins = !!bonusData && bonusData.coins > 0;
-  const hasCorporateCredits = corporateCredits > 0;
+  const hasCorporateCredits = !!user?.isCorporateUser && corporateCredits > 0;
 
   const handleClose = useCallback(() => {
     setIsOpen(false);

@@ -55,13 +55,13 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
 
             {/* Always With You Banner */}
             {footerHeartUrl ? (
-                <View style={{ paddingTop: width * 0.10, paddingBottom: 0, paddingHorizontal: exactScale(20) }}>
+                <View style={{ paddingTop: exactScale(39), paddingBottom: 0, paddingHorizontal: exactScale(20) }}>
                     {isSvg(footerHeartUrl) ? (
-                        <SvgUri uri={footerHeartUrl} width={width * 0.38} height={width * 0.30} />
+                        <SvgUri uri={footerHeartUrl} width={exactScale(148)} height={exactScale(117)} />
                     ) : (
                         <Image
                             source={{ uri: footerHeartUrl }}
-                            style={{ width: width * 0.38, height: width * 0.30 }}
+                            style={{ width: exactScale(148), height: exactScale(117) }}
                             contentFit="contain"
                             contentPosition="top"
                         />
@@ -71,10 +71,10 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ appContent, isLoading })
 
             {/* Skyline with text overlay at bottom-left */}
             {footerImageUrl ? (
-                <View style={{ width: width, height: width * 0.7, marginTop: exactScale(10) }}>
+                <View style={{ width: width, height: exactScale(273), marginTop: exactScale(10) }}>
                     <Image
                         source={{ uri: footerImageUrl }}
-                        style={{ width: width, height: width * 0.8 }}
+                        style={{ width: width, height: exactScale(312) }}
                         contentFit="cover"
                         contentPosition="bottom"
                     />

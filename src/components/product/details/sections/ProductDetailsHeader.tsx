@@ -4,6 +4,7 @@ import { colors } from "@/src/constants/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useNav } from "@/src/hooks/useNav";
 import { ProductDetailsHeaderProps } from "@/src/types/product";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Alert, Share, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -45,12 +46,12 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
     >
       <View
         className="flex-row items-center justify-between"
-        style={{ height: 48 }}
+        style={{ height: exactScale(48) }}
       >
         <Touchable
           onPress={handleBack}
           className="bg-white rounded-full border border-[#919EAB33] items-center justify-center"
-          style={{ width: 44, height: 44 }}
+          style={{ width: exactScale(44), height: exactScale(44) }}
           activeOpacity={0.7}
         >
           <icons.arrow_back width={18} height={18} fill={colors.text} />
@@ -60,7 +61,7 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
           <Touchable
             onPress={() => router.push("/search")}
             className="bg-white rounded-full border border-[#919EAB33] items-center justify-center"
-            style={{ width: 44, height: 44 }}
+            style={{ width: exactScale(44), height: exactScale(44) }}
             activeOpacity={0.7}
           >
             <icons.search width={22} height={22} />
@@ -69,7 +70,7 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
           <Touchable
             onPress={() => router.push("/(modal)/cart")}
             className="bg-white rounded-full border border-[#919EAB33] items-center justify-center relative"
-            style={{ width: 44, height: 44 }}
+            style={{ width: exactScale(44), height: exactScale(44) }}
             activeOpacity={0.7}
           >
             <icons.cart_svg width={24} height={24} />
@@ -79,16 +80,16 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
                   position: "absolute",
                   top: -2,
                   right: -2,
-                  minWidth: 16,
-                  height: 16,
-                  borderRadius: 8,
+                  minWidth: exactScale(16),
+                  height: exactScale(16),
+                  borderRadius: exactScale(8),
                   backgroundColor: "#FF3B30",
                   justifyContent: "center",
                   alignItems: "center",
                   paddingHorizontal: 3,
                 }}
               >
-                <Text className="text-[10px] font-inter-bold text-white leading-none">
+                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(10, 0.1) }}>
                   {cartCount}
                 </Text>
               </View>
@@ -98,7 +99,7 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
           <Touchable
             onPress={handleShare}
             className="bg-white rounded-full border border-[#919EAB33] items-center justify-center"
-            style={{ width: 44, height: 44 }}
+            style={{ width: exactScale(44), height: exactScale(44) }}
             activeOpacity={0.7}
           >
             <icons.share width={22} height={22} />

@@ -1,10 +1,9 @@
 import { useToastStore } from '@/src/store/toastStore';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Keyboard, Platform, Pressable, Text, View } from 'react-native';
+import { Animated, Keyboard, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-
-const { width } = Dimensions.get('window');
+import { exactScale } from "@/src/utils/exactScale";
 
 const CONFIG = {
   success: {
@@ -97,7 +96,7 @@ export const Toast: React.FC = () => {
     >
       <View
         style={{
-          width: width * 0.88,
+          width: exactScale(343),
           backgroundColor: c.cardBg,
           borderWidth: 1,
           borderColor: c.cardBorder,

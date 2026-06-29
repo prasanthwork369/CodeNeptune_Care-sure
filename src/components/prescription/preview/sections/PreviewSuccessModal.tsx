@@ -5,6 +5,7 @@ import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { Image } from 'expo-image';
 import { PreviewSuccessModalProps } from '@/src/types/prescription';
+import { moderateScale } from '@/src/utils/exactScale';
 
 export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
     visible,
@@ -26,10 +27,10 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                             <Image source={HOME_IMAGES.presSuccess} style={{ width: 36, height: 36 }} contentFit="contain" />
                         </View>
 
-                        <Text className="text-[18px] font-inter-bold text-[#222222] mb-1.5 text-center">
+                        <Text className="font-inter-bold text-[#222222] mb-1.5 text-center" style={{ fontSize: moderateScale(18, 0.1) }}>
                             Upload Successful!
                         </Text>
-                        <Text className="text-[13px] font-inter-medium text-[#6A6A6A] text-center leading-5 mb-6">
+                        <Text className="font-inter-medium text-[#6A6A6A] text-center leading-5 mb-6" style={{ fontSize: moderateScale(13, 0.1) }}>
                             Your prescription has been{"\n"}uploaded successfully
                         </Text>
 
@@ -39,7 +40,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                             activeOpacity={0.85}
                             onPress={onContinue}
                         >
-                            <Text style={{ fontSize: 15, fontWeight: '600', color: '#fff', letterSpacing: 0.5 }}>
+                            <Text style={{ fontSize: moderateScale(15, 0.1), fontWeight: '600', color: '#fff', letterSpacing: 0.5 }}>
                                 Great
                             </Text>
                         </Touchable>

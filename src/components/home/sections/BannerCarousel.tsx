@@ -54,7 +54,7 @@ const findCardBySlug = (link: string, categories?: CategoryCard[]): CategoryCard
 
 export const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners, categories, isLoading, isVisible = true }) => {
     const { width } = useWindowDimensions();
-    const bannerHeight = Math.round(width * 0.45);
+    const bannerHeight = Math.round(exactScale(176));
     const router = useNav();
     const carouselRef = useRef<ICarouselInstance>(null);
     const progressShared = useSharedValue(0);

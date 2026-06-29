@@ -1,10 +1,10 @@
 import { ANIMATIONS } from "@/src/constants/images";
+import { exactScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 
-const { width: SCREEN_W } = Dimensions.get("screen");
-const SIZE = SCREEN_W;
+const SIZE = exactScale(390);
 
 interface CartConfettiProps {
   /** Increment this number each time you want to play the animation.

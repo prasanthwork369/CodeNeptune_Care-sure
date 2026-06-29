@@ -29,6 +29,7 @@ import {
 } from "react-native";
 import Pdf from "react-native-pdf";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const FOLDER = "customers/prescriptions";
 const isPdf = (uri: string, type?: string) =>
@@ -359,7 +360,7 @@ export const PreviewLayout: React.FC = () => {
                 {isPdf(item.localUri, item.type) ? (
                   <View className="flex-1 items-center justify-center">
                     <icons.upload_file width={24} height={24} />
-                    <Text className="text-[8px] font-inter-bold text-[#1A1C1E] mt-1">
+                    <Text className="font-inter-bold text-[#1A1C1E] mt-1" style={{ fontSize: moderateScale(8, 0.1) }}>
                       PDF
                     </Text>
                   </View>
@@ -387,7 +388,7 @@ export const PreviewLayout: React.FC = () => {
           className="px-3 py-4 border-t border-[#919EAB1A] flex-row items-center justify-between"
           style={{ paddingBottom: Math.max(adjustedBottom + 8, 24) }}
         >
-          <Text className="text-[14px] font-inter-medium text-[#000000]">
+          <Text className="font-inter-medium text-[#000000]" style={{ fontSize: moderateScale(14, 0.1) }}>
             {items.length} / {MAX_FILES} Prescription
             {items.length !== 1 ? "s" : ""} Uploaded
           </Text>
@@ -399,7 +400,7 @@ export const PreviewLayout: React.FC = () => {
             onPress={handleSubmit}
           >
             {submitting && <ActivityIndicator size="small" color="#fff" />}
-            <Text className="text-white text-[14px] font-inter-semibold">
+            <Text className="text-white font-inter-semibold" style={{ fontSize: moderateScale(14, 0.1) }}>
               {submitting ? "Uploading..." : "Proceed"}
             </Text>
           </Touchable>
@@ -472,7 +473,7 @@ export const PreviewLayout: React.FC = () => {
             />
             <Text
               style={{
-                fontSize: 20,
+                fontSize: moderateScale(20, 0.1),
                 fontWeight: "700",
                 color: "#1A1C1E",
                 marginTop: 8,
@@ -492,7 +493,7 @@ export const PreviewLayout: React.FC = () => {
               <icons.verified_user width={14} height={14} fill="#0F7635" />
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: moderateScale(12, 0.1),
                   fontWeight: "500",
                   color: "#0F7635",
                   marginLeft: 6,
@@ -519,7 +520,7 @@ export const PreviewLayout: React.FC = () => {
             >
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: moderateScale(15, 0.1),
                   fontWeight: "600",
                   color: "#fff",
                   letterSpacing: 0.5,

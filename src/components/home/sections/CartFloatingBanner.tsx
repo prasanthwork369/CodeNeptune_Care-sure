@@ -6,7 +6,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -194,12 +194,16 @@ export const CartFloatingBanner = ({
 
                 <View className="flex-1 justify-center">
                   <Text
-                    className="text-[14px] font-inter-bold text-[#1A1C1E] leading-[18px]"
+                    className="font-inter-bold text-[#1A1C1E]"
                     numberOfLines={1}
+                    style={{ fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(18, 0.1) }}
                   >
                     {displayTitle}
                   </Text>
-                  <Text className="text-[14px] font-inter-bold text-[#1A1C1E] leading-[18px]">
+                  <Text
+                    className="font-inter-bold text-[#1A1C1E]"
+                    style={{ fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(18, 0.1) }}
+                  >
                     {displaySubtitle}
                   </Text>
                 </View>
@@ -255,7 +259,7 @@ export const CartFloatingBanner = ({
               {isClearing ? (
                 <ActivityIndicator size="small" color="#0F7635" />
               ) : (
-                <Text className="text-[14px] font-inter-semibold text-[#0F7635]">
+                <Text className="font-inter-semibold text-[#0F7635]" style={{ fontSize: moderateScale(14, 0.1) }}>
                   Remove
                 </Text>
               )}

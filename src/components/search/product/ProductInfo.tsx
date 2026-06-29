@@ -5,6 +5,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Image, Text, useWindowDimensions, View } from 'react-native';
+import { exactScale } from '@/src/utils/exactScale';
 
 interface ProductInfoProps {
     productId: string;
@@ -30,7 +31,7 @@ interface ProductInfoProps {
 export const ProductInfo: React.FC<ProductInfoProps> = ({ productId, medicineUuid, product }) => {
     const { width } = useWindowDimensions();
     const [activeIndex, setActiveIndex] = useState(0);
-    const imgSize = width * 0.55;
+    const imgSize = exactScale(215);
 
     const { count, increment, decrement, animations, isPending } = useCartActions({
         medicineId: medicineUuid ?? productId,

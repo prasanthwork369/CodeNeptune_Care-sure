@@ -2,10 +2,10 @@ import { HomeProductCard } from './HomeProductCard';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { Product } from '@/src/types/home';
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface ProductSectionProps {
     title: string;
@@ -40,8 +40,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
     onProductPress,
     disableCart,
 }) => {
-    const { width } = useWindowDimensions();
-    const cardWidth = width * 0.42;
+    const cardWidth = exactScale(164);
     const imageSize = cardWidth * 0.69;
     const cardHeight = imageSize * 1.5 + 160;
 
@@ -69,9 +68,9 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 {/* Header */}
                 <View className="px-5 flex-row justify-between items-center mb-6">
                     <View className="flex-1 pr-2">
-                        <Text className="text-[14px] font-inter-semibold text-brand-text">{title}</Text>
+                        <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(14, 0.1) }}>{title}</Text>
                         <View className="mt-0.5">
-                            <Text style={{ color: subtitleColor }} className="text-[18px] font-inter-bold leading-[28px]">
+                            <Text style={{ color: subtitleColor, fontSize: moderateScale(18, 0.1), lineHeight: moderateScale(28, 0.1) }} className="font-inter-bold">
                                 {subtitle}
                             </Text>
                             <LinearGradient

@@ -1,5 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { useHeroTransitionStore } from "@/src/store/heroTransitionStore";
 import { Product } from "@/src/types/home";
@@ -161,7 +162,7 @@ export const HomeProductCard: React.FC<Props> = ({
             disabled={isPending || disableCart}
             className="rounded-[10px] items-center justify-center bg-white"
             style={{
-              height: s.addToCart.fontSize * 2.8,
+              height: CART_BUTTON_HEIGHT,
               borderWidth: 1,
               borderColor: buttonColor,
             }}
@@ -177,7 +178,7 @@ export const HomeProductCard: React.FC<Props> = ({
           <View
             className="flex-row items-center justify-between rounded-[10px]"
             style={{
-              height: s.addToCart.fontSize * 2.8,
+              height: CART_BUTTON_HEIGHT,
               backgroundColor: buttonColor,
             }}
           >

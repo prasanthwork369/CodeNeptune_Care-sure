@@ -12,6 +12,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 import {
     PatientContactInfo,
     PatientEmptyState,
@@ -109,7 +110,7 @@ export const SelectPatientLayout: React.FC = () => {
               }}
               activeOpacity={0.8}
             >
-              <Text className="text-[13px] font-inter-bold text-[#0F7635]">
+              <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(13, 0.1) }}>
                 ADD PATIENT
               </Text>
             </Touchable>

@@ -1,7 +1,9 @@
 import { moderateScale } from "@/src/utils/exactScale";
 
 // Standard height for "Add to Cart" / "+ Add" buttons across product cards
-export const CART_BUTTON_HEIGHT = moderateScale(14, 0.25) * 2.8;
+// Must match HomeProductCard.styles.ts's addToCart.fontSize scaling (default factor) so
+// the button height stays consistent with the home page across all screen sizes.
+export const CART_BUTTON_HEIGHT = moderateScale(14) * 2.8;
 
 export const colors = {
     // Brand Colors

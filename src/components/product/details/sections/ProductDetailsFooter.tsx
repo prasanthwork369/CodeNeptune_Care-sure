@@ -1,15 +1,11 @@
+import { Touchable } from "@/src/components/ui/Touchable";
+import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
-import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { ProductDetailsFooterProps } from "@/src/types/product";
-import { Touchable } from "@/src/components/ui/Touchable";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
-import {
-    ActivityIndicator,
-    Animated,
-    Text,
-    View,
-} from "react-native";
+import { ActivityIndicator, Animated, Text, View } from "react-native";
 
 export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
   productId,
@@ -40,17 +36,29 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
   );
   const { totalItems, totalPrice } = useCart();
   const { slideAnim, opacityAnim } = animations;
+  // Shared height for the qty-counter and View Cart pill so they line up
+  // with each other (and roughly with CART_BUTTON_HEIGHT used in the idle state).
+  const FOOTER_CONTROL_HEIGHT = exactScale(48);
 
   if (hideAddButton && count === 0) return null;
 
   const priceBlock = (
-    <View style={{ flex: 1, marginRight: 12 }}>
-      <View className="flex-row items-baseline gap-x-2" style={{ flexWrap: 'wrap' }}>
-        <Text className="text-[20px] font-inter-extrabold text-[#111827]">
+    <View style={{ flex: 1, marginRight: exactScale(10), minWidth: 0 }}>
+      <View
+        className="flex-row items-baseline gap-x-1"
+        style={{ flexWrap: "wrap" }}
+      >
+        <Text
+          className="font-inter-extrabold text-[#111827]"
+          style={{ fontSize: moderateScale(20, 0.1) }}
+        >
           ₹{Number(product.price).toFixed(2)}
         </Text>
         {!!product.originalPrice && product.originalPrice > product.price && (
-          <Text className="text-[12px] font-inter-medium text-brand-subtext line-through">
+          <Text
+            className="font-inter-medium text-brand-subtext line-through"
+            style={{ fontSize: moderateScale(12, 0.1) }}
+          >
             ₹{Number(product.originalPrice).toFixed(2)}
           </Text>
         )}
@@ -60,15 +68,20 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             style={{ backgroundColor: "#DBE9FE" }}
           >
             <Text
-              className="text-[12px] font-inter-bold"
-              style={{ color: "#0559E8" }}
+              className="font-inter-bold"
+              style={{ color: "#0559E8", fontSize: moderateScale(12, 0.1) }}
             >
               {product.savingsPercent}% off
             </Text>
           </View>
         )}
       </View>
-      <Text className="text-[11px] font-inter-medium text-brand-subtext mt-0.5">
+      <Text
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        className="font-inter-medium text-brand-subtext mt-0.5"
+        style={{ fontSize: moderateScale(11, 0.1) }}
+      >
         (Inclusive of all Taxes)
       </Text>
     </View>
@@ -93,13 +106,20 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             onPress={increment}
             disabled={isPending}
             activeOpacity={0.85}
-            className="bg-brand-primary rounded-[12px] px-8 items-center justify-center"
-            style={{ minWidth: 140, height: CART_BUTTON_HEIGHT }}
+            className="bg-brand-primary rounded-[10px] px-8 items-center justify-center"
+            style={{
+              minWidth: exactScale(140),
+              height: CART_BUTTON_HEIGHT,
+              flexShrink: 0,
+            }}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text className="text-[16px] font-inter-bold text-white">
+              <Text
+                className="font-inter-bold text-white"
+                style={{ fontSize: moderateScale(16, 0.1) }}
+              >
                 Add to Cart
               </Text>
             )}
@@ -109,8 +129,8 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
         <>
           {/* Left — qty counter (outline, mirrors ComparisonBoard) */}
           <View
-            className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white h-[42px]"
-            style={{ width: 120 }}
+            className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white"
+            style={{ width: exactScale(120), height: FOOTER_CONTROL_HEIGHT }}
           >
             <Touchable
               onPress={decrement}
@@ -118,14 +138,17 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
               activeOpacity={0.7}
               className="flex-1 items-center justify-center h-full"
             >
-              <Text className="text-[24px] font-inter-semibold text-brand-text">
+              <Text
+                className="font-inter-semibold text-brand-text"
+                style={{ fontSize: moderateScale(24, 0.1) }}
+              >
                 −
               </Text>
             </Touchable>
             <View
               style={{
-                width: 32,
-                height: 24,
+                width: exactScale(32),
+                height: exactScale(24),
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -137,8 +160,9 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
                   style={{
                     transform: [{ translateY: slideAnim }],
                     opacity: opacityAnim,
+                    fontSize: moderateScale(16, 0.1),
                   }}
-                  className="text-[16px] font-inter-bold text-brand-text text-center px-2"
+                  className="font-inter-bold text-brand-text text-center px-2"
                 >
                   {count}
                 </Animated.Text>
@@ -150,27 +174,39 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
               activeOpacity={0.7}
               className="flex-1 items-center justify-center h-full"
             >
-              <Text className="text-[22px] font-inter-semibold text-brand-text">
+              <Text
+                className="font-inter-semibold text-brand-text"
+                style={{ fontSize: moderateScale(22, 0.1) }}
+              >
                 +
               </Text>
             </Touchable>
           </View>
 
-          {/* Right — cart summary pill (View Cart) */}
+          {/* Right — cart summary pill (View Cart), fills remaining width */}
           <Touchable
             onPress={onViewCart}
             activeOpacity={0.85}
-            className="flex-row items-center bg-brand-primary rounded-[12px] overflow-hidden"
-            style={{ height: 52 }}
+            className="flex-1 flex-row items-center justify-between bg-brand-primary rounded-[12px] overflow-hidden"
+            style={{
+              height: FOOTER_CONTROL_HEIGHT,
+              marginLeft: exactScale(12),
+            }}
           >
             {/* Price + items */}
-            <View className="px-4 justify-center" style={{ minWidth: 100 }}>
-              <Text className="text-[15px] font-inter-extrabold text-white">
+            <View className="px-4 justify-center">
+              <Text
+                className="font-inter-extrabold text-white"
+                style={{ fontSize: moderateScale(15, 0.1) }}
+              >
                 ₹{Number(totalPrice).toFixed(2)}
               </Text>
               <Text
-                className="text-[11px] font-inter-medium"
-                style={{ color: "rgba(255,255,255,0.75)" }}
+                className="font-inter-medium"
+                style={{
+                  color: "rgba(255,255,255,0.75)",
+                  fontSize: moderateScale(11, 0.1),
+                }}
               >
                 {totalItems} Item{totalItems !== 1 ? "s" : ""}
               </Text>
@@ -180,17 +216,25 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             <View
               style={{
                 width: 1,
-                height: 28,
+                height: exactScale(28),
                 backgroundColor: "rgba(255,255,255,0.3)",
               }}
             />
 
             {/* View Cart label */}
             <View className="px-4 justify-center items-center flex-row gap-x-1.5">
-              <Text className="text-[15px] font-inter-bold text-white">
+              <Text
+                className="font-inter-bold text-white"
+                style={{ fontSize: moderateScale(15, 0.1) }}
+              >
                 View Cart
               </Text>
-              <Text className="text-white text-[16px] font-inter-bold">›</Text>
+              <Text
+                className="text-white font-inter-bold"
+                style={{ fontSize: moderateScale(16, 0.1) }}
+              >
+                ›
+              </Text>
             </View>
           </Touchable>
         </>

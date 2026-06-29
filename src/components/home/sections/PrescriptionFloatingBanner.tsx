@@ -20,7 +20,7 @@ import Animated, {
 
 import { HOME_IMAGES } from "@/src/constants/images";
 import PRESCRIPTION_ICON from "../../../../assets/images/prescription/prescription-pending.png";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const DURATION = 250;
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
@@ -216,8 +216,9 @@ export const PrescriptionFloatingBanner = ({
                 }}
               >
                 <Text
-                  className="text-[13px] font-inter-bold text-[#1A1C1E] leading-[17px]"
+                  className="font-inter-bold text-[#1A1C1E]"
                   numberOfLines={1}
+                  style={{ fontSize: moderateScale(13, 0.1), lineHeight: moderateScale(17, 0.1) }}
                 >
                   {config.title}
                 </Text>
@@ -225,9 +226,9 @@ export const PrescriptionFloatingBanner = ({
                 {/* Subtitle + inline progress pill */}
                 <View style={{ flexDirection: "row", alignItems: "center", gap: exactScale(6) }}>
                   <Text
-                    className="text-[11px] font-inter-medium text-[#6A6A6A]"
+                    className="font-inter-medium text-[#6A6A6A]"
                     numberOfLines={1}
-                    style={{ flexShrink: 1 }}
+                    style={{ flexShrink: 1, fontSize: moderateScale(11, 0.1) }}
                   >
                     {subtitleText}
                   </Text>

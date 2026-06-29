@@ -11,6 +11,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 import { PrescriptionHistoryItem } from "./sections";
 
 const formatDate = (iso: string) => {
@@ -105,7 +106,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           onRefresh={refetch}
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center py-16">
-              <Text className="text-[14px] font-inter-medium text-brand-subtext">
+              <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(14, 0.1) }}>
                 No prescriptions found
               </Text>
             </View>

@@ -3,6 +3,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { Image, type ImageSource } from 'expo-image';
 import React from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { moderateScale } from '@/src/utils/exactScale';
 
 interface RemoveConfirmModalProps {
     visible: boolean;
@@ -52,12 +53,14 @@ export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
                     )}
 
                     <Text
-                        className={`text-[17px] font-inter-bold text-[#222222] mb-2 ${icon ? 'text-center' : ''}`}
+                        className={`font-inter-bold text-[#222222] mb-2 ${icon ? 'text-center' : ''}`}
+                        style={{ fontSize: moderateScale(17, 0.1) }}
                     >
                         {title}
                     </Text>
                     <Text
-                        className={`text-[13px] font-inter-medium text-[#6A6A6A] mb-6 leading-5 ${icon ? 'text-center' : ''}`}
+                        className={`font-inter-medium text-[#6A6A6A] mb-6 leading-5 ${icon ? 'text-center' : ''}`}
+                        style={{ fontSize: moderateScale(13, 0.1) }}
                     >
                         {message}
                     </Text>
@@ -67,7 +70,7 @@ export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
                             className="flex-1 items-center justify-center py-3.5 rounded-lg border border-[#919EAB33]"
                             onPress={onCancel}
                         >
-                            <Text className="text-[14px] font-inter-semibold text-[#222222]">{cancelLabel}</Text>
+                            <Text className="font-inter-semibold text-[#222222]" style={{ fontSize: moderateScale(14, 0.1) }}>{cancelLabel}</Text>
                         </Touchable>
                         <Touchable
                             activeOpacity={0.85}
@@ -76,7 +79,7 @@ export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
                             onPress={onConfirm}
                         >
                             {!icon && <icons.delete_red width={16} height={16} fill="#FFFFFF" />}
-                            <Text className="text-[14px] font-inter-semibold text-white">{confirmLabel}</Text>
+                            <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(14, 0.1) }}>{confirmLabel}</Text>
                         </Touchable>
                     </View>
                 </View>

@@ -4,6 +4,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { moderateScale } from '@/src/utils/exactScale';
 
 interface FileTooLargeModalProps {
     visible: boolean;
@@ -35,10 +36,10 @@ export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
                         <Image source={HOME_IMAGES.prescriptionInfo} style={{ width: 36, height: 36 }} contentFit="contain" />
                     </View>
 
-                    <Text className="text-[18px] font-inter-bold text-[#0F1724] mb-1.5 text-center">
+                    <Text className="font-inter-bold text-[#0F1724] mb-1.5 text-center" style={{ fontSize: moderateScale(18, 0.1) }}>
                         Oops! File is too large
                     </Text>
-                    <Text className="text-[13px] font-inter-medium text-[#6A6A6A] text-center leading-5 mb-5">
+                    <Text className="font-inter-medium text-[#6A6A6A] text-center leading-5 mb-5" style={{ fontSize: moderateScale(13, 0.1) }}>
                         Upload a file under {maxSizeLabel} to continue
                     </Text>
 
@@ -48,18 +49,18 @@ export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
                                 <View className="w-7 h-7 rounded-[6px] bg-[#FDEAEA] items-center justify-center mr-2.5">
                                     <Image source={HOME_IMAGES.prescriptionInstructions} style={{ width: 16, height: 16 }} contentFit="contain" />
                                 </View>
-                                <Text className="text-[13px] font-inter-medium text-[#0F1724]">Selected file size</Text>
+                                <Text className="font-inter-medium text-[#0F1724]" style={{ fontSize: moderateScale(13, 0.1) }}>Selected file size</Text>
                             </View>
-                            <Text className="text-[13px] font-inter-bold text-[#E0383D]">{selectedSizeLabel}</Text>
+                            <Text className="font-inter-bold text-[#E0383D]" style={{ fontSize: moderateScale(13, 0.1) }}>{selectedSizeLabel}</Text>
                         </View>
                         <View className="flex-row items-center justify-between py-3">
                             <View className="flex-row items-center">
                                 <View className="w-7 h-7 rounded-full bg-[#E8F5E9] items-center justify-center mr-2.5">
                                     <icons.verified_user width={16} height={16} fill="#0F7635" />
                                 </View>
-                                <Text className="text-[13px] font-inter-medium text-[#0F1724]">Maximum allowed</Text>
+                                <Text className="font-inter-medium text-[#0F1724]" style={{ fontSize: moderateScale(13, 0.1) }}>Maximum allowed</Text>
                             </View>
-                            <Text className="text-[13px] font-inter-bold text-brand-primary">{maxSizeLabel}</Text>
+                            <Text className="font-inter-bold text-brand-primary" style={{ fontSize: moderateScale(13, 0.1) }}>{maxSizeLabel}</Text>
                         </View>
                     </View>
 
@@ -68,7 +69,7 @@ export const FileTooLargeModal: React.FC<FileTooLargeModalProps> = ({
                         activeOpacity={0.85}
                         className="w-full bg-brand-primary rounded-lg py-3.5 items-center"
                     >
-                        <Text className="text-[15px] font-inter-bold text-white">Choose Another File</Text>
+                        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15, 0.1) }}>Choose Another File</Text>
                     </Touchable>
                 </View>
             </Pressable>

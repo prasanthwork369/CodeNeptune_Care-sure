@@ -18,6 +18,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const PrescriptionViewerLayout: React.FC = () => {
   const router = useNav();
@@ -194,10 +195,10 @@ export const PrescriptionViewerLayout: React.FC = () => {
               <icons.check_circle width={20} height={20} fill="#0F7635" />
             </View>
             <View className="flex-1 justify-center">
-              <Text className="text-[14px] font-inter-bold text-[#111827]">
+              <Text className="font-inter-bold text-[#111827]" style={{ fontSize: moderateScale(14, 0.1) }}>
                 Prescription Verified
               </Text>
-              <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5">
+              <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1) }}>
                 Your medicines are ready to order
               </Text>
             </View>
@@ -214,7 +215,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
             activeOpacity={0.85}
             className="flex-1 items-center justify-center py-3.5 rounded-lg bg-brand-primary"
           >
-            <Text className="text-[14px] font-inter-semibold text-white">
+            <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(14, 0.1) }}>
               Select
             </Text>
           </Touchable>

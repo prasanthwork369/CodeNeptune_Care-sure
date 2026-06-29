@@ -1,9 +1,10 @@
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import React from "react";
-import { Image, Text, useWindowDimensions, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import Svg, { Line } from "react-native-svg";
 import { styles as s } from "./ValidPrescriptionInfo.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 const VALID_ITEMS = [
   "Doctor's details",
@@ -13,9 +14,7 @@ const VALID_ITEMS = [
 ];
 
 export const ValidPrescriptionInfo: React.FC = () => {
-  const { width: screenWidth } = useWindowDimensions();
-
-  const rxBoxW = Math.round(screenWidth * 0.27);
+  const rxBoxW = Math.round(exactScale(105));
   const rxBoxH = Math.round(rxBoxW * 1.09);
   const rxImgW = Math.round(rxBoxW * 0.71);
   const rxImgH = Math.round(rxImgW * 1.23);

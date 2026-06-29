@@ -94,6 +94,11 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
   return React.createElement(OriginalText, {
     ...props,
     ref,
+    // Font sizes are already deliberately scaled per-device by moderateScale()/
+    // exactScale() against the Figma baseline — letting the OS *also* apply its
+    // own font-scale multiplier on top stacks two independent scaling systems
+    // and makes text size unpredictable across devices. Keep this the single
+    // source of truth instead.
     allowFontScaling: false,
     style: [
       { fontFamily: undefined, includeFontPadding: false }, // Default reset

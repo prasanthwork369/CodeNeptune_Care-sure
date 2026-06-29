@@ -2,6 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { Image, Text, View } from "react-native";
 
@@ -21,14 +22,14 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
       activeOpacity={isTruncatable ? 0.9 : 1}
       onPress={() => isTruncatable && setExpanded((v) => !v)}
       style={{
-        borderRadius: 12,
+        borderRadius: exactScale(12),
         overflow: "hidden",
-        paddingHorizontal: 16,
+        paddingHorizontal: exactScale(16),
         borderBottomWidth: 1,
         borderBottomColor: "#919EAB33",
         borderStyle: "dashed",
         backgroundColor: "#14835A",
-        minHeight: 40,
+        minHeight: exactScale(40),
       }}
       className="mx-4 my-4"
     >
@@ -47,18 +48,18 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
       />
       <View
         className="flex-row items-center relative z-10 w-full"
-        style={{ minHeight: 46, paddingVertical: 6 }}
+        style={{ minHeight: exactScale(46), paddingVertical: exactScale(6) }}
       >
         <View className="items-center justify-center">
           <DotLottie
             source={ANIMATIONS.chemicalBeaker}
             autoplay
             loop
-            style={{ width: 40, height: 60 }}
+            style={{ width: exactScale(40), height: exactScale(60) }}
           />
         </View>
         <View style={{ flex: 1, marginRight: isTruncatable ? 8 : 0 }}>
-          <Text className="text-[10px] font-inter-semibold text-white uppercase tracking-[1px] mb-0.5">
+          <Text className="font-inter-semibold text-white uppercase tracking-[1px] mb-0.5" style={{ fontSize: moderateScale(10, 0.1) }}>
             SALT COMPOSITION IN BOTH
           </Text>
           {/* Hidden measurement text — detects if composition overflows one
@@ -66,12 +67,13 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
               otherwise it wraps differently and reports the wrong line
               count (e.g. always >1 with no width constraint). */}
           <Text
-            className="text-[15px] font-inter-bold"
+            className="font-inter-bold"
             style={{
               position: "absolute",
               width: "100%",
               opacity: 0,
               pointerEvents: "none",
+              fontSize: moderateScale(15, 0.1),
             }}
             onTextLayout={(e) =>
               setIsTruncatable(e.nativeEvent.lines.length > 1)
@@ -80,9 +82,10 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
             {composition}
           </Text>
           <Text
-            className="text-[15px] font-inter-bold text-white leading-tight"
+            className="font-inter-bold text-white leading-tight"
             numberOfLines={expanded ? undefined : 1}
             ellipsizeMode="tail"
+            style={{ fontSize: moderateScale(15, 0.1) }}
           >
             {composition}
           </Text>
@@ -91,9 +94,9 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
         {isTruncatable && (
           <View
             style={{
-              width: 28,
-              height: 28,
-              borderRadius: 14,
+              width: exactScale(28),
+              height: exactScale(28),
+              borderRadius: exactScale(14),
               backgroundColor: "rgba(255,255,255,0.2)",
               alignItems: "center",
               justifyContent: "center",

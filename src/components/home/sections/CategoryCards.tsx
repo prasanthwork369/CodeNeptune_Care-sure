@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text } from 'react-native';
 import { styles as s } from './CategoryCards.styles';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { Image } from 'expo-image';
@@ -7,6 +7,7 @@ import { icons } from '@/src/constants/icons';
 import type { CategoryCard } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { exactScale } from "@/src/utils/exactScale";
+import { useResponsiveTier } from "@/src/hooks/ui/useResponsiveTier";
 
 interface CategoryCardsProps {
     cards: CategoryCard[];
@@ -14,9 +15,12 @@ interface CategoryCardsProps {
     isLoading?: boolean;
 }
 
+const GAP = 8;
+
 export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress, isLoading }) => {
-    const { width } = useWindowDimensions();
-    const cardWidth = (width - 48) / 3;
+    const { width, pick } = useResponsiveTier();
+    const numColumns = pick(2, 3, 4);
+    const cardWidth = (width - 32 - GAP * (numColumns - 1)) / numColumns;
     const cardHeight = cardWidth * (128 / 114);
     const imgSize = cardWidth * 0.75;
 
@@ -30,8 +34,8 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
         );
     }
 
-    const remainder = cards.length % 3;
-    const placeholders = remainder === 0 ? 0 : 3 - remainder;
+    const remainder = cards.length % numColumns;
+    const placeholders = remainder === 0 ? 0 : numColumns - remainder;
 
     return (
         <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3">

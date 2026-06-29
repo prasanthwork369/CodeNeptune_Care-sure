@@ -4,6 +4,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { UploadMethodCardProps } from '@/src/types/prescription';
+import { moderateScale } from '@/src/utils/exactScale';
 
 const RadioButton = ({ selected }: { selected: boolean }) => (
     <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: selected ? '#0F7635' : '#C4C4C4', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' }}>
@@ -21,14 +22,14 @@ export const UploadMethodCard: React.FC<UploadMethodCardProps> = ({ isSelected, 
                 style={{ borderRadius: 14, borderWidth: 1, borderColor: '#919EAB33', padding: 14 }}
             >
                 <View style={{ backgroundColor: '#D0ECFD', alignSelf: 'flex-start', marginBottom: 12 }} className="rounded px-2 py-0.5">
-                    <Text style={{ color: '#1A1C1E', fontSize: 10 }} className="font-inter-semibold uppercase tracking-wider">Order Now</Text>
+                    <Text style={{ color: '#1A1C1E', fontSize: moderateScale(10, 0.1) }} className="font-inter-semibold uppercase tracking-wider">Order Now</Text>
                 </View>
                 <View className="flex-row items-center justify-between">
                     <View className="flex-row items-start flex-1 pr-4">
                         <Image source={HOME_IMAGES.prescription} style={{ width: 30, height: 30 }} resizeMode="contain" />
                         <View className="flex-1 ml-3">
-                            <Text className="text-[14px] font-inter-bold text-[#1A1C1E]">Upload Prescription</Text>
-                            <Text className="text-[12px] font-inter-medium text-[#6A6A6A] mt-0.5 leading-[17px]">
+                            <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14, 0.1) }}>Upload Prescription</Text>
+                            <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(17, 0.1) }}>
                                 The Following Item Requires Verification Before Purchase
                             </Text>
                         </View>

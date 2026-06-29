@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { useLocationStore } from '@/src/store/locationStore';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 interface LogisticsBarProps {
     deliveryTime?: string;
@@ -23,17 +24,29 @@ export const LogisticsBar: React.FC<LogisticsBarProps> = ({
 
     return (
         <View className="mx-4 bg-white border border-[#919EAB33] rounded-[12px] flex-row items-center justify-between px-4 py-4 mb-6">
-            <View className="flex-row items-center border-r border-[#F3F4F6] pr-4">
+            <View className="flex-row items-center border-r border-[#F3F4F6] pr-4 flex-1" style={{ minWidth: 0 }}>
                 <icons.shopping_bag width={20} height={20} />
-                <Text className="text-[12px] font-inter text-brand-text ml-2">
+                <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    className="font-inter text-brand-text ml-2"
+                    style={{ flexShrink: 1, fontSize: moderateScale(12, 0.1) }}
+                >
                     Get by <Text className="font-inter-bold text-brand-text">{deliveryTime}</Text>
                 </Text>
             </View>
-            <View className="flex-row items-center pl-4">
+            <View className="flex-row items-center pl-4" style={{ flexShrink: 0 }}>
                 <icons.location width={18} height={18} />
-                <Text className="text-[12px] font-inter-semibold text-brand-text mx-2">{displayLabel}</Text>
-                <Touchable onPress={onChangeLocation}>
-                    <Text className="text-[14px] font-inter-semibold text-brand-primary">Change</Text>
+                <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    className="font-inter-semibold text-brand-text mx-2"
+                    style={{ maxWidth: exactScale(70), fontSize: moderateScale(12, 0.1) }}
+                >
+                    {displayLabel}
+                </Text>
+                <Touchable onPress={onChangeLocation} style={{ flexShrink: 0 }}>
+                    <Text className="font-inter-semibold text-brand-primary" style={{ fontSize: moderateScale(14, 0.1) }}>Change</Text>
                 </Touchable>
             </View>
         </View>

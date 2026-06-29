@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 
 export const styles = StyleSheet.create({
     badge:       { fontSize: moderateScale(11) },
@@ -68,7 +69,7 @@ export const styles = StyleSheet.create({
     },
     cartBtn: {
         width: exactScale(137),
-        height: exactScale(40),
+        height: CART_BUTTON_HEIGHT,
         borderRadius: exactScale(6),
         borderWidth: 1,
         borderColor: '#0F7635',
@@ -83,7 +84,7 @@ export const styles = StyleSheet.create({
     },
     cartBtnActive: {
         width: exactScale(137),
-        height: exactScale(38),
+        height: CART_BUTTON_HEIGHT,
         borderRadius: exactScale(6),
         backgroundColor: '#0F7635',
         flexDirection: 'row',
