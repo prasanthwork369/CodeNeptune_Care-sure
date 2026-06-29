@@ -94,7 +94,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
             />
           </View>
           <View style={[s.walletBadgeWrap, { marginTop: -14 }]}>
-            <Text style={s.walletBadgeText} className="font-inter-bold">
+            <Text style={s.walletBadgeText} className="font-inter-bold" numberOfLines={1}>
               {walletDisplay}
             </Text>
           </View>

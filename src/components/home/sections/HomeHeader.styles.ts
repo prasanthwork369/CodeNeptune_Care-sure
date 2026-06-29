@@ -1,6 +1,6 @@
 import { colors } from "@/src/constants/theme";
-import { StyleSheet } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   deliverLabel: {
@@ -56,8 +56,8 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   walletBadgeWrap: {
-    width: exactScale(54),
-    height: exactScale(15),
+    minWidth: exactScale(54),
+    minHeight: exactScale(12),
     paddingTop: exactScale(2),
     paddingRight: exactScale(9),
     paddingBottom: exactScale(2),
@@ -71,8 +71,8 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   walletBadgeText: {
-    fontSize: moderateScale(10),
-    lineHeight: moderateScale(10),
+    fontSize: moderateScale(10, 0.1),
+    lineHeight: moderateScale(13, 0.1),
     letterSpacing: 0,
     color: colors.text,
     padding: 1,

@@ -29,7 +29,8 @@ const pixelRatio = PixelRatio.get();
 // call a plain (non-worklet) JS function on the UI thread.
 export const scale = (size: number) => {
   "worklet";
-  const shortDimension = screenWidth < screenHeight ? screenWidth : screenHeight;
+  const shortDimension =
+    screenWidth < screenHeight ? screenWidth : screenHeight;
   const rawScale = shortDimension / guidelineBaseWidth;
   const clampedScale = Math.max(0.82, Math.min(rawScale, 1.0));
   const val = clampedScale * size;

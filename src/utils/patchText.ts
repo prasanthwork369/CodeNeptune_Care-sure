@@ -94,12 +94,18 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
   return React.createElement(OriginalText, {
     ...props,
     ref,
-    // Font sizes are already deliberately scaled per-device by moderateScale()/
-    // exactScale() against the Figma baseline — letting the OS *also* apply its
-    // own font-scale multiplier on top stacks two independent scaling systems
-    // and makes text size unpredictable across devices. Keep this the single
-    // source of truth instead.
-    allowFontScaling: false,
+    // Respect the OS accessibility text-size setting (unless a specific Text
+    // instance opts out), but cap the multiplier so it can't stack unbounded
+    // on top of the app's own per-device moderateScale()/exactScale() sizing.
+    // Any fixed-width/height container around text needs to tolerate this
+    // (minWidth/minHeight + numberOfLines, not fixed dimensions) -- fix those
+    // as they're found rather than disabling scaling globally again.
+    allowFontScaling:
+      props.allowFontScaling !== undefined ? props.allowFontScaling : true,
+    maxFontSizeMultiplier:
+      props.maxFontSizeMultiplier !== undefined
+        ? props.maxFontSizeMultiplier
+        : 1,
     style: [
       { fontFamily: undefined, includeFontPadding: false }, // Default reset
       sanitizedStyle,

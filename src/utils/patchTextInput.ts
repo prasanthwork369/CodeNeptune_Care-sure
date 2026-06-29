@@ -4,25 +4,29 @@ import * as RN from "react-native";
 // unpatched TextInput component instead of looping back into this file.
 import OriginalTextInputImport from "react-native/Libraries/Components/TextInput/TextInput";
 
-const OriginalTextInput = OriginalTextInputImport as unknown as typeof RN.TextInput;
+const OriginalTextInput =
+  OriginalTextInputImport as unknown as typeof RN.TextInput;
 
 /**
  * TextInput.defaultProps does not work on this RN/React version (defaultProps
  * support for function/forwardRef components was removed) — so this has to be
  * injected as a render-time prop instead, mirroring patchText.ts's pattern.
  *
- * allowFontScaling is forced false for the same reason as patchText.ts: input
- * font sizes are already deliberately scaled per-device by moderateScale()/
- * exactScale() against the Figma baseline, so letting the OS also apply its
- * own font-scale multiplier on top stacks two independent scaling systems and
- * makes size unpredictable across devices.
+ * Respects the OS accessibility text-size setting (unless a specific
+ * TextInput opts out), capped so it can't stack unbounded on top of the
+ * app's own per-device moderateScale()/exactScale() sizing.
  */
 const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
   (props, ref) => {
     return React.createElement(OriginalTextInput, {
       ...props,
       ref,
-      allowFontScaling: false,
+      allowFontScaling:
+        props.allowFontScaling !== undefined ? props.allowFontScaling : true,
+      maxFontSizeMultiplier:
+        props.maxFontSizeMultiplier !== undefined
+          ? props.maxFontSizeMultiplier
+          : 1,
     });
   },
 );
@@ -45,7 +49,10 @@ try {
     // @ts-ignore
     RN.TextInput = PatchedTextInput;
   } catch (err) {
-    console.error("Failed to globally patch react-native TextInput component:", err);
+    console.error(
+      "Failed to globally patch react-native TextInput component:",
+      err,
+    );
   }
 }
 
