@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     },
     box: {
         width: '48%',
-        height: exactScale(70),
+        minHeight: exactScale(70),
         borderRadius: exactScale(6),
         borderWidth: 1,
         borderColor: '#919EAB33',

@@ -26,7 +26,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           },
         ]}
       >
-        <Text style={s.prefix}>+91</Text>
+        <Text style={s.prefix} allowFontScaling={false}>+91</Text>
         <View style={s.divider} />
         <TextInput
           placeholder="Enter your mobile number"
@@ -36,6 +36,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           autoComplete="tel"
           accessibilityLabel="Mobile number"
           style={s.input}
+          allowFontScaling={false}
           maxLength={10}
           cursorColor="#0F7635"
           value={phoneNumber}
@@ -50,7 +51,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </View>
 
       {phoneError || error ? (
-        <Text style={s.error}>{phoneError || error}</Text>
+        <Text style={s.error} allowFontScaling={false}>{phoneError || error}</Text>
       ) : null}
     </View>
   );

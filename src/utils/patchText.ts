@@ -6,6 +6,14 @@ import OriginalTextImport from "react-native/Libraries/Text/Text";
 
 const OriginalText = OriginalTextImport as unknown as typeof RN.Text;
 
+// Read once at startup. If the device's OS text-size setting is below the
+// system default (1.0x), we disable scaling entirely for that render instead
+// of trying to inflate-then-let-native-cancel-it-out (that compensation math
+// caused real bugs earlier) — simplest way to guarantee a 1.0x floor: never
+// shrink below the design size, only allow growth up to the cap below.
+const systemFontScale = RN.PixelRatio.getFontScale();
+const isBelowDefaultFontScale = systemFontScale < 1;
+
 // Maps numeric/keyword font weights to the Inter font family loaded via
 // @expo-google-fonts/inter (see app/_layout.tsx useFonts call). Android's
 // system font (Roboto) does not render numeric fontWeight reliably, so we
@@ -101,11 +109,17 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
     // (minWidth/minHeight + numberOfLines, not fixed dimensions) -- fix those
     // as they're found rather than disabling scaling globally again.
     allowFontScaling:
-      props.allowFontScaling !== undefined ? props.allowFontScaling : true,
+      props.allowFontScaling !== undefined
+        ? props.allowFontScaling
+        : !isBelowDefaultFontScale,
+    // 1.2 = 20% max growth with OS accessibility font setting.
+    // - Prevents text from looking frozen/tiny at Maximum system font
+    // - Prevents unbounded stacking on top of moderateScale() sizing
+    // - Containers must use minHeight (not fixed height) to absorb this growth.
     maxFontSizeMultiplier:
       props.maxFontSizeMultiplier !== undefined
         ? props.maxFontSizeMultiplier
-        : 1,
+        : 1.2,
     style: [
       { fontFamily: undefined, includeFontPadding: false }, // Default reset
       sanitizedStyle,

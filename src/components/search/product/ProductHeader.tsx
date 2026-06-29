@@ -7,6 +7,7 @@ import React from "react";
 import { Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { searchHeaderStyles as hs } from "@/src/components/search/search.styles";
+import { moderateScale } from "@/src/utils/exactScale";
 
 interface ProductHeaderProps {
   cartCount?: number;
@@ -78,6 +79,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 }
                 placeholderTextColor="#6A6A6A"
                 style={hs.inputText}
+                allowFontScaling={false}
                 autoFocus
                 returnKeyType="search"
               />
@@ -96,7 +98,8 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
 
           {!onQueryChange && (
             <Text
-              className="flex-1 text-[15px] font-inter text-[#222222]"
+              className="flex-1 font-inter text-[#222222]"
+              style={{ fontSize: moderateScale(15, 0.1) }}
               numberOfLines={1}
             >
               {query || "Search affordable substitute"}
@@ -128,7 +131,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             <icons.Add_Cart width={30} height={30} />
             {cartCount > 0 && (
               <View className="absolute -top-1 -right-1 w-[20px] h-[20px] rounded-full bg-[#C22923] items-center justify-center">
-                <Text className="text-[12px] font-inter-bold text-white leading-none">
+                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(12, 0.1) }}>
                   {cartCount}
                 </Text>
               </View>

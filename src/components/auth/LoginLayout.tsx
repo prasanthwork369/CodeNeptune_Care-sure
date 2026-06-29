@@ -33,8 +33,9 @@ export const LoginLayout: React.FC = () => {
             <Text
               style={s.title}
               className="font-inter-extrabold text-brand-text text-center"
+              allowFontScaling={false}
             >
-              Why pay more for the{"\n"}same medicine?
+              Why pay more for the same medicine?
             </Text>
           </View>
           <LoginForm

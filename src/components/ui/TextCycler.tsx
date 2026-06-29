@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Text, TextStyle, View } from "react-native";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 const DURATION = 700;
@@ -61,6 +61,7 @@ const WordItem: React.FC<{
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.6}
+        allowFontScaling={false}
       >
         {word}
       </Text>
@@ -99,6 +100,7 @@ export const TextCycler: React.FC<TextCyclerProps> = ({
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.7}
+        allowFontScaling={false}
       >
         {words[0]}
       </Text>
@@ -126,6 +128,7 @@ export const TextCycler: React.FC<TextCyclerProps> = ({
         pointerEvents="none"
         adjustsFontSizeToFit
         minimumFontScale={0.6}
+        allowFontScaling={false}
       >
         {longestWord}
       </Text>

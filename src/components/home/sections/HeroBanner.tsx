@@ -2,6 +2,7 @@ import { Skeleton } from "@/src/components/ui/Skeleton";
 import { TextCycler } from "@/src/components/ui/TextCycler";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { ApiHero } from "@/src/types/home";
+import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
@@ -16,8 +17,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SvgUri } from "react-native-svg";
-import { styles, TITLE_LINE_HEIGHT } from "./HeroBanner.styles";
-import { exactScale } from "@/src/utils/exactScale";
+import { styles } from "./HeroBanner.styles";
 
 const ease = Easing.out(Easing.cubic);
 
@@ -155,7 +155,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </View>
 
         {/* Right: person */}
-        <View style={[styles.avatar, { width: dynamicAvatarWidth, height: dynamicAvatarHeight, top: dynamicAvatarTop }]}>
+        <View
+          style={[
+            styles.avatar,
+            {
+              width: dynamicAvatarWidth,
+              height: dynamicAvatarHeight,
+              top: dynamicAvatarTop,
+            },
+          ]}
+        >
           <Skeleton
             width={dynamicAvatarWidth}
             height={dynamicAvatarHeight}
@@ -188,22 +197,40 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         >
           <View>
             {/* First line (e.g. 'Stop overpaying') */}
-            <Text style={[styles.titleText, { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }]} className="text-brand-text">
+            <Text
+              style={[
+                styles.titleText,
+                { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight },
+              ]}
+              className="text-brand-text"
+              allowFontScaling={false}
+            >
               {getCleanTitlePart1(title)}
             </Text>
 
             {/* Second line (inline 'for your' prefix and cycling word cycler) */}
             <View className="flex-row items-center" style={{ minWidth: 0 }}>
               <Text
-                style={[styles.titleText, { flexShrink: 0, fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }]}
+                style={[
+                  styles.titleText,
+                  {
+                    flexShrink: 0,
+                    fontSize: dynamicFontSize,
+                    lineHeight: dynamicLineHeight,
+                  },
+                ]}
                 className="text-brand-text"
+                allowFontScaling={false}
               >
                 for your{" "}
               </Text>
               <TextCycler
                 words={highlights}
                 lineHeight={dynamicLineHeight}
-                style={StyleSheet.flatten([styles.titleText, { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }])}
+                style={StyleSheet.flatten([
+                  styles.titleText,
+                  { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight },
+                ])}
                 className="text-brand-primary"
               />
             </View>
@@ -230,7 +257,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 height={dynamicBadgeIconHeight}
               />
             ) : null}
-            <Text style={[styles.badgeText, { fontSize: dynamicBadgeFontSize, lineHeight: dynamicBadgeLineHeight }]}>
+            <Text
+              style={[
+                styles.badgeText,
+                {
+                  fontSize: dynamicBadgeFontSize,
+                  lineHeight: dynamicBadgeLineHeight,
+                },
+              ]}
+              allowFontScaling={false}
+            >
               {badgeText}
             </Text>
           </View>
@@ -238,7 +274,17 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       </LinearGradient>
 
       {/* ── Right: Person image (positioned absolute, sibling to allow overflow) ── */}
-      <Animated.View style={[styles.avatar, { width: dynamicAvatarWidth, height: dynamicAvatarHeight, top: dynamicAvatarTop }, rightAnim]}>
+      <Animated.View
+        style={[
+          styles.avatar,
+          {
+            width: dynamicAvatarWidth,
+            height: dynamicAvatarHeight,
+            top: dynamicAvatarTop,
+          },
+          rightAnim,
+        ]}
+      >
         <Image
           source={mainImage}
           style={{ width: "100%", height: "100%" }}

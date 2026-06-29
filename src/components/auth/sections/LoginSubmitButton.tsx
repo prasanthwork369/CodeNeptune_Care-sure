@@ -23,7 +23,7 @@ export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
                 <ActivityIndicator color="#fff" size="small" />
             ) : (
                 <>
-                    <Text style={s.btnText}>Get OTP</Text>
+                    <Text style={s.btnText} allowFontScaling={false}>Get OTP</Text>
                     <icons.arrow_forward_white
                         width={13}
                         height={13}

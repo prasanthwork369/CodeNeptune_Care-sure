@@ -13,6 +13,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { styles as s } from "./HomeHeader.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 const NotificationIcon = icons.notification;
 
@@ -48,10 +49,10 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   return (
     <View
       className="flex-row justify-between items-center px-5 pb-2"
-      style={{ paddingTop: Math.max(insets.top, 20) + 16 }}
+      style={{ paddingTop: insets.top + exactScale(10) }}
     >
       {/* Left: Delivery Location */}
-      <View>
+      <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={s.deliverLabel} className="font-inter-semibold uppercase">
           DELIVER TO
         </Text>
@@ -61,8 +62,14 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           accessibilityRole="button"
           accessibilityLabel={`Change delivery location, current ${location.label || location.city}`}
           className="flex-row items-center mt-1.5"
+          style={{ minWidth: 0 }}
         >
-          <Text style={s.locationText} className="font-inter-bold capitalize">
+          <Text
+            style={[s.locationText, { flexShrink: 1 }]}
+            className="font-inter-bold capitalize"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {location.pincode
               ? `${location.city} - ${location.pincode}`
               : location.label &&
@@ -71,12 +78,15 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 ? `${location.label} - ${location.city}`
                 : location.city}
           </Text>
-          <icons.arrow_drop_down fill="#1C1B1F" style={s.dropDownIcon} />
+          <icons.arrow_drop_down
+            fill="#1C1B1F"
+            style={[s.dropDownIcon, { flexShrink: 0 }]}
+          />
         </Touchable>
       </View>
 
       {/* Right: Wallet + Notification */}
-      <View className="flex-row items-start gap-3">
+      <View className="flex-row items-start gap-3" style={{ flexShrink: 0 }}>
         <Touchable
           onPress={() => router.push("/profile/wallet")}
           className="items-center"
@@ -93,8 +103,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
               contentFit="contain"
             />
           </View>
-          <View style={[s.walletBadgeWrap, { marginTop: -14 }]}>
-            <Text style={s.walletBadgeText} className="font-inter-bold" numberOfLines={1}>
+          <View style={[s.walletBadgeWrap, { marginTop: -exactScale(14) }]}>
+            <Text style={s.walletBadgeText} className="font-inter-bold">
               {walletDisplay}
             </Text>
           </View>

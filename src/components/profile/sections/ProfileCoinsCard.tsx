@@ -1,8 +1,8 @@
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
-import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
@@ -32,9 +32,9 @@ export const ProfileCoinsCard: React.FC = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         className="flex-row items-center justify-between px-5 pt-5 pb-7"
-        style={{ minHeight: 104 }}
+        style={{ minHeight: 104, padding: 10 }}
       >
-        <View className="flex-1 pr-20">
+        <View className="flex-1 pr-20 ">
           <Text
             style={s.coinsTitle}
             className="font-inter-extrabold text-[#222222]"
@@ -50,7 +50,13 @@ export const ProfileCoinsCard: React.FC = () => {
         </View>
         <Image
           source={HOME_IMAGES.moneyBag}
-          style={{ width: 96, height: 96, position: "absolute", right: 0, bottom: -5 }}
+          style={{
+            width: 96,
+            height: 96,
+            position: "absolute",
+            right: 0,
+            bottom: -5,
+          }}
           contentFit="contain"
         />
       </LinearGradient>

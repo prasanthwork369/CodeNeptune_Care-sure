@@ -128,7 +128,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
           }}
           onPress={handleSkip}
         >
-          <Text style={styles.skipText}>
+          <Text style={styles.skipText} allowFontScaling={false}>
             Skip
           </Text>
           <icons.arrow_forward_green width={6.09} height={11.08} />
