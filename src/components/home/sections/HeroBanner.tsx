@@ -203,7 +203,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight },
               ]}
               className="text-brand-text"
-              allowFontScaling={false}
+             
             >
               {getCleanTitlePart1(title)}
             </Text>
@@ -220,7 +220,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   },
                 ]}
                 className="text-brand-text"
-                allowFontScaling={false}
+               
               >
                 for your{" "}
               </Text>
@@ -265,7 +265,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   lineHeight: dynamicBadgeLineHeight,
                 },
               ]}
-              allowFontScaling={false}
             >
               {badgeText}
             </Text>

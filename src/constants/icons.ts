@@ -147,6 +147,14 @@ import arrow_up_circle from "../../assets/icons/arrow_up_circle.svg";
 import arrow_down_circle from "../../assets/icons/arrow_down_circle.svg";
 import ellipsis_vertical from "../../assets/icons/ellipsis_vertical.svg";
 
+// Return flow SVGs
+import return_wallet from "../../assets/icons/return_wallet.svg";
+import return_calendar from "../../assets/icons/return_calendar.svg";
+import return_calendar_today from "../../assets/icons/return_calendar_today.svg";
+import return_check from "../../assets/icons/return_check.svg";
+import return_rupee from "../../assets/icons/return_rupee.svg";
+import return_review from "../../assets/icons/return_review.svg";
+import return_pickup from "../../assets/icons/return_pickup.svg";
 // Font Icons (for Expo Vector Icons)
 export const ICONS = {
     arrowForward: "arrow-forward",
@@ -302,7 +310,15 @@ export const icons = {
     arrow_up_circle,
     arrow_down_circle,
     ellipsis_vertical,
-} as const;
 
+    // Return flow
+    return_wallet,
+    return_calendar,
+    return_calendar_today,
+    return_check,
+    return_rupee,
+    return_review,
+    return_pickup,
+} as const;
 
 export type IconKey = keyof typeof icons;

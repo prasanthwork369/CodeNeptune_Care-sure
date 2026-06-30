@@ -83,7 +83,6 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
           style={{
             width: width,
             height: exactScale(273),
-            marginTop: exactScale(10),
           }}
         >
           <Image
@@ -96,7 +95,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
             style={{
               position: "absolute",
               left: exactScale(20),
-              top: 20,
+              top: exactScale(70),
               gap: 0,
             }}
           >

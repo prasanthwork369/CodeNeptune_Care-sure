@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Image, Platform, View } from "react-native";
+import { Image, Platform, View, TouchableOpacity, Text } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -18,6 +18,7 @@ import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { Toast } from "@/src/components/common/Toast";
+import { DevTestButton } from "@/src/components/dev/DevTestButton";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
@@ -141,6 +142,7 @@ export default function RootLayout() {
               <NetworkToast />
               <Toast />
               <SignupBonusPopup />
+              <DevTestButton />
             </View>
           </SafeAreaProvider>
         </KeyboardProvider>
