@@ -22,11 +22,6 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         padding: exactScale(12),
         gap: exactScale(12),
-        shadowColor: '#919EAB',
-        shadowOffset: { width: 0, height: exactScale(4) },
-        shadowRadius: 10,
-        shadowOpacity: 0.04,
-        elevation: 1,
     },
     iconBox: {
         width: exactScale(36),

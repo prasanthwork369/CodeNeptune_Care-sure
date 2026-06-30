@@ -1,5 +1,5 @@
+import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { Platform, StyleSheet } from "react-native";
-import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
   inputWrap: {
@@ -30,8 +30,12 @@ export const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 0,
     fontSize: moderateScale(15, 0.3),
-    fontFamily: Platform.OS === "android" ? "Inter_500Medium" : undefined,
-    fontWeight: Platform.OS === "android" ? "normal" : "500",
+    // Android renders weight via the loaded font file itself (fontWeight is
+    // ignored once fontFamily is set to a specific static Inter weight) --
+    // use the Regular weight file directly instead of setting a numeric
+    // fontWeight that has no effect.
+    fontFamily: Platform.OS === "android" ? "Inter_400Regular" : undefined,
+    fontWeight: Platform.OS === "android" ? "normal" : "400",
     letterSpacing: 0,
     color: "#222222",
   },

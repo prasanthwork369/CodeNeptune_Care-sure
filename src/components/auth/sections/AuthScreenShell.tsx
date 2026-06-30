@@ -1,29 +1,30 @@
 import { AuthMedicineBackground } from "@/src/components/auth/AuthMedicineBackground";
 import { icons } from "@/src/constants/icons";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useAuthStore } from "@/src/store/authStore";
+import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
+import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
-    Dimensions,
-    Keyboard,
-    Pressable,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  Dimensions,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { KeyboardEvents } from "react-native-keyboard-controller";
-import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 interface AuthScreenShellProps {
   children?: React.ReactNode;
@@ -110,14 +111,17 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
         style={[
           styles.skipWrapper,
           {
-            top: insets.top > 0 ? insets.top + verticalScale(10) : verticalScale(53),
+            top:
+              insets.top > 0
+                ? insets.top + verticalScale(10)
+                : verticalScale(53),
             right: width >= 390 ? scale(13) : scale(16),
           },
           skipStyle,
         ]}
       >
         <Pressable
-          style={styles.skipBtn}
+          style={styles.skipBtnOuter}
           accessibilityRole="button"
           accessibilityLabel="Skip"
           onPressIn={() => {
@@ -128,10 +132,15 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
           }}
           onPress={handleSkip}
         >
-          <Text style={styles.skipText}>
-            Skip
-          </Text>
-          <icons.arrow_forward_green width={6.09} height={11.08} />
+          <BlurView
+            intensity={40}
+            tint="systemChromeMaterialLight"
+            experimentalBlurMethod="dimezisBlurView"
+            style={styles.skipBtn}
+          >
+            <Text style={styles.skipText}>Skip</Text>
+            <icons.arrow_forward_darkgreen width={6} height={11.08} />
+          </BlurView>
         </Pressable>
       </Animated.View>
 
@@ -191,27 +200,31 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 50,
   },
-  skipBtn: {
+  skipBtnOuter: {
     width: scale(70),
     height: verticalScale(30),
+    borderRadius: scale(20),
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: "#919EAB33",
-    borderRadius: scale(20),
-    backgroundColor: "#FFFFFF",
-    paddingTop: verticalScale(6),
-    paddingBottom: verticalScale(6),
+  },
+  skipBtn: {
+    flex: 1,
+    paddingTop: verticalScale(4),
+    paddingBottom: verticalScale(4),
     paddingLeft: scale(10),
     paddingRight: scale(10),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: scale(8),
+    borderColor: "#919EAB33",
   },
   skipText: {
-    fontFamily: "Inter",
-    fontWeight: "500",
-    fontSize: moderateScale(12, 0.3),
-    lineHeight: moderateScale(12, 0.3),
+    fontFamily: "Inter-700Bold",
+    fontWeight: "700",
+    fontSize: moderateScale(13, 0.3),
+    lineHeight: moderateScale(17, 0.3),
     letterSpacing: 0,
     textAlign: "center",
     textAlignVertical: "center",

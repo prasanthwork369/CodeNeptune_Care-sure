@@ -1,5 +1,5 @@
+import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { StyleSheet } from "react-native";
-import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
   wrap: { paddingBottom: verticalScale(16) },
@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   secureText: {
     fontSize: moderateScale(13, 0.3),
     fontWeight: "500",
-    color: "#637381",
+    color: "#6A6A6A",
   },
   policyText: {
     fontSize: moderateScale(12, 0.3),

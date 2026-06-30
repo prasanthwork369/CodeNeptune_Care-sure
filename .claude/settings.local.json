@@ -4,7 +4,8 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(xargs grep -l \"profileStore\\\\|addressStore\\\\|homeStore\\\\|categoryStore\\\\|profile\\\\.service\\\\|address\\\\.service\\\\|home\\\\.service\\\\|category\\\\.service\")",
-      "Read(//c/Code Neptune/ShaN/Jay/care-sure-main/care-sure-main/customer-website/**)"
+      "Read(//c/Code Neptune/ShaN/Jay/care-sure-main/care-sure-main/customer-website/**)",
+      "Bash(git checkout *)"
     ]
   }
 }

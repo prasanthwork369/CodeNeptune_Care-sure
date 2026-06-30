@@ -79,6 +79,7 @@ import account_balance_wallet from "../../assets/icons/account_balance_wallet.sv
 import account_balance_wallet_green from "../../assets/icons/account_balance_wallet_green.svg";
 import add_photo from "../../assets/icons/add_photo.svg";
 import admin_meds from "../../assets/icons/admin_meds.svg";
+import arrow_forward_darkgreen from "../../assets/icons/arrow_forward_darkgreen.svg";
 import arrow_forward_green from "../../assets/icons/arrow_forward_green.svg";
 import article from "../../assets/icons/article.svg";
 import business from "../../assets/icons/business.svg";
@@ -268,6 +269,7 @@ export const icons = {
     verified_user_outline,
     verified_user_round,
     arrow_forward_green,
+    arrow_forward_darkgreen,
     cart_svg,
     account_balance_wallet,
     account_balance_wallet_green,

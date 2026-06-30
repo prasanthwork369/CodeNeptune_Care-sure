@@ -58,7 +58,7 @@ const ScrollingColumn = ({
               marginBottom: gap,
               backgroundColor: bgColor,
               borderRadius: 20,
-              borderWidth: 1.25,
+              borderWidth: 0.5,
               borderColor: "#919EAB33",
             }}
             className="items-center justify-center p-3"
