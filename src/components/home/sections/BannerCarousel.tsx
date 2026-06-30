@@ -52,7 +52,7 @@ const findCardBySlug = (link: string, categories?: CategoryCard[]): CategoryCard
 };
 
 
-export const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners, categories, isLoading, isVisible = true }) => {
+export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banners, categories, isLoading, isVisible = true }) => {
     const { width } = useWindowDimensions();
     const bannerHeight = Math.round(exactScale(176));
     const router = useNav();
@@ -137,9 +137,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners, categor
                 height={bannerHeight}
                 scrollAnimationDuration={500}
                 data={banners}
-                onProgressChange={(_, absoluteProgress) => {
-                    progressShared.value = absoluteProgress;
-                }}
+                onProgressChange={progressShared}
                 renderItem={renderItem}
                 onConfigurePanGesture={(gesture) => {
                     gesture.activeOffsetX([-10, 10]);
@@ -156,4 +154,5 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners, categor
             )}
         </View>
     );
-};
+});
+BannerCarousel.displayName = 'BannerCarousel';

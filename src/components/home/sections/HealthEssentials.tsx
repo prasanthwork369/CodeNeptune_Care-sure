@@ -235,7 +235,7 @@ interface HealthEssentialsProps {
     onProductPress: (productId: string) => void;
 }
 
-export const HealthEssentials: React.FC<HealthEssentialsProps> = ({ subcategories, isLoading, onProductPress }) => {
+export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ subcategories, isLoading, onProductPress }) => {
     if (isLoading) {
         return (
             <View className="mb-6 mt-2">
@@ -258,4 +258,5 @@ export const HealthEssentials: React.FC<HealthEssentialsProps> = ({ subcategorie
             ))}
         </>
     );
-};
+});
+HealthEssentials.displayName = 'HealthEssentials';

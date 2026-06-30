@@ -32,7 +32,7 @@ const RemoteIcon: React.FC<{ uri: string; style?: any }> = ({ uri, style }) => {
   return <Image source={{ uri }} style={style} contentFit="contain" />;
 };
 
-export const HomeFooter: React.FC<HomeFooterProps> = ({
+export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
   appContent,
   isLoading,
 }) => {
@@ -140,4 +140,5 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({
       </View>
     </View>
   );
-};
+});
+HomeFooter.displayName = 'HomeFooter';

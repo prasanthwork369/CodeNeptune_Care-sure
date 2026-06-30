@@ -10,7 +10,7 @@ interface QuickActionsProps {
     onActionPress?: (id: string) => void;
 }
 
-export const QuickActions: React.FC<QuickActionsProps> = ({ actions, onActionPress }) => {
+export const QuickActions: React.FC<QuickActionsProps> = React.memo(({ actions, onActionPress }) => {
     return (
         <View style={s.container}>
             {actions.map((action) => (
@@ -39,4 +39,5 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ actions, onActionPre
             ))}
         </View>
     );
-};
+});
+QuickActions.displayName = 'QuickActions';

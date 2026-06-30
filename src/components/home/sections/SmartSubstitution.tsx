@@ -8,7 +8,7 @@ interface SmartSubstitutionProps {
     isLoading?: boolean;
 }
 
-export const SmartSubstitution: React.FC<SmartSubstitutionProps> = ({
+export const SmartSubstitution: React.FC<SmartSubstitutionProps> = React.memo(({
     products,
     onProductPress,
     isLoading
@@ -20,4 +20,5 @@ export const SmartSubstitution: React.FC<SmartSubstitutionProps> = ({
             isLoading={isLoading}
         />
     );
-};
+});
+SmartSubstitution.displayName = 'SmartSubstitution';

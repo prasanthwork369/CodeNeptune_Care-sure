@@ -12,7 +12,7 @@ interface ShopByCategoriesProps {
     isLoading?: boolean;
 }
 
-export const ShopByCategories: React.FC<ShopByCategoriesProps> = ({
+export const ShopByCategories: React.FC<ShopByCategoriesProps> = React.memo(({
     tabs,
     cards,
     onCardPress,
@@ -45,4 +45,5 @@ export const ShopByCategories: React.FC<ShopByCategoriesProps> = ({
             </Animated.View>
         </View>
     );
-};
+});
+ShopByCategories.displayName = 'ShopByCategories';

@@ -4,7 +4,7 @@ import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, ScrollView, useWindowDimensions, View } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
   interpolateColor,
@@ -14,9 +14,7 @@ import Animated, {
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-
 import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
 import { exactScale } from "@/src/utils/exactScale";
@@ -247,7 +245,13 @@ export const FloatingBannersCarousel = ({
 
   if (!isCartActive && !isRxActive) return null;
 
-  const TAB_BAR_HEIGHT = 75 + adjustedBottom;
+  // Distance from the screen bottom to the top of the visible pill bar in
+  // LiquidTabBar: adjustedBottom (its paddingBottom) + the pill's vertical
+  // centering offset within BAR_HEIGHT, i.e. (BAR_HEIGHT + PILL_HEIGHT) / 2.
+  // At the 390px baseline that's exactly 75, but it must go through
+  // exactScale() like BAR_HEIGHT/PILL_HEIGHT themselves do, or this drifts
+  // out of sync with the real tab bar position on non-baseline screen widths.
+  const TAB_BAR_HEIGHT = exactScale(75) + adjustedBottom;
 
   return (
     <>

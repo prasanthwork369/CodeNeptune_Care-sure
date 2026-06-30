@@ -107,7 +107,7 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
     );
 };
 
-export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> = ({ substitutes, onProductPress, onViewAll, disableCart }) => {
+export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> = React.memo(({ substitutes, onProductPress, onViewAll, disableCart }) => {
     return (
         <View className="mt-8 px-4 mb-6">
             <View className="flex-row justify-between items-center mb-4">
@@ -123,4 +123,5 @@ export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> = ({ substi
             </View>
         </View>
     );
-};
+});
+FrequentSubstitutes.displayName = 'FrequentSubstitutes';

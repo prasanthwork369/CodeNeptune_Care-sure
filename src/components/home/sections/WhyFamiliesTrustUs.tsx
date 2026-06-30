@@ -21,7 +21,7 @@ const RemoteIcon: React.FC<{ uri: string }> = ({ uri }) => {
   return <Image source={{ uri }} style={s.icon} contentFit="contain" />;
 };
 
-export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = ({
+export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = React.memo(({
   promise,
   isLoading,
   showTitle = true,
@@ -56,4 +56,5 @@ export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = ({
       </View>
     </View>
   );
-};
+});
+WhyFamiliesTrustUs.displayName = 'WhyFamiliesTrustUs';

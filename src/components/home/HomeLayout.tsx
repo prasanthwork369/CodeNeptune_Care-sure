@@ -45,6 +45,8 @@ import {
 } from "react-native";
 import Animated, {
   Easing,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -91,7 +93,6 @@ export const HomeLayout: React.FC = () => {
   const [carouselY, setCarouselY] = useState(0);
   const [carouselHeight, setCarouselHeight] = useState(0);
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
-  const currentScrollY = useRef(0);
 
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener("home-scroll-to-top", () => {
@@ -206,46 +207,58 @@ export const HomeLayout: React.FC = () => {
     }
   };
 
-  const handleCombinedScroll = (e: any) => {
-    handleScroll(e);
-    const y: number = e.nativeEvent?.contentOffset?.y ?? 0;
-    currentScrollY.current = y;
-    setIsBannerVisible(
-      y + height > carouselY && y < carouselY + carouselHeight,
-    );
-  };
+  // Banner visibility is derived on the UI thread from the already-tracked
+  // scrollY shared value instead of recomputing it in the JS-thread onScroll
+  // callback every frame — runOnJS only fires on an actual true/false flip,
+  // not on every scroll tick, which was the main source of scroll jank.
+  useAnimatedReaction(
+    () =>
+      scrollY.value + height > carouselY &&
+      scrollY.value < carouselY + carouselHeight,
+    (visible, prevVisible) => {
+      if (visible !== prevVisible) {
+        runOnJS(setIsBannerVisible)(visible);
+      }
+    },
+    [carouselY, carouselHeight, height],
+  );
 
-  // Keep visibility in sync when layout coordinates are measured
-  useEffect(() => {
-    const y = currentScrollY.current;
-    setIsBannerVisible(
-      y + height > carouselY && y < carouselY + carouselHeight,
-    );
-  }, [carouselY, carouselHeight, height]);
+  const handleQuickAction = useCallback(
+    (id: string) => {
+      if (id === "upload") router.push("/upload");
+      else if (id === "substitute") router.push("/search");
+      else if (id === "call") callSupport();
+      else if (id === "whatsapp") whatsappOrder();
+    },
+    [router, callSupport, whatsappOrder],
+  );
 
-  const handleQuickAction = (id: string) => {
-    if (id === "upload") router.push("/upload");
-    else if (id === "substitute") router.push("/search");
-    else if (id === "call") callSupport();
-    else if (id === "whatsapp") whatsappOrder();
-  };
+  const handleCardPress = useCallback(
+    (id: string) => {
+      const card = cards.find((c) => c.id === id);
+      router.push({
+        pathname: "/category/[id]",
+        params: {
+          id,
+          slug: card?.slug,
+          familySlug: card?.familySlug,
+          name: card?.label.replace("\n", " "),
+        },
+      });
+    },
+    [router, cards],
+  );
 
-  const handleCardPress = (id: string) => {
-    const card = cards.find((c) => c.id === id);
-    router.push({
-      pathname: "/category/[id]",
-      params: {
-        id,
-        slug: card?.slug,
-        familySlug: card?.familySlug,
-        name: card?.label.replace("\n", " "),
-      },
-    });
-  };
+  const handleProductPress = useCallback(
+    (id: string) => {
+      router.push({ pathname: "/product/[id]", params: { id } });
+    },
+    [router],
+  );
 
-  const handleProductPress = (id: string) => {
-    router.push({ pathname: "/product/[id]", params: { id } });
-  };
+  const handleViewAllFrequent = useCallback(() => {
+    router.push("/profile/orders/frequent" as any);
+  }, [router]);
 
   return (
     <View className="flex-1 bg-white">
@@ -265,7 +278,7 @@ export const HomeLayout: React.FC = () => {
         overScrollMode="never"
         style={{ backgroundColor: "#FFFFFF" }}
         contentContainerStyle={{ backgroundColor: "#FFFFFF", flexGrow: 1 }}
-        onScroll={handleCombinedScroll}
+        onScroll={handleScroll}
         scrollEventThrottle={16}
         refreshControl={
           <RefreshControl
@@ -378,7 +391,7 @@ export const HomeLayout: React.FC = () => {
             <FrequentSubstitutes
               substitutes={frequentlyOrdered}
               onProductPress={handleProductPress}
-              onViewAll={() => router.push("/profile/orders/frequent" as any)}
+              onViewAll={handleViewAllFrequent}
             />
           )}
 
