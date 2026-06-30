@@ -6,3 +6,4 @@ export { LogisticsBar } from './LogisticsBar';
 export { MoreAboutSection } from './MoreAboutSection';
 export { SaltCompositionBanner } from './SaltCompositionBanner';
 export { TrustBadge } from './TrustBadge';
+export { NoSubstituteBanner } from './NoSubstituteBanner';

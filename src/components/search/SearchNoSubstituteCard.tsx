@@ -1,0 +1,100 @@
+import React from 'react';
+import { Text, View } from 'react-native';
+import { Touchable } from '@/src/components/ui/Touchable';
+import { icons } from '@/src/constants/icons';
+import { useToastStore } from '@/src/store/toastStore';
+import { moderateScale } from '@/src/utils/exactScale';
+import { searchCardStyles as s } from './search.styles';
+
+interface SearchNoSubstituteCardProps {
+    data: {
+        id: string;
+        productId?: string;
+        searched: {
+            name: string;
+            manufacturer?: string;
+            price: number;
+            status: string;
+        };
+    };
+}
+
+export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ data }) => {
+    const showToast = useToastStore((store) => store.show);
+
+    const handleRequest = () => {
+        // No backend endpoint exists yet for this -- wire the real API call
+        // in here once one exists.
+        if (__DEV__) {
+            console.log('[SearchNoSubstituteCard] request substitute for', {
+                productId: data.productId ?? data.id,
+            });
+        }
+        showToast('Your substitute request has been sent', 'success');
+    };
+
+    return (
+        <View
+            style={{ borderWidth: 1, borderColor: '#919EAB33' }}
+            className="w-full rounded-[12px] bg-white overflow-hidden mb-5"
+        >
+            {/* Top Section: Split */}
+            <View className="flex-row w-full">
+                {/* Left Side — searched product */}
+                <View className="flex-1 p-4">
+                    <View className="mb-6">
+                        <Text style={s.name} className="font-inter-semibold text-brand-text mb-1 leading-snug tracking-tight">
+                            {data.searched.name}
+                        </Text>
+                        {data.searched.manufacturer ? (
+                            <Text style={s.desc} className="font-inter-medium text-brand-subtext mt-0.5" numberOfLines={1}>
+                                {data.searched.manufacturer}
+                            </Text>
+                        ) : null}
+                    </View>
+                    <View className="mt-auto">
+                        {data.searched.price != null && (
+                            <Text style={s.price} className="font-inter-extrabold text-brand-text mb-1.5 tracking-tight">
+                                ₹{Number(data.searched.price).toFixed(2)}
+                            </Text>
+                        )}
+                        <Text style={s.savings} className="font-inter-semibold text-[#FF383C] mt-1">
+                            {data.searched.status}
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Right Side — no substitute message */}
+                <View className="flex-1 p-4 bg-[#FEF1F1] justify-start">
+                    <Text className="font-inter-bold text-[#730404]" style={{ fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(20, 0.1) }}>
+                        Sorry! We couldn't find a substitute
+                    </Text>
+                </View>
+            </View>
+
+            {/* Horizontal Divider Line */}
+            <View className="h-[1px] w-full bg-[#EAEAEA]" />
+
+            {/* Bottom Section: Uniform Actions Row */}
+            <View className="flex-row justify-between items-center px-4 py-3.5 bg-white">
+                <View className="flex-row items-center">
+                    <icons.info_error width={18} height={18} />
+                    <Text style={s.sameComp} className="font-inter-semibold text-brand-text ml-3">
+                        No substitute available
+                    </Text>
+                </View>
+
+                <Touchable
+                    onPress={handleRequest}
+                    activeOpacity={0.85}
+                    style={{ borderWidth: 1, borderColor: '#FF383C' }}
+                    className="rounded-[8px] px-5 py-2"
+                >
+                    <Text className="font-inter-bold text-[#FF383C]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                        Request
+                    </Text>
+                </Touchable>
+            </View>
+        </View>
+    );
+};

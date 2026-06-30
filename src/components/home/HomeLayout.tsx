@@ -32,6 +32,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
+import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -39,23 +40,21 @@ import {
   DeviceEventEmitter,
   Platform,
   RefreshControl,
-  ScrollView,
   View,
-  useWindowDimensions,
+  useWindowDimensions
 } from "react-native";
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedReaction,
+  useAnimatedRef,
   useAnimatedStyle,
+  useScrollViewOffset,
   useSharedValue,
   withDelay,
   withTiming,
-  useAnimatedRef,
-  useScrollViewOffset,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { exactScale } from "@/src/utils/exactScale";
 
 const easeOut = Easing.out(Easing.cubic);
 const EMPTY_BANNERS: NonNullable<
@@ -162,8 +161,10 @@ export const HomeLayout: React.FC = () => {
   const heroHeightRef = useRef(0);
   const heroHeightShared = useSharedValue(0);
   const scrollY = useScrollViewOffset(scrollViewRef);
-  const { handleScroll, stickySearchVisible } =
-    useHomeScroll(scrollY, heroHeightShared);
+  const { handleScroll, stickySearchVisible } = useHomeScroll(
+    scrollY,
+    heroHeightShared,
+  );
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
   const adjustedBottoms =
     Platform.OS === "android"
@@ -171,7 +172,7 @@ export const HomeLayout: React.FC = () => {
         ? adjustedBottom - 8
         : adjustedBottom
       : adjustedBottom;
-  const TAB_BAR_HEIGHT = 75 + adjustedBottom;
+  const TAB_BAR_HEIGHT = exactScale(85) + adjustedBottom;
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -341,7 +342,10 @@ export const HomeLayout: React.FC = () => {
                   onPress={() => router.push("/upload")}
                   className="border-l border-[#919EAB33] pl-3 ml-1"
                 >
-                  <icons.uploadActive width={exactScale(22)} height={exactScale(22)} />
+                  <icons.uploadActive
+                    width={exactScale(22)}
+                    height={exactScale(22)}
+                  />
                 </Touchable>
               }
             />

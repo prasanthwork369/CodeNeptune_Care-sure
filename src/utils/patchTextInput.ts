@@ -23,18 +23,12 @@ const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
       ref,
       allowFontScaling:
         props.allowFontScaling !== undefined ? props.allowFontScaling : false,
-      maxFontSizeMultiplier:
-        props.maxFontSizeMultiplier !== undefined
-          ? props.maxFontSizeMultiplier
-          : 1,
     });
   },
 );
 
 // @ts-ignore
 PatchedTextInput.displayName = "TextInput";
-// @ts-ignore
-PatchedTextInput.isPatched = true;
 
 try {
   Object.defineProperty(RN, "TextInput", {

@@ -21,12 +21,19 @@ import {
     KnowYourMedicine,
     LogisticsBar,
     MoreAboutSection,
+    NoSubstituteBanner,
     ProductDetailsFooter,
     ProductDetailsHeader,
     ProductInfo,
     SaltCompositionBanner,
     TrustBadge,
 } from "./sections";
+
+// Backend doesn't yet distinguish "checked, no substitute exists" from
+// "recommendation just not populated for this product" -- showing the
+// banner on every empty recommendation would be misleading. Flip to true
+// once the API guarantees that signal.
+const SHOW_NO_SUBSTITUTE_BANNER = false;
 
 export const ProductDetailsLayout: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -232,7 +239,7 @@ export const ProductDetailsLayout: React.FC = () => {
               </ScrollView>
             )}
 
-            {activeProduct && (
+            {activeProduct && (recommendation || !SHOW_NO_SUBSTITUTE_BANNER ? (
               <ProductDetailsFooter
                 productId={id}
                 medicineUuid={medicineId}
@@ -257,7 +264,14 @@ export const ProductDetailsLayout: React.FC = () => {
                 safeAreaBottom={adjustedBottom}
                 onViewCart={() => router.push("/(modal)/cart")}
               />
-            )}
+            ) : (
+              <NoSubstituteBanner
+                productId={id}
+                medicineUuid={medicineId}
+                productName={activeProduct.name}
+                safeAreaBottom={adjustedBottom}
+              />
+            ))}
           </View>
         </Animated.View>
       </Animated.View>

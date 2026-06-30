@@ -100,10 +100,6 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
     // specific Text instance can still opt in via allowFontScaling.
     allowFontScaling:
       props.allowFontScaling !== undefined ? props.allowFontScaling : false,
-    maxFontSizeMultiplier:
-      props.maxFontSizeMultiplier !== undefined
-        ? props.maxFontSizeMultiplier
-        : 1,
     style: [
       { fontFamily: undefined, includeFontPadding: false }, // Default reset
       sanitizedStyle,
@@ -113,8 +109,6 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
 
 // @ts-ignore
 PatchedText.displayName = "Text";
-// @ts-ignore
-PatchedText.isPatched = true;
 
 // Overwrite the property in react-native module exports
 try {

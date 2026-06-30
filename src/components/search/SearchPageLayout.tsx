@@ -60,6 +60,24 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     };
 };
 
+// For sourceType===2 items with no recommendation found -- only derives the
+// searched side, never touches item.recommendation (unlike toComparisonData,
+// which assumes it exists).
+const toSearchedOnlyData = (item: ApiSearchMedicine) => {
+    const raw = item.mrp || item.price;
+    const searchedMrp = raw != null && raw !== '' ? parseFloat(raw) : null;
+    return {
+        id: item.id,
+        productId: item.productId,
+        searched: {
+            name: item.name,
+            manufacturer: item.brand?.name ?? '',
+            price: searchedMrp,
+            status: 'Not for Purchase',
+        },
+    };
+};
+
 const toRecommendData = (item: ApiSearchMedicine) => ({
     id: item.id,
     productId: item.productId ?? item.id,
@@ -151,6 +169,7 @@ export const SearchPageLayout = () => {
                     colWidth={colWidth}
                     bottomPad={adjustedBottom + 24}
                     toComparisonData={toComparisonData}
+                    toSearchedOnlyData={toSearchedOnlyData}
                     toRecommendData={toRecommendData}
                     onRecommendPress={(productId) => router.push({ pathname: '/product/[id]', params: { id: productId } } as any)}
                     onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}

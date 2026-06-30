@@ -115,6 +115,8 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           {product.name}
         </Text>
 
+        <View style={{ borderTopWidth: 1, borderColor: '#E5E7EB', borderStyle: 'dashed', marginBottom: 12 }} />
+
         <View className="flex-row items-baseline gap-x-1.5 mb-1">
           <Text className="font-inter-extrabold text-[#111827]" style={{ fontSize: moderateScale(24, 0.1) }}>
             ₹{Number(product.price).toFixed(2)}
