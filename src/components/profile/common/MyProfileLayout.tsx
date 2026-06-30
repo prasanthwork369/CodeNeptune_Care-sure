@@ -19,6 +19,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale } from "@/src/utils/exactScale";
 
 const GENDERS = ['Male', 'Female', 'Other'];
 
@@ -32,7 +33,7 @@ const Field: React.FC<{
     rightSlot?: React.ReactNode;
 }> = ({ label, value, onChangeText, placeholder, editable = true, keyboardType = 'default', rightSlot }) => (
     <View style={{ marginBottom: 16 }}>
-        <Text style={{ fontSize: 13, fontWeight: '600', color: '#222222', marginBottom: 6 }}>
+        <Text style={{ fontSize: moderateScale(13), fontWeight: '600', color: '#222222', marginBottom: 6 }}>
             {label}
         </Text>
         <View style={{
@@ -52,7 +53,7 @@ const Field: React.FC<{
                 placeholderTextColor="#AAAAAA"
                 editable={editable}
                 keyboardType={keyboardType}
-                style={{ flex: 1, fontSize: 14, color: editable ? '#111827' : '#637381', padding: 0 }}
+                style={{ flex: 1, fontSize: moderateScale(14), color: editable ? '#111827' : '#637381', padding: 0 }}
             />
             {rightSlot}
         </View>
@@ -151,7 +152,7 @@ export const MyProfileLayout: React.FC = () => {
                     rightSlot={
                         email ? (
                             <Touchable onPress={() => {}} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                                <Text style={{ fontSize: 13, fontWeight: '600', color: '#0F7635' }}>Verify</Text>
+                                <Text style={{ fontSize: moderateScale(13), fontWeight: '600', color: '#0F7635' }}>Verify</Text>
                             </Touchable>
                         ) : null
                     }
@@ -161,7 +162,7 @@ export const MyProfileLayout: React.FC = () => {
                 <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
                     {/* Gender */}
                     <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#222222', marginBottom: 6 }}>Gender</Text>
+                        <Text style={{ fontSize: moderateScale(13), fontWeight: '600', color: '#222222', marginBottom: 6 }}>Gender</Text>
                         <Touchable
                             onPress={handleGenderPick}
                             activeOpacity={0.8}
@@ -176,7 +177,7 @@ export const MyProfileLayout: React.FC = () => {
                                 height: 48,
                             }}
                         >
-                            <Text style={{ flex: 1, fontSize: 14, color: gender ? '#111827' : '#AAAAAA' }}>
+                            <Text style={{ flex: 1, fontSize: moderateScale(14), color: gender ? '#111827' : '#AAAAAA' }}>
                                 {gender || 'Select'}
                             </Text>
                             <icons.down_arrow width={16} height={16} />
@@ -185,7 +186,7 @@ export const MyProfileLayout: React.FC = () => {
 
                     {/* Date of Birth */}
                     <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#222222', marginBottom: 6 }}>Date of Birth</Text>
+                        <Text style={{ fontSize: moderateScale(13), fontWeight: '600', color: '#222222', marginBottom: 6 }}>Date of Birth</Text>
                         <Touchable
                             onPress={() => setShowDatePicker(true)}
                             activeOpacity={0.8}
@@ -200,7 +201,7 @@ export const MyProfileLayout: React.FC = () => {
                                 height: 48,
                             }}
                         >
-                            <Text style={{ flex: 1, fontSize: 14, color: formattedDob ? '#111827' : '#AAAAAA' }}>
+                            <Text style={{ flex: 1, fontSize: moderateScale(14), color: formattedDob ? '#111827' : '#AAAAAA' }}>
                                 {formattedDob || 'DD-MM-YYYY'}
                             </Text>
                             <icons.calendar_month width={18} height={18} />
@@ -217,15 +218,15 @@ export const MyProfileLayout: React.FC = () => {
                 />
 
                 {error ? (
-                    <Text style={{ fontSize: 13, fontWeight: '500', color: '#EF4444', marginBottom: 12 }}>{error}</Text>
+                    <Text style={{ fontSize: moderateScale(13), fontWeight: '500', color: '#EF4444', marginBottom: 12 }}>{error}</Text>
                 ) : null}
 
                 {/* Delete Account */}
                 <View style={{ marginTop: 24, borderTopWidth: 1, borderTopColor: '#E8E8E8', paddingTop: 20 }}>
                     <Touchable onPress={handleDeleteAccount} activeOpacity={0.7} style={{ marginBottom: 6 }}>
-                        <Text style={{ fontSize: 14, fontWeight: '700', color: '#CA2B25' }}>Delete Account</Text>
+                        <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#CA2B25' }}>Delete Account</Text>
                     </Touchable>
-                    <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 20 }}>
+                    <Text style={{ fontSize: moderateScale(13), color: '#6B7280', lineHeight: moderateScale(20) }}>
                         Deleting your account will remove all your order, wallet amount and any active referral
                     </Text>
                 </View>
@@ -249,7 +250,7 @@ export const MyProfileLayout: React.FC = () => {
                     >
                         {updating
                             ? <ActivityIndicator color="#fff" size="small" />
-                            : <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Save Changes</Text>
+                            : <Text style={{ fontSize: moderateScale(15), fontWeight: '600', color: '#FFFFFF' }}>Save Changes</Text>
                         }
                     </Touchable>
                 </View>
@@ -261,7 +262,7 @@ export const MyProfileLayout: React.FC = () => {
                 onClose={() => setShowGenderSheet(false)}
             >
               <BottomSheetView style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 16 }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 16 }}>Select Gender</Text>
+                <Text style={{ fontSize: moderateScale(16), fontWeight: '700', color: '#111827', marginBottom: 16 }}>Select Gender</Text>
                 {GENDERS.map((g, i) => (
                     <Touchable
                         key={g}
@@ -276,7 +277,7 @@ export const MyProfileLayout: React.FC = () => {
                             borderBottomColor: '#F3F4F6',
                         }}
                     >
-                        <Text style={{ fontSize: 15, fontWeight: gender === g ? '600' : '400', color: gender === g ? '#0F7635' : '#111827' }}>
+                        <Text style={{ fontSize: moderateScale(15), fontWeight: gender === g ? '600' : '400', color: gender === g ? '#0F7635' : '#111827' }}>
                             {g}
                         </Text>
                         {gender === g && <icons.check_circle width={20} height={20} fill="#0F7635" />}

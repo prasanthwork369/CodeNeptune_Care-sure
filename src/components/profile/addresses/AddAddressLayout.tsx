@@ -21,6 +21,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const Field = React.forwardRef<
   TextInput,
@@ -68,7 +69,7 @@ const Field = React.forwardRef<
     <View className="mb-5" onLayout={(e) => onLayout?.(e.nativeEvent.layout.y)}>
       <Text
         style={{
-          fontSize: 13,
+          fontSize: moderateScale(13),
           fontWeight: "600",
           color: "#222222",
           marginBottom: 8,
@@ -98,7 +99,7 @@ const Field = React.forwardRef<
       {error ? (
         <Text
           style={{
-            fontSize: 12,
+            fontSize: moderateScale(12),
             fontWeight: "500",
             color: "#EF4444",
             marginTop: 4,
@@ -455,7 +456,7 @@ export const AddAddressLayout: React.FC = () => {
           <View className="mb-5">
             <Text
               style={{
-                fontSize: 13,
+                fontSize: moderateScale(13),
                 fontWeight: "600",
                 color: "#222222",
                 marginBottom: 8,

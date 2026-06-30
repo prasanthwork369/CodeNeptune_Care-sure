@@ -21,6 +21,7 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 function SectionCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
     return <View className={`bg-white rounded-lg mx-base ${className}`} style={{ borderWidth: 1, borderColor: '#F0F1F3', elevation: 0 }}>{children}</View>;
@@ -298,7 +299,7 @@ export const ReturnProductLayout: React.FC = () => {
                                         </View>
                                     </View>
                                     <Touchable onPress={() => toggleItem(item)} activeOpacity={0.7} className="ml-2 mt-0.5 w-6 h-6 rounded items-center justify-center" style={{ borderWidth: 1.5, borderColor: isChecked ? '#0F7635' : '#9CA3AF', backgroundColor: isChecked ? '#0F7635' : 'transparent' }}>
-                                        {isChecked && <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', lineHeight: 14 }}>✓</Text>}
+                                        {isChecked && <Text style={{ color: '#FFFFFF', fontSize: moderateScale(12), fontWeight: '700', lineHeight: moderateScale(14) }}>✓</Text>}
                                     </Touchable>
                                 </View>
                                 {isChecked && reasonData && (
@@ -307,7 +308,7 @@ export const ReturnProductLayout: React.FC = () => {
                                         <View className="flex-row items-start justify-between">
                                             <View className="flex-1">
                                                 <View className="flex-row items-center gap-2"><icons.info_gray width={16} height={16} /><Text style={s.labelMd} className="font-inter-bold text-[#222222]">{reasonData.reason}</Text></View>
-                                                {!!reasonData.details && <Text className="text-[12px] font-inter-medium text-brand-subtext mt-1">{reasonData.details}</Text>}
+                                                {!!reasonData.details && <Text className="font-inter-medium text-brand-subtext mt-1" style={{ fontSize: moderateScale(12) }}>{reasonData.details}</Text>}
                                                 <View className="flex-row mt-3 gap-2">
                                                     {Object.values(reasonData.images).filter(Boolean).map((img, i) => (
                                                         <Image key={i} source={{ uri: img }} className="w-[52px] h-[52px] rounded-lg" resizeMode="cover" />

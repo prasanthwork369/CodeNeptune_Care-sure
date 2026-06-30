@@ -25,6 +25,7 @@ import {
 } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { typography } from "@/src/constants/typography";
 
 interface LocationBottomSheetProps {
   isVisible: boolean;
@@ -521,7 +522,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                     </View>
                   )}
                 </View>
-                <Text className="font-inter text-brand-subtext" style={{ fontSize: moderateScale(14), lineHeight: moderateScale(20) }}>
+                <Text className="font-inter text-brand-subtext" style={{ fontSize: typography.body.fontSize, lineHeight: typography.body.lineHeight }}>
                   {fullAddress}
                 </Text>
               </Touchable>

@@ -2,6 +2,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 interface SavingsBannerProps {
   amount: number;
@@ -26,7 +27,7 @@ export const SavingsBanner: React.FC<SavingsBannerProps> = ({ amount }) => (
       resizeMode="contain"
     />
     <Text
-      style={{ fontSize: 14, fontWeight: "600", color: "#0A0A0A" }}
+      style={{ fontSize: moderateScale(14), fontWeight: "600", color: "#0A0A0A" }}
     >
       {"You saved  "}
       <Text style={{ fontWeight: "800" }}>

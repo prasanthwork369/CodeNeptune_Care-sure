@@ -13,6 +13,7 @@ import {
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { typography } from "@/src/constants/typography";
 
 interface HealthProblemSheetProps {
   isVisible: boolean;
@@ -285,7 +286,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                               size={exactScale(44)}
                             />
                           ) : (
-                            <Text style={{ fontSize: moderateScale(22), lineHeight: moderateScale(28) }}>
+                            <Text style={{ fontSize: typography.h2.fontSize, lineHeight: typography.h2.lineHeight }}>
                               {item.icon}
                             </Text>
                           )}

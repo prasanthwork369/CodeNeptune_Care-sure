@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 interface Props {
   isVisible: boolean;
@@ -135,7 +136,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
 
           <Text
             style={{
-              fontSize: 20,
+              fontSize: moderateScale(20),
               fontWeight: "700",
               color: "#111827",
               textAlign: "center",
@@ -148,11 +149,11 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
 
           <Text
             style={{
-              fontSize: 13,
+              fontSize: moderateScale(13),
               fontWeight: "400",
               color: "#6B7280",
               textAlign: "center",
-              lineHeight: 20,
+              lineHeight: moderateScale(20),
               marginBottom: 24,
             }}
           >
@@ -185,7 +186,7 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
             ) : (
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: moderateScale(15),
                   fontWeight: "600",
                   color: "#FFFFFF",
                 }}

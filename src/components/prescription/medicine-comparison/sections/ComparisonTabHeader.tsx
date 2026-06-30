@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const ComparisonTabHeader: React.FC = () => (
   <View
@@ -20,7 +21,7 @@ export const ComparisonTabHeader: React.FC = () => (
     >
       <Text
         style={{
-          fontSize: 13,
+          fontSize: moderateScale(13),
           fontWeight: "500",
           color: "#6B7280",
         }}
@@ -38,7 +39,7 @@ export const ComparisonTabHeader: React.FC = () => (
     >
       <Text
         style={{
-          fontSize: 13,
+          fontSize: moderateScale(13),
           fontWeight: "600",
           color: "#0F7635",
         }}

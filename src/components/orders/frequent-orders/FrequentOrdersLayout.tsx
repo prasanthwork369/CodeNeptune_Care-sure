@@ -13,6 +13,7 @@ import {
     View,
 } from "react-native";
 import { ProductCard } from "./sections";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const FrequentOrdersLayout: React.FC = () => {
   const router = useNav();
@@ -93,7 +94,7 @@ export const FrequentOrdersLayout: React.FC = () => {
               >
                 <Text
                   style={{
-                    fontSize: 10,
+                    fontSize: moderateScale(10),
                     fontWeight: "700",
                     color: "#fff",
                   }}
@@ -136,7 +137,7 @@ export const FrequentOrdersLayout: React.FC = () => {
               placeholderTextColor="#B0BAC4"
               style={{
                 flex: 1,
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "400",
                 color: "#1C2024",
                 paddingVertical: 0,
@@ -187,7 +188,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                 >
                   <Text
                     style={{
-                      fontSize: 13,
+                      fontSize: moderateScale(13),
                       fontWeight: active ? "600" : "500",
                       color: active ? "#fff" : "#637381",
                     }}
@@ -225,7 +226,7 @@ export const FrequentOrdersLayout: React.FC = () => {
           <View style={{ alignItems: "center", justifyContent: "center" }}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 fontWeight: "600",
                 color: "#637381",
                 textAlign: "center",
@@ -237,7 +238,7 @@ export const FrequentOrdersLayout: React.FC = () => {
             </Text>
             <Text
               style={{
-                fontSize: 13,
+                fontSize: moderateScale(13),
                 fontWeight: "400",
                 color: "#919EAB",
                 marginTop: 6,

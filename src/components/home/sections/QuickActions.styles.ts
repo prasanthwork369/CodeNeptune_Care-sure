@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { typography } from "@/src/constants/typography";
 
 export const styles = StyleSheet.create({
     container: {
@@ -41,9 +42,9 @@ export const styles = StyleSheet.create({
     label: {
         flex: 1,
         fontWeight: '600',
-        fontSize: moderateScale(14),
+        fontSize: typography.body.fontSize,
         color: '#0F172A',
-        lineHeight: moderateScale(20),
+        lineHeight: typography.body.lineHeight,
         verticalAlign: 'middle',
     },
 });

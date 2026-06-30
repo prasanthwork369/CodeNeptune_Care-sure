@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const RadioDot = ({ selected }: { selected: boolean }) => (
   <View
@@ -35,7 +36,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
     <View>
       <Text
         style={{
-          fontSize: 16,
+          fontSize: moderateScale(16),
           fontWeight: "700",
           color: "#1A1C1E",
           marginBottom: 12,
@@ -80,7 +81,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
             <View style={{ flex: 1, marginLeft: 16 }}>
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: moderateScale(15),
                   fontWeight: "700",
                   color: "#1A1C1E",
                 }}
@@ -89,7 +90,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
               </Text>
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: moderateScale(12),
                   fontWeight: "500",
                   color: "#6B7280",
                   marginTop: 4,

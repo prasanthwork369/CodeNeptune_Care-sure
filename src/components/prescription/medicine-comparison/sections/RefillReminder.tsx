@@ -2,6 +2,7 @@ import { CustomSwitch } from "@/src/components/ui/CustomSwitch";
 import { HOME_IMAGES } from "@/src/constants/images";
 import React from "react";
 import { Image, Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 interface RefillReminderProps {
   value: boolean;
@@ -33,13 +34,13 @@ export const RefillReminder: React.FC<RefillReminderProps> = ({
       />
       <View style={{ flex: 1, marginLeft: 12 }}>
         <Text
-          style={{ fontSize: 14, fontWeight: "700", color: "#111827" }}
+          style={{ fontSize: moderateScale(14), fontWeight: "700", color: "#111827" }}
         >
           Refill Reminder
         </Text>
         <Text
           style={{
-            fontSize: 12,
+            fontSize: moderateScale(12),
             fontWeight: "500",
             color: "#6B7280",
             marginTop: 2,
@@ -53,7 +54,7 @@ export const RefillReminder: React.FC<RefillReminderProps> = ({
     {value && (
       <Text
         style={{
-          fontSize: 12,
+          fontSize: moderateScale(12),
           fontWeight: "500",
           color: "#6B7280",
           marginTop: 10,

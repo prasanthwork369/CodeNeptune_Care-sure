@@ -21,7 +21,7 @@ export const RequiresPrescriptionWarning: React.FC<RequiresPrescriptionWarningPr
                         marginRight: 8 
                     }}
                 >
-                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700', lineHeight: 14 }}>i</Text>
+                    <Text style={{ color: '#fff', fontSize: moderateScale(12), fontWeight: '700', lineHeight: moderateScale(14) }}>i</Text>
                 </View>
                 <Text style={{ color: '#E56F07', fontSize: moderateScale(13, 0.1) }} className="font-inter-bold">
                     {itemCount} Item{itemCount > 1 ? 's' : ''} Requires Prescription
@@ -29,7 +29,7 @@ export const RequiresPrescriptionWarning: React.FC<RequiresPrescriptionWarningPr
             </View>
             {items.map((item) => (
                 <View key={item.id} className="flex-row items-start ml-1 mb-0.5">
-                    <Text style={{ color: '#6A6A6A', marginRight: 6, lineHeight: 18 }}>{'•'}</Text>
+                    <Text style={{ color: '#6A6A6A', marginRight: 6, lineHeight: moderateScale(18) }}>{'•'}</Text>
                     <Text
                         style={{ color: '#6A6A6A', fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(18, 0.1) }}
                         className="font-inter-medium flex-1"

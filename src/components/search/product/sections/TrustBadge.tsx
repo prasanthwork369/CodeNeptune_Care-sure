@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { icons } from '@/src/constants/icons';
 import { colors } from '@/src/constants/theme';
+import { moderateScale } from '@/src/utils/exactScale';
 
 export const TrustBadge = () => {
     return (
@@ -62,7 +63,7 @@ export const TrustBadge = () => {
                         </Text>
                         <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
                             <icons.check_circle width={14} height={14} color={colors.primary} />
-                            <Text className="text-[14px] font-inter-semibold text-brand-primary ml-1.5">
+                            <Text className="font-inter-semibold text-brand-primary ml-1.5" style={{ fontSize: moderateScale(14) }}>
                                 100% Match
                             </Text>
                         </View>
@@ -75,7 +76,7 @@ export const TrustBadge = () => {
                         </Text>
                         <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
                             <icons.check_circle width={14} height={14} color={colors.primary} />
-                            <Text className="text-[14px] font-inter-semibold text-brand-primary ml-1.5">
+                            <Text className="font-inter-semibold text-brand-primary ml-1.5" style={{ fontSize: moderateScale(14) }}>
                                 Same
                             </Text>
                         </View>
@@ -87,7 +88,7 @@ export const TrustBadge = () => {
                             PRICE/UNIT
                         </Text>
                         <View className="flex-row items-center justify-between">
-                            <Text className="text-[14px] font-inter-semibold text-[#111827]">
+                            <Text className="font-inter-semibold text-[#111827]" style={{ fontSize: moderateScale(14) }}>
                                 ₹1.5
                             </Text>
                             <Text style={s.value} className="font-inter-semibold text-brand-primary">

@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
   totalSavings,
@@ -29,7 +30,7 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
         resizeMode="contain"
       />
       <Text
-        style={{ fontSize: 14, fontWeight: "600", color: "#0A0A0A" }}
+        style={{ fontSize: moderateScale(14), fontWeight: "600", color: "#0A0A0A" }}
       >
         {"You saved  "}
         <Text className="font-inter-extrabold text-[#0A0A0A]">

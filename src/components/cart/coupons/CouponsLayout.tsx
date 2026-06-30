@@ -8,6 +8,7 @@ import { useCart } from '@/src/hooks/queries/useCart';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { CouponInput, CouponCard } from './sections';
+import { moderateScale } from '@/src/utils/exactScale';
 
 export const CouponsLayout: React.FC = () => {
     const [couponCode, setCouponCode] = useState('');
@@ -48,12 +49,12 @@ export const CouponsLayout: React.FC = () => {
                     loading={validating}
                 />
 
-                <Text className="text-[14px] font-inter-bold text-brand-text mt-8 mb-4">More Coupons</Text>
+                <Text className="font-inter-bold text-brand-text mt-8 mb-4" style={{ fontSize: moderateScale(14) }}>More Coupons</Text>
 
                 {isLoading ? (
                     <ActivityIndicator color="#0F7635" />
                 ) : coupons.length === 0 ? (
-                    <Text className="text-[13px] font-inter-medium text-brand-subtext text-center mt-4">
+                    <Text className="font-inter-medium text-brand-subtext text-center mt-4" style={{ fontSize: moderateScale(13) }}>
                         No coupons available
                     </Text>
                 ) : (

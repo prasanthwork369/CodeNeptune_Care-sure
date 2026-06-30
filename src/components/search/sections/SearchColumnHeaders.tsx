@@ -7,6 +7,7 @@ import Svg, {
     LinearGradient as SvgLinearGradient,
     Text as SvgText,
 } from "react-native-svg";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
   // Safety check for colWidth to prevent native crashes on Android
@@ -16,8 +17,8 @@ export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
     <View className="flex-row mx-4 mt-2">
       <View className="flex-1 items-center justify-center pb-3">
         <Text
-          style={{ letterSpacing: 0.5 }}
-          className="text-[11px] font-inter-bold text-brand-subtext uppercase"
+          style={{ letterSpacing: 0.5, fontSize: moderateScale(11) }}
+          className="font-inter-bold text-brand-subtext uppercase"
         >
           YOU SEARCHED
         </Text>
@@ -34,7 +35,7 @@ export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
             fill="url(#grad)"
             stroke="url(#grad)"
             strokeWidth={0.3}
-            fontSize={11}
+            fontSize={moderateScale(11)}
             fontWeight="700"
             letterSpacing={0.5}
             x={safeColWidth / 2}

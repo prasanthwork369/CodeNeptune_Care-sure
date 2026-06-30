@@ -5,6 +5,7 @@ import React, { useState, useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useWebsiteContent } from '@/src/hooks/queries/useWebsiteContent';
 import { Skeleton } from '@/src/components/ui/Skeleton';
+import { moderateScale } from "@/src/utils/exactScale";
 
 const FaqSkeleton = () => (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16 }}>
@@ -67,7 +68,7 @@ export const FaqLayout: React.FC = () => {
                 <FaqSkeleton />
             ) : faqs.length === 0 ? (
                 <View className="flex-1 items-center justify-center p-8">
-                    <Text className="text-[14px] font-inter-medium text-brand-subtext text-center">
+                    <Text className="font-inter-medium text-brand-subtext text-center" style={{ fontSize: moderateScale(14) }}>
                         No FAQs found at the moment.
                     </Text>
                 </View>
@@ -81,7 +82,7 @@ export const FaqLayout: React.FC = () => {
                                     activeOpacity={0.7}
                                     className="flex-row items-center px-5 py-6"
                                 >
-                                    <Text className="flex-1 text-[15px] font-inter-semibold text-brand-text pr-3" style={{ lineHeight: 22 }}>
+                                    <Text className="flex-1 font-inter-semibold text-brand-text pr-3" style={{ fontSize: moderateScale(15), lineHeight: moderateScale(22) }}>
                                         {item.question}
                                     </Text>
                                     {openIndex === index
@@ -91,7 +92,7 @@ export const FaqLayout: React.FC = () => {
                                 </Touchable>
                                 {openIndex === index && (
                                     <View className="px-5 pb-5">
-                                        <Text className="text-[13px] font-inter-medium text-brand-subtext" style={{ lineHeight: 20 }}>
+                                        <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(13), lineHeight: moderateScale(20) }}>
                                             {item.answer}
                                         </Text>
                                     </View>

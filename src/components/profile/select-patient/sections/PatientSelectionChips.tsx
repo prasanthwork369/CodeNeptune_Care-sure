@@ -3,6 +3,7 @@ import { PatientSelectionChipsProps } from "@/src/types/patient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const PatientSelectionChips: React.FC<PatientSelectionChipsProps> = ({
   members,
@@ -20,7 +21,7 @@ export const PatientSelectionChips: React.FC<PatientSelectionChipsProps> = ({
         {loading ? (
           <PatientChipSkeleton />
         ) : members.length === 0 ? (
-          <Text className="text-[12px] font-inter text-[#919EAB] py-2">
+          <Text className="font-inter text-[#919EAB] py-2" style={{ fontSize: moderateScale(12) }}>
             No patients yet. Tap &quot;ADD PATIENT&quot;
           </Text>
         ) : (
@@ -38,8 +39,8 @@ export const PatientSelectionChips: React.FC<PatientSelectionChipsProps> = ({
                 }}
               >
                 <Text
-                  className="text-[13px] font-inter-medium"
-                  style={{ color: sel ? "#FFFFFF" : "#6A6A6A" }}
+                  className="font-inter-medium"
+                  style={{ color: sel ? "#FFFFFF" : "#6A6A6A", fontSize: moderateScale(13) }}
                 >
                   {p.name}{" "}
                   <Text className="font-inter">({p.relationship})</Text>

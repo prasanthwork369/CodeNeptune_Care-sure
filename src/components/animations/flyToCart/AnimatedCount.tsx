@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -42,10 +43,10 @@ export const AnimatedCount: React.FC<AnimatedCountProps> = ({ count }) => {
           style,
           {
             color: "#fff",
-            fontSize: 11.5,
+            fontSize: moderateScale(11.5),
             fontWeight: "500",
             opacity: 0.9,
-            lineHeight: 14,
+            lineHeight: moderateScale(14),
           },
         ]}
       >
@@ -54,11 +55,11 @@ export const AnimatedCount: React.FC<AnimatedCountProps> = ({ count }) => {
       <Text
         style={{
           color: "#fff",
-          fontSize: 11.5,
+          fontSize: moderateScale(11.5),
           fontWeight: "500",
           opacity: 0.9,
           marginLeft: 4,
-          lineHeight: 14,
+          lineHeight: moderateScale(14),
         }}
       >
         {count === 1 ? "item" : "items"}

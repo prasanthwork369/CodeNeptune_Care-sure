@@ -14,6 +14,7 @@ import {
 import React, { useState } from "react";
 import { Image, Text, View, ActivityIndicator, Alert } from "react-native";
 import { cartStyles as s } from "../cart.styles";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const computeDiscount = (coupon: Coupon, amount: number) => {
   if (coupon.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE) {
@@ -146,7 +147,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
       <View className="bg-[#EAF6FF] px-4 pt-4 pb-4">
         <Text
           style={{
-            fontSize: 15,
+            fontSize: moderateScale(15),
             fontWeight: "700",
             color: "#1A1C1E",
             marginBottom: 10,
@@ -180,10 +181,10 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               numberOfLines={1}
               ellipsizeMode="tail"
               style={{
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "700",
                 color: "#1A1C1E",
-                lineHeight: 18,
+                lineHeight: moderateScale(18),
               }}
             >
               Save ₹{savings.toFixed(0)} with {bestCoupon.code}
@@ -191,7 +192,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             {isLocked && (
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: moderateScale(12),
                   fontWeight: "600",
                   color: "#E16D09",
                   marginTop: 3,
@@ -220,7 +221,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             ) : (
               <Text
                 style={{
-                  fontSize: 13,
+                  fontSize: moderateScale(13),
                   fontWeight: "700",
                   color: isLocked ? "#9CA3AF" : "#0F7635",
                 }}
@@ -249,7 +250,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
       >
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             fontWeight: "500",
             color: "#6A6A6A",
           }}

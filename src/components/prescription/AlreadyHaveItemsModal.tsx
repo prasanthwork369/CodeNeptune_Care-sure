@@ -1,6 +1,7 @@
 import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
+import { moderateScale } from "@/src/utils/exactScale";
 import {
     ActivityIndicator,
     Modal,
@@ -95,13 +96,13 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
           {/* Title */}
           <Text
             style={{
-              fontSize: 21,
+              fontSize: moderateScale(21),
               fontWeight: "700",
               color: "#111827",
               textAlign: "center",
               marginBottom: 10,
               paddingHorizontal: 12,
-              lineHeight: 28,
+              lineHeight: moderateScale(28),
             }}
           >
             You Already Have Items in Your Cart
@@ -110,11 +111,11 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
           {/* Subtitle */}
           <Text
             style={{
-              fontSize: 14.5,
+              fontSize: moderateScale(14.5),
               fontWeight: "400",
               color: "#6B7280",
               textAlign: "center",
-              lineHeight: 22,
+              lineHeight: moderateScale(22),
               marginBottom: 28,
               paddingHorizontal: 12,
             }}
@@ -150,7 +151,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
                 <icons.shopping_cart width={20} height={20} color="#fff" />
                 <Text
                   style={{
-                    fontSize: 15.5,
+                    fontSize: moderateScale(15.5),
                     fontWeight: "600",
                     color: "#fff",
                   }}
@@ -178,7 +179,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
                 <icons.swapcart width={20} height={20} color="#1D4ED8" />
                 <Text
                   style={{
-                    fontSize: 15.5,
+                    fontSize: moderateScale(15.5),
                     fontWeight: "600",
                     color: "#1D4ED8",
                   }}

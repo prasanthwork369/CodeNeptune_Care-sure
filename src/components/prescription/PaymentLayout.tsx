@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const PAYMENT_METHODS = [
   {
@@ -239,7 +240,7 @@ export const PaymentLayout: React.FC = () => {
           </Touchable>
           <Text
             style={{
-              fontSize: 18,
+              fontSize: moderateScale(18),
               fontWeight: "700",
               color: "#1A1C1E",
             }}
@@ -266,7 +267,7 @@ export const PaymentLayout: React.FC = () => {
         >
           <Text
             style={{
-              fontSize: 14,
+              fontSize: moderateScale(14),
               fontWeight: "500",
               color: "rgba(255,255,255,0.8)",
               letterSpacing: 0.5,
@@ -283,7 +284,7 @@ export const PaymentLayout: React.FC = () => {
           >
             <Text
               style={{
-                fontSize: 24,
+                fontSize: moderateScale(24),
                 fontWeight: "700",
                 color: "#fff",
                 marginRight: 4,
@@ -293,7 +294,7 @@ export const PaymentLayout: React.FC = () => {
             </Text>
             <Text
               style={{
-                fontSize: 42,
+                fontSize: moderateScale(42),
                 fontWeight: "800",
                 color: "#fff",
               }}
@@ -314,7 +315,7 @@ export const PaymentLayout: React.FC = () => {
             <icons.verified_user width={16} height={16} fill="#fff" />
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "600",
                 color: "#fff",
                 marginLeft: 8,
@@ -328,7 +329,7 @@ export const PaymentLayout: React.FC = () => {
         <View style={{ marginBottom: 24 }}>
           <Text
             style={{
-              fontSize: 16,
+              fontSize: moderateScale(16),
               fontWeight: "700",
               color: "#1A1C1E",
               marginBottom: 12,
@@ -374,7 +375,7 @@ export const PaymentLayout: React.FC = () => {
             <View style={{ flex: 1, marginLeft: 16 }}>
               <Text
                 style={{
-                  fontSize: 14,
+                  fontSize: moderateScale(14),
                   fontWeight: "700",
                   color: "#1A1C1E",
                 }}
@@ -385,7 +386,7 @@ export const PaymentLayout: React.FC = () => {
               </Text>
               <Text
                 style={{
-                  fontSize: 13,
+                  fontSize: moderateScale(13),
                   fontWeight: "500",
                   color: "#6B7280",
                   marginTop: 4,
@@ -415,7 +416,7 @@ export const PaymentLayout: React.FC = () => {
         <View>
           <Text
             style={{
-              fontSize: 16,
+              fontSize: moderateScale(16),
               fontWeight: "700",
               color: "#1A1C1E",
               marginBottom: 12,
@@ -460,7 +461,7 @@ export const PaymentLayout: React.FC = () => {
                 <View style={{ flex: 1, marginLeft: 16 }}>
                   <Text
                     style={{
-                      fontSize: 15,
+                      fontSize: moderateScale(15),
                       fontWeight: "700",
                       color: "#1A1C1E",
                     }}
@@ -469,7 +470,7 @@ export const PaymentLayout: React.FC = () => {
                   </Text>
                   <Text
                     style={{
-                      fontSize: 12,
+                      fontSize: moderateScale(12),
                       fontWeight: "500",
                       color: "#6B7280",
                       marginTop: 4,
@@ -527,7 +528,7 @@ export const PaymentLayout: React.FC = () => {
               <>
                 <Text
                   style={{
-                    fontSize: 17,
+                    fontSize: moderateScale(17),
                     fontWeight: "700",
                     color: "#fff",
                   }}

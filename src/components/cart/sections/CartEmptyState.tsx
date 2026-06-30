@@ -6,6 +6,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   featuredProducts,
@@ -36,7 +37,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
           loop
           style={{ width: 140, height: 140 }}
         />
-        <Text className="text-[16px] font-inter-semibold text-[#008097] mt-2">
+        <Text className="font-inter-semibold text-[#008097] mt-2" style={{ fontSize: moderateScale(16) }}>
           Your cart is empty
         </Text>
         <Touchable
@@ -44,7 +45,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
           onPress={() => router.replace("/(tabs)")}
           className="bg-brand-primary rounded-[12px] px-8 py-3 mt-4"
         >
-          <Text className="text-[14px] font-inter-semibold text-white">
+          <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(14) }}>
             Add More
           </Text>
         </Touchable>
@@ -52,7 +53,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
 
       {featuredProducts.length > 0 && (
         <View className="mt-2">
-          <Text className="px-4 mb-2 text-[16px] font-inter-bold text-brand-text">
+          <Text className="px-4 mb-2 font-inter-bold text-brand-text" style={{ fontSize: moderateScale(16) }}>
             Before you go
           </Text>
           <ScrollView
@@ -96,7 +97,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     {/* Discount badge */}
                     {!!product.discount && (
                       <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, backgroundColor: '#008097' }}>
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>
+                        <Text style={{ fontSize: moderateScale(10), fontWeight: '700', color: '#fff' }}>
                           {String(product.discount).toUpperCase()}
                         </Text>
                       </View>
@@ -117,10 +118,10 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                       <Text
                         numberOfLines={2}
                         style={{
-                          fontSize: 13.5,
+                          fontSize: moderateScale(13.5),
                           fontWeight: "500",
                           color: "#222222",
-                          lineHeight: 18,
+                          lineHeight: moderateScale(18),
                         }}
                       >
                         {product.name}
@@ -128,7 +129,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                       <Text
                         numberOfLines={1}
                         style={{
-                          fontSize: 12,
+                          fontSize: moderateScale(12),
                           fontWeight: "700",
                           color: "#009989",
                           marginTop: 2,
@@ -139,7 +140,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                       <Text
                         numberOfLines={1}
                         style={{
-                          fontSize: 11,
+                          fontSize: moderateScale(11),
                           fontWeight: "500",
                           color: "#6A6A6A",
                           marginTop: 1,
@@ -160,7 +161,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                       >
                         <Text
                           style={{
-                            fontSize: 15,
+                            fontSize: moderateScale(15),
                             fontWeight: "700",
                             color: "#0F172A",
                           }}
@@ -170,7 +171,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         {!!product.originalPrice && product.originalPrice > product.price && (
                           <Text
                             style={{
-                              fontSize: 11,
+                              fontSize: moderateScale(11),
                               fontWeight: "400",
                               color: "#637381",
                               textDecorationLine: "line-through",
@@ -206,7 +207,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                           ) : (
                             <Text
                               style={{
-                                fontSize: 14,
+                                fontSize: moderateScale(14),
                                 fontWeight: "700",
                                 color: "#0F7635",
                               }}

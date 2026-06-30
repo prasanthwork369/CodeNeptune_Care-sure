@@ -6,6 +6,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { searchRecentStyles as s } from '../search.styles';
+import { moderateScale } from "@/src/utils/exactScale";
 
 const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
     <Touchable
@@ -26,7 +27,7 @@ const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
             zIndex: 10,
         }}
     >
-        <Text style={{ fontSize: 7, color: '#E53E3E', fontWeight: '700', lineHeight: 9 }}>✕</Text>
+        <Text style={{ fontSize: moderateScale(7), color: '#E53E3E', fontWeight: '700', lineHeight: moderateScale(9) }}>✕</Text>
     </Touchable>
 );
 

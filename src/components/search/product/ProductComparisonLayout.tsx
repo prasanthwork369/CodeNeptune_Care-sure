@@ -22,6 +22,7 @@ import React, { useCallback, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 import {
     ComparisonBoard,
     MoreAboutSection,
@@ -163,7 +164,7 @@ export const ProductComparisonLayout: React.FC<
               >
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: moderateScale(16),
                     fontWeight: "600",
                     color: "#333232",
                     textAlign: "center",

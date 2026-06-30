@@ -4,6 +4,7 @@ import { useNotificationPreferences } from '@/src/hooks/queries/useNotificationP
 import React from 'react';
 import { Text, View } from 'react-native';
 import { Skeleton } from '@/src/components/ui/Skeleton';
+import { moderateScale } from "@/src/utils/exactScale";
 
 const ITEMS = [
     {
@@ -80,10 +81,10 @@ export const NotificationSettingsLayout: React.FC = () => {
                                 }}
                             >
                                 <View style={{ flex: 1, marginRight: 16 }}>
-                                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 3 }}>
+                                    <Text style={{ fontSize: moderateScale(15), fontWeight: '700', color: '#111827', marginBottom: 3 }}>
                                         {item.label}
                                     </Text>
-                                    <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 18 }}>
+                                    <Text style={{ fontSize: moderateScale(13), color: '#6B7280', lineHeight: moderateScale(18) }}>
                                         {item.desc}
                                     </Text>
                                 </View>

@@ -5,6 +5,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import React, { useState } from "react";
+import { moderateScale } from "@/src/utils/exactScale";
 import {
     ActivityIndicator,
     Alert,
@@ -170,7 +171,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           >
             <Text
               style={{
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "600",
                 color: "#1C2024",
                 flex: 1,
@@ -184,7 +185,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <View style={{ alignItems: "flex-end" }}>
               <Text
                 style={{
-                  fontSize: 14,
+                  fontSize: moderateScale(14),
                   fontWeight: "700",
                   color: "#0F7635",
                 }}
@@ -195,7 +196,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
                 Number(item.originalPrice) > Number(item.price) && (
                   <Text
                     style={{
-                      fontSize: 11,
+                      fontSize: moderateScale(11),
                       fontWeight: "400",
                       color: "#919EAB",
                       textDecorationLine: "line-through",
@@ -212,7 +213,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           {!!brandLine && (
             <Text
               style={{
-                fontSize: 11,
+                fontSize: moderateScale(11),
                 fontWeight: "400",
                 color: "#637381",
                 marginTop: 4,
@@ -237,7 +238,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           >
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "500",
                 color: "#1C2024",
               }}
@@ -263,16 +264,16 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
       {cartItem ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635', height: CART_BUTTON_HEIGHT }}>
           <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 20, color: '#fff', fontWeight: '500', lineHeight: 24 }}>−</Text>
+            <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>−</Text>
           </Touchable>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             {counterPending
               ? <ActivityIndicator size="small" color="#fff" />
-              : <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>{cartItem.quantity}</Text>
+              : <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#fff' }}>{cartItem.quantity}</Text>
             }
           </View>
           <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 20, color: '#fff', fontWeight: '500', lineHeight: 24 }}>+</Text>
+            <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>+</Text>
           </Touchable>
         </View>
       ) : (
@@ -284,7 +285,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
         >
           {isAdding
             ? <ActivityIndicator size="small" color="#0F7635" />
-            : <Text style={{ fontSize: 14, fontWeight: '600', color: '#0F7635' }}>Add to cart</Text>
+            : <Text style={{ fontSize: moderateScale(14), fontWeight: '600', color: '#0F7635' }}>Add to cart</Text>
           }
         </Touchable>
       )}
@@ -303,7 +304,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           {!!item.orderedTimes && (
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "600",
                 color: "#0F7635",
               }}
@@ -314,7 +315,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           {!!item.lastOrdered && (
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "500",
                 color: "#637381",
                 marginLeft: item.orderedTimes ? 8 : 0,

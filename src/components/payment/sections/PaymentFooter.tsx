@@ -4,6 +4,7 @@ import { PaymentFooterProps } from "@/src/types/payment";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const PaymentFooter: React.FC<PaymentFooterProps> = ({
   onPress,
@@ -54,7 +55,7 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
             <>
               <Text
                 style={{
-                  fontSize: 17,
+                  fontSize: moderateScale(17),
                   fontWeight: "700",
                   color: "#fff",
                 }}

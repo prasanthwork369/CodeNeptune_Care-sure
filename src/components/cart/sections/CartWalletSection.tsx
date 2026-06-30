@@ -4,6 +4,7 @@ import { cartStyles as s } from '../cart.styles';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { CustomSwitch } from '@/src/components/ui/CustomSwitch';
 import { CartWalletSectionProps } from '@/src/types/cart';
+import { moderateScale } from '@/src/utils/exactScale';
 
 export const CartWalletSection: React.FC<CartWalletSectionProps> = ({
     value,
@@ -42,7 +43,7 @@ export const CartWalletSection: React.FC<CartWalletSectionProps> = ({
                         ) : null}
                     </View>
                     {!corporateCreditsEligible && (
-                        <Text className="font-inter-medium text-[#B45309] text-[12px] pb-3.5">
+                        <Text className="font-inter-medium text-[#B45309] pb-3.5" style={{ fontSize: moderateScale(12) }}>
                             Add ₹{Number(corporateCreditsRemainingForEligibility).toFixed(2)} more to use Corporate Credits
                         </Text>
                     )}

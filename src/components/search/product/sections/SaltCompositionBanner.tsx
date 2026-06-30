@@ -2,6 +2,7 @@ import { HOME_IMAGES, ANIMATIONS } from '@/src/constants/images';
 import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
+import { moderateScale } from '@/src/utils/exactScale';
 interface SaltCompositionBannerProps {
     composition: string;
 }
@@ -36,10 +37,10 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({ co
                     />
                 </View>
                 <View className="flex-1">
-                    <Text className="text-[10px] font-inter-semibold text-white uppercase tracking-[1px] mb-0.5">
+                    <Text className="font-inter-semibold text-white uppercase tracking-[1px] mb-0.5" style={{ fontSize: moderateScale(10) }}>
                         SALT COMPOSITION IN BOTH
                     </Text>
-                    <Text className="text-[15px] font-inter-bold text-white leading-tight">
+                    <Text className="font-inter-bold text-white leading-tight" style={{ fontSize: moderateScale(15) }}>
                         {composition}
                     </Text>
                 </View>

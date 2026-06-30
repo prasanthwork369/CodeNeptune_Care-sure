@@ -12,6 +12,7 @@ import {
     Image, Text, View,
 } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export type ReturnReason = {
     reason: string;
@@ -165,7 +166,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
                             )}
 
                             {/* Reason */}
-                            <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">{"What's the issue with your order?"}</Text>
+                            <Text className="font-inter-bold text-[#222222] mb-3" style={{ fontSize: moderateScale(14) }}>{"What's the issue with your order?"}</Text>
                             <ReasonDropdown
                                 options={reasons}
                                 loading={reasonsLoading}
@@ -191,24 +192,24 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
                                     onChangeText={(value) => { setOtherReason(value); if (error) setError(''); }}
                                     multiline
                                     numberOfLines={3}
-                                    className="p-4 border border-[#919EAB33] rounded-xl text-[14px] font-inter-medium min-h-[80px] mt-2"
-                                    style={{ textAlignVertical: 'top', backgroundColor: '#FFFFFF' }}
+                                    className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[80px] mt-2"
+                                    style={{ textAlignVertical: 'top', backgroundColor: '#FFFFFF', fontSize: moderateScale(14) }}
                                 />
                             )}
 
                             {!!error && (
-                                <Text className="text-[12px] font-inter-medium text-[#DC2626] mt-3 mb-3">{error}</Text>
+                                <Text className="font-inter-medium text-[#DC2626] mt-3 mb-3" style={{ fontSize: moderateScale(12) }}>{error}</Text>
                             )}
 
                             {/* Details */}
-                            <Text className="text-[14px] font-inter-bold text-[#222222] mb-3">Add details</Text>
+                            <Text className="font-inter-bold text-[#222222] mb-3" style={{ fontSize: moderateScale(14) }}>Add details</Text>
                             <BottomSheetTextInput
                                 multiline
                                 numberOfLines={4}
                                 placeholder="Please provide more details about the issue with the product"
                                 placeholderTextColor="#919EAB"
-                                className="p-4 border border-[#919EAB33] rounded-xl text-[14px] font-inter-medium min-h-[100px] mb-6"
-                                style={{ textAlignVertical: 'top', backgroundColor: '#FFFFFF' }}
+                                className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
+                                style={{ textAlignVertical: 'top', backgroundColor: '#FFFFFF', fontSize: moderateScale(14) }}
                                 value={details}
                                 onChangeText={setDetails}
                             />

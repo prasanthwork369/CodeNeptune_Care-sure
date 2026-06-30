@@ -3,6 +3,7 @@ import { HOME_IMAGES } from '@/src/constants/images';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
 import { Image, Modal, Text, View } from 'react-native';
+import { moderateScale } from "@/src/utils/exactScale";
 
 type IconVariant = 'package' | 'check' | 'check-green' | 'delete' | 'pdf' | 'no_internet';
 type ButtonVariant = 'green' | 'red' | 'outline';
@@ -86,12 +87,12 @@ export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDia
 
                     <Text
                         style={{
-                            fontSize: 16,
+                            fontSize: moderateScale(16),
                             fontWeight: '700',
                             color: '#1A1C1E',
                             textAlign: 'center',
                             marginBottom: 24,
-                            lineHeight: 22,
+                            lineHeight: moderateScale(22),
                         }}
                     >
                         {title}
@@ -130,7 +131,7 @@ export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDia
                             >
                                 <Text
                                     style={[
-                                        { fontSize: 14, fontWeight: '600' },
+                                        { fontSize: moderateScale(14), fontWeight: '600' },
                                         (btn.variant === 'green' || btn.variant === 'red') && { color: '#fff' },
                                         btn.variant === 'outline' && { color: '#374151' },
                                     ]}

@@ -4,6 +4,7 @@ import { Animated, Keyboard, Platform, Pressable, Text, View } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const CONFIG = {
   success: {
@@ -136,14 +137,14 @@ export const Toast: React.FC = () => {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: c.iconColor, fontSize: 11, fontWeight: '700', lineHeight: 13 }}>
+            <Text style={{ color: c.iconColor, fontSize: moderateScale(11), fontWeight: '700', lineHeight: moderateScale(13) }}>
               {c.icon}
             </Text>
           </View>
         </View>
 
         <Text
-          style={{ flex: 1, fontSize: 12.5, fontWeight: '500', color: '#1A1A1A', lineHeight: 18 }}
+          style={{ flex: 1, fontSize: moderateScale(12.5), fontWeight: '500', color: '#1A1A1A', lineHeight: moderateScale(18) }}
           numberOfLines={3}
         >
           {message}
@@ -160,7 +161,7 @@ export const Toast: React.FC = () => {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{ marginLeft: 10, padding: 4 }}
         >
-          <Text style={{ fontSize: 14, color: '#9CA3AF', fontWeight: '700', lineHeight: 16 }}>✕</Text>
+          <Text style={{ fontSize: moderateScale(14), color: '#9CA3AF', fontWeight: '700', lineHeight: moderateScale(16) }}>✕</Text>
         </Pressable>
       </View>
     </Animated.View>

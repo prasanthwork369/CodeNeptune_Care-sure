@@ -5,6 +5,7 @@ import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 import Animated, {
     Easing,
     LinearTransition,
@@ -117,7 +118,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
 
   return (
     <View className="mx-4 mb-6 ">
-      <Text className="text-[17px] bg-white py-1 pb-4 font-inter-bold text-brand-text mb-4">
+      <Text className="bg-white py-1 pb-4 font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(17) }}>
         More About {medicineName}
       </Text>
 
@@ -159,7 +160,8 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                   }}
                 >
                   <Text
-                    className={`text-[14px] font-inter-medium ${activeTab === tab.id ? "text-brand-primary" : "text-brand-subtext"}`}
+                    className={`font-inter-medium ${activeTab === tab.id ? "text-brand-primary" : "text-brand-subtext"}`}
+                    style={{ fontSize: moderateScale(14) }}
                   >
                     {tab.label}
                   </Text>
@@ -189,7 +191,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
           layout={LinearTransition.duration(220).easing(Easing.out(Easing.quad))}
         >
           {activeTabData?.heading ? (
-            <Text className="text-[16px] font-inter-medium text-brand-text mb-2">
+            <Text className="font-inter-medium text-brand-text mb-2" style={{ fontSize: moderateScale(16) }}>
               {activeTabData.heading}
             </Text>
           ) : null}
@@ -228,7 +230,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                           <RemoteIcon uri={item.image} size={48} />
                         ) : null}
                       </View>
-                      <Text className="text-[14px] font-inter-semibold text-brand-text mb-2">
+                      <Text className="font-inter-semibold text-brand-text mb-2" style={{ fontSize: moderateScale(14) }}>
                         {item.title}
                       </Text>
                       <View
@@ -236,15 +238,15 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                         style={{ backgroundColor: item.statusBg }}
                       >
                         <Text
-                          className="text-[10px] font-inter-semibold"
+                          className="font-inter-semibold"
                           numberOfLines={1}
                           adjustsFontSizeToFit
-                          style={{ color: item.statusColor }}
+                          style={{ color: item.statusColor, fontSize: moderateScale(10) }}
                         >
                           {item.status}
                         </Text>
                       </View>
-                      <Text className="text-[12px] font-inter-medium text-brand-subtext leading-[18px]">
+                      <Text className="font-inter-medium text-brand-subtext leading-[18px]" style={{ fontSize: moderateScale(12) }}>
                         {isExpanded
                           ? item.fullDescription
                           : item.shortDescription}

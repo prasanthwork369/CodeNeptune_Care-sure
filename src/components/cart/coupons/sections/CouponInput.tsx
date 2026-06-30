@@ -3,6 +3,7 @@ import { ActivityIndicator, View, TextInput, Text } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { colors } from '@/src/constants/theme';
 import { CouponInputProps } from '@/src/types/cart';
+import { moderateScale } from '@/src/utils/exactScale';
 
 export const CouponInput: React.FC<CouponInputProps> = ({ value, onChangeText, onApply, loading }) => {
     return (
@@ -12,7 +13,8 @@ export const CouponInput: React.FC<CouponInputProps> = ({ value, onChangeText, o
                 onChangeText={onChangeText}
                 placeholder="Enter Code"
                 placeholderTextColor="#6A6A6A"
-                className="flex-1 text-[15px] font-inter-medium text-brand-text"
+                className="flex-1 font-inter-medium text-brand-text"
+                style={{ fontSize: moderateScale(15) }}
                 autoCapitalize="characters"
                 editable={!loading}
             />
@@ -24,7 +26,7 @@ export const CouponInput: React.FC<CouponInputProps> = ({ value, onChangeText, o
             >
                 {loading
                     ? <ActivityIndicator size="small" color="#fff" />
-                    : <Text className="text-[12px] font-inter-bold text-white">APPLY</Text>
+                    : <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(12) }}>APPLY</Text>
                 }
             </Touchable>
         </View>

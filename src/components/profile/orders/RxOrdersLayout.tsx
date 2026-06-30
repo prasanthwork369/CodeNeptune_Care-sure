@@ -19,6 +19,7 @@ import Svg, {
   Text as SvgText,
 } from "react-native-svg";
 import { orderStyles as s } from "./orders.styles";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const GradientText: React.FC<{ text: string }> = ({ text }) => {
   const width = text.length * 7;
@@ -189,7 +190,7 @@ const OptionsPanel: React.FC<{
         <icons.eye width={20} height={20} fill="#6A6A6A" />
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             fontWeight: "500",
             color: "#222222",
             marginLeft: 12,
@@ -212,7 +213,7 @@ const OptionsPanel: React.FC<{
         <icons.download_gray width={20} height={20} />
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             fontWeight: "500",
             color: "#222222",
             marginLeft: 12,
@@ -235,7 +236,7 @@ const OptionsPanel: React.FC<{
         <icons.share_gray width={20} height={20} />
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             fontWeight: "500",
             color: "#222222",
             marginLeft: 12,
@@ -260,7 +261,7 @@ const OptionsPanel: React.FC<{
         <icons.delete_red width={20} height={20} />
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             fontWeight: "500",
             color: "#C22307",
             marginLeft: 12,
@@ -365,7 +366,7 @@ const PrescriptionCard = ({
         >
           <Text
             style={{
-              fontSize: 11,
+              fontSize: moderateScale(11),
               fontWeight: "600",
               color: statusStyle.text,
             }}

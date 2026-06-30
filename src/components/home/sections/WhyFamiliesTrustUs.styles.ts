@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { typography } from "@/src/constants/typography";
 
 export const iconSize = 64;
 
@@ -28,8 +29,8 @@ export const styles = StyleSheet.create({
   },
   itemLabel: {
     fontWeight: "500",
-    fontSize: moderateScale(14),
-    lineHeight: moderateScale(20),
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
     letterSpacing: 0,
     textAlign: "center",
     verticalAlign: "middle",

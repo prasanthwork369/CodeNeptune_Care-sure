@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
+import { moderateScale } from '@/src/utils/exactScale';
 
 interface KnowYourMedicineProps {
     manufacturer: string;
@@ -21,7 +22,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
             end={{ x: 0, y: 1 }}
             className="px-4 pt-6 pb-8"
         >
-            <Text className="text-[17px] font-inter-bold mb-4 pl-1" style={{ color: '#6B2A75' }}>
+            <Text className="font-inter-bold mb-4 pl-1" style={{ color: '#6B2A75', fontSize: moderateScale(17) }}>
                 Know Your Medicine
             </Text>
 
@@ -31,8 +32,8 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Image source={HOME_IMAGES.chemical} style={{ width: 24, height: 24 }} resizeMode="contain" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-[15px] font-inter-bold text-[#111827] mb-1">Manufacturer/Marketer</Text>
-                        <Text style={{ color: '#009989' }} className="text-[14px] font-inter-semibold">{manufacturer}</Text>
+                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15) }}>Manufacturer/Marketer</Text>
+                        <Text style={{ color: '#009989', fontSize: moderateScale(14) }} className="font-inter-semibold">{manufacturer}</Text>
                     </View>
                 </View>
 
@@ -41,8 +42,8 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Image source={HOME_IMAGES.medicine} style={{ width: 24, height: 24 }} resizeMode="contain" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-[15px] font-inter-bold text-[#111827] mb-1">Consume Type</Text>
-                        <Text className="text-[14px] font-inter-medium text-[#6B7280]">{consumeType}</Text>
+                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15) }}>Consume Type</Text>
+                        <Text className="font-inter-medium text-[#6B7280]" style={{ fontSize: moderateScale(14) }}>{consumeType}</Text>
                     </View>
                 </View>
 
@@ -51,8 +52,8 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Image source={HOME_IMAGES.deliveryBox} style={{ width: 24, height: 24 }} resizeMode="contain" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-[15px] font-inter-bold text-[#111827] mb-1">Return Policy</Text>
-                        <Text style={{ color: '#009989' }} className="text-[14px] font-inter-semibold">{returnPolicy}</Text>
+                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15) }}>Return Policy</Text>
+                        <Text style={{ color: '#009989', fontSize: moderateScale(14) }} className="font-inter-semibold">{returnPolicy}</Text>
                     </View>
                 </View>
             </View>

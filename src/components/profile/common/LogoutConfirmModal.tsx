@@ -2,6 +2,7 @@ import { icons } from '@/src/constants/icons';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
 import { Modal, Text, View, ActivityIndicator } from 'react-native';
+import { moderateScale } from "@/src/utils/exactScale";
 
 interface LogoutConfirmModalProps {
     isVisible: boolean;
@@ -43,7 +44,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isVisibl
                     {/* Message */}
                     <Text
                         className="font-inter-bold text-[#1A1C1E] text-center"
-                        style={{ fontSize: 16, marginBottom: 24 }}
+                        style={{ fontSize: moderateScale(16), marginBottom: 24 }}
                     >
                         Are you sure you want to logout
                     </Text>
@@ -65,7 +66,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isVisibl
                                 opacity: isLoggingOut ? 0.6 : 1,
                             }}
                         >
-                            <Text className="text-[15px] font-inter-semibold text-[#1A1C1E]">No</Text>
+                            <Text className="font-inter-semibold text-[#1A1C1E]" style={{ fontSize: moderateScale(15) }}>No</Text>
                         </Touchable>
 
                         <Touchable
@@ -83,7 +84,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isVisibl
                             {isLoggingOut ? (
                                 <ActivityIndicator color="#FFFFFF" size="small" />
                             ) : (
-                                <Text className="text-[15px] font-inter-semibold text-white">Yes</Text>
+                                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15) }}>Yes</Text>
                             )}
                         </Touchable>
                     </View>

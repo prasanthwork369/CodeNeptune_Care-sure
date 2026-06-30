@@ -2,6 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import React from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export interface ReasonOption {
   id: number | string;
@@ -63,7 +64,7 @@ export function ReasonDropdown({
           numberOfLines={1}
           style={{
             flex: 1,
-            fontSize: 13,
+            fontSize: moderateScale(13),
             fontWeight: "500",
             color: selectedLabel ? "#1A1C1E" : "#9CA3AF",
           }}
@@ -124,7 +125,7 @@ export function ReasonDropdown({
                   <Text
                     style={{
                       flex: 1,
-                      fontSize: 16,
+                      fontSize: moderateScale(16),
                       fontWeight: "400",
                       color: isSelected ? "#0F7635" : "#1A1C1E",
                     }}
@@ -158,7 +159,7 @@ export function ReasonDropdown({
               <Text
                 style={{
                   flex: 1,
-                  fontSize: 16,
+                  fontSize: moderateScale(16),
                   fontWeight: "400",
                   color: isOtherSelected ? "#0F7635" : "#1A1C1E",
                 }}

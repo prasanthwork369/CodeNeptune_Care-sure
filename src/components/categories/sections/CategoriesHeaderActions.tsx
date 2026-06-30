@@ -4,6 +4,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { useNav } from '@/src/hooks/useNav';
 import { icons } from '@/src/constants/icons';
 import { useCart } from '@/src/hooks/queries/useCart';
+import { moderateScale } from '@/src/utils/exactScale';
 
 export const CategoriesHeaderActions: React.FC = () => {
     const router = useNav();
@@ -26,7 +27,7 @@ export const CategoriesHeaderActions: React.FC = () => {
                 </Touchable>
                 {totalItems > 0 && (
                     <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C22923] items-center justify-center">
-                        <Text className="text-[10px] font-inter-bold text-white">{totalItems}</Text>
+                        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(10) }}>{totalItems}</Text>
                     </View>
                 )}
             </View>

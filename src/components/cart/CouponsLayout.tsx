@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { CouponCard } from "./sections/CouponCard";
 import { CouponInput } from "./sections/CouponInput";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const MOCK_COUPONS = [
   {
@@ -73,7 +74,7 @@ export const CouponsLayout: React.FC = () => {
           onApply={handleManualApply}
         />
 
-        <Text className="text-[14px] font-inter-bold text-brand-text mt-8 mb-4">
+        <Text className="font-inter-bold text-brand-text mt-8 mb-4" style={{ fontSize: moderateScale(14) }}>
           More Coupons
         </Text>
 

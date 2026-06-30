@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Image } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { PatientPrescriptionPreviewProps } from '@/src/types/patient';
+import { moderateScale } from '@/src/utils/exactScale';
 
 const isPdf = (uri: string, type?: string) =>
     type === 'application/pdf' || uri.toLowerCase().endsWith('.pdf');
@@ -12,7 +13,7 @@ export const PatientPrescriptionPreview: React.FC<PatientPrescriptionPreviewProp
 
     return (
         <View className="mb-4">
-            <Text className="text-[14px] font-inter-semibold text-[#1A1C1E] mb-[10px]">Prescription</Text>
+            <Text className="font-inter-semibold text-[#1A1C1E] mb-[10px]" style={{ fontSize: moderateScale(14) }}>Prescription</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row" style={{ gap: 10 }}>
                     <Touchable onPress={onAddPress} activeOpacity={0.8} className="w-[72px] h-[72px] rounded-[10px] border border-[#919EAB33] bg-[#FCFDFF] items-center justify-center">
@@ -23,7 +24,7 @@ export const PatientPrescriptionPreview: React.FC<PatientPrescriptionPreviewProp
                             {isPdf(item.localUri, item.type) ? (
                                 <View className="flex-1 items-center justify-center">
                                     <icons.upload_file width={22} height={22} />
-                                    <Text className="text-[8px] font-inter-bold text-[#1A1C1E] mt-0.5">PDF</Text>
+                                    <Text className="font-inter-bold text-[#1A1C1E] mt-0.5" style={{ fontSize: moderateScale(8) }}>PDF</Text>
                                 </View>
                             ) : (
                                 <Image source={{ uri: item.localUri }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />

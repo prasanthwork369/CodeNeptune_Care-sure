@@ -1,5 +1,6 @@
 import { icons } from "@/src/constants/icons";
 import React, { useEffect, useReducer, useRef } from "react";
+import { moderateScale } from "@/src/utils/exactScale";
 import {
     StyleSheet,
     TextInput,
@@ -203,13 +204,13 @@ const styles = StyleSheet.create({
   word: {
     height: SLOT_H,
     lineHeight: SLOT_H,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "500",
     color: "#9CA3AF",
     includeFontPadding: false,
   },
   input: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "500",
     color: "#1A1C1E",
     padding: 0,

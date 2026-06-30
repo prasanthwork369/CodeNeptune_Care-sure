@@ -1,6 +1,8 @@
 import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
+import { moderateScale } from "@/src/utils/exactScale";
+import { typography } from "@/src/constants/typography";
 
 interface PatientEmptyStateProps {
     onAddPress: () => void;
@@ -14,10 +16,10 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
                 style={{ width: 220, height: 220, marginBottom: 24 }}
                 resizeMode="contain"
             />
-            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C2024', marginBottom: 10, textAlign: 'center' }}>
+            <Text style={{ fontSize: moderateScale(22), fontWeight: '700', color: '#1C2024', marginBottom: 10, textAlign: 'center' }}>
                 No Patients Added Yet
             </Text>
-            <Text style={{ fontSize: 14, fontWeight: '400', color: '#637381', textAlign: 'center', lineHeight: 20, marginBottom: 28, maxWidth: 280 }}>
+            <Text style={{ fontSize: typography.body.fontSize, fontWeight: '400', color: '#637381', textAlign: 'center', lineHeight: typography.body.lineHeight, marginBottom: 28, maxWidth: 280 }}>
                 Patient details help doctors provide better care
             </Text>
             <Touchable
@@ -38,8 +40,8 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
                     elevation: 4,
                 }}
             >
-                <Text style={{ fontSize: 18, color: '#fff', fontWeight: '700', marginTop: -2 }}>+</Text>
-                <Text style={{ fontSize: 15, fontWeight: '600', color: '#fff' }}>
+                <Text style={{ fontSize: moderateScale(18), color: '#fff', fontWeight: '700', marginTop: -2 }}>+</Text>
+                <Text style={{ fontSize: moderateScale(15), fontWeight: '600', color: '#fff' }}>
                     Add Patient
                 </Text>
             </Touchable>

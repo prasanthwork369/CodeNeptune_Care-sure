@@ -1,12 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { typography } from "@/src/constants/typography";
 
 export const styles = StyleSheet.create({
     badge:           { fontSize: moderateScale(11) },
     name: {
         fontWeight: '500',
-        fontSize: moderateScale(14),
-        lineHeight: moderateScale(20),
+        fontSize: typography.body.fontSize,
+        lineHeight: typography.body.lineHeight,
         verticalAlign: 'middle',
         letterSpacing: 0,
     },

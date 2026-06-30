@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text, View } from "react-native";
 import { ComparisonMedicine } from "../types";
+import { moderateScale } from "@/src/utils/exactScale";
 
 interface ComparisonCardProps {
   item: ComparisonMedicine;
@@ -45,7 +46,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         <icons.info_outline width={13} height={13} fill="#6B7280" />
         <Text
           style={{
-            fontSize: 11,
+            fontSize: moderateScale(11),
             fontWeight: "500",
             color: "#6B7280",
             letterSpacing: 0.4,
@@ -56,7 +57,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
       </View>
       <Text
         style={{
-          fontSize: 13,
+          fontSize: moderateScale(13),
           fontWeight: "600",
           color: "#111827",
           paddingHorizontal: 14,
@@ -115,10 +116,10 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </View>
             <Text
               style={{
-                fontSize: 15,
+                fontSize: moderateScale(15),
                 fontWeight: "700",
                 color: "#111827",
-                lineHeight: 20,
+                lineHeight: moderateScale(20),
                 marginBottom: 4,
                 marginTop: 8,
               }}
@@ -128,7 +129,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </Text>
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "500",
                 color: "#6B7280",
                 marginBottom: 2,
@@ -139,7 +140,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </Text>
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "400",
                 color: "#6B7280",
               }}
@@ -151,7 +152,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           <View style={{ marginTop: 12 }}>
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "500",
                 color: "#6B7280",
                 marginBottom: 2,
@@ -161,7 +162,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </Text>
             <Text
               style={{
-                fontSize: 18,
+                fontSize: moderateScale(18),
                 fontWeight: "800",
                 color: "#111827",
               }}
@@ -213,22 +214,22 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               >
                 <Text
                   style={{
-                    fontSize: 11,
+                    fontSize: moderateScale(11),
                     fontWeight: "700",
                     color: "#fff",
                     textAlign: "center",
-                    lineHeight: 12,
+                    lineHeight: moderateScale(12),
                   }}
                 >
                   {item.recommended.discountPercent}%
                 </Text>
                 <Text
                   style={{
-                    fontSize: 8,
+                    fontSize: moderateScale(8),
                     fontWeight: "700",
                     color: "#fff",
                     textAlign: "center",
-                    lineHeight: 9,
+                    lineHeight: moderateScale(9),
                     marginTop: 1,
                   }}
                 >
@@ -267,10 +268,10 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </View>
             <Text
               style={{
-                fontSize: 15,
+                fontSize: moderateScale(15),
                 fontWeight: "700",
                 color: "#111827",
-                lineHeight: 20,
+                lineHeight: moderateScale(20),
                 marginBottom: 4,
                 marginTop: 8,
               }}
@@ -280,7 +281,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </Text>
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "500",
                 color: "#6B7280",
                 marginBottom: 2,
@@ -291,7 +292,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             </Text>
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontWeight: "400",
                 color: "#6B7280",
               }}
@@ -312,7 +313,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             >
               <Text
                 style={{
-                  fontSize: 18,
+                  fontSize: moderateScale(18),
                   fontWeight: "800",
                   color: "#111827",
                 }}
@@ -322,7 +323,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               {item.recommended.mrp > item.recommended.price && (
                 <Text
                   style={{
-                    fontSize: 12,
+                    fontSize: moderateScale(12),
                     fontWeight: "500",
                     color: "#9CA3AF",
                     textDecorationLine: "line-through",
@@ -348,7 +349,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
             >
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: moderateScale(15),
                   fontWeight: "700",
                   color: "#111827",
                 }}

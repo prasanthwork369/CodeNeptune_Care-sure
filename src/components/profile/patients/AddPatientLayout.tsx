@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const RELATIONSHIPS = ["Self", "Wife", "Husband", "Mother", "Father", "Other"];
 const GENDERS = [
@@ -41,16 +42,17 @@ const input: object = {
   borderRadius: 12,
   paddingHorizontal: 16,
   paddingVertical: 14,
-  fontSize: 14,
+  fontSize: moderateScale(14),
   fontWeight: "500",
   color: "#1A1C1E",
   backgroundColor: "#fff",
   marginBottom: 18,
 };
-const labelStyle = "text-[14px] font-inter-bold text-brand-text mb-2";
+const labelStyle = "font-inter-bold text-brand-text mb-2";
+const labelTextStyle: object = { fontSize: moderateScale(14) };
 const errorText: object = {
   color: "#EF4444",
-  fontSize: 12,
+  fontSize: moderateScale(12),
   marginTop: -12,
   marginBottom: 12,
 };
@@ -162,7 +164,7 @@ export const AddPatientLayout: React.FC = () => {
           }}
           className="flex-1"
         >
-          <Text className={labelStyle}>Name</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Name</Text>
           <TextInput
             placeholder="Enter the name"
             placeholderTextColor="#919EAB"
@@ -175,7 +177,7 @@ export const AddPatientLayout: React.FC = () => {
           />
           {errors.name && <Text style={errorText}>{errors.name}</Text>}
 
-          <Text className={labelStyle}>Mobile Number</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Mobile Number</Text>
           <View
             style={[
               { flexDirection: "row", alignItems: "center", height: 52 },
@@ -186,7 +188,7 @@ export const AddPatientLayout: React.FC = () => {
           >
             <Text
               style={{
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "500",
                 color: "#1A1C1E",
                 marginRight: 8,
@@ -206,7 +208,7 @@ export const AddPatientLayout: React.FC = () => {
               }}
               style={{
                 flex: 1,
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "500",
                 color: "#1A1C1E",
                 height: "100%",
@@ -215,7 +217,7 @@ export const AddPatientLayout: React.FC = () => {
           </View>
           {errors.mobile && <Text style={errorText}>{errors.mobile}</Text>}
 
-          <Text className={labelStyle}>Relationship</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Relationship</Text>
           <View
             style={{
               flexDirection: "row",
@@ -248,7 +250,7 @@ export const AddPatientLayout: React.FC = () => {
                 >
                   <Text
                     style={{
-                      fontSize: 13,
+                      fontSize: moderateScale(13),
                       fontWeight: "500",
                       color: sel ? "#0F7635" : "#6A6A6A",
                     }}
@@ -289,7 +291,7 @@ export const AddPatientLayout: React.FC = () => {
             </View>
           )}
 
-          <Text className={labelStyle}>Date Of Birth</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Date Of Birth</Text>
           <Touchable
             onPress={() => {
               setShowDatePicker(true);
@@ -305,7 +307,7 @@ export const AddPatientLayout: React.FC = () => {
             <Text
               style={{
                 flex: 1,
-                fontSize: 14,
+                fontSize: moderateScale(14),
                 fontWeight: "500",
                 color: dob ? "#1A1C1E" : "#919EAB",
               }}
@@ -328,7 +330,7 @@ export const AddPatientLayout: React.FC = () => {
             }}
           />
 
-          <Text className={labelStyle}>Gender</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Gender</Text>
           <View
             style={{
               flexDirection: "row",
@@ -364,7 +366,7 @@ export const AddPatientLayout: React.FC = () => {
                   })}
                   <Text
                     style={{
-                      fontSize: 11,
+                      fontSize: moderateScale(11),
                       fontWeight: "500",
                       color: sel ? "#0F7635" : "#6A6A6A",
                     }}
@@ -379,7 +381,7 @@ export const AddPatientLayout: React.FC = () => {
             <Text
               style={{
                 color: "#EF4444",
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 marginTop: -4,
                 marginBottom: 16,
               }}
@@ -407,7 +409,7 @@ export const AddPatientLayout: React.FC = () => {
           >
             <Text
               style={{
-                fontSize: 15,
+                fontSize: moderateScale(15),
                 fontWeight: "600",
                 color: "#fff",
               }}

@@ -17,6 +17,7 @@ import {
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CategoryProductCard, CategoryCartBanner } from "./sections";
 import { FlyToCartProvider, FlyToCartOverlay } from "@/src/components/animations/flyToCart";
+import { moderateScale } from "@/src/utils/exactScale";
 
 const GRID_PADDING = 16;
 const GRID_GAP = 10;
@@ -59,7 +60,7 @@ const CategoryProductsContent: React.FC = () => {
               </Touchable>
               {totalItems > 0 && (
                 <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C22923] items-center justify-center">
-                  <Text className="text-[10px] font-inter-bold text-white">
+                  <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(10) }}>
                     {totalItems}
                   </Text>
                 </View>
@@ -115,7 +116,7 @@ const CategoryProductsContent: React.FC = () => {
           </View>
         ) : products.length === 0 ? (
           <View className="flex-1 items-center justify-center py-20">
-            <Text className="text-[15px] font-inter-medium text-brand-subtext">
+            <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(15) }}>
               No products found
             </Text>
           </View>

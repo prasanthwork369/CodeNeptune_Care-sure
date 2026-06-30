@@ -191,7 +191,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                         </View>
 
                         <View className="bg-white rounded-t-[12px] px-6 pt-6 pb-8">
-                            <Text className="text-[16px] font-inter-bold text-brand-text mb-4">
+                            <Text className="font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(16) }}>
                                 Remind me at
                             </Text>
 
@@ -205,7 +205,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({ isVisible, onClose
                                 onPress={handleSetReminder}
                                 className="bg-[#0F7635] rounded-xl py-4 items-center mt-5"
                             >
-                                <Text className="text-[16px] font-inter-semibold text-white">
+                                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(16) }}>
                                     Set Reminder
                                 </Text>
                             </Touchable>

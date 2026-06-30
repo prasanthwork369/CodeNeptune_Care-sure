@@ -90,9 +90,9 @@ export const ChooseMethodLayout: React.FC = () => {
                 <Text
                   style={{
                     color: "#fff",
-                    fontSize: 12,
+                    fontSize: moderateScale(12),
                     fontWeight: "700",
-                    lineHeight: 14,
+                    lineHeight: moderateScale(14),
                   }}
                 >
                   i
@@ -109,7 +109,7 @@ export const ChooseMethodLayout: React.FC = () => {
             {rxItems.map((item) => (
               <View key={item.id} className="flex-row items-start ml-1 mb-0.5">
                 <Text
-                  style={{ color: "#6A6A6A", marginRight: 6, lineHeight: 18 }}
+                  style={{ color: "#6A6A6A", marginRight: 6, lineHeight: moderateScale(18) }}
                 >
                   {"•"}
                 </Text>

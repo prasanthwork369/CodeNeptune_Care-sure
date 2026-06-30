@@ -3,6 +3,7 @@ import { PaymentHeaderProps } from "@/src/types/payment";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 
 export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
   onBack,
@@ -36,7 +37,7 @@ export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
         <icons.arrow_back width={20} height={20} fill="#1A1C1E" />
       </Touchable>
       <Text
-        style={{ fontSize: 18, fontWeight: "700", color: "#1A1C1E" }}
+        style={{ fontSize: moderateScale(18), fontWeight: "700", color: "#1A1C1E" }}
       >
         {title}
       </Text>

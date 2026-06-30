@@ -8,6 +8,7 @@ import { DotLottie, type Dotlottie } from '@lottiefiles/dotlottie-react-native';
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale } from "@/src/utils/exactScale";
 
 const PRESETS = [500, 1000, 2000];
 const MAX_TOPUP = 2000;
@@ -52,7 +53,7 @@ export const AddMoneyLayout: React.FC = () => {
 
             {/* Amount Section */}
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ alignItems: 'center', paddingTop: 36, paddingBottom: 28, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#F0F0F0' }}>
-                <Text style={{ fontSize: 14, fontWeight: '500', color: '#6B7280', marginBottom: 12 }}>
+                <Text style={{ fontSize: moderateScale(14), fontWeight: '500', color: '#6B7280', marginBottom: 12 }}>
                     How much would you like to add?
                 </Text>
 
@@ -71,7 +72,7 @@ export const AddMoneyLayout: React.FC = () => {
                             paddingBottom: 4,
                         }}
                     >
-                        <Text style={{ fontSize: 44, fontWeight: '800', color: '#111827' }}>₹</Text>
+                        <Text style={{ fontSize: moderateScale(44), fontWeight: '800', color: '#111827' }}>₹</Text>
                         <TextInput
                             ref={inputRef}
                             autoFocus
@@ -86,7 +87,7 @@ export const AddMoneyLayout: React.FC = () => {
                             cursorColor="#0F7635"
                             selectionColor="#0F7635"
                             style={{
-                                fontSize: 44,
+                                fontSize: moderateScale(44),
                                 fontWeight: '800',
                                 color: '#111827',
                                 minWidth: 80,
@@ -95,7 +96,7 @@ export const AddMoneyLayout: React.FC = () => {
                              }}
                         />
                     </View>
-                    <Text style={{ fontSize: 12, fontWeight: '500', color: isAmountFocused ? '#0F7635' : '#9CA3AF', marginTop: 6 }}>
+                    <Text style={{ fontSize: moderateScale(12), fontWeight: '500', color: isAmountFocused ? '#0F7635' : '#9CA3AF', marginTop: 6 }}>
                         Tap to enter a custom amount
                     </Text>
                 </Touchable>
@@ -103,7 +104,7 @@ export const AddMoneyLayout: React.FC = () => {
                 {isBalancePending ? (
                     <ActivityIndicator color="#0F7635" size="small" style={{ marginBottom: 20 }} />
                 ) : (
-                    <Text style={{ fontSize: 13, fontWeight: '500', color: '#6B7280', marginBottom: 20 }}>
+                    <Text style={{ fontSize: moderateScale(13), fontWeight: '500', color: '#6B7280', marginBottom: 20 }}>
                         Available Balance:{' '}
                         <Text style={{ fontWeight: '700', color: '#111827' }}>
                             ₹{walletBalance.toLocaleString()}
@@ -130,7 +131,7 @@ export const AddMoneyLayout: React.FC = () => {
                                 }}
                             >
                                 <Text style={{
-                                    fontSize: 14,
+                                    fontSize: moderateScale(14),
                                     fontWeight: '600',
                                     color: isActive ? '#0F7635' : '#374151',
                                 }}>
@@ -141,7 +142,7 @@ export const AddMoneyLayout: React.FC = () => {
                     })}
                 </View>
 
-                <Text style={{ fontSize: 12, fontWeight: '500', color: '#9CA3AF' }}>
+                <Text style={{ fontSize: moderateScale(12), fontWeight: '500', color: '#9CA3AF' }}>
                     Maximum Top-Up Limit: ₹{MAX_TOPUP.toLocaleString()}
                 </Text>
             </ScrollView>
@@ -171,7 +172,7 @@ export const AddMoneyLayout: React.FC = () => {
                         ) : (
                             <>
                                 <icons.lock width={18} height={18} fill="#FFFFFF" />
-                                <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>
+                                <Text style={{ fontSize: moderateScale(16), fontWeight: '600', color: '#FFFFFF' }}>
                                     Proceed to Pay ₹{numericAmount.toLocaleString()}
                                 </Text>
                             </>

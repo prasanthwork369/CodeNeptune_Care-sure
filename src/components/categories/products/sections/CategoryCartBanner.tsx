@@ -3,6 +3,7 @@ import { icons } from "@/src/constants/icons";
 import { useFlyToCartSafe, ThumbnailItem, AnimatedCount } from "@/src/components/animations/flyToCart";
 import React, { useEffect, useRef } from "react";
 import { Text, View, useWindowDimensions } from "react-native";
+import { moderateScale } from "@/src/utils/exactScale";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -197,7 +198,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
 
           {/* "View cart" + count — fade in mid-expansion */}
           <Animated.View style={[{ flex: 1, marginLeft: 10, justifyContent: "center" }, textStyle]}>
-            <Text style={{ color: "#fff", fontSize: 14.5, fontWeight: "700", lineHeight: 18 }}>
+            <Text style={{ color: "#fff", fontSize: moderateScale(14.5), fontWeight: "700", lineHeight: moderateScale(18) }}>
               View cart
             </Text>
             <AnimatedCount count={visualCartCount} />
