@@ -6,14 +6,6 @@ import OriginalTextImport from "react-native/Libraries/Text/Text";
 
 const OriginalText = OriginalTextImport as unknown as typeof RN.Text;
 
-// Read once at startup. If the device's OS text-size setting is below the
-// system default (1.0x), we disable scaling entirely for that render instead
-// of trying to inflate-then-let-native-cancel-it-out (that compensation math
-// caused real bugs earlier) — simplest way to guarantee a 1.0x floor: never
-// shrink below the design size, only allow growth up to the cap below.
-const systemFontScale = RN.PixelRatio.getFontScale();
-const isBelowDefaultFontScale = systemFontScale < 1;
-
 // Maps numeric/keyword font weights to the Inter font family loaded via
 // @expo-google-fonts/inter (see app/_layout.tsx useFonts call). Android's
 // system font (Roboto) does not render numeric fontWeight reliably, so we
@@ -102,24 +94,16 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
   return React.createElement(OriginalText, {
     ...props,
     ref,
-    // Respect the OS accessibility text-size setting (unless a specific Text
-    // instance opts out), but cap the multiplier so it can't stack unbounded
-    // on top of the app's own per-device moderateScale()/exactScale() sizing.
-    // Any fixed-width/height container around text needs to tolerate this
-    // (minWidth/minHeight + numberOfLines, not fixed dimensions) -- fix those
-    // as they're found rather than disabling scaling globally again.
+    // Font sizes are deliberately scaled per-device by moderateScale() against
+    // the Figma baseline — the OS accessibility text-size setting is ignored
+    // entirely by default so it can't affect layout/spacing at all. A
+    // specific Text instance can still opt in via allowFontScaling.
     allowFontScaling:
-      props.allowFontScaling !== undefined
-        ? props.allowFontScaling
-        : !isBelowDefaultFontScale,
-    // 1.2 = 20% max growth with OS accessibility font setting.
-    // - Prevents text from looking frozen/tiny at Maximum system font
-    // - Prevents unbounded stacking on top of moderateScale() sizing
-    // - Containers must use minHeight (not fixed height) to absorb this growth.
+      props.allowFontScaling !== undefined ? props.allowFontScaling : false,
     maxFontSizeMultiplier:
       props.maxFontSizeMultiplier !== undefined
         ? props.maxFontSizeMultiplier
-        : 1.2,
+        : 1,
     style: [
       { fontFamily: undefined, includeFontPadding: false }, // Default reset
       sanitizedStyle,
