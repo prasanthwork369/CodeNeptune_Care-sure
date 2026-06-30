@@ -38,6 +38,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { exactScale } from "@/src/utils/exactScale";
+import { TabBarFadeGradient } from "./TabBarFadeGradient";
 import {
   ACTIVE_HEIGHT,
   ACTIVE_RADIUS,
@@ -564,6 +565,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       pointerEvents="box-none"
       onLayout={handleLayout}
     >
+      <TabBarFadeGradient />
       <Animated.View
         style={[{ flex: 1, height: PILL_HEIGHT }, animatedTabBarContainerStyle]}
         pointerEvents="box-none"

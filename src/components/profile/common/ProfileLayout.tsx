@@ -1,4 +1,3 @@
-import { TabBarFadeGradient } from "@/src/components/navigation/TabBarFadeGradient";
 import { components } from "@/src/constants/theme";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useProfile } from "@/src/hooks/queries/useProfile";
@@ -150,7 +149,6 @@ export const ProfileLayout: React.FC = () => {
         onSelectLibrary={handleSelectLibrary}
       />
 
-      <TabBarFadeGradient />
     </View>
   );
 };

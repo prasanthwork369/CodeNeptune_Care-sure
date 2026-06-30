@@ -14,7 +14,6 @@ import {
   StickySearchHeader,
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
-import { TabBarFadeGradient } from "@/src/components/navigation/TabBarFadeGradient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
@@ -408,8 +407,6 @@ export const HomeLayout: React.FC = () => {
         isVisible={isLocationSheetVisible}
         onClose={() => setIsLocationSheetVisible(false)}
       />
-
-      <TabBarFadeGradient />
 
       <FloatingBannersCarousel isFocused={isScreenFocused} />
     </View>

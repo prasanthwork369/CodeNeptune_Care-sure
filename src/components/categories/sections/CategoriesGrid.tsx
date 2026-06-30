@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ScrollView, Text } from 'react-native';
-import { gridStyles as s, CARD_RADIUS } from '../categories.styles';
+import { gridStyles as s, CARD_RADIUS, CARD_WIDTH, CARD_IMAGE_LEFT, CARD_IMAGE_WIDTH, CARD_IMAGE_HEIGHT } from '../categories.styles';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { useNav } from '@/src/hooks/useNav';
@@ -26,6 +26,17 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
     isLoading,
 }) => {
     const router = useNav();
+    // cardImage's left/width/height in categories.styles.ts were authored
+    // against the fixed CARD_WIDTH design value — since cardWidth is now
+    // computed dynamically to fill the grid, scale those proportionally too
+    // so the image keeps reaching the card's right/bottom edge as designed.
+    const imageScale = cardWidth / CARD_WIDTH;
+    const cardImageStyle = {
+        ...s.cardImage,
+        left: CARD_IMAGE_LEFT * imageScale,
+        width: CARD_IMAGE_WIDTH * imageScale,
+        height: CARD_IMAGE_HEIGHT * imageScale,
+    };
 
     if (isLoading) {
         return (
@@ -89,7 +100,7 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                                     </Text>
                                     <Image
                                         source={card.image}
-                                        style={s.cardImage}
+                                        style={cardImageStyle}
                                         contentFit="contain"
                                     />
                                 </Touchable>

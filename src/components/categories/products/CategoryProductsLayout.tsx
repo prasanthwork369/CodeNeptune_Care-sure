@@ -1,23 +1,26 @@
+import {
+  FlyToCartOverlay,
+  FlyToCartProvider,
+} from "@/src/components/animations/flyToCart";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCategoryProducts } from "@/src/hooks/queries/useCategories";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
+import { moderateScale } from "@/src/utils/exactScale";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
-    RefreshControl,
-    ScrollView,
-    Text,
-    View,
-    useWindowDimensions,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
 } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { CategoryProductCard, CategoryCartBanner } from "./sections";
-import { FlyToCartProvider, FlyToCartOverlay } from "@/src/components/animations/flyToCart";
-import { moderateScale } from "@/src/utils/exactScale";
+import { CategoryCartBanner, CategoryProductCard } from "./sections";
 
 const GRID_PADDING = 16;
 const GRID_GAP = 10;
@@ -60,7 +63,10 @@ const CategoryProductsContent: React.FC = () => {
               </Touchable>
               {totalItems > 0 && (
                 <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C22923] items-center justify-center">
-                  <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(10) }}>
+                  <Text
+                    className="font-inter-bold text-white"
+                    style={{ fontSize: moderateScale(10) }}
+                  >
                     {totalItems}
                   </Text>
                 </View>
@@ -73,7 +79,8 @@ const CategoryProductsContent: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           padding: GRID_PADDING,
-          paddingBottom: totalItems > 0 ? adjustedBottom + 90 : adjustedBottom + 24,
+          paddingBottom:
+            totalItems > 0 ? adjustedBottom + 90 : adjustedBottom + 24,
           flexGrow: 1,
         }}
         refreshControl={
@@ -116,7 +123,10 @@ const CategoryProductsContent: React.FC = () => {
           </View>
         ) : products.length === 0 ? (
           <View className="flex-1 items-center justify-center py-20">
-            <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(15) }}>
+            <Text
+              className="font-inter-medium text-brand-subtext"
+              style={{ fontSize: moderateScale(15) }}
+            >
               No products found
             </Text>
           </View>
@@ -163,4 +173,3 @@ export const CategoryProductsLayout: React.FC = () => {
     </FlyToCartProvider>
   );
 };
-
