@@ -46,21 +46,24 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
             }}
             className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-3 border-t border-[#F3F4F6]"
         >
-            <View className="flex-row items-center mb-3">
-                <icons.info_error width={20} height={20} />
-                <Text className="font-inter-semibold text-[#CA2B25] ml-2" style={{ fontSize: moderateScale(14, 0.1) }}>
-                    No substitute available
-                </Text>
+            <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                    <icons.info_error width={20} height={20} />
+                    <Text className="font-inter-semibold text-brand-text ml-2" style={{ fontSize: moderateScale(14, 0.1) }}>
+                        No substitute available
+                    </Text>
+                </View>
+                <Touchable
+                    onPress={handleRequest}
+                    activeOpacity={0.85}
+                    style={{ borderWidth: 1, borderColor: '#FF383C' }}
+                    className="rounded-[8px] px-5 py-2"
+                >
+                    <Text className="font-inter-bold text-[#FF383C]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                        Request
+                    </Text>
+                </Touchable>
             </View>
-            <Touchable
-                onPress={handleRequest}
-                activeOpacity={0.85}
-                className="bg-[#FF5252] rounded-[12px] py-4 items-center"
-            >
-                <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15, 0.1) }}>
-                    Request a Substitute
-                </Text>
-            </Touchable>
         </View>
     );
 };

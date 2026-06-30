@@ -52,55 +52,70 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
     <Touchable
       activeOpacity={0.85}
       onPress={() => onPress(data.productId)}
-      style={s.recCard}
-      className="w-full flex-row items-start rounded-[16px] p-4 mb-4 gap-x-3"
+      style={[s.recCard, { padding: 0, overflow: 'hidden', minHeight: 0 }]}
+      className="w-full rounded-[16px] mb-4"
     >
-      {/* Left: image container */}
+      {/* Top Section: Yellow (#FFFDEB) */}
       <View
-        className="bg-white items-center justify-center"
-        style={s.recImgBox}
+        style={{ backgroundColor: '#FFFDEB' }}
+        className="flex-row items-start p-4 gap-x-3"
       >
-        {data.thumbnailUrl ? (
-          <Image
-            source={{ uri: data.thumbnailUrl }}
-            style={s.imgInner}
-            resizeMode="contain"
-          />
-        ) : (
-          <icons.placeholder width={64} height={64} />
-        )}
-      </View>
-
-      {/* Right: info & actions column */}
-      <View className="flex-1 justify-start">
-        <Text
-          style={s.name}
-          className="font-inter-bold text-brand-text"
-          numberOfLines={2}
+        {/* Left: image container */}
+        <View
+          className="bg-white items-center justify-center"
+          style={s.recImgBox}
         >
-          {data.name}
-        </Text>
-        {packLabel ? (
+          {data.thumbnailUrl ? (
+            <Image
+              source={{ uri: data.thumbnailUrl }}
+              style={s.imgInner}
+              resizeMode="contain"
+            />
+          ) : (
+            <icons.placeholder width={64} height={64} />
+          )}
+        </View>
+
+        {/* Right: info column */}
+        <View className="flex-1 justify-start">
           <Text
             style={s.name}
-            className="font-inter-normal text-brand-subtext mt-0.5"
-            numberOfLines={1}
+            className="font-inter-bold text-brand-text"
+            numberOfLines={2}
           >
-            {packLabel}
+            {data.name}
           </Text>
-        ) : null}
-        {data.manufacturer ? (
-          <Text
-            style={s.desc}
-            className="font-inter-medium text-brand-subtext mt-0.5"
-            numberOfLines={1}
-          >
-            {data.manufacturer}
-          </Text>
-        ) : null}
+          {packLabel ? (
+            <Text
+              style={s.desc}
+              className="font-inter-normal text-brand-subtext mt-0.5"
+              numberOfLines={1}
+            >
+              {packLabel}
+            </Text>
+          ) : null}
+          {data.manufacturer ? (
+            <Text
+              style={s.desc}
+              className="font-inter-medium text-brand-subtext mt-0.5"
+              numberOfLines={1}
+            >
+              {data.manufacturer}
+            </Text>
+          ) : null}
+        </View>
+      </View>
 
+      {/* Divider */}
+      <View style={{ height: 1, backgroundColor: '#E5E7EB' }} />
+
+      {/* Bottom Section: White */}
+      <View
+        style={{ backgroundColor: '#FFFFFF' }}
+        className="flex-row items-center justify-between p-4"
+      >
         {/* Price + savings row */}
-        <View className="flex-row items-center mt-3">
+        <View className="flex-row items-center flex-wrap flex-1 mr-2">
           <View className="flex-row items-baseline gap-x-2">
             {data.price != null && (
               <Text
@@ -133,7 +148,7 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
         </View>
 
         {/* Add / stepper */}
-        <View className="mt-3 items-start">
+        <View>
           {count === 0 ? (
             <Touchable
               onPress={increment}

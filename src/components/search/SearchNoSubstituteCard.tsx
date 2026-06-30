@@ -4,7 +4,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { useToastStore } from '@/src/store/toastStore';
 import { moderateScale } from '@/src/utils/exactScale';
-import { searchCardStyles as s } from './search.styles';
+import { cartCounterStyles as cc, searchCardStyles as s } from './search.styles';
 
 interface SearchNoSubstituteCardProps {
     data: {
@@ -87,10 +87,9 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
                 <Touchable
                     onPress={handleRequest}
                     activeOpacity={0.85}
-                    style={{ borderWidth: 1, borderColor: '#FF383C' }}
-                    className="rounded-[8px] px-5 py-2"
+                    style={[cc.addBtn, { borderColor: '#FF383C' }]}
                 >
-                    <Text className="font-inter-bold text-[#FF383C]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                    <Text style={[s.label, { color: '#FF383C' }]} className="font-inter-bold">
                         Request
                     </Text>
                 </Touchable>
