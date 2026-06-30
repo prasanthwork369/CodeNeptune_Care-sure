@@ -107,10 +107,10 @@ export const Toast: React.FC = () => {
           paddingHorizontal: 12,
           paddingVertical: 9,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-          elevation: 4,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.03,
+          shadowRadius: 4,
+          elevation: 2,
         }}
       >
         {/* Outer rounded wrapper — matches web icon container */}

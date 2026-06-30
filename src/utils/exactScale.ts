@@ -1,13 +1,14 @@
-import { Dimensions } from "react-native";
+import { PixelRatio } from "react-native";
 
-const { width, height } = Dimensions.get("window");
+const pixelRatio = PixelRatio.get();
 
-const FIGMA_WIDTH = 390;
-const FIGMA_HEIGHT = 844;
-
+// Locked to the literal Figma value on every device — no device-width-based
+// scaling at all. Every screen renders pixel-identical to Figma regardless
+// of device size, at the cost of possible overflow/clipping on phones
+// narrower than the Figma baseline and unused space on larger screens.
 export const scale = (size: number) => {
   "worklet";
-  return (width / FIGMA_WIDTH) * size;
+  return Math.round(size * pixelRatio) / pixelRatio;
 };
 
 export const exactScale = (size: number) => {
@@ -17,16 +18,10 @@ export const exactScale = (size: number) => {
 
 export const verticalScale = (size: number) => {
   "worklet";
-  return (height / FIGMA_HEIGHT) * size;
+  return Math.round(size * pixelRatio) / pixelRatio;
 };
 
-export const moderateScale = (
-  size: number,
-  factor = 0.5
-) => {
+export const moderateScale = (size: number, _factor = 0.5) => {
   "worklet";
-
-  const scaled = scale(size);
-
-  return size + (scaled - size) * factor;
+  return Math.round(size * pixelRatio) / pixelRatio;
 };

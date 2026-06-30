@@ -29,14 +29,18 @@ import {
     TrustBadge,
 } from "./sections";
 
-// Backend doesn't yet distinguish "checked, no substitute exists" from
-// "recommendation just not populated for this product" -- showing the
-// banner on every empty recommendation would be misleading. Flip to true
-// once the API guarantees that signal.
-const SHOW_NO_SUBSTITUTE_BANNER = false;
-
 export const ProductDetailsLayout: React.FC = () => {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // Backend doesn't yet distinguish "checked, no substitute exists" from
+  // "recommendation just not populated for this product" -- showing the
+  // banner on every empty recommendation would be misleading. Only show it
+  // when the user arrived here specifically from a SearchNoSubstituteCard
+  // tap (which already confirmed no substitute via its own sourceType/
+  // recommendation check), not on every product details page visit.
+  const { id, fromNoSubstitute } = useLocalSearchParams<{
+    id: string;
+    fromNoSubstitute?: string;
+  }>();
+  const showNoSubstituteBanner = fromNoSubstitute === 'true';
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { product, recommendation, saltComposition, variants, raw, isLoading } =
@@ -239,7 +243,7 @@ export const ProductDetailsLayout: React.FC = () => {
               </ScrollView>
             )}
 
-            {activeProduct && (recommendation || !SHOW_NO_SUBSTITUTE_BANNER ? (
+            {activeProduct && (recommendation || !showNoSubstituteBanner ? (
               <ProductDetailsFooter
                 productId={id}
                 medicineUuid={medicineId}

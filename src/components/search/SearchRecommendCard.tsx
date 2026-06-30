@@ -4,8 +4,8 @@ import { useCartActions } from "@/src/hooks/useCartActions";
 import React from "react";
 import { ActivityIndicator, Animated, Image, Text, View } from "react-native";
 import {
-    cartCounterStyles as cc,
-    searchCardStyles as s,
+  cartCounterStyles as cc,
+  searchCardStyles as s,
 } from "./search.styles";
 
 interface SearchRecommendCardProps {
@@ -52,12 +52,12 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
     <Touchable
       activeOpacity={0.85}
       onPress={() => onPress(data.productId)}
-      style={[s.recCard, { padding: 0, overflow: 'hidden', minHeight: 0 }]}
+      style={[s.recCard, { padding: 0, overflow: "hidden", minHeight: 0 }]}
       className="w-full rounded-[16px] mb-4"
     >
       {/* Top Section: Yellow (#FFFDEB) */}
       <View
-        style={{ backgroundColor: '#FFFDEB' }}
+        style={{ backgroundColor: "#FBFFF2" }}
         className="flex-row items-start p-4 gap-x-3"
       >
         {/* Left: image container */}
@@ -107,11 +107,11 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
       </View>
 
       {/* Divider */}
-      <View style={{ height: 1, backgroundColor: '#E5E7EB' }} />
+      <View style={{ height: 1, backgroundColor: "#E5E7EB" }} />
 
       {/* Bottom Section: White */}
       <View
-        style={{ backgroundColor: '#FFFFFF' }}
+        style={{ backgroundColor: "#FFFFFF" }}
         className="flex-row items-center justify-between p-4"
       >
         {/* Price + savings row */}
@@ -136,7 +136,12 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
           </View>
           {hasSavings && (
             <View className="flex-row items-center ml-3">
-              <icons.sell width={15} height={15} fill="#0F7635" style={s.sellIcon} />
+              <icons.sell
+                width={15}
+                height={15}
+                fill="#0F7635"
+                style={s.sellIcon}
+              />
               <Text
                 style={s.savings}
                 className="font-inter-bold text-brand-primary ml-1.5 tracking-tight"

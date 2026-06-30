@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
+import { useNav } from '@/src/hooks/useNav';
 import { useToastStore } from '@/src/store/toastStore';
 import { moderateScale } from '@/src/utils/exactScale';
 import { cartCounterStyles as cc, searchCardStyles as s } from './search.styles';
@@ -20,7 +21,15 @@ interface SearchNoSubstituteCardProps {
 }
 
 export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ data }) => {
+    const router = useNav();
     const showToast = useToastStore((store) => store.show);
+
+    const handleCardPress = () => {
+        router.push({
+            pathname: '/product/[id]',
+            params: { id: data.productId ?? data.id, fromNoSubstitute: 'true' },
+        } as any);
+    };
 
     const handleRequest = () => {
         // No backend endpoint exists yet for this -- wire the real API call
@@ -34,7 +43,9 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
     };
 
     return (
-        <View
+        <Touchable
+            activeOpacity={0.5}
+            onPress={handleCardPress}
             style={{ borderWidth: 1, borderColor: '#919EAB33' }}
             className="w-full rounded-[12px] bg-white overflow-hidden mb-5"
         >
@@ -94,6 +105,6 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
                     </Text>
                 </Touchable>
             </View>
-        </View>
+        </Touchable>
     );
 };

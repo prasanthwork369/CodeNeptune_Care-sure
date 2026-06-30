@@ -216,7 +216,9 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
       }}
     >
       {!notification.isRead && (
-        <View style={[s.unreadDot, { borderRadius: 999, backgroundColor: '#0F7635', marginTop: 6, marginRight: 6 }]} />
+        <View style={{ height: s.notifIconBox.height, justifyContent: 'center', marginRight: 6 }}>
+          <View style={[s.unreadDot, { borderRadius: 999, backgroundColor: '#0F7635' }]} />
+        </View>
       )}
 
       <View style={[s.notifIconBox, { borderRadius: 999, backgroundColor: visual.bg, alignItems: 'center', justifyContent: 'center', marginRight: 12 }]}>

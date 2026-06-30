@@ -1,7 +1,10 @@
 import { StyleSheet } from 'react-native';
 import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
-export const COUNTER_W   = exactScale(90);
+// Widened from 90 -- at 90 the middle quantity slot (90 - 36*2 = 18px) was
+// too narrow for 2-digit quantities (10+), causing the number to wrap
+// vertically instead of staying on one line.
+export const COUNTER_W   = exactScale(100);
 export const COUNTER_BTN = exactScale(36);
 
 export const cartStyles = StyleSheet.create({

@@ -62,7 +62,7 @@ export const searchCardStyles = StyleSheet.create({
   recCard: {
     borderWidth: 1,
     borderColor: "#919EAB33",
-    backgroundColor: "#F4FFF7",
+    backgroundColor: "#FBFFF2",
     minHeight: exactScale(148),
   },
 });
