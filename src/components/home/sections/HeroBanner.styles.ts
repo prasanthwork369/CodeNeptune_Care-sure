@@ -6,7 +6,7 @@ export const TITLE_LINE_HEIGHT = exactScale(30);
 export const styles = StyleSheet.create({
   container: {
     height: exactScale(190),
-    marginHorizontal: exactScale(12),
+    marginHorizontal: exactScale(14),
     marginTop: exactScale(20),
     borderRadius: exactScale(12),
     borderWidth: 1,
@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   },
   skeletonContainer: {
     height: exactScale(190),
-    marginHorizontal: exactScale(12),
+    marginHorizontal: exactScale(14),
     marginTop: exactScale(20),
     borderRadius: exactScale(12),
     borderWidth: 1,
@@ -35,8 +35,6 @@ export const styles = StyleSheet.create({
     verticalAlign: "middle",
   },
   badgeContainer: {
-    width: exactScale(160),
-    height: exactScale(30),
     borderRadius: exactScale(9999),
     borderWidth: 1,
     borderColor: "#919EAB33",
@@ -73,8 +71,8 @@ export const styles = StyleSheet.create({
     position: "absolute",
     width: exactScale(184),
     height: exactScale(211),
-    top: exactScale(-21),
-    right: exactScale(-2),
+    top: exactScale(-22),
+    right: exactScale(1),
   },
   decorMedicine: {
     position: "absolute",
@@ -92,3 +90,71 @@ export const styles = StyleSheet.create({
     transform: [{ rotate: "-36.76deg" }],
   },
 });
+
+export const getDynamicStyles = (scale: number) => {
+  const personWidth = Math.round(exactScale(184) * scale);
+  const skeletonLineHeight = Math.round(
+    Math.min(Math.max(Math.round(exactScale(21) * scale), 16), 26) * 1.34,
+  );
+
+  return StyleSheet.create({
+    containerHeight: {
+      height: Math.round(exactScale(190) * scale),
+    },
+    textBlock: {
+      paddingRight: Math.round(personWidth * 0.6),
+      paddingLeft: Math.round(exactScale(10) * scale),
+      paddingTop: Math.round(exactScale(32) * scale),
+    },
+    skeletonTextBlock: {
+      paddingRight: Math.round(personWidth * 0.4),
+      paddingLeft: Math.round(exactScale(10) * scale),
+      paddingTop: Math.round(exactScale(32) * scale),
+    },
+    skeletonLine1: {
+      marginBottom: exactScale(6),
+      height: skeletonLineHeight,
+    },
+    skeletonLine2: {
+      marginBottom: Math.round(exactScale(20) * scale),
+      height: skeletonLineHeight,
+    },
+    skeletonBadge: {
+      width: Math.round(exactScale(120) * scale),
+      height: Math.round(exactScale(32) * scale),
+    },
+    titleText: {
+      fontSize: Math.round(moderateScale(20) * scale),
+      lineHeight: Math.round(exactScale(30) * scale),
+    },
+    badgeContainer: {
+      marginTop: Math.round(exactScale(10) * scale),
+      paddingTop: Math.round(exactScale(4) * scale),
+      paddingBottom: Math.round(exactScale(4) * scale),
+      paddingLeft: Math.round(exactScale(7) * scale),
+      paddingRight: Math.round(exactScale(7) * scale),
+      gap: Math.round(exactScale(6) * scale),
+    },
+    badgeText: {
+      fontSize: Math.round(moderateScale(12) * scale),
+      lineHeight: Math.round(moderateScale(12) * scale),
+    },
+    avatar: {
+      width: personWidth,
+      height: Math.round(exactScale(211) * scale),
+      top: Math.round(exactScale(-21) * scale),
+    },
+    decorMedicine: {
+      width: Math.round(exactScale(20) * scale),
+      height: Math.round(exactScale(20) * scale),
+      top: Math.round(exactScale(144) * scale),
+      left: Math.round(exactScale(140) * scale),
+    },
+    decorPills: {
+      width: Math.round(exactScale(27.2) * scale),
+      height: Math.round(exactScale(27.2) * scale),
+      top: Math.round(exactScale(26.52) * scale),
+      right: Math.round(exactScale(15) * scale),
+    },
+  });
+};

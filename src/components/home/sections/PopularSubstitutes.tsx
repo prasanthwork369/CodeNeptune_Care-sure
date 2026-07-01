@@ -7,7 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
-import { ActivityIndicator, Animated, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Animated, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { HomeProductCardSkeleton } from './HomeProductCardSkeleton';
 import { styles as s } from './PopularSubstitutes.styles';
 import { exactScale } from "@/src/utils/exactScale";
@@ -59,7 +59,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
             >
                 <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12,alignItems: 'center', justifyContent: 'center', paddingTop: exactScale(24) }}>
                     {!!product.discount && (
-                        <View style={{ backgroundColor: DISCOUNT_BG, position: 'absolute', top: exactScale(6), left: exactScale(8), paddingHorizontal: exactScale(6), paddingVertical: exactScale(3), borderRadius: exactScale(4) }}>
+                        <View style={[s.badgeContainer, { backgroundColor: DISCOUNT_BG }]}>
                             <Text style={[s.badge, { color: ACCENT, fontWeight: '800' }]}>{product.discount}</Text>
                         </View>
                     )}
@@ -145,16 +145,24 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
                 colors={['#F2FAF7', '#FFFFFF']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+                style={StyleSheet.absoluteFillObject}
             />
             <View className="flex-row justify-between items-center mb-4 px-4">
                 <View>
                     <Text style={s.sectionTitle} className="text-brand-text ">
                         Spend Less on What You Need
                     </Text>
-                    <Text style={s.sectionSubtitle} className="mt-1">
-                        More Affordable Choices
-                    </Text>
+                    <View className="mt-1">
+                        <Text style={s.sectionSubtitle}>
+                            More Affordable Choices
+                        </Text>
+                        <LinearGradient
+                            colors={['#12975E', 'rgba(255,255,255,0)']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={{ height: exactScale(3), width: exactScale(160), marginTop: exactScale(6), borderRadius: exactScale(2), opacity: 0.6 }}
+                        />
+                    </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: exactScale(6) }}>
                     <Image source={HOME_IMAGES.supplements} style={s.headerImage} contentFit="contain" />

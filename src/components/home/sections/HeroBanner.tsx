@@ -17,7 +17,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SvgUri } from "react-native-svg";
-import { styles } from "./HeroBanner.styles";
+import { styles, getDynamicStyles } from "./HeroBanner.styles";
 
 const ease = Easing.out(Easing.cubic);
 
@@ -89,34 +89,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 }) => {
   const { width } = useWindowDimensions();
 
-  const bannerWidth = width - 32;
+  const bannerWidth = width - exactScale(32);
 
   // Scale down on smaller devices (down to 0.8), but do not scale up on larger devices (cap at 1.0)
   const scale = Math.min(Math.max(0.8, bannerWidth / 358), 1.0);
 
-  // Dynamically calculate the avatar size and text properties
-  const dynamicAvatarWidth = Math.round(styles.avatar.width * scale);
-  const dynamicAvatarHeight = Math.round(styles.avatar.height * scale);
-  const dynamicAvatarTop = Math.round(styles.avatar.top * scale);
-  const personWidth = dynamicAvatarWidth;
+  // Generate dynamic styles scaled precisely for the current device width
+  const dStyles = getDynamicStyles(scale);
 
-  const dynamicFontSize = Math.round(20 * scale);
-  const dynamicLineHeight = Math.round(30 * scale);
-
-  // Dynamically calculate badge dimensions and text styling
-  const dynamicBadgeWidth = Math.round(160 * scale);
-  const dynamicBadgeHeight = Math.round(30 * scale);
-  const dynamicBadgeMarginTop = Math.round(10 * scale);
-  const dynamicBadgeIconWidth = Math.round(16.6 * scale);
-  const dynamicBadgeIconHeight = Math.round(20.5 * scale);
-  const dynamicBadgeFontSize = Math.round(12 * scale);
-  const dynamicBadgeLineHeight = Math.round(12 * scale);
-
-  const lineHeight = Math.round(
-    Math.min(Math.max(Math.round(21 * scale), 16), 26) * 1.34,
-  );
-  const contentPaddingTop = Math.round(32 * scale);
-  const badgeMarginTop = Math.round(20 * scale);
+  const dynamicBadgeIconWidth = exactScale(16.6) * scale;
+  const dynamicBadgeIconHeight = exactScale(20.5) * scale;
 
   // Hooks must be called before any early return
   const leftAnim = useSlideUp(200);
@@ -126,48 +108,30 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
   if (isLoading || !content) {
     return (
-      <View style={styles.skeletonContainer}>
+      <View style={[styles.skeletonContainer, dStyles.containerHeight]}>
         {/* Left: mirrors flex-[1.2] */}
-        <View
-          style={{
-            paddingLeft: exactScale(10),
-            paddingTop: contentPaddingTop,
-            paddingRight: Math.round(personWidth * 0.4),
-          }}
-        >
+        <View style={dStyles.skeletonTextBlock}>
           <Skeleton
             width="80%"
-            height={lineHeight}
             borderRadius={exactScale(8)}
-            style={{ marginBottom: exactScale(6) }}
+            style={dStyles.skeletonLine1}
           />
           <Skeleton
             width="65%"
-            height={lineHeight}
             borderRadius={exactScale(8)}
-            style={{ marginBottom: badgeMarginTop }}
+            style={dStyles.skeletonLine2}
           />
           <Skeleton
-            width={Math.round(120 * scale)}
-            height={Math.round(32 * scale)}
             borderRadius={exactScale(999)}
+            style={dStyles.skeletonBadge}
           />
         </View>
 
         {/* Right: person */}
-        <View
-          style={[
-            styles.avatar,
-            {
-              width: dynamicAvatarWidth,
-              height: dynamicAvatarHeight,
-              top: dynamicAvatarTop,
-            },
-          ]}
-        >
+        <View style={[styles.avatar, dStyles.avatar]}>
           <Skeleton
-            width={dynamicAvatarWidth}
-            height={dynamicAvatarHeight}
+            width={dStyles.avatar.width}
+            height={dStyles.avatar.height}
             borderRadius={exactScale(16)}
           />
         </View>
@@ -181,7 +145,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const highlights = content.highlighted_text ?? [];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dStyles.containerHeight]}>
       {/* Background Gradient Card */}
       <LinearGradient
         colors={["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"]}
@@ -192,18 +156,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       >
         {/* ── Left: Text block ── */}
         <Animated.View
-          style={[leftAnim, { paddingRight: Math.round(personWidth * 0.6) }]}
-          className="flex-[1.2] pl-3 pt-6 justify-start"
+          style={[leftAnim, dStyles.textBlock]}
+          className="flex-[1.2] justify-start"
         >
           <View>
             {/* First line (e.g. 'Stop overpaying') */}
             <Text
-              style={[
-                styles.titleText,
-                { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight },
-              ]}
+              style={[styles.titleText, dStyles.titleText]}
               className="text-brand-text"
-             
             >
               {getCleanTitlePart1(title)}
             </Text>
@@ -213,23 +173,19 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               <Text
                 style={[
                   styles.titleText,
-                  {
-                    flexShrink: 0,
-                    fontSize: dynamicFontSize,
-                    lineHeight: dynamicLineHeight,
-                  },
+                  dStyles.titleText,
+                  { flexShrink: 0 },
                 ]}
                 className="text-brand-text"
-               
               >
                 for your{" "}
               </Text>
               <TextCycler
                 words={highlights}
-                lineHeight={dynamicLineHeight}
+                lineHeight={dStyles.titleText.lineHeight}
                 style={StyleSheet.flatten([
                   styles.titleText,
-                  { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight },
+                  dStyles.titleText,
                 ])}
                 className="text-brand-primary"
               />
@@ -237,19 +193,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           </View>
 
           {/* Pay less badge */}
-          <View
-            style={[
-              styles.badgeContainer,
-              {
-                width: dynamicBadgeWidth,
-                height: dynamicBadgeHeight,
-                marginTop: dynamicBadgeMarginTop,
-                paddingLeft: Math.round(7 * scale),
-                paddingRight: Math.round(7 * scale),
-                gap: Math.round(6 * scale),
-              },
-            ]}
-          >
+          <View style={[styles.badgeContainer, dStyles.badgeContainer]}>
             {content.labelImage ? (
               <SvgUri
                 uri={content.labelImage}
@@ -257,15 +201,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 height={dynamicBadgeIconHeight}
               />
             ) : null}
-            <Text
-              style={[
-                styles.badgeText,
-                {
-                  fontSize: dynamicBadgeFontSize,
-                  lineHeight: dynamicBadgeLineHeight,
-                },
-              ]}
-            >
+            <Text style={[styles.badgeText, dStyles.badgeText]}>
               {badgeText}
             </Text>
           </View>
@@ -273,17 +209,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       </LinearGradient>
 
       {/* ── Right: Person image (positioned absolute, sibling to allow overflow) ── */}
-      <Animated.View
-        style={[
-          styles.avatar,
-          {
-            width: dynamicAvatarWidth,
-            height: dynamicAvatarHeight,
-            top: dynamicAvatarTop,
-          },
-          rightAnim,
-        ]}
-      >
+      <Animated.View style={[styles.avatar, dStyles.avatar, rightAnim]}>
         <Image
           source={mainImage}
           style={{ width: "100%", height: "100%" }}
@@ -293,14 +219,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       </Animated.View>
 
       {/* ── Background Decors (floating) ── */}
-      <Animated.View style={[styles.decorPills, float1Anim]}>
+      <Animated.View style={[styles.decorPills, dStyles.decorPills, float1Anim]}>
         <Image
           source={HOME_IMAGES.bannerPills}
           style={{ width: "100%", height: "100%" }}
           contentFit="contain"
         />
       </Animated.View>
-      <Animated.View style={[styles.decorMedicine, float2Anim]}>
+      <Animated.View style={[styles.decorMedicine, dStyles.decorMedicine, float2Anim]}>
         <Image
           source={HOME_IMAGES.bannerMedicine}
           style={{ width: "100%", height: "100%" }}

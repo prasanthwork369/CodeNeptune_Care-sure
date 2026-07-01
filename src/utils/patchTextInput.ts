@@ -4,6 +4,8 @@ import * as RN from "react-native";
 // unpatched TextInput component instead of looping back into this file.
 import OriginalTextInputImport from "react-native/Libraries/Components/TextInput/TextInput";
 
+import { sanitizeStyle } from "./patchText";
+
 const OriginalTextInput =
   OriginalTextInputImport as unknown as typeof RN.TextInput;
 
@@ -18,11 +20,16 @@ const OriginalTextInput =
  */
 const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
   (props, ref) => {
+    const sanitizedStyle = sanitizeStyle(props.style);
     return React.createElement(OriginalTextInput, {
       ...props,
       ref,
       allowFontScaling:
         props.allowFontScaling !== undefined ? props.allowFontScaling : false,
+      style: [
+        { fontFamily: undefined, includeFontPadding: false }, // Default reset
+        sanitizedStyle,
+      ],
     });
   },
 );

@@ -2,7 +2,7 @@ import { HomeProductCard } from './HomeProductCard';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Product } from '@/src/types/home';
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -46,11 +46,6 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
 
     return (
         <View className="mb-6">
-            {/* Top Dotted Line */}
-            <View
-                style={{ borderTopWidth: 1, borderTopColor: '#919EAB33', borderStyle: 'dashed' }}
-                className="mx-5 mb-8"
-            />
 
             {bgGradient ? (
                 <LinearGradient
@@ -58,7 +53,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                     locations={bgLocations as any}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 0, y: 0 }}
-                    className="absolute top-0 left-0 right-0 bottom-0"
+                    style={StyleSheet.absoluteFillObject}
                 />
             ) : (
                 <View style={{ backgroundColor: bgColor }} className="absolute top-0 left-0 right-0 bottom-0" />
@@ -74,11 +69,10 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                                 {subtitle}
                             </Text>
                             <LinearGradient
-                                colors={[subtitleColor, 'transparent'] as any}
+                                colors={[subtitleColor, 'rgba(255,255,255,0)'] as any}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
-                                style={{ height: exactScale(3), width: exactScale(140), marginTop: exactScale(4), borderRadius: exactScale(2) }}
-                                className="opacity-60"
+                                style={{ height: exactScale(3), width: exactScale(140), marginTop: exactScale(4), borderRadius: exactScale(2), opacity: 0.6 }}
                             />
                         </View>
                     </View>

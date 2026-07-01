@@ -1,4 +1,5 @@
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Platform } from "react-native";
@@ -12,12 +13,14 @@ export const TabBarFadeGradient: React.FC = () => {
   // pushes the gradient top above the banner when the tab bar hides.
   // Use a tight offset for gesture nav, larger for 3-button nav.
   const is3Button = Platform.OS === "android" && rawBottom > 24;
-  const extraHeight = Platform.OS === "android" ? (is3Button ? 28 : 24) : 24;
+  const extraHeight = exactScale(
+    Platform.OS === "android" ? (is3Button ? 30 : 25) : 24,
+  );
 
   return (
     <LinearGradient
       colors={["rgba(255,255,255,0)", "rgba(255,255,255,0.90)", "#FFFFFF"]}
-      locations={[0, 0.22, 1]}
+      locations={[0.1, 0.2, 1]}
       pointerEvents="none"
       style={{
         position: "absolute",

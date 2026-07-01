@@ -40,7 +40,7 @@ const ANDROID_WEIGHT_TO_INTER_FAMILY: Record<string, string> = {
  *    Android's default system font does not support numeric fontWeight dynamically.
  * 5. Leaves fontFamily untouched on iOS so it falls back to the native SF Pro system font.
  */
-function sanitizeStyle(styleProp: any): any {
+export function sanitizeStyle(styleProp: any): any {
   if (!styleProp) return {};
 
   const flattened = RN.StyleSheet.flatten(styleProp);

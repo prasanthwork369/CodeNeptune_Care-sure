@@ -11,6 +11,7 @@ import {
     ActivityIndicator,
     Animated,
     ScrollView,
+    StyleSheet,
     Text,
     View,
     useWindowDimensions,
@@ -79,7 +80,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             >
                 <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center', paddingTop: exactScale(24) }}>
                     {!!discountLabel && (
-                        <View style={{ backgroundColor: discountBg, position: 'absolute', top: exactScale(6), left: exactScale(8), paddingHorizontal: exactScale(6), paddingVertical: exactScale(3), borderRadius: exactScale(4) }}>
+                        <View style={[s.badgeContainer, { backgroundColor: discountBg }]}>
                             <Text style={[s.badge, { color: accentColor, fontWeight: '800' }]}>{discountLabel}</Text>
                         </View>
                     )}
@@ -167,14 +168,13 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
 
     return (
         <View className="mb-6">
-            <View style={{ borderTopWidth: 1, borderTopColor: '#919EAB33', borderStyle: 'dashed' }} className="mx-5 mb-6" />
 
             <View style={{ position: 'relative' }}>
                 <LinearGradient
                     colors={[gradientStart || '#FFFFFF', gradientEnd || '#FFFFFF']}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 0, y: 0 }}
-                    className="absolute top-0 left-0 right-0 bottom-0"
+                    style={StyleSheet.absoluteFillObject}
                 />
 
                 <View className="pt-6 pb-8">
@@ -184,11 +184,10 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
                             <View className="mt-1">
                                 <Text className="font-inter-extrabold" style={[s.sectionSubtitle, { color: text2Color }]}>{subtitle}</Text>
                                 <LinearGradient
-                                    colors={[lineColor, 'transparent']}
+                                    colors={[lineColor, 'rgba(255,255,255,0)']}
                                     start={{ x: 0, y: 0 }}
                                     end={{ x: 1, y: 0 }}
-                                    style={{ height: exactScale(3), width: exactScale(160), marginTop: exactScale(6), borderRadius: exactScale(2) }}
-                                    className="opacity-60"
+                                    style={{ height: exactScale(3), width: exactScale(160), marginTop: exactScale(6), borderRadius: exactScale(2), opacity: 0.6 }}
                                 />
                             </View>
                         </View>

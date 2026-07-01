@@ -55,7 +55,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
       {footerHeartUrl ? (
         <View
           style={{
-            paddingTop: exactScale(39),
+            paddingTop: exactScale(10),
             paddingBottom: 0,
             paddingHorizontal: exactScale(20),
           }}
@@ -87,7 +87,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
         >
           <Image
             source={{ uri: footerImageUrl }}
-            style={{ width: width, height: exactScale(312) }}
+            style={{ width: width, height: "100%" }}
             contentFit="cover"
             contentPosition="bottom"
           />
@@ -95,7 +95,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
             style={{
               position: "absolute",
               left: exactScale(20),
-              top: exactScale(70),
+              top: exactScale(20),
               gap: 0,
             }}
           >
@@ -104,7 +104,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
                 key={idx}
                 style={{
                   fontSize: moderateScale(60, 0.1),
-                  lineHeight: verticalScale(55),
+                  lineHeight: verticalScale(65),
                 }}
                 className="font-inter-extrabold text-[#D4D4D4] uppercase"
               >
@@ -115,10 +115,8 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(({
         </View>
       ) : null}
 
-      {/* Sub-footer trust labels */}
       <View
         className="flex-row justify-between items-start w-full px-5"
-        style={{ paddingBottom: exactScale(20), paddingTop: exactScale(30) }}
       >
         {(appContent.footer?.labels ?? []).map((label, idx) => {
           const isLeft = idx === 0;

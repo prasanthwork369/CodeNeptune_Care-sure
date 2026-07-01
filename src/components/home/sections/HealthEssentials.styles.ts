@@ -3,6 +3,14 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { typography } from "@/src/constants/typography";
 
 export const styles = StyleSheet.create({
+    badgeContainer: {
+        position: 'absolute',
+        top: exactScale(10),
+        left: exactScale(10),
+        paddingHorizontal: exactScale(6),
+        paddingVertical: exactScale(6),
+        borderRadius: exactScale(4),
+    },
     badge:           { fontSize: moderateScale(11) },
     name: {
         fontWeight: '500',

@@ -20,13 +20,15 @@ const GAP = 8;
 export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress, isLoading }) => {
     const { width, pick } = useResponsiveTier();
     const numColumns = pick(2, 3, 4);
-    const cardWidth = (width - 32 - GAP * (numColumns - 1)) / numColumns;
+    const scaledGap = exactScale(8);
+    const scaledPad = exactScale(16);
+    const cardWidth = (width - scaledPad * 2 - scaledGap * (numColumns - 1)) / numColumns;
     const cardHeight = cardWidth * (128 / 114);
     const imgSize = cardWidth * 0.75;
 
     if (isLoading) {
         return (
-            <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3">
+            <View style={s.container}>
                 {Array.from({ length: 6 }).map((_, i) => (
                     <Skeleton key={i} width={cardWidth} height={cardHeight} borderRadius={exactScale(10)} />
                 ))}
@@ -38,7 +40,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
     const placeholders = remainder === 0 ? 0 : numColumns - remainder;
 
     return (
-        <View className="flex-row flex-wrap justify-between px-4 mt-5 gap-y-3">
+        <View style={s.container}>
             {cards.map((card) => (
                 <Touchable
                     key={card.id}
@@ -49,7 +51,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
                     style={{ backgroundColor: card.bgColor, width: cardWidth, height: cardHeight, borderRadius: exactScale(10) }}
                     className="overflow-hidden justify-start"
                 >
-                    <Text style={s.cardLabel} className="font-inter-semibold text-brand-text px-2 pt-2.5 leading-tight z-10">
+                    <Text style={s.cardLabel} className="font-inter-semibold text-brand-text leading-tight z-10">
                         {card.label}
                     </Text>
                     {card.image ? (
