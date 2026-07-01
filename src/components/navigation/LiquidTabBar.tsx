@@ -298,8 +298,9 @@ const TabItem = React.memo(
           alignItems: "center",
           justifyContent: "center",
           paddingHorizontal: exactScale(6),
+          paddingVertical: exactScale(8),
         }}
-        className="py-2 h-full z-10"
+        className="h-full z-10"
       >
         <Animated.View
           style={[
@@ -347,6 +348,7 @@ TabItem.displayName = "TabItem";
 
 const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const adjustedBottom = useAdjustedBottomInset();
+  const extraGap = exactScale(6);
   const router = useNav();
   const { isTabBarVisible } = useUIStore();
   const { setTabBarHeight } = useTabBarStore();
@@ -559,10 +561,11 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
 
   return (
     <View
-      className="absolute bottom-0 left-0 right-0 flex-row items-center pl-3 pr-0"
+      className="absolute bottom-0 left-0 right-0 flex-row items-center"
       style={{
-        height: BAR_HEIGHT + adjustedBottom,
-        paddingBottom: adjustedBottom,
+        height: BAR_HEIGHT + adjustedBottom + extraGap,
+        paddingBottom: adjustedBottom + extraGap,
+        paddingLeft: exactScale(12),
       }}
       pointerEvents="box-none"
       onLayout={handleLayout}
@@ -579,13 +582,13 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
             the even, all-around glow box-shadow: 0px 0px 20px 0px #00000026 calls for. */}
         <View
           style={{
+            flex: 1,
+            marginRight: exactScale(10),
             height: PILL_HEIGHT,
             borderRadius: PILL_HEIGHT / 2,
             backgroundColor: "#fff",
             boxShadow: "0px 0px 20px 0px #00000026",
-
           }}
-          className="flex-1 mr-2.5"
         >
           <GestureDetector gesture={gesture}>
             <View

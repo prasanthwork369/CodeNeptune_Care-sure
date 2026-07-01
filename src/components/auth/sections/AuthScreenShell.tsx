@@ -133,7 +133,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
           onPress={handleSkip}
         >
           <BlurView
-            intensity={40}
+            intensity={60}
             tint="systemChromeMaterialLight"
             experimentalBlurMethod="dimezisBlurView"
             style={styles.skipBtn}
@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: scale(8),
     borderColor: "#919EAB33",
+    backgroundColor: "rgba(255,255,255,0.82)",
   },
   skipText: {
     fontFamily: "Inter-700Bold",

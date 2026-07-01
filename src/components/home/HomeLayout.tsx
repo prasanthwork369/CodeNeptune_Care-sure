@@ -17,6 +17,7 @@ import {
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
+import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
@@ -172,7 +173,7 @@ export const HomeLayout: React.FC = () => {
         ? adjustedBottom - 8
         : adjustedBottom
       : adjustedBottom;
-  const TAB_BAR_HEIGHT = exactScale(85) + adjustedBottom;
+  const TAB_BAR_HEIGHT = BAR_HEIGHT + adjustedBottom + exactScale(6);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -325,8 +326,8 @@ export const HomeLayout: React.FC = () => {
         {/* Child 1: Sticky SearchBar Container */}
         <View
           style={{
-            marginTop: -(insets.top + 8) - 30,
-            paddingTop: insets.top + 8,
+            marginTop: -(insets.top + exactScale(8)) - exactScale(30),
+            paddingTop: insets.top + exactScale(8),
             paddingBottom: exactScale(14),
             paddingHorizontal: exactScale(36),
             backgroundColor: "transparent",
@@ -356,7 +357,7 @@ export const HomeLayout: React.FC = () => {
         <View
           className="bg-white flex-1"
           style={{
-            paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? 75 : 0),
+            paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
           }}
         >
           <Animated.View style={quickActionsAnim}>

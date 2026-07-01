@@ -5,6 +5,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
+import { BAR_HEIGHT, PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import Animated, {
   Easing,
   interpolateColor,
@@ -59,6 +60,7 @@ export const FloatingBannersCarousel = ({
 }) => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
+  const extraGap = exactScale(6);
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
   const { isTabBarVisible } = useUIStore();
@@ -134,7 +136,7 @@ export const FloatingBannersCarousel = ({
   const translateY = useSharedValue(0);
 
   useEffect(() => {
-    translateY.value = withTiming(isTabBarVisible ? 0 : 70, {
+    translateY.value = withTiming(isTabBarVisible ? 0 : exactScale(73), {
       duration: 300,
       easing: Easing.inOut(Easing.ease),
     });
@@ -245,13 +247,11 @@ export const FloatingBannersCarousel = ({
 
   if (!isCartActive && !isRxActive) return null;
 
-  // Distance from the screen bottom to the top of the visible pill bar in
-  // LiquidTabBar: adjustedBottom (its paddingBottom) + the pill's vertical
-  // centering offset within BAR_HEIGHT, i.e. (BAR_HEIGHT + PILL_HEIGHT) / 2.
-  // At the 390px baseline that's exactly 75, but it must go through
-  // exactScale() like BAR_HEIGHT/PILL_HEIGHT themselves do, or this drifts
-  // out of sync with the real tab bar position on non-baseline screen widths.
-  const TAB_BAR_HEIGHT = exactScale(75) + adjustedBottom;
+  // Distance from screen bottom to the top of the LiquidTabBar pill:
+  // paddingBottom (adjustedBottom + extraGap) + vertical centering offset
+  // within BAR_HEIGHT = (BAR_HEIGHT + PILL_HEIGHT) / 2.
+  // Derived from actual style constants so it stays in sync automatically.
+  const TAB_BAR_HEIGHT = (BAR_HEIGHT + PILL_HEIGHT) / 2 + adjustedBottom + extraGap;
 
   return (
     <>
@@ -261,10 +261,11 @@ export const FloatingBannersCarousel = ({
           style={[
             {
               position: "absolute",
-              bottom: TAB_BAR_HEIGHT,
+              bottom: TAB_BAR_HEIGHT + exactScale(8),
               left: 0,
               width: width,
               height: exactScale(90),
+              justifyContent: "flex-end",
               zIndex: 100,
             },
             animatedContainerStyle,
@@ -410,7 +411,7 @@ export const FloatingBannersCarousel = ({
               style={[
                 {
                   position: "absolute",
-                  bottom: TAB_BAR_HEIGHT + 8,
+                  bottom: TAB_BAR_HEIGHT + exactScale(8),
                   left: 0,
                   right: 0,
                   zIndex: 50,
@@ -437,7 +438,7 @@ export const FloatingBannersCarousel = ({
               style={[
                 {
                   position: "absolute",
-                  bottom: TAB_BAR_HEIGHT + 8,
+                  bottom: TAB_BAR_HEIGHT + exactScale(8),
                   left: 0,
                   right: 0,
                   zIndex: 50,

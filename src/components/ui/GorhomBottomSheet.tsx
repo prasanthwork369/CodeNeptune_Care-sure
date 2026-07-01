@@ -82,23 +82,34 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
 
         const isPresentedRef = useRef(false);
 
+        const hasMountedRef = useRef(false);
+
         useEffect(() => {
             if (isVisible) {
                 isPresentedRef.current = true;
                 onPresent?.();
-                // Double rAF ensures the bottom sheet portal has completed its
-                // first layout pass before we present, otherwise the first
-                // present() can be a no-op on cold start.
-                requestAnimationFrame(() => {
+                
+                if (!hasMountedRef.current) {
+                    // Cold start: needs double rAF for the portal layout pass
                     requestAnimationFrame(() => {
-                        internalRef.current?.present();
+                        requestAnimationFrame(() => {
+                            internalRef.current?.present();
+                            hasMountedRef.current = true;
+                        });
                     });
-                });
+                } else {
+                    // Already mounted, open instantly!
+                    internalRef.current?.present();
+                }
             } else if (isPresentedRef.current) {
                 isPresentedRef.current = false;
                 internalRef.current?.dismiss();
             }
         }, [isVisible, onPresent]);
+
+        useEffect(() => {
+            hasMountedRef.current = true;
+        }, []);
 
         const handleDismiss = useCallback(() => {
             isPresentedRef.current = false;

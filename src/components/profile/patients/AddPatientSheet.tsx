@@ -5,9 +5,9 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
@@ -66,7 +66,7 @@ export function AddPatientSheet({
   const inFlight = useRef(false);
 
   const isEditMode = !!editPatient;
-  const mobileRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const mobileRef = useRef<React.ElementRef<typeof BottomSheetTextInput>>(null);
   const maxDob = getMaxDob();
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export function AddPatientSheet({
         onClose={onClose}
         snapPoints={snapPoints}
         closeButtonOffset="80%"
-        keyboardBehavior="interactive"
+        keyboardBehavior="extend"
         keyboardBlurBehavior="none"
         backgroundStyle={{
           backgroundColor: "#fff",
@@ -186,7 +186,7 @@ export function AddPatientSheet({
               errors.name ? { borderColor: "#EF4444" } : {},
             ]}
           >
-            <TextInput
+            <SafeInput
               placeholder="Enter the name"
               placeholderTextColor="#6A6A6A"
               style={{
@@ -197,7 +197,7 @@ export function AddPatientSheet({
                 margin: 0,
               }}
               value={name}
-              onChangeText={(t) => {
+              onChangeText={(t: string) => {
                 setName(t);
                 setErrors((e) => (e.name ? { ...e, name: undefined } : e));
               }}
@@ -241,7 +241,7 @@ export function AddPatientSheet({
             >
               +91 |
             </Text>
-            <TextInput
+            <SafeInput
               ref={mobileRef}
               placeholder="Enter The number"
               placeholderTextColor="#6A6A6A"
@@ -256,7 +256,7 @@ export function AddPatientSheet({
                 height: "100%",
               }}
               value={mobile}
-              onChangeText={(t) => {
+              onChangeText={(t: string) => {
                 const d = t.replace(/\D/g, "");
                 setMobile(d);
                 setErrors((e) => (e.mobile ? { ...e, mobile: undefined } : e));
@@ -327,7 +327,7 @@ export function AddPatientSheet({
           )}
           {relationship === "Other" && (
             <>
-              <TextInput
+              <SafeInput
                 placeholder="Specify relationship"
                 placeholderTextColor="#6A6A6A"
                 style={[
@@ -339,7 +339,7 @@ export function AddPatientSheet({
                   errors.relationship ? { borderColor: "#EF4444" } : {},
                 ]}
                 value={otherRelationship}
-                onChangeText={(t) => {
+                onChangeText={(t: string) => {
                   setOtherRelationship(t);
                   setErrors((e) =>
                     e.relationship ? { ...e, relationship: undefined } : e,
@@ -513,3 +513,32 @@ const inputStyle: object = {
   backgroundColor: "#fff",
   marginBottom: exactScale(18),
 };
+
+const SafeInput = React.forwardRef<React.ElementRef<typeof BottomSheetTextInput>, any>(
+  ({ value, onChangeText, ...props }, ref) => {
+    const [text, setText] = useState(value);
+    const lastNotifiedValue = useRef(value);
+
+    useEffect(() => {
+      // Only update local state if parent intentionally changed it
+      // (e.g. form reset, not just a slow re-render reflecting our own keystrokes)
+      if (value !== lastNotifiedValue.current) {
+        setText(value);
+        lastNotifiedValue.current = value;
+      }
+    }, [value]);
+
+    return (
+      <BottomSheetTextInput
+        {...props}
+        ref={ref}
+        value={text}
+        onChangeText={(t: string) => {
+          setText(t);
+          lastNotifiedValue.current = t;
+          onChangeText(t);
+        }}
+      />
+    );
+  }
+);
