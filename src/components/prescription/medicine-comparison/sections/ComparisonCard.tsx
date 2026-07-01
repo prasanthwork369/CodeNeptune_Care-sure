@@ -2,7 +2,8 @@ import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
 import { ComparisonMedicine } from "../types";
 import { moderateScale } from "@/src/utils/exactScale";
 

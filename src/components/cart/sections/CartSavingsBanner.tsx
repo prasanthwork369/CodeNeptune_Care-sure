@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
   totalSavings,
@@ -19,8 +19,8 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
       style={{
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: exactScale(16),
+        paddingVertical: exactScale(12),
         gap: 10,
       }}
     >

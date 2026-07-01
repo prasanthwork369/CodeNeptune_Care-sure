@@ -3,7 +3,7 @@ import { icons } from "@/src/constants/icons";
 import { useFlyToCartSafe, ThumbnailItem, AnimatedCount } from "@/src/components/animations/flyToCart";
 import React, { useEffect, useRef } from "react";
 import { Text, View, useWindowDimensions } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -167,7 +167,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
         <Touchable
           activeOpacity={0.9}
           onPress={onPress}
-          style={{ width: "100%", height: "100%", flexDirection: "row", alignItems: "center", paddingLeft: 12, paddingRight: 16 }}
+          style={{ width: "100%", height: "100%", flexDirection: "row", alignItems: "center", paddingLeft: exactScale(12), paddingRight: exactScale(16) }}
         >
           {/* Thumbnails — visible from the moment circle appears */}
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -197,7 +197,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
           </View>
 
           {/* "View cart" + count — fade in mid-expansion */}
-          <Animated.View style={[{ flex: 1, marginLeft: 10, justifyContent: "center" }, textStyle]}>
+          <Animated.View style={[{ flex: 1, marginLeft: exactScale(10), justifyContent: "center" }, textStyle]}>
             <Text style={{ color: "#fff", fontSize: moderateScale(14.5), fontWeight: "700", lineHeight: moderateScale(18) }}>
               View cart
             </Text>

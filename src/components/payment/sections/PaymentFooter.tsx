@@ -4,7 +4,7 @@ import { PaymentFooterProps } from "@/src/types/payment";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const PaymentFooter: React.FC<PaymentFooterProps> = ({
   onPress,
@@ -19,8 +19,8 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 20,
-        paddingBottom: safeAreaBottom + 10,
+        padding: exactScale(20),
+        paddingBottom: safeAreaBottom + exactScale(10),
         backgroundColor: "#fff",
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
@@ -42,7 +42,7 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={{
-            paddingVertical: 18,
+            paddingVertical: exactScale(18),
             alignItems: "center",
             flexDirection: "row",
             justifyContent: "center",

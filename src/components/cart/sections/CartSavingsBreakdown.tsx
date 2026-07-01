@@ -4,11 +4,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import PercentDiscountIcon from '@/assets/icons/percent_discount.svg';
 import { colors } from '@/src/constants/theme';
 import { CartSavingsBreakdownProps } from '@/src/types/cart';
-import { moderateScale } from '@/src/utils/exactScale';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 export const CartSavingsBreakdown: React.FC<CartSavingsBreakdownProps> = ({ totalSavings, rows }) => {
     return (
-        <View style={{ marginHorizontal: 16, marginTop: 12, borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33', backgroundColor: 'white', overflow: 'hidden' }}>
+        <View style={{ marginHorizontal: exactScale(16), marginTop: exactScale(12), borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33', backgroundColor: 'white', overflow: 'hidden' }}>
             <LinearGradient colors={['#FBFEFC', '#EBFAF0']} start={{ x: 0.5, y: 1 }} end={{ x: 0.5, y: 0 }}>
                 <View className="px-4 py-3 flex-row items-center">
                     <PercentDiscountIcon width={20} height={20} fill={colors.primary} />

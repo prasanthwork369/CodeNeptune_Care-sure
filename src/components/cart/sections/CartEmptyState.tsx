@@ -6,7 +6,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   featuredProducts,
@@ -60,9 +60,9 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{
-              paddingHorizontal: 16,
-              paddingTop: 4,
-              paddingBottom: 16,
+              paddingHorizontal: exactScale(16),
+              paddingTop: exactScale(4),
+              paddingBottom: exactScale(16),
             }}
           >
             {featuredProducts.slice(0, 5).map((product) => (
@@ -75,7 +75,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     params: { id: product.productId ?? product.id },
                   } as any)
                 }
-                style={{ width: 165, marginRight: 12 }}
+                style={{ width: 165, marginRight: exactScale(12) }}
               >
                 {/* Unified Premium Card Wrapper */}
                 <View
@@ -96,7 +96,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
 
                     {/* Discount badge */}
                     {!!product.discount && (
-                      <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, backgroundColor: '#008097' }}>
+                      <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: exactScale(6), paddingVertical: exactScale(2), backgroundColor: '#008097' }}>
                         <Text style={{ fontSize: moderateScale(10), fontWeight: '700', color: '#fff' }}>
                           {String(product.discount).toUpperCase()}
                         </Text>
@@ -109,7 +109,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     style={{
                       flex: 1,
                       backgroundColor: "#F5F6FB",
-                      padding: 10,
+                      padding: exactScale(10),
                       justifyContent: "space-between",
                     }}
                   >
@@ -132,7 +132,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                           fontSize: moderateScale(12),
                           fontWeight: "700",
                           color: "#009989",
-                          marginTop: 2,
+                          marginTop: exactScale(2),
                         }}
                       >
                         {product.brand}
@@ -143,7 +143,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                           fontSize: moderateScale(11),
                           fontWeight: "500",
                           color: "#6A6A6A",
-                          marginTop: 1,
+                          marginTop: exactScale(1),
                         }}
                       >
                         {product.pack || " "}
@@ -156,7 +156,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                         style={{
                           flexDirection: "row",
                           alignItems: "baseline",
-                          marginBottom: 4,
+                          marginBottom: exactScale(4),
                         }}
                       >
                         <Text
@@ -175,7 +175,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                               fontWeight: "400",
                               color: "#637381",
                               textDecorationLine: "line-through",
-                              marginLeft: 6,
+                              marginLeft: exactScale(6),
                             }}
                           >
                             ₹{Number(product.originalPrice).toFixed(2)}
@@ -193,10 +193,10 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                             borderWidth: 1,
                             borderColor: "#0F7635",
                             borderRadius: 10,
-                            paddingVertical: 9,
+                            paddingVertical: exactScale(9),
                             alignItems: "center",
                             justifyContent: "center",
-                            marginVertical: 4,
+                            marginVertical: exactScale(4),
                             opacity: addingProductId !== null ? 0.7 : 1,
                           }}
                         >

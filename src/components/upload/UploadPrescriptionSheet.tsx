@@ -13,7 +13,8 @@ import {
   useBottomSheet,
 } from "@gorhom/bottom-sheet";
 import React, { useEffect, useRef, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
 import Animated, {
   FadeIn,
   FadeOut,

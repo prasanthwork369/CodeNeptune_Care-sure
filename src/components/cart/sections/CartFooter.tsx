@@ -1,3 +1,4 @@
+import { exactScale } from '@/src/utils/exactScale';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { cartStyles as s } from '../cart.styles';
@@ -8,7 +9,7 @@ export const CartFooter: React.FC<CartFooterProps> = ({ toPay, safeAreaBottom, o
     return (
         <View 
             className="bg-white border-t border-[#919EAB33] px-4 flex-row items-center justify-between" 
-            style={{ paddingTop: 12, paddingBottom: safeAreaBottom + 12 }}
+            style={{ paddingTop: exactScale(12), paddingBottom: safeAreaBottom + exactScale(12) }}
         >
             <View>
                 <Text style={s.footerLabel} className="font-inter-medium text-brand-text">To Pay</Text>

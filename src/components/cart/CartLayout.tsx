@@ -4,6 +4,7 @@ import { LocationBottomSheet } from "@/src/components/home/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";
+import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import {
@@ -90,7 +91,7 @@ export const CartLayout: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: exactScale(24) }}
       >
         <CartSavingsBanner firstName={firstName} totalSavings={totalSavings} />
 

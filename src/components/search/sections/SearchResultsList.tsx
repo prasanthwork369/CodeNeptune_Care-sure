@@ -3,8 +3,9 @@ import { SearchProductCard } from '@/src/components/search/SearchProductCard';
 import { SearchRecommendCard } from '@/src/components/search/SearchRecommendCard';
 import { SearchNoSubstituteCard } from '@/src/components/search/SearchNoSubstituteCard';
 import { SearchColumnHeaders } from './SearchColumnHeaders';
-import React from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 export const SearchResultsList = ({
     results,
@@ -26,33 +27,37 @@ export const SearchResultsList = ({
     onRecommendPress: (productId: string) => void;
     onEndReached: () => void;
     isFetchingNextPage: boolean;
-}) => (
-    <FlatList
-        data={results}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: bottomPad }}
-        className="flex-1"
-        ListHeaderComponent={<SearchColumnHeaders colWidth={colWidth} />}
-        renderItem={({ item }) => (
-            <View className="px-4">
-                {item.sourceType === 2 ? (
-                    item.recommendation ? (
-                        <SearchProductCard data={toComparisonData(item)} />
-                    ) : (
-                        <SearchNoSubstituteCard data={toSearchedOnlyData(item)} />
-                    )
+}) => {
+    const renderItem = useCallback(({ item }: { item: ApiSearchMedicine }) => (
+        <View className="px-4">
+            {item.sourceType === 2 ? (
+                item.recommendation ? (
+                    <SearchProductCard data={toComparisonData(item)} />
                 ) : (
-                    <SearchRecommendCard data={toRecommendData(item)} onPress={onRecommendPress} />
-                )}
-            </View>
-        )}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.4}
-        ListFooterComponent={
-            isFetchingNextPage
-                ? <ActivityIndicator size="small" color="#0F7635" style={{ marginVertical: 12 }} />
-                : null
-        }
-    />
-);
+                    <SearchNoSubstituteCard data={toSearchedOnlyData(item)} />
+                )
+            ) : (
+                <SearchRecommendCard data={toRecommendData(item)} onPress={onRecommendPress} />
+            )}
+        </View>
+    ), [toComparisonData, toSearchedOnlyData, toRecommendData, onRecommendPress]);
+
+    return (
+        <FlashList
+            data={results}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: bottomPad }}
+            className="flex-1"
+            ListHeaderComponent={<SearchColumnHeaders colWidth={colWidth} />}
+            renderItem={renderItem}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.4}
+            ListFooterComponent={
+                isFetchingNextPage
+                    ? <ActivityIndicator size="small" color="#0F7635" style={{ marginVertical: 12 }} />
+                    : null
+            }
+        />
+    );
+};

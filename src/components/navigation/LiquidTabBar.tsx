@@ -76,6 +76,8 @@ const HOLD_COLLAPSED_MS = 1400;
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
+const TAB_LABEL_MARGIN_TOP = exactScale(4);
+
 // ─── Animated Upload Button ───────────────────────────────────────────────────
 
 const AnimatedUploadButton = React.memo(
@@ -283,7 +285,7 @@ const TabItem = React.memo(
             : undefined,
         fontWeight:
           Platform.OS === "android" ? "normal" : w > 0.5 ? "700" : "500",
-        marginTop: exactScale(4),
+        marginTop: TAB_LABEL_MARGIN_TOP,
         textAlign: "center",
         width: "100%",
       };

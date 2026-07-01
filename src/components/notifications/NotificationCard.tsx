@@ -1,3 +1,4 @@
+import { exactScale } from '@/src/utils/exactScale';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
@@ -25,7 +26,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
         <View className="bg-white rounded-2xl border border-[#919EAB33] p-4 mb-3">
             <View className="flex-row items-center">
                 {/* Icon Circle */}
-                <View style={[s.cardIconBox, { borderRadius: 999, backgroundColor: '#E9F6ED', alignItems: 'center', justifyContent: 'center', marginRight: 12 }]}>
+                <View style={[s.cardIconBox, { borderRadius: 999, backgroundColor: '#E9F6ED', alignItems: 'center', justifyContent: 'center', marginRight: exactScale(12) }]}>
                     <Icon width={s.cardIcon.width} height={s.cardIcon.height} fill="#0F7635" />
                 </View>
 

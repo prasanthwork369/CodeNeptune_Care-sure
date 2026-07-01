@@ -9,7 +9,7 @@ export const ProductSkeleton = () => {
     return (
         <ScrollView 
             showsVerticalScrollIndicator={false} 
-            contentContainerStyle={{ paddingBottom: 100 }}
+            contentContainerStyle={{ paddingBottom: exactScale(100) }}
             className="flex-1"
         >
             {/* Image Carousel Mock */}
@@ -24,9 +24,9 @@ export const ProductSkeleton = () => {
 
             {/* Product Details Mock */}
             <View className="px-5">
-                <Skeleton width={100} height={13} style={{ marginBottom: 8 }} />
-                <Skeleton width="90%" height={24} style={{ marginBottom: 8 }} />
-                <Skeleton width="60%" height={24} style={{ marginBottom: 16 }} />
+                <Skeleton width={100} height={13} style={{ marginBottom: exactScale(8) }} />
+                <Skeleton width="90%" height={24} style={{ marginBottom: exactScale(8) }} />
+                <Skeleton width="60%" height={24} style={{ marginBottom: exactScale(16) }} />
 
                 <View className="flex-row items-baseline gap-x-2 mb-4">
                     <Skeleton width={80} height={28} />
@@ -34,7 +34,7 @@ export const ProductSkeleton = () => {
                     <Skeleton width={50} height={16} />
                 </View>
 
-                <Skeleton width="80%" height={12} style={{ marginBottom: 20 }} />
+                <Skeleton width="80%" height={12} style={{ marginBottom: exactScale(20) }} />
             </View>
 
             <View className="h-[1px] bg-[#F3F4F6] mt-4 mb-4" />
@@ -49,7 +49,7 @@ export const ProductSkeleton = () => {
                 <View className="flex-row items-center">
                     <Skeleton width={40} height={40} borderRadius={20} />
                     <View className="ml-3 flex-1">
-                        <Skeleton width="60%" height={14} style={{ marginBottom: 6 }} />
+                        <Skeleton width="60%" height={14} style={{ marginBottom: exactScale(6) }} />
                         <Skeleton width="40%" height={12} />
                     </View>
                 </View>
@@ -59,7 +59,7 @@ export const ProductSkeleton = () => {
             <View className="flex-row px-5 mb-8 justify-between">
                 {[1, 2, 3].map((i) => (
                     <View key={i} className="items-center">
-                        <Skeleton width={48} height={48} borderRadius={24} style={{ marginBottom: 8 }} />
+                        <Skeleton width={48} height={48} borderRadius={24} style={{ marginBottom: exactScale(8) }} />
                         <Skeleton width={40} height={10} />
                     </View>
                 ))}
@@ -67,9 +67,9 @@ export const ProductSkeleton = () => {
 
             {/* Know Your Medicine Mock */}
             <View className="px-5">
-                <Skeleton width={150} height={18} style={{ marginBottom: 12 }} />
+                <Skeleton width={150} height={18} style={{ marginBottom: exactScale(12) }} />
                 {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} width="100%" height={12} style={{ marginBottom: 8 }} />
+                    <Skeleton key={i} width="100%" height={12} style={{ marginBottom: exactScale(8) }} />
                 ))}
             </View>
         </ScrollView>

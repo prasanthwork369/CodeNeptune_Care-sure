@@ -14,7 +14,7 @@ import {
 import React, { useState } from "react";
 import { Image, Text, View, ActivityIndicator, Alert } from "react-native";
 import { cartStyles as s } from "../cart.styles";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const computeDiscount = (coupon: Coupon, amount: number) => {
   if (coupon.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE) {
@@ -150,7 +150,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             fontSize: moderateScale(15),
             fontWeight: "700",
             color: "#1A1C1E",
-            marginBottom: 10,
+            marginBottom: exactScale(10),
           }}
         >
           Coupons & offers
@@ -165,7 +165,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               backgroundColor: "#E1F2FF",
               alignItems: "center",
               justifyContent: "center",
-              marginRight: 12,
+              marginRight: exactScale(12),
               borderWidth: 1,
               borderColor: "#BFE3FF",
             }}
@@ -195,7 +195,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
                   fontSize: moderateScale(12),
                   fontWeight: "600",
                   color: "#E16D09",
-                  marginTop: 3,
+                  marginTop: exactScale(3),
                 }}
               >
                 Shop ₹{remaining.toFixed(0)} more to apply

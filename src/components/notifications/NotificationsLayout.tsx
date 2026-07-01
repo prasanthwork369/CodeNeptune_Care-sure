@@ -1,3 +1,4 @@
+import { exactScale } from '@/src/utils/exactScale';
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
@@ -148,10 +149,10 @@ const OptionsPanel: React.FC<{
       <Touchable
         activeOpacity={0.7}
         onPress={onDismiss}
-        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 }}
+        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(16), paddingVertical: exactScale(14) }}
       >
         <icons.close_dark width={s.popoverIcon.width} height={s.popoverIcon.height} />
-        <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: 14 }]}>
+        <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: exactScale(14) }]}>
           Clear
         </Text>
       </Touchable>
@@ -159,10 +160,10 @@ const OptionsPanel: React.FC<{
         <Touchable
           activeOpacity={0.7}
           onPress={onMarkRead}
-          style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 }}
+          style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(16), paddingVertical: exactScale(14) }}
         >
           <icons.done_all width={s.popoverIconAlt.width} height={s.popoverIconAlt.height} fill="#111827" />
-          <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: 14 }]}>
+          <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: exactScale(14) }]}>
             Mark as read
           </Text>
         </Touchable>
@@ -210,18 +211,18 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
       style={{
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingVertical: 14,
+        paddingVertical: exactScale(14),
         borderBottomWidth: isLast ? 0 : 1,
         borderBottomColor: '#F0F1F3',
       }}
     >
       {!notification.isRead && (
-        <View style={{ height: s.notifIconBox.height, justifyContent: 'center', marginRight: 6 }}>
+        <View style={{ height: s.notifIconBox.height, justifyContent: 'center', marginRight: exactScale(6) }}>
           <View style={[s.unreadDot, { borderRadius: 999, backgroundColor: '#0F7635' }]} />
         </View>
       )}
 
-      <View style={[s.notifIconBox, { borderRadius: 999, backgroundColor: visual.bg, alignItems: 'center', justifyContent: 'center', marginRight: 12 }]}>
+      <View style={[s.notifIconBox, { borderRadius: 999, backgroundColor: visual.bg, alignItems: 'center', justifyContent: 'center', marginRight: exactScale(12) }]}>
         {visual.icon}
       </View>
 
@@ -230,7 +231,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
           {getNotificationTitle(notification)}
         </Text>
         {isLong && !expanded ? (
-          <Text style={[s.notifBody, { marginTop: 2 }]}>
+          <Text style={[s.notifBody, { marginTop: exactScale(2) }]}>
             {body.substring(0, 100)}...{' '}
             <Text
               onPress={(e) => { e.stopPropagation?.(); setExpanded(true); }}
@@ -240,11 +241,11 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
             </Text>
           </Text>
         ) : (
-          <Text style={[s.notifBody, { marginTop: 2 }]}>
+          <Text style={[s.notifBody, { marginTop: exactScale(2) }]}>
             {body}
           </Text>
         )}
-        <Text style={[s.notifTime, { marginTop: 4 }]}>
+        <Text style={[s.notifTime, { marginTop: exactScale(4) }]}>
           {formatRowTime(notification.createdAt, section)}
         </Text>
       </View>
@@ -254,7 +255,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
           activeOpacity={0.7}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           onPress={(e) => { e.stopPropagation?.(); openMenu(); }}
-          style={{ padding: 2 }}
+          style={{ padding: exactScale(2) }}
         >
           <icons.dots width={s.dotsIcon.width} height={s.dotsIcon.height} fill="#9CA3AF" />
         </Touchable>
@@ -322,14 +323,14 @@ export const NotificationsLayout: React.FC = () => {
       ) : (
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: adjustedBottom + 16, flexGrow: 1 }}
+          contentContainerStyle={{ paddingHorizontal: exactScale(16), paddingBottom: adjustedBottom + exactScale(16), flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#0F7635" colors={['#0F7635']} />
           }
         >
           {showEmpty && (
-            <View className="flex-1 items-center justify-center" style={{ paddingTop: 80 }}>
+            <View className="flex-1 items-center justify-center" style={{ paddingTop: exactScale(80) }}>
               <icons.notification width={s.emptyIcon.width} height={s.emptyIcon.height} fill="#D1D5DB" />
               <Text style={s.emptyTitle} className="font-inter-semibold text-brand-subtext mt-4">No notifications yet</Text>
               <Text style={s.emptySub} className="font-inter text-[#9CA3AF] mt-1 text-center">
@@ -339,8 +340,8 @@ export const NotificationsLayout: React.FC = () => {
           )}
 
           {sections.map((section) => (
-            <View key={section.key} style={{ marginTop: 18 }}>
-              <Text style={[s.sectionHeader, { fontWeight: '600', color: '#6A6A6A', letterSpacing: 0, textTransform: 'uppercase', marginBottom: 10 }]}>
+            <View key={section.key} style={{ marginTop: exactScale(18) }}>
+              <Text style={[s.sectionHeader, { fontWeight: '600', color: '#6A6A6A', letterSpacing: 0, textTransform: 'uppercase', marginBottom: exactScale(10) }]}>
                 {section.key}
               </Text>
               {section.items.map((notification, idx) => (

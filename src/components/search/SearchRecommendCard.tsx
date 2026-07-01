@@ -2,7 +2,8 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import React from "react";
-import { ActivityIndicator, Animated, Image, Text, View } from "react-native";
+import { ActivityIndicator, Animated, Text, View } from "react-native";
+import { Image } from "expo-image";
 import {
   cartCounterStyles as cc,
   searchCardStyles as s,
@@ -25,10 +26,10 @@ interface SearchRecommendCardProps {
   onPress: (productId: string) => void;
 }
 
-export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
+export const SearchRecommendCard = React.memo(({
   data,
   onPress,
-}) => {
+}: SearchRecommendCardProps) => {
   const savings =
     data.mrp != null && data.price != null ? data.mrp - data.price : 0;
   const hasSavings = savings > 0;
@@ -227,4 +228,4 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> = ({
       </View>
     </Touchable>
   );
-};
+});

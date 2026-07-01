@@ -1,7 +1,8 @@
 import { useNav } from "@/src/hooks/useNav";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
 import { icons } from "@/src/constants/icons";
 import { PrescriptionHistoryItemProps } from "@/src/types/prescription";
 import { moderateScale } from "@/src/utils/exactScale";

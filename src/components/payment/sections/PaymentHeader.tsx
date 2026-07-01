@@ -3,7 +3,7 @@ import { PaymentHeaderProps } from "@/src/types/payment";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
   onBack,
@@ -15,7 +15,7 @@ export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 24,
+        marginBottom: exactScale(24),
       }}
     >
       <Touchable

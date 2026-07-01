@@ -20,7 +20,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const isPdf = (uri: string, type?: string) =>
   type === "application/pdf" || uri.toLowerCase().endsWith(".pdf");
@@ -94,8 +94,8 @@ export const SelectPatientLayout: React.FC = () => {
             showsVerticalScrollIndicator={false}
             className="flex-1"
             contentContainerStyle={{
-              padding: 16,
-              paddingBottom: adjustedBottom + 90,
+              padding: exactScale(16),
+              paddingBottom: adjustedBottom + exactScale(90),
             }}
           >
             {prescriptionItems.length > 0 && (
@@ -104,7 +104,7 @@ export const SelectPatientLayout: React.FC = () => {
                   Prescription
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View className="flex-row" style={{ gap: 10 }}>
+                  <View className="flex-row" style={{ gap: exactScale(10) }}>
                     <Touchable className="w-[72px] h-[72px] rounded-[10px] border border-[#919EAB33] bg-[#FCFDFF] items-center justify-center">
                       <icons.add_photo width={24} height={24} />
                     </Touchable>
@@ -146,7 +146,7 @@ export const SelectPatientLayout: React.FC = () => {
               showsHorizontalScrollIndicator={false}
               style={{ marginBottom: 16 }}
             >
-              <View className="flex-row pr-1" style={{ gap: 8 }}>
+              <View className="flex-row pr-1" style={{ gap: exactScale(8) }}>
                 {loading ? (
                   <PatientChipSkeleton />
                 ) : members.length === 0 ? (
@@ -236,7 +236,7 @@ export const SelectPatientLayout: React.FC = () => {
               </Touchable>
             </View>
 
-            <View className="flex-row mb-4" style={{ gap: 12 }}>
+            <View className="flex-row mb-4" style={{ gap: exactScale(12) }}>
               <View className="flex-1">
                 <Text className="font-inter-bold text-[#222222] mb-2" style={{ fontSize: moderateScale(13, 0.1) }}>
                   Age
@@ -368,7 +368,7 @@ export const SelectPatientLayout: React.FC = () => {
             <View className="flex-row items-center pb-4">
               <Image
                 source={HOME_IMAGES.verifiedUser}
-                style={{ width: 22, height: 22, marginRight: 10 }}
+                style={{ width: 22, height: 22, marginRight: exactScale(10) }}
                 resizeMode="contain"
               />
               <View className="flex-1">

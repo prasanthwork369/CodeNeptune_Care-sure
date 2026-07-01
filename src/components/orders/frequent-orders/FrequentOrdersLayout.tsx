@@ -13,7 +13,7 @@ import {
     View,
 } from "react-native";
 import { ProductCard } from "./sections";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const FrequentOrdersLayout: React.FC = () => {
   const router = useNav();
@@ -111,9 +111,9 @@ export const FrequentOrdersLayout: React.FC = () => {
       {frequentlyOrdered.length > 0 && (
         <View
           style={{
-            paddingHorizontal: 16,
-            paddingTop: 12,
-            paddingBottom: 10,
+            paddingHorizontal: exactScale(16),
+            paddingTop: exactScale(12),
+            paddingBottom: exactScale(10),
             backgroundColor: "#fff",
           }}
         >
@@ -126,10 +126,10 @@ export const FrequentOrdersLayout: React.FC = () => {
               borderWidth: 1,
               borderColor: "#EEEFF1",
               height: 46,
-              paddingHorizontal: 12,
+              paddingHorizontal: exactScale(12),
             }}
           >
-            <icons.search width={18} height={18} style={{ marginRight: 8 }} />
+            <icons.search width={18} height={18} style={{ marginRight: exactScale(8) }} />
             <TextInput
               value={search}
               onChangeText={setSearch}
@@ -160,13 +160,13 @@ export const FrequentOrdersLayout: React.FC = () => {
 
       {/* Category filter chips */}
       {categories.length > 1 && (
-        <View style={{ backgroundColor: "#fff", paddingBottom: 10 }}>
+        <View style={{ backgroundColor: "#fff", paddingBottom: exactScale(10) }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{
-              paddingHorizontal: 16,
-              gap: 8,
+              paddingHorizontal: exactScale(16),
+              gap: exactScale(8),
               alignItems: "center",
             }}
           >
@@ -178,8 +178,8 @@ export const FrequentOrdersLayout: React.FC = () => {
                   onPress={() => setActiveFilter(cat)}
                   activeOpacity={0.7}
                   style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 6,
+                    paddingHorizontal: exactScale(16),
+                    paddingVertical: exactScale(6),
                     borderRadius: 20,
                     backgroundColor: active ? "#0F7635" : "#F5F6FB",
                     borderWidth: 1,
@@ -211,10 +211,10 @@ export const FrequentOrdersLayout: React.FC = () => {
             ? {
                 flexGrow: 1,
                 justifyContent: "center",
-                paddingHorizontal: 32,
-                paddingBottom: 80,
+                paddingHorizontal: exactScale(32),
+                paddingBottom: exactScale(80),
               }
-            : { paddingTop: 14, paddingBottom: 32 }
+            : { paddingTop: exactScale(14), paddingBottom: exactScale(32) }
         }
         keyboardShouldPersistTaps="handled"
       >
@@ -241,7 +241,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                 fontSize: moderateScale(13),
                 fontWeight: "400",
                 color: "#919EAB",
-                marginTop: 6,
+                marginTop: exactScale(6),
                 textAlign: "center",
               }}
             >

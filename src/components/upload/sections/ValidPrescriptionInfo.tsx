@@ -1,7 +1,8 @@
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
 import Svg, { Line } from "react-native-svg";
 import { styles as s } from "./ValidPrescriptionInfo.styles";
 import { exactScale } from "@/src/utils/exactScale";

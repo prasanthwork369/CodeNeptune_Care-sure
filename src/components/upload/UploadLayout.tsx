@@ -10,6 +10,7 @@ import { Redirect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale } from "@/src/utils/exactScale";
 import {
     UploadActions,
     ValidPrescriptionInfo,
@@ -85,9 +86,9 @@ export const UploadLayout: React.FC = () => {
                 showsVerticalScrollIndicator={false}
                 className="flex-1"
                 contentContainerStyle={{
-                    padding: 16,
-                    gap: 12,
-                    paddingBottom: components.tabBar.height + adjustedBottom + 40,
+                    padding: exactScale(16),
+                    gap: exactScale(12),
+                    paddingBottom: components.tabBar.height + adjustedBottom + exactScale(40),
                 }}
             >
                 <UploadActions

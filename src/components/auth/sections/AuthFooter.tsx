@@ -5,6 +5,7 @@ import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { styles as s } from "./AuthFooter.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 type LinkKey = "terms" | "privacy" | "refund";
 
@@ -20,7 +21,7 @@ export const AuthFooter: React.FC = () => {
     {
       opacity: enabled ? 1 : 0.5,
       borderRadius: 6,
-      paddingHorizontal: 3,
+      paddingHorizontal: exactScale(3),
       backgroundColor:
         pressedLink === key ? "rgba(15, 118, 53, 0.18)" : "transparent",
     },

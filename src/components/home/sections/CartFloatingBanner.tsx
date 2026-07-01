@@ -4,7 +4,8 @@ import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Image, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { Image } from "expo-image";
 import Animated from "react-native-reanimated";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 

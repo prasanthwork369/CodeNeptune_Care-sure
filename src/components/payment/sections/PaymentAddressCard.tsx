@@ -3,7 +3,7 @@ import { PaymentAddressCardProps } from "@/src/types/payment";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
   hasAddress,
@@ -12,14 +12,14 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
   onPress,
 }) => {
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View style={{ marginBottom: exactScale(24) }}>
       <Text
         style={{
           fontSize: moderateScale(16),
           fontWeight: "700",
           color: "#1A1C1E",
-          marginBottom: 12,
-          marginLeft: 4,
+          marginBottom: exactScale(12),
+          marginLeft: exactScale(4),
         }}
       >
         Delivery Address
@@ -30,7 +30,7 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
         style={{
           backgroundColor: "#fff",
           borderRadius: 20,
-          padding: 16,
+          padding: exactScale(16),
           flexDirection: "row",
           alignItems: "center",
           borderWidth: hasAddress ? 0 : 1.5,
@@ -58,7 +58,7 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
             fill={hasAddress ? "#0F7635" : "#EF4444"}
           />
         </View>
-        <View style={{ flex: 1, marginLeft: 16 }}>
+        <View style={{ flex: 1, marginLeft: exactScale(16) }}>
           <Text
             style={{
               fontSize: moderateScale(14),
@@ -75,7 +75,7 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
               fontSize: moderateScale(13),
               fontWeight: "500",
               color: "#6B7280",
-              marginTop: 4,
+              marginTop: exactScale(4),
             }}
             numberOfLines={1}
           >

@@ -34,7 +34,7 @@ interface SearchRowProps {
     };
 }
 
-export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
+export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
     const router = useNav();
 
     const handleCardPress = useCallback(() => {
@@ -189,4 +189,4 @@ export const SearchProductCard: React.FC<SearchRowProps> = ({ data }) => {
 
         </Touchable>
     );
-};
+});

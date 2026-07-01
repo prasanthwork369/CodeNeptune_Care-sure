@@ -5,7 +5,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import React, { useState } from "react";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import {
     ActivityIndicator,
     Alert,
@@ -114,9 +114,9 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
       style={{
         backgroundColor: "#fff",
         borderRadius: 16,
-        marginHorizontal: 16,
-        marginBottom: 12,
-        padding: 16,
+        marginHorizontal: exactScale(16),
+        marginBottom: exactScale(12),
+        padding: exactScale(16),
         borderWidth: 1,
         borderColor: "#EEEFF1",
       }}
@@ -140,7 +140,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             backgroundColor: "#F9FAFB",
             alignItems: "center",
             justifyContent: "center",
-            marginRight: 12,
+            marginRight: exactScale(12),
           }}
         >
           {typeof item.image === "number" || (item.image && !item.image.uri) ? (
@@ -175,7 +175,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
                 fontWeight: "600",
                 color: "#1C2024",
                 flex: 1,
-                paddingRight: 8,
+                paddingRight: exactScale(8),
               }}
               numberOfLines={2}
             >
@@ -200,7 +200,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
                       fontWeight: "400",
                       color: "#919EAB",
                       textDecorationLine: "line-through",
-                      marginTop: 2,
+                      marginTop: exactScale(2),
                     }}
                   >
                     ₹{Number(item.originalPrice).toFixed(1)}
@@ -216,8 +216,8 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
                 fontSize: moderateScale(11),
                 fontWeight: "400",
                 color: "#637381",
-                marginTop: 4,
-                marginBottom: 8,
+                marginTop: exactScale(4),
+                marginBottom: exactScale(8),
               }}
               numberOfLines={1}
             >
@@ -232,8 +232,8 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
               borderWidth: 1,
               borderColor: "#EEEFF1",
               borderRadius: 6,
-              paddingHorizontal: 10,
-              paddingVertical: 3,
+              paddingHorizontal: exactScale(10),
+              paddingVertical: exactScale(3),
             }}
           >
             <Text
@@ -256,7 +256,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           borderWidth: 1,
           borderColor: "#EEEFF1",
           height: 0,
-          marginVertical: 12,
+          marginVertical: exactScale(12),
         }}
       />
 
@@ -293,13 +293,13 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
       {/* Ordered X times + last ordered */}
       {(!!item.orderedTimes || !!item.lastOrdered) && (
         <View
-          style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}
+          style={{ flexDirection: "row", alignItems: "center", marginTop: exactScale(10) }}
         >
           <icons.trend_up
             width={14}
             height={14}
             fill="#0F7635"
-            style={{ marginRight: 6 }}
+            style={{ marginRight: exactScale(6) }}
           />
           {!!item.orderedTimes && (
             <Text

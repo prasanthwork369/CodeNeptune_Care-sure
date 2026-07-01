@@ -1,3 +1,4 @@
+import { exactScale } from "@/src/utils/exactScale";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -38,7 +39,7 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
         activeOpacity={0.7}
         style={{
           width: COUNTER_BTN,
-          paddingVertical: 8,
+          paddingVertical: exactScale(8),
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -53,7 +54,7 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
       <View
         style={{
           flex: 1,
-          paddingVertical: 8,
+          paddingVertical: exactScale(8),
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -76,7 +77,7 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
         activeOpacity={0.7}
         style={{
           width: COUNTER_BTN,
-          paddingVertical: 8,
+          paddingVertical: exactScale(8),
           alignItems: "center",
           justifyContent: "center",
         }}

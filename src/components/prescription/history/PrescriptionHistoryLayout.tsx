@@ -8,8 +8,9 @@ import {
 } from "@/src/constants/prescription-status";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import React, { useState, useMemo, useCallback } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 import { PrescriptionHistoryItem } from "./sections";
@@ -57,16 +58,23 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   });
 
   const query = search.trim().toLowerCase();
-  const items = prescriptions
-    .map(mapItem)
-    .filter((item: ReturnType<typeof mapItem>) => {
-      if (!query) return true;
-      return (
-        item.id.toLowerCase().includes(query) ||
-        item.patientName.toLowerCase().includes(query) ||
-        item.doctorName.toLowerCase().includes(query)
-      );
-    });
+  
+  const items = useMemo(() => {
+    return prescriptions
+      .map(mapItem)
+      .filter((item: ReturnType<typeof mapItem>) => {
+        if (!query) return true;
+        return (
+          item.id.toLowerCase().includes(query) ||
+          item.patientName.toLowerCase().includes(query) ||
+          item.doctorName.toLowerCase().includes(query)
+        );
+      });
+  }, [prescriptions, query, source, toPay]);
+
+  const renderItem = useCallback(({ item }: { item: any }) => (
+    <PrescriptionHistoryItem item={item} />
+  ), []);
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -92,10 +100,10 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           <ActivityIndicator color="#0F7635" />
         </View>
       ) : (
-        <FlatList
+        <FlashList
           data={items}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PrescriptionHistoryItem item={item} />}
+          renderItem={renderItem}
           contentContainerStyle={{
             padding: 20,
             paddingBottom: adjustedBottom + 20,

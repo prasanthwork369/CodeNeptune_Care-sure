@@ -4,6 +4,7 @@ import { colors } from "@/src/constants/theme";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { exactScale } from "@/src/utils/exactScale";
 
 interface LocalCouponCardProps {
   coupon: {
@@ -21,7 +22,7 @@ export const CouponCard: React.FC<LocalCouponCardProps> = ({ coupon, onApply }) 
     <View className="mb-4 relative">
       <View className="bg-white rounded-[16px] border border-[#919EAB33]">
         <View className="p-4 flex-row items-center overflow-hidden rounded-t-[16px]">
-          <View style={[s.couponIconBox, { borderRadius: 6, backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', alignItems: 'center', justifyContent: 'center', padding: 6 }]}>
+          <View style={[s.couponIconBox, { borderRadius: 6, backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', alignItems: 'center', justifyContent: 'center', padding: exactScale(6) }]}>
             <icons.percent_discount
               width={s.couponIcon.width}
               height={s.couponIcon.height}
@@ -89,11 +90,11 @@ const styles = StyleSheet.create({
   },
   leftNotch: {
     position: "absolute",
-    left: -10,
-    top: 72,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    left: exactScale(-10),
+    top: exactScale(72),
+    width: exactScale(20),
+    height: exactScale(20),
+    borderRadius: exactScale(10),
     backgroundColor: "#F5F6FB",
     borderWidth: 1,
     borderColor: "#919EAB33",
@@ -101,11 +102,11 @@ const styles = StyleSheet.create({
   },
   rightNotch: {
     position: "absolute",
-    right: -10,
-    top: 72,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    right: exactScale(-10),
+    top: exactScale(72),
+    width: exactScale(20),
+    height: exactScale(20),
+    borderRadius: exactScale(10),
     backgroundColor: "#F5F6FB",
     borderWidth: 1,
     borderColor: "#919EAB33",

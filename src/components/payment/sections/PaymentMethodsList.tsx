@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const RadioDot = ({ selected }: { selected: boolean }) => (
   <View
@@ -39,13 +39,13 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
           fontSize: moderateScale(16),
           fontWeight: "700",
           color: "#1A1C1E",
-          marginBottom: 12,
-          marginLeft: 4,
+          marginBottom: exactScale(12),
+          marginLeft: exactScale(4),
         }}
       >
         Payment Method
       </Text>
-      <View style={{ gap: 12 }}>
+      <View style={{ gap: exactScale(12) }}>
         {methods.map((method) => (
           <Touchable
             key={method.id}
@@ -54,7 +54,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
             style={{
               backgroundColor: "#fff",
               borderRadius: 20,
-              padding: 16,
+              padding: exactScale(16),
               flexDirection: "row",
               alignItems: "center",
               borderWidth: selectedId === method.id ? 2 : 0,
@@ -78,7 +78,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
             >
               {method.icon}
             </View>
-            <View style={{ flex: 1, marginLeft: 16 }}>
+            <View style={{ flex: 1, marginLeft: exactScale(16) }}>
               <Text
                 style={{
                   fontSize: moderateScale(15),
@@ -93,7 +93,7 @@ export const PaymentMethodsList: React.FC<PaymentMethodsListProps> = ({
                   fontSize: moderateScale(12),
                   fontWeight: "500",
                   color: "#6B7280",
-                  marginTop: 4,
+                  marginTop: exactScale(4),
                 }}
               >
                 {method.subtitle}

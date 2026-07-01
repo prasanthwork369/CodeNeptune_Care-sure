@@ -1,3 +1,4 @@
+import { exactScale } from '@/src/utils/exactScale';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { cartStyles as s } from '../cart.styles';
@@ -14,7 +15,7 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
             colors={['#FFF6ED', '#FFFFFF']} 
             start={{ x: 0.5, y: 0 }} 
             end={{ x: 0.5, y: 1 }} 
-            style={{ marginHorizontal: 16, marginTop: 12, borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33' }}
+            style={{ marginHorizontal: exactScale(16), marginTop: exactScale(12), borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33' }}
         >
             <View className="px-4 py-4">
                 <View className="flex-row items-center">

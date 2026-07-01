@@ -3,6 +3,7 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePaymentCalculations } from "@/src/hooks/usePaymentCalculations";
 import { useLocationStore } from "@/src/store/locationStore";
+import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import {
@@ -54,8 +55,8 @@ export const PaymentLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          padding: 16,
-          paddingBottom: adjustedBottom + 100,
+          padding: exactScale(16),
+          paddingBottom: adjustedBottom + exactScale(100),
         }}
       >
         <PaymentHeader onBack={() => router.back()} title="Checkout" />

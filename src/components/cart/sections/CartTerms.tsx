@@ -1,3 +1,4 @@
+import { exactScale } from '@/src/utils/exactScale';
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { cartStyles as s } from '../cart.styles';
@@ -18,7 +19,7 @@ export const CartTerms: React.FC = () => {
         {
             opacity: enabled ? 1 : 0.5,
             borderRadius: 6,
-            paddingHorizontal: 3,
+            paddingHorizontal: exactScale(3),
             backgroundColor: pressedLink === key ? 'rgba(15, 118, 53, 0.18)' : 'transparent',
         },
     ];

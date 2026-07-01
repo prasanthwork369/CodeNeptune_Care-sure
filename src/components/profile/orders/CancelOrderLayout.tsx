@@ -1,18 +1,24 @@
+import { orderApi } from "@/src/api/order.api";
+import { AlertDialog } from "@/src/components/ui/AlertDialog";
+import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReasons";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
-import { useNav } from "@/src/hooks/useNav";
-import { orderApi } from "@/src/api/order.api";
-import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useLocalSearchParams } from "expo-router";
-import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { AlertDialog } from "@/src/components/ui/AlertDialog";
-import React, { useState } from "react";
-import { ActivityIndicator, Text, TextInput, View, ScrollView } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useNav } from "@/src/hooks/useNav";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLocalSearchParams } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 interface ReasonConfig {
   icon: any;
@@ -64,7 +70,7 @@ const REASON_CONFIGS: Record<string, ReasonConfig> = {
     iconColor: "#4B5563",
     defaultDescription: "Something else",
   },
-  "other": {
+  other: {
     icon: icons.cancel_other_reason,
     bgColor: "#F3F4F6",
     iconColor: "#4B5563",
@@ -114,22 +120,25 @@ export function CancelOrderLayout() {
   const bottomInset = useAdjustedBottomInset();
 
   const { order, loading: orderLoading } = useOrderById(orderId);
-  const { data: reasons = [], isLoading: reasonsLoading } = useCancellationReasons();
+  const { data: reasons = [], isLoading: reasonsLoading } =
+    useCancellationReasons();
 
-  const [selectedReasonId, setSelectedReasonId] = useState<number | typeof OTHER_OPTION | null>(null);
+  const [selectedReasonId, setSelectedReasonId] = useState<
+    number | typeof OTHER_OPTION | null
+  >(null);
   const [otherReason, setOtherReason] = useState("");
   const [error, setError] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [alertState, setAlertState] = useState<{
     visible: boolean;
-    icon: 'check-green' | 'delete';
+    icon: "check-green" | "delete";
     title: string;
     onClose?: () => void;
   }>({
     visible: false,
-    icon: 'check-green',
-    title: '',
+    icon: "check-green",
+    title: "",
   });
 
   const isOtherSelected = selectedReasonId === OTHER_OPTION;
@@ -137,8 +146,10 @@ export function CancelOrderLayout() {
   const selectedLabel = isOtherSelected ? "Other" : selectedReason?.label;
 
   const orderNumber = order?.orderId
-    ? String(order.orderId).replace(/[^a-zA-Z_]/g, "").slice(0, 2).toUpperCase() +
-      String(order.orderId).slice(-5)
+    ? String(order.orderId)
+        .replace(/[^a-zA-Z_]/g, "")
+        .slice(0, 2)
+        .toUpperCase() + String(order.orderId).slice(-5)
     : undefined;
   const itemsCount = order?.items?.length ?? 0;
   const totalAmount = Number(order?.total ?? 0);
@@ -156,12 +167,14 @@ export function CancelOrderLayout() {
   };
 
   const handleConfirm = async () => {
-    const finalReason = isOtherSelected ? otherReason.trim() : selectedReason?.label;
+    const finalReason = isOtherSelected
+      ? otherReason.trim()
+      : selectedReason?.label;
     if (!finalReason) {
       setError(
         isOtherSelected
           ? "Please describe your reason for cancellation."
-          : "Please select a reason for cancellation."
+          : "Please select a reason for cancellation.",
       );
       return;
     }
@@ -171,22 +184,26 @@ export function CancelOrderLayout() {
     setIsCancelling(true);
     try {
       await orderApi.cancelOrder(orderId, finalReason);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId) });
-      queryClient.invalidateQueries({ queryKey: ['customer', 'orders', 'list'] });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customer", "orders", "list"],
+      });
       setAlertState({
         visible: true,
-        icon: 'check-green',
-        title: 'Order cancelled successfully!',
+        icon: "check-green",
+        title: "Order cancelled successfully!",
         onClose: () => {
           setTimeout(() => router.back(), 500);
         },
       });
     } catch (err) {
-      if (__DEV__) console.error('[CancelOrder]', err);
+      if (__DEV__) console.error("[CancelOrder]", err);
       setAlertState({
         visible: true,
-        icon: 'delete',
-        title: 'Failed to cancel order. Please try again.',
+        icon: "delete",
+        title: "Failed to cancel order. Please try again.",
       });
     } finally {
       setIsCancelling(false);
@@ -207,12 +224,13 @@ export function CancelOrderLayout() {
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="Cancel Order" showBorder />
-      
+
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: scale(20),
           paddingTop: verticalScale(24),
-          paddingBottom: Math.max(bottomInset, verticalScale(24)) + verticalScale(120), // Extra padding for absolute footer
+          paddingBottom:
+            Math.max(bottomInset, verticalScale(24)) + verticalScale(120), // Extra padding for absolute footer
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -226,12 +244,7 @@ export function CancelOrderLayout() {
               padding: scale(20),
               width: "100%",
               borderWidth: 1,
-              borderColor: "#E5E7EB",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.03,
-              shadowRadius: 6,
-              elevation: 1,
+              borderColor: "#919EAB33",
             }}
           >
             {/* Top Order summary section */}
@@ -250,16 +263,26 @@ export function CancelOrderLayout() {
                   width: scale(40),
                   height: scale(40),
                   borderRadius: scale(20),
-                  backgroundColor: "#FFF1F2", // light pink bg
+                  backgroundColor: "#FFF1F1",
                   alignItems: "center",
                   justifyContent: "center",
                   marginRight: scale(12),
                 }}
               >
-                <icons.cancel_order_bag width={moderateScale(20, 0.3)} height={moderateScale(20, 0.3)} fill="#E11D48" />
+                <icons.cancel_order_bag
+                  width={moderateScale(20, 0.3)}
+                  height={moderateScale(20, 0.3)}
+                  fill="#E11D48"
+                />
               </View>
               <View>
-                <Text style={{ fontSize: moderateScale(15, 0.3), fontWeight: "700", color: "#222222" }}>
+                <Text
+                  style={{
+                    fontSize: moderateScale(15, 0.3),
+                    fontWeight: "700",
+                    color: "#222222",
+                  }}
+                >
                   Order #{orderNumber}
                 </Text>
                 <Text
@@ -290,12 +313,17 @@ export function CancelOrderLayout() {
 
             {/* Options List */}
             {reasonsLoading ? (
-              <ActivityIndicator color="#0F7635" style={{ marginVertical: verticalScale(20) }} />
+              <ActivityIndicator
+                color="#0F7635"
+                style={{ marginVertical: verticalScale(20) }}
+              />
             ) : (
               <View style={{ width: "100%" }}>
                 {(() => {
                   const hasOther = reasons.some(
-                    (r) => r.label.toLowerCase().includes("other") || (r.id as any) === OTHER_OPTION
+                    (r) =>
+                      r.label.toLowerCase().includes("other") ||
+                      (r.id as any) === OTHER_OPTION,
                   );
                   const displayReasons = [...reasons];
                   if (!hasOther) {
@@ -452,7 +480,7 @@ export function CancelOrderLayout() {
       {/* Action button — Fixed Footer */}
       <View
         style={{
-          position: 'absolute',
+          position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
@@ -480,7 +508,13 @@ export function CancelOrderLayout() {
             isCancelling && { opacity: 0.7 },
           ]}
         >
-          <Text style={{ fontSize: moderateScale(16, 0.3), fontWeight: "700", color: "#fff" }}>
+          <Text
+            style={{
+              fontSize: moderateScale(16, 0.3),
+              fontWeight: "700",
+              color: "#fff",
+            }}
+          >
             {isCancelling ? "Cancelling..." : "Cancel Order"}
           </Text>
         </Touchable>
@@ -493,8 +527,17 @@ export function CancelOrderLayout() {
             gap: scale(5),
           }}
         >
-          <icons.lock_grey width={moderateScale(14, 0.3)} height={moderateScale(14, 0.3)} />
-          <Text style={{ fontSize: moderateScale(12, 0.3), fontWeight: "400", color: "#9CA3AF" }}>
+          <icons.lock_grey
+            width={moderateScale(14, 0.3)}
+            height={moderateScale(14, 0.3)}
+          />
+          <Text
+            style={{
+              fontSize: moderateScale(12, 0.3),
+              fontWeight: "400",
+              color: "#9CA3AF",
+            }}
+          >
             This action cannot be undone
           </Text>
         </View>
@@ -507,9 +550,9 @@ export function CancelOrderLayout() {
         title={alertState.title}
         buttons={[
           {
-            label: 'OK',
+            label: "OK",
             onPress: closeAlert,
-            variant: 'green',
+            variant: "green",
           },
         ]}
       />

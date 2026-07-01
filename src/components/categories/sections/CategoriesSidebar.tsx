@@ -5,6 +5,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { sidebarStyles as s } from '../categories.styles';
+import { exactScale } from "@/src/utils/exactScale";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -72,7 +73,7 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 10 }}
+          contentContainerStyle={{ paddingVertical: exactScale(10) }}
         >
           {Array.from({ length: 7 }).map((_, i) => (
             <View key={i} className="items-center py-5 gap-y-2">
@@ -93,7 +94,7 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
       <ScrollView
         ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingVertical: 10 }}
+        contentContainerStyle={{ paddingVertical: exactScale(10) }}
         onLayout={(e) => {
           viewportHeight.current = e.nativeEvent.layout.height;
         }}

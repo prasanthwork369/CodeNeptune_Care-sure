@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { exactScale } from '@/src/utils/exactScale';
 
 // ----------------------------------------------------
 // UPDATE THESE VALUES ANYTIME TO TEST DIFFERENT SCREENS
@@ -20,8 +21,8 @@ export function DevTestButton() {
         onPress={() => router.push(TEST_PATH as any)}
         style={{
           backgroundColor: '#2563EB',
-          paddingVertical: 10,
-          paddingHorizontal: 16,
+          paddingVertical: exactScale(10),
+          paddingHorizontal: exactScale(16),
           borderRadius: 20,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },

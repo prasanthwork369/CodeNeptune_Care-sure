@@ -12,6 +12,7 @@ import {
     CARD_BTN_W,
     categoryCardStyles as s,
 } from "../../categories.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
   product,
@@ -79,7 +80,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
   };
 
   return (
-    <View style={{ width: cardWidth, marginBottom: 20 }}>
+    <View style={{ width: cardWidth, marginBottom: exactScale(20) }}>
       {/* Image container */}
       <Touchable
         activeOpacity={0.9}
@@ -213,21 +214,21 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
       </Touchable>
 
       {/* Info below card */}
-      <View style={{ marginTop: 8 }}>
+      <View style={{ marginTop: exactScale(8) }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: 8,
-            marginBottom: 6,
+            gap: exactScale(8),
+            marginBottom: exactScale(6),
           }}
         >
           <View
             style={{
               backgroundColor: "#349638",
               borderRadius: 6,
-              paddingHorizontal: 8,
-              paddingVertical: 4,
+              paddingHorizontal: exactScale(8),
+              paddingVertical: exactScale(4),
               shadowColor: "#113D24",
               shadowOffset: { width: -1, height: 1 },
               shadowOpacity: 1,
@@ -244,11 +245,11 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
           )}
         </View>
 
-        <Text style={[s.name, { marginBottom: 4 }]} numberOfLines={2}>
+        <Text style={[s.name, { marginBottom: exactScale(4) }]} numberOfLines={2}>
           {product.name}
         </Text>
 
-        <Text style={[s.desc, { marginBottom: 4 }]} numberOfLines={1}>
+        <Text style={[s.desc, { marginBottom: exactScale(4) }]} numberOfLines={1}>
           {product.description}
         </Text>
 
@@ -257,8 +258,8 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
             style={{
               alignSelf: "flex-start",
               backgroundColor: "#ECFAFB",
-              paddingHorizontal: 4,
-              paddingVertical: 2,
+              paddingHorizontal: exactScale(4),
+              paddingVertical: exactScale(2),
               borderRadius: 8,
             }}
           >

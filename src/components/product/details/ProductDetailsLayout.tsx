@@ -178,7 +178,7 @@ export const ProductDetailsLayout: React.FC = () => {
                   flex: 1,
                   alignItems: "center",
                   justifyContent: "center",
-                  paddingHorizontal: 32,
+                  paddingHorizontal: exactScale(32),
                 }}
               >
                 <Text

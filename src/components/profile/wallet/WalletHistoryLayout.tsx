@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { Touchable } from '@/src/components/ui/Touchable';
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -70,7 +70,7 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
         isCredit               ? HOME_IMAGES.accountBalanceCredit :
                                  HOME_IMAGES.accountBalanceDebit;
     return (
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: isCredit ? '#DFF3E6' : '#FCE8E8', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: exactScale(44), height: exactScale(44), borderRadius: 22, backgroundColor: isCredit ? '#DFF3E6' : '#FCE8E8', alignItems: 'center', justifyContent: 'center' }}>
             <Image source={src} style={{ width: 26, height: 26 }} resizeMode="contain" />
         </View>
     );
@@ -80,11 +80,11 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
 
 const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({ tx, isLast }) => (
     <View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(20), paddingVertical: exactScale(14) }}>
             <TransactionIcon type={tx.iconType} />
-            <View style={{ flex: 1, marginLeft: 14 }}>
+            <View style={{ flex: 1, marginLeft: exactScale(14) }}>
                 <Text style={{ fontSize: moderateScale(14), fontWeight: '600', color: '#111827' }}>{tx.title}</Text>
-                <Text style={{ fontSize: moderateScale(12), color: '#6B7280', marginTop: 2 }}>{tx.date}</Text>
+                <Text style={{ fontSize: moderateScale(12), color: '#6B7280', marginTop: exactScale(2) }}>{tx.date}</Text>
             </View>
             {tx.isCoin ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -95,7 +95,7 @@ const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({ tx, isLast }) =
                 <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
             )}
         </View>
-        {!isLast && <View style={{ height: 1, backgroundColor: '#F3F4F6', marginHorizontal: 20 }} />}
+        {!isLast && <View style={{ height: 1, backgroundColor: '#F3F4F6', marginHorizontal: exactScale(20) }} />}
     </View>
 );
 
@@ -129,7 +129,7 @@ export const WalletHistoryLayout: React.FC = () => {
                         key={tab}
                         onPress={() => setActiveTab(tab)}
                         activeOpacity={0.8}
-                        style={{ flex: 1, alignItems: 'center', paddingVertical: 12 }}
+                        style={{ flex: 1, alignItems: 'center', paddingVertical: exactScale(12) }}
                     >
                         <Text style={{
                             fontSize: moderateScale(14),
@@ -149,7 +149,7 @@ export const WalletHistoryLayout: React.FC = () => {
                     backgroundColor: "#0F7635",
                     borderTopLeftRadius: 4,
                     borderTopRightRadius: 4,
-                    marginHorizontal: 20,
+                    marginHorizontal: exactScale(20),
                   }}
                               />
                         )}
@@ -159,7 +159,7 @@ export const WalletHistoryLayout: React.FC = () => {
 
             {/* List */}
             {loading ? (
-                <ActivityIndicator color="#0F7635" style={{ marginTop: 40 }} />
+                <ActivityIndicator color="#0F7635" style={{ marginTop: exactScale(40) }} />
             ) : filtered.length === 0 ? (
                 <Text style={{ textAlign: 'center', color: '#9CA3AF', fontWeight: '500', fontSize: moderateScale(14), marginTop: 40 }}>
                     No transactions
@@ -181,7 +181,7 @@ export const WalletHistoryLayout: React.FC = () => {
                         <TxRow key={tx.id} tx={tx} isLast={idx === filtered.length - 1} />
                     ))}
                     {isFetchingNextPage && (
-                        <ActivityIndicator color="#0F7635" style={{ paddingVertical: 16 }} />
+                        <ActivityIndicator color="#0F7635" style={{ paddingVertical: exactScale(16) }} />
                     )}
                 </ScrollView>
             )}

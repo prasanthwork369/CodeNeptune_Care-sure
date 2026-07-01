@@ -6,7 +6,8 @@ import {
 import { useUIStore } from "@/src/store/uiStore";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect } from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
 import Animated, {
     Easing,
     interpolate,

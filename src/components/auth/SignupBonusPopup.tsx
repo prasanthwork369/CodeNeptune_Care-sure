@@ -860,7 +860,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: 24,
+            paddingHorizontal: exactScale(24),
           }}
         >
           <View

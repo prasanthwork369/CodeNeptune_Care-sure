@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -58,7 +58,7 @@ export const AnimatedCount: React.FC<AnimatedCountProps> = ({ count }) => {
           fontSize: moderateScale(11.5),
           fontWeight: "500",
           opacity: 0.9,
-          marginLeft: 4,
+          marginLeft: exactScale(4),
           lineHeight: moderateScale(14),
         }}
       >
