@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -85,16 +85,10 @@ export default function RootLayout() {
     }
   }, [interFontsLoaded]);
 
-  // Show animated splash until fonts load + animation plays + auth resolves.
-  if (!interFontsLoaded || !isAnimationDone || !isAuthLoaded) {
-    return (
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-        {interFontsLoaded && (
-          <SplashAnimationScreen onComplete={() => setIsAnimationDone(true)} />
-        )}
-      </View>
-    );
-  }
+  // Splash acts as a curtain over the fully-mounted app tree.
+  // The app renders and initialises underneath while the splash plays —
+  // so when the curtain lifts the home screen is already ready, no white flash.
+  const showSplash = !interFontsLoaded || !isAnimationDone || !isAuthLoaded;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -133,13 +127,26 @@ export default function RootLayout() {
                 <CartSyncProvider />
                 <PushNotificationProvider />
               </BottomSheetModalProvider>
-              {/* Rendered after BottomSheetModalProvider closes (not inside it),
-                so these always paint above any open bottom sheet's portal —
-                otherwise a sheet's native overlay covers them. */}
               <NetworkToast />
               <Toast />
               <SignupBonusPopup />
               <DevTestButton />
+
+              {/* Splash curtain — sits above the entire app tree.
+                  Renders the animated splash while fonts/auth/animation
+                  are pending, then unmounts cleanly once the app underneath
+                  is fully ready. No white flash since app is already mounted. */}
+              {showSplash && (
+                <View style={StyleSheet.absoluteFillObject} pointerEvents="box-only">
+                  {interFontsLoaded ? (
+                    <SplashAnimationScreen
+                      onComplete={() => setIsAnimationDone(true)}
+                    />
+                  ) : (
+                    <View style={styles.splashFallback} />
+                  )}
+                </View>
+              )}
             </View>
           </SafeAreaProvider>
         </KeyboardProvider>
@@ -147,3 +154,10 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  splashFallback: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+});

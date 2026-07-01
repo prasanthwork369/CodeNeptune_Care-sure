@@ -32,7 +32,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   const { latestPrescription, hasPendingPrescription } =
     usePrescriptionBanner();
 
-  const { lastSeenRxId, lastSeenRxStatus } = useNotificationStore();
+  const { lastSeenRxId, lastSeenRxStatus, setLastSeenRx } = useNotificationStore();
   const { unreadCount: apiUnreadCount } = useNotifications();
   const isRxUnread =
     hasPendingPrescription &&
@@ -111,7 +111,12 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
         </Touchable>
 
         <Touchable
-          onPress={() => router.push("/notifications")}
+          onPress={() => {
+            if (isRxUnread && latestPrescription) {
+              setLastSeenRx(latestPrescription.id, String(latestPrescription.status));
+            }
+            router.push("/notifications");
+          }}
           accessibilityRole="button"
           accessibilityLabel={`Notifications, ${unreadCount} unread`}
           style={s.notificationBtn}

@@ -1,108 +1,64 @@
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect } from "react";
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text } from "react-native";
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSequence,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 
 const SPLASH_LOGO = require("../../../assets/images/splash-icon.png");
 
-const { width } = Dimensions.get("window");
 const LOGO_SIZE = exactScale(110);
-const RING_SIZE = exactScale(140);
 
-// Duration budget:
-//   0ms   — logo springs in
-// 350ms   — pulse ring 1 expands
-// 550ms   — pulse ring 2 expands (staggered)
-// 450ms   — brand text slides up
-// 650ms   — tagline fades in
-// 1800ms  — hold complete
-// 2000ms  — screen fades out
-// 2400ms  — onComplete fires
+// Spring-like easing using bezier — runs entirely on the UI thread,
+// no JS physics computation, no stutter under CPU load.
+const SPRING_EASING = Easing.bezier(0.34, 1.56, 0.64, 1);
+const EASE_OUT = Easing.out(Easing.cubic);
+const EASE_IN = Easing.in(Easing.ease);
+
+// Small settle delay lets the component finish painting before
+// animations start — avoids the first-frame jank from JS thread
+// being busy with auth init and DB queries at the same time.
+const SETTLE = 80;
 
 interface Props {
   onComplete: () => void;
 }
 
-const PulseRing = ({
-  delay,
-  maxScale,
-}: {
-  delay: number;
-  maxScale: number;
-}) => {
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(0);
-
-  useEffect(() => {
-    opacity.value = withDelay(
-      delay,
-      withSequence(
-        withTiming(0.45, { duration: 180 }),
-        withTiming(0, { duration: 700, easing: Easing.out(Easing.exp) }),
-      ),
-    );
-    scale.value = withDelay(
-      delay,
-      withTiming(maxScale, {
-        duration: 880,
-        easing: Easing.out(Easing.exp),
-      }),
-    );
-  }, []);
-
-  const animStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }],
-  }));
-
-  return <Animated.View style={[styles.ring, animStyle]} />;
-};
-
 export const SplashAnimationScreen: React.FC<Props> = ({ onComplete }) => {
-  const logoScale = useSharedValue(0.35);
+  const logoScale   = useSharedValue(0.4);
   const logoOpacity = useSharedValue(0);
 
-  const textTranslateY = useSharedValue(exactScale(18));
+  const textY       = useSharedValue(exactScale(16));
   const textOpacity = useSharedValue(0);
 
   const taglineOpacity = useSharedValue(0);
-
-  const screenOpacity = useSharedValue(1);
+  const screenOpacity  = useSharedValue(1);
 
   useEffect(() => {
-    // Logo springs in
-    logoScale.value = withSpring(1, { damping: 14, stiffness: 110 });
-    logoOpacity.value = withTiming(1, { duration: 320 });
+    // All animations delayed by SETTLE so the component has painted
+    // one clean frame before motion starts.
 
-    // Brand text slides up
-    textOpacity.value = withDelay(
-      450,
-      withTiming(1, { duration: 380, easing: Easing.out(Easing.cubic) }),
-    );
-    textTranslateY.value = withDelay(
-      450,
-      withTiming(0, { duration: 380, easing: Easing.out(Easing.cubic) }),
-    );
+    // Logo scales in with spring-like overshoot
+    logoOpacity.value = withDelay(SETTLE, withTiming(1, { duration: 300 }));
+    logoScale.value   = withDelay(SETTLE, withTiming(1, { duration: 500, easing: SPRING_EASING }));
+
+    // Brand name slides up
+    textOpacity.value = withDelay(SETTLE + 320, withTiming(1, { duration: 340, easing: EASE_OUT }));
+    textY.value       = withDelay(SETTLE + 320, withTiming(0, { duration: 340, easing: EASE_OUT }));
 
     // Tagline fades in
-    taglineOpacity.value = withDelay(
-      650,
-      withTiming(1, { duration: 400 }),
-    );
+    taglineOpacity.value = withDelay(SETTLE + 500, withTiming(1, { duration: 320 }));
 
-    // Screen fades out → triggers app
+    // Screen fades out → reveal app underneath
     screenOpacity.value = withDelay(
-      2000,
-      withTiming(0, { duration: 380, easing: Easing.in(Easing.ease) }, (done) => {
+      SETTLE + 1800,
+      withTiming(0, { duration: 350, easing: EASE_IN }, (done) => {
+        "worklet";
         if (done) runOnJS(onComplete)();
       }),
     );
@@ -115,40 +71,22 @@ export const SplashAnimationScreen: React.FC<Props> = ({ onComplete }) => {
 
   const textStyle = useAnimatedStyle(() => ({
     opacity: textOpacity.value,
-    transform: [{ translateY: textTranslateY.value }],
+    transform: [{ translateY: textY.value }],
   }));
 
-  const taglineStyle = useAnimatedStyle(() => ({
-    opacity: taglineOpacity.value,
-  }));
-
-  const screenStyle = useAnimatedStyle(() => ({
-    opacity: screenOpacity.value,
-  }));
+  const taglineStyle   = useAnimatedStyle(() => ({ opacity: taglineOpacity.value }));
+  const screenStyle    = useAnimatedStyle(() => ({ opacity: screenOpacity.value }));
 
   return (
     <Animated.View style={[styles.container, screenStyle]}>
-      {/* Pulse rings — behind logo */}
-      <View style={styles.ringContainer}>
-        <PulseRing delay={350} maxScale={2.4} />
-        <PulseRing delay={560} maxScale={3.1} />
+      <Animated.View style={[styles.logoWrapper, logoStyle]}>
+        <Image source={SPLASH_LOGO} style={styles.logo} resizeMode="contain" />
+      </Animated.View>
 
-        {/* Logo */}
-        <Animated.View style={[styles.logoWrapper, logoStyle]}>
-          <Image
-            source={SPLASH_LOGO}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </Animated.View>
-      </View>
-
-      {/* Brand text */}
       <Animated.View style={[styles.textBlock, textStyle]}>
         <Text style={styles.brandName}>CareSure</Text>
       </Animated.View>
 
-      {/* Tagline */}
       <Animated.View style={taglineStyle}>
         <Text style={styles.tagline}>Medicine delivered with care</Text>
       </Animated.View>
@@ -162,20 +100,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-  },
-  ringContainer: {
-    width: RING_SIZE,
-    height: RING_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ring: {
-    position: "absolute",
-    width: RING_SIZE,
-    height: RING_SIZE,
-    borderRadius: RING_SIZE / 2,
-    borderWidth: 1.5,
-    borderColor: "#0F7635",
   },
   logoWrapper: {
     width: LOGO_SIZE,

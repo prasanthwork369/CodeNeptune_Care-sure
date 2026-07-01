@@ -1,23 +1,24 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { useCategories } from '@/src/hooks/queries/useCategories';
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CategoriesSidebar, CategoriesGrid, CategoriesHeaderActions } from './sections';
-import { CARD_HEIGHT, CARD_WIDTH, GRID_PADDING } from './categories.styles';
+import { CARD_HEIGHT, CARD_WIDTH, GRID_PADDING, GRID_GAP } from './categories.styles';
 
 const SIDEBAR_WIDTH = 76;
 
 export const CategoriesLayout: React.FC = () => {
+    const { width: windowWidth } = useWindowDimensions();
     const [activeTabId, setActiveTabId] = useState('');
     const adjustedBottom = useAdjustedBottomInset();
-    // Fixed to the Figma-designed card size on every device, per the app's
-    // locked-to-Figma scaling policy -- on screens wider than the design
-    // baseline this leaves empty space at the end of the row instead of
-    // stretching the cards to fill it.
-    const cardWidth = CARD_WIDTH;
-    const cardHeight = CARD_HEIGHT;
+    
+    // Dynamically calculate width so cards fill the entire remaining space exactly
+    const availableGridWidth = windowWidth - SIDEBAR_WIDTH - (GRID_PADDING * 2) - GRID_GAP;
+    const cardWidth = availableGridWidth / 2;
+    // Scale height proportionally to maintain the design aspect ratio
+    const cardHeight = cardWidth * (CARD_HEIGHT / CARD_WIDTH);
 
     const { tabs, cards, isLoading } = useCategories();
 
