@@ -29,7 +29,7 @@ export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = React.memo(
   if (isLoading || !promise) return null;
 
   return (
-    <View className="mb-8">
+    <View>
       {showTitle && (
         <View className="flex-row items-center px-5 mb-4 mt-2">
           <Text style={s.title} className="ml-1 mr-4 ">

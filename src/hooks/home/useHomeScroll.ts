@@ -1,7 +1,7 @@
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SharedValue } from 'react-native-reanimated';
-import { useTabBarVisibility } from './useTabBarVisibility';
-import { useStickySearchBar } from './useStickySearchBar';
+import { useTabBarVisibility } from '../ui/useTabBarVisibility';
+import { useStickySearchBar } from '../ui/useStickySearchBar';
 
 /**
  * Combines the Home screen's scroll-driven animations:

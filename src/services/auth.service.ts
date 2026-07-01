@@ -16,7 +16,7 @@ export const authService = {
         if (refreshToken) {
             await tokenStorage.setRefreshToken(refreshToken);
         }
-        
+
         // 2. Fetch and store full profile immediately (Matching Warehouse Flow)
         try {
             const profile = await profileApi.getProfile();

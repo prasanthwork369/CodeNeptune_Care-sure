@@ -18,87 +18,54 @@ import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
-import { useHomeData } from "@/src/hooks/queries/useHomeData";
+import { useHomeData } from "@/src/hooks/home/useHomeData";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useBannerVisibility } from "@/src/hooks/home/useBannerVisibility";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
-import { useHomeScroll } from "@/src/hooks/ui/useHomeScroll";
+import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
+import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
+import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
-  DeviceEventEmitter,
   RefreshControl,
   View,
   useWindowDimensions,
 } from "react-native";
 import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedReaction,
   useAnimatedRef,
-  useAnimatedStyle,
   useScrollViewOffset,
   useSharedValue,
-  withDelay,
-  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const easeOut = Easing.out(Easing.cubic);
 const EMPTY_BANNERS: NonNullable<
   ReturnType<typeof useHomeData>["appContent"]
 >["banners"] = [];
-
-function useSlideUp(delayMs: number) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
-  useEffect(() => {
-    opacity.value = withDelay(
-      delayMs,
-      withTiming(1, { duration: 480, easing: easeOut }),
-    );
-    translateY.value = withDelay(
-      delayMs,
-      withTiming(0, { duration: 480, easing: easeOut }),
-    );
-  }, []);
-  return useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-}
 
 export const HomeLayout: React.FC = () => {
   const router = useNav();
   const insets = useSafeAreaInsets();
   const adjustedBottom = useAdjustedBottomInset();
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
 
   const [isLocationSheetVisible, setIsLocationSheetVisible] = useState(false);
-  const [isBannerVisible, setIsBannerVisible] = useState(true);
-  const [carouselY, setCarouselY] = useState(0);
-  const [carouselHeight, setCarouselHeight] = useState(0);
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
 
-  useEffect(() => {
-    const sub = DeviceEventEmitter.addListener("home-scroll-to-top", () => {
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-    });
-    return () => sub.remove();
-  }, []);
+  useScrollToTop(scrollViewRef);
 
   const searchBarAnim = useSlideUp(350);
   const quickActionsAnim = useSlideUp(500);
 
-  const { isTabBarVisible, setTabBarVisible, setUploadButtonCollapsed } =
-    useUIStore();
+  const { setTabBarVisible, setUploadButtonCollapsed } = useUIStore();
   const { totalItems } = useCart();
   const { hasPendingPrescription } = usePrescriptionBanner();
   const hasFloatingBanner = totalItems > 0 || hasPendingPrescription;
@@ -150,23 +117,8 @@ export const HomeLayout: React.FC = () => {
     heroHeightShared,
   );
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
+  const { isBannerVisible, onCarouselLayout } = useBannerVisibility(scrollY, height);
   const TAB_BAR_HEIGHT = BAR_HEIGHT + adjustedBottom + exactScale(6);
-
-  // Banner visibility is derived on the UI thread from the already-tracked
-  // scrollY shared value instead of recomputing it in the JS-thread onScroll
-  // callback every frame — runOnJS only fires on an actual true/false flip,
-  // not on every scroll tick, which was the main source of scroll jank.
-  useAnimatedReaction(
-    () =>
-      scrollY.value + height > carouselY &&
-      scrollY.value < carouselY + carouselHeight,
-    (visible, prevVisible) => {
-      if (visible !== prevVisible) {
-        runOnJS(setIsBannerVisible)(visible);
-      }
-    },
-    [carouselY, carouselHeight, height],
-  );
 
   const handleQuickAction = useCallback(
     (id: string) => {
@@ -310,18 +262,16 @@ export const HomeLayout: React.FC = () => {
             />
           </Animated.View>
 
-          <ShopByCategories
-            tabs={tabs}
-            cards={cards}
-            onCardPress={handleCardPress}
-            isLoading={isHomeLoading}
-          />
-          <View
-            onLayout={(e) => {
-              setCarouselY(e.nativeEvent.layout.y);
-              setCarouselHeight(e.nativeEvent.layout.height);
-            }}
-          >
+          <View style={{ marginTop: exactScale(20) }}>
+            <ShopByCategories
+              tabs={tabs}
+              cards={cards}
+              onCardPress={handleCardPress}
+              isLoading={isHomeLoading}
+            />
+          </View>
+
+          <View style={{ marginTop: exactScale(20) }} onLayout={onCarouselLayout}>
             <BannerCarousel
               banners={appContent?.banners ?? EMPTY_BANNERS}
               categories={cards}
@@ -329,32 +279,43 @@ export const HomeLayout: React.FC = () => {
               isVisible={isBannerVisible && isScreenFocused}
             />
           </View>
-          <SmartSubstitution
-            products={featuredProducts}
-            isLoading={isFeaturedLoading}
-            onProductPress={handleProductPress}
-          />
+
+          <View style={{ marginTop: exactScale(20) }}>
+            <SmartSubstitution
+              products={featuredProducts}
+              isLoading={isFeaturedLoading}
+              onProductPress={handleProductPress}
+            />
+          </View>
 
           {frequentlyOrdered.length > 0 && (
-            <FrequentSubstitutes
-              substitutes={frequentlyOrdered}
-              onProductPress={handleProductPress}
-              onViewAll={handleViewAllFrequent}
-            />
+            <View style={{ marginTop: exactScale(20) }}>
+              <FrequentSubstitutes
+                substitutes={frequentlyOrdered}
+                onProductPress={handleProductPress}
+                onViewAll={handleViewAllFrequent}
+              />
+            </View>
           )}
 
-          <HealthEssentials
-            subcategories={featuredSubcategories}
-            isLoading={isSubcategoriesLoading}
-            onProductPress={handleProductPress}
-          />
+          <View style={{ marginTop: exactScale(20) }}>
+            <HealthEssentials
+              subcategories={featuredSubcategories}
+              isLoading={isSubcategoriesLoading}
+              onProductPress={handleProductPress}
+            />
+          </View>
 
-          <WhyFamiliesTrustUs
-            promise={appContent?.promise}
-            isLoading={isHomeLoading}
-          />
+          <View style={{ marginTop: exactScale(24) }}>
+            <WhyFamiliesTrustUs
+              promise={appContent?.promise}
+              isLoading={isHomeLoading}
+            />
+          </View>
 
-          <HomeFooter appContent={appContent} isLoading={isHomeLoading} />
+          <View style={{ marginTop: exactScale(24) }}>
+            <HomeFooter appContent={appContent} isLoading={isHomeLoading} />
+          </View>
         </View>
       </Animated.ScrollView>
 

@@ -8,8 +8,7 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: exactScale(16),
-    marginTop: exactScale(10),
-    rowGap: exactScale(12),
+      rowGap: exactScale(12),
   },
   box: {
     width: "48%",

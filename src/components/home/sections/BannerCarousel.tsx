@@ -118,7 +118,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banne
 
     if (isLoading) {
         return (
-            <View className="mt-4 px-4">
+            <View className="px-4">
                 <Skeleton width="100%" height={bannerHeight} borderRadius={exactScale(16)} />
             </View>
         );
@@ -129,7 +129,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banne
     const canLoop = banners.length > 1;
 
     return (
-        <View className="mt-4">
+        <View>
             <Carousel
                 ref={carouselRef}
                 loop={canLoop}

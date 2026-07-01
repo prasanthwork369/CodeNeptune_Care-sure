@@ -1,8 +1,8 @@
-import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { notificationApi } from '../api/notification.api';
+import { getDeviceInfo } from '../lib/deviceInfo';
 import { isExpoGo } from '../utils/environment';
 
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
@@ -31,6 +31,11 @@ export const notificationService = {
     },
 
     registerWithBackend: async (): Promise<void> => {
+        // Collect device info first — no permission needed, works in Expo Go too
+        const deviceInfo = await getDeviceInfo();
+        if (__DEV__) console.log('[DeviceInfo]', JSON.stringify(deviceInfo, null, 2));
+
+        // Push token registration requires a real dev/prod build
         if (isExpoGo) return;
 
         const granted = await notificationService.requestPermission();
@@ -40,13 +45,31 @@ export const notificationService = {
         if (__DEV__) console.log('[PushToken]', token);
         if (!token) return;
 
+        // ── Backend ready? Replace the registerToken call below with: ──────────
+        // await notificationApi.registerDevice({ push_token: token, ...deviceInfo });
+        // ────────────────────────────────────────────────────────────────────────
         await notificationApi.registerToken({
             token,
             platform: Platform.OS as 'ios' | 'android',
-            deviceName: Device.deviceName ?? null,
-            deviceModel: Device.modelName ?? null,
-            osVersion: Device.osVersion ?? null,
-            appVersion: Application.nativeApplicationVersion ?? null,
+            deviceName: deviceInfo.device_name,
+            deviceModel: deviceInfo.device_model,
+            osVersion: deviceInfo.device_os_version,
+            appVersion: deviceInfo.app_version,
+        }).catch(() => {});
+    },
+
+    updateToken: async (newToken: string): Promise<void> => {
+        if (__DEV__) console.log('[PushToken:refreshed]', newToken);
+        // ── Backend ready? Replace below with: ──────────────────────────────────
+        // await notificationApi.updateToken({ push_token: newToken });
+        // ────────────────────────────────────────────────────────────────────────
+        await notificationApi.registerToken({
+            token: newToken,
+            platform: Platform.OS as 'ios' | 'android',
+            deviceName: null,
+            deviceModel: null,
+            osVersion: null,
+            appVersion: null,
         }).catch(() => {});
     },
 

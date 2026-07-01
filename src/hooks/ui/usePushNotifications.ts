@@ -21,10 +21,19 @@ export const usePushNotifications = () => {
 
     useEffect(() => {
         if (!isAuthenticated) return;
-        const timer = setTimeout(() => {
-            notificationService.registerWithBackend();
-        }, 1500);
-        return () => clearTimeout(timer);
+        notificationService.registerWithBackend().catch(() => {});
+    }, [isAuthenticated]);
+
+
+    useEffect(() => {
+        if (isExpoGo || !isAuthenticated) return;
+
+        // Token rotated mid-session (iOS can issue a new token while app is open)
+        const tokenListener = Notifications.addPushTokenListener((newToken) => {
+            notificationService.updateToken(newToken.data).catch(() => {});
+        });
+
+        return () => tokenListener.remove();
     }, [isAuthenticated]);
 
     useEffect(() => {

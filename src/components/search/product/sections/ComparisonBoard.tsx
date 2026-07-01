@@ -4,9 +4,9 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
+import { moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
-import { moderateScale } from "@/src/utils/exactScale";
 import {
   ActivityIndicator,
   Animated,
@@ -64,7 +64,6 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
   // Measure the right-section content row to determine the correct board height
   const [boardHeight, setBoardHeight] = useState(380);
-  const ADD_BTN_SECTION_H = 80; // pt-3 + border + btn + pb-3.5 + mt-3
 
   // Animated value driving the expandable We Recommended section: 0 = half-width, 1 = full-width
   const expandAnim = useRef(new Animated.Value(0)).current;
@@ -194,7 +193,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
   return (
     <View
-      className="mx-4 mb-2 overflow-hidden"
+      className="mx-4  mb-2 overflow-hidden"
       style={{
         width: cardWidth,
         height: boardHeight,
@@ -223,7 +222,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             <View>
               <Text
                 className="font-inter-bold text-[#4B5563] uppercase tracking-[0.8px] mb-2"
-                style={{ height: 16, lineHeight: moderateScale(16), fontSize: moderateScale(11) }}
+                style={{
+                  height: 16,
+                  lineHeight: moderateScale(16),
+                  fontSize: moderateScale(11),
+                }}
               >
                 YOU SEARCHED
               </Text>
@@ -245,7 +248,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               >
                 {searched.name}
               </Text>
-              <Text className="font-inter-medium text-brand-subtext mb-[3px]" style={{ fontSize: moderateScale(12) }}>
+              <Text
+                className="font-inter-medium text-brand-subtext mb-[3px]"
+                style={{ fontSize: moderateScale(12) }}
+              >
                 {searched.manufacturer}
               </Text>
               <Text
@@ -268,12 +274,18 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               />
               {/* Price Slot */}
               <View style={{ height: 28, justifyContent: "center" }}>
-                <Text className="font-inter-extrabold text-[#111827] mb-[2px]" style={{ fontSize: moderateScale(20) }}>
+                <Text
+                  className="font-inter-extrabold text-[#111827] mb-[2px]"
+                  style={{ fontSize: moderateScale(20) }}
+                >
                   ₹{searched.priceDisplay}
                 </Text>
               </View>
               {/* Unit Price */}
-              <Text className="font-inter-medium text-brand-subtext mb-0" style={{ fontSize: moderateScale(11) }}>
+              <Text
+                className="font-inter-medium text-brand-subtext mb-0"
+                style={{ fontSize: moderateScale(11) }}
+              >
                 ₹{searched.unitPriceDisplay}/ Unit
               </Text>
             </View>
@@ -284,7 +296,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             className="px-[12px] pt-6"
             style={{ height: 62, justifyContent: "center" }}
           >
-            <Text className="font-inter-semibold text-[#EF4444]" style={{ fontSize: moderateScale(12) }}>
+            <Text
+              className="font-inter-semibold text-[#EF4444]"
+              style={{ fontSize: moderateScale(12) }}
+            >
               {searched.status}
             </Text>
           </View>
@@ -337,7 +352,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                   <View>
                     <Text
                       className="font-inter-bold text-[#0F7635] uppercase tracking-[0.8px] mb-2"
-                      style={{ height: 16, lineHeight: moderateScale(16), fontSize: moderateScale(11) }}
+                      style={{
+                        height: 16,
+                        lineHeight: moderateScale(16),
+                        fontSize: moderateScale(11),
+                      }}
                     >
                       WE RECOMMENDED
                     </Text>
@@ -359,7 +378,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     >
                       {recommended.name}
                     </Text>
-                    <Text className="font-inter-bold text-[#0F7635] mt-0.5" style={{ fontSize: moderateScale(12) }}>
+                    <Text
+                      className="font-inter-bold text-[#0F7635] mt-0.5"
+                      style={{ fontSize: moderateScale(12) }}
+                    >
                       {recommended.manufacturer}
                     </Text>
                     <Text
@@ -404,7 +426,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                             marginTop: 6,
                           }}
                         >
-                          <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(10) }}>
+                          <Text
+                            className="font-inter-semibold text-white"
+                            style={{ fontSize: moderateScale(10) }}
+                          >
                             Save ₹{effectiveSaving.toFixed(2)}
                           </Text>
                         </LinearGradient>
@@ -417,26 +442,32 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                         borderTopWidth: 1,
                         borderColor: "#E5E7EB",
                         borderStyle: "dashed",
-                        marginVertical: 16,
+                        marginVertical: 8,
                       }}
                     />
                     {/* Price & Strikethrough Slot */}
                     <View style={{ height: 28, justifyContent: "center" }}>
                       <View className="flex-row items-baseline gap-x-2">
-                        <Text className="font-inter-extrabold text-[#0F7635]" style={{ fontSize: moderateScale(20) }}>
+                        <Text
+                          className="font-inter-extrabold text-[#0F7635]"
+                          style={{ fontSize: moderateScale(20) }}
+                        >
                           ₹{recommended.priceDisplay}
                         </Text>
                         {parseFloat(recommended.mrpDisplay) >
                           parseFloat(recommended.priceDisplay) && (
-                          <Text className="font-inter-medium text-brand-subtext line-through" style={{ fontSize: moderateScale(12) }}>
+                          <Text
+                            className="font-inter-medium text-brand-subtext line-through"
+                            style={{ fontSize: moderateScale(12) }}
+                          >
                             ₹{recommended.mrpDisplay}
                           </Text>
                         )}
                       </View>
                     </View>
 
-                    {/* Unit price spacer to align with left card */}
-                    <View style={{ height: 14 }} />
+                    {/* Unit price spacer — matches left card unit price text height */}
+                    <View style={{ height: 16 }} />
                   </View>
                 </Animated.View>
 
@@ -458,13 +489,16 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                         position: "absolute",
                         bottom: 0,
                         left: 0,
-                        width: 100,
-                        height: 100,
+                        width: moderateScale(100),
+                        height: moderateScale(100),
                       }}
                       resizeMode="contain"
                     />
                     <View className="px-3 pt-3 z-10 w-[70%]">
-                      <Text className="font-inter-extrabold text-brand-text leading-[18px]" style={{ fontSize: moderateScale(14) }}>
+                      <Text
+                        className="font-inter-extrabold text-brand-text leading-[18px]"
+                        style={{ fontSize: moderateScale(14) }}
+                      >
                         Doctor{"\n"}Trusted{"\n"}Medicines
                       </Text>
                     </View>
@@ -488,7 +522,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       style={{ width: 18, height: 18, marginRight: 4 }}
                       resizeMode="contain"
                     />
-                    <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(12) }}>
+                    <Text
+                      className="font-inter-medium text-brand-text"
+                      style={{ fontSize: moderateScale(12) }}
+                    >
                       CareSure Assured
                     </Text>
                   </View>
@@ -501,7 +538,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               style={{
                 paddingHorizontal: 12,
                 paddingBottom: 10,
-                paddingTop:2,
+                paddingTop: 6,
               }}
             >
               {count === 0 ? (
@@ -513,7 +550,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                   className="bg-brand-primary rounded-[12px] items-center justify-center"
                   style={{ height: 46 }}
                 >
-                  <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15) }}>
+                  <Text
+                    className="font-inter-bold text-white"
+                    style={{ fontSize: moderateScale(15) }}
+                  >
                     {isPending ? "Adding..." : "Add"}
                   </Text>
                 </Touchable>
@@ -527,7 +567,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     disabled={isPending}
                     className="flex-1 items-center justify-center h-full"
                   >
-                    <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(24) }}>
+                    <Text
+                      className="font-inter-semibold text-brand-text"
+                      style={{ fontSize: moderateScale(24) }}
+                    >
                       −
                     </Text>
                   </Touchable>
@@ -559,7 +602,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     disabled={isPending}
                     className="flex-1 items-center justify-center h-full"
                   >
-                    <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(22) }}>
+                    <Text
+                      className="font-inter-semibold text-brand-text"
+                      style={{ fontSize: moderateScale(22) }}
+                    >
                       +
                     </Text>
                   </Touchable>

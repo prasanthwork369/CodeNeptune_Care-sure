@@ -170,7 +170,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                 styles.footer,
                 {
                   paddingHorizontal: panelPaddingH,
-                  paddingBottom: adjustedBottom + verticalScale(16),
+                  paddingBottom: Math.max(insets.bottom, 16) + verticalScale(16),
                   maxWidth: panelMaxWidth,
                 },
               ]}

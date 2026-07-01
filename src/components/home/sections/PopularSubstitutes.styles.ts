@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: exactScale(6),
     paddingVertical: exactScale(4),
     borderRadius: exactScale(4),
+    zIndex: 10,
   },
   badge: { fontSize: moderateScale(11) },
   name: {
@@ -66,14 +67,14 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: moderateScale(20),
     lineHeight: moderateScale(30),
-    color: "#2DAAFF",
+    color: "#0F7635",
     letterSpacing: 0,
     verticalAlign: "middle",
   },
 
   headerImage: {
-    width: exactScale(45),
-    height: exactScale(45),
+    width: exactScale(40),
+    height: exactScale(40),
     opacity: 1,
   },
   cartBtn: {

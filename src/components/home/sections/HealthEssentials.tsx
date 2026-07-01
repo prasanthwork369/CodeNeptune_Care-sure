@@ -78,18 +78,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 onPress={() => onPress(productId)}
                 style={{ height: imageAreaHeight, backgroundColor: contentBg, paddingBottom: exactScale(4) }}
             >
-                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center', paddingTop: exactScale(24) }}>
-                    {!!discountLabel && (
-                        <View style={[s.badgeContainer, { backgroundColor: discountBg }]}>
-                            <Text style={[s.badge, { color: accentColor, fontWeight: '800' }]}>{discountLabel}</Text>
-                        </View>
-                    )}
+                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
                     <Image
                         source={thumbnailUrl ? { uri: thumbnailUrl } : undefined}
                         style={{ width: imageSize, height: imageSize }}
                         contentFit="contain"
                     />
                 </View>
+                {!!discountLabel && (
+                    <View style={[s.badgeContainer, { backgroundColor: discountBg, zIndex: 10 }]}>
+                        <Text style={[s.badge, { color: accentColor, fontWeight: '800' }]}>{discountLabel}</Text>
+                    </View>
+                )}
             </Touchable>
 
             {/* Details area — sized to its own content, not a forced half-split */}
@@ -167,7 +167,7 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
     const headerImage   = meta?.featuredImageUrl || subcategory.imageUrl;
 
     return (
-        <View className="mb-6">
+        <View>
 
             <View style={{ position: 'relative' }}>
                 <LinearGradient
@@ -236,17 +236,13 @@ interface HealthEssentialsProps {
 
 export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ subcategories, isLoading, onProductPress }) => {
     if (isLoading) {
-        return (
-            <View className="mb-6 mt-2">
-                <HomeProductCardSkeleton count={3} />
-            </View>
-        );
+        return <HomeProductCardSkeleton count={3} />;
     }
 
     if (subcategories.length === 0) return null;
 
     return (
-        <>
+        <View style={{ gap: exactScale(24) }}>
             {subcategories.map((sub, index) => (
                 <HealthEssentialsSection
                     key={sub.id}
@@ -255,7 +251,7 @@ export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ s
                     onProductPress={onProductPress}
                 />
             ))}
-        </>
+        </View>
     );
 });
 HealthEssentials.displayName = 'HealthEssentials';

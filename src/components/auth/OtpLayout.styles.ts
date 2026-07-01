@@ -2,7 +2,7 @@ import { StyleSheet, Platform } from 'react-native';
 import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
-    title: { fontSize: moderateScale(26, 0.3), fontWeight: '800', color: '#222222', lineHeight: moderateScale(26, 0.3), letterSpacing: 0 },
+    title: { fontSize: moderateScale(26, 0.3), fontWeight: '800', color: '#222222', lineHeight: moderateScale(34, 0.3), letterSpacing: 0 },
     phone: {
         fontSize: moderateScale(14, 0.3),
         fontWeight: '500',

@@ -1,6 +1,6 @@
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
-import { useFeaturedSubcategories } from "@/src/hooks/queries/useFeaturedSubcategories";
+import { useFeaturedSubcategories } from "@/src/hooks/home/useFeaturedSubcategories";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAuthStore } from "@/src/store/authStore";

@@ -37,13 +37,15 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
                 onPress={() => onProductPress?.(item.productId ?? item.id)}
                 className="flex-row items-center flex-1"
             >
-                <View style={[s.imgBox, { backgroundColor: '#fff', borderRadius: exactScale(12), borderWidth: 1, borderColor: '#919EAB1A', alignItems: 'center', justifyContent: 'center', marginRight: exactScale(12) }]}>
+                <View style={[s.imgBox, { backgroundColor: '#fff', borderRadius: exactScale(12), borderWidth: 1, borderColor: '#919EAB1A', marginRight: exactScale(12) }]}>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Image source={item.image?.uri ? item.image : undefined} style={s.imgInner} contentFit="contain" />
+                    </View>
                     {!!item.discount && (
-                        <View style={{ position: 'absolute', top: exactScale(6), left: exactScale(6), backgroundColor: '#E8F5E9', paddingHorizontal: exactScale(5), paddingVertical: exactScale(2), borderRadius: exactScale(4) }}>
+                        <View style={{ position: 'absolute', top: exactScale(6), left: exactScale(6), backgroundColor: '#E8F5E9', paddingHorizontal: exactScale(5), paddingVertical: exactScale(2), borderRadius: exactScale(4), zIndex: 10 }}>
                             <Text style={[s.badge, { fontWeight: '800', color: '#0F7635' }]}>{item.discount}</Text>
                         </View>
                     )}
-                    <Image source={item.image?.uri ? item.image : undefined} style={[s.imgInner, { marginTop: IMG_SIZE * 0.3 }]} contentFit="contain" />
                 </View>
                 <View className="flex-1">
                     <Text style={s.name} className="font-inter-semibold text-brand-text mb-0.5" numberOfLines={1}>
@@ -109,7 +111,7 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
 
 export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> = React.memo(({ substitutes, onProductPress, onViewAll, disableCart }) => {
     return (
-        <View className="mt-8 px-4 mb-6">
+        <View className="px-4">
             <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-lg font-inter-bold text-brand-text">Frequently Ordered Products</Text>
                 <Touchable onPress={onViewAll} accessibilityRole="button">

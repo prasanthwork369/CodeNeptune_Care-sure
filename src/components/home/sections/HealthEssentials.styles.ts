@@ -5,10 +5,10 @@ import { typography } from "@/src/constants/typography";
 export const styles = StyleSheet.create({
     badgeContainer: {
         position: 'absolute',
-        top: exactScale(10),
-        left: exactScale(10),
+        top: exactScale(6),
+        left: exactScale(8),
         paddingHorizontal: exactScale(6),
-        paddingVertical: exactScale(6),
+        paddingVertical: exactScale(4),
         borderRadius: exactScale(4),
     },
     badge:           { fontSize: moderateScale(11) },

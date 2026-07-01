@@ -57,18 +57,18 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
                 onPress={() => onProductPress?.(product.productId ?? product.id)}
                 style={{ height: imageAreaHeight, backgroundColor: CONTENT_BG, paddingBottom: exactScale(4) }}
             >
-                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12,alignItems: 'center', justifyContent: 'center', paddingTop: exactScale(24) }}>
-                    {!!product.discount && (
-                        <View style={[s.badgeContainer, { backgroundColor: DISCOUNT_BG }]}>
-                            <Text style={[s.badge, { color: ACCENT, fontWeight: '800' }]}>{product.discount}</Text>
-                        </View>
-                    )}
+                <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
                     <Image
                         source={product.image}
                         style={{ width: imageSize, height: imageSize }}
                         contentFit="contain"
                     />
                 </View>
+                {!!product.discount && (
+                    <View style={[s.badgeContainer, { backgroundColor: DISCOUNT_BG }]}>
+                        <Text style={[s.badge, { color: ACCENT, fontWeight: '800' }]}>{product.discount}</Text>
+                    </View>
+                )}
             </Touchable>
 
             {/* Details area — sized to its own content, not a forced half-split */}
@@ -140,7 +140,7 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
 
 export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products, isLoading, onProductPress }) => {
     return (
-        <View className="mt-4 py-6" style={{ position: 'relative' }}>
+        <View className="py-6" style={{ position: 'relative' }}>
             <LinearGradient
                 colors={['#F2FAF7', '#FFFFFF']}
                 start={{ x: 0, y: 0 }}
