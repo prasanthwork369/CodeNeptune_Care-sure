@@ -67,6 +67,7 @@ export const API_ENDPOINTS = {
   // ── Prescriptions ────────────────────────────────────────────────────────
   PRESCRIPTIONS: "/api/v1/prescriptions",
   PRESCRIPTION_BY_ID: (id: string) => `/api/v1/prescriptions/${id}`,
+  PRESCRIPTION_DISMISS: (id: string) => `/api/v1/prescriptions/${id}/dismiss`,
   PRESCRIPTION_ORDER_MEDICINES: (orderId: string) =>
     `/api/v1/prescriptions/order/${orderId}`,
 

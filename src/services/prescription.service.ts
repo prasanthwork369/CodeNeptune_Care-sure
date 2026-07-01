@@ -1,75 +1,55 @@
-import { apiClient } from '@/src/api/client';
+import { prescriptionApi, PrescriptionListParams, PrescriptionUploadInput } from '@/src/api/prescription.api';
 import { PRESCRIPTION_CATEGORY } from '@/src/constants/prescription-category';
 import { ApiPrescription } from '@/src/types/prescription';
-import { API_ENDPOINTS } from '@/src/utils/urls';
+import { AppError } from '@/src/api/errors';
+
+type SuccessResult<T> = { success: true; data: T };
+type FailureResult = { success: false; error: string };
+type ServiceResult<T> = SuccessResult<T> | FailureResult;
+
+function toFailure(err: unknown): FailureResult {
+  if (err instanceof AppError) return { success: false, error: err.message };
+  if (err instanceof Error) return { success: false, error: err.message };
+  return { success: false, error: 'Something went wrong' };
+}
 
 export const prescriptionService = {
-    upload: async (data: {
-        imageUrls: string[];
-        category?: number;
-        orderId?: string;
-        doctorName?: string;
-        issuedDate?: string;
-        notes?: string;
-    }) => {
-        const payload = { ...data, category: data.category ?? PRESCRIPTION_CATEGORY.ORDER };
-        try {
-            const response = await apiClient.post(API_ENDPOINTS.PRESCRIPTIONS, payload);
-            return { success: true, data: response.data.data };
-        } catch (error: any) {
-            return {
-                success: false,
-                error: error.response?.data?.message || error.message || 'Failed to submit prescription',
-            };
-        }
-    },
+  upload: async (input: PrescriptionUploadInput): Promise<ServiceResult<ApiPrescription>> => {
+    try {
+      const data = await prescriptionApi.upload({
+        ...input,
+        category: input.category ?? PRESCRIPTION_CATEGORY.ORDER,
+      });
+      return { success: true, data };
+    } catch (err) {
+      return toFailure(err);
+    }
+  },
 
-    getById: async (id: string): Promise<{ success: true; data: ApiPrescription } | { success: false; error: string }> => {
-        try {
-            const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTION_BY_ID(id));
-            return { success: true, data: response.data.data };
-        } catch (error: any) {
-            return {
-                success: false,
-                error: error.response?.data?.message || error.message || 'Failed to fetch prescription',
-            };
-        }
-    },
+  getById: async (id: string): Promise<ServiceResult<ApiPrescription>> => {
+    try {
+      const data = await prescriptionApi.getById(id);
+      return { success: true, data };
+    } catch (err) {
+      return toFailure(err);
+    }
+  },
 
-    list: async (params?: {
-        page?: number;
-        limit?: number;
-        status?: number;
-        excludeStatus?: number;
-        orderId?: string;
-        category?: number;
-        sortOrder?: 'asc' | 'desc';
-    }): Promise<{ success: true; data: ApiPrescription[] } | { success: false; error: string }> => {
-        try {
-            const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTIONS, { params });
-            return { success: true, data: response.data.data };
-        } catch (error: any) {
-            return {
-                success: false,
-                error: error.response?.data?.message || error.message || 'Failed to fetch prescriptions',
-            };
-        }
-    },
+  list: async (params?: PrescriptionListParams): Promise<ServiceResult<ApiPrescription[]>> => {
+    try {
+      const data = await prescriptionApi.list(params);
+      return { success: true, data };
+    } catch (err) {
+      return toFailure(err);
+    }
+  },
 
-    dismiss: async (
-        id: string
-    ): Promise<{ success: true; data: any } | { success: false; error: string }> => {
-        try {
-            const response = await apiClient.patch(`/api/v1/prescriptions/${id}/dismiss`);
-            return {
-                success: true,
-                data: response.data?.data,
-            };
-        } catch (error: any) {
-            return {
-                success: false,
-                error: error.response?.data?.message || error.message || 'Failed to dismiss prescription',
-            };
-        }
-    },
+  dismiss: async (id: string): Promise<ServiceResult<ApiPrescription>> => {
+    try {
+      const data = await prescriptionApi.dismiss(id);
+      return { success: true, data };
+    } catch (err) {
+      return toFailure(err);
+    }
+  },
 };

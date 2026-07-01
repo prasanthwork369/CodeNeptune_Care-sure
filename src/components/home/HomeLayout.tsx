@@ -14,23 +14,18 @@ import {
   StickySearchHeader,
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
+import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
-import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useHomeData } from "@/src/hooks/queries/useHomeData";
 import { useCart } from "@/src/hooks/queries/useCart";
-import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
-import { useFeaturedSubcategories } from "@/src/hooks/queries/useFeaturedSubcategories";
-import { useHome } from "@/src/hooks/queries/useHome";
-import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { useHomeScroll } from "@/src/hooks/ui/useHomeScroll";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useNav } from "@/src/hooks/useNav";
-import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { exactScale } from "@/src/utils/exactScale";
@@ -39,10 +34,9 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   DeviceEventEmitter,
-  Platform,
   RefreshControl,
   View,
-  useWindowDimensions
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   Easing,
@@ -59,7 +53,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const easeOut = Easing.out(Easing.cubic);
 const EMPTY_BANNERS: NonNullable<
-  ReturnType<typeof useHome>["appContent"]
+  ReturnType<typeof useHomeData>["appContent"]
 >["banners"] = [];
 
 function useSlideUp(delayMs: number) {
@@ -88,7 +82,6 @@ export const HomeLayout: React.FC = () => {
   const { width, height } = useWindowDimensions();
 
   const [isLocationSheetVisible, setIsLocationSheetVisible] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [carouselY, setCarouselY] = useState(0);
   const [carouselHeight, setCarouselHeight] = useState(0);
@@ -104,7 +97,6 @@ export const HomeLayout: React.FC = () => {
   const searchBarAnim = useSlideUp(350);
   const quickActionsAnim = useSlideUp(500);
 
-  const { isAuthenticated } = useAuthStore();
   const { isTabBarVisible, setTabBarVisible, setUploadButtonCollapsed } =
     useUIStore();
   const { totalItems } = useCart();
@@ -114,28 +106,19 @@ export const HomeLayout: React.FC = () => {
     tabs,
     cards,
     appContent,
-    isLoading: isHomeLoading,
-    refetch: refetchHome,
-  } = useHome();
-  const {
-    products: featuredProducts,
-    isLoading: isFeaturedLoading,
-    refetch: refetchFeatured,
-  } = useFeaturedMedicines();
-  const {
-    subcategories: featuredSubcategories,
-    isLoading: isSubcategoriesLoading,
-    refetch: refetchSubcategories,
-  } = useFeaturedSubcategories();
-  const { addresses, refetch: refetchAddresses } = useAddress();
-  const { data: frequentlyOrdered = [], refetch: refetchFrequentlyOrdered } =
-    useFrequentlyOrdered({ limit: 5 });
+    isHomeLoading,
+    featuredProducts,
+    isFeaturedLoading,
+    featuredSubcategories,
+    isSubcategoriesLoading,
+    frequentlyOrdered,
+    isRefreshing,
+    onRefresh,
+  } = useHomeData();
   const { callSupport, whatsappOrder } = useContactActions();
   const {
     location,
     pincode: locationPincode,
-    setLocation,
-    clearLocation,
     reopenLocationSheet,
     setReopenLocationSheet,
   } = useLocationStore();
@@ -167,47 +150,7 @@ export const HomeLayout: React.FC = () => {
     heroHeightShared,
   );
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
-  const adjustedBottoms =
-    Platform.OS === "android"
-      ? adjustedBottom > 24
-        ? adjustedBottom - 8
-        : adjustedBottom
-      : adjustedBottom;
   const TAB_BAR_HEIGHT = BAR_HEIGHT + adjustedBottom + exactScale(6);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    if (addresses.length > 0) {
-      const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
-      setLocation(
-        {
-          label: defaultAddr.label,
-          city: defaultAddr.city || defaultAddr.line2 || "",
-        },
-        { addressId: defaultAddr.id, pincode: defaultAddr.pincode },
-      );
-    } else {
-      clearLocation();
-    }
-  }, [addresses, isAuthenticated]);
-
-  const onRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        refetchHome(),
-        refetchFeatured(),
-        refetchSubcategories(),
-        refetchAddresses(),
-        refetchFrequentlyOrdered(),
-        new Promise<void>((resolve) => setTimeout(resolve, 800)),
-      ]);
-    } catch (e) {
-      console.error("[Home] Refresh failed:", e);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   // Banner visibility is derived on the UI thread from the already-tracked
   // scrollY shared value instead of recomputing it in the JS-thread onScroll

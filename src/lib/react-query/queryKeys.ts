@@ -1,3 +1,30 @@
+import { PrescriptionListParams } from '@/src/api/prescription.api';
+
+interface OrderListParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+interface ReturnListParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+}
+
+interface HealthProblemParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+interface CancellationReasonParams {
+  page?: number;
+  limit?: number;
+  type?: string;
+}
+
 export const QUERY_KEYS = {
     CUSTOMER: {
         PROFILE:       ['customer', 'profile'] as const,
@@ -6,16 +33,16 @@ export const QUERY_KEYS = {
         CART:          ['customer', 'cart'] as const,
         COUPONS:       ['customer', 'coupons', 'active'] as const,
         PRESCRIPTIONS: {
-            LIST:   (params?: any) => ['customer', 'prescriptions', 'list', params] as const,
-            BY_ID:  (id: string)   => ['customer', 'prescriptions', 'detail', id] as const,
+            LIST:   (params?: PrescriptionListParams) => ['customer', 'prescriptions', 'list', params] as const,
+            BY_ID:  (id: string)                      => ['customer', 'prescriptions', 'detail', id] as const,
         },
         ORDERS: {
-            LIST:   (params?: any) => ['customer', 'orders', 'list', params] as const,
-            BY_ID:  (id: string)   => ['customer', 'orders', 'detail', id] as const,
+            LIST:   (params?: OrderListParams) => ['customer', 'orders', 'list', params] as const,
+            BY_ID:  (id: string)               => ['customer', 'orders', 'detail', id] as const,
         },
         RETURNS: {
-            LIST:   (params?: any) => ['customer', 'returns', 'list', params] as const,
-            BY_ID:  (id: string)   => ['customer', 'returns', 'detail', id] as const,
+            LIST:   (params?: ReturnListParams) => ['customer', 'returns', 'list', params] as const,
+            BY_ID:  (id: string)                => ['customer', 'returns', 'detail', id] as const,
         },
         NOTIFICATIONS: ['customer', 'notifications'] as const,
         NOTIFICATION_PREFERENCES: ['customer', 'notification-preferences'] as const,
@@ -32,16 +59,16 @@ export const QUERY_KEYS = {
         FEATURED_SUBCATEGORIES:     ['catalog', 'featured-subcategories'] as const,
     },
     APP: {
-        CONTENTS: ['app', 'contents'] as const,
-        HEALTH_PROBLEMS: (params?: any) => ['app', 'health-problems', params] as const,
+        CONTENTS:        ['app', 'contents'] as const,
+        HEALTH_PROBLEMS: (params?: HealthProblemParams) => ['app', 'health-problems', params] as const,
     },
     SEARCH: {
-        MEDICINES:    (query: string)                                    => ['search', 'medicines', query] as const,
-        SUGGESTIONS:  (query: string)                                    => ['search', 'suggestions', query] as const,
-        HISTORY:      (params?: { limit?: number; offset?: number })     => ['search', 'history', params] as const,
-        TRENDING:     (limit?: number)                                   => ['search', 'trending', limit] as const,
+        MEDICINES:    (query: string)                                => ['search', 'medicines', query] as const,
+        SUGGESTIONS:  (query: string)                                => ['search', 'suggestions', query] as const,
+        HISTORY:      (params?: { limit?: number; offset?: number }) => ['search', 'history', params] as const,
+        TRENDING:     (limit?: number)                               => ['search', 'trending', limit] as const,
     },
     CANCELLATION_REASONS: {
-        LIST: (params?: any) => ['cancellation-reasons', 'list', params] as const,
+        LIST: (params?: CancellationReasonParams) => ['cancellation-reasons', 'list', params] as const,
     },
 } as const;
