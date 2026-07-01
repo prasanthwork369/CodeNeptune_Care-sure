@@ -4,10 +4,11 @@ import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useAuthStore } from "@/src/store/authStore";
+import * as Application from "expo-application";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect } from "expo-router";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -133,6 +134,10 @@ export const ProfileLayout: React.FC = () => {
         <ProfileCoinsCard />
 
         <ProfileInfoList onLogout={() => setShowLogoutModal(true)} />
+
+        <Text className="text-center font-inter-semibold text-[#919EAB] text-[11px] mb-6">
+          v{Application.nativeApplicationVersion ?? "—"} ({Application.nativeBuildVersion ?? "—"})
+        </Text>
       </ScrollView>
 
       <LogoutConfirmModal
