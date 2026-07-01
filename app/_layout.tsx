@@ -4,8 +4,8 @@ import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import { Image, Platform, View, TouchableOpacity, Text } from "react-native";
+import { useEffect, useState } from "react";
+import { Platform, View } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -19,6 +19,7 @@ import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { Toast } from "@/src/components/common/Toast";
 import { DevTestButton } from "@/src/components/dev/DevTestButton";
+import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
@@ -41,15 +42,17 @@ const PushNotificationProvider = () => {
   return null;
 };
 
-const SPLASH_LOGO = require("../assets/images/splash-icon.png");
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
-
   const interFontsLoaded = useAndroidInterFonts();
+
+  // Tracks whether the JS animated splash has finished playing.
+  // Auth loading and the animation run in parallel — the app only
+  // shows once BOTH are done, whichever takes longer.
+  const [isAnimationDone, setIsAnimationDone] = useState(false);
 
   useEffect(() => {
     initialize();
@@ -74,27 +77,21 @@ export default function RootLayout() {
     });
   }, []);
 
+  // Hide native splash as soon as fonts are ready so our
+  // animated JS splash takes over seamlessly.
   useEffect(() => {
-    if (isAuthLoaded && interFontsLoaded) {
+    if (interFontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [isAuthLoaded, interFontsLoaded]);
+  }, [interFontsLoaded]);
 
-  if (!isAuthLoaded || !interFontsLoaded) {
+  // Show animated splash until fonts load + animation plays + auth resolves.
+  if (!interFontsLoaded || !isAnimationDone || !isAuthLoaded) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "#FFFFFF",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Image
-          source={SPLASH_LOGO}
-          style={{ width: 200, height: 200 }}
-          resizeMode="contain"
-        />
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        {interFontsLoaded && (
+          <SplashAnimationScreen onComplete={() => setIsAnimationDone(true)} />
+        )}
       </View>
     );
   }
