@@ -1,48 +1,29 @@
 export const colors = {
-  brand: {
-    primary: '#0F7635',
-    primaryPressed: '#0B5A28',
-    primarySoft: '#E6F2EB',
-    secondary: '#FACA15',
-  },
+  // Brand
+  primary: "#0F7635",
+  secondary: "#FACA15",
 
-  text: {
-    DEFAULT: '#222222',
-    subtle: '#6A6A6A',
-    muted: '#94A3B8',
-    inverse: '#FFFFFF',
-  },
+  // Text
+  text: "#222222",
+  subtext: "#6A6A6A",
 
-  surface: {
-    DEFAULT: '#FFFFFF',
-    muted: '#F9FAFB',
-    sunken: '#F3F4F6',
-  },
+  // Backgrounds
+  background: "#F9FAFB",
+  white: "#FFFFFF",
 
-  border: {
-    DEFAULT: '#919EAB33',
-    strong: '#919EAB66',
-    focus: '#0F7635',
-  },
+  // UI
+  border: "#919EAB33",
+  card: "#FFFFFF",
+  success: "#0F7635",
+  error: "#DC2626",
 
-  status: {
-    success: '#0F7635',
-    error: '#DC2626',
-    warning: '#F59E0B',
-    info: '#2563EB',
-  },
-
-  pastels: {
-    pink: '#FFEBEB',
-    blue: '#EBF5FF',
-    purple: '#F5EBFF',
-    cyan: '#EBFFFF',
-    yellow: '#FFF9EB',
-    mint: '#F2FFEB',
-  },
-
-  gradients: {
-    savingsBanner: ['#D0EBFE', '#D7FFEA'],
-    brand: ['#0F7635', '#0B5A28'],
-  },
+  // Animated background palette
+  pastels: [
+    "#FFEBEB",
+    "#EBF5FF",
+    "#F5EBFF",
+    "#EBFFFF",
+    "#FFF9EB",
+    "#F2FFEB",
+  ],
 } as const;
