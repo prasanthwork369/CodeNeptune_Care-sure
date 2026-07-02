@@ -190,19 +190,19 @@ export const PrescriptionFloatingBanner = ({
                   <Image
                     source={HOME_IMAGES.prescriptionApproved}
                     style={{ width: exactScale(44), height: exactScale(44) }}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 ) : status === PRESCRIPTION_STATUS.CANCELLED ? (
                   <Image
                     source={HOME_IMAGES.prescriptionRejected}
                     style={{ width: exactScale(36), height: exactScale(36) }}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 ) : (
                   <Image
                     source={PRESCRIPTION_ICON}
                     style={{ width: exactScale(44), height: exactScale(44) }}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 )}
               </View>

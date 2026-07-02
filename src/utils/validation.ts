@@ -7,7 +7,7 @@ const fail = (message: string): ValidationResult => ({ valid: false, message });
 
 export const REGEX = {
     digitsOnly: /[^0-9]/g,
-    indianMobile: /^[0-9]{10}$/,
+    indianMobile: /^[6-9][0-9]{9}$/,
     pincode: /^[1-9][0-9]{5}$/,
     otp: /^\d{6}$/,
 };
@@ -34,9 +34,9 @@ export const validate = {
         value.trim() ? ok() : fail(`${fieldName} is required`),
 
     phone: (value: string): ValidationResult => {
-        if (!value) return fail('Mobile number is required');
-        if (value.length < 10) return fail('Enter a valid 10-digit mobile number');
-        if (!REGEX.indianMobile.test(value)) return fail('Enter a valid 10-digit mobile number');
+        if (!value) return fail('Please enter your mobile number');
+        if (value.length < 10) return fail('Please enter a valid 10-digit mobile number');
+        if (!REGEX.indianMobile.test(value)) return fail('Please enter a valid 10-digit mobile number');
         return ok();
     },
 

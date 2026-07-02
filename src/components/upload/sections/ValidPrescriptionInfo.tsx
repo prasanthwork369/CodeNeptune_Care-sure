@@ -39,7 +39,7 @@ export const ValidPrescriptionInfo: React.FC = () => {
           <Image
             source={HOME_IMAGES.samplePrescription}
             style={{ width: rxImgW, height: rxImgH }}
-            resizeMode="contain"
+            contentFit="contain"
           />
         </View>
         <View className="flex-1 ml-4">

@@ -109,7 +109,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
                 <Image
                   source={item.prescribed.image}
                   style={{ width: "80%", height: "80%" }}
-                  resizeMode="contain"
+                  contentFit="contain"
                 />
               ) : (
                 <icons.placeholder width="70%" height="70%" />
@@ -201,7 +201,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               <Image
                 source={HOME_IMAGES.couponRibbon}
                 style={{ width: 38, height: 42 }}
-                resizeMode="stretch"
+                contentFit="fill"
               />
               <View
                 style={{
@@ -261,7 +261,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
                 <Image
                   source={item.recommended.image}
                   style={{ width: "80%", height: "80%" }}
-                  resizeMode="contain"
+                  contentFit="contain"
                 />
               ) : (
                 <icons.placeholder width="70%" height="70%" />

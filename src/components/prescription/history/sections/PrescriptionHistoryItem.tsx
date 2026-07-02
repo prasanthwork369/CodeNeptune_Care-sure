@@ -97,7 +97,7 @@ export const PrescriptionHistoryItem: React.FC<
               <Image
                 source={imageSource}
                 style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
+                contentFit="cover"
               />
             ) : (
               <icons.pill_gray width={22} height={22} />

@@ -563,7 +563,7 @@ export const OrderTrackLayout: React.FC = () => {
                     <Image
                       source={{ uri: item.medicineSnapshot.image }}
                       style={s.productImg50}
-                      resizeMode="contain"
+                      contentFit="contain"
                     />
                   ) : (
                     <icons.placeholder width={exactScale(50)} height={exactScale(50)} />

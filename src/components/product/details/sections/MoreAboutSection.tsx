@@ -125,7 +125,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
   if (tabsList.length === 0) return null;
 
   return (
-    <View className="mx-4 mb-6 mt-2">
+    <View className="mx-4 mb-6 mt-6">
       <Text className="font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(17, 0.1) }}>
         More About {medicineName}
       </Text>

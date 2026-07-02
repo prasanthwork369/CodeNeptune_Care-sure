@@ -117,7 +117,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
   };
 
   return (
-    <View className="mx-4 mb-6 ">
+    <View className="mx-4 mb-6 mt-6">
       <Text className="bg-white py-1 pb-4 font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(17) }}>
         More About {medicineName}
       </Text>

@@ -310,7 +310,7 @@ export const UploadPrescriptionSheet: React.FC<
                   <Image
                     source={HOME_IMAGES.samplePrescription}
                     style={{ width: exactScale(120), height: exactScale(120) }}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 </View>
                 <View className="flex-1" style={{ marginLeft: exactScale(16) }}>

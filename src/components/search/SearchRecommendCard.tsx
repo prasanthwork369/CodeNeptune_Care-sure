@@ -70,7 +70,7 @@ export const SearchRecommendCard = React.memo(({
             <Image
               source={{ uri: data.thumbnailUrl }}
               style={s.imgInner}
-              resizeMode="contain"
+              contentFit="contain"
             />
           ) : (
             <icons.placeholder width={64} height={64} />

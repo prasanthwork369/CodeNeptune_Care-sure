@@ -165,7 +165,7 @@ export const CartFloatingBanner = ({
                         <Image
                           source={secondImage}
                           style={{ width: exactScale(30), height: exactScale(30) }}
-                          resizeMode="contain"
+                          contentFit="contain"
                         />
                       ) : (
                         <icons.placeholder width={exactScale(30)} height={exactScale(30)} />
@@ -185,7 +185,7 @@ export const CartFloatingBanner = ({
                       <Image
                         source={displayImage}
                         style={{ width: exactScale(30), height: exactScale(30) }}
-                        resizeMode="contain"
+                        contentFit="contain"
                       />
                     ) : (
                       <icons.placeholder width={exactScale(30)} height={exactScale(30)} />
