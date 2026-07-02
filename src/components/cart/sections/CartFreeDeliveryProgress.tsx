@@ -17,10 +17,10 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
             end={{ x: 0.5, y: 1 }} 
             style={{ marginHorizontal: exactScale(16), marginTop: exactScale(12), borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33' }}
         >
-            <View className="px-4 py-4">
+            <View style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}>
                 <View className="flex-row items-center">
-                    <icons.moped_package width={22} height={20} />
-                    <Text style={s.progressText} className="font-inter-medium text-[#1A1C1E] ml-2">
+                    <icons.moped_package width={exactScale(22)} height={exactScale(20)} />
+                    <Text style={[s.progressText, { marginLeft: exactScale(8) }]} className="font-inter-medium text-[#1A1C1E]">
                         {remainingForFreeDelivery > 0 ? (
                             <>Shop <Text className="font-inter-extrabold">₹{Number(remainingForFreeDelivery).toFixed(2)}</Text> more to free delivery</>
                         ) : (
@@ -28,10 +28,10 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
                         )}
                     </Text>
                 </View>
-                <View className="h-[6px] bg-[#F1E2C9] rounded-full mt-3 overflow-hidden">
-                    <View 
-                        className="h-full bg-[#0B0D10] rounded-full" 
-                        style={{ width: `${Math.round(progress * 100)}%` }} 
+                <View style={{ height: exactScale(6), marginTop: exactScale(12) }} className="bg-[#F1E2C9] rounded-full overflow-hidden">
+                    <View
+                        className="h-full bg-[#0B0D10] rounded-full"
+                        style={{ width: `${Math.round(progress * 100)}%` }}
                     />
                 </View>
             </View>

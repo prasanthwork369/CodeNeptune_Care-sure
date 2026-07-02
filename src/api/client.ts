@@ -26,6 +26,12 @@ export function setUnauthorizedHandler(handler: () => void) {
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (v: string) => void; reject: (e: unknown) => void }> = [];
 
+// After a non-auth refresh failure (5xx/network), back off for a short
+// window instead of re-attempting refresh on every subsequent 401 — avoids
+// hammering a struggling refresh endpoint with a burst of retries.
+const REFRESH_COOLDOWN_MS = 5000;
+let refreshCooldownUntil = 0;
+
 const processQueue = (error: unknown, token: string | null) => {
   failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
   failedQueue = [];
@@ -78,6 +84,10 @@ apiClient.interceptors.response.use(
       original?.url?.includes('auth/logout');
 
     if (err.response?.status === 401 && !original?._retry && !isAuthPath) {
+      if (Date.now() < refreshCooldownUntil) {
+        return Promise.reject(toAppError(err));
+      }
+
       if (__DEV__) console.log('[apiClient] 401 detected. Attempting background refresh...');
 
       if (isRefreshing) {
@@ -108,6 +118,7 @@ apiClient.interceptors.response.use(
         const expiresIn = data.data.expiresIn;
 
         if (__DEV__) console.log('[apiClient] Background refresh SUCCESS');
+        refreshCooldownUntil = 0;
 
         // Update in-memory token + persist to SecureStore
         _accessToken = newToken;
@@ -128,6 +139,8 @@ apiClient.interceptors.response.use(
         if (refreshStatus === 401 || refreshStatus === 403) {
           _accessToken = null;
           onUnauthorized?.();
+        } else {
+          refreshCooldownUntil = Date.now() + REFRESH_COOLDOWN_MS;
         }
         return Promise.reject(toAppError(err));
       } finally {

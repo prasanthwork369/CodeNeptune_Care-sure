@@ -107,6 +107,8 @@ export const HOME_IMAGES = {
   prescriptionInfo: require("../../assets/images/prescription/prescription-info.png"),
   prescriptionInstructions: require("../../assets/images/prescription/prescription-instructions.png"),
   prescriptionMedicine: require("../../assets/images/prescription/prescription-medicine.png"),
+  noPatient: require("../../assets/images/prescription/no-patient.png"),
+  splashIcon: require("../../assets/images/splash-icon.png"),
 } as const;
 
 export const UPLOAD_IMAGES = {

@@ -69,9 +69,12 @@ export function useLogin() {
     try {
       const formattedPhone = `+91${phoneNumber}`;
       const res = await requestOtp(formattedPhone);
+      // Only auto-fill the OTP in dev builds (QA convenience) — never trust
+      // this field in production even if the backend happens to send it.
+      const prefillOtp = __DEV__ ? (res?.data?.otp ?? "") : "";
       router.push({
         pathname: "/otp",
-        params: { phone: formattedPhone, prefillOtp: res?.data?.otp ?? "" },
+        params: { phone: formattedPhone, prefillOtp },
       });
     } catch {
       // Error state is captured and handled by useAuth hook

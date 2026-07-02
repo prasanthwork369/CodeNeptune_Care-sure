@@ -1,10 +1,7 @@
 import { ANIMATIONS } from "@/src/constants/images";
-import { exactScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
 import { View } from "react-native";
-
-const SIZE = exactScale(390);
 
 interface CartConfettiProps {
   /** Increment this number each time you want to play the animation.
@@ -30,8 +27,6 @@ export const CartConfetti: React.FC<CartConfettiProps> = ({ trigger }) => {
         bottom: 0,
         zIndex: 999,
         elevation: 20,
-        alignItems: "center",
-        justifyContent: "center",
       }}
     >
       {/* key forces a full remount every time trigger changes,
@@ -41,7 +36,7 @@ export const CartConfetti: React.FC<CartConfettiProps> = ({ trigger }) => {
         source={ANIMATIONS.confetti}
         autoplay
         loop={false}
-        style={{ width: SIZE, height: SIZE, opacity: 0.9 }}
+        style={{ width: "100%", height: "100%", opacity: 0.9 }}
       />
     </View>
   );

@@ -16,13 +16,14 @@ import "../src/utils/patchTextInput";
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
+import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { Toast } from "@/src/components/common/Toast";
-import { DevTestButton } from "@/src/components/dev/DevTestButton";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
+import { initCrashReporting } from "@/src/lib/crashlytics";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
@@ -31,6 +32,7 @@ import { requestQueue } from "@/src/utils/requestQueue";
 import "../global.css";
 
 initDb();
+initCrashReporting();
 
 const CartSyncProvider = () => {
   useCartSocketSync();
@@ -91,11 +93,12 @@ export default function RootLayout() {
   const showSplash = !interFontsLoaded || !isAnimationDone || !isAuthLoaded;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider>
-          <SafeAreaProvider>
-            <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <KeyboardProvider>
+            <SafeAreaProvider>
+              <View style={{ flex: 1, backgroundColor: "#fff" }}>
               <BottomSheetModalProvider>
                 <StatusBar
                   style="dark"
@@ -129,7 +132,6 @@ export default function RootLayout() {
               <NetworkToast />
               <Toast />
               <SignupBonusPopup />
-              <DevTestButton />
 
               {/* Splash curtain — sits above the entire app tree.
                   Renders the animated splash while fonts/auth/animation
@@ -147,10 +149,11 @@ export default function RootLayout() {
                 </View>
               )}
             </View>
-          </SafeAreaProvider>
-        </KeyboardProvider>
-      </GestureHandlerRootView>
-    </QueryClientProvider>
+            </SafeAreaProvider>
+          </KeyboardProvider>
+        </GestureHandlerRootView>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

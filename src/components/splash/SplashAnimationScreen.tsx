@@ -1,3 +1,4 @@
+import { HOME_IMAGES } from "@/src/constants/images";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect } from "react";
 import { Image, StyleSheet, Text } from "react-native";
@@ -10,7 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const SPLASH_LOGO = require("../../../assets/images/splash-icon.png");
+const SPLASH_LOGO = HOME_IMAGES.splashIcon;
 
 const LOGO_SIZE = exactScale(110);
 

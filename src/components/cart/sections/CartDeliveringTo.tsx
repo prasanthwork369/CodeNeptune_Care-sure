@@ -9,9 +9,9 @@ export const CartDeliveringTo: React.FC<CartDeliveringToProps> = ({ label, descr
     return (
         <View className={flat ? "bg-white px-4 py-4 flex-row items-center -mt-1.5" : "mx-4 mt-4 bg-white border border-[#919EAB33] rounded-[6px] px-4 py-4 flex-row items-center"}>
             <View style={[s.deliverIconBox, { borderRadius: 4, backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', alignItems: 'center', justifyContent: 'center' }]}>
-                <icons.telegram width={18} height={18} fill="#0F7635" />
+                <icons.telegram width={20} height={20} fill="#0F7635" />
             </View>
-            <View className="flex-1 ml-3">
+            <View className="flex-1 ml-3.5">
                 <Text style={s.deliverTitle} className="font-inter-bold text-[#000000]">Delivering to {label}</Text>
                 <Text numberOfLines={1} style={s.deliverSub} className="font-inter-medium text-brand-subtext mt-0.5">{description}</Text>
             </View>

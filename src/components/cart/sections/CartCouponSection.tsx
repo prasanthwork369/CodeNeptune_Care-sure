@@ -1,20 +1,17 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useNav } from "@/src/hooks/useNav";
-import { useCouponStore } from "@/src/store/couponStore";
 import { couponService } from "@/src/services/coupon.service";
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
-import {
-    CartCouponSectionProps,
-    Coupon,
-} from "@/src/types/cart";
-import React, { useState } from "react";
-import { Image, Text, View, ActivityIndicator, Alert } from "react-native";
-import { cartStyles as s } from "../cart.styles";
+import { useCouponStore } from "@/src/store/couponStore";
+import { CartCouponSectionProps, Coupon } from "@/src/types/cart";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import React, { useState } from "react";
+import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
+import { cartStyles as s } from "../cart.styles";
 
 const computeDiscount = (coupon: Coupon, amount: number) => {
   if (coupon.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE) {
@@ -54,7 +51,10 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
     if (!bestCoupon) return;
     setApplying(true);
     try {
-      const result = await couponService.validateCoupon(bestCoupon.code, subtotal);
+      const result = await couponService.validateCoupon(
+        bestCoupon.code,
+        subtotal,
+      );
       if (result.valid) {
         apply({
           code: bestCoupon.code,
@@ -62,7 +62,10 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
           description: result.message ?? "",
         });
       } else {
-        Alert.alert("Coupon Invalid", result.message ?? "This coupon is not valid or has expired.");
+        Alert.alert(
+          "Coupon Invalid",
+          result.message ?? "This coupon is not valid or has expired.",
+        );
       }
     } catch {
       Alert.alert("Error", "Could not validate coupon. Please try again.");
@@ -72,31 +75,37 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   };
 
   if (appliedCoupon) {
+    const appliedCouponDef = coupons.find((c) => c.code === appliedCoupon.code);
+    const displayedDiscount = appliedCouponDef
+      ? computeDiscount(appliedCouponDef, subtotal)
+      : Number(appliedCoupon.discount) || 0;
     return (
       <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3">
         <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center gap-x-2">
+          <View className="flex-row items-center gap-x-2 flex-1 mr-2">
             <Image
               source={HOME_IMAGES.couponIcon}
-              style={{ width: 22, height: 22 }}
+              style={{ width: exactScale(22), height: exactScale(22) }}
               resizeMode="contain"
             />
-            <View className="bg-[#E8F5E9] px-2 py-1 rounded">
+            <View className="bg-[#E8F5E9] px-2 py-1 rounded flex-shrink-0">
               <Text
                 style={s.couponText}
                 className="font-inter-bold text-brand-primary"
+                numberOfLines={1}
               >
                 {appliedCoupon.code}
               </Text>
             </View>
             <Text
               style={s.couponText}
-              className="font-inter-medium text-brand-primary"
+              className="font-inter-medium text-brand-primary flex-shrink"
+              numberOfLines={1}
             >
-              - ₹{Number(appliedCoupon.discount).toFixed(2)} saved
+              - ₹{displayedDiscount.toFixed(2)} saved
             </Text>
           </View>
-          <Touchable onPress={onRemove}>
+          <Touchable onPress={onRemove} style={{ flexShrink: 0 }}>
             <Text
               style={s.couponText}
               className="font-inter-semibold text-[#E16D09]"
@@ -119,7 +128,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
           <View className="flex-row items-center gap-x-3">
             <Image
               source={HOME_IMAGES.couponIcon}
-              style={{ width: 22, height: 22 }}
+              style={{ width: exactScale(22), height: exactScale(22) }}
               resizeMode="contain"
             />
             <Text
@@ -159,8 +168,8 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
         <View className="flex-row items-center">
           <View
             style={{
-              width: 44,
-              height: 44,
+              width: exactScale(44),
+              height: exactScale(44),
               borderRadius: 10,
               backgroundColor: "#E1F2FF",
               alignItems: "center",
@@ -172,14 +181,13 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
           >
             <Image
               source={HOME_IMAGES.couponIcon}
-              style={{ width: 24, height: 24 }}
+              style={{ width: exactScale(24), height: exactScale(24) }}
               resizeMode="contain"
             />
           </View>
           <View className="flex-1 mr-2">
             <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
+              numberOfLines={2}
               style={{
                 fontSize: moderateScale(14),
                 fontWeight: "700",
@@ -209,9 +217,10 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               backgroundColor: "white",
               borderWidth: 1,
               borderColor: isLocked ? "#E4E7EC" : "#0F7635",
-              borderRadius:6,
-              width: 74,
-              height: 30,
+              borderRadius: 6,
+              width: exactScale(72),
+              height: exactScale(42),
+              padding: exactScale(8),
               alignItems: "center",
               justifyContent: "center",
             }}

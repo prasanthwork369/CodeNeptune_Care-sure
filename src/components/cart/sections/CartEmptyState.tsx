@@ -35,7 +35,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
           source={ANIMATIONS.emptyCart}
           autoplay
           loop
-          style={{ width: 140, height: 140 }}
+          style={{ width: exactScale(140), height: exactScale(140) }}
         />
         <Text className="font-inter-semibold text-[#008097] mt-2" style={{ fontSize: moderateScale(16) }}>
           Your cart is empty
@@ -75,19 +75,19 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     params: { id: product.productId ?? product.id },
                   } as any)
                 }
-                style={{ width: 165, marginRight: exactScale(12) }}
+                style={{ width: exactScale(165), marginRight: exactScale(12) }}
               >
                 {/* Unified Premium Card Wrapper */}
                 <View
                   style={{
-                    height: 300,
+                    height: exactScale(300),
                     borderRadius: 12,
                     backgroundColor: '#FFFFFF',
                     overflow: 'hidden',
                   }}
                 >
                   {/* Image wrapper */}
-                  <View style={{ height: 115, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  <View style={{ height: exactScale(115), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                     {product.image?.uri ? (
                       <Image source={product.image as any} style={{ width: '70%', height: '70%' }} resizeMode="contain" />
                     ) : (

@@ -53,7 +53,7 @@ export const ProfileLayout: React.FC = () => {
     try {
       await uploadAvatar(uri);
     } catch (err) {
-      console.error("[Avatar Upload Error]", err);
+      if (__DEV__) console.error("[Avatar Upload Error]", err);
       setLocalAvatar(null);
     }
   };

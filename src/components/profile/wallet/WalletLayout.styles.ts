@@ -1,5 +1,5 @@
-import { Platform, StyleSheet } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { Platform, StyleSheet } from "react-native";
 
 /**
  * Stylesheet for the Wallet layout component.
@@ -248,8 +248,8 @@ export const styles = StyleSheet.create({
   },
   // Transaction icon image inside the circle
   txIconImage: {
-    width: exactScale(24),
-    height: exactScale(24),
+    width: exactScale(18),
+    height: exactScale(18),
   },
   // Centered loading indicator inside transaction logs
   loadingIndicatorCenter: {

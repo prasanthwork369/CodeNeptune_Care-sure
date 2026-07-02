@@ -70,8 +70,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {location.pincode
-              ? `${location.city} - ${location.pincode}`
+            {location.shortCity && location.pincode
+              ? `${location.shortCity} - ${location.pincode}`
               : location.label &&
                   location.label !== "DELIVER TO" &&
                   location.label !== location.city

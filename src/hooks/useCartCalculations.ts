@@ -1,17 +1,19 @@
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useCart } from "@/src/hooks/queries/useCart";
+import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
+import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { CartLine } from "@/src/types/cart";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useCartCalculations() {
   const router = useNav();
@@ -63,6 +65,7 @@ export function useCartCalculations() {
     justApplied,
     clearJustApplied,
   } = useCouponStore();
+  const { data: coupons = [] } = useCoupons();
   const setBill = useCheckoutStore((s) => s.setBill);
   const { profile } = useProfile();
   const firstName = profile?.firstName ?? "You";
@@ -173,11 +176,36 @@ export function useCartCalculations() {
       : (settings?.cart?.standardDeliveryCharge ?? 49);
   const HANDLING_CHARGE = settings?.cart?.handlingCharge ?? 15;
 
-  // 1. Coupon — applied to subtotal
-  const COUPON_DISCOUNT = Math.min(
-    appliedCoupon ? Number(appliedCoupon.discount) || 0 : 0,
-    subtotal,
-  );
+  // 1. Coupon — recomputed live from the coupon's own rule (not the frozen
+  // apply-time amount), so it tracks quantity changes in either direction.
+  const appliedCouponDef = appliedCoupon
+    ? coupons.find((c) => c.code === appliedCoupon.code)
+    : null;
+  const couponStillEligible =
+    !appliedCouponDef || subtotal >= appliedCouponDef.minOrderValue;
+
+  useEffect(() => {
+    if (appliedCoupon && appliedCouponDef && !couponStillEligible) {
+      removeCoupon();
+    }
+  }, [appliedCoupon, appliedCouponDef, couponStillEligible, removeCoupon]);
+
+  const COUPON_DISCOUNT =
+    appliedCoupon && couponStillEligible
+      ? Math.min(
+          appliedCouponDef
+            ? appliedCouponDef.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE
+              ? appliedCouponDef.maxDiscountAmount
+                ? Math.min(
+                    (subtotal * appliedCouponDef.discountValue) / 100,
+                    appliedCouponDef.maxDiscountAmount,
+                  )
+                : (subtotal * appliedCouponDef.discountValue) / 100
+              : appliedCouponDef.discountValue
+            : Number(appliedCoupon.discount) || 0,
+          subtotal,
+        )
+      : 0;
 
   // 2. Coins — limit based on subtotal (selling price), applied before wallet
   const maxCoinsUsable = Math.min(

@@ -286,7 +286,7 @@ export const AddAddressLayout: React.FC = () => {
       );
       router.back();
     } catch (err) {
-      console.error("[Address Save Error]", err);
+      if (__DEV__) console.error("[Address Save Error]", err);
     }
   };
 

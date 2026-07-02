@@ -19,15 +19,16 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
       style={{
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
         paddingHorizontal: exactScale(16),
         paddingVertical: exactScale(12),
-        gap: 10,
+        gap: exactScale(10),
       }}
     >
       <Image
         source={HOME_IMAGES.discountTag}
-        style={{ width: 32, height: 32 }}
-        resizeMode="contain"
+        style={{ width: exactScale(32), height: exactScale(32) }}
+        contentFit="contain"
       />
       <Text
         style={{ fontSize: moderateScale(14), fontWeight: "600", color: "#0A0A0A" }}

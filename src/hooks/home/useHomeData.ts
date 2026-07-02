@@ -24,8 +24,11 @@ export function useHomeData() {
     if (!isAuthenticated) return;
     if (addresses.length > 0) {
       const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
+      const fullAddress = [defaultAddr.line1, defaultAddr.line2, defaultAddr.city]
+        .filter(Boolean)
+        .join(", ");
       setLocation(
-        { label: defaultAddr.label, city: defaultAddr.city || defaultAddr.line2 || "" },
+        { label: defaultAddr.label, city: fullAddress, shortCity: defaultAddr.city },
         { addressId: defaultAddr.id, pincode: defaultAddr.pincode },
       );
     } else {

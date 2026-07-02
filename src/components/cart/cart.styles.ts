@@ -53,10 +53,10 @@ export const cartStyles = StyleSheet.create({
     couponTitle:  { fontSize: moderateScale(14, 0.1) },
 
     // CartDeliveringTo
-    deliverIconBox: { width: exactScale(36), height: exactScale(36) },
-    deliverTitle:   { fontSize: moderateScale(14, 0.1) },
-    deliverSub:     { fontSize: moderateScale(12, 0.1) },
-    deliverChange:  { fontSize: moderateScale(14, 0.1) },
+    deliverIconBox: { width: exactScale(40), height: exactScale(40) },
+    deliverTitle:   { fontSize: moderateScale(15, 0.1),lineHeight: moderateScale(18, 0.1) },
+    deliverSub:     { fontSize: moderateScale(13, 0.1),lineHeight: moderateScale(18, 0.1) },
+    deliverChange:  { fontSize: moderateScale(15, 0.1) },
 
     // CartTerms
     termsCircle: { width: exactScale(18), height: exactScale(18) },

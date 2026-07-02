@@ -8,7 +8,7 @@ import { CartCoinsSectionProps } from '@/src/types/cart';
 export const CartCoinsSection: React.FC<CartCoinsSectionProps> = ({ value, availableCoins, redeemedCoins, onToggle, onInfoPress }) => {
     return (
         <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3.5 flex-row items-center">
-            <Touchable className="flex-1" activeOpacity={1} onPress={onInfoPress}>
+            <Touchable className="flex-1" activeOpacity={0.7} onPress={onInfoPress}>
                 <View className="flex-row items-center gap-x-1.5">
                     <Text style={s.coinsTitle} className="font-inter-bold text-brand-text">
                         {value ? `${redeemedCoins} CareSure Coins Redeemed` : 'CareSure Coins'}

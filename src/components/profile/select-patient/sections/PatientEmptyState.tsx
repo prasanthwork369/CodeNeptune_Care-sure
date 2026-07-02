@@ -1,4 +1,5 @@
 import { Touchable } from '@/src/components/ui/Touchable';
+import { HOME_IMAGES } from '@/src/constants/images';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Text, View } from 'react-native';
@@ -13,7 +14,7 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 60 }}>
             <Image
-                source={require('../../../../../assets/images/prescription/no-patient.png')}
+                source={HOME_IMAGES.noPatient}
                 style={{ width: 220, height: 220, marginBottom: 24 }}
                 contentFit="contain"
             />

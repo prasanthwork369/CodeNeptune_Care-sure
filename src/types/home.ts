@@ -32,6 +32,9 @@ export interface CategoryCard {
 export interface DeliveryLocation {
   label: string;
   city: string;
+  /** Plain city name (e.g. "Chennai"), distinct from `city` which may hold
+   * a full joined address string (line1, line2, city) for detailed display. */
+  shortCity?: string;
   pincode?: string;
 }
 

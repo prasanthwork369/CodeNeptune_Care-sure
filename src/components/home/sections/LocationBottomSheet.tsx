@@ -205,13 +205,15 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       showToast("Could not verify serviceability. Please try again.", "error");
       return;
     }
-    const cityLabel = addr.city || addr.line2 || addr.line1;
+    const fullAddress = [addr.line1, addr.line2, addr.city]
+      .filter(Boolean)
+      .join(", ");
     setLocation(
-      { label: addr.label, city: cityLabel },
+      { label: addr.label, city: fullAddress, shortCity: addr.city },
       { addressId: addr.id, pincode: addr.pincode },
     );
-    onSelect?.(addr.label, cityLabel);
-    showToast(`Delivery location set to ${cityLabel} - ${addr.pincode}`, "success");
+    onSelect?.(addr.label, fullAddress);
+    showToast(`Delivery location set to ${addr.city} - ${addr.pincode}`, "success");
     handleClose();
   };
 

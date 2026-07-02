@@ -3,6 +3,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
+import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType, WalletLog } from "@/src/types/wallet";
@@ -145,16 +146,20 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
  * Displays the user's current account balance across Wallet, Credits, and Coins tabs.
  * Manages tab switching, details rendering, and shows the log of recent transaction history.
  */
-const TAB_INDEX: Record<"wallet" | "credits" | "coins", number> = {
-  wallet: 0,
-  credits: 1,
-  coins: 2,
-};
-
 export const WalletLayout: React.FC = () => {
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   const [isHistorySheetVisible, setIsHistorySheetVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<"wallet" | "credits" | "coins">("wallet");
+
+  const { profile } = useProfile();
+  const isCorporateUser = profile?.isCorporateUser ?? false;
+
+  // Only tabs actually rendered — index within this list is the pill's
+  // real visual slot, so the spring always animates 0..(length-1) with no
+  // discontinuity regardless of whether Credits is shown.
+  const visibleTabs = isCorporateUser
+    ? (["wallet", "credits", "coins"] as const)
+    : (["wallet", "coins"] as const);
 
   const confettiRef = useRef<Dotlottie>(null);
   const hasPlayedConfetti = useRef(false);
@@ -168,11 +173,19 @@ export const WalletLayout: React.FC = () => {
   };
 
   useEffect(() => {
-    activeTabIndex.value = withSpring(TAB_INDEX[activeTab], TAB_SNAP_SPRING);
-  }, [activeTab]);
+    const visualIndex = visibleTabs.indexOf(activeTab as any);
+    activeTabIndex.value = withSpring(Math.max(0, visualIndex), TAB_SNAP_SPRING);
+  }, [activeTab, isCorporateUser]);
 
+  // Guard against landing on the Credits tab if the profile loads in as
+  // non-corporate after the tab was already selected (e.g. stale UI state).
+  useEffect(() => {
+    if (!isCorporateUser && activeTab === "credits") setActiveTab("wallet");
+  }, [isCorporateUser, activeTab]);
+
+  const tabCount = visibleTabs.length;
   const animatedPillStyle = useAnimatedStyle(() => {
-    const tabWidth = tabBarWidth.value / 3;
+    const tabWidth = tabBarWidth.value / tabCount;
     return {
       width: tabWidth,
       transform: [{ translateX: activeTabIndex.value * tabWidth }],
@@ -266,26 +279,28 @@ export const WalletLayout: React.FC = () => {
               </Text>
             </Touchable>
 
-            {/* Credits Tab Option */}
-            <Touchable
-              activeOpacity={0.8}
-              onPress={() => setActiveTab("credits")}
-              style={cardStyles.tabItem}
-            >
-              <icons.manufacturer
-                width={18}
-                height={18}
-                fill={activeTab === "credits" ? "#111827" : "#222222"}
-              />
-              <Text
-                style={[
-                  cardStyles.tabText,
-                  activeTab === "credits" && cardStyles.activeTabText,
-                ]}
+            {/* Credits Tab Option — corporate users only */}
+            {isCorporateUser && (
+              <Touchable
+                activeOpacity={0.8}
+                onPress={() => setActiveTab("credits")}
+                style={cardStyles.tabItem}
               >
-                Credits
-              </Text>
-            </Touchable>
+                <icons.manufacturer
+                  width={18}
+                  height={18}
+                  fill={activeTab === "credits" ? "#111827" : "#222222"}
+                />
+                <Text
+                  style={[
+                    cardStyles.tabText,
+                    activeTab === "credits" && cardStyles.activeTabText,
+                  ]}
+                >
+                  Credits
+                </Text>
+              </Touchable>
+            )}
 
             {/* CareSure Coins Tab Option */}
             <Touchable

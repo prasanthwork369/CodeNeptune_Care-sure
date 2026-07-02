@@ -23,7 +23,6 @@ const BANNER_ROUTE_MAP: Record<string, string> = {
     '/categories':  '/categories',
     '/search':      '/search',
     '/upload':      '/upload',
-    '/test':        '/search',
 };
 
 const resolveRoute = (link: string): string =>
