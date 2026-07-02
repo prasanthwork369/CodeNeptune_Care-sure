@@ -39,6 +39,14 @@ export const usePushNotifications = () => {
     useEffect(() => {
         if (isExpoGo) return;
 
+        // Cold start — app was launched by tapping a notification, so the
+        // response listener below never fires for it. Handle it separately.
+        Notifications.getLastNotificationResponseAsync().then((response) => {
+            if (!response) return;
+            const data = response.notification.request.content.data as Record<string, any>;
+            handleNotificationNavigation(data, router);
+        });
+
         // Foreground notification received — save to store
         foregroundListener.current = Notifications.addNotificationReceivedListener(
             (notification) => {

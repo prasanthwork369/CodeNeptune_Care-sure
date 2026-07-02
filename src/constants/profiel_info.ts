@@ -30,4 +30,5 @@ export const INFO_ITEMS = [
     route: "/profile/support/notifications",
   },
   { label: "FAQ", icon: "faq_info", route: "/profile/support/faq" },
+  { label: "About App", icon: "info_outline", route: "/profile/about" },
 ] as const;

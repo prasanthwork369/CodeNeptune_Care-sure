@@ -112,7 +112,6 @@ export default function RootLayout() {
                     name="search"
                     options={{ animation: "fade", animationDuration: 180 }}
                   />
-                  <Stack.Screen name="frequent-orders" />
                   <Stack.Screen name="notifications" />
                   <Stack.Screen name="profile" />
                   <Stack.Screen
