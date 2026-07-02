@@ -22,7 +22,7 @@ export const authService = {
             const profile = await profileApi.getProfile();
             useAuthStore.getState().setUser(profile);
         } catch (error) {
-            console.error('Failed to load profile after login:', error);
+            if (__DEV__) console.error('Failed to load profile after login:', error);
         }
 
         return data;

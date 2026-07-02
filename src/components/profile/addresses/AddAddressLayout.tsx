@@ -133,7 +133,7 @@ export const AddAddressLayout: React.FC = () => {
     prefill_pincode?: string;
   }>();
   const isEdit = !!id;
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const {
     addresses,
     addAddress,

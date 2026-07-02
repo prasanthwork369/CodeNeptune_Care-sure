@@ -1,5 +1,6 @@
+import { Image } from 'expo-image';
 import React from 'react';
-import { View, Text, ScrollView, Image } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { PatientPrescriptionPreviewProps } from '@/src/types/patient';
@@ -27,7 +28,7 @@ export const PatientPrescriptionPreview: React.FC<PatientPrescriptionPreviewProp
                                     <Text className="font-inter-bold text-[#1A1C1E] mt-0.5" style={{ fontSize: moderateScale(8) }}>PDF</Text>
                                 </View>
                             ) : (
-                                <Image source={{ uri: item.localUri }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+                                <Image source={{ uri: item.localUri }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
                             )}
                         </Touchable>
                     ))}

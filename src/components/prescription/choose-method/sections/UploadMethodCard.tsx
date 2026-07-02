@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text } from 'react-native';
+import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
@@ -26,7 +27,7 @@ export const UploadMethodCard: React.FC<UploadMethodCardProps> = ({ isSelected, 
                 </View>
                 <View className="flex-row items-center justify-between">
                     <View className="flex-row items-start flex-1 pr-4">
-                        <Image source={HOME_IMAGES.prescription} style={{ width: 30, height: 30 }} resizeMode="contain" />
+                        <Image source={HOME_IMAGES.prescription} style={{ width: 30, height: 30 }} contentFit="contain" />
                         <View className="flex-1 ml-3">
                             <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14, 0.1) }}>Upload Prescription</Text>
                             <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(17, 0.1) }}>

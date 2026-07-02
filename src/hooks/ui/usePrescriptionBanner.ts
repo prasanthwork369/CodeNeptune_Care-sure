@@ -27,7 +27,7 @@ const isActionable = (p: ApiPrescription): boolean => {
 };
 
 export const usePrescriptionBanner = () => {
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [isFocusRefetching, setIsFocusRefetching] = useState(false);
   const {
     hasJustUploadedPrescription,
@@ -104,7 +104,7 @@ export const usePrescriptionBanner = () => {
   // isPurchased is still set exclusively by the backend on order placement.
   const dismissBanner = () => {
     if (latestPrescription) {
-      console.log("Dismissing prescription banner for", latestPrescription.id);
+      if (__DEV__) console.log("Dismissing prescription banner for", latestPrescription.id);
       dismissPrescription(latestPrescription.id);
     }
   };

@@ -33,7 +33,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
           borderBottomWidth: 1,
           borderBottomColor: "#919EAB33",
         }),
-        ...(backgroundColor && { backgroundColor }),
+        backgroundColor: backgroundColor || "#FFFFFF",
         paddingTop: Math.max(insets.top, exactScale(20)) + exactScale(8),
       }}
       className="px-4 pb-2"

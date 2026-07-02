@@ -41,7 +41,7 @@ interface ProductCardProps {
     onPress: (productId: string) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCard: React.FC<ProductCardProps> = React.memo(({
     id, productId, name, slug, description, price, mrp,
     discountPercentage, thumbnailUrl, accentColor, onPress,
 }) => {
@@ -146,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </View>
         </View>
     );
-};
+});
 
 interface HealthEssentialsSectionProps {
     subcategory: ApiFeaturedSubcategory;

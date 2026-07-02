@@ -26,7 +26,7 @@ function resolveUrl(url: string): string {
             }
         }
     } catch (e) {
-        console.warn('Failed to resolve URL via queryClient:', e);
+        if (__DEV__) console.warn('Failed to resolve URL via queryClient:', e);
     }
 
     return url;
@@ -73,7 +73,7 @@ export async function openExternalBrowser(url: string): Promise<void> {
             Alert.alert('Error', `Cannot open this URL: ${targetUrl}`);
         }
     } catch (error) {
-        console.error('Failed to open external URL:', error);
+        if (__DEV__) console.error('Failed to open external URL:', error);
         Alert.alert('Error', 'Unable to open the requested web page.');
     }
 }

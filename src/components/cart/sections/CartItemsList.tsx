@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
+import { Image } from 'expo-image';
 import { cartStyles as s } from '../cart.styles';
 import { useNav } from '@/src/hooks/useNav';
 import { CartItemsListProps } from '@/src/types/cart';
@@ -29,7 +30,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
                         >
                             <View style={[s.itemImgBox, { backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', borderRadius: 10, alignItems: 'center', justifyContent: 'center', position: 'relative' }]}>
                                 {line.image
-                                    ? <Image source={line.image as any} style={s.itemImg} resizeMode="contain" />
+                                    ? <Image source={line.image as any} style={s.itemImg} contentFit="contain" />
                                     : <icons.placeholder width={52} height={52} />
                                 }
                                 {line.rx && (

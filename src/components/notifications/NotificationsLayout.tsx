@@ -13,8 +13,9 @@ import { NotificationLog } from '@/src/api/inAppNotification.api';
 import { NotificationsSkeleton } from './NotificationsSkeleton';
 import { styles as s } from './notifications.styles';
 import { useFocusEffect } from 'expo-router';
+import { Image } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
-import { Image, Modal, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Modal, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -62,13 +63,13 @@ function formatRowTime(iso: string, section: SectionKey): string {
 function getNotificationVisual(n: NotificationLog) {
   const event = n.event;
   if (event === 'prescription.rejected') {
-    return { bg: '#FEF2F2', icon: <Image source={HOME_IMAGES.warningIcon} style={s.notifIcon} resizeMode="contain" /> };
+    return { bg: '#FEF2F2', icon: <Image source={HOME_IMAGES.warningIcon} style={s.notifIcon} contentFit="contain" /> };
   }
   if (event.startsWith('order.')) {
     if (event.includes('cancel')) {
-      return { bg: '#FEF2F2', icon: <Image source={HOME_IMAGES.blockIcon} style={s.notifIcon} resizeMode="contain" /> };
+      return { bg: '#FEF2F2', icon: <Image source={HOME_IMAGES.blockIcon} style={s.notifIcon} contentFit="contain" /> };
     }
-    return { bg: '#FFFFF4', icon: <Image source={HOME_IMAGES.bucketCheckIcon} style={s.notifIcon} resizeMode="contain" /> };
+    return { bg: '#FFFFF4', icon: <Image source={HOME_IMAGES.bucketCheckIcon} style={s.notifIcon} contentFit="contain" /> };
   }
   if (event.includes('coin')) {
     return { bg: '#FFFBEB', icon: <icons.coin_group width={s.notifIcon.width} height={s.notifIcon.height} fill="#EA580C" /> };
@@ -80,7 +81,7 @@ function getNotificationVisual(n: NotificationLog) {
       : { bg: '#FEF2F2', icon: <icons.account_balance_wallet width={s.notifIcon.width} height={s.notifIcon.height} fill="#DC2626" /> };
   }
   if (event.includes('review')) {
-    return { bg: '#F3F8FF', icon: <Image source={HOME_IMAGES.notiHistoryIcon} style={s.notifIcon} resizeMode="contain" /> };
+    return { bg: '#F3F8FF', icon: <Image source={HOME_IMAGES.notiHistoryIcon} style={s.notifIcon} contentFit="contain" /> };
   }
   if (event === 'prescription.uploaded' || event === 'prescription.approved') {
     return { bg: '#F4FFF7', icon: <icons.prescription_green width={s.notifIcon.width} height={s.notifIcon.height} fill="#15803D" /> };

@@ -112,7 +112,7 @@ export const CartFloatingBanner = ({
       setTabBarVisible(true);
       setUploadButtonCollapsed(false);
     } catch (error) {
-      console.error("Failed to clear cart:", error);
+      if (__DEV__) console.error("Failed to clear cart:", error);
     } finally {
       setIsClearing(false);
       onInteractionChange?.(false);

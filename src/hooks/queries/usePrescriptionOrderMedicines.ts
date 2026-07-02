@@ -16,7 +16,7 @@ const calcDiscount = (mrp: string | number, selling: number): number => {
 };
 
 const toComparisonMedicines = (items: ApiPrescriptionOrderItem[]): ComparisonMedicine[] => {
-    console.log('[usePrescriptionOrderMedicines] Raw items from API:', JSON.stringify(items, null, 2));
+    if (__DEV__) console.log('[usePrescriptionOrderMedicines] Raw items from API:', JSON.stringify(items, null, 2));
     return items.map((item) => {
         const recommended = item.recommended || item.original;
         const prescribed = item.original || recommended;

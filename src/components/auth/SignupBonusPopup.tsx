@@ -583,7 +583,9 @@ export const SignupBonusPopup: React.FC<Props> = ({
   testMode = false,
   onClose,
 }) => {
-  const { isAuthenticated, user, setUser } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const { data: content } = useWebsiteContent("signup_bonus_popup") as {

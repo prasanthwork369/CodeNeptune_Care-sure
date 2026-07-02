@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text } from 'react-native';
+import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
@@ -28,7 +29,7 @@ export const CallMethodCard: React.FC<CallMethodCardProps> = ({ isSelected, onSe
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-start flex-1 pr-4">
                             <View className="w-11 h-11 items-center justify-center">
-                                <Image source={HOME_IMAGES.stethoscope} style={{ width: 36, height: 36 }} resizeMode="contain" />
+                                <Image source={HOME_IMAGES.stethoscope} style={{ width: 36, height: 36 }} contentFit="contain" />
                             </View>
                             <View className="flex-1 ml-3">
                                 <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14, 0.1) }}>{"Don't have a prescription? Call us"}</Text>

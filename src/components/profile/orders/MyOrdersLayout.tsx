@@ -7,12 +7,12 @@ import { useOrders } from "@/src/hooks/queries/useOrders";
 import { useNav } from "@/src/hooks/useNav";
 import { Order, ORDER_STATUS, OrderTabKey } from "@/src/types/order";
 import { buildCartInputs } from "@/src/utils/reorderCart";
-import React, { useState } from "react";
+import { FlashList } from "@shopify/flash-list";
+import { Image } from "expo-image";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   RefreshControl,
-  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -70,7 +70,7 @@ function formatDate(iso: string) {
   });
 }
 
-function OrderCard({ order }: { order: Order }) {
+const OrderCard = React.memo(function OrderCard({ order }: { order: Order }) {
   const router = useNav();
   const items = order.items ?? [];
   const thumbs = items.slice(0, 4);
@@ -219,7 +219,7 @@ function OrderCard({ order }: { order: Order }) {
                   <Image
                     source={{ uri: item.medicineSnapshot.image }}
                     style={s.productImg52}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 ) : (
                   <icons.placeholder width={52} height={52} />
@@ -347,7 +347,7 @@ function OrderCard({ order }: { order: Order }) {
       />
     </View>
   );
-}
+});
 
 export const MyOrdersLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
@@ -366,6 +366,12 @@ export const MyOrdersLayout: React.FC = () => {
     refreshing,
     refetch,
   } = useOrders(statusParam);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Order }) => <OrderCard order={item} />,
+    [],
+  );
+  const keyExtractor = useCallback((item: Order) => item.id, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
@@ -426,12 +432,14 @@ export const MyOrdersLayout: React.FC = () => {
       {loading ? (
         <MyOrdersSkeleton />
       ) : (
-        <ScrollView
+        <FlashList
+          data={filtered}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingTop: 12,
             paddingBottom: adjustedBottom + 24,
-            flexGrow: 1,
           }}
           refreshControl={
             <RefreshControl
@@ -441,8 +449,7 @@ export const MyOrdersLayout: React.FC = () => {
               tintColor="#0F7635"
             />
           }
-        >
-          {filtered.length === 0 ? (
+          ListEmptyComponent={
             <View
               style={{
                 flex: 1,
@@ -477,12 +484,8 @@ export const MyOrdersLayout: React.FC = () => {
                   : `No ${activeTab} orders yet`}
               </Text>
             </View>
-          ) : (
-            filtered.map((order: Order) => (
-              <OrderCard key={order.id} order={order} />
-            ))
-          )}
-        </ScrollView>
+          }
+        />
       )}
     </View>
   );

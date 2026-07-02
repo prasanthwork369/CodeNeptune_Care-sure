@@ -18,8 +18,9 @@ import { CreateReturnRequest, ReturnItemImages } from '@/src/types/return';
 import { OrderItem } from '@/src/types/order';
 import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
+import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, ScrollView, Text, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 
@@ -284,7 +285,7 @@ export const ReturnProductLayout: React.FC = () => {
                                 <View className="flex-row items-start px-4 py-3">
                                     <View className="w-14 h-14 rounded-sm border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center mr-3 overflow-hidden">
                                         {snap?.image ? (
-                                            <Image source={{ uri: snap.image }} className="w-[50px] h-[50px]" resizeMode="contain" />
+                                            <Image source={{ uri: snap.image }} style={{ width: 50, height: 50 }} contentFit="contain" />
                                         ) : (
                                             <icons.package_icon width={28} height={28} />
                                         )}
@@ -311,7 +312,7 @@ export const ReturnProductLayout: React.FC = () => {
                                                 {!!reasonData.details && <Text className="font-inter-medium text-brand-subtext mt-1" style={{ fontSize: moderateScale(12) }}>{reasonData.details}</Text>}
                                                 <View className="flex-row mt-3 gap-2">
                                                     {Object.values(reasonData.images).filter(Boolean).map((img, i) => (
-                                                        <Image key={i} source={{ uri: img }} className="w-[52px] h-[52px] rounded-lg" resizeMode="cover" />
+                                                        <Image key={i} source={{ uri: img }} style={{ width: 52, height: 52, borderRadius: 8 }} contentFit="cover" />
                                                     ))}
                                                 </View>
                                             </View>

@@ -23,7 +23,7 @@ import { ProfileSkeleton } from "./ProfileSkeleton";
 export const ProfileLayout: React.FC = () => {
   const insets = useSafeAreaInsets();
   const adjustedBottom = useAdjustedBottomInset();
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { logout, loading: isLoggingOut } = useAuth();
   const {
     profile,

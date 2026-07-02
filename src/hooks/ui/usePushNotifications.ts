@@ -10,7 +10,7 @@ import { useNotificationStore } from '../../store/notificationStore';
 // Remove the `isExpoGo` check below once running via a development build.
 export const usePushNotifications = () => {
     const router = useNav();
-    const { isAuthenticated } = useAuthStore();
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
     const addNotification = useNotificationStore((s) => s.add);
     const responseListener = useRef<ReturnType<typeof Notifications.addNotificationResponseReceivedListener> | undefined>(undefined);
     const foregroundListener = useRef<ReturnType<typeof Notifications.addNotificationReceivedListener> | undefined>(undefined);

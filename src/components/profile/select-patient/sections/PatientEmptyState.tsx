@@ -1,6 +1,7 @@
 import { Touchable } from '@/src/components/ui/Touchable';
+import { Image } from 'expo-image';
 import React from 'react';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { moderateScale } from "@/src/utils/exactScale";
 import { typography } from "@/src/constants/typography";
 
@@ -14,7 +15,7 @@ export const PatientEmptyState: React.FC<PatientEmptyStateProps> = ({ onAddPress
             <Image
                 source={require('../../../../../assets/images/prescription/no-patient.png')}
                 style={{ width: 220, height: 220, marginBottom: 24 }}
-                resizeMode="contain"
+                contentFit="contain"
             />
             <Text style={{ fontSize: moderateScale(22), fontWeight: '700', color: '#1C2024', marginBottom: 10, textAlign: 'center' }}>
                 No Patients Added Yet

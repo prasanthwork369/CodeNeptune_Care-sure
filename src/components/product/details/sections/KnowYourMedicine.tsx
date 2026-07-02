@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { exactScale, moderateScale } from '@/src/utils/exactScale';
@@ -29,7 +30,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
             <View className="bg-white rounded-[12px] px-5 py-6 mb-7 border border-[#E5E7EB]">
                 <View className="flex-row items-center mb-6">
                     <View className="bg-[#F1F7FF] rounded-[6px] items-center justify-center mr-4" style={{ width: exactScale(48), height: exactScale(48) }}>
-                        <Image source={HOME_IMAGES.chemical} style={{ width: exactScale(24), height: exactScale(24) }} resizeMode="contain" />
+                        <Image source={HOME_IMAGES.chemical} style={{ width: exactScale(24), height: exactScale(24) }} contentFit="contain" />
                     </View>
                     <View className="flex-1">
                         <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15, 0.1) }}>Manufacturer/Marketer</Text>
@@ -39,7 +40,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
 
                 <View className="flex-row items-center mb-6">
                     <View className="bg-[#F4F1FF] rounded-[6px] items-center justify-center mr-4" style={{ width: exactScale(48), height: exactScale(48) }}>
-                        <Image source={HOME_IMAGES.medicine} style={{ width: exactScale(24), height: exactScale(24) }} resizeMode="contain" />
+                        <Image source={HOME_IMAGES.medicine} style={{ width: exactScale(24), height: exactScale(24) }} contentFit="contain" />
                     </View>
                     <View className="flex-1">
                         <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15, 0.1) }}>Consume Type</Text>
@@ -49,7 +50,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
 
                 <View className="flex-row items-center">
                     <View className="bg-[#F1F7FF] rounded-[6px] items-center justify-center mr-4" style={{ width: exactScale(48), height: exactScale(48) }}>
-                        <Image source={HOME_IMAGES.deliveryBox} style={{ width: exactScale(24), height: exactScale(24) }} resizeMode="contain" />
+                        <Image source={HOME_IMAGES.deliveryBox} style={{ width: exactScale(24), height: exactScale(24) }} contentFit="contain" />
                     </View>
                     <View className="flex-1">
                         <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15, 0.1) }}>Return Policy</Text>

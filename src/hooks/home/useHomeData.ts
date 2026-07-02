@@ -8,7 +8,7 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { useEffect, useState } from "react";
 
 export function useHomeData() {
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { setLocation, clearLocation } = useLocationStore();
 
   const { tabs, cards, appContent, isLoading: isHomeLoading, refetch: refetchHome } = useHome();
@@ -45,7 +45,7 @@ export function useHomeData() {
         new Promise<void>((resolve) => setTimeout(resolve, 800)),
       ]);
     } catch (e) {
-      console.error("[Home] Refresh failed:", e);
+      if (__DEV__) console.error("[Home] Refresh failed:", e);
     } finally {
       setIsRefreshing(false);
     }

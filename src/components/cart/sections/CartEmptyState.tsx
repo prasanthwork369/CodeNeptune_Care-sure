@@ -22,7 +22,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
       const delayPromise = new Promise((resolve) => setTimeout(resolve, 3000));
       await Promise.all([apiPromise, delayPromise]);
     } catch (error) {
-      console.error("Error adding item to cart:", error);
+      if (__DEV__) console.error("Error adding item to cart:", error);
     } finally {
       setAddingProductId(null);
     }
