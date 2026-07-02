@@ -25,7 +25,9 @@ import {
 } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
+  useAnimatedStyle,
   useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
@@ -606,6 +608,19 @@ export const SignupBonusPopup: React.FC<Props> = ({
   const confettiRef = useRef<any>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const progressShared = useSharedValue(0);
+  const modalOpacity = useSharedValue(0);
+  const overlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: modalOpacity.value,
+  }));
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: modalOpacity.value,
+    transform: [
+      {
+        translateY: (1 - modalOpacity.value) * exactScale(18),
+      },
+    ],
+  }));
+
   // Measured from real page content instead of a guessed constant, so the
   // card always fits whichever page is tallest with no dead space.
   const [pageHeight, setPageHeight] = useState(0);
@@ -713,6 +728,12 @@ export const SignupBonusPopup: React.FC<Props> = ({
     setIsOpen(false);
     onClose?.();
   }, [onClose]);
+
+  useEffect(() => {
+    modalOpacity.value = withTiming(isOpen ? 1 : 0, {
+      duration: isOpen ? 2000 : 200,
+    });
+  }, [isOpen, modalOpacity]);
 
   // Memoized so gesture-driven state (isInteracting/activePageIndex) doesn't
   // force these heavy trees (gradients, SVGs) to rebuild mid-drag, which was
@@ -845,17 +866,21 @@ export const SignupBonusPopup: React.FC<Props> = ({
       onRequestClose={handleClose}
     >
       <View style={{ flex: 1 }}>
-        <Pressable
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-          }}
-          onPress={handleClose}
-        />
+        <Animated.View
+          style={[
+            {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+            },
+            overlayAnimatedStyle,
+          ]}
+        >
+          <Pressable style={{ flex: 1 }} onPress={handleClose} />
+        </Animated.View>
         <View
           pointerEvents="box-none"
           style={{
@@ -865,13 +890,16 @@ export const SignupBonusPopup: React.FC<Props> = ({
             paddingHorizontal: exactScale(24),
           }}
         >
-          <View
-            style={{
-              width: CARD_WIDTH,
-              borderRadius: exactScale(16),
-              overflow: "hidden",
-              backgroundColor: "#fff",
-            }}
+          <Animated.View
+            style={[
+              {
+                width: CARD_WIDTH,
+                borderRadius: exactScale(16),
+                overflow: "hidden",
+                backgroundColor: "#fff",
+              },
+              cardAnimatedStyle,
+            ]}
           >
             <View
               style={{ height: pageHeight || undefined, overflow: "hidden" }}
@@ -930,7 +958,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
                 ))}
               </View>
             )}
-          </View>
+          </Animated.View>
         </View>
 
         {/* Confetti — rendered AFTER card so it paints on top */}

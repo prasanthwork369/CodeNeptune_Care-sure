@@ -258,6 +258,7 @@ export const OrderTrackLayout: React.FC = () => {
       handlingCharge;
 
   const isCancelled = order?.status === 0;
+  const isInvoiceAvailable = order?.status != null && order.status >= 5 && order.status <= 7;
 
   // Map toStatus → timestamp from statusLogs for accurate step times
   const logTimeByStatus: Record<string, string> = {};
@@ -354,20 +355,22 @@ export const OrderTrackLayout: React.FC = () => {
         title={order?.orderId ? `${String(order.orderId).replace(/[^a-zA-Z_]/g, '') + "-" + String(order.orderId).slice(-6).toUpperCase()}` : "Order Details"}
         showBorder
         rightSlot={
-          <Touchable
-            className="flex-row items-center"
-            style={{ gap: exactScale(4) }}
-            activeOpacity={0.7}
-            onPress={() => downloadLocalAsset(invoiceAsset, "Invoice")}
-          >
-            <Text
-              style={s.labelMd}
-              className="font-inter-semibold text-brand-primary"
+          isInvoiceAvailable ? (
+            <Touchable
+              className="flex-row items-center"
+              style={{ gap: exactScale(4) }}
+              activeOpacity={0.7}
+              onPress={() => downloadLocalAsset(invoiceAsset, "Invoice")}
             >
-              Get Invoice
-            </Text>
-            <icons.download width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
-          </Touchable>
+              <Text
+                style={s.labelMd}
+                className="font-inter-semibold text-brand-primary"
+              >
+                Get Invoice
+              </Text>
+              <icons.download width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
+            </Touchable>
+          ) : undefined
         }
       />
       <ScrollView

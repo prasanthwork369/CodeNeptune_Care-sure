@@ -41,9 +41,9 @@ function OrderCardSkeleton() {
             <Skeleton width={60} height={10} borderRadius={4} style={{ marginHorizontal: 16, marginBottom: 10 }} />
 
             {/* Thumbnails */}
-            <View style={{ flexDirection: 'row', paddingHorizontal: 16, gap: 8, marginBottom: 14 }}>
-                {[0, 1, 2, 3].map(i => (
-                    <Skeleton key={i} width={62} height={62} borderRadius={8} />
+            <View style={{ flexDirection: 'row', paddingHorizontal: 16, gap: 12, marginBottom: 14 }}>
+                {[0, 1, 2, 3, 4].map(i => (
+                    <Skeleton key={i} style={{ flex: 1, aspectRatio: 1, maxWidth: 62 }} borderRadius={8} />
                 ))}
             </View>
 

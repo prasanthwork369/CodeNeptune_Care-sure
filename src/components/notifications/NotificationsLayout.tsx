@@ -1,10 +1,11 @@
-import { exactScale } from '@/src/utils/exactScale';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { useNotifications } from '@/src/hooks/queries/useNotifications';
 import {
+  useDismissAllNotifications,
   useDismissNotification,
   useMarkNotificationRead,
 } from '@/src/hooks/mutations/useNotificationMutations';
@@ -287,6 +288,7 @@ export const NotificationsLayout: React.FC = () => {
   const { notifications, isLoading, isRefetching, refetch } = useNotifications();
   const { mutate: dismiss } = useDismissNotification();
   const { mutate: markRead } = useMarkNotificationRead();
+  const { mutate: dismissAll, isPending: isClearingAll } = useDismissAllNotifications();
   const [isEntryLoading, setIsEntryLoading] = useState(true);
 
   useFocusEffect(
@@ -315,12 +317,41 @@ export const NotificationsLayout: React.FC = () => {
       });
     } else if (notification.event === 'prescription.rejected') {
       router.push('/prescription-history');
+    } else if (notification.event.startsWith('wallet.') || notification.event.includes('coin')) {
+      router.push('/profile/wallet' as any);
+    } else if (notification.event.startsWith('order.') && notification.orderId) {
+      router.push({
+        pathname: '/profile/orders/track',
+        params: { orderId: notification.orderId },
+      } as any);
     }
+  };
+
+  const handleClearAll = () => {
+    dismissAll();
   };
 
   return (
     <View className="flex-1 bg-white">
-      <ScreenHeader title="Recent Notification" showBorder />
+      <ScreenHeader
+        title="Recent Notification"
+        showBorder
+        rightSlot={
+          notifications.length > 0 ? (
+            <Touchable
+              onPress={handleClearAll}
+              disabled={isClearingAll}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text
+                style={{ fontSize: moderateScale(13), fontWeight: '600', color: isClearingAll ? '#9CA3AF' : '#0F7635' }}
+              >
+                Clear All
+              </Text>
+            </Touchable>
+          ) : null
+        }
+      />
 
       {isLoading || isEntryLoading ? (
         <NotificationsSkeleton />

@@ -197,7 +197,7 @@ const OrderCard = React.memo(function OrderCard({ order }: { order: Order }) {
             style={{
               flexDirection: "row",
               paddingHorizontal: 16,
-              gap: 8,
+              gap: 12,
               marginBottom: 12,
             }}
           >
@@ -205,14 +205,16 @@ const OrderCard = React.memo(function OrderCard({ order }: { order: Order }) {
               <View
                 key={i}
                 style={{
-                  width: 62,
-                  height: 62,
+                  flex: 1,
+                  aspectRatio: 1,
+                  maxWidth: 62,
                   borderRadius: 8,
                   borderWidth: 1,
                   borderColor: "#EEEFF1",
                   backgroundColor: "#FAFAFA",
                   alignItems: "center",
                   justifyContent: "center",
+                  overflow: "hidden",
                 }}
               >
                 {item.medicineSnapshot?.image ? (
@@ -229,8 +231,9 @@ const OrderCard = React.memo(function OrderCard({ order }: { order: Order }) {
             {extraCount > 0 && (
               <View
                 style={{
-                  width: 62,
-                  height: 62,
+                  flex: 1,
+                  aspectRatio: 1,
+                  maxWidth: 62,
                   borderRadius: 8,
                   borderWidth: 1,
                   borderColor: "#EEEFF1",
@@ -243,6 +246,7 @@ const OrderCard = React.memo(function OrderCard({ order }: { order: Order }) {
                   style={[
                     s.labelMd,
                     {
+                      fontSize: 18,
                       fontWeight: "600",
                       color: "#222222",
                     },

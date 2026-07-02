@@ -59,6 +59,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
   const { setLocation, selectedAddressId } = useLocationStore();
   const showToast = useToastStore((s) => s.show);
   const [isLocating, setIsLocating] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [predictions, setPredictions] = useState<GooglePrediction[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -70,9 +71,18 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     settings?.mapsApiKey ?? process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const inputRef = useRef<any>(null);
   const snapPoints = useMemo(() => ["70%"], []);
 
-  // Debounced Places Autocomplete
+  // Debounce input value
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(inputValue);
+    }, 400); // 400ms is a snappy debounce for typing
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  // Fetch Places Autocomplete when debounced query changes
   useEffect(() => {
     if (!searchQuery.trim() || !mapsApiKey) {
       setPredictions([]);
@@ -81,10 +91,12 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     }
 
     setIsSearching(true);
-    const timer = setTimeout(async () => {
+    const controller = new AbortController();
+    
+    const fetchPlaces = async () => {
       try {
         const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${mapsApiKey}&components=country:in&types=geocode|establishment`;
-        const res = await fetch(url);
+        const res = await fetch(url, { signal: controller.signal });
         const json = await res.json();
         if (json.status === "OK") {
           setPredictions(
@@ -98,19 +110,24 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         } else {
           setPredictions([]);
         }
-      } catch {
+      } catch (err: any) {
+        if (err?.name === "AbortError") return;
         setPredictions([]);
       } finally {
-        setIsSearching(false);
+        if (!controller.signal.aborted) setIsSearching(false);
       }
-    }, 500);
+    };
 
-    return () => clearTimeout(timer);
+    fetchPlaces();
+
+    return () => controller.abort();
   }, [searchQuery, mapsApiKey]);
 
   const handleClose = () => {
     Keyboard.dismiss();
     bottomSheetRef.current?.dismiss();
+    inputRef.current?.clear();
+    setInputValue("");
     setSearchQuery("");
     setPredictions([]);
     setIsSearchFocused(false);
@@ -284,7 +301,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
   };
 
   const showPredictions =
-    predictions.length > 0 || (isSearching && !!searchQuery);
+    predictions.length > 0 || (isSearching && !!inputValue);
 
   return (
     <GorhomBottomSheet
@@ -329,8 +346,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               <icons.search_grey width={exactScale(18)} height={exactScale(18)} />
             )}
             <BottomSheetTextInput
-              value={searchQuery}
-              onChangeText={setSearchQuery}
+              ref={inputRef}
+              defaultValue=""
+              onChangeText={setInputValue}
               returnKeyType="search"
               autoCapitalize="words"
               autoCorrect={false}
@@ -343,9 +361,11 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               }}
               onBlur={() => setIsSearchFocused(false)}
             />
-            {!!searchQuery && (
+            {!!inputValue && (
               <Touchable
                 onPress={() => {
+                  inputRef.current?.clear();
+                  setInputValue("");
                   setSearchQuery("");
                   setPredictions([]);
                 }}
@@ -358,7 +378,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         </View>
 
         {/* Current location + Add new — hidden while searching or focused */}
-        {!searchQuery && !isSearchFocused && (
+        {!inputValue && !isSearchFocused && (
           <View className="flex-row" style={{ gap: exactScale(12), marginBottom: exactScale(8) }}>
             <Touchable
               onPress={handleUseCurrentLocation}
