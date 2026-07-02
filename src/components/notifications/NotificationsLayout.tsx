@@ -72,13 +72,16 @@ function getNotificationVisual(n: NotificationLog) {
     return { bg: '#FFFFF4', icon: <Image source={HOME_IMAGES.bucketCheckIcon} style={s.notifIcon} contentFit="contain" /> };
   }
   if (event.includes('coin')) {
-    return { bg: '#FFFBEB', icon: <icons.coin_group width={s.notifIcon.width} height={s.notifIcon.height} fill="#EA580C" /> };
+    const isCredit = n.metadata?.type === 'credit' || event.includes('credit');
+    return isCredit
+      ? { bg: '#F4FFF7', icon: <Image source={HOME_IMAGES.coinCredit} style={s.notifIcon} contentFit="contain" /> }
+      : { bg: '#FEF2F2', icon: <Image source={HOME_IMAGES.coinDebit} style={s.notifIcon} contentFit="contain" /> };
   }
   if (event.startsWith('wallet.')) {
     const isCredit = n.metadata?.type === 'credit' || event.includes('credit');
     return isCredit
       ? { bg: '#F4FFF7', icon: <icons.account_balance_wallet_green width={s.notifIcon.width} height={s.notifIcon.height} /> }
-      : { bg: '#FEF2F2', icon: <icons.account_balance_wallet width={s.notifIcon.width} height={s.notifIcon.height} fill="#DC2626" /> };
+      : { bg: '#FEF2F2', icon: <icons.account_balance_wallet_red width={s.notifIcon.width} height={s.notifIcon.height} /> };
   }
   if (event.includes('review')) {
     return { bg: '#F3F8FF', icon: <Image source={HOME_IMAGES.notiHistoryIcon} style={s.notifIcon} contentFit="contain" /> };

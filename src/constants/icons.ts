@@ -77,6 +77,7 @@ import cancel_other_reason from "../../assets/icons/cancel_other_reason.svg";
 
 import account_balance_wallet from "../../assets/icons/account_balance_wallet.svg";
 import account_balance_wallet_green from "../../assets/icons/account_balance_wallet_green.svg";
+import account_balance_wallet_red from "../../assets/icons/account_balance_wallet_red.svg";
 import add_photo from "../../assets/icons/add_photo.svg";
 import admin_meds from "../../assets/icons/admin_meds.svg";
 import arrow_forward_darkgreen from "../../assets/icons/arrow_forward_darkgreen.svg";
@@ -273,6 +274,7 @@ export const icons = {
     cart_svg,
     account_balance_wallet,
     account_balance_wallet_green,
+    account_balance_wallet_red,
     admin_meds,
     article,
     description,
