@@ -55,23 +55,37 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   // native animation's own duration, so our withTiming runs concurrently
   // with — and matches the length of — the real keyboard transition.
   const kbHeight = useSharedValue(0);
+  // Target height of the in-flight animation — kbHeight.value mid-animation
+  // reads the interpolated value, so the "did" listeners compare against
+  // this ref to know whether a correction is actually needed.
+  const kbTarget = React.useRef(0);
   React.useEffect(() => {
-    const showSub = KeyboardEvents.addListener("keyboardWillShow", (e) => {
-      kbHeight.value = withTiming(e.height, {
-        duration: e.duration || 250,
+    const animateTo = (height: number, duration: number) => {
+      kbTarget.current = height;
+      kbHeight.value = withTiming(height, {
+        duration,
         easing: Easing.out(Easing.ease),
       });
-    });
-    const hideSub = KeyboardEvents.addListener("keyboardWillHide", (e) => {
-      kbHeight.value = withTiming(0, {
-        duration: e.duration || 250,
-        easing: Easing.out(Easing.ease),
-      });
-    });
-    return () => {
-      showSub.remove();
-      hideSub.remove();
     };
+    const subs = [
+      KeyboardEvents.addListener("keyboardWillShow", (e) =>
+        animateTo(e.height, e.duration || 250),
+      ),
+      KeyboardEvents.addListener("keyboardWillHide", (e) =>
+        animateTo(0, e.duration || 250),
+      ),
+      // Fallback + correction: some OEM keyboards (Samsung, MIUI/Poco) skip
+      // the "will" events entirely, or settle taller than announced once
+      // their accessory toolbar appears — without this the panel stays
+      // pinned at the bottom and the keyboard covers the inputs.
+      KeyboardEvents.addListener("keyboardDidShow", (e) => {
+        if (Math.abs(kbTarget.current - e.height) > 1) animateTo(e.height, 120);
+      }),
+      KeyboardEvents.addListener("keyboardDidHide", () => {
+        if (kbTarget.current !== 0) animateTo(0, 120);
+      }),
+    ];
+    return () => subs.forEach((s) => s.remove());
   }, [kbHeight]);
 
   const stickyStyle = useAnimatedStyle(() => ({

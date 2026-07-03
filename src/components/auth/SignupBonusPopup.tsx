@@ -2,8 +2,8 @@ import { CarouselDot } from "@/src/components/animations/carousel";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
-import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { walletService } from "@/src/services/wallet.service";
 import { useAuthStore } from "@/src/store/authStore";
@@ -13,7 +13,13 @@ import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { usePathname } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Dimensions,
   Image,
@@ -71,7 +77,10 @@ const BenefitBadges = ({
   >
     <View
       className="flex-row items-center"
-      style={{ paddingVertical: exactScale(10), paddingHorizontal: exactScale(8) }}
+      style={{
+        paddingVertical: exactScale(10),
+        paddingHorizontal: exactScale(8),
+      }}
     >
       {badges.map((badge, index, arr) => (
         <React.Fragment key={index}>
@@ -151,7 +160,10 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
         minHeight: exactScale(76),
       }}
     >
-      <Text className="font-medium text-[#222222]" style={{ fontSize: moderateScale(14) }}>
+      <Text
+        className="font-medium text-[#222222]"
+        style={{ fontSize: moderateScale(14) }}
+      >
         {content?.greeting || "Hi there!"}
       </Text>
       <Text
@@ -170,7 +182,11 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
       <Svg
         width={exactScale(200)}
         height={exactScale(200)}
-        style={{ position: "absolute", top: exactScale(-50), right: exactScale(-70) }}
+        style={{
+          position: "absolute",
+          top: exactScale(-50),
+          right: exactScale(-70),
+        }}
       >
         <Defs>
           <RadialGradient id="giftGlow" cx="50%" cy="50%" r="50%">
@@ -178,7 +194,11 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             <Stop offset="100%" stopColor="#E9D5FF" stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Rect width={exactScale(200)} height={exactScale(200)} fill="url(#giftGlow)" />
+        <Rect
+          width={exactScale(200)}
+          height={exactScale(200)}
+          fill="url(#giftGlow)"
+        />
       </Svg>
 
       {!!content?.giftImage && (
@@ -230,7 +250,10 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
         />
       )}
 
-      <View className="flex-row" style={{ gap: exactScale(10), marginBottom: exactScale(12) }}>
+      <View
+        className="flex-row"
+        style={{ gap: exactScale(10), marginBottom: exactScale(12) }}
+      >
         {hasCoins && (
           <View
             style={{
@@ -271,7 +294,11 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
                 </Text>
                 <Text
                   className="font-inter-extrabold "
-                  style={{ fontSize: moderateScale(22), lineHeight: moderateScale(26), color: "#E28F1C" }}
+                  style={{
+                    fontSize: moderateScale(22),
+                    lineHeight: moderateScale(26),
+                    color: "#E28F1C",
+                  }}
                 >
                   {bonusData.coins}
                 </Text>
@@ -320,7 +347,10 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
                 </Text>
                 <Text
                   className="font-inter-bold text-[#0F7635]"
-                  style={{ fontSize: moderateScale(22), lineHeight: moderateScale(26) }}
+                  style={{
+                    fontSize: moderateScale(22),
+                    lineHeight: moderateScale(26),
+                  }}
                 >
                   ₹{Number(bonusData.wallet).toFixed(0)}
                 </Text>
@@ -343,7 +373,12 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
     </View>
 
     {/* CTA */}
-    <View style={{ paddingHorizontal: exactScale(16), paddingBottom: exactScale(16) }}>
+    <View
+      style={{
+        paddingHorizontal: exactScale(16),
+        paddingBottom: exactScale(16),
+      }}
+    >
       <Touchable
         onPress={onCta}
         activeOpacity={0.85}
@@ -354,7 +389,10 @@ const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
           borderRadius: exactScale(12),
         }}
       >
-        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15) }}>
+        <Text
+          className="font-inter-bold text-white"
+          style={{ fontSize: moderateScale(15) }}
+        >
           {content?.buttonText || "Start Shopping"}
         </Text>
       </Touchable>
@@ -404,7 +442,10 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
         minHeight: exactScale(76),
       }}
     >
-      <Text className="font-medium text-[#222222]" style={{ fontSize: moderateScale(14) }}>
+      <Text
+        className="font-medium text-[#222222]"
+        style={{ fontSize: moderateScale(14) }}
+      >
         Hello!
       </Text>
       <Text
@@ -423,7 +464,11 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
       <Svg
         width={exactScale(200)}
         height={exactScale(200)}
-        style={{ position: "absolute", top: exactScale(-50), right: exactScale(-70) }}
+        style={{
+          position: "absolute",
+          top: exactScale(-50),
+          right: exactScale(-70),
+        }}
       >
         <Defs>
           <RadialGradient id="corpGlow" cx="50%" cy="50%" r="50%">
@@ -431,7 +476,11 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
             <Stop offset="100%" stopColor="#BFDBFE" stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Rect width={exactScale(200)} height={exactScale(200)} fill="url(#corpGlow)" />
+        <Rect
+          width={exactScale(200)}
+          height={exactScale(200)}
+          fill="url(#corpGlow)"
+        />
       </Svg>
 
       <Image
@@ -467,7 +516,10 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
         Your Corporate Wallet
       </Text>
 
-      <View className="flex-row" style={{ gap: exactScale(10), marginBottom: exactScale(12) }}>
+      <View
+        className="flex-row"
+        style={{ gap: exactScale(10), marginBottom: exactScale(12) }}
+      >
         <View
           style={{
             flex: 1,
@@ -495,7 +547,11 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
               </Text>
               <Text
                 className="font-inter-extrabold"
-                style={{ fontSize: moderateScale(22), lineHeight: moderateScale(26), color: "#0047CC" }}
+                style={{
+                  fontSize: moderateScale(22),
+                  lineHeight: moderateScale(26),
+                  color: "#0047CC",
+                }}
               >
                 ₹{Number(creditsBalance).toFixed(0)}
               </Text>
@@ -530,7 +586,11 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
               </Text>
               <Text
                 className="font-inter-bold text-[#6A6A6A]"
-                style={{ fontSize: moderateScale(10), lineHeight: moderateScale(12), marginTop: exactScale(2) }}
+                style={{
+                  fontSize: moderateScale(10),
+                  lineHeight: moderateScale(12),
+                  marginTop: exactScale(2),
+                }}
                 numberOfLines={2}
               >
                 Order medicines with your credits
@@ -557,7 +617,12 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
     </View>
 
     {/* CTA */}
-    <View style={{ paddingHorizontal: exactScale(16), paddingBottom: exactScale(16) }}>
+    <View
+      style={{
+        paddingHorizontal: exactScale(16),
+        paddingBottom: exactScale(16),
+      }}
+    >
       <Touchable
         onPress={onCta}
         activeOpacity={0.85}
@@ -568,7 +633,10 @@ const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
           borderRadius: exactScale(12),
         }}
       >
-        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15) }}>
+        <Text
+          className="font-inter-bold text-white"
+          style={{ fontSize: moderateScale(15) }}
+        >
           Start Shopping
         </Text>
       </Touchable>
@@ -608,22 +676,19 @@ export const SignupBonusPopup: React.FC<Props> = ({
   const confettiRef = useRef<any>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const progressShared = useSharedValue(0);
-  const modalOpacity = useSharedValue(0);
-  const overlayAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: modalOpacity.value,
-  }));
-  const cardAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: modalOpacity.value,
-    transform: [
-      {
-        translateY: (1 - modalOpacity.value) * exactScale(18),
-      },
-    ],
-  }));
-
   // Measured from real page content instead of a guessed constant, so the
   // card always fits whichever page is tallest with no dead space.
   const [pageHeight, setPageHeight] = useState(0);
+
+  // Card stays invisible until EVERY slide has reported its height, then
+  // fades in — revealing after only the first measurement still let the
+  // card grow when a taller slide landed, flashing white at the bottom.
+  const measuredSlides = useRef(new Set<number>());
+  const [allMeasured, setAllMeasured] = useState(false);
+  const cardOpacity = useSharedValue(0);
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+  }));
 
   // Loop/autoplay state. isInteractingRef is a ref (not state) on purpose —
   // flagging a drag must never trigger a re-render, since that's what made
@@ -729,12 +794,6 @@ export const SignupBonusPopup: React.FC<Props> = ({
     onClose?.();
   }, [onClose]);
 
-  useEffect(() => {
-    modalOpacity.value = withTiming(isOpen ? 1 : 0, {
-      duration: isOpen ? 2000 : 200,
-    });
-  }, [isOpen, modalOpacity]);
-
   // Memoized so gesture-driven state (isInteracting/activePageIndex) doesn't
   // force these heavy trees (gradients, SVGs) to rebuild mid-drag, which was
   // congesting the JS thread and making the swipe feel disconnected from the
@@ -763,7 +822,15 @@ export const SignupBonusPopup: React.FC<Props> = ({
       );
     }
     return result;
-  }, [bonusData, hasWallet, hasCoins, hasCorporateCredits, corporateCredits, content, handleClose]);
+  }, [
+    bonusData,
+    hasWallet,
+    hasCoins,
+    hasCorporateCredits,
+    corporateCredits,
+    content,
+    handleClose,
+  ]);
 
   const isLooping = pages.length === 2;
   // [dummy copy of page B, real A, real B, dummy copy of page A] — same
@@ -828,6 +895,27 @@ export const SignupBonusPopup: React.FC<Props> = ({
     }
   }, [isLooping, isOpen]);
 
+  // A slide count change (e.g. corporate page arriving late) means the
+  // final height may change again — re-measure before trusting it.
+  useEffect(() => {
+    measuredSlides.current.clear();
+    setAllMeasured(false);
+  }, [slides.length]);
+
+  // Reveal the card only after every slide is measured, one frame later so
+  // the height update and initial scroll-jump have already painted.
+  useEffect(() => {
+    if (!isOpen) {
+      cardOpacity.value = 0;
+      return;
+    }
+    if (allMeasured) {
+      requestAnimationFrame(() => {
+        cardOpacity.value = withTiming(1, { duration: 220 });
+      });
+    }
+  }, [isOpen, allMeasured, cardOpacity]);
+
   const handleScrollEnd = (offsetX: number) => {
     if (!isLooping) return;
     let pageIndex = Math.round(offsetX / CARD_WIDTH);
@@ -866,21 +954,17 @@ export const SignupBonusPopup: React.FC<Props> = ({
       onRequestClose={handleClose}
     >
       <View style={{ flex: 1 }}>
-        <Animated.View
-          style={[
-            {
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.6)",
-            },
-            overlayAnimatedStyle,
-          ]}
-        >
-          <Pressable style={{ flex: 1 }} onPress={handleClose} />
-        </Animated.View>
+        <Pressable
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+          }}
+          onPress={handleClose}
+        />
         <View
           pointerEvents="box-none"
           style={{
@@ -935,6 +1019,10 @@ export const SignupBonusPopup: React.FC<Props> = ({
                     onLayout={(e) => {
                       const height = e.nativeEvent.layout.height;
                       setPageHeight((h) => Math.max(h, height));
+                      measuredSlides.current.add(i);
+                      if (measuredSlides.current.size >= slides.length) {
+                        setAllMeasured(true);
+                      }
                     }}
                   >
                     {page}
@@ -946,7 +1034,10 @@ export const SignupBonusPopup: React.FC<Props> = ({
             {pages.length > 1 && (
               <View
                 className="flex-row justify-center items-center gap-x-1.5"
-                style={{ paddingTop: exactScale(2), paddingBottom: exactScale(8) }}
+                style={{
+                  paddingTop: exactScale(2),
+                  paddingBottom: exactScale(8),
+                }}
               >
                 {pages.map((_, i) => (
                   <CarouselDot

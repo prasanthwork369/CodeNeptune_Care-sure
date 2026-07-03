@@ -15,13 +15,15 @@ export interface LoginSubmitButtonProps {
 }
 
 export interface OtpFormProps {
-    otp: string[];
+    otp: string;
     otpError: string;
     error: string | null;
     loading: boolean;
     resendCooldown: number;
-    onOtpChange: (value: string, index: number) => void;
-    onKeyPress: (e: any, index: number) => void;
+    activeIndex: number;
+    selection?: { start: number; end: number };
+    onBoxPress: (index: number) => void;
+    onOtpChange: (value: string) => void;
     onResend: () => void;
-    inputRefs: React.MutableRefObject<(TextInput | null)[]>;
+    inputRef: React.RefObject<TextInput | null>;
 }

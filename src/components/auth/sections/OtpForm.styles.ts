@@ -20,8 +20,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  otpInput: {
-    padding: 0,
+  otpDigit: {
     textAlignVertical: "center",
     includeFontPadding: false,
     fontSize: moderateScale(24, 0.3),
@@ -31,8 +30,27 @@ export const styles = StyleSheet.create({
     letterSpacing: 0,
     color: "#111827",
     textAlign: "center",
-    width: "100%",
-    height: "100%",
+  },
+  caret: {
+    width: 2,
+    height: verticalScale(24),
+    borderRadius: 1,
+    backgroundColor: "#0F7635",
+  },
+  // 1x1 point tucked in the corner — NOT overlaying the boxes. When it
+  // covered the row, Android's native input grabbed taps (pointerEvents
+  // "none" is ignored for TextInput there) and showed its teal selection
+  // handle over the boxes. Off to the side, the box Pressables own every
+  // tap and focus() it programmatically; keyboard + SMS autofill still work.
+  hiddenInput: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 1,
+    height: 1,
+    opacity: 0,
+    color: "transparent",
+    padding: 0,
   },
   error: {
     fontSize: moderateScale(13, 0.3),

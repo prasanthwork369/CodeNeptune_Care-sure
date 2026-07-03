@@ -4,7 +4,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { isExpoGo } from "@/src/utils/environment";
-import { sanitize, validate } from "@/src/utils/validation";
+import { validate } from "@/src/utils/validation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -27,20 +27,28 @@ export function useOtp() {
     phone: string;
     prefillOtp?: string;
   }>();
-  const { verifyOtp, requestOtp, loading, error } = useAuth();
+  const { verifyOtp, requestOtp, loading, error, resetError } = useAuth();
 
-  const [otp, setOtp] = useState<string[]>(() =>
-    prefillOtp && prefillOtp.length === 6
-      ? prefillOtp.split("")
-      : ["", "", "", "", "", ""],
+  // Single string of typed digits. The form renders one hidden TextInput
+  // over 6 display boxes — per-box inputs relied on onKeyPress (not
+  // guaranteed for Android soft keyboards) and controlled-value resync
+  // during fast typing, which let digits pile up inside one box.
+  const [otp, setOtp] = useState<string>(() =>
+    prefillOtp && prefillOtp.length === 6 ? prefillOtp : "",
   );
 
-  // Guards auto-focus state on mount so it doesn't snap back to box 1 when prefilled/retrieved
-  const filledRef = useRef(!!(prefillOtp && prefillOtp.length === 6));
-  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const inputRef = useRef<TextInput | null>(null);
   const [otpError, setOtpError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(30);
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Controls the hidden input's text selection so a tapped box can be
+  // edited in place. Undefined = uncontrolled (natural end-of-string cursor)
+  // so normal fast typing is never fought. Set to a 1-char range only when
+  // a filled box is tapped, so the next keystroke replaces just that digit.
+  const [selection, setSelection] = useState<
+    { start: number; end: number } | undefined
+  >(undefined);
 
   // Cooldown countdown timer for resending OTP codes
   useEffect(() => {
@@ -51,10 +59,7 @@ export function useOtp() {
 
   // Initial focus management
   useEffect(() => {
-    const t = setTimeout(() => {
-      if (!filledRef.current) inputRefs.current[0]?.focus();
-      else inputRefs.current[5]?.focus();
-    }, 300);
+    const t = setTimeout(() => inputRef.current?.focus(), 300);
     return () => clearTimeout(t);
   }, []);
 
@@ -68,13 +73,25 @@ export function useOtp() {
   useEffect(() => {
     if (Platform.OS !== "android") return;
     if (!smsOtp || smsOtp.length !== 6) return;
-    const digits = smsOtp.split("");
-    filledRef.current = true;
-    setOtp(digits);
+    setOtp(smsOtp);
     setOtpError("");
-    setTimeout(() => inputRefs.current[5]?.focus(), 50);
-    Keyboard.dismiss();
+    setSelection(undefined);
+    inputRef.current?.blur();
+    // Auto-submit the auto-read code — the user shouldn't have to tap
+    // anything when the SMS is detected.
+    handleVerify(smsOtp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [smsOtp]);
+
+  // Clears BOTH the React state and the native input buffer. Setting the
+  // controlled value to "" alone leaves Android's TextInput holding the old
+  // text, so the next keystroke arrives as "<oldcode><newchar>" and the
+  // cleared code reappears. .clear() empties the native buffer too.
+  const resetOtp = () => {
+    inputRef.current?.clear();
+    setOtp("");
+    setSelection(undefined);
+  };
 
   /**
    * Resends the OTP and prefills it if returned, or resets boxes.
@@ -86,13 +103,11 @@ export function useOtp() {
       const newPrefill = res?.data?.otp ?? "";
 
       if (newPrefill && newPrefill.length === 6) {
-        filledRef.current = true;
-        setOtp(newPrefill.split(""));
-        setTimeout(() => inputRefs.current[5]?.focus(), 50);
+        setSelection(undefined);
+        setOtp(newPrefill);
       } else {
-        filledRef.current = false;
-        setOtp(["", "", "", "", "", ""]);
-        setTimeout(() => inputRefs.current[0]?.focus(), 50);
+        resetOtp();
+        setTimeout(() => inputRef.current?.focus(), 50);
       }
 
       setResendCooldown(30);
@@ -102,53 +117,83 @@ export function useOtp() {
   };
 
   /**
-   * Captures individual digit entries and controls next field focus.
+   * Tapping a box: if it's a filled box, select that one character so the
+   * next keystroke replaces it in place (the rest of the code is kept). If
+   * it's an empty box, park the cursor at the first empty slot — a
+   * contiguous code can't have gaps, so entry can't jump further ahead.
    */
-  const handleOtpChange = (value: string, index: number) => {
+  const handleBoxPress = (index: number) => {
+    if (index < otp.length) {
+      setSelection({ start: index, end: index + 1 });
+    } else {
+      setSelection({ start: otp.length, end: otp.length });
+    }
+    const input = inputRef.current;
+    if (!input) return;
+    // If the keyboard was dismissed (e.g. Android back button, or our own
+    // blur after auto-submit) the input can still be "focused" in RN's
+    // state — then focus() is a no-op and the keyboard stays shut. When the
+    // keyboard isn't visible, blur first so the next focus() truly reopens
+    // it; when it's already open, just focus so the selection applies with
+    // no flicker.
+    if (Keyboard.isVisible()) {
+      input.focus();
+    } else {
+      input.blur();
+      requestAnimationFrame(() => input.focus());
+    }
+  };
+
+  /**
+   * Single change handler for the hidden input — typing, backspace, paste,
+   * and SMS autofill all flow through here as plain text changes. The OS
+   * has already applied any in-place replacement via the selection above.
+   */
+  const handleOtpChange = (value: string) => {
     setOtpError("");
-    if (value.length > 1) {
-      const digits = value.replace(/\D/g, "").slice(0, 6).split("");
-      setOtp([...Array(6)].map((_, i) => digits[i] ?? ""));
-      if (digits.length === 6) {
-        filledRef.current = true;
-        setTimeout(() => inputRefs.current[5]?.focus(), 50);
-        Keyboard.dismiss();
-      }
-      return;
-    }
-    const cleaned = sanitize.otpDigit(value);
-    const newOtp = [...otp];
-    newOtp[index] = cleaned;
-    setOtp(newOtp);
-    if (cleaned && index < 5) inputRefs.current[index + 1]?.focus();
-  };
+    // A new keystroke is a fresh attempt — drop any lingering API error so
+    // the boxes don't stay red while the user retypes.
+    if (error) resetError();
+    const digits = value.replace(/\D/g, "").slice(0, 6);
+    // "Editing" = a box was tapped, so a selection is held. In that mode we
+    // advance the highlight to the NEXT box (sequential in-place editing)
+    // rather than snapping it to the first empty slot. Fresh left-to-right
+    // typing has no selection, so it flows naturally at the end.
+    const editing = selection;
+    setOtp(digits);
 
-  /**
-   * Backspace handling and input overrides for already-filled boxes.
-   */
-  const handleKeyPress = (e: any, index: number) => {
-    const key = e.nativeEvent.key;
-    if (key === "Backspace") {
-      if (otp[index]) {
-        const newOtp = [...otp];
-        newOtp[index] = "";
-        setOtp(newOtp);
-      } else if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
-      }
-    } else if (/^\d$/.test(key) && otp[index]) {
-      const newOtp = [...otp];
-      newOtp[index] = key;
-      setOtp(newOtp);
-      if (index < 5) inputRefs.current[index + 1]?.focus();
+    if (editing) {
+      const next = editing.start + 1;
+      setSelection(next < 6 ? { start: next, end: next + 1 } : undefined);
+    } else {
+      setSelection(undefined);
+    }
+
+    // Auto-submit only when the code is freshly completed by normal typing —
+    // NOT when fixing a digit in an already-full code (that would submit
+    // before the user finishes correcting it).
+    if (digits.length === 6 && !editing) {
+      inputRef.current?.blur();
+      handleVerify(digits);
     }
   };
 
+  // The box showing the active border/caret: the tapped box while a
+  // selection is held, otherwise the first empty box.
+  const activeIndex = selection
+    ? Math.min(selection.start, 5)
+    : Math.min(otp.length, 5);
+
   /**
-   * Verifies the full OTP code, then merges guest items into user account's cart.
+   * Verifies the OTP, then merges guest items into the user's cart.
+   * Accepts an explicit code so auto-submit can pass the just-typed digits
+   * without waiting for the otp state to commit.
    */
-  const handleVerify = async () => {
-    const otpCode = otp.join("");
+  const handleVerify = async (codeArg?: string) => {
+    // Guard against double submission (auto-submit + button tap, or a
+    // duplicate SMS event firing while a verify is already in flight).
+    if (loading || isRedirecting) return;
+    const otpCode = codeArg ?? otp;
     const result = validate.otp(otpCode);
     if (!result.valid) {
       setOtpError(result.message);
@@ -192,11 +237,15 @@ export function useOtp() {
 
       router.replace("/(tabs)");
     } catch {
-      // Error state is captured and handled by useAuth hook
+      // Wrong or expired code (error text is surfaced by useAuth). Clear the
+      // boxes and refocus so the user can retype immediately — the standard
+      // recovery pattern in GPay/WhatsApp/banking OTP screens.
+      resetOtp();
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
-  const isValid = validate.otp(otp.join("")).valid;
+  const isValid = validate.otp(otp).valid;
   const isButtonLoading = loading || isRedirecting;
 
   return {
@@ -208,10 +257,12 @@ export function useOtp() {
     resendCooldown,
     isButtonLoading,
     isValid,
-    inputRefs,
+    inputRef,
+    selection,
+    activeIndex,
+    handleBoxPress,
     handleResend,
     handleOtpChange,
-    handleKeyPress,
     handleVerify,
   };
 }

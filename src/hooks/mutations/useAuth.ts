@@ -24,6 +24,13 @@ export const useAuth = () => {
         requestOtp: (phone: string) => requestOtpMutation.mutateAsync(phone),
         verifyOtp: (phone: string, otp: string) => verifyOtpMutation.mutateAsync({ phone, otp }),
         logout: () => logoutMutation.mutateAsync(),
+        // Clears a lingering mutation error so a new attempt starts clean —
+        // otherwise the previous "invalid OTP" error persists while the user
+        // is already retyping.
+        resetError: () => {
+            requestOtpMutation.reset();
+            verifyOtpMutation.reset();
+        },
         loading,
         error,
     };

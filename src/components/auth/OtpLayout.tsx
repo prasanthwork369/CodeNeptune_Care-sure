@@ -35,10 +35,12 @@ export const OtpLayout: React.FC = () => {
     resendCooldown,
     isButtonLoading,
     isValid,
-    inputRefs,
+    inputRef,
+    selection,
+    activeIndex,
+    handleBoxPress,
     handleResend,
     handleOtpChange,
-    handleKeyPress,
     handleVerify,
   } = useOtp();
 
@@ -67,15 +69,17 @@ export const OtpLayout: React.FC = () => {
             error={error}
             loading={isButtonLoading}
             resendCooldown={resendCooldown}
+            activeIndex={activeIndex}
+            selection={selection}
+            onBoxPress={handleBoxPress}
             onOtpChange={handleOtpChange}
-            onKeyPress={handleKeyPress}
             onResend={handleResend}
-            inputRefs={inputRefs}
+            inputRef={inputRef}
           />
 
           <Touchable
             activeOpacity={0.8}
-            onPress={handleVerify}
+            onPress={() => handleVerify()}
             disabled={isButtonLoading || !isValid}
             accessibilityRole="button"
             accessibilityLabel="Verify and continue"
