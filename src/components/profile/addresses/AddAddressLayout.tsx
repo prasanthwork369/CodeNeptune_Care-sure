@@ -1,4 +1,5 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { FormField } from "@/src/components/ui/FormField";
 import { profileStyles as s } from '../profile.styles';
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
@@ -22,96 +23,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { moderateScale } from "@/src/utils/exactScale";
-
-const Field = React.forwardRef<
-  TextInput,
-  {
-    label: string;
-    value: string;
-    onChangeText: (v: string) => void;
-    placeholder: string;
-    keyboardType?: any;
-    maxLength?: number;
-    error?: string;
-    returnKeyType?: "next" | "done";
-    onSubmitEditing?: () => void;
-    onFocus?: () => void;
-    onLayout?: (y: number) => void;
-    autoComplete?: any;
-    textContentType?: any;
-    importantForAutofill?:
-      | "auto"
-      | "no"
-      | "noExcludeDescendants"
-      | "yes"
-      | "yesExcludeDescendants";
-  }
->(
-  (
-    {
-      label,
-      value,
-      onChangeText,
-      placeholder,
-      keyboardType = "default",
-      maxLength,
-      error,
-      returnKeyType = "next",
-      onSubmitEditing,
-      onFocus,
-      onLayout,
-      autoComplete = "off",
-      textContentType = "none",
-      importantForAutofill = "no",
-    },
-    ref,
-  ) => (
-    <View className="mb-5" onLayout={(e) => onLayout?.(e.nativeEvent.layout.y)}>
-      <Text
-        style={{
-          fontSize: moderateScale(13),
-          fontWeight: "600",
-          color: "#222222",
-          marginBottom: 8,
-        }}
-      >
-        {label}
-      </Text>
-      <TextInput
-        ref={ref}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#AAAAAA"
-        keyboardType={keyboardType}
-        maxLength={maxLength}
-        returnKeyType={returnKeyType}
-        onSubmitEditing={onSubmitEditing}
-        submitBehavior={returnKeyType === "done" ? "blurAndSubmit" : "submit"}
-        autoCorrect={false}
-        autoComplete={autoComplete}
-        textContentType={textContentType}
-        importantForAutofill={importantForAutofill}
-        onFocus={onFocus}
-        className="bg-white rounded-[10px] px-4 py-[14px] font-inter-regular text-[#1A1C1E]"
-        style={[s.addrFormLabel, { borderWidth: 1, borderColor: error ? "#EF4444" : "#E8E8E8" }]}
-      />
-      {error ? (
-        <Text
-          style={{
-            fontSize: moderateScale(12),
-            fontWeight: "500",
-            color: "#EF4444",
-            marginTop: 4,
-          }}
-        >
-          {error}
-        </Text>
-      ) : null}
-    </View>
-  ),
-);
-Field.displayName = "Field";
 
 export const AddAddressLayout: React.FC = () => {
   const router = useNav();
@@ -328,7 +239,7 @@ export const AddAddressLayout: React.FC = () => {
           contentContainerStyle={{ padding: 20, paddingBottom: keyboardHeight > 0 ? keyboardHeight + 2 : 30 }}
           keyboardShouldPersistTaps="handled"
         >
-          <Field
+          <FormField
             label="Full Name"
             value={name}
             onChangeText={setName}
@@ -346,7 +257,7 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <Field
+          <FormField
             ref={mobileRef}
             label="Mobile Number"
             value={mobile}
@@ -369,7 +280,7 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <Field
+          <FormField
             ref={line1Ref}
             label="House Number"
             value={line1}
@@ -386,7 +297,7 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <Field
+          <FormField
             ref={line2Ref}
             label="Building Name, Locality"
             value={line2}
@@ -403,7 +314,7 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <Field
+          <FormField
             ref={cityRef}
             label="City"
             value={city}
@@ -420,7 +331,7 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <Field
+          <FormField
             ref={stateRef}
             label="State"
             value={state}
@@ -437,7 +348,7 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <Field
+          <FormField
             ref={pincodeRef}
             label="Pincode"
             value={pincode}

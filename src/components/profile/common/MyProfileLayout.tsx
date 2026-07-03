@@ -1,5 +1,6 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { GorhomBottomSheet } from '@/src/components/ui/GorhomBottomSheet';
+import { FormField } from '@/src/components/ui/FormField';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { icons } from '@/src/constants/icons';
 import { useProfile } from '@/src/hooks/queries/useProfile';
@@ -15,50 +16,12 @@ import {
     Platform,
     ScrollView,
     Text,
-    TextInput,
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale } from "@/src/utils/exactScale";
 
 const GENDERS = ['Male', 'Female', 'Other'];
-
-const Field: React.FC<{
-    label: string;
-    value: string;
-    onChangeText?: (v: string) => void;
-    placeholder?: string;
-    editable?: boolean;
-    keyboardType?: any;
-    rightSlot?: React.ReactNode;
-}> = ({ label, value, onChangeText, placeholder, editable = true, keyboardType = 'default', rightSlot }) => (
-    <View style={{ marginBottom: 16 }}>
-        <Text style={{ fontSize: moderateScale(13), fontWeight: '600', color: '#222222', marginBottom: 6 }}>
-            {label}
-        </Text>
-        <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: editable ? '#FFFFFF' : '#F5F6FB',
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: '#E8E8E8',
-            paddingHorizontal: 14,
-            height: 48,
-        }}>
-            <TextInput
-                value={value}
-                onChangeText={onChangeText}
-                placeholder={placeholder}
-                placeholderTextColor="#AAAAAA"
-                editable={editable}
-                keyboardType={keyboardType}
-                style={{ flex: 1, fontSize: moderateScale(14), color: editable ? '#111827' : '#637381', padding: 0 }}
-            />
-            {rightSlot}
-        </View>
-    </View>
-);
 
 export const MyProfileLayout: React.FC = () => {
     const router = useNav();
@@ -134,16 +97,17 @@ export const MyProfileLayout: React.FC = () => {
                 contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
             >
                 {/* First Name */}
-                <Field label="First Name" value={firstName} onChangeText={setFirstName} placeholder="Enter first name" />
+                <FormField variant="boxed" label="First Name" value={firstName} onChangeText={setFirstName} placeholder="Enter first name" />
 
                 {/* Last Name */}
-                <Field label="Last Name" value={lastName} onChangeText={setLastName} placeholder="Enter last name" />
+                <FormField variant="boxed" label="Last Name" value={lastName} onChangeText={setLastName} placeholder="Enter last name" />
 
                 {/* Mobile Number */}
-                <Field label="Mobile Number" value={profile?.phoneNumber ?? ''} editable={false} keyboardType="phone-pad" />
+                <FormField variant="boxed" label="Mobile Number" value={profile?.phoneNumber ?? ''} editable={false} keyboardType="phone-pad" />
 
                 {/* Email */}
-                <Field
+                <FormField
+                    variant="boxed"
                     label="Email"
                     value={email}
                     onChangeText={setEmail}

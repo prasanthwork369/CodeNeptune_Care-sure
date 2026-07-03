@@ -36,6 +36,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-sqlite",
     "@react-native-firebase/app",
     "@react-native-firebase/crashlytics",
+    "@react-native-firebase/messaging",
     [
       "expo-image-picker",
       {

@@ -1,9 +1,14 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { notificationApi } from '../api/notification.api';
 import { getDeviceInfo } from '../lib/deviceInfo';
 import { isExpoGo } from '../utils/environment';
+
+const CACHE_KEY_TOKEN = 'caresure.push_token.last_registered';
+const CACHE_KEY_AUTH = 'caresure.push_token.last_auth_state';
 
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
 // Remove the `isExpoGo` checks below once running via a development build.
@@ -18,19 +23,29 @@ export const notificationService = {
         return status === 'granted';
     },
 
-    getExpoPushToken: async (): Promise<string | null> => {
+    // The raw FCM/APNs device token — this is what the backend's Firebase Admin
+    // SDK actually sends to, NOT Expo's wrapped `ExponentPushToken[...]` format.
+    getFcmToken: async (): Promise<string | null> => {
         if (isExpoGo) return null;
         try {
-            const { data } = await Notifications.getExpoPushTokenAsync({
-                projectId: '8af7d922-a6f0-45a5-8c9d-d51ba283e5c2',
-            });
-            return data;
+            if (Platform.OS === 'ios') {
+                await messaging().registerDeviceForRemoteMessages();
+            }
+            return await messaging().getToken();
         } catch {
             return null;
         }
     },
 
-    registerWithBackend: async (): Promise<void> => {
+    /** Registers the device (if needed) and, when logged in, attaches the token to the account. */
+    registerOrClaim: async (token: string, deviceId: string | null, isAuthenticated: boolean): Promise<void> => {
+        await notificationApi.registerDevice(token, deviceId);
+        if (isAuthenticated) {
+            await notificationApi.claimToken(token);
+        }
+    },
+
+    registerWithBackend: async (isAuthenticated: boolean): Promise<void> => {
         // Collect device info first — no permission needed, works in Expo Go too
         const deviceInfo = await getDeviceInfo();
         if (__DEV__) console.log('[DeviceInfo]', JSON.stringify(deviceInfo, null, 2));
@@ -41,45 +56,67 @@ export const notificationService = {
         const granted = await notificationService.requestPermission();
         if (!granted) return;
 
-        const token = await notificationService.getExpoPushToken();
+        const token = await notificationService.getFcmToken();
         if (__DEV__) console.log('[PushToken]', token);
         if (!token) return;
 
-        // ── Backend ready? Replace the registerToken call below with: ──────────
-        // await notificationApi.registerDevice({ push_token: token, ...deviceInfo });
-        // ────────────────────────────────────────────────────────────────────────
-        await notificationApi.registerToken({
-            token,
-            platform: Platform.OS as 'ios' | 'android',
-            deviceName: deviceInfo.device_name,
-            deviceModel: deviceInfo.device_model,
-            osVersion: deviceInfo.device_os_version,
-            appVersion: deviceInfo.app_version,
-        }).catch(() => {});
+        // Check cache before hitting the API
+        try {
+            const cachedToken = await AsyncStorage.getItem(CACHE_KEY_TOKEN);
+            const cachedAuth = await AsyncStorage.getItem(CACHE_KEY_AUTH);
+            const currentAuthStr = String(isAuthenticated);
+            if (token === cachedToken && currentAuthStr === cachedAuth) {
+                if (__DEV__) console.log('[PushToken] Match found in cache. Skipping registration.');
+                return;
+            }
+        } catch {}
+
+        try {
+            await notificationService.registerOrClaim(token, deviceInfo.installation_id, isAuthenticated);
+
+            // Save to cache only on success
+            await AsyncStorage.setItem(CACHE_KEY_TOKEN, token);
+            await AsyncStorage.setItem(CACHE_KEY_AUTH, String(isAuthenticated));
+        } catch (error) {
+            if (__DEV__) console.error('[PushToken] Failed to register with backend:', error);
+        }
     },
 
-    updateToken: async (newToken: string): Promise<void> => {
+    updateToken: async (newToken: string, isAuthenticated: boolean): Promise<void> => {
         if (__DEV__) console.log('[PushToken:refreshed]', newToken);
-        // ── Backend ready? Replace below with: ──────────────────────────────────
-        // await notificationApi.updateToken({ push_token: newToken });
-        // ────────────────────────────────────────────────────────────────────────
-        await notificationApi.registerToken({
-            token: newToken,
-            platform: Platform.OS as 'ios' | 'android',
-            deviceName: null,
-            deviceModel: null,
-            osVersion: null,
-            appVersion: null,
-        }).catch(() => {});
+
+        // Check cache before hitting the API
+        try {
+            const cachedToken = await AsyncStorage.getItem(CACHE_KEY_TOKEN);
+            const cachedAuth = await AsyncStorage.getItem(CACHE_KEY_AUTH);
+            const currentAuthStr = String(isAuthenticated);
+            if (newToken === cachedToken && currentAuthStr === cachedAuth) {
+                if (__DEV__) console.log('[PushToken:refreshed] Match found in cache. Skipping registration.');
+                return;
+            }
+        } catch {}
+
+        try {
+            const deviceInfo = await getDeviceInfo();
+            await notificationService.registerOrClaim(newToken, deviceInfo.installation_id, isAuthenticated);
+
+            // Save to cache only on success
+            await AsyncStorage.setItem(CACHE_KEY_TOKEN, newToken);
+            await AsyncStorage.setItem(CACHE_KEY_AUTH, String(isAuthenticated));
+        } catch (error) {
+            if (__DEV__) console.error('[PushToken:refreshed] Failed to update with backend:', error);
+        }
     },
 
     unregister: async (): Promise<void> => {
         if (isExpoGo) return;
         try {
-            const { data: token } = await Notifications.getExpoPushTokenAsync({
-                projectId: '8af7d922-a6f0-45a5-8c9d-d51ba283e5c2',
-            });
+            const token = await messaging().getToken();
             await notificationApi.removeToken(token).catch(() => {});
+
+            // Clear local cached token/auth state on unregister
+            await AsyncStorage.removeItem(CACHE_KEY_TOKEN);
+            await AsyncStorage.removeItem(CACHE_KEY_AUTH);
         } catch {}
     },
 

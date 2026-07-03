@@ -29,13 +29,28 @@ function formatDate(dateStr?: string | null) {
   }
 }
 
-export function ProductCard({ item, index }: { item: any; index: number }) {
+// "cartCounter" (default): read-only history qty, switches to an in-cart +/- pill once added.
+// "preAddStepper": editable qty stepper before adding, always shows the Add to cart button.
+type ProductCardVariant = "cartCounter" | "preAddStepper";
+
+export function ProductCard({
+  item,
+  index,
+  variant = "cartCounter",
+}: {
+  item: any;
+  index: number;
+  variant?: ProductCardVariant;
+}) {
+  const isStepperVariant = variant === "preAddStepper";
   const router = useNav();
   const { items: cartItems, addItem, updateItem, removeItem } = useCart();
   const [isAdding, setIsAdding] = useState(false);
+  const [manualQty, setManualQty] = useState(1);
 
   const productId = item.productId || item.id;
-  const qty = item.lastQty ?? item.qty ?? 1;
+  const historyQty = item.lastQty ?? item.qty ?? 1;
+  const qty = isStepperVariant ? manualQty : historyQty;
   const cartItem = cartItems.find(
     (c: any) => c.medicineId === productId || c.metadata?.productId === productId
                 || c.medicineId === item.id || c.medicineId === item.medicineId,
@@ -64,12 +79,18 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
       } else {
         const itemId = String(item.medicineId ?? item.productId ?? item.id ?? "").trim();
         if (!itemId) {
-          throw new Error("[FrequentOrders] missing item id");
+          throw new Error(
+            isStepperVariant
+              ? "[FrequentlyOrdered] missing item id"
+              : "[FrequentOrders] missing item id",
+          );
         }
-        const slug =
-          String(item.slug ?? item.productId ?? item.id ?? "").trim() || itemId;
-        const name =
-          String(item.name ?? item.productId ?? item.id ?? "").trim() || itemId;
+        const slug = isStepperVariant
+          ? String(item.slug ?? "").trim() || itemId
+          : String(item.slug ?? item.productId ?? item.id ?? "").trim() || itemId;
+        const name = isStepperVariant
+          ? String(item.name ?? "").trim() || itemId
+          : String(item.name ?? item.productId ?? item.id ?? "").trim() || itemId;
         const price =
           Number(item.price ?? item.originalPrice ?? item.mrp ?? 0) ||
           Number(item.originalPrice ?? item.price ?? item.mrp ?? 0) ||
@@ -78,7 +99,7 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
         const mrp = Number(item.originalPrice ?? item.mrp ?? price);
         const imageUri = item.image?.uri ?? (typeof item.image === 'string' ? item.image : undefined);
         const medicineId = await resolveUUID(itemId, slug, item.productId);
-        if (__DEV__) console.log('[FrequentOrders] resolved:', { itemId, slug, medicineId });
+        if (!isStepperVariant && __DEV__) console.log('[FrequentOrders] resolved:', { itemId, slug, medicineId });
         await addItem({
           medicineId,
           variantId: null,
@@ -98,8 +119,12 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
         });
       }
     } catch (err: any) {
-      if (__DEV__) console.error("[FrequentOrders AddToCart] error:", err?.message ?? err);
-      Alert.alert('Failed', err?.message ?? 'Could not add to cart. Please try again.');
+      if (isStepperVariant) {
+        if (__DEV__) console.log("[FrequentlyOrdered AddToCart] error:", err);
+      } else {
+        if (__DEV__) console.error("[FrequentOrders AddToCart] error:", err?.message ?? err);
+        Alert.alert('Failed', err?.message ?? 'Could not add to cart. Please try again.');
+      }
     } finally {
       setIsAdding(false);
     }
@@ -109,14 +134,25 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
     .filter(Boolean)
     .join(" • ");
 
+  const itemDiscount =
+    item.discount ||
+    (item.originalPrice && Number(item.originalPrice) > Number(item.price)
+      ? `${Math.round(((Number(item.originalPrice) - Number(item.price)) / Number(item.originalPrice)) * 100)}% OFF`
+      : undefined);
+
+  const labelMdFontSize = isStepperVariant ? moderateScale(14, 0.1) : moderateScale(14);
+  const smallFontSize = isStepperVariant ? moderateScale(11, 0.08) : moderateScale(11);
+  const orderedFontSize = isStepperVariant ? moderateScale(13, 0.1) : moderateScale(12);
+  const imgSize = isStepperVariant ? exactScale(54) : 54;
+
   return (
     <View
       style={{
         backgroundColor: "#fff",
         borderRadius: 16,
-        marginHorizontal: exactScale(16),
-        marginBottom: exactScale(12),
-        padding: exactScale(16),
+        marginHorizontal: isStepperVariant ? 16 : exactScale(16),
+        marginBottom: isStepperVariant ? 12 : exactScale(12),
+        padding: isStepperVariant ? 16 : exactScale(16),
         borderWidth: 1,
         borderColor: "#EEEFF1",
       }}
@@ -127,36 +163,69 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
         onPress={() =>
           router.push({ pathname: "/product/[id]", params: { id: productId } })
         }
-        style={{ flexDirection: "row", alignItems: "flex-start" }}
+        style={{
+          flexDirection: "row",
+          alignItems: "flex-start",
+          marginBottom: isStepperVariant ? 12 : undefined,
+        }}
       >
         {/* Product image */}
         <View
           style={{
-            width: 80,
-            height: 80,
+            width: isStepperVariant ? 100 : 80,
+            height: isStepperVariant ? 100 : 80,
             borderRadius: 12,
             borderWidth: 1,
             borderColor: "#EEEFF1",
             backgroundColor: "#F9FAFB",
             alignItems: "center",
             justifyContent: "center",
-            marginRight: exactScale(12),
+            marginRight: isStepperVariant ? 12 : exactScale(12),
+            position: isStepperVariant ? "relative" : undefined,
           }}
         >
+          {isStepperVariant && !!itemDiscount && (
+            <View
+              style={{
+                position: "absolute",
+                top: 6,
+                left: 6,
+                backgroundColor: "#E8F5E9",
+                paddingHorizontal: 5,
+                paddingVertical: 2,
+                borderRadius: 4,
+                zIndex: 1,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: moderateScale(10, 0.08),
+                  fontWeight: "800",
+                  color: "#0F7635",
+                }}
+              >
+                {itemDiscount}
+              </Text>
+            </View>
+          )}
           {typeof item.image === "number" || (item.image && !item.image.uri) ? (
             <Image
               source={item.image}
-              style={{ width: 54, height: 54 }}
+              style={{ width: imgSize, height: imgSize, marginTop: isStepperVariant && itemDiscount ? 26 : 0 }}
               resizeMode="contain"
             />
           ) : item.image?.uri ? (
             <Image
               source={{ uri: item.image.uri }}
-              style={{ width: 54, height: 54 }}
+              style={{ width: imgSize, height: imgSize, marginTop: isStepperVariant && itemDiscount ? 26 : 0 }}
               resizeMode="contain"
             />
           ) : (
-            <icons.placeholder width={54} height={54} />
+            <icons.placeholder
+              width={imgSize}
+              height={imgSize}
+              style={{ marginTop: isStepperVariant && itemDiscount ? 26 : 0 }}
+            />
           )}
         </View>
 
@@ -171,11 +240,11 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           >
             <Text
               style={{
-                fontSize: moderateScale(14),
+                fontSize: labelMdFontSize,
                 fontWeight: "600",
                 color: "#1C2024",
                 flex: 1,
-                paddingRight: exactScale(8),
+                paddingRight: isStepperVariant ? 8 : exactScale(8),
               }}
               numberOfLines={2}
             >
@@ -185,67 +254,102 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
             <View style={{ alignItems: "flex-end" }}>
               <Text
                 style={{
-                  fontSize: moderateScale(14),
+                  fontSize: labelMdFontSize,
                   fontWeight: "700",
-                  color: "#0F7635",
+                  color: isStepperVariant ? "#1C2024" : "#0F7635",
                 }}
               >
-                ₹{Number(item.price).toFixed(1)}
+                ₹{Number(item.price).toFixed(isStepperVariant ? 2 : 1)}
               </Text>
               {!!item.originalPrice &&
                 Number(item.originalPrice) > Number(item.price) && (
                   <Text
                     style={{
-                      fontSize: moderateScale(11),
+                      fontSize: smallFontSize,
                       fontWeight: "400",
                       color: "#919EAB",
                       textDecorationLine: "line-through",
-                      marginTop: exactScale(2),
+                      marginTop: isStepperVariant ? 2 : exactScale(2),
                     }}
                   >
-                    ₹{Number(item.originalPrice).toFixed(1)}
+                    ₹{Number(item.originalPrice).toFixed(isStepperVariant ? 2 : 1)}
                   </Text>
                 )}
             </View>
           </View>
 
-          {/* Brand • Pack info */}
-          {!!brandLine && (
-            <Text
-              style={{
-                fontSize: moderateScale(11),
-                fontWeight: "400",
-                color: "#637381",
-                marginTop: exactScale(4),
-                marginBottom: exactScale(8),
-              }}
-              numberOfLines={1}
-            >
-              {brandLine}
-            </Text>
-          )}
+          {isStepperVariant ? (
+            <>
+              {!!item.brand && (
+                <Text
+                  style={{
+                    fontSize: smallFontSize,
+                    fontWeight: "500",
+                    color: "#637381",
+                    marginTop: 3,
+                    marginBottom: 1,
+                  }}
+                  numberOfLines={1}
+                >
+                  {item.brand}
+                </Text>
+              )}
+              {!!(item.description || item.form) && (
+                <Text
+                  style={{
+                    fontSize: smallFontSize,
+                    fontWeight: "400",
+                    color: "#919EAB",
+                    marginTop: 2,
+                    marginBottom: 2,
+                  }}
+                  numberOfLines={1}
+                >
+                  {item.description || item.form}
+                </Text>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Brand • Pack info */}
+              {!!brandLine && (
+                <Text
+                  style={{
+                    fontSize: smallFontSize,
+                    fontWeight: "400",
+                    color: "#637381",
+                    marginTop: exactScale(4),
+                    marginBottom: exactScale(8),
+                  }}
+                  numberOfLines={1}
+                >
+                  {brandLine}
+                </Text>
+              )}
 
-          {/* Qty badge */}
-          <View
-            style={{
-              alignSelf: "flex-start",
-              borderWidth: 1,
-              borderColor: "#EEEFF1",
-              borderRadius: 6,
-              paddingHorizontal: exactScale(10),
-              paddingVertical: exactScale(3),
-            }}
-          >
-            <Text
-              style={{
-                fontSize: moderateScale(12),
-                fontWeight: "500",
-                color: "#1C2024",
-              }}
-            >
-              Qty: {qty}
-            </Text>
-          </View>
+              {/* Qty badge */}
+              <View
+                style={{
+                  alignSelf: "flex-start",
+                  borderWidth: 1,
+                  borderColor: "#EEEFF1",
+                  borderRadius: 6,
+                  paddingHorizontal: exactScale(10),
+                  paddingVertical: exactScale(3),
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: moderateScale(12),
+                    fontWeight: "500",
+                    color: "#1C2024",
+                  }}
+                >
+                  Qty: {qty}
+                </Text>
+              </View>
+            </>
+          )}
         </View>
       </Touchable>
 
@@ -256,12 +360,101 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
           borderWidth: 1,
           borderColor: "#EEEFF1",
           height: 0,
-          marginVertical: exactScale(12),
+          marginVertical: isStepperVariant ? 12 : exactScale(12),
         }}
       />
 
-      {/* Add to cart — full width */}
-      {cartItem ? (
+      {isStepperVariant ? (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderWidth: 0.69,
+              borderColor: "#919EAB33",
+              borderRadius: 8,
+            }}
+          >
+            <Touchable
+              onPress={() => setManualQty((q) => Math.max(1, q - 1))}
+              style={{
+                width: exactScale(36),
+                height: exactScale(36),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: moderateScale(20, 0.1),
+                  fontWeight: "500",
+                  color: "#1C2024",
+                }}
+              >
+                −
+              </Text>
+            </Touchable>
+            <Text
+              style={{
+                fontSize: labelMdFontSize,
+                fontWeight: "600",
+                color: "#1C2024",
+                paddingHorizontal: 8,
+              }}
+            >
+              {manualQty}
+            </Text>
+            <Touchable
+              onPress={() => setManualQty((q) => q + 1)}
+              style={{
+                width: exactScale(36),
+                height: exactScale(36),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: moderateScale(20, 0.1),
+                  fontWeight: "500",
+                  color: "#1C2024",
+                }}
+              >
+                +
+              </Text>
+            </Touchable>
+          </View>
+          <Touchable
+            style={{
+              flex: 1,
+              height: CART_BUTTON_HEIGHT,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              borderWidth: 1,
+              borderColor: "#0F763533",
+              backgroundColor: "#F1F9F4",
+            }}
+            activeOpacity={0.6}
+            onPress={handleAddToCart}
+            disabled={isAdding}
+          >
+            {isAdding ? (
+              <ActivityIndicator size="small" color="#0F7635" />
+            ) : (
+              <Text
+                style={{
+                  fontSize: moderateScale(13, 0.1),
+                  fontWeight: "600",
+                  color: "#0F7635",
+                }}
+              >
+                Add to cart
+              </Text>
+            )}
+          </Touchable>
+        </View>
+      ) : cartItem ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635', height: CART_BUTTON_HEIGHT }}>
           <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>−</Text>
@@ -293,29 +486,29 @@ export function ProductCard({ item, index }: { item: any; index: number }) {
       {/* Ordered X times + last ordered */}
       {(!!item.orderedTimes || !!item.lastOrdered) && (
         <View
-          style={{ flexDirection: "row", alignItems: "center", marginTop: exactScale(10) }}
+          style={{ flexDirection: "row", alignItems: "center", marginTop: isStepperVariant ? 12 : exactScale(10) }}
         >
           <icons.trend_up
             width={14}
             height={14}
             fill="#0F7635"
-            style={{ marginRight: exactScale(6) }}
+            style={{ marginRight: isStepperVariant ? 6 : exactScale(6) }}
           />
           {!!item.orderedTimes && (
             <Text
               style={{
-                fontSize: moderateScale(12),
+                fontSize: orderedFontSize,
                 fontWeight: "600",
                 color: "#0F7635",
               }}
             >
-              Ordered {item.orderedTimes} times
+              Ordered {isStepperVariant ? String(item.orderedTimes).padStart(2, "0") : item.orderedTimes} times
             </Text>
           )}
           {!!item.lastOrdered && (
             <Text
               style={{
-                fontSize: moderateScale(12),
+                fontSize: orderedFontSize,
                 fontWeight: "500",
                 color: "#637381",
                 marginLeft: item.orderedTimes ? 8 : 0,

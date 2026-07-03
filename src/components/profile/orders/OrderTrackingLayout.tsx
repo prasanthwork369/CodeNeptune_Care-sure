@@ -8,16 +8,15 @@ import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
 import { useNav } from "@/src/hooks/useNav";
+import { useOrderTrackingSteps } from "@/src/hooks/useOrderTrackingSteps";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
 import { downloadLocalAsset } from "@/src/utils/fileDownload";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { useQueryClient } from "@tanstack/react-query";
-import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
-import { Image } from "expo-image";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -31,6 +30,14 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { orderStyles as s } from "./orders.styles";
 import { OrderTrackingModal } from "./OrderTrackingModal";
 import { OrderTrackingSkeleton } from "./OrderTrackingSkeleton";
+import {
+  DeliveryAddressSection,
+  ItemsOrderedSection,
+  PaymentMethodSection,
+  PrescriptionSection,
+  SavingsBreakdownSection,
+  SectionCard,
+} from "./tracking-sections";
 
 const invoiceAsset = require("../../../../assets/pdf/Invoice.pdf");
 
@@ -118,42 +125,12 @@ function TrackingStepRow({
   );
 }
 
-function SectionCard({
-  children,
-  className = "",
-  style,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  style?: any;
-}) {
-  return (
-    <View
-      className={`bg-white rounded-lg mx-base ${className}`}
-      style={[{ borderWidth: 1, borderColor: "#F0F1F3", elevation: 0 }, style]}
-    >
-      {children}
-    </View>
-  );
-}
-
 function formatDate(iso?: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  });
-}
-
-function formatDateTime(iso?: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 }
 
@@ -247,6 +224,7 @@ export const OrderTrackLayout: React.FC = () => {
   const couponDiscount = Number(bill?.couponDiscount ?? 0);
   const walletDiscount = Number(bill?.walletDiscount ?? 0);
   const coinsDiscount = Number(bill?.coinsDiscount ?? 0);
+  const totalSaved = Number(bill?.totalSaved ?? order?.discountAmount ?? 0);
 
   const subtotal = Number(order?.subtotal ?? bill?.itemTotal ?? 0);
   const mrpTotal =
@@ -257,88 +235,16 @@ export const OrderTrackLayout: React.FC = () => {
       deliveryFee -
       handlingCharge;
 
-  const isCancelled = order?.status === 0;
   const isInvoiceAvailable = order?.status != null && order.status >= 5 && order.status <= 7;
 
-  // Map toStatus → timestamp from statusLogs for accurate step times
-  const logTimeByStatus: Record<string, string> = {};
-  (order?.statusLogs ?? []).forEach((log) => {
-    if (log.toStatus && log.createdAt) {
-      logTimeByStatus[log.toStatus] = log.createdAt;
-    }
-  });
-  const logTime = (status: number) => logTimeByStatus[String(status)] ?? null;
+  const trackingSteps = useOrderTrackingSteps(order);
 
-  const STATUS_TITLE: Record<number, string> = {
-    1: "Order Placed",
-    2: "Confirmed",
-    3: "Verified by Pharmacist",
-    4: "Processing",
-    5: "Packed",
-    6: "Shipped",
-    7: "Delivered",
-    8: "Under Review",
-    9: "Processing",
-    10: "Under Review",
-    0: "Cancelled",
-  };
-
-  // For cancelled orders: build steps only from what statusLogs recorded
-  const trackingSteps = isCancelled
-    ? (order?.statusLogs ?? [])
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      )
-      .map((log) => ({
-        title: STATUS_TITLE[Number(log.toStatus)] ?? `Status ${log.toStatus}`,
-        time: formatDateTime(log.createdAt),
-        completed: Number(log.toStatus) !== 0,
-        cancelled: Number(log.toStatus) === 0,
-        isActive: false,
-      }))
-    : [
-      {
-        status: 1,
-        title: "Order Placed",
-        time: logTime(1) ?? order?.createdAt,
-      },
-      {
-        status: 2,
-        title: "Confirmed",
-        time: logTime(2) ?? order?.confirmedAt,
-      },
-      {
-        status: 3,
-        title: "Verified",
-        time: logTime(3) ?? order?.processingAt,
-      },
-      {
-        status: 4,
-        title: "Processing",
-        time: logTime(4) ?? order?.processingAt,
-      },
-      { status: 5, title: "Packed", time: logTime(5) ?? order?.processingAt },
-      { status: 6, title: "Shipped", time: logTime(6) ?? order?.shippedAt },
-      {
-        status: 7,
-        title: "Delivered",
-        time: logTime(7) ?? order?.deliveredAt ?? order?.estimatedDelivery,
-      },
-    ].map((s) => {
-      // Only treat status as a progress position if it's a known step (1-7).
-      // Unknown codes (e.g. 11 = pending payment) must not mark later steps complete.
-      const STEP_STATUSES = [1, 2, 3, 4, 5, 6, 7];
-      const cur = STEP_STATUSES.includes(order?.status ?? -1) ? (order?.status ?? 0) : 0;
-      return {
-        title: s.title,
-        time: s.time ? formatDateTime(s.time) : "—",
-        completed: cur > 0 && cur >= s.status,
-        cancelled: false,
-        isActive: cur > 0 ? cur === s.status : s.status === 1,
-      };
-    });
+  // Same "toStatus → timestamp" lookup the tracking steps use, needed here to
+  // show the precise "Delivered on" date in the header above.
+  const deliveredLogTime = (order?.statusLogs ?? []).reduce<string | null>(
+    (acc, log) => (log.toStatus === "7" && log.createdAt ? log.createdAt : acc),
+    null,
+  );
 
   if (loading) {
     return (
@@ -392,7 +298,7 @@ export const OrderTrackLayout: React.FC = () => {
             <Text style={s.label20} className="font-inter-bold text-brand-text">
               {order?.status === 7
                 ? formatDate(
-                  logTime(7) ??
+                  deliveredLogTime ??
                   order?.deliveredAt ??
                   order?.estimatedDelivery,
                 )
@@ -465,191 +371,12 @@ export const OrderTrackLayout: React.FC = () => {
           )}
         </SectionCard>
 
-        <SectionCard>
-          <View
-            className="flex-row items-center justify-between"
-            style={{
-              paddingHorizontal: exactScale(16),
-              paddingTop: exactScale(16),
-              paddingBottom: exactScale(12),
-            }}
-          >
-            <Text style={s.labelMd} className="font-inter-bold text-brand-text">
-              Items Ordered ({items.length})
-            </Text>
-            <View className="flex-row" style={{ gap: exactScale(8) }}>
-              {order?.status === 7 && (
-                <Touchable
-                  className="flex-row items-center"
-                  style={{
-                    borderWidth: exactScale(1.33),
-                    borderColor: "#FDE047",
-                    backgroundColor: "#FEF9C3",
-                    borderRadius: exactScale(20),
-                    paddingHorizontal: exactScale(12),
-                    paddingVertical: exactScale(4),
-                  }}
-                  activeOpacity={0.7}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/profile/orders/return",
-                      params: { orderId },
-                    } as any)
-                  }
-                >
-                  <icons.package_icon width={exactScale(14)} height={exactScale(14)} fill="#854D0E" />
-                  <Text
-                    style={[s.labelSm, { marginLeft: exactScale(6) }]}
-                    className="font-inter-semibold text-brand-text"
-                  >
-                    Return
-                  </Text>
-                </Touchable>
-              )}
-              {order?.status !== 7 && order?.status !== 0 && (
-                <Touchable
-                  className="flex-row items-center"
-                  style={{
-                    borderWidth: exactScale(1.33),
-                    borderColor: "#515F0014",
-                    backgroundColor: "#FFFFDC",
-                    borderRadius: exactScale(20),
-                    paddingHorizontal: exactScale(12),
-                    paddingVertical: exactScale(4),
-                    shadowColor: "#000000",
-                    shadowOffset: { width: 0, height: exactScale(5.33) },
-                    shadowOpacity: 0.05,
-                    shadowRadius: exactScale(32),
-                  }}
-                  activeOpacity={0.7}
-                  onPress={() => router.push({ pathname: "/profile/orders/cancel", params: { orderId } } as any)}
-                  disabled={isCancelling}
-                >
-                  <Text
-                    style={[s.labelSm, { marginLeft: exactScale(6) }]}
-                    className="font-inter-semibold text-brand-text"
-                  >
-                    {isCancelling ? 'Cancelling...' : 'Cancel Order'}
-                  </Text>
-                </Touchable>
-              )}
-            </View>
-          </View>
-          {items.map((item, index, arr) => (
-            <View key={item.id}>
-              <Touchable
-                activeOpacity={0.7}
-                onPress={() => {
-                  const productId =
-                    item.medicineSnapshot?.productId ??
-                    item.medicineSnapshot?.slug ??
-                    item.medicineId;
-                  if (productId)
-                    router.push({
-                      pathname: "/product/[id]",
-                      params: { id: productId },
-                    } as any);
-                }}
-                className="flex-row"
-                style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(12) }}
-              >
-                <View
-                  className="border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center overflow-hidden"
-                  style={{
-                    width: exactScale(72),
-                    height: exactScale(72),
-                    borderRadius: exactScale(8),
-                    marginRight: exactScale(12),
-                  }}
-                >
-                  {item.medicineSnapshot?.image ? (
-                    <Image
-                      source={{ uri: item.medicineSnapshot.image }}
-                      style={s.productImg50}
-                      contentFit="contain"
-                    />
-                  ) : (
-                    <icons.placeholder width={exactScale(50)} height={exactScale(50)} />
-                  )}
-                </View>
-                <View className="flex-1">
-                  <View className="flex-row justify-between items-start">
-                    <Text
-                      style={[s.labelSm, { paddingRight: exactScale(8) }]}
-                      className="font-inter-semibold text-brand-text flex-1"
-                      numberOfLines={2}
-                    >
-                      {item.medicineSnapshot?.name ?? item.medicineId}
-                    </Text>
-                    <View className="items-end">
-                      <Text
-                        style={s.labelSm}
-                        className="font-inter-bold text-brand-text"
-                      >
-                        {item.unitPrice
-                          ? `₹${parseFloat((Number(item.unitPrice) * item.quantity).toFixed(2))}`
-                          : "—"}
-                      </Text>
-                      {item.medicineSnapshot?.mrp != null && (
-                        <Text
-                          style={[s.statusBadge, { marginTop: exactScale(2) }]}
-                          className="font-inter text-brand-subtext line-through"
-                        >
-                          ₹
-                          {parseFloat(
-                            (item.medicineSnapshot.mrp * item.quantity).toFixed(
-                              2,
-                            ),
-                          )}
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-                  {(item.medicineSnapshot?.brand ||
-                    item.medicineSnapshot?.pack) && (
-                      <Text
-                        style={[s.labelSm, { marginTop: exactScale(2) }]}
-                        className="font-inter-medium text-brand-subtext"
-                      >
-                        {[item.medicineSnapshot.brand, item.medicineSnapshot.pack]
-                          .filter(Boolean)
-                          .join(" • ")}
-                      </Text>
-                    )}
-                  <View className="flex-row" style={{ marginTop: exactScale(8) }}>
-                    <View
-                      style={{
-                        borderWidth: exactScale(1),
-                        borderColor: "#E2E8F0",
-                        backgroundColor: "#F3F4F6",
-                        borderRadius: exactScale(4),
-                        paddingHorizontal: exactScale(10),
-                        paddingVertical: exactScale(2),
-                      }}
-                    >
-                      <Text
-                        style={s.statusBadge}
-                        className="font-inter-semibold text-brand-text"
-                      >
-                        Qty: {item.quantity}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </Touchable>
-              {index < arr.length - 1 && (
-                <View
-                  style={{
-                    borderTopWidth: 1,
-                    borderColor: "#E5E7EB",
-                    marginHorizontal: exactScale(20),
-                    borderStyle: "dashed",
-                  }}
-                />
-              )}
-            </View>
-          ))}
-        </SectionCard>
+        <ItemsOrderedSection
+          items={items}
+          orderId={orderId}
+          orderStatus={order?.status}
+          isCancelling={isCancelling}
+        />
 
         <SectionCard>
           <Touchable
@@ -694,263 +421,20 @@ export const OrderTrackLayout: React.FC = () => {
           </Touchable>
         </SectionCard>
 
-        <View className="mx-base rounded-lg overflow-hidden border border-[#919EAB33] bg-white">
-          <LinearGradient
-            colors={["#FBFEFC", "#EBFAF0"]}
-            start={{ x: 0.5, y: 1 }}
-            end={{ x: 0.5, y: 0 }}
-          >
-            <View
-              className="flex-row items-center justify-between"
-              style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(12) }}
-            >
-              <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
-                <icons.percent_discount width={exactScale(18)} height={exactScale(18)} fill="#0F7635" />
-                <Text
-                  style={s.labelMd}
-                  className="font-inter-bold text-brand-text"
-                >
-                  Saving this order
-                </Text>
-              </View>
-              <LinearGradient
-                colors={["#68D36C", "#329939"]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-                style={{ borderRadius: exactScale(6) }}
-              >
-                <View style={{ paddingHorizontal: exactScale(10), paddingVertical: exactScale(4) }}>
-                  <Text
-                    style={s.labelSm}
-                    className="font-inter-bold text-white"
-                  >
-                    ₹
-                    {Number(
-                      bill?.totalSaved ?? order?.discountAmount ?? 0,
-                    ).toFixed(2)}
-                  </Text>
-                </View>
-              </LinearGradient>
-            </View>
-          </LinearGradient>
-          <View style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(8) }}>
-            {productDiscount > 0 && (
-              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-medium text-[#6A6A6A]"
-                >
-                  Product Discount
-                </Text>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-semibold text-[#0F7635]"
-                >
-                  -₹{productDiscount.toFixed(2)}
-                </Text>
-              </View>
-            )}
-            {couponDiscount > 0 && (
-              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-medium text-[#6A6A6A]"
-                >
-                  Coupon Discount
-                </Text>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-semibold text-[#0F7635]"
-                >
-                  -₹{couponDiscount.toFixed(2)}
-                </Text>
-              </View>
-            )}
-            {walletDiscount > 0 && (
-              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-medium text-[#6A6A6A]"
-                >
-                  CareSure Wallet
-                </Text>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-semibold text-[#0F7635]"
-                >
-                  -₹{walletDiscount.toFixed(2)}
-                </Text>
-              </View>
-            )}
-            {coinsDiscount > 0 && (
-              <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-medium text-[#6A6A6A]"
-                >
-                  CareSure Coins
-                </Text>
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-semibold text-[#0F7635]"
-                >
-                  -₹{coinsDiscount.toFixed(2)}
-                </Text>
-              </View>
-            )}
-            {productDiscount === 0 &&
-              couponDiscount === 0 &&
-              walletDiscount === 0 &&
-              coinsDiscount === 0 && (
-                <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
-                  <Text
-                    style={s.labelSm}
-                    className="font-inter-medium text-[#6A6A6A]"
-                  >
-                    No discounts applied
-                  </Text>
-                  <Text
-                    style={s.labelSm}
-                    className="font-inter-semibold text-[#0F7635]"
-                  >
-                    ₹0.00
-                  </Text>
-                </View>
-              )}
-          </View>
-        </View>
+        <SavingsBreakdownSection
+          totalSaved={totalSaved}
+          productDiscount={productDiscount}
+          couponDiscount={couponDiscount}
+          walletDiscount={walletDiscount}
+          coinsDiscount={coinsDiscount}
+        />
 
-        <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}>
-          <Text
-            className="font-inter-semibold text-brand-text"
-            style={{ fontSize: moderateScale(14), marginBottom: exactScale(12) }}
-          >
-            Deliver To
-          </Text>
-          {order?.deliveryAddress ? (
-            <View style={{ gap: exactScale(2) }}>
-              <Text
-                style={s.labelSm}
-                className="font-inter-bold text-brand-text"
-              >
-                {order.deliveryAddress.name}
-              </Text>
-              <Text
-                style={[s.labelSm, { lineHeight: moderateScale(18), marginTop: exactScale(4) }]}
-                className="font-inter text-brand-subtext"
-              >
-                {[order.deliveryAddress.line1, order.deliveryAddress.line2]
-                  .filter(Boolean)
-                  .join(", ")}
-                {", "}
-                {order.deliveryAddress.city},{"\n"}
-                {order.deliveryAddress.state.toUpperCase()},{" "}
-                {order.deliveryAddress.pincode}
-              </Text>
-              <Text style={s.labelSm} className="font-inter text-brand-subtext">
-                Phone : {order.deliveryAddress.phone}
-              </Text>
-            </View>
-          ) : (
-            <Text style={s.labelSm} className="font-inter text-brand-subtext">
-              —
-            </Text>
-          )}
-        </SectionCard>
+        <DeliveryAddressSection address={order?.deliveryAddress} />
 
-        <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}>
-          <Text
-            className="font-inter-semibold text-brand-text"
-            style={{ fontSize: moderateScale(14), marginBottom: exactScale(12) }}
-          >
-            Payment Method
-          </Text>
-          <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
-            <View
-              className="items-center justify-center bg-[#FFFFFF]"
-              style={{ width: exactScale(40), height: exactScale(40) }}
-            >
-              <icons.credit_card width={exactScale(24)} height={exactScale(24)} fill="#0F7635" />
-            </View>
-            <View>
-              <Text
-                style={s.labelMd}
-                className="font-inter-semibold text-brand-text"
-              >
-                Paid online
-              </Text>
-              <Text
-                style={s.labelSm}
-                className="font-inter-medium text-brand-subtext"
-              >
-                UPI / Netbanking
-              </Text>
-            </View>
-          </View>
-        </SectionCard>
+        <PaymentMethodSection />
 
         {order?.clinicalData && (
-          <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16), marginBottom: exactScale(8) }}>
-            <Text
-              style={[s.labelMd, { color: "#0F1724", marginBottom: exactScale(12) }]}
-              className="font-inter-semibold"
-            >
-              Prescription Details
-            </Text>
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
-                <View
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    borderWidth: exactScale(1),
-                    borderColor: "#919EAB33",
-                    width: exactScale(40),
-                    height: exactScale(40),
-                    borderRadius: exactScale(4),
-                  }}
-                  className="items-center justify-center"
-                >
-                  <icons.prescription_green width={exactScale(22)} height={exactScale(22)} />
-                </View>
-                <View>
-                  <Text
-                    style={s.labelSm}
-                    className="font-inter-bold text-[#0F1724]"
-                  >
-                    Prescription Attached
-                  </Text>
-                  <View className="flex-row items-center" style={{ gap: exactScale(4), marginTop: exactScale(2) }}>
-                    <icons.verified_user_round width={exactScale(14)} height={exactScale(14)} />
-                    <Text
-                      style={s.labelSm}
-                      className="font-inter-medium text-[#16A34A]"
-                    >
-                      Verified by our Pharmacist
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <Touchable
-                onPress={() => setRxModalVisible(true)}
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  borderWidth: exactScale(1),
-                  borderColor: "#00000014",
-                  borderRadius: exactScale(6),
-                  paddingHorizontal: exactScale(16),
-                  paddingVertical: exactScale(6),
-                }}
-                activeOpacity={0.5}
-              >
-                <Text
-                  style={s.labelSm}
-                  className="font-inter-semibold text-[#0F1724]"
-                >
-                  View Rx
-                </Text>
-              </Touchable>
-            </View>
-          </SectionCard>
+          <PrescriptionSection onViewRx={() => setRxModalVisible(true)} />
         )}
       </ScrollView>
 

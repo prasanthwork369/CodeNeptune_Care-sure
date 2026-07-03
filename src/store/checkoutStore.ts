@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface BillBreakdown {
+export interface BillBreakdown {
     subtotal: number;
     productDiscount: number;
     couponDiscount: number;

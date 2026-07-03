@@ -2,6 +2,7 @@ import { authApi } from '../api/auth.api';
 import { profileApi } from '../api/profile.api';
 import { tokenStorage } from '../lib/storage';
 import { useAuthStore } from '../store/authStore';
+import { notificationService } from './notification.service';
 
 export const authService = {
     requestOtp: async (phone: string) => {
@@ -29,7 +30,10 @@ export const authService = {
     },
     logout: async () => {
         try {
-            await authApi.logout();
+            // Unregister the push token while the auth header is still valid —
+            // deactivates it server-side so this device stops getting pushes
+            // addressed to an account it's no longer signed into.
+            await Promise.allSettled([authApi.logout(), notificationService.unregister()]);
         } finally {
             await useAuthStore.getState().logout();
         }

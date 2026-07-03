@@ -1,6 +1,6 @@
 // Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
 // Flip LIVE to switch the app between the live API and QA.
-const LIVE = false;
+const LIVE = true;
 const PROD_URL = process.env.EXPO_PUBLIC_API_BASE_URL_PROD;
 const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
 
@@ -86,7 +86,10 @@ export const API_ENDPOINTS = {
   WALLET_TOPUP: "/api/v1/customers/wallet/topup",
 
   // ── Push Notifications ───────────────────────────────────────────────────
-  PUSH_TOKEN: "/api/v1/customers/push-token",
+  PUSH_DEVICE_REGISTER: "/api/v1/push-notifications/devices",
+  PUSH_DEVICE_CLAIM: "/api/v1/push-notifications/devices/claim",
+  PUSH_DEVICE_BY_TOKEN: (token: string) =>
+    `/api/v1/push-notifications/devices/${encodeURIComponent(token)}`,
 
   // ── In-App Notifications ─────────────────────────────────────────────────
   NOTIFICATIONS: "/api/v1/customers/notifications",

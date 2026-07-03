@@ -29,11 +29,4 @@ export const orderStyles = StyleSheet.create({
 
     // ReturnSuccessModal
     returnSuccessImg: { width: exactScale(88), height: exactScale(88) },
-
-    // FrequentlyOrderedLayout counter
-    freqCounter:   { width: exactScale(90) },
-    freqCounterBtn:{ width: exactScale(44), height: exactScale(44) },
-    freqCounterVal:{ fontSize: moderateScale(13, 0.1) },
-    freqImgBox:    { width: exactScale(100), height: exactScale(100) },
-    freqImg:       { width: exactScale(54), height: exactScale(54) },
 });

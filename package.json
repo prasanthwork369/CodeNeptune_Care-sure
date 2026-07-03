@@ -21,6 +21,7 @@
     "@react-native-community/netinfo": "11.4.1",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-firebase/crashlytics": "^25.1.0",
+    "@react-native-firebase/messaging": "^25.1.0",
     "@react-native-picker/picker": "2.11.1",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",

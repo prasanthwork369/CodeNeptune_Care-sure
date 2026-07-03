@@ -3,6 +3,8 @@ import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCartPendingStore } from "@/src/store/cartStore";
+import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
+import { NotificationNavigation } from "@/src/services/NotificationNavigation";
 import { isExpoGo } from "@/src/utils/environment";
 import { validate } from "@/src/utils/validation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -160,9 +162,16 @@ export function useOtp() {
     // rather than snapping it to the first empty slot. Fresh left-to-right
     // typing has no selection, so it flows naturally at the end.
     const editing = selection;
+    // A shrinking value means the selected digit was deleted, not replaced —
+    // every digit after it just shifted one slot left. Advancing the
+    // highlight forward in that case would land it on a box that already
+    // has a shifted-in digit, leaving the true empty box unmarked. Drop out
+    // of editing mode instead, so the highlight falls back to sitting right
+    // after the last remaining digit.
+    const wasDeletion = digits.length < otp.length;
     setOtp(digits);
 
-    if (editing) {
+    if (editing && !wasDeletion) {
       const next = editing.start + 1;
       setSelection(next < 6 ? { start: next, end: next + 1 } : undefined);
     } else {
@@ -235,7 +244,13 @@ export function useOtp() {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
       }
 
-      router.replace("/(tabs)");
+      const pendingNotification = useNotificationNavigationStore.getState().pendingNotification;
+      if (pendingNotification) {
+        NotificationNavigation.executeNavigation(pendingNotification);
+        useNotificationNavigationStore.getState().clearPendingNotification();
+      } else {
+        router.replace("/(tabs)");
+      }
     } catch {
       // Wrong or expired code (error text is surfaced by useAuth). Clear the
       // boxes and refocus so the user can retype immediately — the standard

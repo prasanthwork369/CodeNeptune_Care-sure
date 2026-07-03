@@ -1,6 +1,7 @@
 import { exactScale, moderateScale } from '@/src/utils/exactScale';
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { CardOptionsMenu } from '@/src/components/ui/CardOptionsMenu';
 import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { useNotifications } from '@/src/hooks/queries/useNotifications';
@@ -16,7 +17,7 @@ import { styles as s } from './notifications.styles';
 import { useFocusEffect } from 'expo-router';
 import { Image } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
-import { Modal, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, TextStyle, View } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -119,65 +120,20 @@ function getNotificationTitle(n: NotificationLog): string {
   return 'Notification';
 }
 
-// ─── Options popover (pattern reused from RxOrdersLayout) ────────────────────
-
-const OptionsPanel: React.FC<{
-  top: number;
-  onClose: () => void;
-  isRead: boolean;
-  onMarkRead: () => void;
-  onDismiss: () => void;
-}> = ({ top, onClose, isRead, onMarkRead, onDismiss }) => (
-  <View style={{ flex: 1 }}>
-    <Touchable
-      activeOpacity={1}
-      onPress={onClose}
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-    />
-    <View
-      style={[
-        s.popoverWidth,
-        {
-          position: 'absolute',
-          top,
-          right: 16,
-          backgroundColor: '#FFFFFF',
-          borderRadius: 16,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 6 },
-          shadowOpacity: 0.2,
-          shadowRadius: 16,
-          elevation: 10,
-        },
-      ]}
-    >
-      <Touchable
-        activeOpacity={0.7}
-        onPress={onDismiss}
-        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(16), paddingVertical: exactScale(14) }}
-      >
-        <icons.close_dark width={s.popoverIcon.width} height={s.popoverIcon.height} />
-        <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: exactScale(14) }]}>
-          Clear
-        </Text>
-      </Touchable>
-      {!isRead && (
-        <Touchable
-          activeOpacity={0.7}
-          onPress={onMarkRead}
-          style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(16), paddingVertical: exactScale(14) }}
-        >
-          <icons.done_all width={s.popoverIconAlt.width} height={s.popoverIconAlt.height} fill="#111827" />
-          <Text style={[s.popoverText, { fontWeight: '600', color: '#111827', marginLeft: exactScale(14) }]}>
-            Mark as read
-          </Text>
-        </Touchable>
-      )}
-    </View>
-  </View>
-);
-
 // ─── Notification row ────────────────────────────────────────────────────────
+
+const optionRowStyle = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  paddingHorizontal: exactScale(16),
+  paddingVertical: exactScale(14),
+};
+
+const optionTextStyle: TextStyle = {
+  fontWeight: '600',
+  color: '#111827',
+  marginLeft: exactScale(14),
+};
 
 interface NotificationRowItemProps {
   notification: NotificationLog;
@@ -266,15 +222,48 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
         </Touchable>
       </View>
 
-      <Modal transparent visible={!!menuAnchor} animationType="fade" onRequestClose={() => setMenuAnchor(null)}>
-        <OptionsPanel
-          top={menuAnchor?.top ?? 0}
-          onClose={() => setMenuAnchor(null)}
-          isRead={notification.isRead}
-          onMarkRead={() => { setMenuAnchor(null); onMarkRead(); }}
-          onDismiss={() => { setMenuAnchor(null); onDismiss(); }}
-        />
-      </Modal>
+      <CardOptionsMenu
+        useModal
+        modalVisible={!!menuAnchor}
+        onClose={() => setMenuAnchor(null)}
+        popoverStyle={[
+          s.popoverWidth,
+          {
+            position: 'absolute',
+            top: menuAnchor?.top ?? 0,
+            right: 16,
+            backgroundColor: '#FFFFFF',
+            borderRadius: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.2,
+            shadowRadius: 16,
+            elevation: 10,
+          },
+        ]}
+        items={[
+          {
+            key: 'clear',
+            icon: <icons.close_dark width={s.popoverIcon.width} height={s.popoverIcon.height} />,
+            label: 'Clear',
+            rowStyle: optionRowStyle,
+            textStyle: [s.popoverText, optionTextStyle],
+            onPress: () => { setMenuAnchor(null); onDismiss(); },
+          },
+          ...(!notification.isRead
+            ? [
+                {
+                  key: 'markRead',
+                  icon: <icons.done_all width={s.popoverIconAlt.width} height={s.popoverIconAlt.height} fill="#111827" />,
+                  label: 'Mark as read',
+                  rowStyle: optionRowStyle,
+                  textStyle: [s.popoverText, optionTextStyle],
+                  onPress: () => { setMenuAnchor(null); onMarkRead(); },
+                },
+              ]
+            : []),
+        ]}
+      />
     </Touchable>
   );
 };
