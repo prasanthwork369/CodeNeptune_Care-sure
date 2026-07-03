@@ -2,12 +2,15 @@ import { Address } from "@/src/api/address.api";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { typography } from "@/src/constants/typography";
+import { usePincode } from "@/src/hooks/mutations/usePincode";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useSettings } from "@/src/hooks/queries/useSettings";
-import { usePincode } from "@/src/hooks/mutations/usePincode";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useToastStore } from "@/src/store/toastStore";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import {
   BottomSheetModal,
   BottomSheetScrollView,
@@ -23,9 +26,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { typography } from "@/src/constants/typography";
 
 interface LocationBottomSheetProps {
   isVisible: boolean;
@@ -242,10 +242,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          "Location permission needed",
+          "Location access needed",
           canAskAgain
-            ? "We need your location to auto-fill your delivery address."
-            : "Enable location access for Caresure in Settings to use this feature.",
+            ? "Allow location access while you use the app to auto-fill your delivery address."
+            : "Location access is turned off. Enable it in Settings to use this feature.",
           canAskAgain
             ? [{ text: "OK" }]
             : [

@@ -61,6 +61,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
       <View style={s.boxRow}>
         {[...Array(OTP_LENGTH)].map((_, index) => {
           const isActive = focused && index === activeIndex;
+          const isFilled = !!otp[index];
           return (
             <Pressable
               key={index}
@@ -68,16 +69,19 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               style={[
                 s.otpBox,
                 {
-                  borderWidth: isActive || showError ? 1.5 : 1,
+                  borderWidth: isActive || showError ? 2 : 1,
                   borderColor: showError
                     ? "#EF4444"
                     : isActive
                       ? "#0F7635"
-                      : "#919EAB33",
+                      : isFilled
+                        ? "#0F7635"
+                        : "#D0D5DD",
+                  backgroundColor: isActive ? "#F0FDF4" : "#FFFFFF",
                 },
               ]}
             >
-              {otp[index] ? (
+              {isFilled ? (
                 <Text style={s.otpDigit}>{otp[index]}</Text>
               ) : isActive ? (
                 <Caret />
@@ -91,6 +95,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
           value={otp}
           selection={selection}
           onChangeText={onOtpChange}
+          onSelectionChange={({ nativeEvent }) => onBoxPress(nativeEvent.selection.start)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           keyboardType="number-pad"

@@ -2,9 +2,9 @@ import { cartApi } from "@/src/api/cart.api";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { NotificationNavigation } from "@/src/services/NotificationNavigation";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
-import { NotificationNavigation } from "@/src/services/NotificationNavigation";
 import { isExpoGo } from "@/src/utils/environment";
 import { validate } from "@/src/utils/validation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -88,12 +88,23 @@ export function useOtp() {
   // Clears BOTH the React state and the native input buffer. Setting the
   // controlled value to "" alone leaves Android's TextInput holding the old
   // text, so the next keystroke arrives as "<oldcode><newchar>" and the
-  // cleared code reappears. .clear() empties the native buffer too.
+  // cleared code reappears. Clearing the native TextInput immediately plus
+  // forcing an empty native text and selection prevents that stale-buffer issue.
   const resetOtp = () => {
-    inputRef.current?.clear();
     setOtp("");
-    setSelection(undefined);
+    setSelection({ start: 0, end: 0 });
+    requestAnimationFrame(() => {
+      inputRef.current?.clear();
+      inputRef.current?.setNativeProps({ text: "", selection: { start: 0, end: 0 } });
+    });
   };
+
+  useEffect(() => {
+    if (!selection) return;
+    requestAnimationFrame(() => {
+      inputRef.current?.setNativeProps({ selection });
+    });
+  }, [selection]);
 
   /**
    * Resends the OTP and prefills it if returned, or resets boxes.
@@ -163,19 +174,24 @@ export function useOtp() {
     // typing has no selection, so it flows naturally at the end.
     const editing = selection;
     // A shrinking value means the selected digit was deleted, not replaced —
-    // every digit after it just shifted one slot left. Advancing the
-    // highlight forward in that case would land it on a box that already
-    // has a shifted-in digit, leaving the true empty box unmarked. Drop out
-    // of editing mode instead, so the highlight falls back to sitting right
-    // after the last remaining digit.
+    // every digit after it just shifted one slot left. We move the cursor to
+    // the first empty slot so fast typing and deletion stay aligned.
     const wasDeletion = digits.length < otp.length;
     setOtp(digits);
 
-    if (editing && !wasDeletion) {
-      const next = editing.start + 1;
-      setSelection(next < 6 ? { start: next, end: next + 1 } : undefined);
+    if (editing) {
+      const next = wasDeletion
+        ? Math.min(editing.start, digits.length)
+        : editing.start + 1;
+      setSelection(
+        next < 6 ? { start: next, end: wasDeletion ? next : next + 1 } : undefined,
+      );
     } else {
-      setSelection(undefined);
+      setSelection(
+        digits.length < 6
+          ? { start: digits.length, end: digits.length }
+          : undefined,
+      );
     }
 
     // Auto-submit only when the code is freshly completed by normal typing —

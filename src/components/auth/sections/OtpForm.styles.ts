@@ -1,5 +1,5 @@
+import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { Platform, StyleSheet } from "react-native";
-import { scale, verticalScale, moderateScale } from "@/src/utils/exactScale";
 
 export const styles = StyleSheet.create({
   boxRow: {
@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     includeFontPadding: false,
     fontSize: moderateScale(24, 0.3),
     fontFamily: Platform.OS === "android" ? "Inter_700Bold" : undefined,
-    fontWeight: Platform.OS === "android" ? "normal" : "700",
+    fontWeight: "700",
     lineHeight: verticalScale(24),
     letterSpacing: 0,
     color: "#111827",

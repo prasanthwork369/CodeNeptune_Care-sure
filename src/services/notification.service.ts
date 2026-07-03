@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import messaging from '@react-native-firebase/messaging';
+import type FirebaseMessaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
@@ -9,6 +9,12 @@ import { isExpoGo } from '../utils/environment';
 
 const CACHE_KEY_TOKEN = 'caresure.push_token.last_registered';
 const CACHE_KEY_AUTH = 'caresure.push_token.last_auth_state';
+
+// Firebase Messaging is a native module unavailable in Expo Go — a static
+// top-level `import` would crash the JS bundle on load there before the
+// isExpoGo checks below ever run. Only required lazily, after that check.
+const messaging = (): ReturnType<typeof FirebaseMessaging> =>
+    (require('@react-native-firebase/messaging').default as typeof FirebaseMessaging)();
 
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
 // Remove the `isExpoGo` checks below once running via a development build.

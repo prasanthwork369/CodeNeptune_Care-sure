@@ -1,16 +1,22 @@
-import messaging from '@react-native-firebase/messaging';
-import * as Notifications from 'expo-notifications';
 import { isExpoGo } from '@/src/utils/environment';
+import type FirebaseMessaging from '@react-native-firebase/messaging';
+import * as Notifications from 'expo-notifications';
 import { useEffect, useRef } from 'react';
 import { notificationService } from '../../services/notification.service';
+import { NotificationNavigation } from '../../services/NotificationNavigation';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/notificationStore';
-import { NotificationNavigation } from '../../services/NotificationNavigation';
 import { NotificationType } from '../../types/notification';
+
+// Firebase Messaging is a native module unavailable in Expo Go — a static
+// top-level `import` would crash the JS bundle on load there before the
+// isExpoGo checks below ever run. Only required lazily, after that check.
+const messaging = (): ReturnType<typeof FirebaseMessaging> =>
+    (require('@react-native-firebase/messaging').default as typeof FirebaseMessaging)();
 
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
 // Remove the `isExpoGo` check below once running via a development build.
-export const usePushNotifications = () => {
+export const usePushNotifications = () => {                                                 
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
     const isLoaded = useAuthStore((s) => s.isLoaded);
     const addNotification = useNotificationStore((s) => s.add);
@@ -40,7 +46,7 @@ export const usePushNotifications = () => {
 
     // Handle Cold Start (App launched via notification tap)
     useEffect(() => {
-        if (!isLoaded) return;
+        if (!isLoaded || isExpoGo) return;
 
         if (!hasHandledColdStart.current) {
             hasHandledColdStart.current = true;
