@@ -95,7 +95,6 @@ export const OtpForm: React.FC<OtpFormProps> = ({
           value={otp}
           selection={selection}
           onChangeText={onOtpChange}
-          onSelectionChange={({ nativeEvent }) => onBoxPress(nativeEvent.selection.start)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           keyboardType="number-pad"

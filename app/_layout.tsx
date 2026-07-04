@@ -99,56 +99,59 @@ export default function RootLayout() {
           <KeyboardProvider>
             <SafeAreaProvider>
               <View style={{ flex: 1, backgroundColor: "#fff" }}>
-              <BottomSheetModalProvider>
-                <StatusBar
-                  style="dark"
-                  translucent
-                  backgroundColor="transparent"
-                />
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="(auth)" />
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="(modal)" />
-                  <Stack.Screen name="(prescription)" />
-                  <Stack.Screen
-                    name="search"
-                    options={{ animation: "fade", animationDuration: 180 }}
+                <BottomSheetModalProvider>
+                  <StatusBar
+                    style="dark"
+                    translucent
+                    backgroundColor="transparent"
                   />
-                  <Stack.Screen name="notifications" />
-                  <Stack.Screen name="profile" />
-                  <Stack.Screen
-                    name="product"
-                    options={{
-                      presentation: "transparentModal",
-                      animation: "none",
-                      gestureEnabled: false,
-                    }}
-                  />
-                </Stack>
-                <CartSyncProvider />
-                <PushNotificationProvider />
-              </BottomSheetModalProvider>
-              <NetworkToast />
-              <Toast />
-              <SignupBonusPopup />
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="(modal)" />
+                    <Stack.Screen name="(prescription)" />
+                    <Stack.Screen
+                      name="search"
+                      options={{ animation: "fade", animationDuration: 180 }}
+                    />
+                    <Stack.Screen name="notifications" />
+                    <Stack.Screen name="profile" />
+                    <Stack.Screen
+                      name="product"
+                      options={{
+                        presentation: "transparentModal",
+                        animation: "none",
+                        gestureEnabled: false,
+                      }}
+                    />
+                  </Stack>
+                  <CartSyncProvider />
+                  <PushNotificationProvider />
+                </BottomSheetModalProvider>
+                <NetworkToast />
+                <Toast />
+                <SignupBonusPopup />
 
-              {/* Splash curtain — sits above the entire app tree.
+                {/* Splash curtain — sits above the entire app tree.
                   Renders the animated splash while fonts/auth/animation
                   are pending, then unmounts cleanly once the app underneath
                   is fully ready. No white flash since app is already mounted. */}
-              {showSplash && (
-                <View style={StyleSheet.absoluteFillObject} pointerEvents="box-only">
-                  {interFontsLoaded ? (
-                    <SplashAnimationScreen
-                      onComplete={() => setIsAnimationDone(true)}
-                    />
-                  ) : (
-                    <View style={styles.splashFallback} />
-                  )}
-                </View>
-              )}
-            </View>
+                {showSplash && (
+                  <View
+                    style={StyleSheet.absoluteFillObject}
+                    pointerEvents="box-only"
+                  >
+                    {interFontsLoaded ? (
+                      <SplashAnimationScreen
+                        onComplete={() => setIsAnimationDone(true)}
+                      />
+                    ) : (
+                      <View style={styles.splashFallback} />
+                    )}
+                  </View>
+                )}
+              </View>
             </SafeAreaProvider>
           </KeyboardProvider>
         </GestureHandlerRootView>

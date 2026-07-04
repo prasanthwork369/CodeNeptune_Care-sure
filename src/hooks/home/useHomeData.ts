@@ -1,6 +1,6 @@
+import { useFeaturedSubcategories } from "@/src/hooks/home/useFeaturedSubcategories";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
-import { useFeaturedSubcategories } from "@/src/hooks/home/useFeaturedSubcategories";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAuthStore } from "@/src/store/authStore";
@@ -11,11 +11,26 @@ export function useHomeData() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { setLocation, clearLocation } = useLocationStore();
 
-  const { tabs, cards, appContent, isLoading: isHomeLoading, refetch: refetchHome } = useHome();
-  const { products: featuredProducts, isLoading: isFeaturedLoading, refetch: refetchFeatured } = useFeaturedMedicines();
-  const { subcategories: featuredSubcategories, isLoading: isSubcategoriesLoading, refetch: refetchSubcategories } = useFeaturedSubcategories();
+  const {
+    tabs,
+    cards,
+    appContent,
+    isLoading: isHomeLoading,
+    refetch: refetchHome,
+  } = useHome();
+  const {
+    products: featuredProducts,
+    isLoading: isFeaturedLoading,
+    refetch: refetchFeatured,
+  } = useFeaturedMedicines();
+  const {
+    subcategories: featuredSubcategories,
+    isLoading: isSubcategoriesLoading,
+    refetch: refetchSubcategories,
+  } = useFeaturedSubcategories();
   const { addresses, refetch: refetchAddresses } = useAddress();
-  const { data: frequentlyOrdered = [], refetch: refetchFrequentlyOrdered } = useFrequentlyOrdered({ limit: 5 });
+  const { data: frequentlyOrdered = [], refetch: refetchFrequentlyOrdered } =
+    useFrequentlyOrdered({ limit: 5 });
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -24,11 +39,19 @@ export function useHomeData() {
     if (!isAuthenticated) return;
     if (addresses.length > 0) {
       const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
-      const fullAddress = [defaultAddr.line1, defaultAddr.line2, defaultAddr.city]
+      const fullAddress = [
+        defaultAddr.line1,
+        defaultAddr.line2,
+        defaultAddr.city,
+      ]
         .filter(Boolean)
         .join(", ");
       setLocation(
-        { label: defaultAddr.label, city: fullAddress, shortCity: defaultAddr.city },
+        {
+          label: defaultAddr.label,
+          city: fullAddress,
+          shortCity: defaultAddr.city,
+        },
         { addressId: defaultAddr.id, pincode: defaultAddr.pincode },
       );
     } else {

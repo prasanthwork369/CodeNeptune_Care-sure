@@ -1,32 +1,32 @@
 import {
-  BannerCarousel,
-  FloatingBannersCarousel,
-  FrequentSubstitutes,
-  HealthEssentials,
-  HeroBanner,
-  HomeFooter,
-  HomeHeader,
-  LocationBottomSheet,
-  QuickActions,
-  SearchBar,
-  ShopByCategories,
-  SmartSubstitution,
-  StickySearchHeader,
-  WhyFamiliesTrustUs,
+    BannerCarousel,
+    FloatingBannersCarousel,
+    FrequentSubstitutes,
+    HealthEssentials,
+    HeroBanner,
+    HomeFooter,
+    HomeHeader,
+    LocationBottomSheet,
+    QuickActions,
+    SearchBar,
+    ShopByCategories,
+    SmartSubstitution,
+    StickySearchHeader,
+    WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
+import { useBannerVisibility } from "@/src/hooks/home/useBannerVisibility";
 import { useHomeData } from "@/src/hooks/home/useHomeData";
+import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
+import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useBannerVisibility } from "@/src/hooks/home/useBannerVisibility";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
-import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
-import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
@@ -35,15 +35,11 @@ import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
-import {
-  RefreshControl,
-  View,
-  useWindowDimensions,
-} from "react-native";
+import { RefreshControl, View, useWindowDimensions } from "react-native";
 import Animated, {
-  useAnimatedRef,
-  useScrollViewOffset,
-  useSharedValue,
+    useAnimatedRef,
+    useScrollViewOffset,
+    useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -117,7 +113,10 @@ export const HomeLayout: React.FC = () => {
     heroHeightShared,
   );
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, heroHeightShared);
-  const { isBannerVisible, onCarouselLayout } = useBannerVisibility(scrollY, height);
+  const { isBannerVisible, onCarouselLayout } = useBannerVisibility(
+    scrollY,
+    height,
+  );
   const TAB_BAR_HEIGHT = BAR_HEIGHT + adjustedBottom + exactScale(6);
 
   const handleQuickAction = useCallback(
@@ -252,7 +251,8 @@ export const HomeLayout: React.FC = () => {
         <View
           className="bg-white flex-1"
           style={{
-            paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
+            paddingBottom:
+              TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
           }}
         >
           <Animated.View style={quickActionsAnim}>
@@ -271,7 +271,10 @@ export const HomeLayout: React.FC = () => {
             />
           </View>
 
-          <View style={{ marginTop: exactScale(20) }} onLayout={onCarouselLayout}>
+          <View
+            style={{ marginTop: exactScale(20) }}
+            onLayout={onCarouselLayout}
+          >
             <BannerCarousel
               banners={appContent?.banners ?? EMPTY_BANNERS}
               categories={cards}
