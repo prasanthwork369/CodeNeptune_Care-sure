@@ -10,6 +10,7 @@ export const REGEX = {
     indianMobile: /^[6-9][0-9]{9}$/,
     pincode: /^[1-9][0-9]{5}$/,
     otp: /^\d{6}$/,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
 };
 
 // ─── Input sanitisers ─────────────────────────────────────────────────────────
@@ -56,6 +57,13 @@ export const validate = {
     otp: (value: string): ValidationResult => {
         if (!value || value.length < 6) return fail('Enter the 6-digit OTP');
         if (!REGEX.otp.test(value)) return fail('OTP must contain digits only');
+        return ok();
+    },
+
+    email: (value: string): ValidationResult => {
+        const v = value.trim();
+        if (!v) return fail('Email is required');
+        if (!REGEX.email.test(v)) return fail('Enter a valid email address');
         return ok();
     },
 

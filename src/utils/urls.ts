@@ -35,6 +35,10 @@ export const API_ENDPOINTS = {
 
   // ── Customer ─────────────────────────────────────────────────────────────
   CUSTOMER_PROFILE: "/api/v1/customers/profile",
+  // Email verification: request sends an OTP to the given email, verify
+  // confirms the OTP. Both are scoped to the logged-in customer (Bearer auth).
+  CUSTOMER_EMAIL_REQUEST_VERIFY: "/api/v1/customers/profile/email/request-verify",
+  CUSTOMER_EMAIL_VERIFY: "/api/v1/customers/profile/email/verify",
   CUSTOMER_NOTIFICATION_PREFERENCES:
     "/api/v1/customers/notification-preferences",
   CUSTOMER_ADDRESSES: "/api/v1/customers/addresses",

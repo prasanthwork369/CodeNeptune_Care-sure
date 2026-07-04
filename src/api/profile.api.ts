@@ -12,6 +12,8 @@ export interface CustomerProfile {
   gender?: string;
   isFirstTimeLogin?: boolean;
   isCorporateUser?: boolean;
+  isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
 }
 
 export interface UpdateProfilePayload {
@@ -31,5 +33,13 @@ export const profileApi = {
     updateProfile: async (payload: UpdateProfilePayload): Promise<CustomerProfile> => {
         const response = await apiClient.patch(API_ENDPOINTS.CUSTOMER_PROFILE, payload);
         return response.data?.data ?? profileApi.getProfile();
+    },
+    // Sends a verification OTP to the given email address.
+    requestEmailVerify: async (email: string): Promise<void> => {
+        await apiClient.post(API_ENDPOINTS.CUSTOMER_EMAIL_REQUEST_VERIFY, { email });
+    },
+    // Confirms the OTP the user received by email.
+    verifyEmail: async (otp: string): Promise<void> => {
+        await apiClient.post(API_ENDPOINTS.CUSTOMER_EMAIL_VERIFY, { otp });
     },
 };
