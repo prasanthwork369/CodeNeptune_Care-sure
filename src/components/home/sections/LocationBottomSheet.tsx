@@ -8,6 +8,7 @@ import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useSettings } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
+import { locationService } from "@/src/services/location.service";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -16,7 +17,6 @@ import {
   BottomSheetScrollView,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
-import * as Location from "expo-location";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -238,9 +238,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     if (isLocating) return;
     setIsLocating(true);
     try {
-      const { status, canAskAgain } =
-        await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
+      const { granted, canAskAgain } = await locationService.requestPermission();
+      if (!granted) {
         Alert.alert(
           "Location access needed",
           canAskAgain
@@ -258,34 +257,20 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         );
         return;
       }
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      const [place] = await Location.reverseGeocodeAsync({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-      const numberMatch = place?.name?.match(/^(\d+)/);
-      const line1 = numberMatch ? numberMatch[1] : "";
-      const buildingName = place?.name?.replace(/^\d+[,\s]*/, "").trim() || "";
-      const line2 = [
-        buildingName,
-        place?.street,
-        place?.district ?? place?.subregion,
-      ]
-        .filter(Boolean)
-        .join(", ");
-      const city = place?.city || place?.subregion || place?.region || "";
-      const state = place?.region || "";
-      const pincode = place?.postalCode
-        ? place.postalCode.replace(/\D/g, "").slice(0, 6)
-        : "";
+      const place = await locationService.getCurrentPlace();
+      if (!place) {
+        Alert.alert(
+          "Could not fetch location",
+          "Please check that location services are enabled and try again.",
+        );
+        return;
+      }
       const params: Record<string, string> = {};
-      if (line1) params.prefill_line1 = line1;
-      if (line2) params.prefill_line2 = line2;
-      if (city) params.prefill_city = city;
-      if (state) params.prefill_state = state;
-      if (pincode) params.prefill_pincode = pincode;
+      if (place.line1) params.prefill_line1 = place.line1;
+      if (place.line2) params.prefill_line2 = place.line2;
+      if (place.city) params.prefill_city = place.city;
+      if (place.state) params.prefill_state = place.state;
+      if (place.pincode) params.prefill_pincode = place.pincode;
       handleClose();
       setTimeout(() => {
         router.push({ pathname: "/profile/addresses/add" as any, params });

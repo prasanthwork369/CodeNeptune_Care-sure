@@ -10,6 +10,7 @@ import { useLoopingCarousel } from "@/src/hooks/useLoopingCarousel";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { walletService } from "@/src/services/wallet.service";
 import { useAuthStore } from "@/src/store/authStore";
+import { useUIStore } from "@/src/store/uiStore";
 import {
   SignupBonusData,
   SignupBonusPopupContent,
@@ -42,6 +43,9 @@ export const SignupBonusPopup: React.FC<Props> = ({
   const { data: content } = useWebsiteContent("signup_bonus_popup") as {
     data?: SignupBonusPopupContent;
   };
+  // Gate: the popup must not appear until the onboarding permission flow
+  // (location → notification) has finished, so it never overlaps a dialog.
+  const permissionFlowComplete = useUIStore((s) => s.permissionFlowComplete);
   const { data: cartWalletSettings } = useCartWalletSettings();
   const walletSettings = cartWalletSettings?.wallet;
   const isBonusOn = walletSettings
@@ -71,6 +75,10 @@ export const SignupBonusPopup: React.FC<Props> = ({
     // checking/showing the bonus — avoids it popping up mid-navigation
     // (OTP screen -> Home transition).
     if (pathname !== "/") return;
+
+    // Wait for the location + notification permission flow to finish first, so
+    // the bonus popup never overlaps a permission dialog.
+    if (!permissionFlowComplete) return;
 
     let cancelled = false;
     let confettiTimer: ReturnType<typeof setTimeout> | null = null;
@@ -131,6 +139,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
     user?.id,
     user?.isFirstTimeLogin,
     pathname,
+    permissionFlowComplete,
     cartWalletSettings,
     isBonusOn,
     setUser,
@@ -220,6 +229,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
       visible={isOpen}
       transparent
       animationType="fade"
+      presentationStyle="overFullScreen"
       statusBarTranslucent
       navigationBarTranslucent
       onRequestClose={handleClose}

@@ -30,6 +30,24 @@ export const notificationService = {
         return status === 'granted';
     },
 
+    // Silent check — never shows the OS prompt. Used on startup so we can
+    // register the token for users who already granted, without asking anyone
+    // who hasn't (the prompt is shown later, at a contextual moment).
+    hasPermission: async (): Promise<boolean> => {
+        if (!Device.isDevice) return false;
+        const { status } = await Notifications.getPermissionsAsync();
+        return status === 'granted';
+    },
+
+    // Shows the OS prompt (once) and registers the token if granted. Called at
+    // contextual moments — after the signup bonus popup for first-time users,
+    // or a few seconds after home for everyone else.
+    promptAndRegister: async (isAuthenticated: boolean): Promise<void> => {
+        if (isExpoGo) return;
+        const granted = await notificationService.requestPermission();
+        if (granted) await notificationService.registerWithBackend(isAuthenticated);
+    },
+
     // The raw FCM/APNs device token — this is what the backend's Firebase Admin
     // SDK actually sends to, NOT Expo's wrapped `ExponentPushToken[...]` format.
     getFcmToken: async (): Promise<string | null> => {
@@ -60,7 +78,9 @@ export const notificationService = {
         // Push token registration requires a real dev/prod build
         if (isExpoGo) return;
 
-        const granted = await notificationService.requestPermission();
+        // Silent on startup — only register if the user already granted. The
+        // actual prompt is shown later on the home screen (useHomeOnboarding).
+        const granted = await notificationService.hasPermission();
         if (!granted) return;
 
         const token = await notificationService.getFcmToken();

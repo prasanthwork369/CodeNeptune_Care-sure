@@ -18,6 +18,7 @@ import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
+import { useHomeOnboarding } from "@/src/hooks/home/useHomeOnboarding";
 import { useBannerVisibility } from "@/src/hooks/home/useBannerVisibility";
 import { useHomeData } from "@/src/hooks/home/useHomeData";
 import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
@@ -85,6 +86,9 @@ export const HomeLayout: React.FC = () => {
     reopenLocationSheet,
     setReopenLocationSheet,
   } = useLocationStore();
+
+  // Sequential onboarding: location → notification → unlock signup popup.
+  useHomeOnboarding();
 
   const [isScreenFocused, setIsScreenFocused] = useState(true);
 
