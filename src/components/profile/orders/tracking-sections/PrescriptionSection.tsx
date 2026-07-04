@@ -20,7 +20,7 @@ export function PrescriptionSection({ onViewRx }: PrescriptionSectionProps) {
         Prescription Details
       </Text>
       <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
+        <View className="flex-1 flex-row items-center" style={{ gap: exactScale(12), marginRight: exactScale(8) }}>
           <View
             style={{
               backgroundColor: "#FFFFFF",
@@ -34,7 +34,7 @@ export function PrescriptionSection({ onViewRx }: PrescriptionSectionProps) {
           >
             <icons.prescription_green width={exactScale(22)} height={exactScale(22)} />
           </View>
-          <View>
+          <View className="flex-1">
             <Text
               style={s.labelSm}
               className="font-inter-bold text-[#0F1724]"
@@ -46,6 +46,8 @@ export function PrescriptionSection({ onViewRx }: PrescriptionSectionProps) {
               <Text
                 style={s.labelSm}
                 className="font-inter-medium text-[#16A34A]"
+                numberOfLines={1}
+                ellipsizeMode="tail"
               >
                 Verified by our Pharmacist
               </Text>

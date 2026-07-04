@@ -486,7 +486,7 @@ export function CancelOrderLayout() {
           right: 0,
           paddingHorizontal: scale(20),
           paddingTop: verticalScale(16),
-          paddingBottom: Math.max(bottomInset, verticalScale(20)),
+          paddingBottom: bottomInset + verticalScale(16),
           backgroundColor: "#fff",
           borderTopWidth: 1,
           borderTopColor: "#F3F4F6",

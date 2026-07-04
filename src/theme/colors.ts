@@ -2,6 +2,13 @@ export const colors = {
   // Brand
   primary: "#0F7635",
   secondary: "#FACA15",
+  brand: {
+    primary: "#0F7635",
+    secondary: "#FACA15",
+  },
+  gradients: {
+    savingsBanner: ["#D0EBFE", "#D7FFEA"],
+  },
 
   // Text
   text: "#222222",

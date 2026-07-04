@@ -30,7 +30,7 @@ import {
 interface LocationBottomSheetProps {
   isVisible: boolean;
   onClose: () => void;
-  onSelect?: (label: string, city: string) => void;
+  onSelect?: (label: string, city: string, address?: Address) => void;
 }
 
 interface GooglePrediction {
@@ -229,7 +229,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       { label: addr.label, city: fullAddress, shortCity: addr.city },
       { addressId: addr.id, pincode: addr.pincode },
     );
-    onSelect?.(addr.label, fullAddress);
+    onSelect?.(addr.label, fullAddress, addr);
     showToast(`Delivery location set to ${addr.city} - ${addr.pincode}`, "success");
     handleClose();
   };

@@ -1,4 +1,3 @@
-import { orderApi } from "@/src/api/order.api";
 import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
 import { AlreadyHaveItemsModal } from "@/src/components/prescription/AlreadyHaveItemsModal";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
@@ -7,10 +6,11 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useOrderTrackingSteps } from "@/src/hooks/useOrderTrackingSteps";
-import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { downloadLocalAsset } from "@/src/utils/fileDownload";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,9 +24,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { orderStyles as s } from "./orders.styles";
 import { OrderTrackingModal } from "./OrderTrackingModal";
 import { OrderTrackingSkeleton } from "./OrderTrackingSkeleton";
@@ -60,8 +58,14 @@ function TrackingStepRow({
   useEffect(() => {
     if (!triggered) return;
     const d = index * 90;
-    opacity.value = withDelay(d, withTiming(1, { duration: 260, easing: EASE_OUT }));
-    translateY.value = withDelay(d, withTiming(0, { duration: 260, easing: EASE_OUT }));
+    opacity.value = withDelay(
+      d,
+      withTiming(1, { duration: 260, easing: EASE_OUT }),
+    );
+    translateY.value = withDelay(
+      d,
+      withTiming(0, { duration: 260, easing: EASE_OUT }),
+    );
   }, [triggered]);
 
   const rowStyle = useAnimatedStyle(() => ({
@@ -70,53 +74,155 @@ function TrackingStepRow({
   }));
 
   const lineColor = step.completed && !step.isActive ? "#16A34A" : "#E5E7EB";
-  const textColor = step.cancelled ? "#DC2626" : step.completed || step.isActive ? "#1A1C1E" : "#9CA3AF";
+  const textColor = step.cancelled
+    ? "#DC2626"
+    : step.completed || step.isActive
+      ? "#1A1C1E"
+      : "#9CA3AF";
 
   const renderDot = () => {
     if (step.cancelled) {
       return (
-        <View style={{ width: exactScale(18), height: exactScale(18), borderRadius: exactScale(9), backgroundColor: "#DC2626", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#FFF", fontSize: moderateScale(9), fontWeight: "700", lineHeight: moderateScale(11) }}>✕</Text>
+        <View
+          style={{
+            width: exactScale(18),
+            height: exactScale(18),
+            borderRadius: exactScale(9),
+            backgroundColor: "#DC2626",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "#FFF",
+              fontSize: moderateScale(9),
+              fontWeight: "700",
+              lineHeight: moderateScale(11),
+            }}
+          >
+            ✕
+          </Text>
         </View>
       );
     }
     if (step.isActive) {
       // Current stop — solid green with white ring: clearly marks "you are here"
       return (
-        <View style={{ width: exactScale(22), height: exactScale(22), borderRadius: exactScale(11), backgroundColor: "#16A34A", borderWidth: exactScale(3), borderColor: "#DCFCE7", alignItems: "center", justifyContent: "center" }}>
-          <View style={{ width: exactScale(8), height: exactScale(8), borderRadius: exactScale(4), backgroundColor: "#fff" }} />
+        <View
+          style={{
+            width: exactScale(22),
+            height: exactScale(22),
+            borderRadius: exactScale(11),
+            backgroundColor: "#16A34A",
+            borderWidth: exactScale(3),
+            borderColor: "#DCFCE7",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              width: exactScale(8),
+              height: exactScale(8),
+              borderRadius: exactScale(4),
+              backgroundColor: "#fff",
+            }}
+          />
         </View>
       );
     }
     if (step.completed) {
       return (
-        <View style={{ width: exactScale(18), height: exactScale(18), borderRadius: exactScale(9), backgroundColor: "#16A34A", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "#fff", fontSize: moderateScale(9), fontWeight: "700", lineHeight: moderateScale(11) }}>✓</Text>
+        <View
+          style={{
+            width: exactScale(18),
+            height: exactScale(18),
+            borderRadius: exactScale(9),
+            backgroundColor: "#16A34A",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: moderateScale(9),
+              fontWeight: "700",
+              lineHeight: moderateScale(11),
+            }}
+          >
+            ✓
+          </Text>
         </View>
       );
     }
     // Pending — empty grey ring
     return (
-      <View style={{ width: exactScale(16), height: exactScale(16), borderRadius: exactScale(8), borderWidth: exactScale(1.5), borderColor: "#D1D5DB", backgroundColor: "#fff" }} />
+      <View
+        style={{
+          width: exactScale(16),
+          height: exactScale(16),
+          borderRadius: exactScale(8),
+          borderWidth: exactScale(1.5),
+          borderColor: "#D1D5DB",
+          backgroundColor: "#fff",
+        }}
+      />
     );
   };
 
   return (
-    <Animated.View style={[{ flexDirection: "row", paddingHorizontal: exactScale(16) }, rowStyle]}>
-      <View style={{ width: exactScale(26), alignItems: "center", alignSelf: 'stretch' }}>
-        <View style={{ height: exactScale(24), justifyContent: "center", alignItems: "center" }}>
+    <Animated.View
+      style={[
+        { flexDirection: "row", paddingHorizontal: exactScale(16) },
+        rowStyle,
+      ]}
+    >
+      <View
+        style={{
+          width: exactScale(26),
+          alignItems: "center",
+          alignSelf: "stretch",
+        }}
+      >
+        <View
+          style={{
+            height: exactScale(24),
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           {renderDot()}
         </View>
         {!isLast && (
-          <View style={{ width: exactScale(2), flex: 1, backgroundColor: lineColor }} />
+          <View
+            style={{
+              width: exactScale(2),
+              flex: 1,
+              backgroundColor: lineColor,
+            }}
+          />
         )}
       </View>
-      <View style={{ flex: 1, paddingLeft: exactScale(10), paddingBottom: isLast ? exactScale(4) : exactScale(10) }}>
-        <Text style={[s.labelSm, { color: textColor }]} className="font-inter-semibold">
+      <View
+        style={{
+          flex: 1,
+          paddingLeft: exactScale(10),
+          paddingBottom: isLast ? exactScale(4) : exactScale(10),
+        }}
+      >
+        <Text
+          style={[s.labelSm, { color: textColor }]}
+          className="font-inter-semibold"
+        >
           {step.title}
         </Text>
         {(step.completed || step.cancelled) && !!step.time && (
-          <Text style={s.labelSm} className="font-inter text-brand-subtext mt-0.5">
+          <Text
+            style={s.labelSm}
+            className="font-inter text-brand-subtext mt-0.5"
+          >
             {step.time}
           </Text>
         )}
@@ -150,13 +256,13 @@ export const OrderTrackLayout: React.FC = () => {
 
   const [alertState, setAlertState] = useState<{
     visible: boolean;
-    icon: 'check-green' | 'delete' | 'package';
+    icon: "check-green" | "delete" | "package";
     title: string;
     onClose?: () => void;
   }>({
     visible: false,
-    icon: 'check-green',
-    title: '',
+    icon: "check-green",
+    title: "",
   });
 
   const { items: cartItems, addItem, updateItem, clearCart } = useCart();
@@ -202,13 +308,13 @@ export const OrderTrackLayout: React.FC = () => {
     }
   };
 
-
-
   useEffect(() => {
     if (order && !animTriggered) setAnimTriggered(true);
   }, [order]);
 
-  const statusInfo = (order?.status != null ? ORDER_STATUS[order.status] : undefined) ?? {
+  const statusInfo = (order?.status != null
+    ? ORDER_STATUS[order.status]
+    : undefined) ?? {
     label: "PENDING",
     bg: "#FFFBE8",
     text: "#92600A",
@@ -231,11 +337,12 @@ export const OrderTrackLayout: React.FC = () => {
     subtotal > 0
       ? subtotal + productDiscount
       : toPay +
-      Number(order?.discountAmount ?? 0) -
-      deliveryFee -
-      handlingCharge;
+        Number(order?.discountAmount ?? 0) -
+        deliveryFee -
+        handlingCharge;
 
-  const isInvoiceAvailable = order?.status != null && order.status >= 5 && order.status <= 7;
+  const isInvoiceAvailable =
+    order?.status != null && order.status >= 5 && order.status <= 7;
 
   const trackingSteps = useOrderTrackingSteps(order);
 
@@ -258,7 +365,11 @@ export const OrderTrackLayout: React.FC = () => {
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader
-        title={order?.orderId ? `${String(order.orderId).replace(/[^a-zA-Z_]/g, '') + "-" + String(order.orderId).slice(-6).toUpperCase()}` : "Order Details"}
+        title={
+          order?.orderId
+            ? `${String(order.orderId).replace(/[^a-zA-Z_]/g, "") + "-" + String(order.orderId).slice(-6).toUpperCase()}`
+            : "Order Details"
+        }
         showBorder
         rightSlot={
           isInvoiceAvailable ? (
@@ -274,7 +385,11 @@ export const OrderTrackLayout: React.FC = () => {
               >
                 Get Invoice
               </Text>
-              <icons.download width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
+              <icons.download
+                width={exactScale(20)}
+                height={exactScale(20)}
+                fill="#0F7635"
+              />
             </Touchable>
           ) : undefined
         }
@@ -283,7 +398,8 @@ export const OrderTrackLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: exactScale(12),
-          paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
+          paddingBottom:
+            Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
           gap: exactScale(10),
         }}
       >
@@ -298,10 +414,10 @@ export const OrderTrackLayout: React.FC = () => {
             <Text style={s.label20} className="font-inter-bold text-brand-text">
               {order?.status === 7
                 ? formatDate(
-                  deliveredLogTime ??
-                  order?.deliveredAt ??
-                  order?.estimatedDelivery,
-                )
+                    deliveredLogTime ??
+                      order?.deliveredAt ??
+                      order?.estimatedDelivery,
+                  )
                 : formatDate(order?.createdAt)}
             </Text>
             <View
@@ -365,7 +481,10 @@ export const OrderTrackLayout: React.FC = () => {
                 >
                   View all updates
                 </Text>
-                <icons.arrow_down_green width={exactScale(18)} height={exactScale(18)} />
+                <icons.arrow_down_green
+                  width={exactScale(18)}
+                  height={exactScale(18)}
+                />
               </Touchable>
             </>
           )}
@@ -381,16 +500,32 @@ export const OrderTrackLayout: React.FC = () => {
         <SectionCard>
           <Touchable
             className="flex-row items-center justify-between"
-            style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}
+            style={{
+              paddingHorizontal: exactScale(16),
+              paddingVertical: exactScale(16),
+            }}
             activeOpacity={0.7}
             onPress={() => setBillSheetVisible(true)}
           >
-            <View className="flex-row items-center" style={{ gap: exactScale(12) }}>
+            <View
+              className="flex-row items-center"
+              style={{ gap: exactScale(12) }}
+            >
               <View
-                style={{ borderWidth: 1, borderColor: "#E2E8F0", width: exactScale(40), height: exactScale(40), borderRadius: exactScale(4) }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#E2E8F0",
+                  width: exactScale(40),
+                  height: exactScale(40),
+                  borderRadius: exactScale(4),
+                }}
                 className="bg-[#F8FAFC] items-center justify-center"
               >
-                <icons.description width={exactScale(20)} height={exactScale(20)} fill="#64748B" />
+                <icons.description
+                  width={exactScale(20)}
+                  height={exactScale(20)}
+                  fill="#64748B"
+                />
               </View>
               <View>
                 <Text
@@ -407,7 +542,10 @@ export const OrderTrackLayout: React.FC = () => {
                 </Text>
               </View>
             </View>
-            <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
+            <View
+              className="flex-row items-center"
+              style={{ gap: exactScale(8) }}
+            >
               <Text
                 style={s.labelLg}
                 className="font-inter-bold text-brand-text"
@@ -416,7 +554,11 @@ export const OrderTrackLayout: React.FC = () => {
                   ? `₹${Number(order.total).toFixed(2)}`
                   : "—"}
               </Text>
-              <icons.arrow_forward_ios width={exactScale(14)} height={exactScale(14)} fill="#6A6A6A" />
+              <icons.arrow_forward_ios
+                width={exactScale(14)}
+                height={exactScale(14)}
+                fill="#6A6A6A"
+              />
             </View>
           </Touchable>
         </SectionCard>
@@ -440,7 +582,11 @@ export const OrderTrackLayout: React.FC = () => {
 
       <View
         className="bg-white border-t border-[#919EAB33]"
-        style={{ paddingHorizontal: exactScale(16), paddingTop: exactScale(12), paddingBottom: Math.max(adjustedBottom, exactScale(16)) }}
+        style={{
+          paddingHorizontal: exactScale(16),
+          paddingTop: exactScale(12),
+          paddingBottom: adjustedBottom + exactScale(16),
+        }}
       >
         <Touchable
           className="items-center"
@@ -455,9 +601,15 @@ export const OrderTrackLayout: React.FC = () => {
           }}
         >
           {isProceeding ? (
-            <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
+            <View
+              className="flex-row items-center"
+              style={{ gap: exactScale(8) }}
+            >
               <ActivityIndicator size="small" color="#fff" />
-              <Text style={s.labelMd} className="font-inter-semibold text-white">
+              <Text
+                style={s.labelMd}
+                className="font-inter-semibold text-white"
+              >
                 Adding to cart...
               </Text>
             </View>
@@ -505,7 +657,6 @@ export const OrderTrackLayout: React.FC = () => {
         isProceeding={isProceeding}
       />
 
-
       <AlertDialog
         visible={alertState.visible}
         onClose={closeAlert}
@@ -513,9 +664,9 @@ export const OrderTrackLayout: React.FC = () => {
         title={alertState.title}
         buttons={[
           {
-            label: 'OK',
+            label: "OK",
             onPress: closeAlert,
-            variant: 'green',
+            variant: "green",
           },
         ]}
       />

@@ -8,7 +8,7 @@ import { DotLottie, type Dotlottie } from '@lottiefiles/dotlottie-react-native';
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const PRESETS = [500, 1000, 2000];
 const MAX_TOPUP = 2000;
@@ -26,7 +26,7 @@ export const AddMoneyLayout: React.FC = () => {
     const inputRef = useRef<TextInput>(null);
 
     const walletBalance = Number(balance?.walletBalance ?? 0);
-    const numericAmount = Math.min(Number(amount) || 0, MAX_TOPUP);
+    const numericAmount = Number(amount) || 0;
     const selectedPreset = PRESETS.find((p) => p === numericAmount) ?? null;
 
     const handlePreset = (value: number) => setAmount(String(value));
@@ -46,6 +46,8 @@ export const AddMoneyLayout: React.FC = () => {
             Alert.alert('Failed', err?.message ?? 'Could not add money. Please try again.');
         }
     };
+
+    const hasError = numericAmount > MAX_TOPUP;
 
     return (
         <View style={{ flex: 1, backgroundColor: '#F5F6FB' }}>
@@ -68,8 +70,9 @@ export const AddMoneyLayout: React.FC = () => {
                             flexDirection: 'row',
                             alignItems: 'center',
                             borderBottomWidth: 2,
-                            borderBottomColor: isAmountFocused ? '#0F7635' : '#E5E7EB',
+                            borderBottomColor: hasError ? '#DC2626' : (isAmountFocused ? '#0F7635' : '#E5E7EB'),
                             paddingBottom: 4,
+                            gap: exactScale(8),
                         }}
                     >
                         <Text style={{ fontSize: moderateScale(44), fontWeight: '800', color: '#111827' }}>₹</Text>
@@ -96,8 +99,13 @@ export const AddMoneyLayout: React.FC = () => {
                              }}
                         />
                     </View>
-                    <Text style={{ fontSize: moderateScale(12), fontWeight: '500', color: isAmountFocused ? '#0F7635' : '#9CA3AF', marginTop: 6 }}>
-                        Tap to enter a custom amount
+                    <Text style={{
+                        fontSize: moderateScale(12),
+                        fontWeight: '500',
+                        color: hasError ? '#DC2626' : (isAmountFocused ? '#0F7635' : '#9CA3AF'),
+                        marginTop: 6
+                    }}>
+                        {hasError ? 'Amount cannot exceed ₹2,000' : 'Tap to enter a custom amount'}
                     </Text>
                 </Touchable>
 
@@ -154,7 +162,7 @@ export const AddMoneyLayout: React.FC = () => {
                 <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12 }}>
                     <Touchable
                         onPress={handleProceed}
-                        disabled={loading || !numericAmount || numericAmount > MAX_TOPUP}
+                        disabled={loading || !numericAmount || hasError}
                         activeOpacity={0.85}
                         style={{
                             backgroundColor: '#0F7635',
@@ -164,7 +172,7 @@ export const AddMoneyLayout: React.FC = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: 8,
-                            opacity: (loading || !numericAmount || numericAmount > MAX_TOPUP) ? 0.5 : 1,
+                            opacity: (loading || !numericAmount || hasError) ? 0.5 : 1,
                         }}
                     >
                         {loading ? (

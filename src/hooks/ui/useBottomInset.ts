@@ -1,5 +1,5 @@
-import { Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
  * Returns the platform-adjusted bottom safe-area inset used by the tab bar,
@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export const IOS_BOTTOM_CAP = 1;
 
 export function getAdjustedBottom(rawBottom: number): number {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     // Some Android ROMs/gesture overlays draw over the app but report 0 bottom inset.
     // Enforce a minimum of 16 to keep buttons and tab bars safe from clipping.
     const base = rawBottom > 24 ? rawBottom - 8 : rawBottom;

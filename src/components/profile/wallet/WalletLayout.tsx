@@ -76,9 +76,6 @@ export const WalletLayout: React.FC = () => {
     ? (["wallet", "credits", "coins"] as const)
     : (["wallet", "coins"] as const);
 
-  const confettiRef = useRef<Dotlottie>(null);
-  const hasPlayedConfetti = useRef(false);
-
   // Drives the sliding white pill behind the active tab
   const tabBarWidth = useSharedValue(0);
   const activeTabIndex = useSharedValue(0);
@@ -128,17 +125,6 @@ export const WalletLayout: React.FC = () => {
   const transactions: Transaction[] = logs.flatMap(logToTransactions);
   const previewTxs = transactions.slice(0, 5);
 
-  // Play a one-shot success/welcome confetti trigger upon component mount
-  useEffect(() => {
-    if (!hasPlayedConfetti.current) {
-      hasPlayedConfetti.current = true;
-      const timer = setTimeout(() => {
-        confettiRef.current?.play();
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
   return (
     <View style={cardStyles.container}>
       <ScreenHeader
@@ -151,16 +137,7 @@ export const WalletLayout: React.FC = () => {
       >
         {/* Balance Dashboard Card */}
         <View style={cardStyles.card}>
-          {/* Confetti animation overlay */}
-          <View pointerEvents="none" style={cardStyles.confettiContainer}>
-            <DotLottie
-              ref={confettiRef}
-              source={ANIMATIONS.confetti}
-              autoplay={false}
-              loop={false}
-              style={cardStyles.confettiAnim}
-            />
-          </View>
+
 
           {/* 3D Wallet & Shield absolute background artwork */}
           <Image

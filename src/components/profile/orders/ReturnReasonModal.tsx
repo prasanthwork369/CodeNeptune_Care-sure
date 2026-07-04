@@ -144,7 +144,12 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
             backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         >
                         <BottomSheetScrollView
-                            style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: Math.max(adjustedBottom, 16) + 16 }}
+                            style={{ flex: 1 }}
+                            contentContainerStyle={{
+                                paddingHorizontal: 16,
+                                paddingTop: 8,
+                                paddingBottom: Math.max(adjustedBottom, 16) + 24,
+                            }}
                             showsVerticalScrollIndicator={false}
                         >
 
