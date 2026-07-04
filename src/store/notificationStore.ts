@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NotificationData } from '../types/notification';
 
 export interface AppNotification {
     id: string;
     title: string;
     body: string;
-    data?: Record<string, any>;
+    data?: NotificationData;
     receivedAt: string;
     isRead: boolean;
 }

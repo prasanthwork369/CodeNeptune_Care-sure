@@ -4,6 +4,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { notificationApi } from '../api/notification.api';
+import { NOTIFICATION_CHANNELS } from '../constants/notificationChannels';
 import { getDeviceInfo } from '../lib/deviceInfo';
 import { isExpoGo } from '../utils/environment';
 
@@ -136,5 +137,32 @@ export const notificationService = {
                 shouldSetBadge: true,
             }),
         });
+    },
+
+    /**
+     * Creates the Android notification channels the backend can target via the
+     * FCM message's `channelId`. Separating them lets users mute offers without
+     * losing order/transaction alerts. No-op on iOS (channels are Android-only).
+     */
+    setupAndroidChannels: async (): Promise<void> => {
+        if (isExpoGo || Platform.OS !== 'android') return;
+        try {
+            await Notifications.setNotificationChannelAsync(NOTIFICATION_CHANNELS.ORDERS, {
+                name: 'Order Updates',
+                importance: Notifications.AndroidImportance.HIGH,
+                sound: 'default',
+            });
+            await Notifications.setNotificationChannelAsync(NOTIFICATION_CHANNELS.REMINDERS, {
+                name: 'Reminders',
+                importance: Notifications.AndroidImportance.HIGH,
+                sound: 'default',
+            });
+            await Notifications.setNotificationChannelAsync(NOTIFICATION_CHANNELS.OFFERS, {
+                name: 'Offers & Promotions',
+                importance: Notifications.AndroidImportance.DEFAULT,
+            });
+        } catch (error) {
+            if (__DEV__) console.error('[PushChannels] Failed to set up channels:', error);
+        }
     },
 };

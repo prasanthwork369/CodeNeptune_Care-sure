@@ -34,10 +34,10 @@ const AUTH_REQUIRED_TYPES = new Set<NotificationType>([
 export const NotificationNavigation = {
   /** Central entrypoint for handling notification tap navigation */
   handleTap: (payload: NotificationPayload, tapId?: string) => {
-    console.log('[NotificationNavigation] handleTap called with payload:', JSON.stringify(payload, null, 2));
+    if (__DEV__) console.log('[NotificationNavigation] handleTap called with payload:', JSON.stringify(payload, null, 2));
 
     if (!payload.type) {
-      console.warn('[NotificationNavigation] Exiting handleTap: No valid notification type found in payload.');
+      if (__DEV__) console.warn('[NotificationNavigation] Exiting handleTap: No valid notification type found in payload.');
       return;
     }
 
@@ -45,18 +45,18 @@ export const NotificationNavigation = {
     const store = useNotificationNavigationStore.getState();
     if (tapId) {
       if (store.lastHandledTapId === tapId) {
-        console.log('[NotificationNavigation] Skipping duplicate tap event for tapId:', tapId);
+        if (__DEV__) console.log('[NotificationNavigation] Skipping duplicate tap event for tapId:', tapId);
         return;
       }
       store.setLastHandledTapId(tapId);
     }
 
     const { isAuthenticated } = useAuthStore.getState();
-    console.log(`[NotificationNavigation] User isAuthenticated status: ${isAuthenticated}`);
+    if (__DEV__) console.log(`[NotificationNavigation] User isAuthenticated status: ${isAuthenticated}`);
 
     // Authentication Guard
     if (AUTH_REQUIRED_TYPES.has(payload.type) && !isAuthenticated) {
-      console.log(`[NotificationNavigation] Route for type "${payload.type}" requires authentication. Caching and pushing to login.`);
+      if (__DEV__) console.log(`[NotificationNavigation] Route for type "${payload.type}" requires authentication. Caching and pushing to login.`);
       store.setPendingNotification(payload);
       router.push('/(auth)/login');
       return;
@@ -68,7 +68,7 @@ export const NotificationNavigation = {
   /** Maps types to Expo Router paths and navigates */
   executeNavigation: (payload: NotificationPayload) => {
     const { type, data = {} } = payload;
-    console.log(`[NotificationNavigation] Routing to destination for type: ${type} with data:`, JSON.stringify(data, null, 2));
+    if (__DEV__) console.log(`[NotificationNavigation] Routing to destination for type: ${type} with data:`, JSON.stringify(data, null, 2));
 
     switch (type) {
       // --- Order Detail/Tracking ---

@@ -6,13 +6,34 @@ import { notificationService } from '../../services/notification.service';
 import { NotificationNavigation } from '../../services/NotificationNavigation';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/notificationStore';
-import { NotificationType } from '../../types/notification';
+import { NotificationData, NotificationPayload, NotificationType } from '../../types/notification';
 
 // Firebase Messaging is a native module unavailable in Expo Go — a static
 // top-level `import` would crash the JS bundle on load there before the
 // isExpoGo checks below ever run. Only required lazily, after that check.
 const messaging = (): ReturnType<typeof FirebaseMessaging> =>
     (require('@react-native-firebase/messaging').default as typeof FirebaseMessaging)();
+
+/** Turns a notification-tap response into a routing payload + a stable de-dup id. */
+const buildTapPayload = (
+    response: Notifications.NotificationResponse,
+): { payload: NotificationPayload; tapId: string } => {
+    const data = (response.notification.request.content.data ?? {}) as NotificationData;
+    const tapId = response.actionIdentifier + response.notification.date;
+
+    // Parse `type` or `screen` field case-insensitively
+    const rawType = data.type || data.screen || '';
+    const normalizedType = rawType.toUpperCase().trim() as NotificationType;
+
+    let parsedParams: NotificationData = { ...data };
+    if (typeof data.data === 'string') {
+        try {
+            parsedParams = { ...parsedParams, ...JSON.parse(data.data) };
+        } catch {}
+    }
+
+    return { payload: { type: normalizedType, data: parsedParams }, tapId };
+};
 
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
 // Remove the `isExpoGo` check below once running via a development build.
@@ -26,6 +47,7 @@ export const usePushNotifications = () => {
 
     useEffect(() => {
         notificationService.configureBehavior();
+        notificationService.setupAndroidChannels().catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -52,26 +74,10 @@ export const usePushNotifications = () => {
             hasHandledColdStart.current = true;
             Notifications.getLastNotificationResponseAsync().then((response) => {
                 if (!response) return;
-                console.log('[PushNotificationHook] Cold start response received:', JSON.stringify(response, null, 2));
+                if (__DEV__) console.log('[PushNotificationHook] Cold start response received:', JSON.stringify(response, null, 2));
 
-                const data = response.notification.request.content.data as Record<string, any>;
-                const tapId = response.actionIdentifier + response.notification.date;
-                
-                // Parse screen or type field case-insensitively
-                const rawType = (data.type || data.screen || '') as string;
-                const normalizedType = rawType.toUpperCase().trim() as NotificationType;
-
-                let parsedParams = { ...data };
-                if (typeof data.data === 'string') {
-                    try {
-                        parsedParams = { ...parsedParams, ...JSON.parse(data.data) };
-                    } catch {}
-                }
-
-                NotificationNavigation.handleTap({
-                    type: normalizedType,
-                    data: parsedParams,
-                }, tapId);
+                const { payload, tapId } = buildTapPayload(response);
+                NotificationNavigation.handleTap(payload, tapId);
             });
         }
     }, [isLoaded]);
@@ -83,12 +89,12 @@ export const usePushNotifications = () => {
         // Foreground notification received — save to store
         foregroundListener.current = Notifications.addNotificationReceivedListener(
             (notification) => {
-                console.log('[PushNotificationHook] Foreground notification received:', JSON.stringify(notification, null, 2));
+                if (__DEV__) console.log('[PushNotificationHook] Foreground notification received:', JSON.stringify(notification, null, 2));
                 const { title, body, data } = notification.request.content;
                 addNotification({
                     title: title ?? 'Notification',
                     body: body ?? '',
-                    data: (data as Record<string, any>) ?? {},
+                    data: (data as NotificationData) ?? {},
                 });
             }
         );
@@ -96,25 +102,9 @@ export const usePushNotifications = () => {
         // Notification tapped (foreground / background)
         responseListener.current = Notifications.addNotificationResponseReceivedListener(
             (response) => {
-                console.log('[PushNotificationHook] Notification tapped (response listener):', JSON.stringify(response, null, 2));
-                const data = response.notification.request.content.data as Record<string, any>;
-                const tapId = response.actionIdentifier + response.notification.date;
-                
-                // Parse screen or type field case-insensitively
-                const rawType = (data.type || data.screen || '') as string;
-                const normalizedType = rawType.toUpperCase().trim() as NotificationType;
-
-                let parsedParams = { ...data };
-                if (typeof data.data === 'string') {
-                    try {
-                        parsedParams = { ...parsedParams, ...JSON.parse(data.data) };
-                    } catch {}
-                }
-
-                NotificationNavigation.handleTap({
-                    type: normalizedType,
-                    data: parsedParams,
-                }, tapId);
+                if (__DEV__) console.log('[PushNotificationHook] Notification tapped (response listener):', JSON.stringify(response, null, 2));
+                const { payload, tapId } = buildTapPayload(response);
+                NotificationNavigation.handleTap(payload, tapId);
             }
         );
 

@@ -74,6 +74,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         androidCollapsedTitle: "Caresure",
       },
     ],
+    // Resolves the manifest-merger clash between expo-notifications and
+    // @react-native-firebase/messaging over default_notification_color.
+    "./plugins/withFirebaseNotificationColorFix",
   ],
   experiments: {
     typedRoutes: true,

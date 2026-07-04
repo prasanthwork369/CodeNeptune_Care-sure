@@ -34,8 +34,29 @@ export enum NotificationType {
   NOTIFICATIONS = 'NOTIFICATIONS',
 }
 
+/**
+ * The `data` block of a push notification. FCM data payloads are always
+ * string key/values, so every field is a string. Fields listed explicitly are
+ * the ones the app reads; the index signature covers anything else the backend
+ * sends (including the nested `data` JSON string we parse on receipt).
+ */
+export interface NotificationData {
+  type?: string;
+  screen?: string;
+  orderId?: string;
+  prescriptionId?: string;
+  productId?: string;
+  categoryId?: string;
+  id?: string;
+  status?: string;
+  imageUrls?: string;
+  /** A nested JSON string of extra params, parsed and merged on receipt. */
+  data?: string;
+  [key: string]: string | undefined;
+}
+
 export interface NotificationPayload {
   type: NotificationType;
   id?: string;
-  data?: Record<string, any>;
+  data?: NotificationData;
 }
