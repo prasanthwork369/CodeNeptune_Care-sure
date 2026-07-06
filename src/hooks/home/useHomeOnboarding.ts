@@ -58,6 +58,9 @@ export const useHomeOnboarding = () => {
                             })
                             .catch(() => {});
                     }
+                    // Note: if location is skipped/denied, the header still fills
+                    // in for returning users — useHomeData syncs their default
+                    // saved address into the location store once addresses load.
                 }
 
                 // ── Step 2: Notification ────────────────────────────────────

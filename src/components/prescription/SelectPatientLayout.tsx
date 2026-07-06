@@ -194,7 +194,7 @@ export const SelectPatientLayout: React.FC = () => {
                   style={{ fontSize: moderateScale(14, 0.1) }}
                   value={phoneValue}
                   onChangeText={setPhoneValue}
-                  keyboardType="phone-pad"
+                  keyboardType="number-pad"
                   maxLength={15}
                   autoFocus
                   placeholderTextColor="#919EAB"

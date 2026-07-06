@@ -5,6 +5,7 @@ import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
@@ -22,6 +23,7 @@ const GENDERS = ["Male", "Female", "Other"];
 export const MyProfileLayout: React.FC = () => {
   const router = useNav();
   const { profile, updating, error, updateProfile } = useProfile();
+  const { deleteAccount, deletingAccount } = useAuth();
   const { requestVerify, requesting } = useEmailVerification();
   const isOffline = useIsOffline();
 
@@ -106,12 +108,28 @@ export const MyProfileLayout: React.FC = () => {
   };
 
   const handleDeleteAccount = () => {
+    if (deletingAccount) return;
     Alert.alert(
       "Delete Account",
       "Are you sure you want to delete your account? This action cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => {} },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // On success the auth state is cleared, so the root layout
+              // automatically redirects back to login — no manual navigation.
+              await deleteAccount();
+            } catch (err: any) {
+              Alert.alert(
+                "Delete Account",
+                err?.message ?? "Could not delete your account. Please try again.",
+              );
+            }
+          },
+        },
       ],
     );
   };
@@ -149,7 +167,7 @@ export const MyProfileLayout: React.FC = () => {
           label="Mobile Number"
           value={profile?.phoneNumber ?? ""}
           editable={false}
-          keyboardType="phone-pad"
+          keyboardType="number-pad"
         />
 
         {/* Email */}
@@ -320,17 +338,26 @@ export const MyProfileLayout: React.FC = () => {
           <Touchable
             onPress={handleDeleteAccount}
             activeOpacity={0.7}
-            style={{ marginBottom: 6 }}
+            disabled={deletingAccount}
+            style={{ marginBottom: 6, flexDirection: "row", alignItems: "center" }}
           >
             <Text
               style={{
                 fontSize: moderateScale(14),
                 fontWeight: "700",
                 color: "#CA2B25",
+                opacity: deletingAccount ? 0.6 : 1,
               }}
             >
-              Delete Account
+              {deletingAccount ? "Deleting…" : "Delete Account"}
             </Text>
+            {deletingAccount && (
+              <ActivityIndicator
+                size="small"
+                color="#CA2B25"
+                style={{ marginLeft: 8 }}
+              />
+            )}
           </Touchable>
           <Text
             style={{

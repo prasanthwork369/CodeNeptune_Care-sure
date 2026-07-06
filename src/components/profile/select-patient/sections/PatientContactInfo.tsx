@@ -66,7 +66,7 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
                 setLocalValue(sanitize.phone(text));
                 setError("");
               }}
-              keyboardType="phone-pad"
+              keyboardType="number-pad"
               maxLength={10}
               autoFocus
               cursorColor="#6A6A6A"

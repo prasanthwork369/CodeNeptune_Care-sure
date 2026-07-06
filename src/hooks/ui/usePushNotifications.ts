@@ -2,6 +2,7 @@ import { isExpoGo } from "@/src/utils/environment";
 import type FirebaseMessaging from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
 import { notificationService } from "../../services/notification.service";
 import { NotificationNavigation } from "../../services/NotificationNavigation";
 import { useAuthStore } from "../../store/authStore";
@@ -76,6 +77,37 @@ export const usePushNotifications = () => {
       notificationService
         .updateToken(newToken, useAuthStore.getState().isAuthenticated)
         .catch(() => {});
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Foreground FCM messages. Android suppresses notification-message banners
+  // while the app is open, and @react-native-firebase/messaging (not
+  // expo-notifications) owns the FirebaseMessagingService — so expo's
+  // addNotificationReceivedListener never fires for these. Re-present the
+  // message as a local notification here to make it visible: the
+  // setNotificationHandler shows the banner and the received listener above
+  // then saves it to the store (single path, no duplicate). Android only —
+  // iOS already surfaces foreground notification messages via expo's handler,
+  // so re-presenting there would show a duplicate banner.
+  useEffect(() => {
+    if (isExpoGo || Platform.OS !== "android") return;
+
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      if (__DEV__)
+        console.log(
+          "[PushNotificationHook] Foreground FCM message:",
+          JSON.stringify(remoteMessage, null, 2),
+        );
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: remoteMessage?.notification?.title ?? "Notification",
+          body: remoteMessage?.notification?.body ?? "",
+          data: (remoteMessage?.data ?? {}) as NotificationData,
+        },
+        trigger: null, // present immediately
+      }).catch(() => {});
     });
 
     return unsubscribe;

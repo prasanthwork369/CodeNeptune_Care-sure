@@ -199,7 +199,7 @@ export const AddPatientLayout: React.FC = () => {
             <TextInput
               placeholder="10 digit number"
               placeholderTextColor="#919EAB"
-              keyboardType="phone-pad"
+              keyboardType="number-pad"
               maxLength={10}
               value={mobile}
               onChangeText={(t) => {

@@ -5,6 +5,7 @@ import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
+import { addressToLocation, pickDefaultAddress } from "@/src/utils/addressLocation";
 import { useEffect, useState } from "react";
 
 export function useHomeData() {
@@ -34,26 +35,14 @@ export function useHomeData() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Sync default address into location store
+  // Sync default address into location store — this is what fills the home
+  // header for returning users who skip the location permission.
   useEffect(() => {
     if (!isAuthenticated) return;
-    if (addresses.length > 0) {
-      const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
-      const fullAddress = [
-        defaultAddr.line1,
-        defaultAddr.line2,
-        defaultAddr.city,
-      ]
-        .filter(Boolean)
-        .join(", ");
-      setLocation(
-        {
-          label: defaultAddr.label,
-          city: fullAddress,
-          shortCity: defaultAddr.city,
-        },
-        { addressId: defaultAddr.id, pincode: defaultAddr.pincode },
-      );
+    const defaultAddr = pickDefaultAddress(addresses);
+    if (defaultAddr) {
+      const { location, addressId, pincode } = addressToLocation(defaultAddr);
+      setLocation(location, { addressId, pincode });
     } else {
       clearLocation();
     }

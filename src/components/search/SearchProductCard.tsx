@@ -17,7 +17,7 @@ interface SearchRowProps {
         recSlug?: string;
         searched: {
             name: string;
-            manufacturer: string;
+            brandName: string;
             description?: string;
             price: number;
             status: string;
@@ -76,6 +76,11 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
                         {data.searched.description ? (
                             <Text style={s.desc} className="font-inter-medium text-brand-subtext mt-0.5" numberOfLines={1}>
                                 {data.searched.description}
+                            </Text>
+                        ) : null}
+                        {data.searched.brandName ? (
+                            <Text style={s.desc} className="font-inter-medium text-brand-subtext mt-0.5" numberOfLines={1}>
+                                {data.searched.brandName}
                             </Text>
                         ) : null}
                     </View>

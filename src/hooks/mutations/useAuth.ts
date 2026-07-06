@@ -17,6 +17,11 @@ export const useAuth = () => {
         onSuccess: () => queryClient.clear(),
     });
 
+    const deleteAccountMutation = useMutation({
+        mutationFn: (reason?: string) => authService.deleteAccount(reason),
+        onSuccess: () => queryClient.clear(),
+    });
+
     const loading = requestOtpMutation.isPending || verifyOtpMutation.isPending || logoutMutation.isPending;
     const error = (requestOtpMutation.error ?? verifyOtpMutation.error)?.message ?? null;
 
@@ -24,6 +29,8 @@ export const useAuth = () => {
         requestOtp: (phone: string) => requestOtpMutation.mutateAsync(phone),
         verifyOtp: (phone: string, otp: string) => verifyOtpMutation.mutateAsync({ phone, otp }),
         logout: () => logoutMutation.mutateAsync(),
+        deleteAccount: (reason?: string) => deleteAccountMutation.mutateAsync(reason),
+        deletingAccount: deleteAccountMutation.isPending,
         // Clears a lingering mutation error so a new attempt starts clean —
         // otherwise the previous "invalid OTP" error persists while the user
         // is already retyping.

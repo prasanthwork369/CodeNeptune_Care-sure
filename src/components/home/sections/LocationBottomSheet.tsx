@@ -11,6 +11,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { locationService } from "@/src/services/location.service";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useToastStore } from "@/src/store/toastStore";
+import { addressToLocation } from "@/src/utils/addressLocation";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import {
   BottomSheetModal,
@@ -222,14 +223,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       showToast("Could not verify serviceability. Please try again.", "error");
       return;
     }
-    const fullAddress = [addr.line1, addr.line2, addr.city]
-      .filter(Boolean)
-      .join(", ");
-    setLocation(
-      { label: addr.label, city: fullAddress, shortCity: addr.city },
-      { addressId: addr.id, pincode: addr.pincode },
-    );
-    onSelect?.(addr.label, fullAddress, addr);
+    const { location, addressId, pincode } = addressToLocation(addr);
+    setLocation(location, { addressId, pincode });
+    onSelect?.(addr.label, location.city, addr);
     showToast(`Delivery location set to ${addr.city} - ${addr.pincode}`, "success");
     handleClose();
   };

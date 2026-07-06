@@ -151,7 +151,8 @@ export function useCartCalculations() {
       medicineId: item.medicineId,
       name: item.medicineName,
       brand: item.metadata?.brand ?? "",
-      pack: packSize ?? "",
+      // Prefer the backend's human-readable packaging string; fall back to raw packSize.
+      pack: item.packagingDetail ?? packSize ?? "",
       discount:
         discountPct > 0 ? `${parseFloat(discountPct.toFixed(2))}% off` : "",
       mrp,

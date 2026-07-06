@@ -31,6 +31,7 @@ export interface CartItem {
   productType?: number;
   unit?: string;
   packSize?: string;
+  packagingDetail?: string; // human-readable packaging string, e.g. "Strip of 10 tablets"
   dosageForm?: string;
 
   // UI fields

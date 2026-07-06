@@ -42,4 +42,11 @@ export const profileApi = {
     verifyEmail: async (otp: string): Promise<void> => {
         await apiClient.post(API_ENDPOINTS.CUSTOMER_EMAIL_VERIFY, { otp });
     },
+    // Permanently deletes the logged-in customer's account. reason is optional.
+    deleteAccount: async (reason?: string): Promise<{ success: boolean }> => {
+        const response = await apiClient.delete(API_ENDPOINTS.CUSTOMER_PROFILE, {
+            data: reason ? { reason } : undefined,
+        });
+        return response.data?.data ?? response.data;
+    },
 };

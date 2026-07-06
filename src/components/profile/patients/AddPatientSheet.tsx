@@ -245,7 +245,7 @@ export function AddPatientSheet({
               ref={mobileRef}
               placeholder="Enter The number"
               placeholderTextColor="#6A6A6A"
-              keyboardType="phone-pad"
+              keyboardType="number-pad"
               maxLength={10}
               returnKeyType="done"
               style={{

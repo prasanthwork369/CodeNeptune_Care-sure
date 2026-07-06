@@ -41,7 +41,7 @@ const toComparisonData = (item: ApiSearchMedicine) => {
         recSlug: rec.slug,
         searched: {
             name: item.name,
-            manufacturer: item.brand?.name ?? '',
+            brandName: item.brand?.name ?? '',
             price: searchedMrp,
             status: 'Not for Purchase',
             image: item.thumbnailUrl ? { uri: item.thumbnailUrl } : undefined,
