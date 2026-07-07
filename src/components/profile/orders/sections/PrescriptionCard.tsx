@@ -207,18 +207,6 @@ export const PrescriptionCard = ({
     }
   };
 
-  const handleDelete = () => {
-    setShowOptions(false);
-    Alert.alert(
-      "Delete Prescription",
-      "Are you sure you want to delete this prescription?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => {} },
-      ],
-    );
-  };
-
   const statusStyle = getStatusStyle(item.status);
 
   return (
@@ -365,17 +353,14 @@ export const PrescriptionCard = ({
           backdropStyle={{ zIndex: 9 }}
           popoverStyle={{
             position: "absolute",
-            top: 64,
+            top: 48,
             right: 8,
             width: 210,
             backgroundColor: "#FFFFFF",
             borderRadius: 16,
+            borderWidth: 1,
+            borderColor: "#919EAB33",
             zIndex: 10,
-            shadowColor: "#919EAB33",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.12,
-            shadowRadius: 12,
-            elevation: 8,
           }}
           items={[
             {
@@ -401,15 +386,6 @@ export const PrescriptionCard = ({
               rowStyle: optionRowStyle,
               textStyle: optionTextStyle,
               onPress: handleShare,
-            },
-            {
-              key: "delete",
-              icon: <icons.delete_red width={20} height={20} />,
-              label: "Delete",
-              rowStyle: optionRowStyle,
-              textStyle: { ...optionTextStyle, color: "#C22307" },
-              dividerStyle: { height: 1, backgroundColor: "#F0F0F0" },
-              onPress: handleDelete,
             },
           ]}
         />

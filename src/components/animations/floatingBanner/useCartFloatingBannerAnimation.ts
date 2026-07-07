@@ -7,6 +7,7 @@ import {
   Easing,
   interpolate,
 } from "react-native-reanimated";
+import { exactScale } from "@/src/utils/exactScale";
 
 interface UseCartFloatingBannerAnimationProps {
   visible?: boolean;
@@ -23,7 +24,9 @@ export const useCartFloatingBannerAnimation = ({
   isUploadButtonCollapsed,
   onInteractionChange,
 }: UseCartFloatingBannerAnimationProps) => {
-  const SLIDE_OFFSET = -90;
+  // Scaled to match the Remove button's width/position (exactScale(90)) so the
+  // reveal geometry stays consistent across device widths, not just at 390px.
+  const SLIDE_OFFSET = -exactScale(90);
   const DURATION = 250;
   const EASE_IN_OUT = Easing.inOut(Easing.ease);
 

@@ -5,25 +5,31 @@ import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useProfile } from "@/src/hooks/queries/useProfile";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
 import { moderateScale } from "@/src/utils/exactScale";
-import { validate } from "@/src/utils/validation";
+import { format, validate } from "@/src/utils/validation";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Keyboard, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmailVerifyModal } from "./EmailVerifyModal";
 
-const GENDERS = ["Male", "Female", "Other"];
+// Label shown to the user vs. value sent to the backend (kept in sync with
+// AddPatientLayout — "Prefer not to say" maps to the "OTHER" gender value).
+const GENDERS = [
+  { label: "Male", value: "MALE" },
+  { label: "Female", value: "FEMALE" },
+  { label: "Prefer not to say", value: "OTHER" },
+];
 
 export const MyProfileLayout: React.FC = () => {
   const router = useNav();
+  const adjustedBottom = useAdjustedBottomInset();
   const { profile, updating, error, updateProfile } = useProfile();
-  const { deleteAccount, deletingAccount } = useAuth();
   const { requestVerify, requesting } = useEmailVerification();
   const isOffline = useIsOffline();
 
@@ -37,16 +43,20 @@ export const MyProfileLayout: React.FC = () => {
   const [showEmailVerify, setShowEmailVerify] = useState(false);
   const [emailError, setEmailError] = useState("");
 
+  // Hydrate the form once per profile (keyed by id). A background refetch of the
+  // same profile returns a new object each time; re-syncing on every change would
+  // clobber the user's in-progress edits — e.g. revert a changed email back to
+  // the verified one and make the Verify button disappear.
+  const hydratedIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!profile) return;
+    if (!profile || hydratedIdRef.current === profile.id) return;
+    hydratedIdRef.current = profile.id;
     setFirstName(profile.firstName ?? "");
     setLastName(profile.lastName ?? "");
     setEmail(profile.email ?? "");
     if (profile.gender) {
-      const g =
-        profile.gender.charAt(0).toUpperCase() +
-        profile.gender.slice(1).toLowerCase();
-      setGender(GENDERS.includes(g as any) ? g : "");
+      const val = profile.gender.toUpperCase();
+      setGender(GENDERS.some((x) => x.value === val) ? val : "");
     }
     if (profile.dateOfBirth) setDob(new Date(profile.dateOfBirth));
   }, [profile]);
@@ -55,7 +65,20 @@ export const MyProfileLayout: React.FC = () => {
     ? `${String(dob.getDate()).padStart(2, "0")}-${String(dob.getMonth() + 1).padStart(2, "0")}-${dob.getFullYear()}`
     : "";
 
-  const handleGenderPick = () => setShowGenderSheet(true);
+  // Show the "Verified" badge only while the field still holds the exact
+  // address that was verified. Once the user edits the email it's a new,
+  // unverified address, so the Verify button must re-enable.
+  const isCurrentEmailVerified =
+    !!profile?.isEmailVerified &&
+    !!email.trim() &&
+    email.trim().toLowerCase() === (profile.email ?? "").trim().toLowerCase();
+
+  // Dismiss the keyboard first so it doesn't stay open over the gender sheet
+  // when a text field (name/email) was focused.
+  const handleGenderPick = () => {
+    Keyboard.dismiss();
+    setShowGenderSheet(true);
+  };
 
   const handleSave = async () => {
     try {
@@ -63,7 +86,7 @@ export const MyProfileLayout: React.FC = () => {
       if (firstName.trim()) payload.firstName = firstName.trim();
       if (lastName.trim()) payload.lastName = lastName.trim();
       payload.email = email.trim();
-      if (gender) payload.gender = gender.toUpperCase();
+      if (gender) payload.gender = gender;
       if (dob) payload.dateOfBirth = dob.toISOString();
 
       if (Object.keys(payload).length === 0) return;
@@ -107,32 +130,9 @@ export const MyProfileLayout: React.FC = () => {
     // rightSlot badge automatically — no Alert needed.
   };
 
-  const handleDeleteAccount = () => {
-    if (deletingAccount) return;
-    Alert.alert(
-      "Delete Account",
-      "Are you sure you want to delete your account? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // On success the auth state is cleared, so the root layout
-              // automatically redirects back to login — no manual navigation.
-              await deleteAccount();
-            } catch (err: any) {
-              Alert.alert(
-                "Delete Account",
-                err?.message ?? "Could not delete your account. Please try again.",
-              );
-            }
-          },
-        },
-      ],
-    );
-  };
+  // Opens the dedicated Delete Account confirmation screen, which handles the
+  // actual deletion (and the "lose access to" details from the design).
+  const handleDeleteAccount = () => router.push("/profile/delete-account" as any);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
@@ -165,7 +165,7 @@ export const MyProfileLayout: React.FC = () => {
         <FormField
           variant="boxed"
           label="Mobile Number"
-          value={profile?.phoneNumber ?? ""}
+          value={format.phone(profile?.phoneNumber)}
           editable={false}
           keyboardType="number-pad"
         />
@@ -183,7 +183,7 @@ export const MyProfileLayout: React.FC = () => {
           keyboardType="email-address"
           error={emailError}
           rightSlot={
-            profile?.isEmailVerified && email ? (
+            isCurrentEmailVerified ? (
               // Already verified — show a green badge, no action needed
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
@@ -259,7 +259,7 @@ export const MyProfileLayout: React.FC = () => {
                   color: gender ? "#111827" : "#AAAAAA",
                 }}
               >
-                {gender || "Select"}
+                {GENDERS.find((x) => x.value === gender)?.label || "Select"}
               </Text>
               <icons.down_arrow width={16} height={16} />
             </Touchable>
@@ -338,26 +338,17 @@ export const MyProfileLayout: React.FC = () => {
           <Touchable
             onPress={handleDeleteAccount}
             activeOpacity={0.7}
-            disabled={deletingAccount}
-            style={{ marginBottom: 6, flexDirection: "row", alignItems: "center" }}
+            style={{ marginBottom: 6 }}
           >
             <Text
               style={{
                 fontSize: moderateScale(14),
                 fontWeight: "700",
                 color: "#CA2B25",
-                opacity: deletingAccount ? 0.6 : 1,
               }}
             >
-              {deletingAccount ? "Deleting…" : "Delete Account"}
+              Delete Account
             </Text>
-            {deletingAccount && (
-              <ActivityIndicator
-                size="small"
-                color="#CA2B25"
-                style={{ marginLeft: 8 }}
-              />
-            )}
           </Touchable>
           <Text
             style={{
@@ -413,7 +404,14 @@ export const MyProfileLayout: React.FC = () => {
         onClose={() => setShowGenderSheet(false)}
       >
         <BottomSheetView
-          style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 16 }}
+          // Adjusted bottom inset so the last option isn't hidden behind the
+          // Android 3-button nav bar (edge-to-edge is enabled); consistent with
+          // the tab bar / other bottom UI.
+          style={{
+            paddingHorizontal: 20,
+            paddingTop: 24,
+            paddingBottom: adjustedBottom + 8,
+          }}
         >
           <Text
             style={{
@@ -427,9 +425,9 @@ export const MyProfileLayout: React.FC = () => {
           </Text>
           {GENDERS.map((g, i) => (
             <Touchable
-              key={g}
+              key={g.value}
               onPress={() => {
-                setGender(g);
+                setGender(g.value);
                 setShowGenderSheet(false);
               }}
               activeOpacity={0.8}
@@ -445,13 +443,13 @@ export const MyProfileLayout: React.FC = () => {
               <Text
                 style={{
                   fontSize: moderateScale(15),
-                  fontWeight: gender === g ? "600" : "400",
-                  color: gender === g ? "#0F7635" : "#111827",
+                  fontWeight: gender === g.value ? "600" : "400",
+                  color: gender === g.value ? "#0F7635" : "#111827",
                 }}
               >
-                {g}
+                {g.label}
               </Text>
-              {gender === g && (
+              {gender === g.value && (
                 <icons.check_circle width={20} height={20} fill="#0F7635" />
               )}
             </Touchable>

@@ -24,6 +24,8 @@ export type DeviceInfo = {
 
   // Install identifier
   installation_id: string | null;
+  deviceId: string | null;
+  platform: "ios" | "android" | "web";
 
   // Locale / timezone (via built-in Intl — no expo-localization needed)
   timezone: string;
@@ -70,6 +72,8 @@ export async function getDeviceInfo(): Promise<DeviceInfo> {
     app_env: __DEV__ ? "development" : "production",
 
     installation_id: installationId,
+    deviceId: installationId,
+    platform: Platform.OS as DeviceInfo["platform"],
 
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     locale: Intl.DateTimeFormat().resolvedOptions().locale,

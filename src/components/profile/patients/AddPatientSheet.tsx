@@ -6,6 +6,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
 import { BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
@@ -66,7 +67,13 @@ export function AddPatientSheet({
   const inFlight = useRef(false);
 
   const isEditMode = !!editPatient;
-  const mobileRef = useRef<React.ElementRef<typeof BottomSheetTextInput>>(null);
+  const mobileRef = useRef<any>(null);
+  const setMobileRef = (ref: any) => {
+    mobileRef.current = ref;
+    if (ref) {
+      applyDigitsOnlyFilter(ref);
+    }
+  };
   const maxDob = getMaxDob();
 
   useEffect(() => {
@@ -242,7 +249,7 @@ export function AddPatientSheet({
               +91 |
             </Text>
             <SafeInput
-              ref={mobileRef}
+              ref={setMobileRef}
               placeholder="Enter The number"
               placeholderTextColor="#6A6A6A"
               keyboardType="number-pad"

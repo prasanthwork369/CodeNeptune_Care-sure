@@ -134,7 +134,7 @@ export const FrequentOrdersLayout: React.FC = () => {
               value={search}
               onChangeText={setSearch}
               placeholder="Search your ordered products..."
-              placeholderTextColor="#B0BAC4"
+              placeholderTextColor="#6A6A6A"
               style={{
                 flex: 1,
                 fontSize: moderateScale(14),

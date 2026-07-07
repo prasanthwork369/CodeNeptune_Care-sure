@@ -109,6 +109,9 @@ export const HOME_IMAGES = {
   prescriptionMedicine: require("../../assets/images/prescription/prescription-medicine.png"),
   noPatient: require("../../assets/images/prescription/no-patient.png"),
   splashIcon: require("../../assets/images/splash-icon.png"),
+
+  // Delete Account
+  deleteAccount: require("../../assets/images/delete-account.png"),
 } as const;
 
 export const UPLOAD_IMAGES = {
@@ -124,4 +127,5 @@ export const ANIMATIONS = {
   pharmacy: require("../../assets/animations/pharmacy.lottie"),
   orderPlaced: require("../../assets/animations/order-placed.lottie"),
   confetti: require("../../assets/animations/confetti.lottie"),
+  splash: require("../../assets/animations/splash.lottie"),
 } as const;

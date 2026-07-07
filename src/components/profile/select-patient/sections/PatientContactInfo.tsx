@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { PatientContactInfoProps } from "@/src/types/patient";
-import { sanitize, validate } from "@/src/utils/validation";
+import { format, sanitize, validate } from "@/src/utils/validation";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
@@ -34,7 +34,7 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
     onSave(localValue);
   };
 
-  const displayPhone = phone ? `+91 ${stripCountryCode(phone)}` : "";
+  const displayPhone = format.phone(phone);
 
   return (
     <View className="mb-4">
@@ -70,7 +70,7 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
               maxLength={10}
               autoFocus
               cursorColor="#6A6A6A"
-              placeholderTextColor="#919EAB"
+              placeholderTextColor="#6A6A6A"
               placeholder="10 digit number"
             />
           </View>

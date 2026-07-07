@@ -1,5 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { FormField } from "@/src/components/ui/FormField";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { profileStyles as s } from '../profile.styles';
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
@@ -59,7 +60,13 @@ export const AddAddressLayout: React.FC = () => {
   const scrollRef = useRef<ScrollView>(null);
   const fieldY = useRef<Record<string, number>>({});
 
-  const mobileRef = useRef<TextInput>(null);
+  const mobileRef = useRef<TextInput | null>(null);
+  const setMobileRef = (ref: TextInput | null) => {
+    mobileRef.current = ref;
+    if (ref) {
+      applyDigitsOnlyFilter(ref);
+    }
+  };
   const line1Ref = useRef<TextInput>(null);
   const line2Ref = useRef<TextInput>(null);
   const cityRef = useRef<TextInput>(null);
@@ -258,7 +265,7 @@ export const AddAddressLayout: React.FC = () => {
           />
 
           <FormField
-            ref={mobileRef}
+            ref={setMobileRef}
             label="Mobile Number"
             value={mobile}
             onChangeText={handleMobileChange}

@@ -1,3 +1,4 @@
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { LoginFormProps } from "@/src/types/auth";
 import { sanitize } from "@/src/utils/validation";
 import React, { useState } from "react";
@@ -30,9 +31,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           },
         ]}
       >
-        <Text style={s.prefix} >+91</Text>
+        <Text style={s.prefix}>+91</Text>
         <View style={s.divider} />
         <TextInput
+          ref={applyDigitsOnlyFilter}
           placeholder="Enter your mobile number"
           placeholderTextColor="#6A6A6A"
           // MUST stay "number-pad" (maps to Android inputType="number") — a clean

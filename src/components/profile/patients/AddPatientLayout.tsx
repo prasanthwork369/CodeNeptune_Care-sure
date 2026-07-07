@@ -9,6 +9,7 @@ import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import React, { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -167,7 +168,7 @@ export const AddPatientLayout: React.FC = () => {
           <Text className={labelStyle} style={labelTextStyle}>Name</Text>
           <TextInput
             placeholder="Enter the name"
-            placeholderTextColor="#919EAB"
+            placeholderTextColor="#6A6A6A"
             value={name}
             onChangeText={(t) => {
               setName(t);
@@ -197,8 +198,9 @@ export const AddPatientLayout: React.FC = () => {
               +91 |
             </Text>
             <TextInput
+              ref={applyDigitsOnlyFilter}
               placeholder="10 digit number"
-              placeholderTextColor="#919EAB"
+              placeholderTextColor="#6A6A6A"
               keyboardType="number-pad"
               maxLength={10}
               value={mobile}
@@ -270,7 +272,7 @@ export const AddPatientLayout: React.FC = () => {
             <View style={{ marginBottom: 18 }}>
               <TextInput
                 placeholder="Please specify relationship"
-                placeholderTextColor="#919EAB"
+                placeholderTextColor="#6A6A6A"
                 value={otherRelationship}
                 onChangeText={(t) => {
                   setOtherRelationship(t);

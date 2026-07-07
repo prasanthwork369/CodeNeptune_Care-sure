@@ -4,7 +4,9 @@ import { API_ENDPOINTS } from '../utils/urls';
 export interface CustomerNotificationPreferences {
     id: string;
     customerId: string;
-    orderUpdatesEnabled: boolean;
+    // Order Updates is split into two channels (matches the web + API)
+    orderUpdatesSmsEnabled: boolean;
+    orderUpdatesEmailEnabled: boolean;
     healthUpdatesEnabled: boolean;
     promotionsOffersEnabled: boolean;
     createdAt: string;
@@ -12,7 +14,8 @@ export interface CustomerNotificationPreferences {
 }
 
 export interface UpdateNotificationPreferencesInput {
-    orderUpdatesEnabled?: boolean;
+    orderUpdatesSmsEnabled?: boolean;
+    orderUpdatesEmailEnabled?: boolean;
     healthUpdatesEnabled?: boolean;
     promotionsOffersEnabled?: boolean;
 }

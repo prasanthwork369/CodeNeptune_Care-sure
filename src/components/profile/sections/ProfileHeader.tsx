@@ -5,6 +5,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { icons } from '@/src/constants/icons';
+import { format } from '@/src/utils/validation';
 
 interface ProfileHeaderProps {
     profile: any;
@@ -59,7 +60,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     ? `${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim()
                     : '—'}
             </Text>
-            <Text style={s.personPhone} className="mt-1 font-inter-semibold text-brand-text">{profile?.phoneNumber ?? '—'}</Text>
+            <Text style={s.personPhone} className="mt-1 font-inter-semibold text-brand-text">{format.phone(profile?.phoneNumber) || '—'}</Text>
         </LinearGradient>
     );
 };

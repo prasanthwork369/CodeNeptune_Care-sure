@@ -149,12 +149,12 @@ export const CartFloatingBanner = ({
               style={{ width: "100%" }}
             >
               <View
-                className="flex-row items-center px-3 bg-white"
-                style={{ borderRadius: exactScale(999), height: exactScale(65) }}
+                className="flex-row items-center bg-white"
+                style={{ borderRadius: exactScale(999), height: exactScale(65), paddingHorizontal: exactScale(12) }}
               >
                 <View
-                  className="mr-3 justify-center"
-                  style={{ width: totalItems > 1 ? 52 : 44, height: exactScale(48) }}
+                  className="justify-center"
+                  style={{ width: totalItems > 1 ? exactScale(52) : exactScale(44), height: exactScale(48), marginRight: exactScale(12) }}
                 >
                   {totalItems > 1 && (
                     <View
@@ -178,7 +178,7 @@ export const CartFloatingBanner = ({
                       width: exactScale(44),
                       height: exactScale(44),
                       position: totalItems > 1 ? "absolute" : "relative",
-                      left: totalItems > 1 ? 8 : 0,
+                      left: totalItems > 1 ? exactScale(8) : 0,
                     }}
                   >
                     {displayImage ? (
@@ -209,7 +209,7 @@ export const CartFloatingBanner = ({
                   </Text>
                 </View>
 
-                <View className="flex-row items-center gap-x-2">
+                <View className="flex-row items-center" style={{ columnGap: exactScale(8) }}>
                   <Touchable activeOpacity={0.9} onPress={onViewCart}>
                     <Animated.View style={[BUTTON_STATIC, buttonAnimatedStyle]}>
                       <AnimatedText
@@ -234,7 +234,8 @@ export const CartFloatingBanner = ({
                   <Touchable
                     onPress={handleClosePress}
                     activeOpacity={0.7}
-                    className="w-[30px] h-[30px] rounded-full bg-[#F3F4F6] items-center justify-center"
+                    className="rounded-full bg-[#F3F4F6] items-center justify-center"
+                    style={{ width: exactScale(30), height: exactScale(30) }}
                   >
                     <icons.close_small width={exactScale(12)} height={exactScale(12)} fill="#6A6A6A" />
                   </Touchable>
@@ -248,7 +249,7 @@ export const CartFloatingBanner = ({
               disabled={isClearing}
               style={{
                 position: "absolute",
-                right: -90,
+                right: -exactScale(90),
                 width: exactScale(90),
                 height: "100%",
                 backgroundColor: "#ECFDF5",

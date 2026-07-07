@@ -66,9 +66,7 @@ export const useHomeOnboarding = () => {
                 // ── Step 2: Notification ────────────────────────────────────
                 // Awaits the dialog, so it only appears after location is done.
                 if (!isExpoGo) {
-                    await notificationService.promptAndRegister(
-                        useAuthStore.getState().isAuthenticated,
-                    );
+                    await notificationService.promptAndRegister();
                 }
             } catch {
                 // Permissions are best-effort — never block the home screen.

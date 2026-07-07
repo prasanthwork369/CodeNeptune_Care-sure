@@ -57,11 +57,14 @@ export const EmailVerifyModal: React.FC<EmailVerifyModalProps> = ({
 
   const otp = useOtpInput(handleVerify);
 
-  // Reset OTP + countdown each time the modal opens.
+  // Reset OTP + countdown + any stale error each time the modal opens. The
+  // modal stays mounted (only `visible` toggles), so a previous "Invalid OTP"
+  // error would otherwise linger when reopened for a new email.
   useEffect(() => {
     if (!isVisible) return;
     setResendCooldown(RESEND_SECONDS);
     otp.reset();
+    resetVerifyError();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);
 

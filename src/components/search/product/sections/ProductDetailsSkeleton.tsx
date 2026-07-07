@@ -6,7 +6,7 @@ export const ProductDetailsSkeleton = () => {
     return (
         <ScrollView showsVerticalScrollIndicator={false} className="flex-1" bounces={false}>
             {/* Mock SaltCompositionBanner */}
-            <View className="px-4 py-3 bg-[#FFFDEB]">
+            <View className="px-4 py-3">
                 <Skeleton width="80%" height={14} />
             </View>
 
@@ -22,7 +22,7 @@ export const ProductDetailsSkeleton = () => {
                             <Skeleton width={80} height={24} />
                         </View>
                         {/* Right Side */}
-                        <View className="flex-1 p-4 bg-[#FFFDEB]">
+                        <View className="flex-1 p-4">
                             <Skeleton width="100%" height={120} borderRadius={12} style={{ marginBottom: 12 }} />
                             <Skeleton width="90%" height={18} style={{ marginBottom: 8 }} />
                             <Skeleton width="60%" height={12} style={{ marginBottom: 16 }} />

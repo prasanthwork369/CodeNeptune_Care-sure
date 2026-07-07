@@ -298,22 +298,48 @@ export const NotificationsLayout: React.FC = () => {
 
   const handlePress = (notification: NotificationLog) => {
     if (!notification.isRead) markRead(notification.id);
-    const orderId = notification.metadata?.prescriptionOrderId ?? notification.orderId;
-    if (notification.event === 'prescription.approved' && orderId) {
+
+    const { event } = notification;
+    const prescriptionOrderId =
+      notification.metadata?.prescriptionOrderId ?? notification.orderId;
+
+    // Prescription verified with a linked order → jump straight to comparison
+    if (event === 'prescription.approved' && prescriptionOrderId) {
       router.push({
         pathname: '/(prescription)/medicine-comparison',
-        params: { prescriptionOrderId: orderId, prescriptionId: notification.id },
+        params: { prescriptionOrderId, prescriptionId: notification.id },
       });
-    } else if (notification.event === 'prescription.rejected') {
-      router.push('/prescription-history');
-    } else if (notification.event.startsWith('wallet.') || notification.event.includes('coin')) {
-      router.push('/profile/wallet' as any);
-    } else if (notification.event.startsWith('order.') && notification.orderId) {
-      router.push({
-        pathname: '/profile/orders/track',
-        params: { orderId: notification.orderId },
-      } as any);
+      return;
     }
+
+    // Any other prescription update (uploaded, under review, rejected, …) →
+    // the prescription history list, so the row is never a dead end.
+    if (event.startsWith('prescription.') || event.includes('review')) {
+      router.push('/prescription-history');
+      return;
+    }
+
+    // Wallet / coins → wallet screen
+    if (event.startsWith('wallet.') || event.includes('coin')) {
+      router.push('/profile/wallet' as any);
+      return;
+    }
+
+    // Orders → track when we have an id, otherwise the orders list
+    if (event.startsWith('order.')) {
+      if (notification.orderId) {
+        router.push({
+          pathname: '/profile/orders/track',
+          params: { orderId: notification.orderId },
+        } as any);
+      } else {
+        router.push('/profile/orders' as any);
+      }
+      return;
+    }
+
+    // Unknown event: the user is already on the notifications screen, so there
+    // is nowhere more useful to send them — leave them here (already marked read).
   };
 
   const handleClearAll = () => {

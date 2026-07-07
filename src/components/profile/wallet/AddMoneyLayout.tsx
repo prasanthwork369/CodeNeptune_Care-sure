@@ -84,7 +84,7 @@ export const AddMoneyLayout: React.FC = () => {
                             onFocus={() => setIsAmountFocused(true)}
                             onBlur={() => setIsAmountFocused(false)}
                             placeholder="0"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor="#6A6A6A"
                             keyboardType="number-pad"
                             maxLength={6}
                             cursorColor="#0F7635"

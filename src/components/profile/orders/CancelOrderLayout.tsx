@@ -425,7 +425,7 @@ export function CancelOrderLayout() {
                         {isSelected && isOtherSelected && (
                           <TextInput
                             placeholder="Enter cancellation reason..."
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor="#6A6A6A"
                             value={otherReason}
                             onChangeText={(value) => {
                               setOtherReason(value);

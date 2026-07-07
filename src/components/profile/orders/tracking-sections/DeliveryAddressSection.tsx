@@ -1,5 +1,6 @@
 import { Order } from "@/src/types/order";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { format } from "@/src/utils/validation";
 import React from "react";
 import { Text, View } from "react-native";
 import { orderStyles as s } from "../orders.styles";
@@ -39,7 +40,7 @@ export function DeliveryAddressSection({ address }: DeliveryAddressSectionProps)
             {address.pincode}
           </Text>
           <Text style={s.labelSm} className="font-inter text-brand-subtext">
-            Phone : {address.phone}
+            Phone : {format.phone(address.phone)}
           </Text>
         </View>
       ) : (

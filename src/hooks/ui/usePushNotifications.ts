@@ -1,5 +1,6 @@
 import { isExpoGo } from "@/src/utils/environment";
 import type FirebaseMessaging from "@react-native-firebase/messaging";
+import { useRootNavigationState } from "expo-router";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
@@ -22,14 +23,11 @@ const messaging = (): ReturnType<typeof FirebaseMessaging> =>
       .default as typeof FirebaseMessaging
   )();
 
-/** Turns a notification-tap response into a routing payload + a stable de-dup id. */
-const buildTapPayload = (
-  response: Notifications.NotificationResponse,
+/** Builds a routing payload + de-dup id from a notification's `data` block. */
+const buildPayloadFromData = (
+  data: NotificationData,
+  tapId: string,
 ): { payload: NotificationPayload; tapId: string } => {
-  const data = (response.notification.request.content.data ??
-    {}) as NotificationData;
-  const tapId = response.actionIdentifier + response.notification.date;
-
   // Parse `type` or `screen` field case-insensitively
   const rawType = data.type || data.screen || "";
   const normalizedType = rawType.toUpperCase().trim() as NotificationType;
@@ -44,11 +42,39 @@ const buildTapPayload = (
   return { payload: { type: normalizedType, data: parsedParams }, tapId };
 };
 
+/** Tap coming through expo-notifications (foreground-presented / local). */
+const buildTapPayload = (response: Notifications.NotificationResponse) => {
+  const data = (response.notification.request.content.data ??
+    {}) as NotificationData;
+  // Prefer the FCM message id as the de-dup key so this tap matches the same
+  // message arriving through the Firebase handlers (getInitialNotification /
+  // onNotificationOpenedApp) — both listeners can fire for one background tap,
+  // and identical tapIds make handleTap navigate only once.
+  const messageId = data["google.message_id"];
+  const tapId =
+    messageId || response.actionIdentifier + response.notification.date;
+  return buildPayloadFromData(data, tapId);
+};
+
+/** Tap coming through Firebase (OS-displayed FCM notification, background/killed). */
+const buildFcmTapPayload = (remoteMessage: {
+  data?: Record<string, unknown>;
+  messageId?: string;
+}) =>
+  buildPayloadFromData(
+    (remoteMessage.data ?? {}) as NotificationData,
+    remoteMessage.messageId ?? String(Date.now()),
+  );
+
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
 // Remove the `isExpoGo` check below once running via a development build.
 export const usePushNotifications = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoaded = useAuthStore((s) => s.isLoaded);
+  // Root navigator readiness — `key` is set only once the navigation tree is
+  // mounted. Cold-start navigation must wait for this so it lands AFTER index's
+  // initial redirect settles (otherwise the redirect can clobber the target).
+  const navReady = !!useRootNavigationState()?.key;
   const addNotification = useNotificationStore((s) => s.add);
   const responseListener = useRef<
     | ReturnType<typeof Notifications.addNotificationResponseReceivedListener>
@@ -64,18 +90,22 @@ export const usePushNotifications = () => {
     notificationService.setupAndroidChannels().catch(() => {});
   }, []);
 
+  // Registers the push token once on app launch (anonymous).
+  // The backend links the token to the user account via deviceId at OTP verify.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!isLoaded) return;
-    notificationService.registerWithBackend(isAuthenticated).catch(() => {});
-  }, [isLoaded, isAuthenticated]);
+    notificationService.registerWithBackend().catch(() => {});
+  }, [isLoaded]);
 
   useEffect(() => {
     if (isExpoGo) return;
 
-    // Token rotated mid-session (iOS can issue a new token while app is open)
+    // Token rotated mid-session — re-register with backend using the new token.
+    // Always anonymous (false) — backend links user via deviceId at OTP verify.
     const unsubscribe = messaging().onTokenRefresh((newToken) => {
       notificationService
-        .updateToken(newToken, useAuthStore.getState().isAuthenticated)
+        .updateToken(newToken)
         .catch(() => {});
     });
 
@@ -113,25 +143,78 @@ export const usePushNotifications = () => {
     return unsubscribe;
   }, []);
 
-  // Handle Cold Start (App launched via notification tap)
-  useEffect(() => {
-    if (!isLoaded || isExpoGo) return;
+  // Handle Cold Start (app launched by tapping a notification). Waits for auth
+  // load + the root navigator being ready, so index's redirect settles and our
+  // push lands on top of it instead of being replaced. Runs the navigation only
+  // once, from whichever source actually holds the tap (see below).
+  const runColdStart = (payload: NotificationPayload, tapId: string) => {
+    if (hasHandledColdStart.current) return;
+    hasHandledColdStart.current = true;
+    // Defer one frame so index's <Redirect> commits before we push.
+    requestAnimationFrame(() =>
+      NotificationNavigation.handleTap(payload, tapId),
+    );
+  };
 
-    if (!hasHandledColdStart.current) {
-      hasHandledColdStart.current = true;
-      Notifications.getLastNotificationResponseAsync().then((response) => {
-        if (!response) return;
+  // Primary cold-start source on Android: FCM notifications are displayed by
+  // Firebase (it owns the messaging service), so the launch tap arrives here —
+  // NOT through expo's getLastNotificationResponseAsync (which returns null for
+  // them). This is what makes a killed-app tap actually redirect.
+  useEffect(() => {
+    if (isExpoGo) return;
+    if (__DEV__)
+      console.log(
+        `[PushNotificationHook] Cold-start gate — isLoaded:${isLoaded} navReady:${navReady}`,
+      );
+    if (!isLoaded || !navReady) return;
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
         if (__DEV__)
           console.log(
-            "[PushNotificationHook] Cold start response received:",
-            JSON.stringify(response, null, 2),
+            "[PushNotificationHook] Cold start (FCM) getInitialNotification:",
+            remoteMessage ? JSON.stringify(remoteMessage, null, 2) : "null",
           );
-
-        const { payload, tapId } = buildTapPayload(response);
-        NotificationNavigation.handleTap(payload, tapId);
+        if (!remoteMessage) return;
+        const { payload, tapId } = buildFcmTapPayload(remoteMessage);
+        runColdStart(payload, tapId);
+      })
+      .catch((e) => {
+        if (__DEV__) console.log("[PushNotificationHook] getInitialNotification error:", e);
       });
-    }
-  }, [isLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, navReady]);
+
+  // Secondary cold-start source: notifications presented locally by
+  // expo-notifications (e.g. our foreground re-present). Shares the same guard
+  // so it never double-navigates with the FCM source above.
+  useEffect(() => {
+    if (!isLoaded || !navReady || isExpoGo) return;
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (!response) return;
+      const { payload, tapId } = buildTapPayload(response);
+      runColdStart(payload, tapId);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, navReady]);
+
+  // Background → foreground tap: app was alive in the background, the FCM
+  // notification was shown by the OS, and the user tapped it. Firebase delivers
+  // it here (again, not through expo's response listener for FCM messages).
+  useEffect(() => {
+    if (isExpoGo) return;
+    const unsubscribe = messaging().onNotificationOpenedApp((remoteMessage) => {
+      if (!remoteMessage) return;
+      if (__DEV__)
+        console.log(
+          "[PushNotificationHook] Notification opened app (FCM):",
+          JSON.stringify(remoteMessage, null, 2),
+        );
+      const { payload, tapId } = buildFcmTapPayload(remoteMessage);
+      NotificationNavigation.handleTap(payload, tapId);
+    });
+    return unsubscribe;
+  }, []);
 
   // Handle Taps / Foreground interactions while app is active
   useEffect(() => {

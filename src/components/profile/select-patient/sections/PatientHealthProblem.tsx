@@ -37,7 +37,7 @@ export const PatientHealthProblem: React.FC<PatientHealthProblemProps> = ({ sele
                         value={customText}
                         onChangeText={setCustomText}
                         placeholder="Type the health problem..."
-                        placeholderTextColor="#919EAB"
+                        placeholderTextColor="#6A6A6A"
                         className="w-full font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px] py-3"
                         style={{ fontSize: moderateScale(14) }}
                     />

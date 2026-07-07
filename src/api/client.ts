@@ -49,6 +49,13 @@ export const apiClient: AxiosInstance = axios.create({
 
 // Synchronous request interceptor — reads from in-memory token (no async)
 apiClient.interceptors.request.use((config) => {
+  if (__DEV__) {
+    if (config.data !== undefined) {
+      console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
+    } else {
+      console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
+    }
+  }
   const method = config.method?.toLowerCase() ?? '';
   if (MUTATION_METHODS.has(method)) {
     const { isConnected } = useNetworkStore.getState();

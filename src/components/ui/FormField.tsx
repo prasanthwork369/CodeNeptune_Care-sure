@@ -88,11 +88,19 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
               value={value}
               onChangeText={onChangeText}
               placeholder={placeholder}
-              placeholderTextColor="#AAAAAA"
+              placeholderTextColor="#6A6A6A"
               editable={editable}
               keyboardType={keyboardType}
+              // Explicit caret/selection colors — some OEM keyboards/themes
+              // render the default caret invisible against the white field.
+              cursorColor="#0F7635"
+              selectionColor="#0F763533"
+              // Fill the box height so the whole field (not just the text line)
+              // is a tap target, and the caret sits vertically centered.
+              textAlignVertical="center"
               style={{
                 flex: 1,
+                height: "100%",
                 fontSize: moderateScale(14),
                 color: editable ? "#111827" : "#637381",
                 padding: 0,
@@ -133,12 +141,16 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#AAAAAA"
+          placeholderTextColor="#6A6A6A"
           keyboardType={keyboardType}
           maxLength={maxLength}
           returnKeyType={returnKeyType}
           onSubmitEditing={onSubmitEditing}
           submitBehavior={returnKeyType === "done" ? "blurAndSubmit" : "submit"}
+          // Explicit caret/selection colors so the cursor is visible on all
+          // devices (some OEM themes render the default caret invisible).
+          cursorColor="#0F7635"
+          selectionColor="#0F763533"
           autoCorrect={false}
           autoComplete={autoComplete}
           textContentType={textContentType}

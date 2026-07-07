@@ -28,6 +28,18 @@ export const sanitize = {
     }
 };
 
+// ─── Display formatters ───────────────────────────────────────────────────────
+
+export const format = {
+    // Any raw phone ("+919639639639", "919639639639", "9639639639") →
+    // "+91 9639639639" — a single gap after the country code, then 10 digits.
+    phone: (raw?: string | null): string => {
+        if (!raw) return '';
+        const digits = raw.replace(REGEX.digitsOnly, '').slice(-10);
+        return digits ? `+91 ${digits}` : '';
+    },
+};
+
 // ─── Validators ───────────────────────────────────────────────────────────────
 
 export const validate = {

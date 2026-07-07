@@ -5,4 +5,6 @@ LogBox.ignoreLogs([
   '`setPositionAsync` is not supported with edge-to-edge enabled.',
   '`setBackgroundColorAsync` is not supported with edge-to-edge enabled.',
   'Looks like you have configured linking in multiple places.',
+  "Deep imports from the 'react-native' package are deprecated",
+  "This method is deprecated (as well as all React Native Firebase namespaced API)",
 ]);

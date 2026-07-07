@@ -192,7 +192,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
                             {isOtherSelected && (
                                 <BottomSheetTextInput
                                     placeholder="Describe the issue..."
-                                    placeholderTextColor="#919EAB"
+                                    placeholderTextColor="#6A6A6A"
                                     value={otherReason}
                                     onChangeText={(value) => { setOtherReason(value); if (error) setError(''); }}
                                     multiline
@@ -212,7 +212,7 @@ export function ReturnReasonModal({ isVisible, onClose, item, quantity, initialD
                                 multiline
                                 numberOfLines={4}
                                 placeholder="Please provide more details about the issue with the product"
-                                placeholderTextColor="#919EAB"
+                                placeholderTextColor="#6A6A6A"
                                 className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
                                 style={{ textAlignVertical: 'top', backgroundColor: '#FFFFFF', fontSize: moderateScale(14) }}
                                 value={details}

@@ -11,6 +11,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useSelectPatient } from "@/src/hooks/useSelectPatient";
 import { getAge } from "@/src/utils/patient";
 import { resolveAssetUrl } from "@/src/utils/urls";
+import { format } from "@/src/utils/validation";
 import React from "react";
 import {
   ActivityIndicator,
@@ -197,7 +198,7 @@ export const SelectPatientLayout: React.FC = () => {
                   keyboardType="number-pad"
                   maxLength={15}
                   autoFocus
-                  placeholderTextColor="#919EAB"
+                  placeholderTextColor="#6A6A6A"
                   placeholder="Enter phone number"
                 />
               ) : (
@@ -215,8 +216,7 @@ export const SelectPatientLayout: React.FC = () => {
                     fontSize: moderateScale(14, 0.1),
                   }}
                 >
-                  {phoneValue ||
-                    selectedPatient?.phone ||
+                  {format.phone(phoneValue || selectedPatient?.phone) ||
                     "e.g. +91 98765 43210"}
                 </Text>
               )}
@@ -336,7 +336,7 @@ export const SelectPatientLayout: React.FC = () => {
                   value={customProblemText}
                   onChangeText={setCustomProblemText}
                   placeholder="Type the health problem..."
-                  placeholderTextColor="#919EAB"
+                  placeholderTextColor="#6A6A6A"
                   className="w-full font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px] py-3"
                   style={{ fontSize: moderateScale(14, 0.1) }}
                 />
@@ -348,7 +348,7 @@ export const SelectPatientLayout: React.FC = () => {
             </Text>
             <TextInput
               placeholder="Eg: Mild fever and body pain"
-              placeholderTextColor="#919EAB"
+              placeholderTextColor="#6A6A6A"
               multiline
               value={symptoms}
               onChangeText={setSymptoms}

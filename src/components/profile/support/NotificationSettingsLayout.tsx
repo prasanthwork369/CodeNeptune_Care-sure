@@ -1,106 +1,159 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { CustomSwitch } from '@/src/components/ui/CustomSwitch';
 import { useNotificationPreferences } from '@/src/hooks/queries/useNotificationPreferences';
+import { UpdateNotificationPreferencesInput } from '@/src/api/notification-preferences.api';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { Skeleton } from '@/src/components/ui/Skeleton';
-import { moderateScale } from "@/src/utils/exactScale";
+import { moderateScale } from '@/src/utils/exactScale';
 
-const ITEMS = [
-    {
-        label: 'Order Updates',
-        desc: 'Get SMS and email alerts for your order status',
-        key: 'orderUpdatesEnabled' as const,
-    },
-    {
-        label: 'Health Updates',
-        desc: 'Receive reminders to refill prescriptions',
-        key: 'healthUpdatesEnabled' as const,
-    },
-    {
-        label: 'Promotions & Offers',
-        desc: 'Updates on latest discounts and coupons',
-        key: 'promotionsOffersEnabled' as const,
-    },
+// Only the boolean preference fields are togglable keys.
+type PreferenceKey = keyof UpdateNotificationPreferencesInput;
+
+// Screen structure mirrors the web: "Order Updates" is a grouped header with
+// SMS + Email channel sub-rows, while Health/Promotions are single toggles.
+type Section =
+  | {
+      type: 'group';
+      header: string;
+      items: { label: string; desc: string; key: PreferenceKey }[];
+    }
+  | { type: 'single'; label: string; desc: string; key: PreferenceKey };
+
+const SECTIONS: Section[] = [
+  {
+    type: 'group',
+    header: 'Order Updates',
+    items: [
+      { label: 'SMS', desc: 'Order status alerts via text message', key: 'orderUpdatesSmsEnabled' },
+      { label: 'Email', desc: 'Order status alerts via email', key: 'orderUpdatesEmailEnabled' },
+    ],
+  },
+  {
+    type: 'single',
+    label: 'Health Updates',
+    desc: 'Receive reminders to refill prescriptions',
+    key: 'healthUpdatesEnabled',
+  },
+  {
+    type: 'single',
+    label: 'Promotions & Offers',
+    desc: 'Updates on latest discounts and coupons',
+    key: 'promotionsOffersEnabled',
+  },
 ];
 
+const Divider = () => (
+  <View style={{ height: 1, backgroundColor: '#E5E7EB', marginHorizontal: 20 }} />
+);
+
 const NotificationSkeleton = () => (
-    <View style={{ marginTop: 8 }}>
-        {[1, 2, 3].map((_, index) => (
-            <View key={index}>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        backgroundColor: '#FFFFFF',
-                        paddingHorizontal: 20,
-                        paddingVertical: 16,
-                    }}
-                >
-                    <View style={{ flex: 1, marginRight: 16 }}>
-                        <Skeleton width="40%" height={15} style={{ marginBottom: 8 }} />
-                        <Skeleton width="80%" height={12} style={{ marginBottom: 4 }} />
-                        <Skeleton width="60%" height={12} />
-                    </View>
-                    <Skeleton width={44} height={24} borderRadius={12} />
-                </View>
-                {index < 2 && (
-                    <View style={{ height: 1, backgroundColor: '#E5E7EB', marginHorizontal: 20 }} />
-                )}
-            </View>
-        ))}
-    </View>
+  <View style={{ marginTop: 8 }}>
+    {[1, 2, 3, 4].map((_, index) => (
+      <View key={index}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
+            paddingVertical: 16,
+          }}
+        >
+          <View style={{ flex: 1, marginRight: 16 }}>
+            <Skeleton width="40%" height={15} style={{ marginBottom: 8 }} />
+            <Skeleton width="70%" height={12} />
+          </View>
+          <Skeleton width={44} height={24} borderRadius={12} />
+        </View>
+        {index < 3 && <Divider />}
+      </View>
+    ))}
+  </View>
 );
 
 export const NotificationSettingsLayout: React.FC = () => {
-    const { preferences, isLoading, updating, updatePreferences } = useNotificationPreferences();
+  const { preferences, isLoading, updating, updatePreferences } = useNotificationPreferences();
 
-    const handleToggle = async (key: 'orderUpdatesEnabled' | 'healthUpdatesEnabled' | 'promotionsOffersEnabled', value: boolean) => {
-        await updatePreferences({ [key]: value });
-    };
+  const handleToggle = async (key: PreferenceKey, value: boolean) => {
+    await updatePreferences({ [key]: value });
+  };
 
-    return (
-        <View style={{ flex: 1, backgroundColor: '#F5F6FB' }}>
-            <ScreenHeader title="Notification" showBorder backgroundColor="#FFFFFF" />
+  // A single label + description + switch row (used for both channel sub-rows
+  // and single-toggle sections). `bold` marks a top-level section title.
+  const ToggleRow = ({
+    label,
+    desc,
+    keyName,
+    bold,
+  }: {
+    label: string;
+    desc: string;
+    keyName: PreferenceKey;
+    bold?: boolean;
+  }) => (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+      }}
+    >
+      <View style={{ flex: 1, marginRight: 16 }}>
+        <Text style={{ fontSize: moderateScale(15), fontWeight: bold ? '700' : '500', color: '#111827', marginBottom: 3 }}>
+          {label}
+        </Text>
+        <Text style={{ fontSize: moderateScale(13), color: '#6B7280', lineHeight: moderateScale(18) }}>
+          {desc}
+        </Text>
+      </View>
+      <CustomSwitch
+        value={preferences?.[keyName] ?? false}
+        onValueChange={(v) => handleToggle(keyName, v)}
+        disabled={updating}
+      />
+    </View>
+  );
 
-            {isLoading ? (
-                <NotificationSkeleton />
-            ) : (
-                <View style={{ marginTop: 8 }}>
-                    {ITEMS.map((item, index) => (
-                        <View key={item.label}>
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    backgroundColor: '#F5F6FB',
-                                    paddingHorizontal: 20,
-                                    paddingVertical: 16,
-                                }}
-                            >
-                                <View style={{ flex: 1, marginRight: 16 }}>
-                                    <Text style={{ fontSize: moderateScale(15), fontWeight: '700', color: '#111827', marginBottom: 3 }}>
-                                        {item.label}
-                                    </Text>
-                                    <Text style={{ fontSize: moderateScale(13), color: '#6B7280', lineHeight: moderateScale(18) }}>
-                                        {item.desc}
-                                    </Text>
-                                </View>
-                                <CustomSwitch
-                                    value={preferences?.[item.key] ?? false}
-                                    onValueChange={(v) => handleToggle(item.key, v)}
-                                    disabled={updating}
-                                />
-                            </View>
-                            {index < ITEMS.length - 1 && (
-                                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginHorizontal: 20 }} />
-                            )}
-                        </View>
-                    ))}
+  return (
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <ScreenHeader title="Notification" showBorder backgroundColor="#FFFFFF" />
+
+      {isLoading ? (
+        <NotificationSkeleton />
+      ) : (
+        <View style={{ marginTop: 8 }}>
+          {SECTIONS.map((section, index) => (
+            <View key={section.type === 'group' ? section.header : section.label}>
+              {section.type === 'group' ? (
+                <View>
+                  {/* Group header — no toggle, just labels the channel rows below */}
+                  <Text
+                    style={{
+                      fontSize: moderateScale(15),
+                      fontWeight: '700',
+                      color: '#111827',
+                      paddingHorizontal: 20,
+                      paddingTop: 14,
+                      paddingBottom: 2,
+                    }}
+                  >
+                    {section.header}
+                  </Text>
+                  {section.items.map((item) => (
+                    <ToggleRow key={item.key} label={item.label} desc={item.desc} keyName={item.key} />
+                  ))}
                 </View>
-            )}
+              ) : (
+                <ToggleRow label={section.label} desc={section.desc} keyName={section.key} bold />
+              )}
+              {index < SECTIONS.length - 1 && <Divider />}
+            </View>
+          ))}
         </View>
-    );
+      )}
+    </View>
+  );
 };

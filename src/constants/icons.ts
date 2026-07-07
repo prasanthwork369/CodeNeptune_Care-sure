@@ -39,6 +39,7 @@ import camera_gray from "../../assets/icons/camera_gray.svg";
 import delete_icon from "../../assets/icons/delete.svg";
 import done_all from "../../assets/icons/done_all.svg";
 import delete_red from "../../assets/icons/delete_red.svg";
+import delete_white from "../../assets/icons/delete_white.svg";
 import dots from "../../assets/icons/dots.svg";
 
 import edit_icon from "../../assets/icons/edit.svg";
@@ -78,6 +79,10 @@ import cancel_other_reason from "../../assets/icons/cancel_other_reason.svg";
 import account_balance_wallet from "../../assets/icons/account_balance_wallet.svg";
 import account_balance_wallet_green from "../../assets/icons/account_balance_wallet_green.svg";
 import account_balance_wallet_red from "../../assets/icons/account_balance_wallet_red.svg";
+// Red danger-variant icons used on the Delete Account screen.
+import wallet_red from "../../assets/icons/wallet_red.svg";
+import prescriptions_red from "../../assets/icons/prescriptions_red.svg";
+import person_red from "../../assets/icons/person_red.svg";
 import add_photo from "../../assets/icons/add_photo.svg";
 import admin_meds from "../../assets/icons/admin_meds.svg";
 import arrow_forward_darkgreen from "../../assets/icons/arrow_forward_darkgreen.svg";
@@ -224,6 +229,7 @@ export const icons = {
 
     delete_icon,
     delete_red,
+    delete_white,
     done_all,
     dots,
     close_icon,
@@ -275,6 +281,9 @@ export const icons = {
     account_balance_wallet,
     account_balance_wallet_green,
     account_balance_wallet_red,
+    wallet_red,
+    prescriptions_red,
+    person_red,
     admin_meds,
     article,
     description,
