@@ -65,6 +65,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   // Measure the right-section content row to determine the correct board height
   const [boardHeight, setBoardHeight] = useState(380);
 
+  useEffect(() => {
+    setBoardHeight(380);
+  }, [productId]);
+
   // Animated value driving the expandable We Recommended section: 0 = half-width, 1 = full-width
   const expandAnim = useRef(new Animated.Value(0)).current;
   const currentExpandVal = useRef(0);
@@ -183,13 +187,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     outputRange: ["#FEFFF9", "#FEFFF9"],
   });
 
-  // Matches the recommended box's actual visible width (recWidth minus its
-  // paddingLeft) so the info column's right padding isn't clipped by the
-  // box's own overflow:hidden when collapsed.
-  const leftColWidth = expandAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [cardWidth / 2 - 4, cardWidth / 2],
-  });
+  const leftColWidth = cardWidth / 2;
 
   return (
     <View

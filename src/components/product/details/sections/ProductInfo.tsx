@@ -3,6 +3,8 @@ import { icons } from "@/src/constants/icons";
 import { MedicineVariant } from "@/src/hooks/queries/useProduct";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
+import { useSharedValue } from "react-native-reanimated";
+import { CarouselDot } from "@/src/components/animations/carousel";
 import {
     Image,
     ScrollView,
@@ -46,6 +48,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 }) => {
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
+  const progress = useSharedValue(0);
   // 0.55 * Figma's 390px baseline, scaled the same way as the rest of the
   // app (capped at 1.15x) so this doesn't grow unbounded on large screens.
   const imgSize = exactScale(215);
@@ -65,6 +68,9 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           autoPlayInterval={3000}
           loop={carouselImages.length > 1}
           onSnapToItem={setActiveIndex}
+          onProgressChange={(_, absoluteProgress) => {
+            progress.value = absoluteProgress;
+          }}
           renderItem={({ item }) => (
             <View
               style={{
@@ -92,15 +98,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         {carouselImages.length > 1 && (
           <View className="flex-row items-center justify-center mt-4 gap-x-1.5">
             {carouselImages.map((_, index) => (
-              <View
+              <CarouselDot
                 key={index}
-                style={{
-                  height: exactScale(5),
-                  width: activeIndex === index ? exactScale(18) : exactScale(8),
-                  borderRadius: exactScale(3),
-                  backgroundColor:
-                    activeIndex === index ? "#009989" : "#E1F0FF",
-                }}
+                index={index}
+                progress={progress}
+                total={carouselImages.length}
               />
             ))}
           </View>

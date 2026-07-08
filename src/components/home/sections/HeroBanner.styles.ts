@@ -87,7 +87,6 @@ export const styles = StyleSheet.create({
     height: exactScale(27.2),
     top: exactScale(26.52),
     right: exactScale(15),
-    transform: [{ rotate: "-36.76deg" }],
   },
 });
 

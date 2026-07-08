@@ -5,6 +5,7 @@ export { CartFreeDeliveryProgress } from './CartFreeDeliveryProgress';
 export { CartItemsList } from './CartItemsList';
 export { CartCouponSection } from './CartCouponSection';
 export { CartWalletSection } from './CartWalletSection';
+export { CartCorporateCreditsSection } from './CartCorporateCreditsSection';
 export { CartCoinsSection } from './CartCoinsSection';
 export { CartBillSummary } from './CartBillSummary';
 export { CartSavingsBreakdown } from './CartSavingsBreakdown';

@@ -2,6 +2,8 @@ import { useCartActions } from '@/src/hooks/useCartActions';
 import { useCart } from '@/src/hooks/queries/useCart';
 import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import Carousel from 'react-native-reanimated-carousel';
+import { useSharedValue } from 'react-native-reanimated';
+import { CarouselDot } from '@/src/components/animations/carousel';
 import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Image, Text, useWindowDimensions, View } from 'react-native';
@@ -31,6 +33,7 @@ interface ProductInfoProps {
 export const ProductInfo: React.FC<ProductInfoProps> = ({ productId, medicineUuid, product }) => {
     const { width } = useWindowDimensions();
     const [activeIndex, setActiveIndex] = useState(0);
+    const progress = useSharedValue(0);
     const imgSize = exactScale(215);
 
     const { count, increment, decrement, animations, isPending } = useCartActions({
@@ -63,6 +66,9 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ productId, medicineUui
                     autoPlayInterval={3000}
                     loop={carouselImages.length > 1}
                     onSnapToItem={setActiveIndex}
+                    onProgressChange={(_, absoluteProgress) => {
+                        progress.value = absoluteProgress;
+                    }}
                     renderItem={({ item }) => (
                         <View style={{ width, height: imgSize, alignItems: 'center', justifyContent: 'center' }}>
                             <Image
@@ -76,14 +82,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ productId, medicineUui
                 {/* Dot indicators */}
                 <View className="flex-row items-center justify-center mt-4 gap-x-1.5">
                     {carouselImages.map((_, index) => (
-                        <View
+                        <CarouselDot
                             key={index}
-                            style={{
-                                height: 5,
-                                width: activeIndex === index ? 18 : 8,
-                                borderRadius: 3,
-                                backgroundColor: activeIndex === index ? '#009989' : '#E1F0FF',
-                            }}
+                            index={index}
+                            progress={progress}
+                            total={carouselImages.length}
                         />
                     ))}
                 </View>

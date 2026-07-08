@@ -21,6 +21,7 @@ import {
     CartSavingsBreakdown,
     CartTerms,
     CartWalletSection,
+    CartCorporateCreditsSection,
 } from "./sections";
 
 export const CartLayout: React.FC = () => {
@@ -135,13 +136,16 @@ export const CartLayout: React.FC = () => {
             value={walletOn}
             walletBalance={walletBalance}
             onToggle={handleWalletToggle}
-            corporateCreditsValue={corporateCreditsOn}
-            corporateCreditsBalance={corporateCreditsBalance}
-            onCorporateCreditsToggle={handleCorporateCreditsToggle}
-            corporateCreditsEligible={corporateCreditsEligible}
-            corporateCreditsRemainingForEligibility={
-              corporateCreditsRemainingForEligibility
-            }
+          />
+        )}
+
+        {corporateCreditsBalance > 0 && (
+          <CartCorporateCreditsSection
+            value={corporateCreditsOn}
+            balance={corporateCreditsBalance}
+            onToggle={handleCorporateCreditsToggle}
+            eligible={corporateCreditsEligible}
+            remainingForEligibility={corporateCreditsRemainingForEligibility}
           />
         )}
 

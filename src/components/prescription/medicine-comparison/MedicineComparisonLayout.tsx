@@ -8,13 +8,12 @@ import { CartDeliveringTo } from "@/src/components/cart/sections/CartDeliveringT
 import { CartFooter } from "@/src/components/cart/sections/CartFooter";
 import { CartSavingsBreakdown } from "@/src/components/cart/sections/CartSavingsBreakdown";
 import { CartTerms } from "@/src/components/cart/sections/CartTerms";
-import { CartWalletSection } from "@/src/components/cart/sections/CartWalletSection";
+import { CartWalletSection, CartCorporateCreditsSection } from "@/src/components/cart/sections";
 import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAddress } from "@/src/hooks/queries/useAddress";
-import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
-import { useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -22,6 +21,7 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
 import { ScrollView, View, useWindowDimensions } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
@@ -57,6 +57,7 @@ export const MedicineComparisonLayout: React.FC<
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [walletOn, setWalletOn] = useState(false);
   const [coinsOn, setCoinsOn] = useState(false);
+  const [corporateCreditsOn, setCorporateCreditsOn] = useState(false);
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
   const [refillOn, setRefillOn] = useState(false);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
@@ -100,14 +101,6 @@ export const MedicineComparisonLayout: React.FC<
       .join(", ") ??
     "No address saved";
 
-  // Wallet & coins
-  const { balance } = useWalletBalance();
-  const { data: settings } = useCartWalletSettings();
-  const walletBalance = balance != null ? Number(balance.walletBalance) : 0;
-  const availableCoins = balance?.coinsBalance ?? 0;
-  const coinValue = settings?.wallet?.coinValueInRupees ?? 1;
-  const coinLimitPct = settings?.wallet?.coinUsagePercentage ?? 10;
-
   // Coupon
   const { applied: appliedCoupon, remove: removeCoupon } = useCouponStore();
 
@@ -138,33 +131,31 @@ export const MedicineComparisonLayout: React.FC<
     (sum, item) => sum + item.recommended.mrp * (item.quantity || 1),
     0,
   );
-  const productSavings = Math.max(0, mrpTotal - subtotal);
-  const COUPON_DISCOUNT = appliedCoupon
-    ? Math.min(Number(appliedCoupon.discount) || 0, subtotal)
-    : 0;
-  const maxCoinsUsable = Math.min(
-    availableCoins,
-    (subtotal * (coinLimitPct / 100)) / coinValue,
-  );
-  const COINS_DISCOUNT = coinsOn
-    ? Math.round(Math.floor(maxCoinsUsable) * coinValue * 10) / 10
-    : 0;
-  const subtotalBeforeWallet = Math.max(
-    subtotal - COUPON_DISCOUNT - COINS_DISCOUNT,
-    0,
-  );
-  const WALLET_DISCOUNT = walletOn
-    ? Math.round(Math.min(walletBalance, subtotalBeforeWallet) * 10) / 10
-    : 0;
-  const toPay = Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0);
 
-  const savingsRows = [
-    { label: "Product Discount", value: productSavings },
-    { label: "Coupon Discount", value: COUPON_DISCOUNT },
-    { label: "CareSure Wallet", value: WALLET_DISCOUNT },
-    { label: "CareSure Coins", value: COINS_DISCOUNT },
-  ];
-  const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
+  // Use reusable calculations hook
+  const {
+    walletBalance,
+    availableCoins,
+    maxCoinsUsable,
+    coinValue,
+    COUPON_DISCOUNT,
+    COINS_DISCOUNT,
+    WALLET_DISCOUNT,
+    CORPORATE_CREDITS_DISCOUNT,
+    corporateCreditsBalance,
+    corporateCreditsEligible,
+    corporateCreditsRemainingForEligibility,
+    productSavings,
+    toPay,
+    savingsRows,
+    totalSavings,
+  } = useBillingCalculations({
+    subtotal,
+    mrpTotal,
+    walletOn,
+    coinsOn,
+    corporateCreditsOn,
+  });
 
   const handleProceed = () => {
     setPrescriptionOrderItems(
@@ -190,7 +181,7 @@ export const MedicineComparisonLayout: React.FC<
         couponDiscount: COUPON_DISCOUNT,
         walletDiscount: WALLET_DISCOUNT,
         coinsDiscount: COINS_DISCOUNT,
-        corporateCreditsDiscount: 0,
+        corporateCreditsDiscount: CORPORATE_CREDITS_DISCOUNT,
         deliveryFee: 0,
         handlingCharge: 0,
         totalSaved: totalSavings,
@@ -199,7 +190,7 @@ export const MedicineComparisonLayout: React.FC<
       {
         walletUsed: walletOn,
         coinsUsed: coinsOn,
-        corporateCreditsUsed: false,
+        corporateCreditsUsed: corporateCreditsOn,
         couponCode: appliedCoupon?.code ?? "",
       },
     );
@@ -219,7 +210,7 @@ export const MedicineComparisonLayout: React.FC<
       <ScrollView
         style={{ flex: 1, backgroundColor: "#F9FAFB" }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: adjustedBottom + 100 }}
+        contentContainerStyle={{ paddingBottom: exactScale(24) }}
         stickyHeaderIndices={totalSavings > 0 ? [2] : [1]}
         scrollEventThrottle={16}
         onScroll={handleScroll}
@@ -277,11 +268,27 @@ export const MedicineComparisonLayout: React.FC<
         />
 
         {/* Wallet */}
-        <CartWalletSection
-          value={walletOn}
-          walletBalance={walletBalance}
-          onToggle={handleWalletToggle}
-        />
+        {walletBalance > 0 && (
+          <CartWalletSection
+            value={walletOn}
+            walletBalance={walletBalance}
+            onToggle={handleWalletToggle}
+          />
+        )}
+
+        {/* Corporate Credits */}
+        {corporateCreditsBalance > 0 && (
+          <CartCorporateCreditsSection
+            value={corporateCreditsOn}
+            balance={corporateCreditsBalance}
+            onToggle={(v) => {
+              setCorporateCreditsOn(v);
+              if (v) playConfetti();
+            }}
+            eligible={corporateCreditsEligible}
+            remainingForEligibility={corporateCreditsRemainingForEligibility}
+          />
+        )}
 
         {/* Coins */}
         <CartCoinsSection
@@ -328,6 +335,7 @@ export const MedicineComparisonLayout: React.FC<
         couponDiscount={COUPON_DISCOUNT}
         walletDiscount={WALLET_DISCOUNT}
         coinsDiscount={COINS_DISCOUNT}
+        corporateCreditsDiscount={CORPORATE_CREDITS_DISCOUNT}
         deliveryFee={0}
         handlingCharge={0}
         toPay={toPay}

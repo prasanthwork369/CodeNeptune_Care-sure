@@ -4,7 +4,7 @@ import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
-import { useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useNav } from "@/src/hooks/useNav";
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { useAuthStore } from "@/src/store/authStore";
@@ -111,22 +111,7 @@ export function useCartCalculations() {
     updateItem,
   } = useCart();
   const { products: featuredProducts } = useFeaturedMedicines();
-  const { balance } = useWalletBalance();
   const { data: settings } = useCartWalletSettings();
-  const availableCoins = balance?.coinsBalance ?? 0;
-  const walletBalance = balance != null ? Number(balance.walletBalance) : 0;
-  // Corporate Credits only ever apply to corporate users — gate on the
-  // profile flag so the section never appears for a regular customer even
-  // if a stray balance value exists.
-  const corporateCreditsBalance =
-    isCorporateUser && balance != null ? Number(balance.corporateCredits ?? 0) : 0;
-  const corporateCreditsMinOrderValue = Number(
-    balance?.minOrderValueForDiscount ?? 0,
-  );
-  const corporateCreditsMaxDiscount =
-    balance?.maxDiscountPerOrder != null
-      ? Number(balance.maxDiscountPerOrder)
-      : Infinity;
 
   const lines: CartLine[] = cartItems.map((item): CartLine => {
     // unitPrice from the backend is the MRP (strikethrough price); the
@@ -167,9 +152,6 @@ export function useCartCalculations() {
   const mrpTotal = lines.reduce((sum, l) => sum + l.mrp * l.qty, 0);
   const productSavings = Math.max(0, mrpTotal - subtotal);
 
-  const coinValue = settings?.wallet?.coinValueInRupees ?? 1;
-  const coinLimitPct = settings?.wallet?.coinUsagePercentage ?? 10;
-
   const FREE_DELIVERY_THRESHOLD = settings?.cart?.freeDeliveryAbove ?? 500;
   const DELIVERY_FEE =
     subtotal >= FREE_DELIVERY_THRESHOLD
@@ -208,65 +190,32 @@ export function useCartCalculations() {
         )
       : 0;
 
-  // 2. Coins — limit based on subtotal (selling price), applied before wallet
-  const maxCoinsUsable = Math.min(
+  const {
+    walletBalance,
     availableCoins,
-    (subtotal * (coinLimitPct / 100)) / coinValue,
-  );
+    maxCoinsUsable,
+    coinValue,
+    COINS_DISCOUNT,
+    WALLET_DISCOUNT,
+    CORPORATE_CREDITS_DISCOUNT,
+    corporateCreditsBalance,
+    corporateCreditsEligible,
+    corporateCreditsRemainingForEligibility,
+    toPay,
+    savingsRows,
+    totalSavings,
+  } = useBillingCalculations({
+    subtotal,
+    mrpTotal,
+    walletOn,
+    coinsOn,
+    corporateCreditsOn,
+    deliveryFee: DELIVERY_FEE,
+    handlingCharge: HANDLING_CHARGE,
+    couponDiscount: COUPON_DISCOUNT,
+  });
+
   const coinsUsed = coinsOn ? Math.floor(maxCoinsUsable) : 0;
-  const COINS_DISCOUNT = Math.round(coinsUsed * coinValue * 10) / 10;
-
-  // 3. Wallet — applied last, covers items + fees after coupon & coins
-  const subtotalBeforeWallet = Math.max(
-    subtotal -
-      COUPON_DISCOUNT -
-      COINS_DISCOUNT +
-      DELIVERY_FEE +
-      HANDLING_CHARGE,
-    0,
-  );
-  const WALLET_DISCOUNT = walletOn
-    ? Math.round(Math.min(walletBalance, subtotalBeforeWallet) * 10) / 10
-    : 0;
-
-  // 4. Corporate Credits — applied last, covers whatever remains after wallet,
-  // gated by a minimum order value and capped per order (both server-configured)
-  const corporateCreditsEligible = subtotal >= corporateCreditsMinOrderValue;
-  const corporateCreditsRemainingForEligibility = Math.max(
-    0,
-    Math.round((corporateCreditsMinOrderValue - subtotal) * 10) / 10,
-  );
-  const subtotalBeforeCorporateCredits = Math.max(
-    subtotalBeforeWallet - WALLET_DISCOUNT,
-    0,
-  );
-  const CORPORATE_CREDITS_DISCOUNT =
-    corporateCreditsOn && corporateCreditsEligible
-      ? Math.round(
-          Math.min(
-            corporateCreditsBalance,
-            corporateCreditsMaxDiscount,
-            subtotalBeforeCorporateCredits,
-          ) * 10,
-        ) / 10
-      : 0;
-
-  const toPay =
-    Math.round(
-      Math.max(
-        subtotalBeforeCorporateCredits - CORPORATE_CREDITS_DISCOUNT,
-        0,
-      ) * 10,
-    ) / 10;
-
-  const savingsRows = [
-    { label: "Product Discount", value: productSavings },
-    { label: "Coupon Discount", value: COUPON_DISCOUNT },
-    { label: "CareSure Coins", value: COINS_DISCOUNT },
-    { label: "CareSure Wallet", value: WALLET_DISCOUNT },
-    { label: "Corporate Credits", value: CORPORATE_CREDITS_DISCOUNT },
-  ];
-  const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
   const remainingForFreeDelivery = Math.max(
     0,
     FREE_DELIVERY_THRESHOLD - subtotal,

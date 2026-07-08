@@ -146,11 +146,14 @@ export interface CartWalletSectionProps {
   value: boolean;
   walletBalance: number;
   onToggle: (v: boolean) => void;
-  corporateCreditsValue?: boolean;
-  corporateCreditsBalance?: number;
-  onCorporateCreditsToggle?: (v: boolean) => void;
-  corporateCreditsEligible?: boolean;
-  corporateCreditsRemainingForEligibility?: number;
+}
+
+export interface CartCorporateCreditsSectionProps {
+  value: boolean;
+  balance: number;
+  onToggle: (v: boolean) => void;
+  eligible?: boolean;
+  remainingForEligibility?: number;
 }
 
 export interface CartCoinsSectionProps {
