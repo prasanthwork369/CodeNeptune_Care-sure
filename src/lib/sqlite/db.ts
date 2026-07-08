@@ -9,5 +9,9 @@ export const initDb = () => {
       data TEXT NOT NULL,
       updated_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS sync_metadata (
+      component_name TEXT PRIMARY KEY NOT NULL,
+      last_sync_time TEXT NOT NULL
+    );
   `);
 };

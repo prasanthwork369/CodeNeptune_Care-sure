@@ -4,8 +4,11 @@ import { medicineApi } from "../../api/medicine.api";
 import type { Product } from "../../types/home";
 import { formatPackLabel } from "../../utils/packLabel";
 import { resolveAssetUrl } from "../../utils/urls";
+import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 export const useFeaturedMedicines = () => {
+  const cachedMed = apiCache.getWithMeta<any[]>('featured_medicines');
+
   const {
     data: medicines = [],
     isLoading,
@@ -13,7 +16,9 @@ export const useFeaturedMedicines = () => {
     refetch,
   } = useQuery({
     queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES,
-    queryFn: medicineApi.getFeaturedCards,
+    queryFn: withSqliteCache('featured_medicines', medicineApi.getFeaturedCards),
+    initialData: () => cachedMed?.data,
+    initialDataUpdatedAt: () => cachedMed?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
     refetchInterval: 2 * 60 * 1000,
   });

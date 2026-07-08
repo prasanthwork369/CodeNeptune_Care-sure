@@ -1,0 +1,403 @@
+{
+  "exported_at": "2026-07-08T12:46:53.163Z",
+  "sync_metadata": [
+    {
+      "component_name": "categoryFamilyMap",
+      "last_sync_time": "2026-07-02T12:10:00.918Z"
+    },
+    {
+      "component_name": "featuredSubcategories",
+      "last_sync_time": "2026-07-02T12:10:00.918Z"
+    },
+    {
+      "component_name": "appContents",
+      "last_sync_time": "2026-07-08T12:46:19.073Z"
+    }
+  ],
+  "api_cache": [
+    {
+      "key": "frequently_ordered",
+      "updated_at": "2026-07-08T12:44:05.780Z",
+      "data": []
+    },
+    {
+      "key": "category_family_map",
+      "updated_at": "2026-07-08T12:44:12.087Z",
+      "data": [
+        {
+          "id": "ac79a732-54f4-4490-91d8-e3c4358eba90",
+          "name": "Personal Care",
+          "slug": "personal-care",
+          "iconActive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518582368-sanitizer-(1).svg",
+          "iconInactive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518584660-sanitizer.svg",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1778503635017-Frame-885.webp",
+          "mobIconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/mobile/1780321595166-hand-sanitizer.png",
+          "mobileShortName": "Personal ",
+          "subCategories": [
+            {
+              "id": "1d190b74-04c2-40a0-b86d-5d1cd4ca188e",
+              "name": "Baby and Mom Care ",
+              "slug": "baby-and-mom-care",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1779794994191-ChatGPT-Image-May-26,-2026,-04_18_52-PM-1.webp",
+              "icon": ""
+            },
+            {
+              "id": "a82854ce-9a68-4b00-91b0-fb8d805ce9a5",
+              "name": "Body Care",
+              "slug": "body-care",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519320832-ChatGPT-Image-Mar-20,-2026,-12_48_29-PM-1.webp",
+              "icon": ""
+            },
+            {
+              "id": "d434cf17-b58a-47c5-b1ae-45de2381dcbe",
+              "name": "Bone and  Joint",
+              "slug": "test-1",
+              "imageUrl": "/care-sure/sub-categories/1776519232020-ChatGPT-Image-Mar-20,-2026,-12_32_46-PM-1.webp",
+              "icon": ""
+            },
+            {
+              "id": "863acd2e-9774-4f0b-ae81-2c630b53927b",
+              "name": "Cough and Cold",
+              "slug": "test-2-child",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519168659-image-14.webp",
+              "icon": ""
+            },
+            {
+              "id": "81c0fadd-1b24-47c1-b16b-122ef8d1fd52",
+              "name": "Hair Care",
+              "slug": "hair-care",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519295675-haircare-1.webp",
+              "icon": ""
+            },
+            {
+              "id": "5fa15eb8-7893-4ae9-b92c-ce7b982eb951",
+              "name": "Miscellaneous",
+              "slug": "miscellaneous",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1779795016013-ChatGPT-Image-May-26,-2026,-04_52_15-PM-(2)-(1)-1.webp",
+              "icon": ""
+            },
+            {
+              "id": "aec2aa4a-17cf-41cf-9d98-8d9b8335ec16",
+              "name": "Sexual Wellness",
+              "slug": "sexual-wellness",
+              "imageUrl": "/care-sure/sub-categories/1779795004692-ChatGPT-Image-May-26,-2026,-04_35_04-PM-1.webp",
+              "icon": ""
+            },
+            {
+              "id": "c573a31a-e2a9-44ae-a1cf-d4121ca258ce",
+              "name": "Skin Care",
+              "slug": "skin-care",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519343989-ChatGPT-Image-Mar-20,-2026,-12_54_56-PM-1.webp",
+              "icon": ""
+            }
+          ]
+        },
+        {
+          "id": "d2cc25bd-432a-4c8a-aa52-fe0a28595f9e",
+          "name": "Health Conditions",
+          "slug": "health-conditions",
+          "iconActive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518617171-admin_meds-(1).svg",
+          "iconInactive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518619716-admin_meds.svg",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1778503663632-Frame-886.webp",
+          "mobIconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/mobile/1780321469809-health.png",
+          "mobileShortName": "Health ",
+          "subCategories": [
+            {
+              "id": "1a9c8f0f-106c-4491-86f3-04dbbd5e6071",
+              "name": "Digestive Care",
+              "slug": "digestive-care",
+              "imageUrl": "/care-sure/sub-categories/1776519404142-13927-1.webp",
+              "icon": null
+            },
+            {
+              "id": "a988c7d8-fba7-4707-bf7e-393c0d47c65f",
+              "name": "Pain Relief",
+              "slug": "pain-relief",
+              "imageUrl": "/care-sure/sub-categories/1776519387331-60145-1.webp",
+              "icon": null
+            },
+            {
+              "id": "c4cf0cde-20fd-4e3d-b851-db8951ccf69e",
+              "name": "Respiratory  Care",
+              "slug": "respiratory-care",
+              "imageUrl": "/care-sure/sub-categories/1776519425196-file_000000005aac7208953193ab1d1ac3f2-1.webp",
+              "icon": null
+            },
+            {
+              "id": "3e419f68-9f73-4272-bb2a-8ce411a1388d",
+              "name": "Stomach",
+              "slug": "stomach",
+              "imageUrl": null,
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "08e362dd-0afb-40ff-9b75-377eea221510",
+          "name": "Healthcare Devices",
+          "slug": "healthcare-devices",
+          "iconActive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518655866-biotech-(1).svg",
+          "iconInactive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518658175-biotech.svg",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1778503668635-Frame-887.webp",
+          "mobIconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/mobile/1780321502793-thermometer.png",
+          "mobileShortName": "Devices",
+          "subCategories": [
+            {
+              "id": "bf8b7dc0-e360-4df3-8502-dcf768e8d5a0",
+              "name": "BP Monitor",
+              "slug": "bp-monitor",
+              "imageUrl": "/care-sure/sub-categories/1776519495160-âPngtreeâblood-pressure-monitor-on-white_18842678-1.webp",
+              "icon": null
+            },
+            {
+              "id": "6a2d8215-5a58-416c-9a5f-e4c7787db607",
+              "name": "Nebulizers",
+              "slug": "nebulizers",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519507813-0a307caf-c2b0-4c8a-a151-b3f52e097b74-1.webp",
+              "icon": null
+            },
+            {
+              "id": "c5eb8eb1-afed-4dc5-91de-ee1b0a4be00c",
+              "name": "Supports and Braces ",
+              "slug": "supports-and-braces",
+              "imageUrl": null,
+              "icon": null
+            },
+            {
+              "id": "79a850af-2390-4977-b032-4ebee35f4f22",
+              "name": "Vaporizers",
+              "slug": "vaporizers",
+              "imageUrl": "/care-sure/sub-categories/1776519519169-image-22.webp",
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "c39c44e0-b1b7-47ac-b970-e601ecfc64b9",
+          "name": "Vitamins & Supplements",
+          "slug": "vitamins-supplements",
+          "iconActive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518694008-pill.svg",
+          "iconInactive": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1776518695841-pill-(1).svg",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/1778503674589-Frame-888.webp",
+          "mobIconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/categories/mobile/1780321522419-vitamin.png",
+          "mobileShortName": "Vitamins ",
+          "subCategories": [
+            {
+              "id": "0bfd8a57-126f-4779-84d7-8b46daa1be78",
+              "name": "Calcium and Minerals",
+              "slug": "calcium-and-minarals",
+              "imageUrl": "",
+              "icon": ""
+            },
+            {
+              "id": "3b68c693-342a-483b-a60c-749d039d873e",
+              "name": "Supplement Powder",
+              "slug": "supplements",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519598802-image-24.webp",
+              "icon": ""
+            },
+            {
+              "id": "213209c4-8ee6-4ddf-b31e-59047438392f",
+              "name": "Vitamin A-Z",
+              "slug": "multivitamin",
+              "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519650734-image-26.webp",
+              "icon": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "featured_subcategories",
+      "updated_at": "2026-07-08T12:44:12.670Z",
+      "data": [
+        {
+          "id": "701676ab-6bee-40e0-9352-370ac78122a9",
+          "categoryId": "189f2e3d-7742-4527-953c-54756a2f5b8c",
+          "name": "Baby Wash",
+          "slug": "baby-wash",
+          "description": null,
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519711343-image-28.webp",
+          "icon": null,
+          "status": 1,
+          "isFeatured": true,
+          "featuredMetadata": {},
+          "sortOrder": 0,
+          "categoryName": "Baby Care",
+          "products": []
+        },
+        {
+          "id": "a82854ce-9a68-4b00-91b0-fb8d805ce9a5",
+          "categoryId": "ac79a732-54f4-4490-91d8-e3c4358eba90",
+          "name": "Body Care",
+          "slug": "body-care",
+          "description": "",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519320832-ChatGPT-Image-Mar-20,-2026,-12_48_29-PM-1.webp",
+          "icon": "",
+          "status": 1,
+          "isFeatured": true,
+          "featuredMetadata": {
+            "text1": "Don’t Skip Your Daily Care",
+            "text2": "We’ve Got It Ready",
+            "lineColor": "#6957EB",
+            "text2Color": "#6957EB",
+            "bgGradientEnd": "#F3EAFF",
+            "bgGradientStart": "",
+            "featuredImageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/subcategory/featured/1780381955041-Group-86.webp"
+          },
+          "sortOrder": 0,
+          "categoryName": "Personal Care",
+          "products": []
+        },
+        {
+          "id": "81c0fadd-1b24-47c1-b16b-122ef8d1fd52",
+          "categoryId": "ac79a732-54f4-4490-91d8-e3c4358eba90",
+          "name": "Hair Care",
+          "slug": "hair-care",
+          "description": "Design-focused perspectives on user experience, interface strategy, and usability patterns that drive engagement.",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519295675-haircare-1.webp",
+          "icon": "",
+          "status": 1,
+          "isFeatured": true,
+          "featuredMetadata": {
+            "text1": "Still Struggling with Hair Fall?",
+            "text2": "Let’s Fix That Today",
+            "lineColor": "#2DAAFF",
+            "text2Color": "#2DAAFF",
+            "bgGradientEnd": "#EFF9FF",
+            "bgGradientStart": "#ffffff",
+            "featuredImageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/subcategory/featured/1780381716881-Group-85.webp"
+          },
+          "sortOrder": 0,
+          "categoryName": "Personal Care",
+          "products": []
+        },
+        {
+          "id": "c573a31a-e2a9-44ae-a1cf-d4121ca258ce",
+          "categoryId": "ac79a732-54f4-4490-91d8-e3c4358eba90",
+          "name": "Skin Care",
+          "slug": "skin-care",
+          "description": "",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/sub-categories/1776519343989-ChatGPT-Image-Mar-20,-2026,-12_54_56-PM-1.webp",
+          "icon": "",
+          "status": 1,
+          "isFeatured": true,
+          "featuredMetadata": {
+            "text1": "Your skin, on its best days",
+            "text2": "starts with simple care",
+            "lineColor": "#DE399B",
+            "text2Color": "#DE399B",
+            "bgGradientEnd": "#FFF2FC",
+            "bgGradientStart": "",
+            "featuredImageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/subcategory/featured/1780381795138-Group-84.webp"
+          },
+          "sortOrder": 0,
+          "categoryName": "Personal Care",
+          "products": []
+        }
+      ]
+    },
+    {
+      "key": "featured_medicines",
+      "updated_at": "2026-07-08T12:46:05.828Z",
+      "data": []
+    },
+    {
+      "key": "customer_profile",
+      "updated_at": "2026-07-08T12:46:49.370Z",
+      "data": {
+        "id": "42ee50c1-378c-4d6e-b554-b0c741f44ad7",
+        "phoneNumber": "+919639669960",
+        "email": null,
+        "isActive": true,
+        "status": 1,
+        "firstLoginPlatform": "APP",
+        "isPhoneVerified": true,
+        "isEmailVerified": false,
+        "createdAt": "2026-07-08T12:09:30.483Z",
+        "updatedAt": "2026-07-08T12:09:38.591Z",
+        "profileId": "84aac319-f74f-408e-8c0e-202a6b964b0c",
+        "firstName": null,
+        "lastName": null,
+        "dateOfBirth": null,
+        "gender": null,
+        "avatarUrl": null,
+        "isFirstTimeLogin": false,
+        "walletBalance": "500.00",
+        "coinsBalance": 100,
+        "isFirstTimeLoginAsCorporate": false,
+        "isCorporateUser": false
+      }
+    },
+    {
+      "key": "app_contents",
+      "updated_at": "2026-07-08T12:46:53.150Z",
+      "data": {
+        "hero": {
+          "image": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/hero-section/1778671150134-Aravind.webp",
+          "title": "Stop overpaying for your",
+          "labelImage": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/hero-section/1778671155068-verified_user.svg",
+          "status_text": "Pay less. Feel better",
+          "highlighted_text": [
+            "medicine",
+            "composition",
+            "quality"
+          ]
+        },
+        "banners": [
+          {
+            "alt": "Test",
+            "link": "/test",
+            "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/banners/1778671360397-Frame-1306.webp"
+          },
+          {
+            "alt": "Category",
+            "link": "/category",
+            "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/banners/1778671488974-Frame-1307.webp"
+          },
+          {
+            "alt": "Cart",
+            "link": "/cart",
+            "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/banners/1778671516163-Frame-1308.webp"
+          }
+        ],
+        "promise": {
+          "items": [
+            {
+              "label": "100%  Genuine",
+              "iconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/promises/1778738498235-Background.webp"
+            },
+            {
+              "label": "Fast  Delivery",
+              "iconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/promises/1778738505859-Background(1).webp"
+            },
+            {
+              "label": "Doctor  Trust",
+              "iconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/promises/1778738508513-Background(2).webp"
+            }
+          ],
+          "title": "The Caresure Promise"
+        },
+        "footer": {
+          "title": "Always With You",
+          "labels": [
+            {
+              "icon": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/footer/1778673458990-favorite-(1).svg",
+              "text": "Built with trust"
+            },
+            {
+              "icon": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/footer/1778673478185-medication.svg",
+              "text": "Affordable for all"
+            },
+            {
+              "icon": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/footer/1778673506535-pill.svg",
+              "text": "Switch & Save"
+            }
+          ],
+          "iconUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/footer/1778673522789-favorite.svg",
+          "imageUrl": "https://amzn-s3-cn-project.s3.ap-south-1.amazonaws.com/care-sure/app-contents/footer/1778673526093-ChatGPT-Image-Apr-27,-2026,-06_50_17-PM-1.webp"
+        }
+      }
+    }
+  ]
+}

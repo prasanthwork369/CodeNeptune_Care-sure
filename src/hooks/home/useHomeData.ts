@@ -7,10 +7,18 @@ import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { addressToLocation, pickDefaultAddress } from "@/src/utils/addressLocation";
 import { useEffect, useState } from "react";
+import { queryClient } from "@/src/lib/react-query/queryClient";
+import { syncService } from "@/src/services/sync.service";
 
 export function useHomeData() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { setLocation, clearLocation } = useLocationStore();
+
+  useEffect(() => {
+    syncService.performSync(queryClient, isAuthenticated).catch((err) => {
+      if (__DEV__) console.error("[Sync] Background sync check failed:", err);
+    });
+  }, [isAuthenticated]);
 
   const {
     tabs,
