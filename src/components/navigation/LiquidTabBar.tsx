@@ -4,6 +4,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
+import { exactScale } from "@/src/utils/exactScale";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,8 +21,9 @@ import {
   LayoutChangeEvent,
   Platform,
   Pressable,
+  StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -37,8 +39,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { exactScale } from "@/src/utils/exactScale";
-import { TabBarFadeGradient } from "./TabBarFadeGradient";
 import {
   ACTIVE_HEIGHT,
   ACTIVE_RADIUS,
@@ -49,6 +49,7 @@ import {
   styles as tabStyles,
   UPLOAD_ICON,
 } from "./LiquidTabBar.styles";
+import { TabBarFadeGradient } from "./TabBarFadeGradient";
 
 const ACTIVE_BG = "#ECFDF5";
 const ACTIVE_ICON_COLOR = "#0F7635";
@@ -570,7 +571,12 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       pointerEvents="box-none"
       onLayout={handleLayout}
     >
-      <TabBarFadeGradient />
+      <Animated.View
+        style={[StyleSheet.absoluteFill, animatedTabBarContainerStyle]}
+        pointerEvents="none"
+      >
+        <TabBarFadeGradient />
+      </Animated.View>
       <Animated.View
         style={[{ flex: 1, height: PILL_HEIGHT }, animatedTabBarContainerStyle]}
         pointerEvents="box-none"
@@ -583,7 +589,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
         <View
           style={{
             flex: 1,
-            marginRight: exactScale(10),
+            marginRight: exactScale(12),
             height: PILL_HEIGHT,
             borderRadius: PILL_HEIGHT / 2,
             backgroundColor: "#fff",

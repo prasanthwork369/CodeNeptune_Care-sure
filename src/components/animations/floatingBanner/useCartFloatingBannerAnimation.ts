@@ -96,18 +96,22 @@ export const useCartFloatingBannerAnimation = ({
     transform: [{ translateX: translateX.value }],
   }));
 
+  const exact127 = exactScale(127);
+  const exact77 = exactScale(77);
+  const exact12 = exactScale(12);
+
   const containerStyle = useAnimatedStyle(() => {
     const collapsedPaddingRight = interpolate(
       uploadCollapsedAnim.value,
       [0, 1],
-      [125, 75]
+      [exact127, exact77]
     );
     return {
-      paddingLeft: interpolate(tabBarAnim.value, [0, 1], [12, 16]),
+      paddingLeft: exact12,
       paddingRight: interpolate(
         tabBarAnim.value,
         [0, 1],
-        [collapsedPaddingRight, 16]
+        [collapsedPaddingRight, exact12]
       ),
       transform: [{ translateY: slideY.value }],
       opacity: opacity.value,

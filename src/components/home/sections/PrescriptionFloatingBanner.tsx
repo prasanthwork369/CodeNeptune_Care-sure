@@ -22,6 +22,7 @@ import Animated, {
 import { HOME_IMAGES } from "@/src/constants/images";
 import PRESCRIPTION_ICON from "../../../../assets/images/prescription/prescription-pending.png";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 
 const DURATION = 250;
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
@@ -115,18 +116,22 @@ export const PrescriptionFloatingBanner = ({
     }
   }, [visible, status]);
 
+  const exact127 = exactScale(127);
+  const exact77 = exactScale(77);
+  const exact12 = exactScale(12);
+
   const containerStyle = useAnimatedStyle(() => {
     const collapsedPaddingRight = interpolate(
       uploadCollapsedAnim.value,
       [0, 1],
-      [125, 75],
+      [exact127, exact77],
     );
     return {
-      paddingLeft: interpolate(tabBarAnim.value, [0, 1], [12, 16]),
+      paddingLeft: exact12,
       paddingRight: interpolate(
         tabBarAnim.value,
         [0, 1],
-        [collapsedPaddingRight, 16],
+        [collapsedPaddingRight, exact12],
       ),
       transform: [{ translateY: slideY.value }],
       opacity: opacity.value,
@@ -154,11 +159,7 @@ export const PrescriptionFloatingBanner = ({
     <Animated.View style={containerStyle}>
       <View
         style={{
-          shadowColor: "#919EAB",
-          shadowOffset: { width: 0, height: exactScale(4) },
-          shadowOpacity: 0.2,
-          shadowRadius: 10,
-          elevation: 4,
+            boxShadow: "0px 0px 20px 0px #00000026",
           borderRadius: exactScale(999),
           backgroundColor: "white",
         }}
@@ -173,7 +174,7 @@ export const PrescriptionFloatingBanner = ({
         >
           <View
             className="flex-row items-center bg-white"
-            style={{ borderRadius: exactScale(999), height: exactScale(65) }}
+            style={{ borderRadius: exactScale(999), height: PILL_HEIGHT }}
           >
           <Touchable
             activeOpacity={0.7}
@@ -182,7 +183,7 @@ export const PrescriptionFloatingBanner = ({
           >
             <View
               className="flex-row items-center px-3"
-              style={{ borderRadius: exactScale(999), height: exactScale(65) }}
+              style={{ borderRadius: exactScale(999), height: PILL_HEIGHT }}
             >
               {/* Rx Icon */}
               <View className="mr-3 items-center justify-center">

@@ -6,6 +6,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import { BAR_HEIGHT, PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
+import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   Easing,
   interpolateColor,
@@ -25,6 +26,22 @@ interface DotProps {
   progress: SharedValue<number>;
   total: number;
 }
+
+const BannerFadeGradient = () => (
+  <LinearGradient
+    colors={["rgba(255,255,255,0)", "rgba(255,255,255,0.95)", "#FFFFFF"]}
+    locations={[0.05, 0.3, 1]}
+    pointerEvents="none"
+    style={{
+      position: "absolute",
+      bottom: -exactScale(100),
+      left: 0,
+      right: 0,
+      height: exactScale(150),
+      zIndex: -1,
+    }}
+  />
+);
 
 const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
   const style = useAnimatedStyle(() => {
@@ -271,6 +288,7 @@ export const FloatingBannersCarousel = ({
             animatedContainerStyle,
           ]}
         >
+          <BannerFadeGradient />
           {/* Slides Container */}
           <View
             pointerEvents="box-none"
@@ -419,6 +437,7 @@ export const FloatingBannersCarousel = ({
                 animatedContainerStyle,
               ]}
             >
+              <BannerFadeGradient />
               <PrescriptionFloatingBanner
                 visible={isRxActive}
                 status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
@@ -446,6 +465,7 @@ export const FloatingBannersCarousel = ({
                 animatedContainerStyle,
               ]}
             >
+              <BannerFadeGradient />
               <CartFloatingBanner
                 visible={isCartActive}
                 onViewCart={() => router.push("/(modal)/cart")}

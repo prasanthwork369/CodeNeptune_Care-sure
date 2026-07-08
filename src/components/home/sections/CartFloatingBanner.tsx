@@ -3,11 +3,12 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useUIStore } from "@/src/store/uiStore";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
+import { Image } from "expo-image";
 import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { Image } from "expo-image";
 import Animated from "react-native-reanimated";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -36,7 +37,12 @@ export const CartFloatingBanner = ({
 }: CartFloatingBannerProps) => {
   const [isClearing, setIsClearing] = useState(false);
   const { totalItems, items, clearCart } = useCart();
-  const { isUploadButtonCollapsed, isTabBarVisible, setTabBarVisible, setUploadButtonCollapsed } = useUIStore();
+  const {
+    isUploadButtonCollapsed,
+    isTabBarVisible,
+    setTabBarVisible,
+    setUploadButtonCollapsed,
+  } = useUIStore();
   const lastAddedItem =
     [...items].reverse().find((i) => i.image ?? i.metadata?.image) ??
     items[items.length - 1] ??
@@ -108,7 +114,9 @@ export const CartFloatingBanner = ({
       await clearCart();
       // totalItems hitting 0 triggers the hook's hide animation; wait for it
       // to finish before letting the banner unmount.
-      await new Promise((resolve) => setTimeout(resolve, hideAnimationDuration));
+      await new Promise((resolve) =>
+        setTimeout(resolve, hideAnimationDuration),
+      );
       setTabBarVisible(true);
       setUploadButtonCollapsed(false);
     } catch (error) {
@@ -117,17 +125,19 @@ export const CartFloatingBanner = ({
       setIsClearing(false);
       onInteractionChange?.(false);
     }
-  }, [clearCart, onInteractionChange, hideAnimationDuration, setTabBarVisible, setUploadButtonCollapsed]);
+  }, [
+    clearCart,
+    onInteractionChange,
+    hideAnimationDuration,
+    setTabBarVisible,
+    setUploadButtonCollapsed,
+  ]);
 
   return (
     <Animated.View style={containerStyle}>
       <View
         style={{
-          shadowColor: "#919EAB",
-          shadowOffset: { width: 0, height: exactScale(4) },
-          shadowOpacity: 0.2,
-          shadowRadius: 10,
-          elevation: 4,
+          boxShadow: "0px 0px 20px 0px #00000026",
           borderRadius: exactScale(999),
           backgroundColor: "white",
         }}
@@ -150,11 +160,19 @@ export const CartFloatingBanner = ({
             >
               <View
                 className="flex-row items-center bg-white"
-                style={{ borderRadius: exactScale(999), height: exactScale(65), paddingHorizontal: exactScale(12) }}
+                style={{
+                  borderRadius: exactScale(999),
+                  height: PILL_HEIGHT,
+                  paddingHorizontal: exactScale(12),
+                }}
               >
                 <View
                   className="justify-center"
-                  style={{ width: totalItems > 1 ? exactScale(52) : exactScale(44), height: exactScale(48), marginRight: exactScale(12) }}
+                  style={{
+                    width: totalItems > 1 ? exactScale(52) : exactScale(44),
+                    height: exactScale(48),
+                    marginRight: exactScale(12),
+                  }}
                 >
                   {totalItems > 1 && (
                     <View
@@ -164,11 +182,17 @@ export const CartFloatingBanner = ({
                       {secondImage ? (
                         <Image
                           source={secondImage}
-                          style={{ width: exactScale(30), height: exactScale(30) }}
+                          style={{
+                            width: exactScale(30),
+                            height: exactScale(30),
+                          }}
                           contentFit="contain"
                         />
                       ) : (
-                        <icons.placeholder width={exactScale(30)} height={exactScale(30)} />
+                        <icons.placeholder
+                          width={exactScale(30)}
+                          height={exactScale(30)}
+                        />
                       )}
                     </View>
                   )}
@@ -184,11 +208,17 @@ export const CartFloatingBanner = ({
                     {displayImage ? (
                       <Image
                         source={displayImage}
-                        style={{ width: exactScale(30), height: exactScale(30) }}
+                        style={{
+                          width: exactScale(30),
+                          height: exactScale(30),
+                        }}
                         contentFit="contain"
                       />
                     ) : (
-                      <icons.placeholder width={exactScale(30)} height={exactScale(30)} />
+                      <icons.placeholder
+                        width={exactScale(30)}
+                        height={exactScale(30)}
+                      />
                     )}
                   </View>
                 </View>
@@ -197,19 +227,28 @@ export const CartFloatingBanner = ({
                   <Text
                     className="font-inter-bold text-[#1A1C1E]"
                     numberOfLines={1}
-                    style={{ fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(18, 0.1) }}
+                    style={{
+                      fontSize: moderateScale(14, 0.1),
+                      lineHeight: moderateScale(18, 0.1),
+                    }}
                   >
                     {displayTitle}
                   </Text>
                   <Text
                     className="font-inter-bold text-[#1A1C1E]"
-                    style={{ fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(18, 0.1) }}
+                    style={{
+                      fontSize: moderateScale(14, 0.1),
+                      lineHeight: moderateScale(18, 0.1),
+                    }}
                   >
                     {displaySubtitle}
                   </Text>
                 </View>
 
-                <View className="flex-row items-center" style={{ columnGap: exactScale(8) }}>
+                <View
+                  className="flex-row items-center"
+                  style={{ columnGap: exactScale(8) }}
+                >
                   <Touchable activeOpacity={0.9} onPress={onViewCart}>
                     <Animated.View style={[BUTTON_STATIC, buttonAnimatedStyle]}>
                       <AnimatedText
@@ -237,7 +276,11 @@ export const CartFloatingBanner = ({
                     className="rounded-full bg-[#F3F4F6] items-center justify-center"
                     style={{ width: exactScale(30), height: exactScale(30) }}
                   >
-                    <icons.close_small width={exactScale(12)} height={exactScale(12)} fill="#6A6A6A" />
+                    <icons.close_small
+                      width={exactScale(12)}
+                      height={exactScale(12)}
+                      fill="#6A6A6A"
+                    />
                   </Touchable>
                 </View>
               </View>
@@ -261,7 +304,10 @@ export const CartFloatingBanner = ({
               {isClearing ? (
                 <ActivityIndicator size="small" color="#0F7635" />
               ) : (
-                <Text className="font-inter-semibold text-[#0F7635]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                <Text
+                  className="font-inter-semibold text-[#0F7635]"
+                  style={{ fontSize: moderateScale(14, 0.1) }}
+                >
                   Remove
                 </Text>
               )}

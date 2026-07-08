@@ -43,40 +43,7 @@ function useSlideUp(delayMs: number) {
   }));
 }
 
-function useFloat(delayMs: number, amplitude = 5, enabled = true) {
-  const translateY = useSharedValue(0);
 
-  useEffect(() => {
-    if (!enabled) {
-      cancelAnimation(translateY);
-      translateY.value = withTiming(0, {
-        duration: 180,
-        easing: Easing.out(Easing.cubic),
-      });
-      return;
-    }
-
-    translateY.value = withDelay(
-      delayMs,
-      withRepeat(
-        withSequence(
-          withTiming(-amplitude, {
-            duration: 1800,
-            easing: Easing.inOut(Easing.sin),
-          }),
-          withTiming(0, { duration: 1800, easing: Easing.inOut(Easing.sin) }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    return () => cancelAnimation(translateY);
-  }, [amplitude, delayMs, enabled, translateY]);
-
-  return useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
-}
 
 interface HeroBannerProps {
   content?: ApiHero;
@@ -116,8 +83,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   // Hooks must be called before any early return
   const leftAnim = useSlideUp(200);
   const rightAnim = useSlideUp(400);
-  const float1Anim = useFloat(600, 5, motionEnabled);
-  const float2Anim = useFloat(1100, 4, motionEnabled);
+
 
   if (isLoading || !content) {
     return (
@@ -231,21 +197,21 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         />
       </Animated.View>
 
-      {/* ── Background Decors (floating) ── */}
-      <Animated.View style={[styles.decorPills, dStyles.decorPills, float1Anim]}>
+      {/* ── Background Decors (static) ── */}
+      <View style={[styles.decorPills, dStyles.decorPills]}>
         <Image
           source={HOME_IMAGES.bannerPills}
           style={{ width: "100%", height: "100%" }}
           contentFit="contain"
         />
-      </Animated.View>
-      <Animated.View style={[styles.decorMedicine, dStyles.decorMedicine, float2Anim]}>
+      </View>
+      <View style={[styles.decorMedicine, dStyles.decorMedicine]}>
         <Image
           source={HOME_IMAGES.bannerMedicine}
           style={{ width: "100%", height: "100%" }}
           contentFit="contain"
         />
-      </Animated.View>
+      </View>
     </View>
   );
 };
