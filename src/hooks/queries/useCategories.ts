@@ -3,6 +3,7 @@ import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { categoryApi, type ApiCategoryFamily } from "../../api/category.api";
+import { resolveAssetUrl } from "../../utils/urls";
 import type { CategoryProduct } from "../../types/category";
 import type { CategoryCard, CategoryTab } from "../../types/home";
 
@@ -61,7 +62,7 @@ export const useCategories = () => {
           slug: sub.slug,
           familySlug: family.slug,
           label: sub.name,
-          image: sub.imageUrl ? { uri: sub.imageUrl } : null,
+          image: sub.imageUrl ? { uri: resolveAssetUrl(sub.imageUrl) } : null,
           bgColor: CARD_BG_COLORS[idx % CARD_BG_COLORS.length],
           tabId: family.id,
         })),
@@ -116,7 +117,7 @@ export const useCategoryProducts = (params: {
         ? `${parseFloat(String(item.discountPercentage))}% OFF`
         : undefined,
     discountPercent: parseFloat(String(item.discountPercentage)) || 0,
-    image: item.thumbnailUrl ? { uri: item.thumbnailUrl } : null,
+    image: item.thumbnailUrl ? { uri: resolveAssetUrl(item.thumbnailUrl) } : null,
   }));
 
   return { products, total: data?.total ?? 0, isLoading, error, refetch };

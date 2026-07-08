@@ -1,13 +1,11 @@
-import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
-import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { useCartActions } from '@/src/hooks/useCartActions';
 import type { Product } from '@/src/types/home';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
-import React from 'react';
-import { ActivityIndicator, Animated, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useCallback } from 'react';
+import { ActivityIndicator, Animated, FlatList, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { HomeProductCardSkeleton } from './HomeProductCardSkeleton';
 import { styles as s } from './PopularSubstitutes.styles';
 import { exactScale } from "@/src/utils/exactScale";
@@ -22,9 +20,7 @@ const ACCENT = '#0F7635';
 const CONTENT_BG = '#F7FDF9';
 const DISCOUNT_BG = '#E8F5E9';
 
-const ProductCard = ({ product, onProductPress }: { product: Product; onProductPress?: (id: string) => void }) => {
-    const { width } = useWindowDimensions();
-    const cardWidth = (width - 20 - 14 - 36) / 2;
+const ProductCard = React.memo(({ product, cardWidth, onProductPress }: { product: Product; cardWidth: number; onProductPress?: (id: string) => void }) => {
     // Image area height is tied to card width (so the image proportion matches
     // the design); the details area below it is NOT forced into a matching
     // half-split -- it sizes itself to its actual text/button content instead,
@@ -136,9 +132,25 @@ const ProductCard = ({ product, onProductPress }: { product: Product; onProductP
             </View>
         </View>
     );
-};
+});
+ProductCard.displayName = 'PopularSubstitutesProductCard';
 
 export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products, isLoading, onProductPress }) => {
+    const { width } = useWindowDimensions();
+    const cardWidth = (width - 20 - 14 - 36) / 2;
+    const gap = exactScale(14);
+
+    const renderProduct = useCallback(
+        ({ item }: { item: Product }) => (
+            <ProductCard
+                product={item}
+                cardWidth={cardWidth}
+                onProductPress={onProductPress}
+            />
+        ),
+        [cardWidth, onProductPress],
+    );
+
     return (
         <View className="py-6" style={{ position: 'relative' }}>
             <LinearGradient
@@ -173,15 +185,21 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
             {isLoading ? (
                 <HomeProductCardSkeleton count={4} />
             ) : (
-                <ScrollView
+                <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40), gap: exactScale(14) }}
-                >
-                    {products.map((product) => (
-                        <ProductCard key={product.id} product={product} onProductPress={onProductPress} />
-                    ))}
-                </ScrollView>
+                    data={products}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderProduct}
+                    removeClippedSubviews
+                    initialNumToRender={4}
+                    maxToRenderPerBatch={4}
+                    windowSize={5}
+                    nestedScrollEnabled
+                    directionalLockEnabled
+                    contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40) }}
+                    ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                />
             )}
         </View>
     );

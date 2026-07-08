@@ -1,14 +1,22 @@
-import { useEffect } from "react";
+import { RefObject, useEffect } from "react";
 import { DeviceEventEmitter } from "react-native";
-import Animated, { AnimatedRef } from "react-native-reanimated";
 
 export const SCROLL_TO_TOP_EVENT = "home-scroll-to-top";
 
-export function useScrollToTop(scrollViewRef: AnimatedRef<Animated.ScrollView>) {
+type ScrollToTopHandle = {
+  scrollTo?: (options: { y: number; animated: boolean }) => void;
+  scrollToOffset?: (options: { offset: number; animated: boolean }) => void;
+};
+
+export function useScrollToTop(scrollRef: RefObject<ScrollToTopHandle | null>) {
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener(SCROLL_TO_TOP_EVENT, () => {
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      if (scrollRef.current?.scrollToOffset) {
+        scrollRef.current.scrollToOffset({ offset: 0, animated: true });
+        return;
+      }
+      scrollRef.current?.scrollTo?.({ y: 0, animated: true });
     });
     return () => sub.remove();
-  }, []);
+  }, [scrollRef]);
 }

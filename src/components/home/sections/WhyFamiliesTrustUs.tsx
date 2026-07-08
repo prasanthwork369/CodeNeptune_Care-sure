@@ -39,10 +39,12 @@ export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = React.memo(
             colors={["#B2E8FF", "#FFFFFF"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{ height: exactScale(5), width: exactScale(170), marginTop: exactScale(4), borderRadius: 1 }}
+            style={{ height: exactScale(5), width: exactScale(170), marginTop: exactScale(4),borderRadius: exactScale(2) }}
+
           />
         </View>
       )}
+
 
       <View className="flex-row justify-around px-4 mt-1">
         {promise.items.map((item, idx) => (

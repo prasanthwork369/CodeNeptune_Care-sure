@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { medicineApi } from "../../api/medicine.api";
 import type { Product } from "../../types/home";
 import { formatPackLabel } from "../../utils/packLabel";
+import { resolveAssetUrl } from "../../utils/urls";
 
 export const useFeaturedMedicines = () => {
   const {
@@ -37,7 +38,7 @@ export const useFeaturedMedicines = () => {
       originalPrice,
       discount: discountPct > 0 ? `${discountPct}% OFF` : undefined,
       discountPercent: discountPct || 0,
-      image: med.thumbnailUrl ? { uri: med.thumbnailUrl } : null,
+      image: med.thumbnailUrl ? { uri: resolveAssetUrl(med.thumbnailUrl) } : null,
       requiresPrescription: med.requiresPrescription,
     };
   });

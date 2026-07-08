@@ -66,10 +66,15 @@ export interface ApiCategoryProductsResponse {
 }
 
 export const categoryApi = {
-  getFeaturedSubcategories: async (limit = 4): Promise<ApiFeaturedSubcategory[]> => {
-    const response = await apiClient.get(API_ENDPOINTS.CATEGORY_FEATURED_SUBCATEGORIES, {
-      params: { limit },
-    });
+  getFeaturedSubcategories: async (
+    limit = 4,
+  ): Promise<ApiFeaturedSubcategory[]> => {
+    const response = await apiClient.get(
+      API_ENDPOINTS.CATEGORY_FEATURED_SUBCATEGORIES,
+      {
+        params: { limit },
+      },
+    );
     return response.data?.data ?? [];
   },
 

@@ -77,6 +77,7 @@ export function useOtp() {
     if (!smsOtp || smsOtp.length !== 6) return;
     setOtp(smsOtp);
     setOtpError("");
+    if (error) resetError();
     setSelection(undefined);
     inputRef.current?.blur();
     // Auto-submit the auto-read code — the user shouldn't have to tap
@@ -116,8 +117,11 @@ export function useOtp() {
       const newPrefill = res?.data?.otp ?? "";
 
       if (newPrefill && newPrefill.length === 6) {
+        setOtpError("");
+        if (error) resetError();
         setSelection(undefined);
         setOtp(newPrefill);
+        inputRef.current?.blur();
       } else {
         resetOtp();
         setTimeout(() => inputRef.current?.focus(), 50);
@@ -141,7 +145,7 @@ export function useOtp() {
     } else {
       setSelection({ start: otp.length, end: otp.length });
     }
-    const input = inputRef.current;
+    const input = inputRef?.current;
     if (!input) return;
     // If the keyboard was dismissed (e.g. Android back button, or our own
     // blur after auto-submit) the input can still be "focused" in RN's

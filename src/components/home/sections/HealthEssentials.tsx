@@ -1,16 +1,15 @@
 import { ApiFeaturedSubcategory, ApiFeaturedSubcategoryMetadata } from '@/src/api/category.api';
-import { icons } from '@/src/constants/icons';
-import { CART_BUTTON_HEIGHT } from '@/src/constants/theme';
 import { useCartActions } from '@/src/hooks/useCartActions';
 import { formatPackLabel } from '@/src/utils/packLabel';
+import { resolveAssetUrl } from '@/src/utils/urls';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
     ActivityIndicator,
     Animated,
-    ScrollView,
+    FlatList,
     StyleSheet,
     Text,
     View,
@@ -38,15 +37,14 @@ interface ProductCardProps {
     discountPercentage: number;
     thumbnailUrl: string;
     accentColor: string;
+    cardWidth: number;
     onPress: (productId: string) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({
     id, productId, name, slug, description, price, mrp,
-    discountPercentage, thumbnailUrl, accentColor, onPress,
+    discountPercentage, thumbnailUrl, accentColor, cardWidth, onPress,
 }) => {
-    const { width } = useWindowDimensions();
-    const cardWidth = (width - 20 - 14 - 36) / 2;
     // Image area height is tied to card width; the details area below it
     // sizes itself to its own content instead of a forced half-split (see
     // PopularSubstitutes.tsx for the same fix and why).
@@ -59,7 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         productId, name, slug, price,
         originalPrice: mrp,
         discountPercent: discountPercentage,
-        image: thumbnailUrl ? { uri: thumbnailUrl } : undefined,
+        image: thumbnailUrl ? { uri: resolveAssetUrl(thumbnailUrl) } : undefined,
     });
     const { slideAnim, opacityAnim } = animations;
 
@@ -80,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             >
                 <View style={{ flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 12, borderTopRightRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
                     <Image
-                        source={thumbnailUrl ? { uri: thumbnailUrl } : undefined}
+                        source={thumbnailUrl ? { uri: resolveAssetUrl(thumbnailUrl) } : undefined}
                         style={{ width: imageSize, height: imageSize }}
                         contentFit="contain"
                     />
@@ -147,6 +145,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         </View>
     );
 });
+ProductCard.displayName = 'HealthEssentialsProductCard';
 
 interface HealthEssentialsSectionProps {
     subcategory: ApiFeaturedSubcategory;
@@ -155,8 +154,11 @@ interface HealthEssentialsSectionProps {
 }
 
 const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subcategory, themeIndex, onProductPress }) => {
+    const { width } = useWindowDimensions();
     const meta: ApiFeaturedSubcategoryMetadata | null = subcategory.featuredMetadata;
     const fallback = FALLBACK_THEMES[themeIndex % FALLBACK_THEMES.length];
+    const cardWidth = (width - 20 - 14 - 36) / 2;
+    const gap = exactScale(14);
 
     const gradientStart = meta?.bgGradientStart?.trim() || '#FFFFFF';
     const gradientEnd   = meta?.bgGradientEnd?.trim()   || fallback.gradientEnd;
@@ -165,6 +167,31 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
     const title         = meta?.text1            || subcategory.categoryName;
     const subtitle      = meta?.text2            || subcategory.name;
     const headerImage   = meta?.featuredImageUrl || subcategory.imageUrl;
+
+    const renderProduct = useCallback(
+        ({ item: p }: { item: ApiFeaturedSubcategory['products'][number] }) => {
+            const packLabel = formatPackLabel({ packSize: p.packSize, unit: p.unit, dosageForm: p.dosageForm });
+            const displayDesc = packLabel || p.description || '';
+
+            return (
+                <ProductCard
+                    id={p.id}
+                    productId={p.productId}
+                    name={p.name}
+                    slug={p.slug}
+                    description={displayDesc}
+                    accentColor={lineColor}
+                    price={Number(p.price)}
+                    mrp={Number(p.mrp ?? p.price)}
+                    discountPercentage={Number(p.discountPercentage)}
+                    thumbnailUrl={p.thumbnailUrl}
+                    cardWidth={cardWidth}
+                    onPress={onProductPress}
+                />
+            );
+        },
+        [cardWidth, lineColor, onProductPress],
+    );
 
     return (
         <View>
@@ -192,36 +219,25 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
                             </View>
                         </View>
                         {!!headerImage && (
-                            <Image source={{ uri: headerImage }} style={{ width: '25%', height: exactScale(75), }} contentFit="contain" />
+                            <Image source={{ uri: resolveAssetUrl(headerImage) }} style={{ width: '25%', height: exactScale(75), }} contentFit="contain" />
                         )}
                     </View>
 
-                    <ScrollView
+                    <FlatList
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40), gap: exactScale(14) }}
-                    >
-                        {subcategory.products.map((p) => {
-                            const packLabel = formatPackLabel({ packSize: p.packSize, unit: p.unit, dosageForm: p.dosageForm });
-                            const displayDesc = packLabel || p.description || '';
-                            return (
-                                <ProductCard
-                                    key={p.id}
-                                    id={p.id}
-                                    productId={p.productId}
-                                    name={p.name}
-                                    slug={p.slug}
-                                    description={displayDesc}
-                                    accentColor={lineColor}
-                                    price={Number(p.price)}
-                                    mrp={Number(p.mrp ?? p.price)}
-                                    discountPercentage={Number(p.discountPercentage)}
-                                    thumbnailUrl={p.thumbnailUrl}
-                                    onPress={onProductPress}
-                                />
-                            );
-                        })}
-                    </ScrollView>
+                        data={subcategory.products}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderProduct}
+                        removeClippedSubviews
+                        initialNumToRender={4}
+                        maxToRenderPerBatch={4}
+                        windowSize={5}
+                        nestedScrollEnabled
+                        directionalLockEnabled
+                        contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40) }}
+                        ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                    />
                 </View>
             </View>
         </View>
@@ -242,7 +258,7 @@ export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ s
     if (subcategories.length === 0) return null;
 
     return (
-        <View style={{ gap: exactScale(24) }}>
+        <View style={{ gap: exactScale(10) }}>
             {subcategories.map((sub, index) => (
                 <HealthEssentialsSection
                     key={sub.id}

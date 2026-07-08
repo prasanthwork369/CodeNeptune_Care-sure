@@ -3,6 +3,7 @@ import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
   runOnJS,
   useAnimatedStyle,
@@ -30,6 +31,10 @@ export const SplashAnimationScreen: React.FC<Props> = ({ onComplete }) => {
         if (done) runOnJS(onComplete)();
       }),
     );
+    // Cancel the pending timing if we unmount early (fast nav / hot reload) so
+    // the completion callback can't fire after teardown.
+    return () => cancelAnimation(screenOpacity);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const screenStyle = useAnimatedStyle(() => ({

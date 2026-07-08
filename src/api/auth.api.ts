@@ -13,6 +13,7 @@ export const authApi = {
       phone,
       otp,
       deviceId: deviceId ?? "", // Fallback to empty string if somehow null, keeping it a valid string type
+      platform: "APP", // Distinguishes the mobile app from the web panel (backend-required)
     });
     return response.data;
   },

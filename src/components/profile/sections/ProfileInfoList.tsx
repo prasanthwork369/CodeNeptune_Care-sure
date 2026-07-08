@@ -1,10 +1,11 @@
-import React from "react";
-import { profileStyles as s } from "../profile.styles";
-import { View, Text } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { useNav } from "@/src/hooks/useNav";
 import { icons } from "@/src/constants/icons";
 import { INFO_ITEMS } from "@/src/constants/profiel_info";
+import { useNav } from "@/src/hooks/useNav";
+import { exactScale } from "@/src/utils/exactScale";
+import React from "react";
+import { Text, View } from "react-native";
+import { profileStyles as s } from "../profile.styles";
 
 interface ProfileInfoListProps {
   onLogout: () => void;
@@ -33,7 +34,16 @@ export const ProfileInfoList: React.FC<ProfileInfoListProps> = ({
                 activeOpacity={0.6}
                 className="flex-row items-center px-4 py-[15px]"
               >
-                <Icon width={22} height={22} fill="#222222" />
+                <View
+                  style={{
+                    width: exactScale(24),
+                    height: exactScale(24),
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Icon  />
+                </View>
                 <Text
                   style={s.infoLabel}
                   className="flex-1 ml-[14px] font-inter-medium text-brand-text"
@@ -61,10 +71,19 @@ export const ProfileInfoList: React.FC<ProfileInfoListProps> = ({
           className="flex-row items-center px-4 py-6 border-t border-[#919EAB33]"
           style={{ borderStyle: "dotted" }}
         >
-          <icons.logout width={22} height={22} fill="#CA2B25" />
+          <View
+            style={{
+              width: exactScale(24),
+              height: exactScale(24),
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <icons.logout fill="#CA2B25" />
+          </View>
           <Text
             style={s.logoutText}
-            className="ml-[10px] font-inter-semibold text-[#CA2B25]"
+            className="ml-[14px] font-inter-semibold text-[#CA2B25]"
           >
             Logout
           </Text>

@@ -1,4 +1,3 @@
-import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SharedValue } from 'react-native-reanimated';
 import { useTabBarVisibility } from '../ui/useTabBarVisibility';
 import { useStickySearchBar } from '../ui/useStickySearchBar';
@@ -12,18 +11,12 @@ import { useStickySearchBar } from '../ui/useStickySearchBar';
  * independently without affecting one another.
  */
 export const useHomeScroll = (scrollY: SharedValue<number>, heroHeightShared: SharedValue<number>) => {
-    const { isTabBarVisibleShared, handleScroll: handleTabBarScroll } = useTabBarVisibility();
+    const { isTabBarVisibleShared, handleScroll: handleTabBarScroll } = useTabBarVisibility(scrollY);
     const { stickySearchVisible } = useStickySearchBar(scrollY, heroHeightShared);
 
-    const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-        const currentScrollY = contentOffset.y;
-
-        const isAtBottom =
-            currentScrollY + layoutMeasurement.height >= contentSize.height - 24;
-
-        handleTabBarScroll(currentScrollY, isAtBottom);
+    return {
+        handleScroll: handleTabBarScroll,
+        isTabBarVisibleShared,
+        stickySearchVisible,
     };
-
-    return { handleScroll, isTabBarVisibleShared, stickySearchVisible };
 };

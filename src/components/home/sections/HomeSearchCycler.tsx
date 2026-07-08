@@ -118,20 +118,26 @@ export const HomeSearchCycler: React.FC = () => {
   };
 
   return (
-    <View style={styles.window}>
-      <Animated.Text style={[textStyle, styles.slot, aStyle]} numberOfLines={1} allowFontScaling={false}>
+    <View style={styles.row}>
+      {/* Fixed prefix — never animates */}
+      <Text style={textStyle} numberOfLines={1} allowFontScaling={false}>
         Search for{" "}
-        <Text style={styles.bold} allowFontScaling={false}>&quot;{MEDICINES[aIdx.current]}&quot;</Text>
-      </Animated.Text>
-      <Animated.Text style={[textStyle, styles.slot, bStyle]} numberOfLines={1} allowFontScaling={false}>
-        Search for{" "}
-        <Text style={styles.bold} allowFontScaling={false}>&quot;{MEDICINES[bIdx.current]}&quot;</Text>
-      </Animated.Text>
+      </Text>
+      {/* Only the medicine name cycles inside this clipped window */}
+      <View style={styles.window}>
+        <Animated.Text style={[textStyle, styles.bold, styles.slot, aStyle]} numberOfLines={1} allowFontScaling={false}>
+          &quot;{MEDICINES[aIdx.current]}&quot;
+        </Animated.Text>
+        <Animated.Text style={[textStyle, styles.bold, styles.slot, bStyle]} numberOfLines={1} allowFontScaling={false}>
+          &quot;{MEDICINES[bIdx.current]}&quot;
+        </Animated.Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  row: { flex: 1, flexDirection: "row", alignItems: "center", height: SLOT_H },
   window: { flex: 1, height: SLOT_H, overflow: "hidden" },
   slot: { position: "absolute", left: 0, top: 0, bottom: 0 },
   bold: { fontWeight: "600", color: "#6B7280" },

@@ -25,5 +25,5 @@ export interface OtpFormProps {
   onBoxPress: (index: number) => void;
   onOtpChange: (value: string) => void;
   onResend: () => void;
-  inputRef: React.RefObject<TextInput | null>;
+  inputRef: React.Ref<TextInput>;
 }

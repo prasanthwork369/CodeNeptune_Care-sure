@@ -1,19 +1,21 @@
 import { storageApi } from "@/src/api/storage.api";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { Touchable } from "@/src/components/ui/Touchable";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
+import { moderateScale } from "@/src/utils/exactScale";
 import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
-import { DotLottie } from "@lottiefiles/dotlottie-react-native";
-import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -28,8 +30,6 @@ import {
   useWindowDimensions,
 } from "react-native";
 import Pdf from "react-native-pdf";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
 
 const FOLDER = "customers/prescriptions";
 const isPdf = (uri: string, type?: string) =>
@@ -147,8 +147,7 @@ export const PreviewLayout: React.FC = () => {
 
   const pickImages = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         showPermissionAlert("photo library");
         return;
@@ -166,6 +165,11 @@ export const PreviewLayout: React.FC = () => {
   };
   const pickPdfs = async () => {
     try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        showPermissionAlert("photo library");
+        return;
+      }
       const result = await DocumentPicker.getDocumentAsync({
         type: ["application/pdf"],
         copyToCacheDirectory: true,
@@ -360,7 +364,10 @@ export const PreviewLayout: React.FC = () => {
                 {isPdf(item.localUri, item.type) ? (
                   <View className="flex-1 items-center justify-center">
                     <icons.upload_file width={24} height={24} />
-                    <Text className="font-inter-bold text-[#1A1C1E] mt-1" style={{ fontSize: moderateScale(8, 0.1) }}>
+                    <Text
+                      className="font-inter-bold text-[#1A1C1E] mt-1"
+                      style={{ fontSize: moderateScale(8, 0.1) }}
+                    >
                       PDF
                     </Text>
                   </View>
@@ -388,7 +395,10 @@ export const PreviewLayout: React.FC = () => {
           className="px-3 py-4 border-t border-[#919EAB1A] flex-row items-center justify-between"
           style={{ paddingBottom: Math.max(adjustedBottom + 8, 24) }}
         >
-          <Text className="font-inter-medium text-[#000000]" style={{ fontSize: moderateScale(14, 0.1) }}>
+          <Text
+            className="font-inter-medium text-[#000000]"
+            style={{ fontSize: moderateScale(14, 0.1) }}
+          >
             {items.length} / {MAX_FILES} Prescription
             {items.length !== 1 ? "s" : ""} Uploaded
           </Text>
@@ -400,7 +410,10 @@ export const PreviewLayout: React.FC = () => {
             onPress={handleSubmit}
           >
             {submitting && <ActivityIndicator size="small" color="#fff" />}
-            <Text className="text-white font-inter-semibold" style={{ fontSize: moderateScale(14, 0.1) }}>
+            <Text
+              className="text-white font-inter-semibold"
+              style={{ fontSize: moderateScale(14, 0.1) }}
+            >
               {submitting ? "Uploading..." : "Proceed"}
             </Text>
           </Touchable>

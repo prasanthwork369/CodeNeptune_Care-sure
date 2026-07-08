@@ -1,47 +1,69 @@
-import { useRef } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
+import { useCallback } from 'react';
+import {
+    runOnJS,
+    SharedValue,
+    useAnimatedScrollHandler,
+    useSharedValue,
+} from 'react-native-reanimated';
 import { useUIStore } from '@/src/store/uiStore';
 
 /**
  * Shows/hides the bottom tab bar and collapses the upload button based on
- * scroll direction. Independent from the sticky search bar logic.
+ * scroll direction. The per-frame scroll work stays on the UI thread; JS is
+ * only notified when the visible state actually changes.
  */
-export const useTabBarVisibility = () => {
-    const setTabBarVisible         = useUIStore.getState().setTabBarVisible;
-    const setUploadButtonCollapsed = useUIStore.getState().setUploadButtonCollapsed;
-    const lastScrollY               = useRef(0);
+export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
+    const lastScrollY               = useSharedValue(0);
     const isTabBarVisibleShared     = useSharedValue(1);
 
-    const handleScroll = (currentScrollY: number, isAtBottom = false) => {
-        // Reaching the end of the scrollable content always reveals the tab
-        // bar, even if the user got there by scrolling down.
-        if (isAtBottom) {
-            lastScrollY.current = currentScrollY;
-            setTabBarVisible(true);
-            setUploadButtonCollapsed(false);
-            isTabBarVisibleShared.value = 1;
-            return;
-        }
+    const applyVisibility = useCallback((visible: boolean) => {
+        useUIStore.setState({
+            isTabBarVisible: visible,
+            isUploadButtonCollapsed: !visible,
+        });
+    }, []);
 
-        const delta = currentScrollY - lastScrollY.current;
+    const handleScroll = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            const currentScrollY = event.contentOffset.y;
+            if (scrollY) {
+                scrollY.value = currentScrollY;
+            }
+            const isAtBottom =
+                currentScrollY + event.layoutMeasurement.height >=
+                event.contentSize.height - 24;
 
-        if (Math.abs(delta) < 5) return;
-        lastScrollY.current = currentScrollY;
+            // Reaching the end of the scrollable content always reveals the
+            // tab bar, even if the user got there by scrolling down.
+            if (isAtBottom) {
+                lastScrollY.value = currentScrollY;
+                if (isTabBarVisibleShared.value !== 1) {
+                    isTabBarVisibleShared.value = 1;
+                    runOnJS(applyVisibility)(true);
+                }
+                return;
+            }
 
-        if (currentScrollY <= 0) {
-            setTabBarVisible(true);
-            setUploadButtonCollapsed(false);
-            isTabBarVisibleShared.value = 1;
-        } else if (delta > 0 && currentScrollY > 100) {
-            setTabBarVisible(false);
-            setUploadButtonCollapsed(true);
-            isTabBarVisibleShared.value = 0;
-        } else if (delta < 0) {
-            setTabBarVisible(true);
-            setUploadButtonCollapsed(false);
-            isTabBarVisibleShared.value = 1;
-        }
-    };
+            const delta = currentScrollY - lastScrollY.value;
+
+            if (Math.abs(delta) < 5) return;
+            lastScrollY.value = currentScrollY;
+
+            let nextVisible = isTabBarVisibleShared.value;
+            if (currentScrollY <= 0) {
+                nextVisible = 1;
+            } else if (delta > 0 && currentScrollY > 100) {
+                nextVisible = 0;
+            } else if (delta < 0) {
+                nextVisible = 1;
+            }
+
+            if (nextVisible !== isTabBarVisibleShared.value) {
+                isTabBarVisibleShared.value = nextVisible;
+                runOnJS(applyVisibility)(nextVisible === 1);
+            }
+        },
+    });
 
     return { isTabBarVisibleShared, handleScroll };
 };

@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { medicineApi, MedicineVariant } from '../../api/medicine.api';
 import { QUERY_KEYS } from '@/src/lib/react-query/queryKeys';
-import { formatPackLabel } from '@/src/utils/packLabel';
+import { formatPackLabel } from "../../utils/packLabel";
+import { resolveAssetUrl } from "../../utils/urls";
 
 export type { MedicineVariant };
 
@@ -44,9 +45,9 @@ export const useProduct = (productId: string) => {
         price,
         originalPrice: discountPct > 0 && data.mrp ? parseFloat(String(data.mrp)) : undefined,
         savingsPercent: discountPct > 0 ? discountPct : undefined,
-        image: data.thumbnailUrl ? { uri: data.thumbnailUrl } : undefined,
+        image: data.thumbnailUrl ? { uri: resolveAssetUrl(data.thumbnailUrl) } : undefined,
         images: [
-            ...(data.thumbnailUrl ? [{ uri: data.thumbnailUrl }] : []),
+            ...(data.thumbnailUrl ? [{ uri: resolveAssetUrl(data.thumbnailUrl) }] : []),
             ...data.images
                 .sort((a, b) => a.sortOrder - b.sortOrder)
                 .filter(img => !!img.url)
@@ -76,7 +77,7 @@ export const useProduct = (productId: string) => {
             ? parseFloat(data.recommendation.mrp)
             : parseFloat(data.recommendation.price) || 0,
         savingsPercent: data.recommendation.discountPercentage || 0,
-        image: data.recommendation.thumbnailUrl ? { uri: data.recommendation.thumbnailUrl } : undefined,
+        image: data.recommendation.thumbnailUrl ? { uri: resolveAssetUrl(data.recommendation.thumbnailUrl) } : undefined,
         productId: data.recommendation.productId,
     } : null;
 

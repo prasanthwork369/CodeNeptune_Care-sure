@@ -8,6 +8,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -34,7 +35,7 @@ function useSlideUp(delayMs: number) {
       delayMs,
       withTiming(0, { duration: 520, easing: ease }),
     );
-  }, []);
+  }, [delayMs, opacity, translateY]);
 
   return useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -42,10 +43,19 @@ function useSlideUp(delayMs: number) {
   }));
 }
 
-function useFloat(delayMs: number, amplitude = 5) {
+function useFloat(delayMs: number, amplitude = 5, enabled = true) {
   const translateY = useSharedValue(0);
 
   useEffect(() => {
+    if (!enabled) {
+      cancelAnimation(translateY);
+      translateY.value = withTiming(0, {
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+      });
+      return;
+    }
+
     translateY.value = withDelay(
       delayMs,
       withRepeat(
@@ -60,7 +70,8 @@ function useFloat(delayMs: number, amplitude = 5) {
         true,
       ),
     );
-  }, []);
+    return () => cancelAnimation(translateY);
+  }, [amplitude, delayMs, enabled, translateY]);
 
   return useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -70,6 +81,7 @@ function useFloat(delayMs: number, amplitude = 5) {
 interface HeroBannerProps {
   content?: ApiHero;
   isLoading?: boolean;
+  motionEnabled?: boolean;
 }
 
 // Trims title to "Stop overpaying" (removes "for your" and cycling words)
@@ -86,6 +98,7 @@ const getCleanTitlePart1 = (rawTitle?: string): string => {
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   content,
   isLoading,
+  motionEnabled = true,
 }) => {
   const { width } = useWindowDimensions();
 
@@ -103,8 +116,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   // Hooks must be called before any early return
   const leftAnim = useSlideUp(200);
   const rightAnim = useSlideUp(400);
-  const float1Anim = useFloat(600, 5);
-  const float2Anim = useFloat(1100, 4);
+  const float1Anim = useFloat(600, 5, motionEnabled);
+  const float2Anim = useFloat(1100, 4, motionEnabled);
 
   if (isLoading || !content) {
     return (

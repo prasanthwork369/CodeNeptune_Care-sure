@@ -1,4 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { OtpFormProps } from "@/src/types/auth";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -91,7 +92,16 @@ export const OtpForm: React.FC<OtpFormProps> = ({
         })}
 
         <TextInput
-          ref={inputRef}
+          ref={(el) => {
+            applyDigitsOnlyFilter(el);
+            if (inputRef) {
+              if (typeof inputRef === 'function') {
+                inputRef(el);
+              } else {
+                (inputRef as React.MutableRefObject<TextInput | null>).current = el;
+              }
+            }
+          }}
           value={otp}
           selection={selection}
           onChangeText={onOtpChange}

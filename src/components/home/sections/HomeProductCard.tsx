@@ -22,7 +22,7 @@ interface Props {
   disableCart?: boolean;
 }
 
-export const HomeProductCard: React.FC<Props> = ({
+export const HomeProductCard: React.FC<Props> = React.memo(({
   item,
   cardWidth,
   cardHeight,
@@ -237,4 +237,5 @@ export const HomeProductCard: React.FC<Props> = ({
       </View>
     </View>
   );
-};
+});
+HomeProductCard.displayName = "HomeProductCard";

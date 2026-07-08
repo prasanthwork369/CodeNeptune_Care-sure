@@ -25,7 +25,8 @@ export const sanitize = {
         if (digits.length > 2) formatted = `${digits.slice(0, 2)}-${digits.slice(2)}`;
         if (digits.length > 4) formatted = `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4, 8)}`;
         return formatted.slice(0, 10);
-    }
+    },
+    money: (raw: string) => raw.replace(REGEX.digitsOnly, '').replace(/^0+/, ''),
 };
 
 // ─── Display formatters ───────────────────────────────────────────────────────

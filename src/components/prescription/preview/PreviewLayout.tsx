@@ -4,28 +4,32 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES, MAX_SIZE_BYTES, validatePrescriptionFile } from "@/src/utils/prescription";
+import {
+    MAX_FILES,
+    MAX_SIZE_BYTES,
+    validatePrescriptionFile,
+} from "@/src/utils/prescription";
+import { useFocusEffect } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
-  DuplicateFileModal,
-  FileTooLargeModal,
-  InfoModal,
-  PendingPrescriptionModal,
-  PreviewDisplay,
-  PreviewSuccessModal,
-  PreviewThumbnails,
-  RemoveConfirmModal,
+    DuplicateFileModal,
+    FileTooLargeModal,
+    InfoModal,
+    PendingPrescriptionModal,
+    PreviewDisplay,
+    PreviewSuccessModal,
+    PreviewThumbnails,
+    RemoveConfirmModal,
 } from "./sections";
 
 const FOLDER = "customers/prescriptions";
@@ -93,7 +97,9 @@ export const PreviewLayout: React.FC = () => {
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [duplicateFileName, setDuplicateFileName] = useState("");
-  const [duplicateFileSize, setDuplicateFileSize] = useState<number | undefined>(undefined);
+  const [duplicateFileSize, setDuplicateFileSize] = useState<
+    number | undefined
+  >(undefined);
   const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
   const [infoModal, setInfoModal] = useState<{
     title: string;
@@ -116,10 +122,13 @@ export const PreviewLayout: React.FC = () => {
   // warning instead of leaving (and silently dropping the draft) unprompted.
   useFocusEffect(
     useCallback(() => {
-      const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-        handleBackPress();
-        return true;
-      });
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          handleBackPress();
+          return true;
+        },
+      );
       return () => subscription.remove();
     }, [handleBackPress]),
   );
@@ -133,7 +142,11 @@ export const PreviewLayout: React.FC = () => {
     const newItems: PrescriptionItem[] = [];
     const currentItems = usePrescriptionDraftStore.getState().items;
     for (const asset of assets) {
-      const item = await validatePrescriptionFile(asset, showInfo, setTooLargeSizeMB);
+      const item = await validatePrescriptionFile(
+        asset,
+        showInfo,
+        setTooLargeSizeMB,
+      );
       if (!item) continue;
       const isDuplicate =
         currentItems.some(
@@ -170,8 +183,7 @@ export const PreviewLayout: React.FC = () => {
 
   const pickImages = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         showPermissionAlert("photo library", showInfo);
         return;
@@ -190,6 +202,11 @@ export const PreviewLayout: React.FC = () => {
 
   const pickPdfs = async () => {
     try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        showPermissionAlert("photo library", showInfo);
+        return;
+      }
       const result = await DocumentPicker.getDocumentAsync({
         type: ["application/pdf"],
         copyToCacheDirectory: true,

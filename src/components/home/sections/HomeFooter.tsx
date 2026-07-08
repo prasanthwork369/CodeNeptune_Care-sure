@@ -114,10 +114,11 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
         ) : null}
 
         <View
-          className="flex-row justify-between items-start w-full px-5 "
+          className="flex-row justify-between items-start w-full px-5"
           style={{
             marginTop: footerImageUrl ? -exactScale(50) : 0,
             marginBottom: exactScale(20),
+            paddingTop: exactScale(10),
           }}
         >
           {(appContent.footer?.labels ?? []).map((label, idx) => {

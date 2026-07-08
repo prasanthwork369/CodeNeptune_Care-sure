@@ -65,7 +65,7 @@ export const styles = StyleSheet.create({
   },
   sectionSubtitle: {
     fontWeight: "700",
-    fontSize: moderateScale(20),
+    fontSize: moderateScale(22),
     lineHeight: moderateScale(30),
     color: "#0F7635",
     letterSpacing: 0,

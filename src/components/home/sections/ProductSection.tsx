@@ -1,8 +1,8 @@
 import { HomeProductCard } from './HomeProductCard';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Product } from '@/src/types/home';
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -43,6 +43,35 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
     const cardWidth = exactScale(164);
     const imageSize = cardWidth * 0.69;
     const cardHeight = imageSize * 1.5 + 160;
+    const gap = exactScale(14);
+
+    const renderProduct = useCallback(
+        ({ item }: { item: Product }) => (
+            <HomeProductCard
+                item={item}
+                cardWidth={cardWidth}
+                cardHeight={cardHeight}
+                imageSize={imageSize}
+                badgeBgColor={badgeBgColor}
+                badgeTextColor={badgeTextColor}
+                detailsBgColor={detailsBgColor}
+                buttonColor={subtitleColor}
+                onPress={onProductPress}
+                disableCart={disableCart}
+            />
+        ),
+        [
+            badgeBgColor,
+            badgeTextColor,
+            cardHeight,
+            cardWidth,
+            detailsBgColor,
+            disableCart,
+            imageSize,
+            onProductPress,
+            subtitleColor,
+        ],
+    );
 
     return (
         <View className="mb-6">
@@ -84,28 +113,22 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 </View>
 
                 {/* Product Cards */}
-                <ScrollView
+                <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
+                    data={products}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderProduct}
+                    removeClippedSubviews
+                    initialNumToRender={3}
+                    maxToRenderPerBatch={3}
+                    windowSize={5}
+                    nestedScrollEnabled
+                    directionalLockEnabled
                     style={{ height: cardHeight }}
-                    contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40), gap: exactScale(14) }}
-                >
-                    {products.map((item) => (
-                        <HomeProductCard
-                            key={item.id}
-                            item={item}
-                            cardWidth={cardWidth}
-                            cardHeight={cardHeight}
-                            imageSize={imageSize}
-                            badgeBgColor={badgeBgColor}
-                            badgeTextColor={badgeTextColor}
-                            detailsBgColor={detailsBgColor}
-                            buttonColor={subtitleColor}
-                            onPress={onProductPress}
-                            disableCart={disableCart}
-                        />
-                    ))}
-                </ScrollView>
+                    contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40) }}
+                    ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                />
             </View>
         </View>
     );

@@ -148,7 +148,6 @@ export const ProfileLayout: React.FC = () => {
         onSelectCamera={handleSelectCamera}
         onSelectLibrary={handleSelectLibrary}
       />
-
     </View>
   );
 };

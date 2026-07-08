@@ -57,7 +57,7 @@ export const useOtpInput = (onComplete: (code: string) => void) => {
     } else {
       setSelection({ start: otp.length, end: otp.length });
     }
-    const input = inputRef.current;
+    const input = inputRef?.current;
     if (!input) return;
     if (Keyboard.isVisible()) {
       input.focus();

@@ -2,9 +2,9 @@ import { useCartActions } from '@/src/hooks/useCartActions';
 import type { SubstituteProduct } from '@/src/types/home';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ActivityIndicator, Animated, Text, View } from 'react-native';
-import { styles as s, IMG_SIZE } from './FrequentSubstitutes.styles';
+import { styles as s } from './FrequentSubstitutes.styles';
 import { exactScale } from "@/src/utils/exactScale";
 
 interface FrequentSubstitutesProps {
@@ -14,7 +14,9 @@ interface FrequentSubstitutesProps {
     disableCart?: boolean;
 }
 
-const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteProduct; onProductPress?: (id: string) => void; disableCart?: boolean }) => {
+const HOME_PREVIEW_LIMIT = 4;
+
+const FrequentItem = React.memo(({ item, onProductPress, disableCart }: { item: SubstituteProduct; onProductPress?: (id: string) => void; disableCart?: boolean }) => {
     const { count, increment, decrement, isPending, animations } = useCartActions({
         medicineId: item.id,
         variantId: null,
@@ -107,9 +109,15 @@ const FrequentItem = ({ item, onProductPress, disableCart }: { item: SubstituteP
             )}
         </View>
     );
-};
+});
+FrequentItem.displayName = 'FrequentItem';
 
 export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> = React.memo(({ substitutes, onProductPress, onViewAll, disableCart }) => {
+    const visibleSubstitutes = useMemo(
+        () => substitutes.slice(0, HOME_PREVIEW_LIMIT),
+        [substitutes],
+    );
+
     return (
         <View className="px-4">
             <View className="flex-row justify-between items-center mb-4">
@@ -119,7 +127,7 @@ export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> = React.mem
                 </Touchable>
             </View>
             <View className="gap-y-4">
-                {substitutes.map((item, index) => (
+                {visibleSubstitutes.map((item, index) => (
                     <FrequentItem key={`${item.productId ?? item.id}-${index}`} item={item} onProductPress={onProductPress} disableCart={disableCart} />
                 ))}
             </View>
