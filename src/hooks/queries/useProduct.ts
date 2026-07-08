@@ -33,7 +33,7 @@ export const useProduct = (productId: string) => {
         requiresPrescription: data.requiresPrescription,
         manufacturer: data.manufacturer?.name ?? data.brand?.name ?? '',
         brandName: data.brand?.name ?? '',
-        description: data.description ?? `${data.dosageForm} | ${data.packSize.trim()}`,
+        description: data.description ?? `${data.dosageForm} | ${String(data.packSize ?? '').trim()}`,
         dosageForm: data.dosageForm,
         packSize: packSizeNum,
         packLabel: formatPackLabel({ packSize: data.packSize, unit: data.unit, dosageForm: data.dosageForm }),

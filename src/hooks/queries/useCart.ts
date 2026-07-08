@@ -19,8 +19,6 @@ export const useCart = () => {
         queryFn: cartService.getCart,
         enabled: isAuthenticated,
         staleTime: 0,
-        refetchInterval: 15_000,
-        refetchIntervalInBackground: false,
     });
 
     const addItemMutation = useMutation({

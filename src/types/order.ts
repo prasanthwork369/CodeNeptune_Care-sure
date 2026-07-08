@@ -69,6 +69,7 @@ export interface OrderItem {
   id: string;
   orderId: string;
   medicineId: string;
+  productId?: string;
   medicineSnapshot?: MedicineSnapshot;
   quantity: number;
   unitPrice?: string;

@@ -46,7 +46,6 @@ export const usePrescriptionBanner = () => {
       ? {
           limit: RECENT_PRESCRIPTIONS_LIMIT,
           sortOrder: "desc",
-          refetchInterval: 3000,
           category: PRESCRIPTION_CATEGORY.ORDER,
         }
       : {},

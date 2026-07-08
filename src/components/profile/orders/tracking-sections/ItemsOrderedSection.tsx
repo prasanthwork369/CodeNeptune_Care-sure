@@ -101,8 +101,9 @@ export function ItemsOrderedSection({
             activeOpacity={0.7}
             onPress={() => {
               const productId =
-                item.medicineSnapshot?.productId ??
-                item.medicineSnapshot?.slug ??
+                item.productId ||
+                item.medicineSnapshot?.productId ||
+                item.medicineSnapshot?.slug ||
                 item.medicineId;
               if (productId)
                 router.push({

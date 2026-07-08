@@ -211,8 +211,13 @@ export const medicineApi = {
         return response.data?.data ?? [];
     },
     getProductById: async (productId: string): Promise<ApiProductDetail> => {
-        const response = await apiClient.get(API_ENDPOINTS.PRODUCT_BY_ID(productId));
-        return response.data.data;
+        try {
+            const response = await apiClient.get(API_ENDPOINTS.PRODUCT_BY_ID(productId));
+            return response.data.data;
+        } catch {
+            const response = await apiClient.get(`/api/v1/medicines/${productId}`);
+            return response.data.data;
+        }
     },
     getProductByCatalogId: async (catalogId: string): Promise<ApiProductDetail> => {
         // catalogId is the alphanumeric productId (e.g. "CS-BDSMYG"), not the UUID id field
