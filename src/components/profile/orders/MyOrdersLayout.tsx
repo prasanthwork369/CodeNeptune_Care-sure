@@ -1,9 +1,10 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { useCart } from "@/src/hooks/queries/useCart";
 import { useOrders } from "@/src/hooks/queries/useOrders";
 import { Order, OrderTabKey } from "@/src/types/order";
 import { FlashList } from "@shopify/flash-list";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { RefreshControl, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { MyOrdersSkeleton } from "./MyOrdersSkeleton";
@@ -34,9 +35,21 @@ export const MyOrdersLayout: React.FC = () => {
     refetch,
   } = useOrders(statusParam);
 
+  const { items: cartItems, addItem, updateItem, clearCart } = useCart();
+  const cartItemsRef = useRef(cartItems);
+  cartItemsRef.current = cartItems;
+
   const renderItem = useCallback(
-    ({ item }: { item: Order }) => <OrderCard order={item} />,
-    [],
+    ({ item }: { item: Order }) => (
+      <OrderCard
+        order={item}
+        cartItemsRef={cartItemsRef}
+        addItem={addItem}
+        updateItem={updateItem}
+        clearCart={clearCart}
+      />
+    ),
+    [addItem, updateItem, clearCart],
   );
   const keyExtractor = useCallback((item: Order) => item.id, []);
 
@@ -103,6 +116,8 @@ export const MyOrdersLayout: React.FC = () => {
           data={filtered}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          drawDistance={300}
+          overrideProps={{ initialDrawBatchSize: 8 }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingTop: 12,

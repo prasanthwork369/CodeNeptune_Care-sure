@@ -18,12 +18,14 @@ import {
   BottomSheetScrollView,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Keyboard,
   Linking,
+  Platform,
   Text,
   View,
 } from "react-native";
@@ -44,10 +46,28 @@ interface GooglePrediction {
 const labelToIcon = (label: string) => {
   const l = label.toUpperCase();
   if (l === "HOME")
-    return <icons.home_add width={exactScale(16)} height={exactScale(16)} fill="#0F7635" />;
+    return (
+      <icons.home_add
+        width={exactScale(16)}
+        height={exactScale(16)}
+        fill="#0F7635"
+      />
+    );
   if (l === "WORK" || l === "OFFICE")
-    return <icons.business width={exactScale(16)} height={exactScale(16)} fill="#0F7635" />;
-  return <icons.location_pin width={exactScale(16)} height={exactScale(16)} fill="#0F7635" />;
+    return (
+      <icons.business
+        width={exactScale(16)}
+        height={exactScale(16)}
+        fill="#0F7635"
+      />
+    );
+  return (
+    <icons.location_pin
+      width={exactScale(16)}
+      height={exactScale(16)}
+      fill="#0F7635"
+    />
+  );
 };
 
 export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
@@ -93,7 +113,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
 
     setIsSearching(true);
     const controller = new AbortController();
-    
+
     const fetchPlaces = async () => {
       try {
         const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${mapsApiKey}&components=country:in&types=geocode|establishment`;
@@ -146,7 +166,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       const json = await res.json();
 
       if (json.status !== "OK" || !json.result) {
-        showToast("Could not fetch location details. Please try again.", "error");
+        showToast(
+          "Could not fetch location details. Please try again.",
+          "error",
+        );
         return;
       }
 
@@ -156,16 +179,18 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
 
       const streetNumber = get("street_number");
       const route = get("route");
-      const sublocality = get("sublocality_level_1") || get("sublocality") || get("neighborhood");
+      const sublocality =
+        get("sublocality_level_1") || get("sublocality") || get("neighborhood");
       const city =
-        get("locality") ||
-        get("administrative_area_level_2") ||
-        sublocality;
+        get("locality") || get("administrative_area_level_2") || sublocality;
       const state = get("administrative_area_level_1");
       const pincode = get("postal_code").replace(/\D/g, "").slice(0, 6);
 
       if (!pincode || !/^\d{6}$/.test(pincode)) {
-        showToast("Could not find a valid pincode for this location.", "warning");
+        showToast(
+          "Could not find a valid pincode for this location.",
+          "warning",
+        );
         return;
       }
 
@@ -208,6 +233,24 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     });
   };
 
+  const openLocationSettings = async () => {
+    try {
+      if (Platform.OS === "android" && (Linking as any).sendIntent) {
+        // Open the Android Location source settings directly.
+        try {
+          await (Linking as any).sendIntent(
+            "android.settings.LOCATION_SOURCE_SETTINGS",
+          );
+          return;
+        } catch {}
+      }
+    } catch {}
+    // Fallback to opening app settings.
+    try {
+      await Linking.openSettings();
+    } catch {}
+  };
+
   const handleSelectAddress = async (addr: Address) => {
     if (!addr.pincode) {
       showToast("This address is missing a pincode.", "warning");
@@ -226,7 +269,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     const { location, addressId, pincode } = addressToLocation(addr);
     setLocation(location, { addressId, pincode });
     onSelect?.(addr.label, location.city, addr);
-    showToast(`Delivery location set to ${addr.city} - ${addr.pincode}`, "success");
+    showToast(
+      `Delivery location set to ${addr.city} - ${addr.pincode}`,
+      "success",
+    );
     handleClose();
   };
 
@@ -234,30 +280,58 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     if (isLocating) return;
     setIsLocating(true);
     try {
-      const { granted, canAskAgain } = await locationService.requestPermission();
+      // This is a user-initiated action so allow the OS dialog to appear.
+      const { granted, canAskAgain } = await locationService.requestPermission({
+        interactive: true,
+      });
+      console.debug("LocationBottomSheet: permission result", {
+        granted,
+        canAskAgain,
+      });
       if (!granted) {
+        console.debug(
+          "LocationBottomSheet: permission denied; canAskAgain=",
+          canAskAgain,
+        );
+        if (!canAskAgain) {
+          // Permission is permanently denied — go straight to Settings so
+          // the user can re-enable it. This avoids repeated useless taps.
+          try {
+            console.debug(
+              "LocationBottomSheet: opening settings due to permanent denial",
+            );
+            await openLocationSettings();
+          } catch {}
+          return;
+        }
         Alert.alert(
           "Location access needed",
-          canAskAgain
-            ? "Allow location access while you use the app to auto-fill your delivery address."
-            : "Location access is turned off. Enable it in Settings to use this feature.",
-          canAskAgain
-            ? [{ text: "OK" }]
-            : [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Open Settings",
-                  onPress: () => Linking.openSettings(),
-                },
-              ],
+          "Allow location access while you use the app to auto-fill your delivery address.",
+          [{ text: "OK" }],
         );
         return;
       }
-      const place = await locationService.getCurrentPlace();
+      const result = await locationService.getCurrentPlace();
+      console.debug("LocationBottomSheet: getCurrentPlace result", result);
+      const place = result.place;
       if (!place) {
+        // If the underlying failure indicates services are disabled,
+        // show the Enable GPS alert. Otherwise show a generic failure.
+        if (result.error?.code === "SERVICES_DISABLED") {
+          Alert.alert(
+            "Location services are off",
+            "Please enable location services (GPS) to auto-detect your address.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Enable GPS", onPress: () => openLocationSettings() },
+            ],
+          );
+          return;
+        }
         Alert.alert(
           "Could not fetch location",
-          "Please check that location services are enabled and try again.",
+          result.error?.message ||
+            "Please check that location services are enabled and try again.",
         );
         return;
       }
@@ -267,6 +341,26 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       if (place.city) params.prefill_city = place.city;
       if (place.state) params.prefill_state = place.state;
       if (place.pincode) params.prefill_pincode = place.pincode;
+      // Persist last-known location for fast startup and header rendering.
+      try {
+        await AsyncStorage.setItem(
+          "@caresure:last_known_location",
+          JSON.stringify({
+            location: {
+              label: place.city,
+              city: place.city,
+              shortCity: place.city,
+              pincode: place.pincode,
+            },
+            coords: place.coords,
+            pincode: place.pincode,
+          }),
+        );
+        try {
+          await AsyncStorage.removeItem("@caresure:gps_prompt_not_now");
+        } catch {}
+      } catch {}
+
       handleClose();
       setTimeout(() => {
         router.push({ pathname: "/profile/addresses/add" as any, params });
@@ -297,14 +391,24 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       style={{ zIndex: 999 }}
     >
       <View
-        style={{ paddingHorizontal: exactScale(20), paddingTop: exactScale(10), paddingBottom: exactScale(10) }}
+        style={{
+          paddingHorizontal: exactScale(20),
+          paddingTop: exactScale(10),
+          paddingBottom: exactScale(10),
+        }}
       >
-        <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(16), marginBottom: exactScale(20) }}>
+        <Text
+          className="font-inter-bold text-brand-text"
+          style={{ fontSize: moderateScale(16), marginBottom: exactScale(20) }}
+        >
           Change Location
         </Text>
 
         {/* Search Box */}
-        <View className="flex-row items-center" style={{ gap: exactScale(12), marginBottom: exactScale(16) }}>
+        <View
+          className="flex-row items-center"
+          style={{ gap: exactScale(12), marginBottom: exactScale(16) }}
+        >
           <View
             style={{
               flex: 1,
@@ -324,7 +428,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
             {isSearching ? (
               <ActivityIndicator size="small" color="#0F7635" />
             ) : (
-              <icons.search_grey width={exactScale(18)} height={exactScale(18)} />
+              <icons.search_grey
+                width={exactScale(18)}
+                height={exactScale(18)}
+              />
             )}
             <BottomSheetTextInput
               ref={inputRef}
@@ -336,7 +443,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               placeholder="Search for area, street name"
               placeholderTextColor="#6A6A6A"
               className="flex-1 font-inter text-brand-text"
-              style={{ marginLeft: exactScale(12), fontSize: moderateScale(14) }}
+              style={{
+                marginLeft: exactScale(12),
+                fontSize: moderateScale(14),
+              }}
               onFocus={() => {
                 setIsSearchFocused(true);
               }}
@@ -350,9 +460,18 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                   setSearchQuery("");
                   setPredictions([]);
                 }}
-                hitSlop={{ top: exactScale(8), bottom: exactScale(8), left: exactScale(8), right: exactScale(8) }}
+                hitSlop={{
+                  top: exactScale(8),
+                  bottom: exactScale(8),
+                  left: exactScale(8),
+                  right: exactScale(8),
+                }}
               >
-                <icons.close_dark width={exactScale(14)} height={exactScale(14)} fill="#222222" />
+                <icons.close_dark
+                  width={exactScale(14)}
+                  height={exactScale(14)}
+                  fill="#222222"
+                />
               </Touchable>
             )}
           </View>
@@ -360,25 +479,50 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
 
         {/* Current location + Add new — hidden while searching or focused */}
         {!inputValue && !isSearchFocused && (
-          <View className="flex-row" style={{ gap: exactScale(12), marginBottom: exactScale(8) }}>
+          <View
+            className="flex-row"
+            style={{ gap: exactScale(12), marginBottom: exactScale(8) }}
+          >
             <Touchable
               onPress={handleUseCurrentLocation}
               disabled={isLocating}
               className="flex-1 flex-row items-center border border-[#919EAB33] bg-white"
-              style={{ borderRadius: exactScale(16), paddingHorizontal: exactScale(14), paddingVertical: exactScale(16) }}
+              style={{
+                borderRadius: exactScale(16),
+                paddingHorizontal: exactScale(14),
+                paddingVertical: exactScale(16),
+              }}
             >
-              <View className="items-center justify-center" style={{ width: exactScale(40), height: exactScale(40), borderRadius: exactScale(20), backgroundColor: "#ECFDF5" }}>
+              <View
+                className="items-center justify-center"
+                style={{
+                  width: exactScale(40),
+                  height: exactScale(40),
+                  borderRadius: exactScale(20),
+                  backgroundColor: "#ECFDF5",
+                }}
+              >
                 {isLocating ? (
                   <ActivityIndicator size="small" color="#059669" />
                 ) : (
-                  <icons.my_location width={exactScale(21)} height={exactScale(21)} fill="#059669" />
+                  <icons.my_location
+                    width={exactScale(21)}
+                    height={exactScale(21)}
+                    fill="#059669"
+                  />
                 )}
               </View>
               <View style={{ marginLeft: exactScale(12) }}>
-                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
+                <Text
+                  className="font-inter-semibold text-brand-text leading-tight"
+                  style={{ fontSize: moderateScale(15) }}
+                >
                   {isLocating ? "Fetching" : "Use Current"}
                 </Text>
-                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
+                <Text
+                  className="font-inter-semibold text-brand-text leading-tight"
+                  style={{ fontSize: moderateScale(15) }}
+                >
                   Location
                 </Text>
               </View>
@@ -386,16 +530,38 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
             <Touchable
               onPress={handleAddNewAddress}
               className="flex-1 flex-row items-center border border-[#919EAB33] bg-white"
-              style={{ borderRadius: exactScale(16), paddingHorizontal: exactScale(14), paddingVertical: exactScale(16) }}
+              style={{
+                borderRadius: exactScale(16),
+                paddingHorizontal: exactScale(14),
+                paddingVertical: exactScale(16),
+              }}
             >
-              <View className="items-center justify-center" style={{ width: exactScale(40), height: exactScale(40), borderRadius: exactScale(20), backgroundColor: "#ECFDF5" }}>
-                <icons.add_circle width={exactScale(21)} height={exactScale(21)} fill="#059669" />
+              <View
+                className="items-center justify-center"
+                style={{
+                  width: exactScale(40),
+                  height: exactScale(40),
+                  borderRadius: exactScale(20),
+                  backgroundColor: "#ECFDF5",
+                }}
+              >
+                <icons.add_circle
+                  width={exactScale(21)}
+                  height={exactScale(21)}
+                  fill="#059669"
+                />
               </View>
               <View style={{ marginLeft: exactScale(12) }}>
-                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
+                <Text
+                  className="font-inter-semibold text-brand-text leading-tight"
+                  style={{ fontSize: moderateScale(15) }}
+                >
                   Add New
                 </Text>
-                <Text className="font-inter-semibold text-brand-text leading-tight" style={{ fontSize: moderateScale(15) }}>
+                <Text
+                  className="font-inter-semibold text-brand-text leading-tight"
+                  style={{ fontSize: moderateScale(15) }}
+                >
                   Addresses
                 </Text>
               </View>
@@ -404,7 +570,13 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         )}
 
         {!showPredictions && (
-          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(15), marginBottom: exactScale(16) }}>
+          <Text
+            className="font-inter-bold text-brand-text"
+            style={{
+              fontSize: moderateScale(15),
+              marginBottom: exactScale(16),
+            }}
+          >
             Your Saved Addresses
           </Text>
         )}
@@ -423,9 +595,18 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         {/* Predictions list */}
         {showPredictions ? (
           isSearching && predictions.length === 0 ? (
-            <ActivityIndicator color="#0F7635" style={{ marginVertical: exactScale(24) }} />
+            <ActivityIndicator
+              color="#0F7635"
+              style={{ marginVertical: exactScale(24) }}
+            />
           ) : (
-            <View className="border border-[#919EAB33] bg-white" style={{ borderRadius: exactScale(8), paddingHorizontal: exactScale(16) }}>
+            <View
+              className="border border-[#919EAB33] bg-white"
+              style={{
+                borderRadius: exactScale(8),
+                paddingHorizontal: exactScale(16),
+              }}
+            >
               {predictions.map((p, index) => (
                 <Touchable
                   key={p.place_id}
@@ -444,16 +625,34 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                   }
                   className="flex-row items-start"
                 >
-                  <View style={{ marginTop: exactScale(2), marginRight: exactScale(12) }}>
-                    <icons.location_on width={exactScale(20)} height={exactScale(20)} fill="#1A1C1E" />
+                  <View
+                    style={{
+                      marginTop: exactScale(2),
+                      marginRight: exactScale(12),
+                    }}
+                  >
+                    <icons.location_on
+                      width={exactScale(20)}
+                      height={exactScale(20)}
+                      fill="#1A1C1E"
+                    />
                   </View>
                   <View className="flex-1">
-                    <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(15), marginBottom: exactScale(4) }}>
+                    <Text
+                      className="font-inter-semibold text-brand-text"
+                      style={{
+                        fontSize: moderateScale(15),
+                        marginBottom: exactScale(4),
+                      }}
+                    >
                       {p.mainText}
                     </Text>
                     <Text
                       className="font-inter-regular text-brand-subtext"
-                      style={{ fontSize: moderateScale(13), lineHeight: moderateScale(20) }}
+                      style={{
+                        fontSize: moderateScale(13),
+                        lineHeight: moderateScale(20),
+                      }}
                       numberOfLines={2}
                     >
                       {p.description}
@@ -465,9 +664,18 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           )
         ) : /* Saved addresses */
         addressesLoading ? (
-          <ActivityIndicator color="#0F7635" style={{ marginVertical: exactScale(24) }} />
+          <ActivityIndicator
+            color="#0F7635"
+            style={{ marginVertical: exactScale(24) }}
+          />
         ) : addresses.length === 0 ? (
-          <Text className="font-inter-medium text-brand-subtext text-center" style={{ fontSize: moderateScale(13), paddingVertical: exactScale(24) }}>
+          <Text
+            className="font-inter-medium text-brand-subtext text-center"
+            style={{
+              fontSize: moderateScale(13),
+              paddingVertical: exactScale(24),
+            }}
+          >
             No saved addresses yet
           </Text>
         ) : (
@@ -498,11 +706,24 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                 }}
               >
                 {isSelected && (
-                  <View style={{ position: "absolute", top: exactScale(14), right: exactScale(14) }}>
-                    <icons.check_circle width={exactScale(20)} height={exactScale(20)} fill="#0F7635" />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: exactScale(14),
+                      right: exactScale(14),
+                    }}
+                  >
+                    <icons.check_circle
+                      width={exactScale(20)}
+                      height={exactScale(20)}
+                      fill="#0F7635"
+                    />
                   </View>
                 )}
-                <View className="flex-row items-center" style={{ marginBottom: exactScale(12) }}>
+                <View
+                  className="flex-row items-center"
+                  style={{ marginBottom: exactScale(12) }}
+                >
                   <View
                     className="items-center justify-center"
                     style={{
@@ -514,18 +735,40 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
                   >
                     {labelToIcon(addr.label)}
                   </View>
-                  <Text className="font-inter-semibold text-brand-text capitalize" style={{ marginLeft: exactScale(12), fontSize: moderateScale(14) }}>
+                  <Text
+                    className="font-inter-semibold text-brand-text capitalize"
+                    style={{
+                      marginLeft: exactScale(12),
+                      fontSize: moderateScale(14),
+                    }}
+                  >
                     {addr.label.charAt(0) + addr.label.slice(1).toLowerCase()}
                   </Text>
                   {addr.isDefault && (
-                    <View className="bg-[#ECFDF5] rounded-full" style={{ marginLeft: exactScale(8), paddingHorizontal: exactScale(8), paddingVertical: exactScale(2) }}>
-                      <Text className="font-inter-semibold text-[#0F7635]" style={{ fontSize: moderateScale(11) }}>
+                    <View
+                      className="bg-[#ECFDF5] rounded-full"
+                      style={{
+                        marginLeft: exactScale(8),
+                        paddingHorizontal: exactScale(8),
+                        paddingVertical: exactScale(2),
+                      }}
+                    >
+                      <Text
+                        className="font-inter-semibold text-[#0F7635]"
+                        style={{ fontSize: moderateScale(11) }}
+                      >
                         Default
                       </Text>
                     </View>
                   )}
                 </View>
-                <Text className="font-inter text-brand-subtext" style={{ fontSize: typography.body.fontSize, lineHeight: typography.body.lineHeight }}>
+                <Text
+                  className="font-inter text-brand-subtext"
+                  style={{
+                    fontSize: typography.body.fontSize,
+                    lineHeight: typography.body.lineHeight,
+                  }}
+                >
                   {fullAddress}
                 </Text>
               </Touchable>

@@ -13,105 +13,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { resolveAssetUrl } from "@/src/utils/urls";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   ScrollView,
   Text,
   TextInput,
   View,
 } from "react-native";
-
-interface ReasonConfig {
-  icon: any;
-  bgColor: string;
-  iconColor: string;
-  defaultDescription: string;
-}
-
-const REASON_CONFIGS: Record<string, ReasonConfig> = {
-  "order by mistake": {
-    icon: icons.cancel_mistake,
-    bgColor: "#EAF7EE",
-    iconColor: "#0F7635",
-    defaultDescription: "I placed this order by mistake",
-  },
-  "found better price elsewhere": {
-    icon: icons.cancel_better_price,
-    bgColor: "#EEF4FF",
-    iconColor: "#3B82F6",
-    defaultDescription: "I found a better price",
-  },
-  "delivery time is too long": {
-    icon: icons.cancel_delivery_long,
-    bgColor: "#FFF3E6",
-    iconColor: "#F97316",
-    defaultDescription: "Delivery is longer than expected",
-  },
-  "no longer needed": {
-    icon: icons.cancel_no_longer_needed,
-    bgColor: "#F5F3FF",
-    iconColor: "#8B5CF6",
-    defaultDescription: "I no longer need these medicines",
-  },
-  "item(s) not required": {
-    icon: icons.cancel_item_not_required,
-    bgColor: "#FEF9C3",
-    iconColor: "#CA8A04",
-    defaultDescription: "I want to remove some or all item",
-  },
-  "item not required": {
-    icon: icons.cancel_item_not_required,
-    bgColor: "#FEF9C3",
-    iconColor: "#CA8A04",
-    defaultDescription: "I want to remove some or all item",
-  },
-  "other reason": {
-    icon: icons.cancel_other_reason,
-    bgColor: "#F3F4F6",
-    iconColor: "#4B5563",
-    defaultDescription: "Something else",
-  },
-  other: {
-    icon: icons.cancel_other_reason,
-    bgColor: "#F3F4F6",
-    iconColor: "#4B5563",
-    defaultDescription: "Something else",
-  },
-  "customer request": {
-    icon: icons.cancel_mistake,
-    bgColor: "#EAF7EE",
-    iconColor: "#0F7635",
-    defaultDescription: "Customer no longer wants the order",
-  },
-  "wrong address": {
-    icon: icons.location_pin,
-    bgColor: "#EEF4FF",
-    iconColor: "#3B82F6",
-    defaultDescription: "Delivery address is incorrect or unreachable",
-  },
-  "duplicate order": {
-    icon: icons.cancel_item_not_required,
-    bgColor: "#FFF3E6",
-    iconColor: "#F97316",
-    defaultDescription: "Customer placed the same order twice",
-  },
-};
-
-function getReasonConfig(label: string) {
-  const normalized = label.toLowerCase().trim();
-  for (const key of Object.keys(REASON_CONFIGS)) {
-    if (normalized.includes(key) || key.includes(normalized)) {
-      return REASON_CONFIGS[key];
-    }
-  }
-  return {
-    icon: icons.cancel_other_reason,
-    bgColor: "#F3F4F6",
-    iconColor: "#4B5563",
-    defaultDescription: "Something else",
-  };
-}
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const OTHER_OPTION = "__other__";
 
@@ -120,6 +32,8 @@ export function CancelOrderLayout() {
   const queryClient = useQueryClient();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const bottomInset = useAdjustedBottomInset();
+  const insets = useSafeAreaInsets();
+  const scrollRef = useRef<any>(null);
 
   const { order, loading: orderLoading } = useOrderById(orderId);
   const { data: reasons = [], isLoading: reasonsLoading } =
@@ -160,6 +74,9 @@ export function CancelOrderLayout() {
     setSelectedReasonId(id);
     setIsDropdownOpen(false);
     if (error) setError("");
+    if (id !== OTHER_OPTION) {
+      Keyboard.dismiss();
+    }
   };
 
   const closeAlert = () => {
@@ -224,10 +141,13 @@ export function CancelOrderLayout() {
   }
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
       <ScreenHeader title="Cancel Order" showBorder />
 
-      <ScrollView
+      <KeyboardAwareScrollView
+        ref={scrollRef}
+        keyboardDismissMode="on-drag"
+        bottomOffset={verticalScale(100)}
         contentContainerStyle={{
           paddingHorizontal: scale(20),
           paddingTop: verticalScale(24),
@@ -336,136 +256,139 @@ export function CancelOrderLayout() {
                     } as any);
                   }
 
-                  return displayReasons.map((reason) => {
-                    const isSelected = selectedReasonId === reason.id;
-                    const config = getReasonConfig(reason.label);
-                    const IconComponent = config.icon;
-
-                    return (
-                      <View key={reason.id} style={{ width: "100%" }}>
-                        <Touchable
-                          onPress={() => selectReason(reason.id)}
-                          activeOpacity={0.7}
-                          disabled={isCancelling}
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            paddingVertical: verticalScale(12),
-                            width: "100%",
-                          }}
+                  return (
+                    <>
+                      <View style={{ width: "100%", maxHeight: verticalScale(260) }}>
+                        <ScrollView
+                          nestedScrollEnabled={true}
+                          showsVerticalScrollIndicator={true}
+                          contentContainerStyle={{ width: "100%" }}
                         >
-                          {/* Icon container */}
-                          <View
-                            style={{
-                              width: scale(40),
-                              height: scale(40),
-                              borderRadius: scale(20),
-                              backgroundColor: reason.image_url ? undefined : config.bgColor,
-                              alignItems: "center",
-                              justifyContent: "center",
-                              marginRight: scale(12),
-                              overflow: "hidden",
-                            }}
-                          >
-                            {reason.image_url ? (
-                              <RemoteIcon
-                                uri={resolveAssetUrl(reason.image_url)}
-                                size={scale(40)}
-                                style={{ borderRadius: scale(20) }}
-                              />
-                            ) : (
-                              IconComponent && (
-                                <IconComponent
-                                  width={moderateScale(20, 0.3)}
-                                  height={moderateScale(20, 0.3)}
-                                  fill={config.iconColor}
-                                />
-                              )
-                            )}
-                          </View>
+                          {displayReasons.map((reason) => {
+                            const isSelected = selectedReasonId === reason.id;
 
-                          {/* Labels */}
-                          <View style={{ flex: 1, marginRight: scale(8) }}>
-                            <Text
-                              style={{
-                                fontSize: moderateScale(14, 0.3),
-                                fontWeight: "600",
-                                color: "#222222",
-                              }}
-                            >
-                              {reason.label}
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: moderateScale(12, 0.3),
-                                color: "#9CA3AF",
-                                marginTop: verticalScale(2),
-                              }}
-                            >
-                              {reason.description || config.defaultDescription}
-                            </Text>
-                          </View>
+                            return (
+                              <View key={reason.id} style={{ width: "100%" }}>
+                                <Touchable
+                                  onPress={() => selectReason(reason.id)}
+                                  activeOpacity={0.7}
+                                  disabled={isCancelling}
+                                  style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    paddingVertical: verticalScale(12),
+                                    width: "100%",
+                                  }}
+                                >
+                                  {/* Icon container */}
+                                  {!!reason.image_url && (
+                                    <View
+                                      style={{
+                                        width: scale(40),
+                                        height: scale(40),
+                                        borderRadius: scale(20),
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginRight: scale(12),
+                                        overflow: "hidden",
+                                      }}
+                                    >
+                                      <RemoteIcon
+                                        uri={resolveAssetUrl(reason.image_url)}
+                                        size={scale(40)}
+                                        style={{ borderRadius: scale(20) }}
+                                      />
+                                    </View>
+                                  )}
 
-                          {/* Radio circle */}
-                          <View
-                            style={{
-                              width: scale(22),
-                              height: scale(22),
-                              borderRadius: scale(11),
-                              borderWidth: 1.5,
-                              borderColor: isSelected ? "#0F7635" : "#D1D5DB",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              backgroundColor: "#fff",
-                            }}
-                          >
-                            {isSelected && (
-                              <View
-                                style={{
-                                  width: scale(12),
-                                  height: scale(12),
-                                  borderRadius: scale(6),
-                                  backgroundColor: "#0F7635",
-                                }}
-                              />
-                            )}
-                          </View>
-                        </Touchable>
+                                  {/* Labels */}
+                                  <View style={{ flex: 1, marginRight: scale(8) }}>
+                                    <Text
+                                      style={{
+                                        fontSize: moderateScale(14, 0.3),
+                                        fontWeight: "600",
+                                        color: "#222222",
+                                      }}
+                                    >
+                                      {reason.label}
+                                    </Text>
+                                    {!!reason.description && (
+                                      <Text
+                                        style={{
+                                          fontSize: moderateScale(12, 0.3),
+                                          color: "#9CA3AF",
+                                          marginTop: verticalScale(2),
+                                        }}
+                                      >
+                                        {reason.description}
+                                      </Text>
+                                    )}
+                                  </View>
 
-                        {/* If this specific option is selected and it is Other, show input field inside the card */}
-                        {isSelected && isOtherSelected && (
-                          <TextInput
-                            placeholder="Enter cancellation reason..."
-                            placeholderTextColor="#6A6A6A"
-                            value={otherReason}
-                            onChangeText={(value) => {
-                              setOtherReason(value);
-                              if (error && value.trim()) setError("");
-                            }}
-                            editable={!isCancelling}
-                            multiline
-                            numberOfLines={3}
-                            style={{
-                              width: "100%",
-                              minHeight: verticalScale(80),
-                              backgroundColor: "#fff",
-                              borderWidth: 1,
-                              borderColor: "#E5E7EB",
-                              borderRadius: scale(10),
-                              paddingHorizontal: scale(14),
-                              paddingVertical: verticalScale(12),
-                              fontWeight: "400",
-                              fontSize: moderateScale(13, 0.3),
-                              color: "#1A1C1E",
-                              textAlignVertical: "top",
-                              marginTop: verticalScale(4),
-                              marginBottom: verticalScale(12),
-                            }}
-                          />
-                        )}
+                                  {/* Radio circle */}
+                                  <View
+                                    style={{
+                                      width: scale(22),
+                                      height: scale(22),
+                                      borderRadius: scale(11),
+                                      borderWidth: 1.5,
+                                      borderColor: isSelected ? "#0F7635" : "#D1D5DB",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      backgroundColor: "#fff",
+                                    }}
+                                  >
+                                    {isSelected && (
+                                      <View
+                                        style={{
+                                          width: scale(12),
+                                          height: scale(12),
+                                          borderRadius: scale(6),
+                                          backgroundColor: "#0F7635",
+                                        }}
+                                      />
+                                    )}
+                                  </View>
+                                </Touchable>
+                              </View>
+                            );
+                          })}
+                        </ScrollView>
                       </View>
-                    );
-                  });
+
+                      {/* If Other is selected, show input field outside of the scrollable reasons list */}
+                      {isOtherSelected && (
+                        <TextInput
+                          placeholder="Enter cancellation reason..."
+                          placeholderTextColor="#6A6A6A"
+                          value={otherReason}
+                          onChangeText={(value) => {
+                            setOtherReason(value);
+                            if (error && value.trim()) setError("");
+                          }}
+                          editable={!isCancelling}
+                          multiline
+                          numberOfLines={3}
+                          style={{
+                            width: "100%",
+                            minHeight: verticalScale(80),
+                            backgroundColor: "#fff",
+                            borderWidth: 1,
+                            borderColor: "#E5E7EB",
+                            borderRadius: scale(10),
+                            paddingHorizontal: scale(14),
+                            paddingVertical: verticalScale(12),
+                            fontWeight: "400",
+                            fontSize: moderateScale(13, 0.3),
+                            color: "#1A1C1E",
+                            textAlignVertical: "top",
+                            marginTop: verticalScale(12),
+                            marginBottom: verticalScale(4),
+                          }}
+                        />
+                      )}
+                    </>
+                  );
                 })()}
               </View>
             )}
@@ -486,7 +409,7 @@ export function CancelOrderLayout() {
             )}
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Action button — Fixed Footer */}
       <View

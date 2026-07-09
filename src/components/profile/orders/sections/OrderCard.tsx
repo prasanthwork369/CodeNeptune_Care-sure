@@ -1,14 +1,22 @@
 import { AlreadyHaveItemsModal } from "@/src/components/prescription/AlreadyHaveItemsModal";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useCart } from "@/src/hooks/queries/useCart";
 import { useNav } from "@/src/hooks/useNav";
 import { Order, ORDER_STATUS } from "@/src/types/order";
+import { AddToCartInput, CartItem, UpdateCartItemInput } from "@/src/types/cart";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { orderStyles as s } from "../orders.styles";
+
+export interface OrderCardProps {
+  order: Order;
+  cartItemsRef: React.RefObject<CartItem[]>;
+  addItem: (input: AddToCartInput) => Promise<any>;
+  updateItem: (itemId: string, input: UpdateCartItemInput) => Promise<any>;
+  clearCart: () => Promise<any>;
+}
 
 const labelStyle = { letterSpacing: 0.6 };
 const valueStyle = { marginTop: 3 };
@@ -54,14 +62,19 @@ function formatDate(iso: string) {
   });
 }
 
-export const OrderCard = React.memo(function OrderCard({ order }: { order: Order }) {
+export const OrderCard = React.memo(function OrderCard({
+  order,
+  cartItemsRef,
+  addItem,
+  updateItem,
+  clearCart,
+}: OrderCardProps) {
   const router = useNav();
   const items = order.items ?? [];
   const thumbs = items.slice(0, 4);
   const extraCount = Math.max(0, items.length - 4);
   const showDetails = true;
 
-  const { items: cartItems, addItem, updateItem, clearCart } = useCart();
   const [isProceeding, setIsProceeding] = useState(false);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
 
@@ -71,9 +84,10 @@ export const OrderCard = React.memo(function OrderCard({ order }: { order: Order
     try {
       if (replace) await clearCart();
       const inputs = await buildCartInputs(items);
+      const currentCartItems = cartItemsRef.current ?? [];
       for (const input of inputs) {
         const existing = !replace
-          ? cartItems.find((c) => c.medicineId === input.medicineId)
+          ? currentCartItems.find((c) => c.medicineId === input.medicineId)
           : null;
         if (existing) {
           await updateItem(existing.id, {
@@ -93,7 +107,8 @@ export const OrderCard = React.memo(function OrderCard({ order }: { order: Order
   };
 
   const handleOrderAgain = () => {
-    if (cartItems.length > 0) {
+    const currentCartItems = cartItemsRef.current ?? [];
+    if (currentCartItems.length > 0) {
       setIsCartModalVisible(true);
     } else {
       addItemsToCart(false);

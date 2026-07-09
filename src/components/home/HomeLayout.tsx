@@ -35,12 +35,7 @@ import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import {
-  FlatList,
-  ListRenderItem,
-  RefreshControl,
-  View,
-} from "react-native";
+import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -92,7 +87,6 @@ export const HomeLayout: React.FC = () => {
     isRefreshing,
     onRefresh,
   } = useHomeData();
-
 
   const { callSupport, whatsappOrder } = useContactActions();
   const {
@@ -453,7 +447,9 @@ export const HomeLayout: React.FC = () => {
         onClose={() => setIsLocationSheetVisible(false)}
       />
 
-      <FloatingBannersCarousel isFocused={isScreenFocused && !isFeedScrolling} />
+      <FloatingBannersCarousel
+        isFocused={isScreenFocused && !isFeedScrolling}
+      />
     </View>
   );
 };
