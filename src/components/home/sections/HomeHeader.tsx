@@ -22,7 +22,7 @@ interface HomeHeaderProps {
   onPressLocation?: () => void;
 }
 
-export const HomeHeader: React.FC<HomeHeaderProps> = ({
+export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(({
   location,
   onPressLocation,
 }) => {
@@ -140,4 +140,5 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
       </View>
     </View>
   );
-};
+});
+HomeHeader.displayName = "HomeHeader";

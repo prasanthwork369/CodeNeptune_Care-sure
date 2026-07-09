@@ -6,6 +6,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { useNav } from '@/src/hooks/useNav';
 import { ApiBanner, CategoryCard } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
+import { useUIStore } from '@/src/store/uiStore';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import { CarouselDot } from '@/src/components/animations/carousel';
 import { exactScale } from "@/src/utils/exactScale";
@@ -58,10 +59,14 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banne
     const carouselRef = useRef<ICarouselInstance>(null);
     const progressShared = useSharedValue(0);
     const appActiveRef = useRef(true);
+    // Subscribed here (not passed as a prop) so the home feed doesn't re-render
+    // on every scroll start/stop — only this carousel reacts to pause autoplay.
+    const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
+    const autoplayActive = isVisible && !isFeedScrolling;
 
     // Manual autoplay — bypasses the unreliable autoPlay prop in v4
     useEffect(() => {
-        if (banners.length <= 1 || !isVisible) return;
+        if (banners.length <= 1 || !autoplayActive) return;
         const sub = AppState.addEventListener('change', (s: AppStateStatus) => {
             appActiveRef.current = s === 'active';
         });
@@ -69,7 +74,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banne
             if (appActiveRef.current) carouselRef.current?.next();
         }, 3500);
         return () => { clearInterval(timer); sub.remove(); };
-    }, [banners.length, isVisible]);
+    }, [banners.length, autoplayActive]);
 
     const handlePress = useCallback((rawLink: string) => {
         if (!rawLink) return;

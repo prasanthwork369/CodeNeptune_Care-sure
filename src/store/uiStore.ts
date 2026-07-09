@@ -5,6 +5,10 @@ interface UIState {
   isUploadButtonCollapsed: boolean;
   hasJustUploadedPrescription: boolean;
   isRxFromCartFlow: boolean;
+  /** True while the home feed is being scrolled/flung. Kept in the store (not
+   * HomeLayout state) so toggling it only re-renders the few components that
+   * subscribe to it (banner autoplays) instead of the whole feed list. */
+  isFeedScrolling: boolean;
   /** True once the home onboarding permission flow (location → notification)
    * has finished. The SignupBonusPopup waits for this so it never overlaps a
    * permission dialog. */
@@ -13,6 +17,7 @@ interface UIState {
   setUploadButtonCollapsed: (collapsed: boolean) => void;
   setHasJustUploadedPrescription: (uploaded: boolean) => void;
   setIsRxFromCartFlow: (value: boolean) => void;
+  setFeedScrolling: (value: boolean) => void;
   setPermissionFlowComplete: (value: boolean) => void;
 }
 
@@ -21,6 +26,7 @@ export const useUIStore = create<UIState>((set) => ({
   isUploadButtonCollapsed: false,
   hasJustUploadedPrescription: false,
   isRxFromCartFlow: false,
+  isFeedScrolling: false,
   permissionFlowComplete: false,
   setTabBarVisible: (visible) => set({ isTabBarVisible: visible }),
   setUploadButtonCollapsed: (collapsed) =>
@@ -28,5 +34,6 @@ export const useUIStore = create<UIState>((set) => ({
   setHasJustUploadedPrescription: (uploaded) =>
     set({ hasJustUploadedPrescription: uploaded }),
   setIsRxFromCartFlow: (value) => set({ isRxFromCartFlow: value }),
+  setFeedScrolling: (value) => set({ isFeedScrolling: value }),
   setPermissionFlowComplete: (value) => set({ permissionFlowComplete: value }),
 }));

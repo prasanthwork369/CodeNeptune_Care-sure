@@ -83,6 +83,10 @@ export const FloatingBannersCarousel = ({
   const { isTabBarVisible } = useUIStore();
   const { latestPrescription, hasPendingPrescription, dismissBanner } = usePrescriptionBanner();
   const { isRxFromCartFlow } = useUIStore();
+  // Pause autoplay while the home feed is scrolling. Read from the store here
+  // (rather than via a prop) so scroll toggles don't re-render the whole feed.
+  const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
+  const focused = isFocused && !isFeedScrolling;
 
   const [isCartInteracting, setIsCartInteracting] = useState(false);
   // Keep the banner mounted through a Remove tap (totalItems hits 0 before
@@ -102,7 +106,7 @@ export const FloatingBannersCarousel = ({
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    if (bothActive && isFocused && !isCartInteracting) {
+    if (bothActive && focused && !isCartInteracting) {
       timerRef.current = setInterval(() => {
         setActiveBannerIndex((prev) => (prev === 2 ? 1 : 2));
       }, 4000);
@@ -118,7 +122,7 @@ export const FloatingBannersCarousel = ({
 
   // Auto-switch between banners when both are active
   useEffect(() => {
-    if (bothActive && isFocused) {
+    if (bothActive && focused) {
       setActiveBannerIndex(1);
       currentScrollX.current = 1 * width;
       progress.value = 1;
@@ -135,7 +139,7 @@ export const FloatingBannersCarousel = ({
     isCartActive,
     isRxActive,
     width,
-    isFocused,
+    focused,
     isCartInteracting,
   ]);
 

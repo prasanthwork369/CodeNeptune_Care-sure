@@ -48,7 +48,6 @@ function useSlideUp(delayMs: number) {
 interface HeroBannerProps {
   content?: ApiHero;
   isLoading?: boolean;
-  motionEnabled?: boolean;
 }
 
 // Trims title to "Stop overpaying" (removes "for your" and cycling words)
@@ -62,10 +61,9 @@ const getCleanTitlePart1 = (rawTitle?: string): string => {
   return "Stop overpaying";
 };
 
-export const HeroBanner: React.FC<HeroBannerProps> = ({
+export const HeroBanner: React.FC<HeroBannerProps> = React.memo(({
   content,
   isLoading,
-  motionEnabled = true,
 }) => {
   const { width } = useWindowDimensions();
 
@@ -214,4 +212,5 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       </View>
     </View>
   );
-};
+});
+HeroBanner.displayName = "HeroBanner";

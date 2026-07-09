@@ -70,7 +70,13 @@ export const HomeLayout: React.FC = () => {
   const searchBarAnim = useSlideUp(350);
   const quickActionsAnim = useSlideUp(500);
 
-  const { setTabBarVisible, setUploadButtonCollapsed } = useUIStore();
+
+  // Select stable setters individually so HomeLayout never subscribes to the
+  // whole UI store — otherwise every isFeedScrolling toggle would re-render
+  // the entire feed, which is exactly the jank we're removing here.
+  const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
+  const setUploadButtonCollapsed = useUIStore((s) => s.setUploadButtonCollapsed);
+  const setFeedScrolling = useUIStore((s) => s.setFeedScrolling);
   const { totalItems } = useCart();
   const { hasPendingPrescription } = usePrescriptionBanner();
   const hasFloatingBanner = totalItems > 0 || hasPendingPrescription;
@@ -100,7 +106,9 @@ export const HomeLayout: React.FC = () => {
   useHomeOnboarding();
 
   const [isScreenFocused, setIsScreenFocused] = useState(true);
-  const [isFeedScrolling, setIsFeedScrolling] = useState(false);
+  // Settles the "scrolling" flag back to false shortly after the last scroll
+  // event so a single drag→fling doesn't flip it true/false/true/false.
+  const feedScrollSettleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -116,12 +124,20 @@ export const HomeLayout: React.FC = () => {
       return () => {
         setIsScreenFocused(false);
         clearTimeout(t);
+        // Leaving Home while a scroll flag is set would strand it as `true`
+        // in the shared store; reset it so banner autoplays resume elsewhere.
+        if (feedScrollSettleRef.current) {
+          clearTimeout(feedScrollSettleRef.current);
+          feedScrollSettleRef.current = null;
+        }
+        setFeedScrolling(false);
       };
     }, [
       reopenLocationSheet,
       setReopenLocationSheet,
       setTabBarVisible,
       setUploadButtonCollapsed,
+      setFeedScrolling,
     ]),
   );
   const heroHeightShared = useSharedValue(0);
@@ -171,12 +187,34 @@ export const HomeLayout: React.FC = () => {
   }, [router]);
 
   const handleScrollStart = useCallback(() => {
-    setIsFeedScrolling(true);
-  }, []);
+    if (feedScrollSettleRef.current) {
+      clearTimeout(feedScrollSettleRef.current);
+      feedScrollSettleRef.current = null;
+    }
+    setFeedScrolling(true);
+  }, [setFeedScrolling]);
 
   const handleScrollStop = useCallback(() => {
-    setIsFeedScrolling(false);
-  }, []);
+    if (feedScrollSettleRef.current) clearTimeout(feedScrollSettleRef.current);
+    feedScrollSettleRef.current = setTimeout(() => {
+      setFeedScrolling(false);
+      feedScrollSettleRef.current = null;
+    }, 120);
+  }, [setFeedScrolling]);
+
+  // Stable identity for the memoized HomeHeader — a fresh object/closure each
+  // render would defeat its React.memo and re-render the header needlessly.
+  const openLocationSheet = useCallback(
+    () => setIsLocationSheetVisible(true),
+    [],
+  );
+  const headerLocation = useMemo(
+    () =>
+      location
+        ? { ...location, pincode: locationPincode ?? undefined }
+        : DELIVERY_LOCATION,
+    [location, locationPincode],
+  );
 
   const sections = useMemo<HomeSection[]>(() => {
     const feedSections: HomeSection[] = [
@@ -224,17 +262,12 @@ export const HomeLayout: React.FC = () => {
                 }}
               />
               <HomeHeader
-                location={
-                  location
-                    ? { ...location, pincode: locationPincode ?? undefined }
-                    : DELIVERY_LOCATION
-                }
-                onPressLocation={() => setIsLocationSheetVisible(true)}
+                location={headerLocation}
+                onPressLocation={openLocationSheet}
               />
               <HeroBanner
                 content={appContent?.hero}
                 isLoading={isHomeLoading}
-                motionEnabled={!isFeedScrolling}
               />
             </View>
           );
@@ -302,7 +335,7 @@ export const HomeLayout: React.FC = () => {
                 banners={appContent?.banners ?? EMPTY_BANNERS}
                 categories={cards}
                 isLoading={isHomeLoading}
-                isVisible={isScreenFocused && !isFeedScrolling}
+                isVisible={isScreenFocused}
               />
             </View>
           );
@@ -371,15 +404,14 @@ export const HomeLayout: React.FC = () => {
       handleProductPress,
       handleQuickAction,
       handleViewAllFrequent,
+      headerLocation,
       heroHeightShared,
       insets.top,
-      isFeedScrolling,
       isFeaturedLoading,
       isHomeLoading,
       isScreenFocused,
       isSubcategoriesLoading,
-      location,
-      locationPincode,
+      openLocationSheet,
       quickActionsAnim,
       router,
       searchBarAnim,
@@ -447,9 +479,7 @@ export const HomeLayout: React.FC = () => {
         onClose={() => setIsLocationSheetVisible(false)}
       />
 
-      <FloatingBannersCarousel
-        isFocused={isScreenFocused && !isFeedScrolling}
-      />
+      <FloatingBannersCarousel isFocused={isScreenFocused} />
     </View>
   );
 };
