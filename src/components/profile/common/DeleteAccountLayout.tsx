@@ -7,8 +7,9 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
+import { ConfirmActionModal } from "./ConfirmActionModal";
 
 // The three things the user loses on deletion — icon + copy, matching the design.
 const LOSS_ITEMS = [
@@ -38,8 +39,13 @@ export const DeleteAccountLayout: React.FC = () => {
   const { deleteAccount, deletingAccount } = useAuth();
   const adjustedBottom = useAdjustedBottomInset();
 
+  // Final "are you sure" popup — reuses the profile logout confirm dialog so
+  // the destructive delete requires one more deliberate tap.
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const handleDelete = async () => {
     if (deletingAccount) return;
+    setShowConfirm(false);
     try {
       await deleteAccount();
       // On success the auth state is cleared → root layout redirects to login.
@@ -188,7 +194,7 @@ export const DeleteAccountLayout: React.FC = () => {
         }}
       >
         <Touchable
-          onPress={handleDelete}
+          onPress={() => setShowConfirm(true)}
           disabled={deletingAccount}
           activeOpacity={0.85}
           style={{
@@ -248,6 +254,18 @@ export const DeleteAccountLayout: React.FC = () => {
           </Text>
         </Touchable>
       </View>
+
+      {/* Final confirmation — same look as the profile logout popup. */}
+      <ConfirmActionModal
+        isVisible={showConfirm}
+        message="Are you sure you want to delete your account"
+        icon={<icons.delete_red width={36} height={36} />}
+        confirmLabel="Yes"
+        cancelLabel="No"
+        isLoading={deletingAccount}
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={handleDelete}
+      />
     </View>
   );
 };

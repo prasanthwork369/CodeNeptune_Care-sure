@@ -29,17 +29,42 @@ const ProductCard = React.memo(({ product, cardWidth, onProductPress }: { produc
     const imageAreaHeight = cardWidth * 0.875;
     const imageSize = imageAreaHeight * 0.65;
 
-    const { count, increment, decrement, animations, isPending } = useCartActions({
-        medicineId: product.id,
-        variantId: null,
-        productId: product.productId,
-        name: product.name,
-        slug: product.slug,
-        price: product.price as number,
-        originalPrice: product.originalPrice,
-        image: product.image,
-        requiresPrescription: product.requiresPrescription,
-    });
+    // Add-to-cart mirrors the web ProductCard: the card shows the base price
+    // (below), but the cart receives the default variant (variant[0]) when the
+    // API expands one. Keyed by the variant UUID like the mobile PDP, so adding
+    // the same variant here or on the PDP lands in one cart row. Falls back to
+    // the base medicine when no variant is present.
+    const v = product.defaultVariant;
+    const { count, increment, decrement, animations, isPending } = useCartActions(
+        v
+            ? {
+                  medicineId: v.id,
+                  baseMedicineId: product.id,
+                  variantId: v.id,
+                  productId: product.productId,
+                  name: product.name,
+                  slug: product.slug,
+                  price: v.sellingPrice,
+                  originalPrice: v.mrp,
+                  discountPercent: v.discountPercent,
+                  packSize: v.packSize,
+                  unit: v.unit,
+                  image: product.image,
+                  requiresPrescription: product.requiresPrescription,
+              }
+            : {
+                  medicineId: product.id,
+                  variantId: null,
+                  productId: product.productId,
+                  name: product.name,
+                  slug: product.slug,
+                  price: product.price as number,
+                  originalPrice: product.originalPrice,
+                  discountPercent: product.discountPercent,
+                  image: product.image,
+                  requiresPrescription: product.requiresPrescription,
+              },
+    );
     const { slideAnim, opacityAnim } = animations;
 
     return (

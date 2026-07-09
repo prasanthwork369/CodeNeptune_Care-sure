@@ -154,7 +154,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           </Text>
         </Text>
 
-        {variants.length > 1 && (
+        {/* Show the pack-size selector whenever variants exist — including a
+            single variant — to match the web PDP (which renders the pack list
+            regardless of count). Previously gated on > 1, so single-variant
+            products showed no selector on mobile. */}
+        {variants.length >= 1 && (
           <View style={{ marginTop: exactScale(16) }}>
             <Text className="font-inter-semibold text-[#6B7280] mb-3 uppercase tracking-wider" style={{ fontSize: moderateScale(12, 0.1) }}>
               Select Pack Size

@@ -45,6 +45,20 @@ export interface HeroContent {
   image: ImageSource;
 }
 
+/**
+ * Default variant (variant[0]) used ONLY for add-to-cart, mirroring the web
+ * ProductCard: the card keeps showing the base price, but the cart receives the
+ * variant's identity and price. Absent when the list API doesn't expand variants.
+ */
+export interface DefaultVariant {
+  id: string;
+  mrp: number; // variant.price (the MRP)
+  sellingPrice: number; // mrp * (1 - discount%)
+  discountPercent: number;
+  packSize?: string;
+  unit?: string;
+}
+
 export interface Product {
   id: string;
   productId?: string;
@@ -59,6 +73,7 @@ export interface Product {
   discountPercent?: number;
   image: ImageSource | null;
   requiresPrescription?: boolean;
+  defaultVariant?: DefaultVariant;
 }
 
 export interface SubstituteProduct extends Product {

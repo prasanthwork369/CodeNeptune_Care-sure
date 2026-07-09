@@ -29,6 +29,9 @@ export interface ApiFeaturedMedicine {
   status: number;
   brand: ApiBrand;
   category: ApiMedicineCategory;
+  // Present when the backend expands variants on featured cards. Used only to
+  // add variant[0] to the cart (the card still displays the base price).
+  medicine_variants?: MedicineVariant[];
 }
 
 export interface ApiProductSalt {

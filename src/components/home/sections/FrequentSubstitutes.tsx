@@ -25,6 +25,10 @@ const FrequentItem = React.memo(({ item, onProductPress, disableCart }: { item: 
         slug: item.slug,
         price: item.price,
         originalPrice: item.originalPrice,
+        // Pass the discount so the cart charges the discounted price, not the
+        // MRP — the backend derives selling = mrp * (1 - discountPercent/100),
+        // matching the web ProductCard's add-to-cart.
+        discountPercent: item.discountPercent,
         image: item.image,
         requiresPrescription: item.requiresPrescription,
     });

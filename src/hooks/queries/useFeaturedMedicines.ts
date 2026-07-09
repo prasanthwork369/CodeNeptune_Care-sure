@@ -31,6 +31,32 @@ export const useFeaturedMedicines = () => {
         ? parseFloat((price / (1 - discountPct / 100)).toFixed(2))
         : undefined;
     const packLabel = formatPackLabel({ packSize: med.packSize, unit: med.unit, dosageForm: med.dosageForm });
+
+    // Default variant (variant[0]) for add-to-cart only — display stays on the
+    // base price above. Mirrors the mobile PDP: variant.price is the MRP and the
+    // discount is the variant's own %, falling back to the medicine-level % when 0.
+    const dv = med.medicine_variants?.[0];
+    const defaultVariant = dv
+      ? (() => {
+          const vDiscount =
+            Number(dv.discountPercentage) > 0
+              ? Number(dv.discountPercentage)
+              : discountPct || 0;
+          const vMrp = Number(dv.price);
+          return {
+            id: dv.id,
+            mrp: vMrp,
+            sellingPrice:
+              vDiscount > 0
+                ? parseFloat((vMrp * (1 - vDiscount / 100)).toFixed(2))
+                : vMrp,
+            discountPercent: vDiscount,
+            packSize: dv.packSize,
+            unit: dv.unit,
+          };
+        })()
+      : undefined;
+
     return {
       id: med.id,
       productId: med.productId,
@@ -45,6 +71,7 @@ export const useFeaturedMedicines = () => {
       discountPercent: discountPct || 0,
       image: med.thumbnailUrl ? { uri: resolveAssetUrl(med.thumbnailUrl) } : null,
       requiresPrescription: med.requiresPrescription,
+      defaultVariant,
     };
   });
 

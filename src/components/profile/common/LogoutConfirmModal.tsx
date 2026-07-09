@@ -1,8 +1,6 @@
 import { icons } from '@/src/constants/icons';
-import { Touchable } from '@/src/components/ui/Touchable';
 import React from 'react';
-import { Modal, Text, View, ActivityIndicator } from 'react-native';
-import { moderateScale } from "@/src/utils/exactScale";
+import { ConfirmActionModal } from './ConfirmActionModal';
 
 interface LogoutConfirmModalProps {
     isVisible: boolean;
@@ -13,83 +11,13 @@ interface LogoutConfirmModalProps {
 
 export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isVisible, onCancel, onConfirm, isLoggingOut }) => {
     return (
-        <Modal
-            visible={isVisible}
-            transparent
-            animationType="fade"
-            statusBarTranslucent
-            navigationBarTranslucent
-            onRequestClose={onCancel}
-        >
-            <View className="flex-1 bg-black/60 items-center justify-center px-6">
-                <View
-                    className="bg-white w-full items-center"
-                    style={{ borderRadius: 16, paddingHorizontal: 24, paddingTop: 28, paddingBottom: 24 }}
-                >
-                    {/* Logout icon — oval pink bg */}
-                    <View
-                        style={{
-                            width: 90,
-                            height: 90,
-                            borderRadius: 45,
-                            backgroundColor: '#FFE4E4',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: 18,
-                        }}
-                    >
-                        <icons.logout width={36} height={36} fill="#CA2B25" />
-                    </View>
-
-                    {/* Message */}
-                    <Text
-                        className="font-inter-bold text-[#1A1C1E] text-center"
-                        style={{ fontSize: moderateScale(16), marginBottom: 24 }}
-                    >
-                        Are you sure you want to logout
-                    </Text>
-
-                    {/* Buttons */}
-                    <View className="flex-row w-full" style={{ gap: 10 }}>
-                        <Touchable
-                            onPress={onCancel}
-                            disabled={isLoggingOut}
-                            activeOpacity={0.8}
-                            style={{
-                                flex: 1,
-                                paddingVertical: 13,
-                                borderRadius: 999,
-                                borderWidth: 1,
-                                borderColor: '#DDDDDD',
-                                backgroundColor: '#FFFFFF',
-                                alignItems: 'center',
-                                opacity: isLoggingOut ? 0.6 : 1,
-                            }}
-                        >
-                            <Text className="font-inter-semibold text-[#1A1C1E]" style={{ fontSize: moderateScale(15) }}>No</Text>
-                        </Touchable>
-
-                        <Touchable
-                            onPress={onConfirm}
-                            disabled={isLoggingOut}
-                            activeOpacity={0.8}
-                            style={{
-                                flex: 1,
-                                paddingVertical: 13,
-                                borderRadius: 999,
-                                backgroundColor: '#E53935',
-                                alignItems: 'center',
-                            }}
-                        >
-                            {isLoggingOut ? (
-                                <ActivityIndicator color="#FFFFFF" size="small" />
-                            ) : (
-                                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15) }}>Yes</Text>
-                            )}
-                        </Touchable>
-                    </View>
-                </View>
-            </View>
-        </Modal>
+        <ConfirmActionModal
+            isVisible={isVisible}
+            message="Are you sure you want to logout"
+            icon={<icons.logout width={36} height={36} fill="#CA2B25" />}
+            isLoading={isLoggingOut}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+        />
     );
 };
