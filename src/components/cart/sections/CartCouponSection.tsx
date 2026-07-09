@@ -122,7 +122,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
     return (
       <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3">
         <Touchable
-          onPress={() => router.push("/(modal)/coupons")}
+          onPress={() => router.push("/(stack)/coupons")}
           className="flex-row items-center justify-between"
         >
           <View className="flex-row items-center gap-x-3">
@@ -253,7 +253,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
       />
 
       <Touchable
-        onPress={() => router.push("/(modal)/coupons")}
+        onPress={() => router.push("/(stack)/coupons")}
         activeOpacity={0.8}
         className="bg-white flex-row items-center justify-between px-4 py-3.5"
       >

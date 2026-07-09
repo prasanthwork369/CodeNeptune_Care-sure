@@ -19,7 +19,7 @@ interface BannerCarouselProps {
 }
 
 const BANNER_ROUTE_MAP: Record<string, string> = {
-    '/cart':        '/(modal)/cart',
+    '/cart':        '/(stack)/cart',
     '/category':    '/categories',
     '/categories':  '/categories',
     '/search':      '/search',

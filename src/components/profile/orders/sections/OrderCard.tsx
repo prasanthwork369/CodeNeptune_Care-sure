@@ -99,7 +99,7 @@ export const OrderCard = React.memo(function OrderCard({
       }
       setIsCartModalVisible(false);
       setIsProceeding(false);
-      setTimeout(() => router.push("/(modal)/cart" as any), 100);
+      setTimeout(() => router.push("/(stack)/cart" as any), 100);
     } catch (err) {
       if (__DEV__) console.error("[OrderAgain]", err);
       setIsProceeding(false);

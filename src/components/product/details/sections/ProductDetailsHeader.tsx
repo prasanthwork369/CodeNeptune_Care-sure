@@ -68,7 +68,7 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
           </Touchable>
 
           <Touchable
-            onPress={() => router.push("/(modal)/cart")}
+            onPress={() => router.push("/(stack)/cart")}
             className="bg-white rounded-full border border-[#919EAB33] items-center justify-center relative"
             style={{ width: exactScale(44), height: exactScale(44) }}
             activeOpacity={0.7}

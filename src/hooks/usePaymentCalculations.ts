@@ -178,7 +178,7 @@ export function usePaymentCalculations() {
       clearCheckout();
       clearPrescriptionOrder();
       router.replace({
-        pathname: "/(modal)/order-success",
+        pathname: "/(stack)/order-success",
         params: { orderId: order?.id ?? "", total: toPay },
       });
     } catch (err: any) {

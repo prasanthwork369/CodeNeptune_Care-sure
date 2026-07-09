@@ -1,32 +1,31 @@
 import {
-    LocationBottomSheet,
-    WhyFamiliesTrustUs,
+  LocationBottomSheet,
+  WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { ProductSkeleton } from "@/src/components/product/ProductSkeleton";
 import { useProductHeroAnimation } from "@/src/hooks/animations/useProductHeroAnimation";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
-import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
 import {
-    KnowYourMedicine,
-    LogisticsBar,
-    MoreAboutSection,
-    NoSubstituteBanner,
-    ProductDetailsFooter,
-    ProductDetailsHeader,
-    ProductInfo,
-    SaltCompositionBanner,
-    TrustBadge,
+  KnowYourMedicine,
+  LogisticsBar,
+  MoreAboutSection,
+  NoSubstituteBanner,
+  ProductDetailsFooter,
+  ProductDetailsHeader,
+  ProductInfo,
+  SaltCompositionBanner,
+  TrustBadge,
 } from "./sections";
 
 export const ProductDetailsLayout: React.FC = () => {
@@ -40,7 +39,7 @@ export const ProductDetailsLayout: React.FC = () => {
     id: string;
     fromNoSubstitute?: string;
   }>();
-  const showNoSubstituteBanner = fromNoSubstitute === 'true';
+  const showNoSubstituteBanner = fromNoSubstitute === "true";
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { product, recommendation, saltComposition, variants, raw, isLoading } =
@@ -131,9 +130,10 @@ export const ProductDetailsLayout: React.FC = () => {
     ? parseInt(String(raw.recommendation.packSize).match(/\d+/)?.[0] ?? "1")
     : 1;
   const recUnitPrice = recommendation
-    ? (
-        // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
-        Math.floor((recommendation.price / Math.max(recPackSize, 1)) * 100) / 100
+    ? // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+      (
+        Math.floor((recommendation.price / Math.max(recPackSize, 1)) * 100) /
+        100
       ).toFixed(2)
     : undefined;
 
@@ -243,39 +243,40 @@ export const ProductDetailsLayout: React.FC = () => {
               </ScrollView>
             )}
 
-            {activeProduct && (recommendation || !showNoSubstituteBanner ? (
-              <ProductDetailsFooter
-                productId={id}
-                medicineUuid={medicineId}
-                // Only fall back to base-product matching for
-                // variant-less products. For products with
-                // variants, baseMedicineId is identical across
-                // all variants — matching on it would make the
-                // footer show "in cart" for every variant once
-                // any one of them (or the base id itself) is
-                // in the cart.
-                baseMedicineId={variants.length > 0 ? undefined : raw?.id}
-                variantId={activeVariantId}
-                product={{
-                  ...activeProduct,
-                  packSize: selectedVariant
-                    ? `${selectedVariant.packSize} ${selectedVariant.unit}`
-                    : activeProduct.packSize != null
-                      ? String(activeProduct.packSize)
-                      : undefined,
-                  unit: selectedVariant?.unit,
-                }}
-                safeAreaBottom={adjustedBottom}
-                onViewCart={() => router.push("/(modal)/cart")}
-              />
-            ) : (
-              <NoSubstituteBanner
-                productId={id}
-                medicineUuid={medicineId}
-                productName={activeProduct.name}
-                safeAreaBottom={adjustedBottom}
-              />
-            ))}
+            {activeProduct &&
+              (recommendation || !showNoSubstituteBanner ? (
+                <ProductDetailsFooter
+                  productId={id}
+                  medicineUuid={medicineId}
+                  // Only fall back to base-product matching for
+                  // variant-less products. For products with
+                  // variants, baseMedicineId is identical across
+                  // all variants — matching on it would make the
+                  // footer show "in cart" for every variant once
+                  // any one of them (or the base id itself) is
+                  // in the cart.
+                  baseMedicineId={variants.length > 0 ? undefined : raw?.id}
+                  variantId={activeVariantId}
+                  product={{
+                    ...activeProduct,
+                    packSize: selectedVariant
+                      ? `${selectedVariant.packSize} ${selectedVariant.unit}`
+                      : activeProduct.packSize != null
+                        ? String(activeProduct.packSize)
+                        : undefined,
+                    unit: selectedVariant?.unit,
+                  }}
+                  safeAreaBottom={adjustedBottom}
+                  onViewCart={() => router.push("/(stack)/cart")}
+                />
+              ) : (
+                <NoSubstituteBanner
+                  productId={id}
+                  medicineUuid={medicineId}
+                  productName={activeProduct.name}
+                  safeAreaBottom={adjustedBottom}
+                />
+              ))}
           </View>
         </Animated.View>
       </Animated.View>

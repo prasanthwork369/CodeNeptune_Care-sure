@@ -242,7 +242,7 @@ export const ProductComparisonLayout: React.FC<
                   requiresPrescription: raw?.requiresPrescription,
                 }}
                 safeAreaBottom={adjustedBottom}
-                onViewCart={() => router.push("/(modal)/cart")}
+                onViewCart={() => router.push("/(stack)/cart")}
                 hideAddButton
               />
             )}

@@ -7,8 +7,10 @@ Think like a senior mobile developer.
 --
 
 ## Project Overview
+
 We are building CareSure, an online pharmacy app for browsing medicines, managing prescriptions, and getting orders delivered.
 The app includes:
+
 - Medicine browsing by category and search
 - Cart, coupons, and checkout
 - Prescription upload, review, and medicine comparison
@@ -22,6 +24,7 @@ Keep the implementation simple and readable.
 --
 
 ## Tech Stack
+
 - Expo
 - React Native
 - TypeScript
@@ -37,8 +40,10 @@ Ask before installing anything new.
 --
 
 ## Development Philosophy
+
 Build feature by feature.
 For every feature:
+
 1. Read this file first.
 2. Keep the implementation simple.
 3. Avoid overengineering.
@@ -49,6 +54,7 @@ For every feature:
 --
 
 ## Decision Making
+
 If something is unclear or could be improved, suggest a better
 approach. If a new library would significantly help, recommend it,
 explain why, and ask before adding it.
@@ -57,12 +63,14 @@ Do not install new libraries without approval.
 --
 
 ## Architecture
+
 Use this folder structure:
+
 ```
 app/
   (auth)/
   (tabs)/
-  (modal)/
+  (stack)/
   (prescription)/
 components/
 constants/
@@ -98,15 +106,18 @@ Never expose secret keys here.
 --
 
 ## UI Rules
+
 For any UI task:
+
 - Replicate the provided design exactly.
 - Match layout, spacing, padding, font sizes, font hierarchy, colors,
-border radius, shadows, alignment, and proportions.
+  border radius, shadows, alignment, and proportions.
 - Do not approximate. Do not simplify unless explicitly asked.
 
 --
 
 ## Styling Rules
+
 Use NativeWind classes. Do not use StyleSheet unless it is not possible
 to style with className.
 Use the NativeWind version installed in this project. Check
@@ -114,7 +125,9 @@ package.json. Do not upgrade without approval.
 Reuse class patterns through utilities in global.css.
 
 ### Style Exception List
+
 Use StyleSheet or inline styles for:
+
 - SafeAreaView (className not supported)
 - KeyboardAvoidingView (behavior props)
 - Modal (visible, transparent props)
@@ -129,7 +142,9 @@ Everywhere else, use NativeWind.
 --
 
 ## Image Rule
+
 Use centralized image imports.
+
 1. Check if constants/images.ts exists.
 2. If not, create it.
 3. Import all app images there.
@@ -151,6 +166,7 @@ Do not import image assets directly inside screens or components.
 --
 
 ## State Management
+
 - Zustand for global client state.
 - Local state for temporary UI state.
 - AsyncStorage for persistence.
@@ -158,6 +174,7 @@ Do not import image assets directly inside screens or components.
 --
 
 ## TypeScript
+
 - Strict mode.
 - No `any`.
 - Keep types simple and readable.
@@ -165,7 +182,9 @@ Do not import image assets directly inside screens or components.
 --
 
 ## Feature Implementation
+
 When building a feature:
+
 1. Read this file first.
 2. Identify the files to change.
 3. Keep changes focused.
@@ -177,12 +196,14 @@ When building a feature:
 --
 
 ## Secrets
+
 - Never expose secret keys in client code.
 - Use server routes for tokens, AI calls, and any external API access.
 
 --
 
 ## Authentication
+
 Use the existing custom phone/OTP authentication (authStore, token
 storage, profile API). Do not introduce Clerk or another auth provider
 without approval.
@@ -190,12 +211,15 @@ without approval.
 --
 
 ## Communication
+
 Be concise. Explain what changed and how to test it.
 
 --
 
 ## Final Reminder
+
 Before every feature:
+
 - Read this file.
 - Follow it strictly.
 - Build clean, simple code.

@@ -1,14 +1,17 @@
 import { useAuthStore } from "@/src/store/authStore";
 import { Redirect, Stack, useSegments } from "expo-router";
 
-export default function ModalLayout() {
+export default function StackLayout() {
   const { isAuthenticated } = useAuthStore();
   const segments = useSegments();
-  const modalRoute = segments[1];
-  const isGuestAllowed = modalRoute === "cart" || modalRoute === "coupons";
+  const currentRoute = segments[1];
 
-  if (!isAuthenticated && !isGuestAllowed)
+  const isGuestAllowed =
+    currentRoute === "cart" || currentRoute === "coupons";
+
+  if (!isAuthenticated && !isGuestAllowed) {
     return <Redirect href="/(auth)/login" />;
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -20,6 +23,7 @@ export default function ModalLayout() {
           animationDuration: 320,
         }}
       />
+
       <Stack.Screen
         name="coupons"
         options={{
@@ -27,9 +31,13 @@ export default function ModalLayout() {
           animation: "slide_from_right",
         }}
       />
+
       <Stack.Screen
         name="order-success"
-        options={{ presentation: "transparentModal", animation: "fade" }}
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+        }}
       />
     </Stack>
   );

@@ -20,7 +20,7 @@ export const CategoriesHeaderActions: React.FC = () => {
             </Touchable>
             <View className="relative">
                 <Touchable
-                    onPress={() => router.push('/(modal)/cart')}
+                    onPress={() => router.push('/(stack)/cart')}
                     className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center"
                 >
                     <icons.cart_outline width={22} height={22} />

@@ -128,7 +128,7 @@ export const PaymentLayout: React.FC = () => {
       removeCoupon();
       clearCheckout();
       router.replace({
-        pathname: "/(modal)/order-success",
+        pathname: "/(stack)/order-success",
         params: { orderId: order?.id ?? "", total: toPay },
       });
     } catch (err: any) {

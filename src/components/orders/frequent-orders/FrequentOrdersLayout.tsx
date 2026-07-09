@@ -73,7 +73,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              onPress={() => router.push("/(modal)/cart")}
+              onPress={() => router.push("/(stack)/cart")}
             >
               <icons.cart_svg width={24} height={24} fill="#222222" />
             </Touchable>

@@ -129,12 +129,12 @@ export const NotificationNavigation = {
 
       // --- Coupons ---
       case NotificationType.COUPON:
-        router.push('/(modal)/coupons' as any);
+        router.push('/(stack)/coupons' as any);
         break;
 
       // --- Cart ---
       case NotificationType.CART_REMINDER:
-        router.push('/(modal)/cart' as any);
+        router.push('/(stack)/cart' as any);
         break;
 
       // --- Wallet ---

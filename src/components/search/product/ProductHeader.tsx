@@ -118,7 +118,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
 
         {isSearching && (
           <Touchable
-            onPress={() => router.push("/(modal)/cart")}
+            onPress={() => router.push("/(stack)/cart")}
             style={{
               elevation: 3,
               shadowColor: "#919EAB",
