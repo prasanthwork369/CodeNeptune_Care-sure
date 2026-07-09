@@ -11,6 +11,8 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
+import { resolveAssetUrl } from "@/src/utils/urls";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -358,18 +360,27 @@ export function CancelOrderLayout() {
                               width: scale(40),
                               height: scale(40),
                               borderRadius: scale(20),
-                              backgroundColor: config.bgColor,
+                              backgroundColor: reason.image_url ? undefined : config.bgColor,
                               alignItems: "center",
                               justifyContent: "center",
                               marginRight: scale(12),
+                              overflow: "hidden",
                             }}
                           >
-                            {IconComponent && (
-                              <IconComponent
-                                width={moderateScale(20, 0.3)}
-                                height={moderateScale(20, 0.3)}
-                                fill={config.iconColor}
+                            {reason.image_url ? (
+                              <RemoteIcon
+                                uri={resolveAssetUrl(reason.image_url)}
+                                size={scale(40)}
+                                style={{ borderRadius: scale(20) }}
                               />
+                            ) : (
+                              IconComponent && (
+                                <IconComponent
+                                  width={moderateScale(20, 0.3)}
+                                  height={moderateScale(20, 0.3)}
+                                  fill={config.iconColor}
+                                />
+                              )
                             )}
                           </View>
 

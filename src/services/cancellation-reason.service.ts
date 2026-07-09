@@ -18,6 +18,7 @@ export interface CancellationReason {
   actor_type:       number;
   status:           number;
   sort_order:       number;
+  image_url?:       string | null;
   applicableToLabel: string;
   actorTypeLabel:   string;
 }
