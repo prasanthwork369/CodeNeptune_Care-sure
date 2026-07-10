@@ -35,6 +35,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View style={s.divider} />
         <TextInput
           ref={applyDigitsOnlyFilter}
+          allowFontScaling={false}
           placeholder="Enter your mobile number"
           placeholderTextColor="#6A6A6A"
           // MUST stay "number-pad" (maps to Android inputType="number") — a clean

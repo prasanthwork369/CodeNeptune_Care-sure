@@ -1,10 +1,10 @@
-import { tokenStorage } from '@/src/lib/storage';
-import { useNetworkStore } from '@/src/store/useNetworkStore';
-import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from '@/src/utils/urls';
-import axios, { AxiosInstance } from 'axios';
-import { toAppError } from './errors';
+import { tokenStorage } from "@/src/lib/storage";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
+import axios, { AxiosInstance } from "axios";
+import { toAppError } from "./errors";
 
-const MUTATION_METHODS = new Set(['post', 'put', 'patch', 'delete']);
+const MUTATION_METHODS = new Set(["post", "put", "patch", "delete"]);
 
 // In-memory token — mirrors window.__ACCESS_TOKEN__ from web client
 // Synchronous access avoids async race conditions in the request interceptor
@@ -24,7 +24,10 @@ export function setUnauthorizedHandler(handler: () => void) {
 }
 
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (v: string) => void; reject: (e: unknown) => void }> = [];
+let failedQueue: Array<{
+  resolve: (v: string) => void;
+  reject: (e: unknown) => void;
+}> = [];
 
 // After a non-auth refresh failure (5xx/network), back off for a short
 // window instead of re-attempting refresh on every subsequent 401 — avoids
@@ -42,27 +45,29 @@ export const apiClient: AxiosInstance = axios.create({
   timeout: API_TIMEOUT,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
-    'x-panel-id': 'customer',
+    "Content-Type": "application/json",
+    "x-panel-id": "customer",
   },
 });
 
 // Synchronous request interceptor — reads from in-memory token (no async)
 apiClient.interceptors.request.use((config) => {
-  if (__DEV__) {
-    if (config.data !== undefined) {
-      console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
-    } else {
-      console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
-    }
-  }
-  const method = config.method?.toLowerCase() ?? '';
+  // if (__DEV__) {
+  //   if (config.data !== undefined) {
+  //     console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
+  //   } else {
+  //     console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
+  //   }
+  // }
+  const method = config.method?.toLowerCase() ?? "";
   if (MUTATION_METHODS.has(method)) {
     const { isConnected } = useNetworkStore.getState();
     if (isConnected === false) {
       useNetworkStore.getState().showOfflineAlert();
       return Promise.reject(
-        Object.assign(new Error('Network offline'), { code: 'NETWORK_OFFLINE' }),
+        Object.assign(new Error("Network offline"), {
+          code: "NETWORK_OFFLINE",
+        }),
       );
     }
   }
@@ -76,26 +81,38 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
-    const isNetworkError = !err.response && err.code !== 'ECONNABORTED' && err.code !== 'NETWORK_OFFLINE';
-    const isMutation = MUTATION_METHODS.has(err.config?.method?.toLowerCase() ?? '');
+    const isNetworkError =
+      !err.response &&
+      err.code !== "ECONNABORTED" &&
+      err.code !== "NETWORK_OFFLINE";
+    const isMutation = MUTATION_METHODS.has(
+      err.config?.method?.toLowerCase() ?? "",
+    );
     const { isConnected } = useNetworkStore.getState();
     if (isNetworkError && isMutation && isConnected === false) {
       useNetworkStore.getState().showOfflineAlert();
-      return Promise.reject(Object.assign(new Error('Network offline'), { code: 'NETWORK_OFFLINE' }));
+      return Promise.reject(
+        Object.assign(new Error("Network offline"), {
+          code: "NETWORK_OFFLINE",
+        }),
+      );
     }
 
     const original = err.config;
 
     const isAuthPath =
-      original?.url?.includes('auth/refresh') ||
-      original?.url?.includes('auth/logout');
+      original?.url?.includes("auth/refresh") ||
+      original?.url?.includes("auth/logout");
 
     if (err.response?.status === 401 && !original?._retry && !isAuthPath) {
       if (Date.now() < refreshCooldownUntil) {
         return Promise.reject(toAppError(err));
       }
 
-      if (__DEV__) console.log('[apiClient] 401 detected. Attempting background refresh...');
+      if (__DEV__)
+        console.log(
+          "[apiClient] 401 detected. Attempting background refresh...",
+        );
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -117,14 +134,14 @@ apiClient.interceptors.response.use(
           {},
           {
             withCredentials: true,
-            headers: { 'x-panel-id': 'customer' },
-          }
+            headers: { "x-panel-id": "customer" },
+          },
         );
 
         const newToken = data.data.accessToken;
         const expiresIn = data.data.expiresIn;
 
-        if (__DEV__) console.log('[apiClient] Background refresh SUCCESS');
+        if (__DEV__) console.log("[apiClient] Background refresh SUCCESS");
         refreshCooldownUntil = 0;
 
         // Update in-memory token + persist to SecureStore
@@ -138,7 +155,7 @@ apiClient.interceptors.response.use(
         original.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(original);
       } catch (e: any) {
-        if (__DEV__) console.error('[apiClient] Background refresh FAILED:', e);
+        if (__DEV__) console.error("[apiClient] Background refresh FAILED:", e);
         processQueue(e, null);
         // Only force logout if the refresh itself returned 401/403 (invalid/expired refresh token)
         // A 5xx server error should not log the user out
@@ -156,5 +173,5 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(toAppError(err));
-  }
+  },
 );

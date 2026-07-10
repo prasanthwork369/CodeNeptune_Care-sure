@@ -1,11 +1,11 @@
 import { HealthProblemSheet } from "@/src/components/prescription/HealthProblemSheet";
 import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
-import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { PatientChipSkeleton } from "@/src/components/profile/patients/PatientSkeleton";
 import { PatientEmptyState } from "@/src/components/profile/select-patient/sections";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -71,7 +71,9 @@ export const SelectPatientLayout: React.FC = () => {
 
       const reordered = [
         item.localUri,
-        ...prescriptionItems.filter((_, i) => i !== index).map((p) => p.localUri),
+        ...prescriptionItems
+          .filter((_, i) => i !== index)
+          .map((p) => p.localUri),
       ];
 
       router.push({
@@ -84,7 +86,7 @@ export const SelectPatientLayout: React.FC = () => {
         },
       });
     },
-    [prescriptionItems, router, selectedPatient?.name]
+    [prescriptionItems, router, selectedPatient?.name],
   );
 
   return (
@@ -431,6 +433,7 @@ export const SelectPatientLayout: React.FC = () => {
             <TextInput
               placeholder="Eg: Mild fever and body pain"
               placeholderTextColor="#6A6A6A"
+              allowFontScaling={false}
               multiline
               value={symptoms}
               onChangeText={setSymptoms}

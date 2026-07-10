@@ -47,6 +47,7 @@ config.serializer = {
     return [
       ...defaultModules,
       require.resolve('./src/utils/patchText.ts'),
+      require.resolve('./src/utils/patchTextInput.ts'),
     ];
   },
 };
@@ -56,6 +57,11 @@ const PATCH_TEXT_PATH = path.resolve(__dirname, 'src/utils/patchText.ts');
 // (deep import like 'react-native/Libraries/Text/Text', or the relative require inside
 // react-native's own index.js, e.g. require('./Libraries/Text/Text')).
 const RN_TEXT_FILE = /[\\/]react-native[\\/]Libraries[\\/]Text[\\/]Text\.js$/;
+
+// Same treatment for TextInput so plain <TextInput> is patched app-wide too
+// (the runtime monkey-patch alone doesn't reliably reach every import).
+const PATCH_TEXTINPUT_PATH = path.resolve(__dirname, 'src/utils/patchTextInput.ts');
+const RN_TEXTINPUT_FILE = /[\\/]react-native[\\/]Libraries[\\/]Components[\\/]TextInput[\\/]TextInput\.js$/;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   // If the request is coming from our patch utility itself, do NOT redirect it!
@@ -73,6 +79,11 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   // no matter whether the original request was a deep absolute import or a relative require.
   if (result.type === 'sourceFile' && RN_TEXT_FILE.test(result.filePath)) {
     return context.resolveRequest(context, PATCH_TEXT_PATH, platform);
+  }
+
+  // Same redirect for TextInput.js → our TextInput patch.
+  if (result.type === 'sourceFile' && RN_TEXTINPUT_FILE.test(result.filePath)) {
+    return context.resolveRequest(context, PATCH_TEXTINPUT_PATH, platform);
   }
 
   return result;

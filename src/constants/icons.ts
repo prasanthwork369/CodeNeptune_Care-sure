@@ -114,6 +114,7 @@ import logout from "../../assets/icons/logout.svg";
 import mail from "../../assets/icons/mail.svg";
 import note_book from "../../assets/icons/note_book.svg";
 import package_icon from "../../assets/icons/package.svg";
+import return_pack from "../../assets/icons/return_pack.svg";
 import return_package from "../../assets/icons/return_package.svg";
 import person from "../../assets/icons/person.svg";
 import person_outline from "../../assets/icons/person_outline.svg";
@@ -292,6 +293,7 @@ export const icons = {
     logo,
     logout,
     package_icon,
+    return_pack,
     return_package,
     person,
     person_outline,

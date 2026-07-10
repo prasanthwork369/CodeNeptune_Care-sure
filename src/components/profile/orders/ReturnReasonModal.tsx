@@ -1,3 +1,4 @@
+import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ReasonDropdown } from "@/src/components/ui/ReasonDropdown";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -6,12 +7,9 @@ import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReaso
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { ReturnItemImages } from "@/src/types/return";
 import { moderateScale } from "@/src/utils/exactScale";
-import {
-    BottomSheetScrollView,
-    BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Image, Text, View } from "react-native";
 import { orderStyles as s } from "./orders.styles";
 
@@ -87,10 +85,15 @@ export function ReturnReasonModal({
   const selectedReason = reasons.find((r) => r.id === selectedReasonId);
   const selectedLabel = isOtherSelected ? "Other" : selectedReason?.label;
 
+  const sheetRef = useRef<BottomSheetModal>(null);
+
   const selectReason = (id: number | typeof OTHER_OPTION) => {
     setSelectedReasonId(id);
     setIsReasonOpen(false);
     if (error) setError("");
+    // Selecting "Other" reveals a text area — expand to the tall snap so it's
+    // visible; picking a normal reason hides it again, so shrink back down.
+    sheetRef.current?.snapToIndex(id === OTHER_OPTION ? 1 : 0);
   };
 
   const handleClose = () => {
@@ -122,7 +125,8 @@ export function ReturnReasonModal({
 
   const pickImage = async (slot: SlotKey) => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") return;
 
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -157,10 +161,18 @@ export function ReturnReasonModal({
 
   return (
     <GorhomBottomSheet
+      ref={sheetRef}
       isVisible={isVisible}
       onClose={onClose}
-      keyboardBehavior="interactive"
-      keyboardBlurBehavior="restore"
+      // Two snap points: opens at 60%, draggable up to 90%. Fixed snaps (not
+      // dynamic sizing) so the sheet never auto-jumps when Other's text area
+      // appears or the dropdown opens — content just scrolls inside.
+      snapPoints={["75%", "85%"]}
+      // Value only disables dynamic sizing now; the close button tracks the
+      // sheet automatically (see GorhomBottomSheet).
+      closeButtonOffset="75%"
+      keyboardBehavior="extend"
+      keyboardBlurBehavior="none"
       backgroundStyle={{
         backgroundColor: "#fff",
         borderTopLeftRadius: 12,
@@ -249,11 +261,13 @@ export function ReturnReasonModal({
           placeholder="Select the reason"
         />
 
-        {/* Spacer so dropdown has room to float over content below */}
-        <View style={{ height: isReasonOpen ? 220 : 0 }} />
+        {/* The dropdown list is position:absolute (floats over the fields
+            below), so it needs NO reserved space. A spacer here would grow the
+            dynamically-sized bottom sheet to full height whenever the dropdown
+            opens — which we explicitly don't want. */}
 
         {isOtherSelected && (
-          <BottomSheetTextInput
+          <SafeBottomSheetInput
             placeholder="Describe the issue..."
             placeholderTextColor="#6A6A6A"
             value={otherReason}
@@ -288,7 +302,7 @@ export function ReturnReasonModal({
         >
           Add details
         </Text>
-        <BottomSheetTextInput
+        <SafeBottomSheetInput
           multiline
           numberOfLines={4}
           placeholder="Please provide more details about the issue with the product"

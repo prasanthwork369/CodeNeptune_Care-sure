@@ -57,7 +57,7 @@ export function ItemsOrderedSection({
                 } as any)
               }
             >
-              <icons.package_icon width={exactScale(14)} height={exactScale(14)} fill="#854D0E" />
+              <icons.return_pack width={exactScale(14)} height={exactScale(14)} />
               <Text
                 style={[s.labelSm, { marginLeft: exactScale(6) }]}
                 className="font-inter-semibold text-brand-text"

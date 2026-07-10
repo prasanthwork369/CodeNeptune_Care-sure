@@ -3,16 +3,17 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { CategoryProductCardProps } from "@/src/types/category";
+import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import {
-    CARD_BTN_H,
-    CARD_BTN_SW,
-    CARD_BTN_W,
-    categoryCardStyles as s,
+  CARD_BTN_H,
+  CARD_BTN_SW,
+  CARD_BTN_W,
+  categoryCardStyles as s,
 } from "../../categories.styles";
-import { exactScale } from "@/src/utils/exactScale";
 
 export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
   product,
@@ -226,14 +227,15 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
           <View
             style={{
               backgroundColor: "#349638",
-              borderRadius: 6,
-              paddingHorizontal: exactScale(8),
-              paddingVertical: exactScale(4),
-              shadowColor: "#113D24",
-              shadowOffset: { width: -1, height: 1 },
-              shadowOpacity: 1,
-              shadowRadius: 0,
-              elevation: 2,
+              borderRadius: 8,
+              borderLeftWidth: 2,
+              borderBottomWidth: 2,
+              borderLeftColor: "#113D24",
+              borderBottomColor: "#113D24",
+              borderTopWidth: 0,
+              borderRightWidth: 0,
+              paddingHorizontal: exactScale(4),
+              paddingVertical: exactScale(6),
             }}
           >
             <Text style={s.price}>₹{Number(product.price).toFixed(2)}</Text>
@@ -243,29 +245,41 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
               ₹{Number(product.originalPrice).toFixed(2)}
             </Text>
           )}
+          {!!product.discount && (
+            <LinearGradient
+              colors={["#C4F15619", "#50B53B19"]} // 10% opacity via 8-digit hex (0x19 ≈ 0.098, closest match)
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0.1 }} // slight y-offset approximates the 92.48deg angle vs. a flat 90deg
+              style={{
+                borderRadius: exactScale(4),
+              }}
+            >
+              <View
+                style={{
+                  alignSelf: "flex-start",
+                  paddingHorizontal: exactScale(2),
+                  paddingVertical: exactScale(4),
+                }}
+              >
+                <Text style={s.discount}>{product.discount}</Text>
+              </View>
+            </LinearGradient>
+          )}
         </View>
 
-        <Text style={[s.name, { marginBottom: exactScale(4) }]} numberOfLines={2}>
+        <Text
+          style={[s.name, { marginBottom: exactScale(4) }]}
+          numberOfLines={2}
+        >
           {product.name}
         </Text>
 
-        <Text style={[s.desc, { marginBottom: exactScale(4) }]} numberOfLines={1}>
+        <Text
+          style={[s.desc, { marginBottom: exactScale(4) }]}
+          numberOfLines={1}
+        >
           {product.description}
         </Text>
-
-        {!!product.discount && (
-          <View
-            style={{
-              alignSelf: "flex-start",
-              backgroundColor: "#ECFAFB",
-              paddingHorizontal: exactScale(4),
-              paddingVertical: exactScale(2),
-              borderRadius: 8,
-            }}
-          >
-            <Text style={s.discount}>{product.discount}</Text>
-          </View>
-        )}
       </View>
     </View>
   );

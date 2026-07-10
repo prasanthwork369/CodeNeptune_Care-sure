@@ -1,7 +1,14 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import React from "react";
+import React, { useEffect } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeOutUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { moderateScale } from "@/src/utils/exactScale";
 
 export interface ReasonOption {
@@ -42,6 +49,15 @@ export function ReasonDropdown({
   placeholder = "Select a reason",
   maxListHeight = 220,
 }: ReasonDropdownProps) {
+  // Smoothly rotate the chevron between 0deg (closed) and 180deg (open).
+  const arrowRotation = useSharedValue(0);
+  useEffect(() => {
+    arrowRotation.value = withTiming(isOpen ? 1 : 0, { duration: 180 });
+  }, [isOpen, arrowRotation]);
+  const arrowStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${arrowRotation.value * 180}deg` }],
+  }));
+
   return (
     <View style={{ width: "100%", zIndex: 10 }}>
       <Touchable
@@ -74,17 +90,16 @@ export function ReasonDropdown({
         {loading ? (
           <ActivityIndicator size="small" color="#0F7635" />
         ) : (
-          <icons.down_arrow
-            width={14}
-            height={14}
-            fill="#6B7280"
-            style={{ transform: [{ rotate: isOpen ? "180deg" : "0deg" }] }}
-          />
+          <Animated.View style={arrowStyle}>
+            <icons.down_arrow width={14} height={14} fill="#6B7280" />
+          </Animated.View>
         )}
       </Touchable>
 
       {isOpen && (
-        <View
+        <Animated.View
+          entering={FadeInDown.duration(160)}
+          exiting={FadeOutUp.duration(120)}
           style={{
             position: "absolute",
             top: 54,
@@ -97,6 +112,11 @@ export function ReasonDropdown({
             borderWidth: 1,
             borderColor: "#E5E7EB",
             overflow: "hidden",
+            // Soft shadow for depth (iOS); Android uses elevation above.
+            shadowColor: "#111827",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.12,
+            shadowRadius: 12,
           }}
         >
           <ScrollView
@@ -171,7 +191,7 @@ export function ReasonDropdown({
               )}
             </Touchable>
           )}
-        </View>
+        </Animated.View>
       )}
     </View>
   );

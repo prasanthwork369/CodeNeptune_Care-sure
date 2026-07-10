@@ -8,6 +8,7 @@ export const PatientSymptomsInput: React.FC<PatientSymptomsInputProps> = ({ valu
         <View className="mb-4">
             <Text className="font-inter-semibold text-[#1A1C1E] mb-2" style={{ fontSize: moderateScale(13) }}>Help us understand your symptoms</Text>
             <TextInput
+                allowFontScaling={false}
                 placeholder="Eg: Mild fever and body pain"
                 placeholderTextColor="#6A6A6A"
                 multiline

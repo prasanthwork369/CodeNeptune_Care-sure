@@ -6,10 +6,8 @@ import { icons } from "@/src/constants/icons";
 import { useHealthProblems } from "@/src/hooks/queries/useHealthProblems";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { resolveAssetUrl } from "@/src/utils/urls";
-import {
-  BottomSheetFlatList,
-  BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";

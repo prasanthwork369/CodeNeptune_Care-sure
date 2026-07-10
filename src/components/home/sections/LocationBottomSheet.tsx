@@ -13,10 +13,10 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { addressToLocation } from "@/src/utils/addressLocation";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import {
   BottomSheetModal,
   BottomSheetScrollView,
-  BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useMemo, useRef, useState } from "react";

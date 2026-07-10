@@ -133,19 +133,16 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
                         pressBehavior="close"
                     />
                     {!hideCloseButton && (
-                        enableDynamicSizing ? (
-                            <BottomSheetCloseButton
-                                animatedIndex={props.animatedIndex}
-                                animatedPosition={props.animatedPosition}
-                                onPress={handleClose}
-                            />
-                        ) : (
-                            <BottomSheetCloseButton
-                                animatedIndex={props.animatedIndex}
-                                onPress={handleClose}
-                                bottomOffset={closeButtonOffset!}
-                            />
-                        )
+                        // Always drive the close button from the sheet's live
+                        // animatedPosition so it tracks the sheet at ANY snap
+                        // point (fixed or dynamic) instead of sitting at a
+                        // static offset. closeButtonOffset now only toggles
+                        // dynamic sizing (see enableDynamicSizing above).
+                        <BottomSheetCloseButton
+                            animatedIndex={props.animatedIndex}
+                            animatedPosition={props.animatedPosition}
+                            onPress={handleClose}
+                        />
                     )}
                 </>
             ),
