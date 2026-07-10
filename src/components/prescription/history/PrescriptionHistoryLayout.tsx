@@ -114,7 +114,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           onRefresh={refetch}
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center py-16">
-              <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(14, 0.1) }}>
+              <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(14) }}>
                 No prescriptions found
               </Text>
             </View>

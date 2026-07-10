@@ -50,14 +50,14 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
       >
         <Text
           className="font-inter-extrabold text-[#111827]"
-          style={{ fontSize: moderateScale(20, 0.1) }}
+          style={{ fontSize: moderateScale(20) }}
         >
           ₹{Number(product.price).toFixed(2)}
         </Text>
         {!!product.originalPrice && product.originalPrice > product.price && (
           <Text
             className="font-inter-medium text-brand-subtext line-through"
-            style={{ fontSize: moderateScale(12, 0.1) }}
+            style={{ fontSize: moderateScale(12) }}
           >
             ₹{Number(product.originalPrice).toFixed(2)}
           </Text>
@@ -69,7 +69,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
           >
             <Text
               className="font-inter-bold"
-              style={{ color: "#0559E8", fontSize: moderateScale(12, 0.1) }}
+              style={[{ fontSize: moderateScale(12) }, { color: "#0559E8" }]}
             >
               {product.savingsPercent}% off
             </Text>
@@ -80,7 +80,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
         numberOfLines={1}
         ellipsizeMode="tail"
         className="font-inter-medium text-brand-subtext mt-0.5"
-        style={{ fontSize: moderateScale(11, 0.1) }}
+        style={{ fontSize: moderateScale(11) }}
       >
         (Inclusive of all Taxes)
       </Text>
@@ -118,7 +118,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             ) : (
               <Text
                 className="font-inter-bold text-white"
-                style={{ fontSize: moderateScale(16, 0.1) }}
+                style={{ fontSize: moderateScale(16) }}
               >
                 Add to Cart
               </Text>
@@ -140,7 +140,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             >
               <Text
                 className="font-inter-semibold text-brand-text"
-                style={{ fontSize: moderateScale(24, 0.1) }}
+                style={{ fontSize: moderateScale(24) }}
               >
                 −
               </Text>
@@ -160,7 +160,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
                   style={{
                     transform: [{ translateY: slideAnim }],
                     opacity: opacityAnim,
-                    fontSize: moderateScale(16, 0.1),
+                    fontSize: moderateScale(16),
                   }}
                   className="font-inter-bold text-brand-text text-center px-2"
                 >
@@ -176,7 +176,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             >
               <Text
                 className="font-inter-semibold text-brand-text"
-                style={{ fontSize: moderateScale(22, 0.1) }}
+                style={{ fontSize: moderateScale(22) }}
               >
                 +
               </Text>
@@ -197,16 +197,13 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             <View className="px-4 justify-center">
               <Text
                 className="font-inter-extrabold text-white"
-                style={{ fontSize: moderateScale(15, 0.1) }}
+                style={{ fontSize: moderateScale(15) }}
               >
                 ₹{Number(totalPrice).toFixed(2)}
               </Text>
               <Text
                 className="font-inter-medium"
-                style={{
-                  color: "rgba(255,255,255,0.75)",
-                  fontSize: moderateScale(11, 0.1),
-                }}
+                style={[{ fontSize: moderateScale(11) }, { color: "rgba(255,255,255,0.75)" }]}
               >
                 {totalItems} Item{totalItems !== 1 ? "s" : ""}
               </Text>
@@ -225,13 +222,13 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             <View className="px-4 justify-center items-center flex-row gap-x-1.5">
               <Text
                 className="font-inter-bold text-white"
-                style={{ fontSize: moderateScale(15, 0.1) }}
+                style={{ fontSize: moderateScale(15) }}
               >
                 View Cart
               </Text>
               <Text
                 className="text-white font-inter-bold"
-                style={{ fontSize: moderateScale(16, 0.1) }}
+                style={{ fontSize: moderateScale(16) }}
               >
                 ›
               </Text>

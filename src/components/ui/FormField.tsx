@@ -158,7 +158,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           onFocus={onFocus}
           className="bg-white rounded-[10px] px-4 py-[14px] font-inter-regular text-[#1A1C1E]"
           style={{
-            fontSize: moderateScale(15, 0.1),
+            fontSize: moderateScale(15),
             borderWidth: 1,
             borderColor: error ? "#EF4444" : "#E8E8E8",
           }}

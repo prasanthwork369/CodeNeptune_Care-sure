@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   otpDigit: {
     textAlignVertical: "center",
     includeFontPadding: false,
-    fontSize: moderateScale(24, 0.3),
+    fontSize: moderateScale(24),
     fontFamily: Platform.OS === "android" ? "Inter_700Bold" : undefined,
     fontWeight: "700",
     lineHeight: verticalScale(24),
@@ -53,21 +53,21 @@ export const styles = StyleSheet.create({
     padding: 0,
   },
   error: {
-    fontSize: moderateScale(13, 0.3),
+    fontSize: moderateScale(13),
     fontWeight: "500",
     color: "#EF4444",
     textAlign: "center",
     marginBottom: verticalScale(8),
   },
   resendText: {
-    fontSize: moderateScale(13, 0.3),
+    fontSize: moderateScale(13),
     fontWeight: "500",
     color: "#637381",
     paddingVertical: verticalScale(8),
   },
   resendHighlight: { color: "#0F7635", fontWeight: "700" },
   resendBtn: {
-    fontSize: moderateScale(13, 0.3),
+    fontSize: moderateScale(13),
     fontWeight: "700",
     color: "#0F7635",
     textDecorationLine: "underline",
@@ -90,10 +90,10 @@ export const styles = StyleSheet.create({
     marginVertical: verticalScale(12),
   },
   btnText: {
-    fontSize: moderateScale(16, 0.3),
+    fontSize: moderateScale(16),
     fontWeight: "700",
     color: "white",
     marginRight: scale(8),
   },
-  arrow: { width: moderateScale(13, 0.3), height: moderateScale(13, 0.3) },
+  arrow: { width: moderateScale(13), height: moderateScale(13) },
 });

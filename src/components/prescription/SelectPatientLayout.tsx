@@ -102,7 +102,7 @@ export const SelectPatientLayout: React.FC = () => {
             >
               <Text
                 className="font-inter-bold text-[#0F7635]"
-                style={{ fontSize: moderateScale(13, 0.1) }}
+                style={{ fontSize: moderateScale(13) }}
               >
                 ADD PATIENT
               </Text>
@@ -132,7 +132,7 @@ export const SelectPatientLayout: React.FC = () => {
               <View className="mb-4">
                 <Text
                   className="font-inter-semibold text-[#1A1C1E] mb-[10px]"
-                  style={{ fontSize: moderateScale(14, 0.1) }}
+                  style={{ fontSize: moderateScale(14) }}
                 >
                   Prescription
                 </Text>
@@ -156,7 +156,7 @@ export const SelectPatientLayout: React.FC = () => {
                             <icons.upload_file width={22} height={22} />
                             <Text
                               className="font-inter-bold text-[#1A1C1E] mt-0.5"
-                              style={{ fontSize: moderateScale(8, 0.1) }}
+                              style={{ fontSize: moderateScale(8) }}
                             >
                               PDF
                             </Text>
@@ -194,7 +194,7 @@ export const SelectPatientLayout: React.FC = () => {
                 ) : members.length === 0 ? (
                   <Text
                     className="font-inter text-[#919EAB] py-2"
-                    style={{ fontSize: moderateScale(12, 0.1) }}
+                    style={{ fontSize: moderateScale(12) }}
                   >
                     No patients yet. Tap &quot;ADD PATIENT&quot;
                   </Text>
@@ -216,7 +216,7 @@ export const SelectPatientLayout: React.FC = () => {
                           className="font-inter-medium"
                           style={{
                             color: sel ? "#FFFFFF" : "#6A6A6A",
-                            fontSize: moderateScale(13, 0.1),
+                            fontSize: moderateScale(13),
                           }}
                         >
                           {p.name}{" "}
@@ -231,7 +231,7 @@ export const SelectPatientLayout: React.FC = () => {
 
             <Text
               className="font-inter-bold text-[#222222] mb-2"
-              style={{ fontSize: moderateScale(13, 0.1) }}
+              style={{ fontSize: moderateScale(13) }}
             >
               Doctor will reach you at
             </Text>
@@ -242,7 +242,7 @@ export const SelectPatientLayout: React.FC = () => {
               {editingPhone ? (
                 <TextInput
                   className="flex-1 font-inter-semibold text-[#222222] py-3"
-                  style={{ fontSize: moderateScale(14, 0.1) }}
+                  style={{ fontSize: moderateScale(14) }}
                   value={phoneValue}
                   onChangeText={setPhoneValue}
                   keyboardType="number-pad"
@@ -263,7 +263,7 @@ export const SelectPatientLayout: React.FC = () => {
                       phoneValue || selectedPatient?.phone
                         ? "#222222"
                         : "#919EAB",
-                    fontSize: moderateScale(14, 0.1),
+                    fontSize: moderateScale(14),
                   }}
                 >
                   {format.phone(phoneValue || selectedPatient?.phone) ||
@@ -281,7 +281,7 @@ export const SelectPatientLayout: React.FC = () => {
                 ) : (
                   <Text
                     className="font-inter-bold text-[#0F7635]"
-                    style={{ fontSize: moderateScale(13, 0.1) }}
+                    style={{ fontSize: moderateScale(13) }}
                   >
                     {editingPhone ? "Done" : "Edit"}
                   </Text>
@@ -293,7 +293,7 @@ export const SelectPatientLayout: React.FC = () => {
               <View className="flex-1">
                 <Text
                   className="font-inter-bold text-[#222222] mb-2"
-                  style={{ fontSize: moderateScale(13, 0.1) }}
+                  style={{ fontSize: moderateScale(13) }}
                 >
                   Age
                 </Text>
@@ -312,7 +312,7 @@ export const SelectPatientLayout: React.FC = () => {
                             ? "Days old"
                             : unit;
                       return (
-                        <Text style={{ fontSize: moderateScale(14, 0.1) }}>
+                        <Text style={{ fontSize: moderateScale(14) }}>
                           <Text className="font-inter-bold text-[#222222]">
                             {value}
                           </Text>
@@ -326,7 +326,7 @@ export const SelectPatientLayout: React.FC = () => {
                   ) : (
                     <Text
                       className="font-inter-bold text-[#222222]"
-                      style={{ fontSize: moderateScale(14, 0.1) }}
+                      style={{ fontSize: moderateScale(14) }}
                     >
                       —
                     </Text>
@@ -336,7 +336,7 @@ export const SelectPatientLayout: React.FC = () => {
               <View>
                 <Text
                   className="font-inter-bold text-[#222222] mb-2"
-                  style={{ fontSize: moderateScale(13, 0.1) }}
+                  style={{ fontSize: moderateScale(13) }}
                 >
                   Gender
                 </Text>
@@ -348,7 +348,7 @@ export const SelectPatientLayout: React.FC = () => {
                   )}
                   <Text
                     className="ml-1.5 font-inter-bold text-[#0F7635]"
-                    style={{ fontSize: moderateScale(13, 0.1) }}
+                    style={{ fontSize: moderateScale(13) }}
                   >
                     {selectedPatient?.gender
                       ? selectedPatient.gender.charAt(0) +
@@ -361,7 +361,7 @@ export const SelectPatientLayout: React.FC = () => {
 
             <Text
               className="font-inter-bold text-[#222222] mb-2"
-              style={{ fontSize: moderateScale(13, 0.1) }}
+              style={{ fontSize: moderateScale(13) }}
             >
               Select Your Health Problem
             </Text>
@@ -384,8 +384,8 @@ export const SelectPatientLayout: React.FC = () => {
                   ) : (
                     <Text
                       style={{
-                        fontSize: moderateScale(20, 0.1),
-                        lineHeight: moderateScale(24, 0.1),
+                        fontSize: moderateScale(20),
+                        lineHeight: moderateScale(24),
                       }}
                     >
                       {selectedHealthProblem.icon}
@@ -393,7 +393,7 @@ export const SelectPatientLayout: React.FC = () => {
                   )}
                   <Text
                     className="font-inter-medium text-[#1A1C1E]"
-                    style={{ fontSize: moderateScale(14, 0.1) }}
+                    style={{ fontSize: moderateScale(14) }}
                   >
                     {selectedHealthProblem.label}
                   </Text>
@@ -401,7 +401,7 @@ export const SelectPatientLayout: React.FC = () => {
               ) : (
                 <Text
                   className="font-inter text-[#6A6A6A]"
-                  style={{ fontSize: moderateScale(14, 0.1) }}
+                  style={{ fontSize: moderateScale(14) }}
                 >
                   Select
                 </Text>
@@ -417,14 +417,14 @@ export const SelectPatientLayout: React.FC = () => {
                   placeholder="Type the health problem..."
                   placeholderTextColor="#6A6A6A"
                   className="w-full font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px] py-3"
-                  style={{ fontSize: moderateScale(14, 0.1) }}
+                  style={{ fontSize: moderateScale(14) }}
                 />
               </View>
             )}
 
             <Text
               className="font-inter-bold text-[#222222] mb-2"
-              style={{ fontSize: moderateScale(13, 0.1) }}
+              style={{ fontSize: moderateScale(13) }}
             >
               Help us understand your symptoms
             </Text>
@@ -438,7 +438,7 @@ export const SelectPatientLayout: React.FC = () => {
               style={{
                 minHeight: 100,
                 textAlignVertical: "top",
-                fontSize: moderateScale(14, 0.1),
+                fontSize: moderateScale(14),
               }}
             />
           </ScrollView>
@@ -460,13 +460,13 @@ export const SelectPatientLayout: React.FC = () => {
               <View className="flex-1">
                 <Text
                   className="font-inter-bold text-[#1A1C1E]"
-                  style={{ fontSize: moderateScale(14, 0.1) }}
+                  style={{ fontSize: moderateScale(14) }}
                 >
                   Take care, {selectedPatient?.name ?? "there"}
                 </Text>
                 <Text
                   className="font-inter-medium text-[#6A6A6A] mt-0.5"
-                  style={{ fontSize: moderateScale(12, 0.1) }}
+                  style={{ fontSize: moderateScale(12) }}
                 >
                   Your medicines will be there when you need them
                 </Text>
@@ -477,13 +477,13 @@ export const SelectPatientLayout: React.FC = () => {
               <View className="mr-4">
                 <Text
                   className="font-inter-medium text-[#222222]"
-                  style={{ fontSize: moderateScale(11, 0.1) }}
+                  style={{ fontSize: moderateScale(11) }}
                 >
                   To Pay
                 </Text>
                 <Text
                   className="font-inter-extrabold text-[#222222]"
-                  style={{ fontSize: moderateScale(18, 0.1) }}
+                  style={{ fontSize: moderateScale(18) }}
                 >
                   ₹{Number(toPay).toFixed(2)}
                 </Text>
@@ -495,7 +495,7 @@ export const SelectPatientLayout: React.FC = () => {
               >
                 <Text
                   className="font-inter-semibold text-white"
-                  style={{ fontSize: moderateScale(15, 0.1) }}
+                  style={{ fontSize: moderateScale(15) }}
                 >
                   Proceed
                 </Text>

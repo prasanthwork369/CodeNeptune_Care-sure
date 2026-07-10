@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
   skipText: {
     fontFamily: "Inter-700Bold",
     fontWeight: "700",
-    fontSize: moderateScale(13, 0.3),
-    lineHeight: moderateScale(17, 0.3),
+    fontSize: moderateScale(13),
+    lineHeight: moderateScale(17),
     letterSpacing: 0,
     textAlign: "center",
     textAlignVertical: "center",

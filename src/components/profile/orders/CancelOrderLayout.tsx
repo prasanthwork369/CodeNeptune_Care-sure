@@ -192,15 +192,15 @@ export function CancelOrderLayout() {
                 }}
               >
                 <icons.cancel_order_bag
-                  width={moderateScale(20, 0.3)}
-                  height={moderateScale(20, 0.3)}
+                  width={moderateScale(20)}
+                  height={moderateScale(20)}
                   fill="#E11D48"
                 />
               </View>
               <View>
                 <Text
                   style={{
-                    fontSize: moderateScale(15, 0.3),
+                    fontSize: moderateScale(15),
                     fontWeight: "700",
                     color: "#222222",
                   }}
@@ -209,7 +209,7 @@ export function CancelOrderLayout() {
                 </Text>
                 <Text
                   style={{
-                    fontSize: moderateScale(12, 0.3),
+                    fontSize: moderateScale(12),
                     fontWeight: "400",
                     color: "#6A6A6A",
                     marginTop: verticalScale(2),
@@ -223,7 +223,7 @@ export function CancelOrderLayout() {
             {/* Title / Question */}
             <Text
               style={{
-                fontSize: moderateScale(14, 0.3),
+                fontSize: moderateScale(14),
                 fontWeight: "700",
                 color: "#222222",
                 marginTop: verticalScale(18),
@@ -305,7 +305,7 @@ export function CancelOrderLayout() {
                                   <View style={{ flex: 1, marginRight: scale(8) }}>
                                     <Text
                                       style={{
-                                        fontSize: moderateScale(14, 0.3),
+                                        fontSize: moderateScale(14),
                                         fontWeight: "600",
                                         color: "#222222",
                                       }}
@@ -315,7 +315,7 @@ export function CancelOrderLayout() {
                                     {!!reason.description && (
                                       <Text
                                         style={{
-                                          fontSize: moderateScale(12, 0.3),
+                                          fontSize: moderateScale(12),
                                           color: "#9CA3AF",
                                           marginTop: verticalScale(2),
                                         }}
@@ -379,7 +379,7 @@ export function CancelOrderLayout() {
                             paddingHorizontal: scale(14),
                             paddingVertical: verticalScale(12),
                             fontWeight: "400",
-                            fontSize: moderateScale(13, 0.3),
+                            fontSize: moderateScale(13),
                             color: "#1A1C1E",
                             textAlignVertical: "top",
                             marginTop: verticalScale(12),
@@ -400,7 +400,7 @@ export function CancelOrderLayout() {
                   width: "100%",
                   marginTop: verticalScale(8),
                   fontWeight: "400",
-                  fontSize: moderateScale(12, 0.3),
+                  fontSize: moderateScale(12),
                   color: "#DC2626",
                 }}
               >
@@ -444,7 +444,7 @@ export function CancelOrderLayout() {
         >
           <Text
             style={{
-              fontSize: moderateScale(16, 0.3),
+              fontSize: moderateScale(16),
               fontWeight: "700",
               color: "#fff",
             }}
@@ -462,12 +462,12 @@ export function CancelOrderLayout() {
           }}
         >
           <icons.lock_grey
-            width={moderateScale(14, 0.3)}
-            height={moderateScale(14, 0.3)}
+            width={moderateScale(14)}
+            height={moderateScale(14)}
           />
           <Text
             style={{
-              fontSize: moderateScale(12, 0.3),
+              fontSize: moderateScale(12),
               fontWeight: "400",
               color: "#9CA3AF",
             }}

@@ -30,7 +30,7 @@ export const LogisticsBar: React.FC<LogisticsBarProps> = ({
                     numberOfLines={1}
                     ellipsizeMode="tail"
                     className="font-inter text-brand-text ml-2"
-                    style={{ flexShrink: 1, fontSize: moderateScale(12, 0.1) }}
+                    style={{ flexShrink: 1, fontSize: moderateScale(12) }}
                 >
                     Get by <Text className="font-inter-bold text-brand-text">{deliveryTime}</Text>
                 </Text>
@@ -41,12 +41,12 @@ export const LogisticsBar: React.FC<LogisticsBarProps> = ({
                     numberOfLines={1}
                     ellipsizeMode="tail"
                     className="font-inter-semibold text-brand-text mx-2"
-                    style={{ maxWidth: exactScale(70), fontSize: moderateScale(12, 0.1) }}
+                    style={{ maxWidth: exactScale(70), fontSize: moderateScale(12) }}
                 >
                     {displayLabel}
                 </Text>
                 <Touchable onPress={onChangeLocation} style={{ flexShrink: 0 }}>
-                    <Text className="font-inter-semibold text-brand-primary" style={{ fontSize: moderateScale(14, 0.1) }}>Change</Text>
+                    <Text className="font-inter-semibold text-brand-primary" style={{ fontSize: moderateScale(14) }}>Change</Text>
                 </Touchable>
             </View>
         </View>

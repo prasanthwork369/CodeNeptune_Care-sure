@@ -36,10 +36,10 @@ export const DuplicateFileModal: React.FC<DuplicateFileModalProps> = ({
                         <Image source={HOME_IMAGES.prescriptionInfo} style={{ width: 36, height: 36 }} contentFit="contain" />
                     </View>
 
-                    <Text className="font-inter-bold text-[#0F1724] mb-1.5 text-center" style={{ fontSize: moderateScale(18, 0.1) }}>
+                    <Text className="font-inter-bold text-[#0F1724] mb-1.5 text-center" style={{ fontSize: moderateScale(18) }}>
                         Duplicate File
                     </Text>
-                    <Text className="font-inter-medium text-[#6A6A6A] text-center leading-5 mb-5" style={{ fontSize: moderateScale(13, 0.1) }}>
+                    <Text className="font-inter-medium text-[#6A6A6A] text-center leading-5 mb-5" style={{ fontSize: moderateScale(13) }}>
                         A file with the same name(&quot;{fileName}&quot;) has already been uploaded
                     </Text>
 
@@ -48,10 +48,10 @@ export const DuplicateFileModal: React.FC<DuplicateFileModalProps> = ({
                             <Image source={HOME_IMAGES.prescriptionMedicine} style={{ width: 22, height: 22 }} contentFit="contain" />
                         </View>
                         <View className="flex-1">
-                            <Text numberOfLines={1} className="font-inter-semibold text-[#0F1724]" style={{ fontSize: moderateScale(13, 0.1) }}>
+                            <Text numberOfLines={1} className="font-inter-semibold text-[#0F1724]" style={{ fontSize: moderateScale(13) }}>
                                 {fileName}
                             </Text>
-                            <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1) }}>
+                            <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12) }}>
                                 {[fileSizeLabel, uploadedLabel].filter(Boolean).join(' | ')}
                             </Text>
                         </View>
@@ -62,7 +62,7 @@ export const DuplicateFileModal: React.FC<DuplicateFileModalProps> = ({
                         activeOpacity={0.85}
                         className="w-full bg-brand-primary rounded-lg py-3.5 items-center"
                     >
-                        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15, 0.1) }}>Choose Another File</Text>
+                        <Text className="font-inter-bold text-white" style={{ fontSize: moderateScale(15) }}>Choose Another File</Text>
                     </Touchable>
                 </View>
             </Pressable>

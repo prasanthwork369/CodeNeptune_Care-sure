@@ -26,9 +26,9 @@ export const cartCounterStyles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
   },
-  addText: { fontSize: moderateScale(14, 0.1) },
-  plusMinus: { fontSize: moderateScale(20, 0.1) },
-  countText: { fontSize: moderateScale(14, 0.1) },
+  addText: { fontSize: moderateScale(14) },
+  plusMinus: { fontSize: moderateScale(20) },
+  countText: { fontSize: moderateScale(14) },
   countContainer: {
     flex: 1,
     paddingVertical: exactScale(9),
@@ -38,16 +38,16 @@ export const cartCounterStyles = StyleSheet.create({
 });
 
 export const searchCardStyles = StyleSheet.create({
-  name: { fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(22) },
-  desc: { fontSize: moderateScale(12, 0.1) },
-  price: { fontSize: moderateScale(18, 0.1), lineHeight: moderateScale(18) },
-  priceSm: { fontSize: moderateScale(16, 0.1) },
-  mrp: { fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(14) },
-  savings: { fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(12) },
-  savingsTag: { fontSize: moderateScale(11, 0.1) },
-  badge: { fontSize: moderateScale(12, 0.1) },
-  label: { fontSize: moderateScale(14, 0.1) },
-  sameComp: { fontSize: moderateScale(14, 0.1) },
+  name: { fontSize: moderateScale(14), lineHeight: moderateScale(22) },
+  desc: { fontSize: moderateScale(12) },
+  price: { fontSize: moderateScale(18), lineHeight: moderateScale(18) },
+  priceSm: { fontSize: moderateScale(16) },
+  mrp: { fontSize: moderateScale(14), lineHeight: moderateScale(14) },
+  savings: { fontSize: moderateScale(12), lineHeight: moderateScale(12) },
+  savingsTag: { fontSize: moderateScale(11) },
+  badge: { fontSize: moderateScale(12) },
+  label: { fontSize: moderateScale(14) },
+  sameComp: { fontSize: moderateScale(14) },
   checkIcon: { width: exactScale(18), height: exactScale(18) },
   sellIcon: { width: exactScale(15), height: exactScale(15), top: exactScale(1.5), left: exactScale(1.5) },
   imgBox: { width: exactScale(80), height: exactScale(80) },
@@ -68,31 +68,31 @@ export const searchCardStyles = StyleSheet.create({
 });
 
 export const searchRecentStyles = StyleSheet.create({
-  sectionTitle: { fontSize: moderateScale(15, 0.1) },
-  clearBtn: { fontSize: moderateScale(13, 0.1) },
-  chipText: { fontSize: moderateScale(13, 0.1) },
+  sectionTitle: { fontSize: moderateScale(15) },
+  clearBtn: { fontSize: moderateScale(13) },
+  chipText: { fontSize: moderateScale(13) },
   chipIcon: { width: exactScale(14), height: exactScale(14) },
   trendIcon: { width: exactScale(16), height: exactScale(16) },
 });
 
 export const searchCartBarStyles = StyleSheet.create({
-  price: { fontSize: moderateScale(20, 0.1) },
-  items: { fontSize: moderateScale(13, 0.1) },
-  btnText: { fontSize: moderateScale(16, 0.1) },
+  price: { fontSize: moderateScale(20) },
+  items: { fontSize: moderateScale(13) },
+  btnText: { fontSize: moderateScale(16) },
 });
 
 export const trustBadgeStyles = StyleSheet.create({
-  sectionTitle: { fontSize: moderateScale(14, 0.1) },
-  label: { fontSize: moderateScale(12, 0.1) },
-  value: { fontSize: moderateScale(14, 0.1) },
+  sectionTitle: { fontSize: moderateScale(14) },
+  label: { fontSize: moderateScale(12) },
+  value: { fontSize: moderateScale(14) },
   checkIcon: { width: exactScale(14), height: exactScale(14) },
   modiLogo: { width: exactScale(90), height: exactScale(24) },
   ciplaLogo: { width: exactScale(60), height: exactScale(20) },
 });
 
 export const logisticsBarStyles = StyleSheet.create({
-  text: { fontSize: moderateScale(12, 0.1) },
-  change: { fontSize: moderateScale(14, 0.1) },
+  text: { fontSize: moderateScale(12) },
+  change: { fontSize: moderateScale(14) },
   bagIcon: { width: exactScale(20), height: exactScale(20) },
   locIcon: { width: exactScale(18), height: exactScale(18) },
 });
@@ -113,13 +113,13 @@ export const searchHeaderStyles = StyleSheet.create({
     elevation: 4,
   },
   inputText: {
-    fontSize: moderateScale(13, 0.1),
+    fontSize: moderateScale(13),
     fontWeight: "400",
     color: "#222222",
     padding: 0,
     margin: 0,
     height: exactScale(28),
-    lineHeight: moderateScale(16, 0.1),
+    lineHeight: moderateScale(16),
     letterSpacing: 0,
     includeFontPadding: false,
   },

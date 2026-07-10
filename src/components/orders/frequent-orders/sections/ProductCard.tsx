@@ -140,9 +140,9 @@ export function ProductCard({
       ? `${Math.round(((Number(item.originalPrice) - Number(item.price)) / Number(item.originalPrice)) * 100)}% OFF`
       : undefined);
 
-  const labelMdFontSize = isStepperVariant ? moderateScale(14, 0.1) : moderateScale(14);
-  const smallFontSize = isStepperVariant ? moderateScale(11, 0.08) : moderateScale(11);
-  const orderedFontSize = isStepperVariant ? moderateScale(13, 0.1) : moderateScale(12);
+  const labelMdFontSize = isStepperVariant ? moderateScale(14) : moderateScale(14);
+  const smallFontSize = isStepperVariant ? moderateScale(11) : moderateScale(11);
+  const orderedFontSize = isStepperVariant ? moderateScale(13) : moderateScale(12);
   const imgSize = isStepperVariant ? exactScale(54) : 54;
 
   return (
@@ -199,7 +199,7 @@ export function ProductCard({
             >
               <Text
                 style={{
-                  fontSize: moderateScale(10, 0.08),
+                  fontSize: moderateScale(10),
                   fontWeight: "800",
                   color: "#0F7635",
                 }}
@@ -386,7 +386,7 @@ export function ProductCard({
             >
               <Text
                 style={{
-                  fontSize: moderateScale(20, 0.1),
+                  fontSize: moderateScale(20),
                   fontWeight: "500",
                   color: "#1C2024",
                 }}
@@ -415,7 +415,7 @@ export function ProductCard({
             >
               <Text
                 style={{
-                  fontSize: moderateScale(20, 0.1),
+                  fontSize: moderateScale(20),
                   fontWeight: "500",
                   color: "#1C2024",
                 }}
@@ -444,7 +444,7 @@ export function ProductCard({
             ) : (
               <Text
                 style={{
-                  fontSize: moderateScale(13, 0.1),
+                  fontSize: moderateScale(13),
                   fontWeight: "600",
                   color: "#0F7635",
                 }}

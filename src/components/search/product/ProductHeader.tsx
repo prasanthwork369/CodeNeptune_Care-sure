@@ -99,7 +99,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           {!onQueryChange && (
             <Text
               className="flex-1 font-inter text-[#222222]"
-              style={{ fontSize: moderateScale(15, 0.1) }}
+              style={{ fontSize: moderateScale(15) }}
               numberOfLines={1}
             >
               {query || "Search affordable substitute"}
@@ -131,7 +131,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             <icons.Add_Cart width={30} height={30} />
             {cartCount > 0 && (
               <View className="absolute -top-1 -right-1 w-[20px] h-[20px] rounded-full bg-[#C22923] items-center justify-center">
-                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(12, 0.1) }}>
+                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(12) }}>
                   {cartCount}
                 </Text>
               </View>

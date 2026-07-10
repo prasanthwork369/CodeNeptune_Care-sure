@@ -174,27 +174,27 @@ export const OrderSuccessLayout: React.FC = () => {
                         style={{ width: exactScale(160), height: exactScale(160) }}
                     />
 
-                    <Text style={{ fontSize: moderateScale(22, 0.1), fontWeight: '800', color: '#0F1724', marginTop: exactScale(8), textAlign: 'center' }}>
+                    <Text style={{ fontSize: moderateScale(22), fontWeight: '800', color: '#0F1724', marginTop: exactScale(8), textAlign: 'center' }}>
                         Order Placed! 🎉
                     </Text>
-                    <Text style={{ fontSize: moderateScale(14, 0.1), color: '#6A6A6A', marginTop: exactScale(6), textAlign: 'center', lineHeight: moderateScale(20, 0.1) }}>
+                    <Text style={{ fontSize: moderateScale(14), color: '#6A6A6A', marginTop: exactScale(6), textAlign: 'center', lineHeight: moderateScale(20) }}>
                         {"Your medicines are on their way.\nWe'll keep you updated."}
                     </Text>
 
                     <View style={{ width: '100%', marginTop: exactScale(24), backgroundColor: '#F8FFF9', borderRadius: exactScale(16), borderWidth: 1, borderColor: '#0F763522', padding: exactScale(16), gap: exactScale(12) }}>
                         {orderId ? (
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '500', color: '#6A6A6A' }}>Order ID</Text>
-                                <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '700', color: '#1A1C1E' }}>{orderId.slice(-8).toUpperCase()}</Text>
+                                <Text style={{ fontSize: moderateScale(13), fontWeight: '500', color: '#6A6A6A' }}>Order ID</Text>
+                                <Text style={{ fontSize: moderateScale(13), fontWeight: '700', color: '#1A1C1E' }}>{orderId.slice(-8).toUpperCase()}</Text>
                             </View>
                         ) : null}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '500', color: '#6A6A6A' }}>Amount Paid</Text>
-                            <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '700', color: '#0F7635' }}>₹{Number(total).toFixed(2)}</Text>
+                            <Text style={{ fontSize: moderateScale(13), fontWeight: '500', color: '#6A6A6A' }}>Amount Paid</Text>
+                            <Text style={{ fontSize: moderateScale(13), fontWeight: '700', color: '#0F7635' }}>₹{Number(total).toFixed(2)}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '500', color: '#6A6A6A' }}>Delivery</Text>
-                            <Text style={{ fontSize: moderateScale(13, 0.1), fontWeight: '700', color: '#1A1C1E' }}>2–4 Business Days</Text>
+                            <Text style={{ fontSize: moderateScale(13), fontWeight: '500', color: '#6A6A6A' }}>Delivery</Text>
+                            <Text style={{ fontSize: moderateScale(13), fontWeight: '700', color: '#1A1C1E' }}>2–4 Business Days</Text>
                         </View>
                     </View>
 
@@ -204,14 +204,14 @@ export const OrderSuccessLayout: React.FC = () => {
                             onPress={() => router.replace('/profile/orders' as any)}
                             style={{ backgroundColor: '#0F7635', borderRadius: exactScale(14), paddingVertical: exactScale(16), alignItems: 'center' }}
                         >
-                            <Text style={{ fontSize: moderateScale(15, 0.1), fontWeight: '700', color: '#fff' }}>Track My Order</Text>
+                            <Text style={{ fontSize: moderateScale(15), fontWeight: '700', color: '#fff' }}>Track My Order</Text>
                         </Touchable>
                         <Touchable
                             activeOpacity={0.5}
                             onPress={() => router.replace('/(tabs)')}
                             style={{ borderRadius: exactScale(14), paddingVertical: exactScale(14), alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: exactScale(6), borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' }}
                         >
-                            <Text style={{ fontSize: moderateScale(14, 0.1), fontWeight: '600', color: '#374151' }}>Continue Shopping</Text>
+                            <Text style={{ fontSize: moderateScale(14), fontWeight: '600', color: '#374151' }}>Continue Shopping</Text>
                             <icons.arrow_forward_ios width={exactScale(12)} height={exactScale(12)} fill="#374151" />
                         </Touchable>
                     </Animated.View>

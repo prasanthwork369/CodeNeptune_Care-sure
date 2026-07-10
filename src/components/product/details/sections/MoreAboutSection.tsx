@@ -126,7 +126,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
 
   return (
     <View className="mx-4 mb-6 mt-6">
-      <Text className="font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(17, 0.1) }}>
+      <Text className="font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(17) }}>
         More About {medicineName}
       </Text>
 
@@ -169,7 +169,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                 >
                   <Text
                     className={`font-inter-medium ${activeTab === tab.id ? "text-brand-primary" : "text-brand-subtext"}`}
-                    style={{ fontSize: moderateScale(14, 0.1) }}
+                    style={{ fontSize: moderateScale(14) }}
                   >
                     {tab.label}
                   </Text>
@@ -199,7 +199,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
           layout={LinearTransition.duration(220).easing(Easing.out(Easing.quad))}
         >
           {activeTabData.heading ? (
-            <Text className="font-inter-medium text-brand-text mb-2" style={{ fontSize: moderateScale(16, 0.1) }}>
+            <Text className="font-inter-medium text-brand-text mb-2" style={{ fontSize: moderateScale(16) }}>
               {activeTabData.heading}
             </Text>
           ) : null}
@@ -239,7 +239,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                           <RemoteIcon uri={item.image} size={exactScale(60)} />
                         ) : null}
                       </View>
-                      <Text className="font-inter-semibold text-brand-text mb-2" style={{ fontSize: moderateScale(14, 0.1) }}>
+                      <Text className="font-inter-semibold text-brand-text mb-2" style={{ fontSize: moderateScale(14) }}>
                         {item.title}
                       </Text>
                       <View
@@ -250,12 +250,12 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                           className="font-inter-semibold"
                           numberOfLines={1}
                           adjustsFontSizeToFit
-                          style={{ color: item.statusColor, fontSize: moderateScale(10, 0.1) }}
+                          style={{ color: item.statusColor, fontSize: moderateScale(10) }}
                         >
                           {item.status}
                         </Text>
                       </View>
-                      <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(18, 0.1) }}>
+                      <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(12), lineHeight: moderateScale(18) }}>
                         {isExpanded
                           ? item.fullDescription
                           : item.shortDescription}
@@ -263,7 +263,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
                           <Text
                             onPress={() => toggleExpand(item.id)}
                             className="text-[#0F7635] font-inter-bold"
-                            style={{ fontSize: moderateScale(14, 0.1) }}
+                            style={{ fontSize: moderateScale(14) }}
                           >
                             {isExpanded ? " Show less" : " Read More"}
                           </Text>

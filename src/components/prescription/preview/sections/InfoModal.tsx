@@ -17,11 +17,11 @@ export const InfoModal: React.FC<InfoModalProps> = ({ title, message, onClose, o
             <Pressable className="flex-1 bg-black/50 items-center justify-center px-6" onPress={handleClose}>
                 <Pressable onPress={e => e.stopPropagation()}>
                     <View className="bg-white rounded-2xl px-6 py-6 w-full">
-                        <Text className="font-inter-bold text-[#0F1724] mb-2" style={{ fontSize: moderateScale(17, 0.1) }}>{title}</Text>
-                        <Text className="font-inter-medium text-[#6A6A6A] mb-6 leading-5" style={{ fontSize: moderateScale(13, 0.1) }}>{message}</Text>
+                        <Text className="font-inter-bold text-[#0F1724] mb-2" style={{ fontSize: moderateScale(17) }}>{title}</Text>
+                        <Text className="font-inter-medium text-[#6A6A6A] mb-6 leading-5" style={{ fontSize: moderateScale(13) }}>{message}</Text>
                         <View className="items-end">
                             <Touchable activeOpacity={0.85} className="items-center justify-center py-2.5 px-8 rounded-full bg-brand-primary" onPress={handleClose}>
-                                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(14, 0.1) }}>Got it</Text>
+                                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(14) }}>Got it</Text>
                             </Touchable>
                         </View>
                     </View>

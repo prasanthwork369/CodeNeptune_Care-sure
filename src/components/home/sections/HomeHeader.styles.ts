@@ -71,8 +71,8 @@ export const styles = StyleSheet.create({
     opacity: 1,
   },
   walletBadgeText: {
-    fontSize: moderateScale(10, 0.1),
-    lineHeight: moderateScale(13, 0.1),
+    fontSize: moderateScale(10),
+    lineHeight: moderateScale(13),
     letterSpacing: 0,
     color: colors.text,
     padding: 1,

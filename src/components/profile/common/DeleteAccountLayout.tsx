@@ -84,11 +84,11 @@ export const DeleteAccountLayout: React.FC = () => {
         {/* Title */}
         <Text
           style={{
-            fontSize: moderateScale(21, 0.1),
+            fontSize: moderateScale(21),
             fontWeight: "700",
             color: "#1A1C1E",
             textAlign: "center",
-            lineHeight: moderateScale(29, 0.1),
+            lineHeight: moderateScale(29),
             marginTop: exactScale(16),
           }}
         >
@@ -98,10 +98,10 @@ export const DeleteAccountLayout: React.FC = () => {
         {/* Subtitle */}
         <Text
           style={{
-            fontSize: moderateScale(13, 0.1),
+            fontSize: moderateScale(13),
             color: "#9AA0A6",
             textAlign: "center",
-            lineHeight: moderateScale(21, 0.1),
+            lineHeight: moderateScale(21),
             marginTop: exactScale(10),
             paddingHorizontal: exactScale(8),
           }}
@@ -113,7 +113,7 @@ export const DeleteAccountLayout: React.FC = () => {
         {/* Section label */}
         <Text
           style={{
-            fontSize: moderateScale(16, 0.1),
+            fontSize: moderateScale(16),
             fontWeight: "700",
             color: "#1A1C1E",
             marginTop: exactScale(28),
@@ -161,7 +161,7 @@ export const DeleteAccountLayout: React.FC = () => {
               <View style={{ flex: 1, marginLeft: exactScale(12) }}>
                 <Text
                   style={{
-                    fontSize: moderateScale(14.5, 0.1),
+                    fontSize: moderateScale(14.5),
                     fontWeight: "700",
                     color: "#1A1C1E",
                   }}
@@ -170,9 +170,9 @@ export const DeleteAccountLayout: React.FC = () => {
                 </Text>
                 <Text
                   style={{
-                    fontSize: moderateScale(12.5, 0.1),
+                    fontSize: moderateScale(12.5),
                     color: "#9AA0A6",
-                    lineHeight: moderateScale(18, 0.1),
+                    lineHeight: moderateScale(18),
                     marginTop: exactScale(3),
                   }}
                 >
@@ -217,7 +217,7 @@ export const DeleteAccountLayout: React.FC = () => {
               />
               <Text
                 style={{
-                  fontSize: moderateScale(15.5, 0.1),
+                  fontSize: moderateScale(15.5),
                   fontWeight: "700",
                   color: "#FFFFFF",
                   marginLeft: exactScale(10),
@@ -245,7 +245,7 @@ export const DeleteAccountLayout: React.FC = () => {
         >
           <Text
             style={{
-              fontSize: moderateScale(15, 0.1),
+              fontSize: moderateScale(15),
               fontWeight: "600",
               color: "#5F6368",
             }}

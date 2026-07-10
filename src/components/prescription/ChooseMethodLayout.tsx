@@ -99,7 +99,7 @@ export const ChooseMethodLayout: React.FC = () => {
                 </Text>
               </View>
               <Text
-                style={{ color: "#FF8D28", fontSize: moderateScale(13, 0.1) }}
+                style={{ color: "#FF8D28", fontSize: moderateScale(13) }}
                 className="font-inter-bold"
               >
                 {rxItems.length} Item{rxItems.length > 1 ? "s" : ""} Requires
@@ -114,7 +114,7 @@ export const ChooseMethodLayout: React.FC = () => {
                   {"•"}
                 </Text>
                 <Text
-                  style={{ color: "#6A6A6A", fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(18, 0.1) }}
+                  style={{ color: "#6A6A6A", fontSize: moderateScale(12), lineHeight: moderateScale(18) }}
                   className="font-inter-medium flex-1"
                 >
                   {item.medicineName}
@@ -148,7 +148,7 @@ export const ChooseMethodLayout: React.FC = () => {
               className="rounded px-2 py-0.5"
             >
               <Text
-                style={{ color: "#222222", fontSize: moderateScale(10, 0.1) }}
+                style={{ color: "#222222", fontSize: moderateScale(10) }}
                 className="font-inter-semibold uppercase tracking-wider"
               >
                 Order Now
@@ -162,10 +162,10 @@ export const ChooseMethodLayout: React.FC = () => {
                   resizeMode="contain"
                 />
                 <View className="flex-1 ml-3">
-                  <Text className="font-inter-bold text-[#222222]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                  <Text className="font-inter-bold text-[#222222]" style={{ fontSize: moderateScale(14) }}>
                     Upload Prescription
                   </Text>
-                  <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(17, 0.1) }}>
+                  <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12), lineHeight: moderateScale(17) }}>
                     The Following Item Requires Verification Before Purchase
                   </Text>
                 </View>
@@ -203,7 +203,7 @@ export const ChooseMethodLayout: React.FC = () => {
                 className="rounded px-2 py-0.5"
               >
                 <Text
-                  style={{ color: "#222222", fontSize: moderateScale(10, 0.1) }}
+                  style={{ color: "#222222", fontSize: moderateScale(10) }}
                   className="font-inter-semibold uppercase tracking-wider"
                 >
                   Call Us
@@ -219,10 +219,10 @@ export const ChooseMethodLayout: React.FC = () => {
                     />
                   </View>
                   <View className="flex-1 ml-3">
-                    <Text className="font-inter-bold text-[#222222]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                    <Text className="font-inter-bold text-[#222222]" style={{ fontSize: moderateScale(14) }}>
                       {"Don't have a prescription? Call us"}
                     </Text>
-                    <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(17, 0.1) }}>
+                    <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12), lineHeight: moderateScale(17) }}>
                       Our Pharmacists Will Assist You And Help You Complete Your
                       Order
                     </Text>
@@ -240,10 +240,10 @@ export const ChooseMethodLayout: React.FC = () => {
         style={{ paddingTop: 12, paddingBottom: adjustedBottom + 12 }}
       >
         <View>
-          <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(11, 0.1) }}>
+          <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(11) }}>
             To Pay
           </Text>
-          <Text className="font-inter-extrabold text-brand-text" style={{ fontSize: moderateScale(18, 0.1) }}>
+          <Text className="font-inter-extrabold text-brand-text" style={{ fontSize: moderateScale(18) }}>
             ₹{Number(toPay).toFixed(2)}
           </Text>
         </View>
@@ -254,7 +254,7 @@ export const ChooseMethodLayout: React.FC = () => {
           className="flex-1 ml-10 rounded-lg py-4 items-center"
           style={{ backgroundColor: selectedOption ? "#0F7635" : "#919EAB66" }}
         >
-          <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15, 0.1) }}>
+          <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15) }}>
             Proceed
           </Text>
         </Touchable>

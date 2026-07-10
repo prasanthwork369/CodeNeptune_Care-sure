@@ -4,13 +4,13 @@ import { exactScale, moderateScale } from '@/src/utils/exactScale';
 // Shared across all order components
 export const orderStyles = StyleSheet.create({
     // MyOrdersLayout
-    statusBadge:   { fontSize: moderateScale(11, 0.08) },
-    labelXs:       { fontSize: moderateScale(10, 0.08) },
-    labelSm:       { fontSize: moderateScale(13, 0.1) },
-    labelMd:       { fontSize: moderateScale(14, 0.1) },
-    labelLg:       { fontSize: moderateScale(15, 0.1) },
-    labelXl:       { fontSize: moderateScale(16, 0.1) },
-    label20:       { fontSize: moderateScale(20, 0.1) },
+    statusBadge:   { fontSize: moderateScale(11) },
+    labelXs:       { fontSize: moderateScale(10) },
+    labelSm:       { fontSize: moderateScale(13) },
+    labelMd:       { fontSize: moderateScale(14) },
+    labelLg:       { fontSize: moderateScale(15) },
+    labelXl:       { fontSize: moderateScale(16) },
+    label20:       { fontSize: moderateScale(20) },
     productImg52:  { width: exactScale(52), height: exactScale(52) },
     productImg50:  { width: exactScale(50), height: exactScale(50) },
     productImg62:  { width: exactScale(62), height: exactScale(62) },

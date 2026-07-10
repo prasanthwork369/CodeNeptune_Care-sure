@@ -110,7 +110,7 @@ export const SelectPatientLayout: React.FC = () => {
               }}
               activeOpacity={0.8}
             >
-              <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(13, 0.1) }}>
+              <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(13) }}>
                 ADD PATIENT
               </Text>
             </Touchable>

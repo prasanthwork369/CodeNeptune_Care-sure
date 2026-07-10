@@ -27,10 +27,10 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                             <Image source={HOME_IMAGES.presSuccess} style={{ width: 36, height: 36 }} contentFit="contain" />
                         </View>
 
-                        <Text className="font-inter-bold text-[#222222] mb-1.5 text-center" style={{ fontSize: moderateScale(18, 0.1) }}>
+                        <Text className="font-inter-bold text-[#222222] mb-1.5 text-center" style={{ fontSize: moderateScale(18) }}>
                             Upload Successful!
                         </Text>
-                        <Text className="font-inter-medium text-[#6A6A6A] text-center leading-5 mb-6" style={{ fontSize: moderateScale(13, 0.1) }}>
+                        <Text className="font-inter-medium text-[#6A6A6A] text-center leading-5 mb-6" style={{ fontSize: moderateScale(13) }}>
                             Your prescription has been{"\n"}uploaded successfully
                         </Text>
 
@@ -40,7 +40,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                             activeOpacity={0.85}
                             onPress={onContinue}
                         >
-                            <Text style={{ fontSize: moderateScale(15, 0.1), fontWeight: '600', color: '#fff', letterSpacing: 0.5 }}>
+                            <Text style={{ fontSize: moderateScale(15), fontWeight: '600', color: '#fff', letterSpacing: 0.5 }}>
                                 Great
                             </Text>
                         </Touchable>

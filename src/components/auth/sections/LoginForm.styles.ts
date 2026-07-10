@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
     marginTop: verticalScale(8),
   },
   prefix: {
-    fontSize: moderateScale(17, 0.3),
+    fontSize: moderateScale(17),
     fontWeight: "500",
     color: "#222222",
   },
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     height: "100%",
     paddingVertical: 0,
     paddingHorizontal: 0,
-    fontSize: moderateScale(15, 0.3),
+    fontSize: moderateScale(15),
     // Android renders weight via the loaded font file itself (fontWeight is
     // ignored once fontFamily is set to a specific static Inter weight) --
     // use the Regular weight file directly instead of setting a numeric
@@ -45,7 +45,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#222222",
   },
   error: {
-    fontSize: moderateScale(13, 0.3),
+    fontSize: moderateScale(13),
     fontWeight: "500",
     color: "#EF4444",
     marginTop: verticalScale(6),
@@ -70,10 +70,10 @@ export const styles = StyleSheet.create({
     marginVertical: verticalScale(16),
   },
   btnText: {
-    fontSize: moderateScale(16, 0.3),
+    fontSize: moderateScale(16),
     fontWeight: "700",
     color: "white",
     marginRight: scale(8),
   },
-  arrow: { width: moderateScale(13, 0.3), height: moderateScale(13, 0.3) },
+  arrow: { width: moderateScale(13), height: moderateScale(13) },
 });

@@ -107,14 +107,14 @@ export const PrescriptionHistoryItem: React.FC<
           <View className="flex-1">
             <Text
               className="font-inter-bold text-[#222222]"
-              style={{ fontSize: moderateScale(15, 0.1) }}
+              style={{ fontSize: moderateScale(15) }}
               numberOfLines={1}
             >
               #{item.id}
             </Text>
             <Text
               className="font-inter-medium text-[#6A6A6A] mt-0.5"
-              style={{ fontSize: moderateScale(13, 0.1) }}
+              style={{ fontSize: moderateScale(13) }}
               numberOfLines={1}
             >
               {item.patientName}
@@ -125,7 +125,7 @@ export const PrescriptionHistoryItem: React.FC<
         <View className="flex-row items-center gap-1 ml-2">
           <Text
             className={`${statusConfig.text} font-inter-semibold`}
-            style={{ fontSize: moderateScale(12, 0.1) }}
+            style={{ fontSize: moderateScale(12) }}
           >
             {item.status}
           </Text>
@@ -139,7 +139,7 @@ export const PrescriptionHistoryItem: React.FC<
           <View className="w-4 h-4 rounded-sm bg-[#D9D9D9] items-center justify-center">
             <icons.pill_gray width={12} height={12} />
           </View>
-          <Text className="font-inter-medium text-[#6A6A6A]" style={{ fontSize: moderateScale(13, 0.1) }}>
+          <Text className="font-inter-medium text-[#6A6A6A]" style={{ fontSize: moderateScale(13) }}>
             {statusConfig.description}
           </Text>
         </View>
@@ -161,14 +161,14 @@ export const PrescriptionHistoryItem: React.FC<
         onPress={handleView}
         className="flex-row items-center justify-center rounded-lg bg-[#F1FEF8] border border-[#919EAB33] py-3"
       >
-        <Text className="text-[#0F7635] font-inter-bold tracking-wider mr-1.5" style={{ fontSize: moderateScale(13, 0.1) }}>
+        <Text className="text-[#0F7635] font-inter-bold tracking-wider mr-1.5" style={{ fontSize: moderateScale(13) }}>
           VIEW PRESCRIPTION
         </Text>
         <icons.arrow_forward_green width={14} height={14} />
       </Touchable>
 
       {/* Uploaded date */}
-      <Text className="pt-2 font-inter-medium text-[#6A6A6A] mt-2.5" style={{ fontSize: moderateScale(12, 0.1) }}>
+      <Text className="pt-2 font-inter-medium text-[#6A6A6A] mt-2.5" style={{ fontSize: moderateScale(12) }}>
         Uploaded on {item.uploadedDate}
       </Text>
     </View>

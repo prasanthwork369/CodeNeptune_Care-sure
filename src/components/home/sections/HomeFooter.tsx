@@ -101,7 +101,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
                 <Text
                   key={idx}
                   style={{
-                    fontSize: moderateScale(60, 0.1),
+                    fontSize: moderateScale(60),
                     lineHeight: verticalScale(65),
                   }}
                   className="font-inter-extrabold text-[#D4D4D4] uppercase"

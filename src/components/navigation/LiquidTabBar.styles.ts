@@ -11,14 +11,14 @@ export const ACTIVE_RADIUS = exactScale(25);
 
 export const styles = StyleSheet.create({
   uploadText: {
-    fontSize: moderateScale(13, 0.1),
+    fontSize: moderateScale(13),
     color: "white",
     fontWeight: "700",
     textAlign: "center",
-    lineHeight: moderateScale(16, 0.1),
+    lineHeight: moderateScale(16),
   },
   tabLabel: {
-    fontSize: moderateScale(11, 0.1),
+    fontSize: moderateScale(11),
     marginTop: exactScale(4),
     textAlign: "center",
     width: "100%",

@@ -366,7 +366,7 @@ export const PreviewLayout: React.FC = () => {
                     <icons.upload_file width={24} height={24} />
                     <Text
                       className="font-inter-bold text-[#1A1C1E] mt-1"
-                      style={{ fontSize: moderateScale(8, 0.1) }}
+                      style={{ fontSize: moderateScale(8) }}
                     >
                       PDF
                     </Text>
@@ -397,7 +397,7 @@ export const PreviewLayout: React.FC = () => {
         >
           <Text
             className="font-inter-medium text-[#000000]"
-            style={{ fontSize: moderateScale(14, 0.1) }}
+            style={{ fontSize: moderateScale(14) }}
           >
             {items.length} / {MAX_FILES} Prescription
             {items.length !== 1 ? "s" : ""} Uploaded
@@ -412,7 +412,7 @@ export const PreviewLayout: React.FC = () => {
             {submitting && <ActivityIndicator size="small" color="#fff" />}
             <Text
               className="text-white font-inter-semibold"
-              style={{ fontSize: moderateScale(14, 0.1) }}
+              style={{ fontSize: moderateScale(14) }}
             >
               {submitting ? "Uploading..." : "Proceed"}
             </Text>
@@ -486,7 +486,7 @@ export const PreviewLayout: React.FC = () => {
             />
             <Text
               style={{
-                fontSize: moderateScale(20, 0.1),
+                fontSize: moderateScale(20),
                 fontWeight: "700",
                 color: "#1A1C1E",
                 marginTop: 8,
@@ -506,7 +506,7 @@ export const PreviewLayout: React.FC = () => {
               <icons.verified_user width={14} height={14} fill="#0F7635" />
               <Text
                 style={{
-                  fontSize: moderateScale(12, 0.1),
+                  fontSize: moderateScale(12),
                   fontWeight: "500",
                   color: "#0F7635",
                   marginLeft: 6,
@@ -533,7 +533,7 @@ export const PreviewLayout: React.FC = () => {
             >
               <Text
                 style={{
-                  fontSize: moderateScale(15, 0.1),
+                  fontSize: moderateScale(15),
                   fontWeight: "600",
                   color: "#fff",
                   letterSpacing: 0.5,

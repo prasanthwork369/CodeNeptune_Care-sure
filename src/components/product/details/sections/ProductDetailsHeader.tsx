@@ -1,10 +1,10 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { colors } from "@/src/constants/theme";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { colors } from "@/src/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useNav } from "@/src/hooks/useNav";
 import { ProductDetailsHeaderProps } from "@/src/types/product";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Alert, Share, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -89,7 +89,7 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
                   paddingHorizontal: 3,
                 }}
               >
-                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(10, 0.1) }}>
+                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(10) }}>
                   {cartCount}
                 </Text>
               </View>

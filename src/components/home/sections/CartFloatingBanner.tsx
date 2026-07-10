@@ -228,8 +228,8 @@ export const CartFloatingBanner = ({
                     className="font-inter-bold text-[#1A1C1E]"
                     numberOfLines={1}
                     style={{
-                      fontSize: moderateScale(14, 0.1),
-                      lineHeight: moderateScale(18, 0.1),
+                      fontSize: moderateScale(14),
+                      lineHeight: moderateScale(18),
                     }}
                   >
                     {displayTitle}
@@ -237,8 +237,8 @@ export const CartFloatingBanner = ({
                   <Text
                     className="font-inter-bold text-[#1A1C1E]"
                     style={{
-                      fontSize: moderateScale(14, 0.1),
-                      lineHeight: moderateScale(18, 0.1),
+                      fontSize: moderateScale(14),
+                      lineHeight: moderateScale(18),
                     }}
                   >
                     {displaySubtitle}
@@ -306,7 +306,7 @@ export const CartFloatingBanner = ({
               ) : (
                 <Text
                   className="font-inter-semibold text-[#0F7635]"
-                  style={{ fontSize: moderateScale(14, 0.1) }}
+                  style={{ fontSize: moderateScale(14) }}
                 >
                   Remove
                 </Text>

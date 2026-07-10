@@ -37,7 +37,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
             className="py-6"
         >
             <View className="px-4 mb-6">
-                <Text className="font-inter-bold text-brand-text mb-4 ml-1" style={{ fontSize: moderateScale(14, 0.1) }}>
+                <Text className="font-inter-bold text-brand-text mb-4 ml-1" style={{ fontSize: moderateScale(14) }}>
                     Medicine Comparison
                 </Text>
 
@@ -45,14 +45,14 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* MEDICINE */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12, 0.1) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
                             MEDICINE
                         </Text>
                         <View className="flex-row items-center justify-between">
-                            <Text className="font-inter-semibold text-brand-text" style={{ flex: 1, marginRight: 8, fontSize: moderateScale(14, 0.1) }} numberOfLines={1}>
+                            <Text className="font-inter-semibold text-brand-text" style={{ flex: 1, marginRight: 8, fontSize: moderateScale(14) }} numberOfLines={1}>
                                 {searchedName}
                             </Text>
-                            <Text className="font-inter-semibold text-brand-primary" style={{ flex: 1, textAlign: 'right', fontSize: moderateScale(14, 0.1) }} numberOfLines={1}>
+                            <Text className="font-inter-semibold text-brand-primary" style={{ flex: 1, textAlign: 'right', fontSize: moderateScale(14) }} numberOfLines={1}>
                                 {recName}
                             </Text>
                         </View>
@@ -61,14 +61,14 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* MANUFACTURER */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12, 0.1) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
                             MANUFACTURER
                         </Text>
                         <View className="flex-row items-center justify-between">
-                            <Text className="font-inter-semibold text-brand-text" style={{ flex: 1, marginRight: 8, fontSize: moderateScale(13, 0.1) }} numberOfLines={2}>
+                            <Text className="font-inter-semibold text-brand-text" style={{ flex: 1, marginRight: 8, fontSize: moderateScale(13) }} numberOfLines={2}>
                                 {searchedManufacturer || '—'}
                             </Text>
-                            <Text className="font-inter-semibold text-brand-primary" style={{ flex: 1, textAlign: 'right', fontSize: moderateScale(13, 0.1) }} numberOfLines={2}>
+                            <Text className="font-inter-semibold text-brand-primary" style={{ flex: 1, textAlign: 'right', fontSize: moderateScale(13) }} numberOfLines={2}>
                                 {recManufacturer || '—'}
                             </Text>
                         </View>
@@ -77,12 +77,12 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* SALT COMPOSITION & STRENGTH */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12, 0.1) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
                             SALT COMPOSITION & STRENGTH
                         </Text>
                         <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
                             <icons.check_circle width={14} height={14} color={colors.primary} />
-                            <Text className="font-inter-semibold text-brand-primary ml-1.5" style={{ fontSize: moderateScale(14, 0.1) }}>
+                            <Text className="font-inter-semibold text-brand-primary ml-1.5" style={{ fontSize: moderateScale(14) }}>
                                 100% Match
                             </Text>
                         </View>
@@ -91,12 +91,12 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* MEDICINAL EFFECT */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12, 0.1) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
                             MEDICINAL EFFECT
                         </Text>
                         <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
                             <icons.check_circle width={14} height={14} color={colors.primary} />
-                            <Text className="font-inter-semibold text-brand-primary ml-1.5" style={{ fontSize: moderateScale(14, 0.1) }}>
+                            <Text className="font-inter-semibold text-brand-primary ml-1.5" style={{ fontSize: moderateScale(14) }}>
                                 Same
                             </Text>
                         </View>
@@ -107,14 +107,14 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
                         <>
                             <Divider />
                             <View>
-                                <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12, 0.1) }}>
+                                <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
                                     PRICE/UNIT
                                 </Text>
                                 <View className="flex-row items-center justify-between">
-                                    <Text className="font-inter-semibold text-[#111827]" style={{ fontSize: moderateScale(14, 0.1) }}>
+                                    <Text className="font-inter-semibold text-[#111827]" style={{ fontSize: moderateScale(14) }}>
                                         {searchedUnitPrice != null ? `₹${Number(searchedUnitPrice).toFixed(2)}` : '—'}
                                     </Text>
-                                    <Text className="font-inter-semibold text-brand-primary" style={{ fontSize: moderateScale(14, 0.1) }}>
+                                    <Text className="font-inter-semibold text-brand-primary" style={{ fontSize: moderateScale(14) }}>
                                         {recommendedUnitPrice != null ? `₹${Number(recommendedUnitPrice).toFixed(2)}` : '—'}
                                     </Text>
                                 </View>

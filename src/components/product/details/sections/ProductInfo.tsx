@@ -110,37 +110,37 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       </View>
 
       <View className="px-5">
-        <Text className="font-inter-semibold text-[#009989] mb-1" style={{ fontSize: moderateScale(13, 0.1) }}>
+        <Text className="font-inter-semibold text-[#009989] mb-1" style={{ fontSize: moderateScale(13) }}>
           {product.manufacturer}
         </Text>
-        <Text className="font-inter-bold text-[#111827] mb-3" style={{ fontSize: moderateScale(20, 0.1), lineHeight: moderateScale(28, 0.1) }}>
+        <Text className="font-inter-bold text-[#111827] mb-3" style={[{ fontSize: moderateScale(20) }, { lineHeight: moderateScale(28) }]}>
           {product.name}
         </Text>
 
         <View style={{ borderTopWidth: 1, borderColor: '#E5E7EB', borderStyle: 'dashed', marginBottom: 12 }} />
 
         <View className="flex-row items-baseline gap-x-1.5 mb-1">
-          <Text className="font-inter-extrabold text-[#111827]" style={{ fontSize: moderateScale(24, 0.1) }}>
+          <Text className="font-inter-extrabold text-[#111827]" style={{ fontSize: moderateScale(24) }}>
             ₹{Number(product.price).toFixed(2)}
           </Text>
           {!!product.originalPrice && product.originalPrice > product.price && (
             <>
-              <Text className="font-inter-medium text-brand-subtext ml-1" style={{ fontSize: moderateScale(13, 0.1) }}>
+              <Text className="font-inter-medium text-brand-subtext ml-1" style={{ fontSize: moderateScale(13) }}>
                 MRP
               </Text>
-              <Text className="font-inter-medium text-brand-subtext line-through" style={{ fontSize: moderateScale(13, 0.1) }}>
+              <Text className="font-inter-medium text-brand-subtext line-through" style={{ fontSize: moderateScale(13) }}>
                 ₹{Number(product.originalPrice).toFixed(2)}
               </Text>
             </>
           )}
           {!!product.savingsPercent && (
-            <Text className="font-inter-bold text-[#0F7635] ml-2" style={{ fontSize: moderateScale(14, 0.1) }}>
+            <Text className="font-inter-bold text-[#0F7635] ml-2" style={{ fontSize: moderateScale(14) }}>
               {product.savingsPercent}% off
             </Text>
           )}
         </View>
 
-        <Text className="font-inter-medium text-brand-subtext uppercase tracking-wider" style={{ fontSize: moderateScale(12, 0.1) }}>
+        <Text className="font-inter-medium text-brand-subtext uppercase tracking-wider" style={{ fontSize: moderateScale(12) }}>
           {product.packLabel ??
             `${product.packSize ?? ""} ${product.dosageForm ?? ""}`.trim()}
           {product.packSize
@@ -160,7 +160,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             products showed no selector on mobile. */}
         {variants.length >= 1 && (
           <View style={{ marginTop: exactScale(16) }}>
-            <Text className="font-inter-semibold text-[#6B7280] mb-3 uppercase tracking-wider" style={{ fontSize: moderateScale(12, 0.1) }}>
+            <Text className="font-inter-semibold text-[#6B7280] mb-3 uppercase tracking-wider" style={{ fontSize: moderateScale(12) }}>
               Select Pack Size
             </Text>
             <ScrollView
@@ -212,7 +212,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                         numberOfLines={1}
                         ellipsizeMode="tail"
                         style={{
-                          fontSize: moderateScale(14, 0.1),
+                          fontSize: moderateScale(14),
                           fontWeight: "600",
                           color: isSelected ? "#0F7635" : "#9CA3AF",
                         }}
@@ -239,7 +239,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                     >
                       <Text
                         style={{
-                          fontSize: moderateScale(15, 0.1),
+                          fontSize: moderateScale(15),
                           fontWeight: "700",
                           color: "#111827",
                           marginBottom: 2,
@@ -250,7 +250,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                       {unitPrice && (
                         <Text
                           style={{
-                            fontSize: moderateScale(12, 0.1),
+                            fontSize: moderateScale(12),
                             fontWeight: "400",
                             color: "#6B7280",
                           }}

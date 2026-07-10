@@ -17,8 +17,8 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
             style={{ paddingTop: 12, paddingBottom: safeAreaBottom + 12 }}
         >
             <View>
-                <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(11, 0.1) }}>To Pay</Text>
-                <Text className="font-inter-extrabold text-brand-text" style={{ fontSize: moderateScale(18, 0.1) }}>₹{Number(toPay).toFixed(2)}</Text>
+                <Text className="font-inter-medium text-brand-text" style={{ fontSize: moderateScale(11) }}>To Pay</Text>
+                <Text className="font-inter-extrabold text-brand-text" style={{ fontSize: moderateScale(18) }}>₹{Number(toPay).toFixed(2)}</Text>
             </View>
             <Touchable
                 activeOpacity={0.85}
@@ -27,7 +27,7 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
                 className="flex-1 ml-10 rounded-lg py-4 items-center"
                 style={{ backgroundColor: canProceed ? '#0F7635' : '#919EAB66' }}
             >
-                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15, 0.1) }}>
+                <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15) }}>
                     {buttonLabel}
                 </Text>
             </Touchable>

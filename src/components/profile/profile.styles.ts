@@ -7,82 +7,82 @@ export const profileStyles = StyleSheet.create({
     avatarIcon:     { width: exactScale(52), height: exactScale(52) },
     avatarEditBtn:  { width: exactScale(34), height: exactScale(34) },
     avatarEditIcon: { width: exactScale(18), height: exactScale(18) },
-    personName:     { fontSize: moderateScale(20, 0.1) },
-    personPhone:    { fontSize: moderateScale(14, 0.1) },
+    personName:     { fontSize: moderateScale(20) },
+    personPhone:    { fontSize: moderateScale(14) },
 
     // ProfileCoinsCard
-    coinsTitle:     { fontSize: moderateScale(18, 0.3) },
-    coinsSub:       { fontSize: moderateScale(15, 0.3) },
-    coinsLabel:     { fontSize: moderateScale(15, 0.3) },
-    coinsBold:      { fontSize: moderateScale(15, 0.3) },
-    coinsSaved:     { fontSize: moderateScale(13, 0.3) },
+    coinsTitle:     { fontSize: moderateScale(18) },
+    coinsSub:       { fontSize: moderateScale(15) },
+    coinsLabel:     { fontSize: moderateScale(15) },
+    coinsBold:      { fontSize: moderateScale(15) },
+    coinsSaved:     { fontSize: moderateScale(13) },
 
     // ProfileInfoList
-    sectionTitle:   { fontSize: moderateScale(16, 0.1) },
-    infoLabel:      { fontSize: moderateScale(14, 0.1) },
-    logoutText:     { fontSize: moderateScale(15, 0.1) },
+    sectionTitle:   { fontSize: moderateScale(16) },
+    infoLabel:      { fontSize: moderateScale(14) },
+    logoutText:     { fontSize: moderateScale(15) },
 
     // WalletLayout
-    walletBalance:  { fontSize: moderateScale(38, 0.1) },
-    walletCoins:    { fontSize: moderateScale(34, 0.1) },
-    walletLabel:    { fontSize: moderateScale(13, 0.1) },
-    walletSub:      { fontSize: moderateScale(12, 0.1) },
-    walletBtn:      { fontSize: moderateScale(16, 0.1) },
-    walletTitle:    { fontSize: moderateScale(16, 0.1) },
-    walletTxTitle:  { fontSize: moderateScale(14, 0.1) },
-    walletTxBonus:  { fontSize: moderateScale(14, 0.1) },
+    walletBalance:  { fontSize: moderateScale(38) },
+    walletCoins:    { fontSize: moderateScale(34) },
+    walletLabel:    { fontSize: moderateScale(13) },
+    walletSub:      { fontSize: moderateScale(12) },
+    walletBtn:      { fontSize: moderateScale(16) },
+    walletTitle:    { fontSize: moderateScale(16) },
+    walletTxTitle:  { fontSize: moderateScale(14) },
+    walletTxBonus:  { fontSize: moderateScale(14) },
 
     // MyAddressesLayout
-    addrTitle:      { fontSize: moderateScale(16, 0.1) },
-    addrLabel:      { fontSize: moderateScale(14, 0.1) },
-    addrSub:        { fontSize: moderateScale(11, 0.08) },
-    addrAction:     { fontSize: moderateScale(13, 0.1) },
-    addrAddBtn:     { fontSize: moderateScale(15, 0.1) },
+    addrTitle:      { fontSize: moderateScale(16) },
+    addrLabel:      { fontSize: moderateScale(14) },
+    addrSub:        { fontSize: moderateScale(11) },
+    addrAction:     { fontSize: moderateScale(13) },
+    addrAddBtn:     { fontSize: moderateScale(15) },
 
     // AddAddressLayout
-    addrFormLabel:  { fontSize: moderateScale(15, 0.1) },
-    addrFormInput:  { fontSize: moderateScale(13, 0.1) },
-    addrFormBtn:    { fontSize: moderateScale(14, 0.1) },
+    addrFormLabel:  { fontSize: moderateScale(15) },
+    addrFormInput:  { fontSize: moderateScale(13) },
+    addrFormBtn:    { fontSize: moderateScale(14) },
 
     // AddPatientLayout / AddPatientSheet
-    patientTitle:   { fontSize: moderateScale(18, 0.1) },
-    patientLabel:   { fontSize: moderateScale(14, 0.1) },
-    patientSub:     { fontSize: moderateScale(13, 0.1) },
+    patientTitle:   { fontSize: moderateScale(18) },
+    patientLabel:   { fontSize: moderateScale(14) },
+    patientSub:     { fontSize: moderateScale(13) },
     patientInput:   { height: exactScale(52) },
 
     // PatientDetailsLayout
     patientAvatar:  { width: exactScale(46), height: exactScale(46) },
-    patientName:    { fontSize: moderateScale(15, 0.1) },
-    patientDob:     { fontSize: moderateScale(12, 0.1) },
-    patientTag:     { fontSize: moderateScale(11, 0.08) },
-    patientDetail:  { fontSize: moderateScale(13, 0.1) },
-    patientValue:   { fontSize: moderateScale(14, 0.1) },
+    patientName:    { fontSize: moderateScale(15) },
+    patientDob:     { fontSize: moderateScale(12) },
+    patientTag:     { fontSize: moderateScale(11) },
+    patientDetail:  { fontSize: moderateScale(13) },
+    patientValue:   { fontSize: moderateScale(14) },
 
     // MyProfileLayout
-    profileLabel:   { fontSize: moderateScale(14, 0.1) },
+    profileLabel:   { fontSize: moderateScale(14) },
     profileInput:   { height: exactScale(52) },
-    profileBtn:     { fontSize: moderateScale(15, 0.1) },
+    profileBtn:     { fontSize: moderateScale(15) },
 
     // HelpLayout / FaqLayout
-    helpTitle:      { fontSize: moderateScale(16, 0.1) },
-    helpLabel:      { fontSize: moderateScale(13, 0.1) },
-    helpValue:      { fontSize: moderateScale(14, 0.1) },
-    faqTitle:       { fontSize: moderateScale(15, 0.1) },
-    faqBody:        { fontSize: moderateScale(13, 0.1) },
+    helpTitle:      { fontSize: moderateScale(16) },
+    helpLabel:      { fontSize: moderateScale(13) },
+    helpValue:      { fontSize: moderateScale(14) },
+    faqTitle:       { fontSize: moderateScale(15) },
+    faqBody:        { fontSize: moderateScale(13) },
 
     // LogoutConfirmModal
     logoutImg:      { width: exactScale(90), height: exactScale(90) },
-    logoutModalBtn: { fontSize: moderateScale(15, 0.1) },
+    logoutModalBtn: { fontSize: moderateScale(15) },
 
     // WalletInfoModal / TransactionHistorySheet
-    walletInfoTitle:  { fontSize: moderateScale(18, 0.1) },
-    walletInfoSub:    { fontSize: moderateScale(16, 0.1) },
-    walletInfoBody:   { fontSize: moderateScale(12, 0.1) },
-    txTitle:          { fontSize: moderateScale(16, 0.1) },
-    txLabel:          { fontSize: moderateScale(14, 0.1) },
-    txSub:            { fontSize: moderateScale(12, 0.1) },
+    walletInfoTitle:  { fontSize: moderateScale(18) },
+    walletInfoSub:    { fontSize: moderateScale(16) },
+    walletInfoBody:   { fontSize: moderateScale(12) },
+    txTitle:          { fontSize: moderateScale(16) },
+    txLabel:          { fontSize: moderateScale(14) },
+    txSub:            { fontSize: moderateScale(12) },
     txIcon:           { width: exactScale(16), height: exactScale(16) },
 
     // ProfileQuickTiles
-    tileLabel:      { fontSize: moderateScale(12, 0.1) },
+    tileLabel:      { fontSize: moderateScale(12) },
 });

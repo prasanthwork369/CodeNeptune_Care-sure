@@ -59,7 +59,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
           />
         </View>
         <View style={{ flex: 1, marginRight: isTruncatable ? 8 : 0 }}>
-          <Text className="font-inter-semibold text-white uppercase tracking-[1px] mb-0.5" style={{ fontSize: moderateScale(10, 0.1) }}>
+          <Text className="font-inter-semibold text-white uppercase tracking-[1px] mb-0.5" style={{ fontSize: moderateScale(10) }}>
             SALT COMPOSITION IN BOTH
           </Text>
           {/* Hidden measurement text — detects if composition overflows one
@@ -73,7 +73,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
               width: "100%",
               opacity: 0,
               pointerEvents: "none",
-              fontSize: moderateScale(15, 0.1),
+              fontSize: moderateScale(15),
             }}
             onTextLayout={(e) =>
               setIsTruncatable(e.nativeEvent.lines.length > 1)
@@ -85,7 +85,7 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
             className="font-inter-bold text-white leading-tight"
             numberOfLines={expanded ? undefined : 1}
             ellipsizeMode="tail"
-            style={{ fontSize: moderateScale(15, 0.1) }}
+            style={{ fontSize: moderateScale(15) }}
           >
             {composition}
           </Text>

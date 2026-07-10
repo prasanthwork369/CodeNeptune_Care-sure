@@ -51,7 +51,7 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
                 <icons.info_error width={22} height={22} />
                 <Text
                     className="font-inter-bold text-[#111827] ml-2.5"
-                    style={{ fontSize: moderateScale(16, 0.1) }}
+                    style={{ fontSize: moderateScale(16) }}
                 >
                     No substitute available
                 </Text>
@@ -70,9 +70,9 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
                     width: '100%',
                 }}
             >
-                <Text 
+                <Text
                     className="font-inter-bold text-white text-center"
-                    style={{ fontSize: moderateScale(15, 0.1) }}
+                    style={{ fontSize: moderateScale(15) }}
                 >
                     Request a Substitute
                 </Text>

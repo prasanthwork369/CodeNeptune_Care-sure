@@ -24,7 +24,7 @@ export const CallMethodCard: React.FC<CallMethodCardProps> = ({ isSelected, onSe
                     style={{ padding: 14 }}
                 >
                     <View style={{ backgroundColor: '#D0ECFD', alignSelf: 'flex-start', marginBottom: 12 }} className="rounded px-2 py-0.5">
-                        <Text style={{ color: '#1A1C1E', fontSize: moderateScale(10, 0.1) }} className="font-inter-semibold uppercase tracking-wider">Call Us</Text>
+                        <Text style={{ color: '#1A1C1E', fontSize: moderateScale(10) }} className="font-inter-semibold uppercase tracking-wider">Call Us</Text>
                     </View>
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-start flex-1 pr-4">
@@ -32,8 +32,8 @@ export const CallMethodCard: React.FC<CallMethodCardProps> = ({ isSelected, onSe
                                 <Image source={HOME_IMAGES.stethoscope} style={{ width: 36, height: 36 }} contentFit="contain" />
                             </View>
                             <View className="flex-1 ml-3">
-                                <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14, 0.1) }}>{"Don't have a prescription? Call us"}</Text>
-                                <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12, 0.1), lineHeight: moderateScale(17, 0.1) }}>
+                                <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14) }}>{"Don't have a prescription? Call us"}</Text>
+                                <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12), lineHeight: moderateScale(17) }}>
                                     Our Pharmacists Will Assist You And Help You Complete Your Order
                                 </Text>
                             </View>

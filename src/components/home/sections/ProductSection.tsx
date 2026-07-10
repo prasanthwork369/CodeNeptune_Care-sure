@@ -92,9 +92,9 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 {/* Header */}
                 <View className="px-5 flex-row justify-between items-center mb-6">
                     <View className="flex-1 pr-2">
-                        <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(14, 0.1) }}>{title}</Text>
+                        <Text className="font-inter-semibold text-brand-text" style={{ fontSize: moderateScale(14) }}>{title}</Text>
                         <View className="mt-0.5">
-                            <Text style={{ color: subtitleColor, fontSize: moderateScale(18, 0.1), lineHeight: moderateScale(28, 0.1) }} className="font-inter-bold">
+                            <Text style={{ color: subtitleColor, fontSize: moderateScale(18), lineHeight: moderateScale(28) }} className="font-inter-bold">
                                 {subtitle}
                             </Text>
                             <LinearGradient

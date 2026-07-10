@@ -23,7 +23,7 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
             end={{ x: 0, y: 1 }}
             style={{ padding: exactScale(16) }}
         >
-            <Text className="font-inter-bold mb-4 pl-1" style={{ color: '#6B2A75', fontSize: moderateScale(17, 0.1) }}>
+            <Text className="font-inter-bold mb-4 pl-1" style={{ color: '#6B2A75', fontSize: moderateScale(17) }}>
                 Know Your Medicine
             </Text>
 
@@ -33,8 +33,8 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Image source={HOME_IMAGES.chemical} style={{ width: exactScale(24), height: exactScale(24) }} contentFit="contain" />
                     </View>
                     <View className="flex-1">
-                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15, 0.1) }}>Manufacturer/Marketer</Text>
-                        <Text style={{ color: '#009989', fontSize: moderateScale(14, 0.1) }} className="font-inter-semibold">{manufacturer}</Text>
+                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15) }}>Manufacturer/Marketer</Text>
+                        <Text style={[{ fontSize: moderateScale(14) }, { color: '#009989' }]} className="font-inter-semibold">{manufacturer}</Text>
                     </View>
                 </View>
 
@@ -43,8 +43,8 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Image source={HOME_IMAGES.medicine} style={{ width: exactScale(24), height: exactScale(24) }} contentFit="contain" />
                     </View>
                     <View className="flex-1">
-                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15, 0.1) }}>Consume Type</Text>
-                        <Text className="font-inter-medium text-[#6B7280]" style={{ fontSize: moderateScale(14, 0.1) }}>{consumeType}</Text>
+                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15) }}>Consume Type</Text>
+                        <Text className="font-inter-medium text-[#6B7280]" style={{ fontSize: moderateScale(14) }}>{consumeType}</Text>
                     </View>
                 </View>
 
@@ -53,8 +53,8 @@ export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
                         <Image source={HOME_IMAGES.deliveryBox} style={{ width: exactScale(24), height: exactScale(24) }} contentFit="contain" />
                     </View>
                     <View className="flex-1">
-                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15, 0.1) }}>Return Policy</Text>
-                        <Text style={{ color: '#009989', fontSize: moderateScale(14, 0.1) }} className="font-inter-semibold">{returnPolicy}</Text>
+                        <Text className="font-inter-bold text-[#111827] mb-1" style={{ fontSize: moderateScale(15) }}>Return Policy</Text>
+                        <Text style={[{ fontSize: moderateScale(14) }, { color: '#009989' }]} className="font-inter-semibold">{returnPolicy}</Text>
                     </View>
                 </View>
             </View>

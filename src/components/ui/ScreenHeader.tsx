@@ -48,7 +48,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
         </Touchable>
         <Text
           className="font-inter-bold flex-1"
-          style={{ color: "#333232", fontSize: moderateScale(18, 0.1) }}
+          style={{ color: "#333232", fontSize: moderateScale(18) }}
           numberOfLines={1}
         >
           {title}

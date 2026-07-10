@@ -77,7 +77,7 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
 
                 {/* Right Side — no substitute message */}
                 <View className="flex-1 p-4 bg-[#FEF1F1] justify-start">
-                    <Text className="font-inter-bold text-[#730404]" style={{ fontSize: moderateScale(14, 0.1), lineHeight: moderateScale(20, 0.1) }}>
+                    <Text className="font-inter-bold text-[#730404]" style={{ fontSize: moderateScale(14), lineHeight: moderateScale(20) }}>
                         Sorry! We couldn't find a substitute
                     </Text>
                 </View>

@@ -220,7 +220,7 @@ export const PrescriptionFloatingBanner = ({
                 <Text
                   className="font-inter-bold text-[#1A1C1E]"
                   numberOfLines={1}
-                  style={{ fontSize: moderateScale(13, 0.1), lineHeight: moderateScale(17, 0.1) }}
+                  style={{ fontSize: moderateScale(13), lineHeight: moderateScale(17) }}
                 >
                   {config.title}
                 </Text>
@@ -230,7 +230,7 @@ export const PrescriptionFloatingBanner = ({
                   <Text
                     className="font-inter-medium text-[#6A6A6A]"
                     numberOfLines={1}
-                    style={{ flexShrink: 1, fontSize: moderateScale(11, 0.1) }}
+                    style={{ flexShrink: 1, fontSize: moderateScale(11) }}
                   >
                     {subtitleText}
                   </Text>
