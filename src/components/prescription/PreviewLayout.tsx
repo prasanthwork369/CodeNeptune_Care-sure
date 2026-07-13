@@ -11,7 +11,7 @@ import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { moderateScale } from "@/src/utils/exactScale";
-import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { MAX_FILES, validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
@@ -437,11 +437,17 @@ export const PreviewLayout: React.FC = () => {
                 if (!canAskAgain) showPermissionAlert("camera");
                 return;
               }
-              const result = await ImagePicker.launchCameraAsync({
-                quality: 0.9,
-              });
-              if (!result.canceled && result.assets.length > 0)
-                await processAndAdd(result.assets);
+              const scannedUri = await capturePrescriptionImage();
+              if (scannedUri) {
+                const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
+                const asset = {
+                  uri: scannedUri,
+                  name: filename,
+                  fileName: filename,
+                  mimeType: "image/jpeg",
+                };
+                await processAndAdd([asset as any]);
+              }
             } catch {
               Alert.alert("Error", "Failed to take photo. Please try again.");
             }

@@ -1,7 +1,7 @@
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { MAX_FILES, validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useRef } from "react";
@@ -188,9 +188,16 @@ export function usePrescriptionUpload(
           );
         return;
       }
-      const result = await ImagePicker.launchCameraAsync({ quality: 0.9 });
-      if (result.canceled || result.assets.length === 0) return;
-      const { validated, hadTooLarge } = await processAssets(result.assets);
+      const scannedUri = await capturePrescriptionImage();
+      if (!scannedUri) return;
+      const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
+      const asset = {
+        uri: scannedUri,
+        name: filename,
+        fileName: filename,
+        mimeType: "image/jpeg",
+      };
+      const { validated, hadTooLarge } = await processAssets([asset as any]);
       handlePicked(validated, hadTooLarge);
     } catch {
       showErr("Error", "Failed to take photo. Please try again.");

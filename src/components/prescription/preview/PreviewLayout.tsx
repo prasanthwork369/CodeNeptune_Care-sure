@@ -14,6 +14,7 @@ import {
     MAX_FILES,
     MAX_SIZE_BYTES,
     validatePrescriptionFile,
+    capturePrescriptionImage,
 } from "@/src/utils/prescription";
 import { useFocusEffect } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
@@ -337,11 +338,17 @@ export const PreviewLayout: React.FC = () => {
                 if (!canAskAgain) showPermissionAlert("camera", showInfo);
                 return;
               }
-              const result = await ImagePicker.launchCameraAsync({
-                quality: 0.9,
-              });
-              if (!result.canceled && result.assets.length > 0)
-                await processAndAdd(result.assets);
+              const scannedUri = await capturePrescriptionImage();
+              if (scannedUri) {
+                const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
+                const asset = {
+                  uri: scannedUri,
+                  name: filename,
+                  fileName: filename,
+                  mimeType: "image/jpeg",
+                };
+                await processAndAdd([asset as any]);
+              }
             } catch {
               showInfo("Error", "Failed to take photo. Please try again.");
             }

@@ -159,3 +159,39 @@ export async function validatePrescriptionFile(
 
     return { localUri: resolvedUri, name, type, size };
 }
+
+export async function capturePrescriptionImage(): Promise<string | null> {
+    let DocumentScanner: any = null;
+    try {
+        DocumentScanner = require("react-native-document-scanner-plugin").default;
+    } catch {
+        // Ignore load/initialization error (e.g. if the native module is missing from the binary)
+    }
+
+    if (DocumentScanner) {
+        try {
+            const result = await DocumentScanner.scanDocument();
+            if (result && result.scannedImages && result.scannedImages.length > 0) {
+                return result.scannedImages[0];
+            }
+            // If the user cancelled, return null without showing the camera fallback
+            if (result) {
+                return null;
+            }
+        } catch (e) {
+            if (__DEV__) {
+                console.warn("[DocumentScanner] scanDocument failed, falling back to ImagePicker:", e);
+            }
+        }
+    }
+
+    // Fallback to standard camera if scanner plugin is unavailable or fails
+    const result = await ImagePicker.launchCameraAsync({
+        quality: 0.9,
+        cameraType: ImagePicker.CameraType.back,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+        return result.assets[0].uri;
+    }
+    return null;
+}

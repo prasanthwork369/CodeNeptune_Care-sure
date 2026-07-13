@@ -29,7 +29,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "android.permission.INTERNET",
       "android.permission.SYSTEM_ALERT_WINDOW",
       "android.permission.READ_EXTERNAL_STORAGE",
-      "android.permission.READ_MEDIA_IMAGES"
+      "android.permission.READ_MEDIA_IMAGES",
+      "android.permission.CAMERA"
     ],
   },
   web: {
@@ -83,6 +84,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Resolves the manifest-merger clash between expo-notifications and
     // @react-native-firebase/messaging over default_notification_color.
     "./plugins/withFirebaseNotificationColorFix",
+    [
+      "react-native-document-scanner-plugin",
+      {
+        cameraPermission:
+          "Allow Caresure to use your camera to scan prescriptions."
+      }
+    ]
   ],
   experiments: {
     typedRoutes: true,

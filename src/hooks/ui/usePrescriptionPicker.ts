@@ -1,7 +1,7 @@
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { validatePrescriptionFile } from "@/src/utils/prescription";
+import { validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 
@@ -163,9 +163,16 @@ export function usePrescriptionPicker(
           );
         return;
       }
-      const result = await ImagePicker.launchCameraAsync({ quality: 0.9 });
-      if (!result.canceled && result.assets.length > 0) {
-        const validated = await processAssets(result.assets);
+      const scannedUri = await capturePrescriptionImage();
+      if (scannedUri) {
+        const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
+        const asset = {
+          uri: scannedUri,
+          name: filename,
+          fileName: filename,
+          mimeType: "image/jpeg",
+        };
+        const validated = await processAssets([asset as any]);
         if (validated.length > 0) navigate(validated);
       }
     } catch {
