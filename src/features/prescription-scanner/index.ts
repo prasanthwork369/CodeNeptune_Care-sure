@@ -66,6 +66,14 @@ export const PrescriptionScanner = {
       };
     }
 
+    return this.analyzeImage(imageUri);
+  },
+
+  /**
+   * Extracted OCR and validation pipeline.
+   * Useful when an image URI is acquired via other means (like the Gallery).
+   */
+  async analyzeImage(imageUri: string): Promise<ScanResult> {
     // Step 2 — OCR (cached, times out gracefully)
     const ocr = await OcrService.recognizeText(imageUri);
 
@@ -103,12 +111,7 @@ export { OcrService } from './ocr.service';
 export { ScannerService } from './scanner.service';
 export { PrescriptionValidator } from './prescription-validator';
 
-// ─── Reusable scan-capture hook ───────────────────────────────────────────────
-
-export { useScannerCapture } from './useScannerCapture';
-export type { CapturedAsset, UseScannerCaptureOptions } from './useScannerCapture';
-
 // ─── Unified upload service hook ──────────────────────────────────────────────
 
 export { usePrescriptionUploadService } from './usePrescriptionUploadService';
-export type { UsePrescriptionUploadServiceOptions } from './usePrescriptionUploadService';
+export type { UsePrescriptionUploadServiceOptions, CapturedAsset } from './usePrescriptionUploadService';

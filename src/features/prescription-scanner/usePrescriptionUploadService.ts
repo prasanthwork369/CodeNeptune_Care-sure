@@ -1,7 +1,15 @@
 import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { useScannerCapture, CapturedAsset } from './useScannerCapture';
+import { PrescriptionScanner, getConfidenceLevel } from './index';
+import { ScannerService } from './scanner.service';
+
+export interface CapturedAsset {
+  uri: string;
+  name: string;
+  fileName: string;
+  mimeType: string;
+}
 
 export interface UsePrescriptionUploadServiceOptions {
   onAssetsReady: (assets: CapturedAsset[]) => Promise<void> | void;
@@ -20,11 +28,88 @@ export function usePrescriptionUploadService({
     }
   };
 
+  const checkConfidenceAndProceed = async (
+    assets: CapturedAsset[],
+    onProceed: () => void,
+    onScanAgain: () => void
+  ) => {
+    // Run OCR + validation on all assets in parallel
+    const scanResults = await Promise.all(
+      assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
+    );
+
+    // Find the lowest confidence score
+    const lowestConfidence = scanResults.reduce(
+      (min, current) => Math.min(min, current.confidence),
+      1.0
+    );
+
+    const level = getConfidenceLevel(lowestConfidence);
+
+    if (level === 'medium') {
+      Alert.alert(
+        'Check Your Prescription',
+        'This may not be a medical prescription. Please ensure you have scanned the correct document.',
+        [
+          { text: 'Scan Again', style: 'cancel', onPress: onScanAgain },
+          { text: 'Continue', onPress: onProceed },
+        ]
+      );
+      return;
+    }
+
+    if (level === 'low') {
+      Alert.alert(
+        'Prescription Not Detected',
+        'We could not confirm this is a prescription. You can still upload it and our team will verify.',
+        [
+          { text: 'Scan Again', style: 'cancel', onPress: onScanAgain },
+          { text: 'Upload Anyway', onPress: onProceed },
+        ]
+      );
+      return;
+    }
+
+    // High confidence — proceed immediately
+    onProceed();
+  };
+
   // ── 1. Camera Flow (via PrescriptionScanner) ─────────────────────────────
-  const { capture: takePhoto } = useScannerCapture({
-    onAssetReady: (asset) => onAssetsReady([asset]),
-    onError: (msg) => showErr('Error', msg),
-  });
+  const takePhoto = async () => {
+    try {
+      const { status, canAskAgain } =
+        await ImagePicker.requestCameraPermissionsAsync();
+
+      if (status !== 'granted') {
+        if (!canAskAgain) {
+          showErr(
+            'Permission Required',
+            'Please allow camera access in Settings to continue.'
+          );
+        }
+        return;
+      }
+
+      const { imageUri, cancelled } = await ScannerService.scan();
+      if (cancelled || !imageUri) return;
+
+      const filename = imageUri.split('/').pop() || 'scanned_prescription.jpg';
+      const asset: CapturedAsset = {
+        uri: imageUri,
+        name: filename,
+        fileName: filename,
+        mimeType: 'image/jpeg',
+      };
+
+      await checkConfidenceAndProceed(
+        [asset],
+        () => onAssetsReady([asset]),
+        takePhoto
+      );
+    } catch {
+      showErr('Error', 'Failed to take photo. Please try again.');
+    }
+  };
 
   // ── 2. Gallery Flow ──────────────────────────────────────────────────────
   const chooseFromGallery = async () => {
@@ -50,7 +135,12 @@ export function usePrescriptionUploadService({
         fileName: a.fileName || a.uri.split('/').pop() || 'gallery_image.jpg',
         mimeType: 'image/jpeg',
       }));
-      await onAssetsReady(assets);
+
+      await checkConfidenceAndProceed(
+        assets,
+        () => onAssetsReady(assets),
+        chooseFromGallery
+      );
     } catch {
       showErr('Error', 'Failed to pick images. Please try again.');
     }
