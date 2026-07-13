@@ -65,7 +65,7 @@ export const DigitalPrescriptionModal: React.FC<
   DigitalPrescriptionModalProps
 > = ({ visible, onClose, clinicalData, orderId, orderCreatedAt }) => {
   const adjustedBottom = useAdjustedBottomInset();
-  const { height: screenHeight } = useWindowDimensions();
+  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const [activePatientIdx, setActivePatientIdx] = useState(0);
 
   const prescriptions = clinicalData?.prescriptions || [];
@@ -134,15 +134,23 @@ export const DigitalPrescriptionModal: React.FC<
 
   const htmlContent = useMemo(() => {
     if (!template?.body) return "";
-    // Inject viewport meta tag if not present to ensure responsive scaling on mobile
-    if (!template.body.includes("viewport")) {
-      return template.body.replace(
-        "<head>",
-        `<head><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=1.0, user-scalable=yes">`
-      );
+    let body = template.body;
+
+    // Template design width is 680px.
+    // Calculate viewport scale based on device screen layout (padding: 20px on each side).
+    const containerWidth = screenWidth - 40;
+    const scale = containerWidth / 680;
+    const metaTag = `<meta name="viewport" content="width=680, initial-scale=${scale.toFixed(2)}, minimum-scale=${scale.toFixed(2)}, maximum-scale=2.0, user-scalable=yes">`;
+
+    if (!body.includes("viewport")) {
+      if (body.includes("<head>")) {
+        body = body.replace("<head>", `<head>${metaTag}`);
+      } else {
+        body = metaTag + body;
+      }
     }
-    return template.body;
-  }, [template?.body]);
+    return body;
+  }, [template?.body, screenWidth]);
 
   if (!clinicalData || prescriptions.length === 0) {
     return null;
@@ -262,10 +270,10 @@ export const DigitalPrescriptionModal: React.FC<
         )}
 
         {/* Prescription Document Rendered via WebView */}
-        {!isLoading && !isError && template?.body && (
+        {!isLoading && !isError && htmlContent ? (
           <View
             style={{
-              height: screenHeight * 0.7,
+              height: screenHeight * 0.6,
               borderRadius: exactScale(12),
               borderWidth: 1,
               borderColor: "#EEEFF1",
@@ -277,16 +285,11 @@ export const DigitalPrescriptionModal: React.FC<
               originWhitelist={["*"]}
               source={{ html: htmlContent }}
               style={{ flex: 1 }}
-              scalesPageToFit={false}
-              pinchGestureEnabled={true}
-              doubleTapEnabled={true}
-              supportZoom={true}
-              builtInZoomControls={true}
-              displayZoomControls={false}
+              scalesPageToFit={true}
               nestedScrollEnabled
             />
           </View>
-        )}
+        ) : null}
       </BottomSheetView>
     </GorhomBottomSheet>
   );
