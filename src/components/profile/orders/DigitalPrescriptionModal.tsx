@@ -253,7 +253,7 @@ export const DigitalPrescriptionModal: React.FC<
         {!isLoading && !isError && template?.body && (
           <View
             style={{
-              height: screenHeight * 0.6,
+              height: screenHeight * 0.7,
               borderRadius: exactScale(12),
               borderWidth: 1,
               borderColor: "#EEEFF1",
@@ -266,6 +266,11 @@ export const DigitalPrescriptionModal: React.FC<
               source={{ html: template.body }}
               style={{ flex: 1 }}
               scalesPageToFit={true}
+              pinchGestureEnabled={true}
+              doubleTapEnabled={true}
+              supportZoom={true}
+              builtInZoomControls={true}
+              displayZoomControls={false}
               nestedScrollEnabled
             />
           </View>
