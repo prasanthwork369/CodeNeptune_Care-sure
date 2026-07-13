@@ -139,14 +139,29 @@ export const DigitalPrescriptionModal: React.FC<
     // Template design width is 680px.
     // Calculate viewport scale based on device screen layout (padding: 20px on each side).
     const containerWidth = screenWidth - 40;
-    const scale = containerWidth / 680;
-    const metaTag = `<meta name="viewport" content="width=680, initial-scale=${scale.toFixed(2)}, minimum-scale=${scale.toFixed(2)}, maximum-scale=2.0, user-scalable=yes">`;
+    const scale = containerWidth / 880;
+    
+    const zoomStyle = `
+      <style>
+        html, body {
+          zoom: ${scale.toFixed(3)} !important;
+          -webkit-text-size-adjust: none !important;
+        }
+      </style>
+    `;
+
+    const metaTag = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">`;
 
     if (!body.includes("viewport")) {
       if (body.includes("<head>")) {
-        body = body.replace("<head>", `<head>${metaTag}`);
+        body = body.replace("<head>", `<head>${metaTag}${zoomStyle}`);
       } else {
-        body = metaTag + body;
+        body = metaTag + zoomStyle + body;
+      }
+    } else {
+      // If template already has head, inject the zoomStyle
+      if (body.includes("<head>")) {
+        body = body.replace("<head>", `<head>${zoomStyle}`);
       }
     }
     return body;
