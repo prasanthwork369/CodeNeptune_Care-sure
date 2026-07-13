@@ -19,6 +19,7 @@ import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
 import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { Toast } from "@/src/components/common/Toast";
+import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
@@ -131,6 +132,7 @@ export default function RootLayout() {
                 </BottomSheetModalProvider>
                 <NetworkToast />
                 <Toast />
+                <GlobalAlertDialog />
                 <SignupBonusPopup />
 
                 {/* Splash curtain — sits above the entire app tree.

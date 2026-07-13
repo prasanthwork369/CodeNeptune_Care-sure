@@ -3,6 +3,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { PrescriptionScanner, getConfidenceLevel } from './index';
 import { ScannerService } from './scanner.service';
+import { useUIStore } from '@/src/store/uiStore';
 
 export interface CapturedAsset {
   uri: string;
@@ -51,26 +52,54 @@ export function usePrescriptionUploadService({
     const retryText = source === 'camera' ? 'Scan Again' : 'Choose Again';
 
     if (level === 'medium') {
-      Alert.alert(
-        'Check Your Prescription',
-        `This may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
-        [
-          { text: retryText, style: 'cancel', onPress: onRetry },
-          { text: 'Continue', onPress: onProceed },
-        ]
-      );
+      useUIStore.getState().setGlobalAlert({
+        title: `Check Your Prescription\n\nThis may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
+        icon: 'package',
+        buttons: [
+          {
+            label: retryText,
+            variant: 'outline',
+            onPress: () => {
+              useUIStore.getState().setGlobalAlert(null);
+              onRetry();
+            },
+          },
+          {
+            label: 'Continue',
+            variant: 'green',
+            onPress: () => {
+              useUIStore.getState().setGlobalAlert(null);
+              onProceed();
+            },
+          },
+        ],
+      });
       return;
     }
 
     if (level === 'low') {
-      Alert.alert(
-        'Prescription Not Detected',
-        'We could not confirm this is a prescription. You can still upload it and our team will verify.',
-        [
-          { text: retryText, style: 'cancel', onPress: onRetry },
-          { text: 'Upload Anyway', onPress: onProceed },
-        ]
-      );
+      useUIStore.getState().setGlobalAlert({
+        title: `Prescription Not Detected\n\nWe could not confirm this is a prescription. You can still upload it and our team will verify.`,
+        icon: 'delete',
+        buttons: [
+          {
+            label: retryText,
+            variant: 'outline',
+            onPress: () => {
+              useUIStore.getState().setGlobalAlert(null);
+              onRetry();
+            },
+          },
+          {
+            label: 'Upload Anyway',
+            variant: 'green',
+            onPress: () => {
+              useUIStore.getState().setGlobalAlert(null);
+              onProceed();
+            },
+          },
+        ],
+      });
       return;
     }
 

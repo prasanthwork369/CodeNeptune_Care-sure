@@ -1,4 +1,11 @@
 import { create } from "zustand";
+import { AlertButton, AlertDialogProps } from "@/src/components/ui/AlertDialog";
+
+export interface GlobalAlertConfig {
+  title: string;
+  icon: AlertDialogProps['icon'];
+  buttons: AlertButton[];
+}
 
 interface UIState {
   isTabBarVisible: boolean;
@@ -19,6 +26,8 @@ interface UIState {
   setIsRxFromCartFlow: (value: boolean) => void;
   setFeedScrolling: (value: boolean) => void;
   setPermissionFlowComplete: (value: boolean) => void;
+  globalAlert: GlobalAlertConfig | null;
+  setGlobalAlert: (alert: GlobalAlertConfig | null) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -36,4 +45,6 @@ export const useUIStore = create<UIState>((set) => ({
   setIsRxFromCartFlow: (value) => set({ isRxFromCartFlow: value }),
   setFeedScrolling: (value) => set({ isFeedScrolling: value }),
   setPermissionFlowComplete: (value) => set({ permissionFlowComplete: value }),
+  globalAlert: null,
+  setGlobalAlert: (alert) => set({ globalAlert: alert }),
 }));
