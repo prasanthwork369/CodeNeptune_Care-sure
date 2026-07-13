@@ -151,19 +151,24 @@ export function ItemsOrderedSection({
                       ? `₹${parseFloat((Number(item.unitPrice) * item.quantity).toFixed(2))}`
                       : "—"}
                   </Text>
-                  {item.medicineSnapshot?.mrp != null && (
-                    <Text
-                      style={[s.statusBadge, { marginTop: exactScale(2) }]}
-                      className="font-inter text-brand-subtext line-through"
-                    >
-                      ₹
-                      {parseFloat(
-                        (item.medicineSnapshot.mrp * item.quantity).toFixed(
-                          2,
-                        ),
-                      )}
-                    </Text>
-                  )}
+                  {/* Only show the struck-through MRP when there's an actual
+                      discount (mrp > selling price) — otherwise it renders a
+                      strikethrough over the same price on non-discounted items. */}
+                  {item.medicineSnapshot?.mrp != null &&
+                    Number(item.medicineSnapshot.mrp) >
+                      Number(item.unitPrice) && (
+                      <Text
+                        style={[s.statusBadge, { marginTop: exactScale(2) }]}
+                        className="font-inter text-brand-subtext line-through"
+                      >
+                        ₹
+                        {parseFloat(
+                          (item.medicineSnapshot.mrp * item.quantity).toFixed(
+                            2,
+                          ),
+                        )}
+                      </Text>
+                    )}
                 </View>
               </View>
               {(item.medicineSnapshot?.brand ||
@@ -177,7 +182,10 @@ export function ItemsOrderedSection({
                       .join(" • ")}
                   </Text>
                 )}
-              <View className="flex-row" style={{ marginTop: exactScale(8) }}>
+              <View
+                className="flex-row items-center justify-between"
+                style={{ marginTop: exactScale(8) }}
+              >
                 <View
                   style={{
                     borderWidth: exactScale(1),
@@ -195,6 +203,27 @@ export function ItemsOrderedSection({
                     Qty: {item.quantity}
                   </Text>
                 </View>
+
+                {/* Discount % on the right — green "X% off", same as the cart,
+                    shown only when MRP is higher than the paid price. */}
+                {item.medicineSnapshot?.mrp != null &&
+                  Number(item.medicineSnapshot.mrp) >
+                    Number(item.unitPrice) && (
+                    <Text
+                      style={s.labelSm}
+                      className="font-inter-bold text-brand-primary"
+                    >
+                      {parseFloat(
+                        (
+                          ((Number(item.medicineSnapshot.mrp) -
+                            Number(item.unitPrice)) /
+                            Number(item.medicineSnapshot.mrp)) *
+                          100
+                        ).toFixed(2),
+                      )}
+                      % off
+                    </Text>
+                  )}
               </View>
             </View>
           </Touchable>
