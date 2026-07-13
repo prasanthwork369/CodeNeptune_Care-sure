@@ -5,6 +5,7 @@ import { validatePrescriptionFile } from "@/src/utils/prescription";
 import { PrescriptionScanner, getConfidenceLevel } from "@/src/features/prescription-scanner";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import { Alert } from "react-native";
 
 export function usePrescriptionPicker(
   onClose: () => void,
@@ -181,28 +182,39 @@ export function usePrescriptionPicker(
         mimeType: "image/jpeg",
       };
 
-      // Deferred continuation — runs after any warning modal is dismissed.
+      // Deferred continuation — runs after any warning is dismissed.
       const continueUpload = async () => {
         const validated = await processAssets([asset as any]);
         if (validated.length > 0) navigate(validated);
       };
 
       // UX: advisory warning for medium or low confidence.
-      // Navigation is deferred into onDismiss — user is never blocked.
+      //
+      // WHY Alert.alert() instead of showErr():
+      // The bottom sheet has already been CLOSED (onClose() was called before
+      // setTimeout(takePhoto, 400)), so any InfoModal rendered inside the sheet
+      // component will never be visible. Alert.alert() is a system-level dialog
+      // that renders above ALL components regardless of mount/visibility state.
       const level = getConfidenceLevel(result.confidence);
       if (level === 'medium') {
-        showErr(
+        Alert.alert(
           'Check Your Prescription',
           'This may not be a medical prescription. Please ensure you have scanned the correct document.',
-          continueUpload,   // ← fires only after user taps OK
+          [
+            { text: 'Scan Again', style: 'cancel' },
+            { text: 'Continue', onPress: continueUpload },
+          ],
         );
-        return;             // ← stop here
+        return;
       }
       if (level === 'low') {
-        showErr(
+        Alert.alert(
           'Prescription Not Detected',
           'We could not confirm this is a prescription. You can still upload it and our team will verify.',
-          continueUpload,
+          [
+            { text: 'Scan Again', style: 'cancel' },
+            { text: 'Upload Anyway', onPress: continueUpload },
+          ],
         );
         return;
       }
