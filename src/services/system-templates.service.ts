@@ -37,7 +37,7 @@ export const systemTemplatesService = {
     channel = 'DOCUMENT',
     variables?: Record<string, any>
   ): Promise<SystemTemplate> => {
-    const { data } = await apiClient.get<SystemTemplateResponse>('/system-templates/public', {
+    const { data } = await apiClient.get<SystemTemplateResponse>('/api/v1/system-templates/public', {
       params: {
         event,
         channel,
