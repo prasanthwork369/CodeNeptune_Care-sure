@@ -2,6 +2,7 @@ import { File, Paths } from 'expo-file-system';
 import { PrescriptionItem } from '../types/prescription';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
+import { CapturedAsset } from '../features/prescription-scanner';
 
 export const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 export const MAX_FILES = 10;
@@ -78,7 +79,7 @@ const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
     ]);
 
 export async function validatePrescriptionFile(
-    asset: DocumentPicker.DocumentPickerAsset | ImagePicker.ImagePickerAsset,
+    asset: DocumentPicker.DocumentPickerAsset | ImagePicker.ImagePickerAsset | CapturedAsset,
     onError?: (title: string, message: string) => void,
     onSizeExceeded?: (sizeMB: string) => void
 ): Promise<PrescriptionItem | null> {

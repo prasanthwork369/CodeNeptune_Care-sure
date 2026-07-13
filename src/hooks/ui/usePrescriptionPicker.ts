@@ -2,10 +2,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { validatePrescriptionFile } from "@/src/utils/prescription";
-import { useScannerCapture } from "@/src/features/prescription-scanner";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
-import { Alert } from "react-native";
+import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
 
 export function usePrescriptionPicker(
   onClose: () => void,
@@ -82,10 +79,7 @@ export function usePrescriptionPicker(
   };
 
   const processAssets = async (
-    assets: (
-      | DocumentPicker.DocumentPickerAsset
-      | ImagePicker.ImagePickerAsset
-    )[],
+    assets: CapturedAsset[],
   ): Promise<PrescriptionItem[]> => {
     const validated: PrescriptionItem[] = [];
     for (const asset of assets) {
@@ -99,67 +93,28 @@ export function usePrescriptionPicker(
     return validated;
   };
 
-  const selectImages = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
-        );
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"] as ImagePicker.MediaType[],
-        quality: 0.9,
-        allowsMultipleSelection: true,
-      });
-      if (!result.canceled && result.assets.length > 0) {
-        const validated = await processAssets(result.assets);
-        if (validated.length > 0) navigate(validated);
-      }
-    } catch {
-      showErr("Error", "Failed to open image picker.");
-    }
-  };
-
-  const selectPdfs = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-          showErr('Permission Required', 'Please allow photo library access in Settings to continue.');
-          return;
-      }
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf"],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-      if (!result.canceled && result.assets.length > 0) {
-        const validated = await processAssets(result.assets);
-        if (validated.length > 0) navigate(validated);
-      }
-    } catch {
-      showErr("Error", "Failed to open document picker.");
-    }
-  };
-
-  const pickImages = () => {
-    onClose();
-    setTimeout(selectImages, 400);
-  };
-  const pickPdf = () => {
-    onClose();
-    setTimeout(selectPdfs, 400);
-  };
-
-  const { capture: takePhoto } = useScannerCapture({
-    onAssetReady: async (asset) => {
-      const validated = await processAssets([asset as any]);
+  const {
+    takePhoto: _takePhoto,
+    chooseFromGallery: _pickImages,
+    pickPdf: _pickPdf,
+  } = usePrescriptionUploadService({
+    onAssetsReady: async (assets) => {
+      const validated = await processAssets(assets as any);
       if (validated.length > 0) navigate(validated);
     },
     onError: (msg) => showErr("Error", msg),
   });
+
+  const pickImages = () => {
+    onClose();
+    setTimeout(_pickImages, 400);
+  };
+  const pickPdf = () => {
+    onClose();
+    setTimeout(_pickPdf, 400);
+  };
+
+  const takePhoto = _takePhoto;
 
   return { pickImages, pickPdf, takePhoto };
 }

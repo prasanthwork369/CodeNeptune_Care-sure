@@ -1,0 +1,125 @@
+import { Alert } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { useScannerCapture, CapturedAsset } from './useScannerCapture';
+
+export interface UsePrescriptionUploadServiceOptions {
+  onAssetsReady: (assets: CapturedAsset[]) => Promise<void> | void;
+  onError?: (message: string) => void;
+}
+
+export function usePrescriptionUploadService({
+  onAssetsReady,
+  onError,
+}: UsePrescriptionUploadServiceOptions) {
+  const showErr = (title: string, message: string) => {
+    if (onError) {
+      onError(message);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
+
+  // ── 1. Camera Flow (via PrescriptionScanner) ─────────────────────────────
+  const { capture: takePhoto } = useScannerCapture({
+    onAssetReady: (asset) => onAssetsReady([asset]),
+    onError: (msg) => showErr('Error', msg),
+  });
+
+  // ── 2. Gallery Flow ──────────────────────────────────────────────────────
+  const chooseFromGallery = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showErr(
+          'Permission Required',
+          'Please allow photo library access in Settings to continue.'
+        );
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.9,
+        allowsMultipleSelection: true,
+      });
+      if (result.canceled || result.assets.length === 0) return;
+
+      const assets: CapturedAsset[] = result.assets.map((a) => ({
+        uri: a.uri,
+        name: a.fileName || a.uri.split('/').pop() || 'gallery_image.jpg',
+        fileName: a.fileName || a.uri.split('/').pop() || 'gallery_image.jpg',
+        mimeType: 'image/jpeg',
+      }));
+      await onAssetsReady(assets);
+    } catch {
+      showErr('Error', 'Failed to pick images. Please try again.');
+    }
+  };
+
+  // ── 3. PDF Flow ──────────────────────────────────────────────────────────
+  const pickPdf = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showErr(
+          'Permission Required',
+          'Please allow photo library access in Settings to continue.'
+        );
+        return;
+      }
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf'],
+        copyToCacheDirectory: true,
+        multiple: true,
+      });
+      if (result.canceled || result.assets.length === 0) return;
+
+      const assets: CapturedAsset[] = result.assets.map((a) => ({
+        uri: a.uri,
+        name: a.name,
+        fileName: a.name,
+        mimeType: 'application/pdf',
+      }));
+      await onAssetsReady(assets);
+    } catch {
+      showErr('Error', 'Failed to pick PDF. Please try again.');
+    }
+  };
+
+  // ── 4. Mixed Document Flow (Images + PDFs) ───────────────────────────────
+  const pickDocument = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showErr(
+          'Permission Required',
+          'Please allow photo library access in Settings to continue.'
+        );
+        return;
+      }
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
+        copyToCacheDirectory: true,
+        multiple: true,
+      });
+      if (result.canceled || result.assets.length === 0) return;
+
+      const assets: CapturedAsset[] = result.assets.map((a) => ({
+        uri: a.uri,
+        name: a.name,
+        fileName: a.name,
+        mimeType: a.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
+      }));
+      await onAssetsReady(assets);
+    } catch {
+      showErr('Error', 'Failed to pick document. Please try again.');
+    }
+  };
+
+  return {
+    takePhoto,
+    chooseFromGallery,
+    pickPdf,
+    pickDocument,
+  };
+}

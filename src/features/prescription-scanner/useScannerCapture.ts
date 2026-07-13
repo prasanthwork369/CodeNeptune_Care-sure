@@ -45,7 +45,7 @@ export interface CapturedAsset {
   uri: string;
   name: string;
   fileName: string;
-  mimeType: 'image/jpeg';
+  mimeType: string;
 }
 
 export interface UseScannerCaptureOptions {

@@ -15,10 +15,8 @@ import {
     MAX_SIZE_BYTES,
     validatePrescriptionFile,
 } from "@/src/utils/prescription";
-import { useScannerCapture } from "@/src/features/prescription-scanner";
+import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
 import { useFocusEffect } from "@react-navigation/native";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, Alert, View, useWindowDimensions } from "react-native";
@@ -51,9 +49,13 @@ export const PreviewLayout: React.FC = () => {
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
 
-  const { capture: takePhoto } = useScannerCapture({
-    onAssetReady: async (asset) => {
-      await processAndAdd([asset as any]);
+  const {
+    takePhoto,
+    chooseFromGallery: pickImages,
+    pickPdf: pickPdfs,
+  } = usePrescriptionUploadService({
+    onAssetsReady: async (assets) => {
+      await processAndAdd(assets as any);
     },
     onError: (msg) => showInfo("Error", msg),
   });
@@ -145,12 +147,8 @@ export const PreviewLayout: React.FC = () => {
     }, [handleBackPress]),
   );
 
-  const processAndAdd = async (
-    assets: (
-      | DocumentPicker.DocumentPickerAsset
-      | ImagePicker.ImagePickerAsset
-    )[],
-  ) => {
+  const processAndAdd = async (assets: CapturedAsset[]) => {
+    if (__DEV__) console.log("Processing and validating new assets...");
     const newItems: PrescriptionItem[] = [];
     const currentItems = usePrescriptionDraftStore.getState().items;
     for (const asset of assets) {
@@ -190,44 +188,6 @@ export const PreviewLayout: React.FC = () => {
     if (newItems.length > 0) {
       addItems(newItems);
       setActiveIndex(usePrescriptionDraftStore.getState().items.length - 1);
-    }
-  };
-
-  const pickImages = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showPermissionAlert("photo library", showInfo);
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"] as ImagePicker.MediaType[],
-        quality: 0.9,
-        allowsMultipleSelection: true,
-      });
-      if (result.canceled || result.assets.length === 0) return;
-      await processAndAdd(result.assets);
-    } catch {
-      showInfo("Error", "Failed to pick images. Please try again.");
-    }
-  };
-
-  const pickPdfs = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showPermissionAlert("photo library", showInfo);
-        return;
-      }
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf"],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-      if (result.canceled || result.assets.length === 0) return;
-      await processAndAdd(result.assets);
-    } catch {
-      showInfo("Error", "Failed to pick PDF. Please try again.");
     }
   };
 

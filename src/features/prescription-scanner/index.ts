@@ -107,3 +107,8 @@ export { PrescriptionValidator } from './prescription-validator';
 
 export { useScannerCapture } from './useScannerCapture';
 export type { CapturedAsset, UseScannerCaptureOptions } from './useScannerCapture';
+
+// ─── Unified upload service hook ──────────────────────────────────────────────
+
+export { usePrescriptionUploadService } from './usePrescriptionUploadService';
+export type { UsePrescriptionUploadServiceOptions } from './usePrescriptionUploadService';

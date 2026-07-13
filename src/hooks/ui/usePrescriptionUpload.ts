@@ -2,9 +2,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
-import { useScannerCapture } from "@/src/features/prescription-scanner";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
+import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
 import { useRef } from "react";
 
 export function usePrescriptionUpload(
@@ -31,10 +29,7 @@ export function usePrescriptionUpload(
     onError?.(title, message, onDismiss);
 
   const processAssets = async (
-    assets: (
-      | DocumentPicker.DocumentPickerAsset
-      | ImagePicker.ImagePickerAsset
-    )[],
+    assets: CapturedAsset[],
   ): Promise<{ validated: PrescriptionItem[]; hadTooLarge: boolean }> => {
     const validated: PrescriptionItem[] = [];
     let hadTooLarge = false;
@@ -131,82 +126,18 @@ export function usePrescriptionUpload(
     pendingTooLarge.current = null;
   };
 
-  const pickDocument = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
-        );
-        return;
-      }
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-      if (result.canceled || result.assets.length === 0) return;
-      const { validated, hadTooLarge } = await processAssets(result.assets);
-      handlePicked(validated, hadTooLarge);
-    } catch {
-      showErr("Error", "Failed to pick document. Please try again.");
-    }
-  };
-
-  const pickImage = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
-        );
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        quality: 0.9,
-        allowsMultipleSelection: true,
-      });
-      if (result.canceled || result.assets.length === 0) return;
-      const { validated, hadTooLarge } = await processAssets(result.assets);
-      handlePicked(validated, hadTooLarge);
-    } catch {
-      showErr("Error", "Failed to pick image. Please try again.");
-    }
-  };
-
-  const { capture: takePhoto } = useScannerCapture({
-    onAssetReady: async (asset) => {
-      const { validated, hadTooLarge } = await processAssets([asset as any]);
+  const {
+    takePhoto,
+    chooseFromGallery: pickImage,
+    pickPdf,
+    pickDocument,
+  } = usePrescriptionUploadService({
+    onAssetsReady: async (assets) => {
+      const { validated, hadTooLarge } = await processAssets(assets as any);
       handlePicked(validated, hadTooLarge);
     },
     onError: (msg) => showErr("Error", msg),
   });
-
-  const pickPdf = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
-        );
-        return;
-      }
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf"],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-      if (result.canceled || result.assets.length === 0) return;
-      const { validated, hadTooLarge } = await processAssets(result.assets);
-      handlePicked(validated, hadTooLarge);
-    } catch {
-      showErr("Error", "Failed to pick PDF. Please try again.");
-    }
-  };
 
   return {
     pickDocument,
