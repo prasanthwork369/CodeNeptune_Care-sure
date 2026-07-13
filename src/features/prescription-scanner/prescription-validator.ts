@@ -19,10 +19,10 @@
 
 import {
   DOSAGE_PATTERN,
+  HIGH_CONFIDENCE_THRESHOLD,
   MAX_KEYWORD_SCORE,
   PRESCRIPTION_KEYWORDS,
 } from './constants';
-import { PrescriptionValidationConfig as config } from './config';
 import { ValidationResult } from './types';
 
 export const PrescriptionValidator = {
@@ -36,59 +36,41 @@ export const PrescriptionValidator = {
     if (!text || text.trim().length === 0) {
       return {
         confidence: 0,
-        level: 'LOW',
         likelyPrescription: false,
-        documentDetected: false,
-        matchedKeywords: [],
+        detectedKeywords: [],
         extractedText: '',
-        warningMessage: "This doesn't appear to be a medical prescription.",
       };
     }
 
     const lower = text.toLowerCase();
-    const documentDetected = text.trim().length >= config.minimumTextLength;
 
     // 1. Keyword matching
-    const matchedKeywords = PRESCRIPTION_KEYWORDS.filter((kw) =>
+    const detectedKeywords = PRESCRIPTION_KEYWORDS.filter((kw) =>
       lower.includes(kw),
     );
 
     // 2. Dosage pattern bonus — counts as one extra keyword hit if present
     const hasDosage = DOSAGE_PATTERN.test(text);
-    const keywordCount = matchedKeywords.length + (hasDosage ? 1 : 0);
-    const keywordRatio = Math.min(keywordCount / MAX_KEYWORD_SCORE, 1);
+    const rawScore = detectedKeywords.length + (hasDosage ? 1 : 0);
 
-    // 3. OCR text density base score (simply having text contributes to confidence)
-    const ocrBaseScore = documentDetected ? Math.min(text.length / 100, 1) : 0;
+    // 3. Normalise to [0, 1]
+    const confidence = Math.min(rawScore / MAX_KEYWORD_SCORE, 1);
 
-    // 4. Weighted calculation
-    const weightedScore =
-      (documentDetected ? config.weights.document : 0) +
-      (keywordRatio * config.weights.keyword) +
-      (ocrBaseScore * config.weights.ocr);
+    const likelyPrescription = confidence >= HIGH_CONFIDENCE_THRESHOLD;
 
-    const confidence = Math.min(weightedScore, 1);
-    const likelyPrescription = confidence >= config.highConfidenceThreshold;
-
-    let level: 'HIGH' | 'MEDIUM' | 'LOW' = 'HIGH';
-    let warningMessage: string | undefined = undefined;
-
-    if (confidence < config.mediumConfidenceThreshold) {
-      level = 'LOW';
-      warningMessage = "This doesn't appear to be a medical prescription.";
-    } else if (confidence < config.highConfidenceThreshold) {
-      level = 'MEDIUM';
-      warningMessage = "We couldn't confidently verify this prescription. If it's handwritten, you can continue and it will be reviewed.";
+    if (__DEV__) {
+      console.log(
+        `[PrescriptionValidator] keywords=${detectedKeywords.length}, ` +
+          `dosage=${hasDosage}, score=${rawScore}/${MAX_KEYWORD_SCORE}, ` +
+          `confidence=${confidence.toFixed(2)}, likely=${likelyPrescription}`,
+      );
     }
 
     return {
       confidence,
-      level,
       likelyPrescription,
-      documentDetected,
-      matchedKeywords,
+      detectedKeywords,
       extractedText: text,
-      warningMessage,
     };
   },
 };
