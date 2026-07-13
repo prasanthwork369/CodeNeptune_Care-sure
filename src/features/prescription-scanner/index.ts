@@ -9,9 +9,6 @@
  *     └─> ScanResult
  */
 
-import { ScannerService } from './scanner.service';
-import { ScanResult } from './types';
-
 export type { ScanResult } from './types';
 export { ScannerService } from './scanner.service';
 
