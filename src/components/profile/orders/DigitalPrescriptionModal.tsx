@@ -132,6 +132,18 @@ export const DigitalPrescriptionModal: React.FC<
     visible && prescriptions.length > 0
   );
 
+  const htmlContent = useMemo(() => {
+    if (!template?.body) return "";
+    // Inject viewport meta tag if not present to ensure responsive scaling on mobile
+    if (!template.body.includes("viewport")) {
+      return template.body.replace(
+        "<head>",
+        `<head><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=1.0, user-scalable=yes">`
+      );
+    }
+    return template.body;
+  }, [template?.body]);
+
   if (!clinicalData || prescriptions.length === 0) {
     return null;
   }
@@ -263,9 +275,9 @@ export const DigitalPrescriptionModal: React.FC<
           >
             <WebView
               originWhitelist={["*"]}
-              source={{ html: template.body }}
+              source={{ html: htmlContent }}
               style={{ flex: 1 }}
-              scalesPageToFit={true}
+              scalesPageToFit={false}
               pinchGestureEnabled={true}
               doubleTapEnabled={true}
               supportZoom={true}
