@@ -49,6 +49,10 @@ export function usePrescriptionUploadService({
 
     const level = getConfidenceLevel(lowestConfidence);
 
+    if (__DEV__) {
+      console.log(`[OCR Validation] Source: ${source} | Lowest Confidence: ${lowestConfidence} | Level: ${level}`);
+    }
+
     const actionWord = source === 'camera' ? 'scanned' : 'selected';
     const retryText = source === 'camera' ? 'Scan Again' : 'Choose Again';
 
