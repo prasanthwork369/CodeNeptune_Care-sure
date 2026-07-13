@@ -37,7 +37,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
             className="py-6"
         >
             <View className="px-4 mb-6">
-                <Text className="font-inter-bold text-brand-text mb-4 ml-1" style={{ fontSize: moderateScale(14) }}>
+                <Text className="font-inter-bold text-brand-text mb-4 text-center" style={{ fontSize: moderateScale(14) }}>
                     Medicine Comparison
                 </Text>
 
@@ -45,7 +45,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* MEDICINE */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center" style={{ fontSize: moderateScale(12) }}>
                             MEDICINE
                         </Text>
                         <View className="flex-row items-center justify-between">
@@ -61,7 +61,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* MANUFACTURER */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center" style={{ fontSize: moderateScale(12) }}>
                             MANUFACTURER
                         </Text>
                         <View className="flex-row items-center justify-between">
@@ -77,7 +77,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* SALT COMPOSITION & STRENGTH */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center" style={{ fontSize: moderateScale(12) }}>
                             SALT COMPOSITION & STRENGTH
                         </Text>
                         <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
@@ -91,7 +91,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
                     {/* MEDICINAL EFFECT */}
                     <View>
-                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
+                        <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center" style={{ fontSize: moderateScale(12) }}>
                             MEDICINAL EFFECT
                         </Text>
                         <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
@@ -107,7 +107,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
                         <>
                             <Divider />
                             <View>
-                                <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2" style={{ fontSize: moderateScale(12) }}>
+                                <Text className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center" style={{ fontSize: moderateScale(12) }}>
                                     PRICE/UNIT
                                 </Text>
                                 <View className="flex-row items-center justify-between">
