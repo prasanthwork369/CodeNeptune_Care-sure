@@ -120,7 +120,7 @@ export function useScannerCapture({
           'Check Your Prescription',
           'This may not be a medical prescription. Please ensure you have scanned the correct document.',
           [
-            { text: 'Scan Again', style: 'cancel' },
+            { text: 'Scan Again', style: 'cancel', onPress: capture },
             { text: 'Continue', onPress: deliver },
           ],
         );
@@ -132,7 +132,7 @@ export function useScannerCapture({
           'Prescription Not Detected',
           'We could not confirm this is a prescription. You can still upload it and our team will verify.',
           [
-            { text: 'Scan Again', style: 'cancel' },
+            { text: 'Scan Again', style: 'cancel', onPress: capture },
             { text: 'Upload Anyway', onPress: deliver },
           ],
         );
