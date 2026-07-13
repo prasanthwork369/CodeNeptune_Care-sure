@@ -31,7 +31,8 @@ export function usePrescriptionUploadService({
   const checkConfidenceAndProceed = async (
     assets: CapturedAsset[],
     onProceed: () => void,
-    onScanAgain: () => void
+    onRetry: () => void,
+    source: 'camera' | 'gallery'
   ) => {
     // Run OCR + validation on all assets in parallel
     const scanResults = await Promise.all(
@@ -46,12 +47,15 @@ export function usePrescriptionUploadService({
 
     const level = getConfidenceLevel(lowestConfidence);
 
+    const actionWord = source === 'camera' ? 'scanned' : 'selected';
+    const retryText = source === 'camera' ? 'Scan Again' : 'Choose Again';
+
     if (level === 'medium') {
       Alert.alert(
         'Check Your Prescription',
-        'This may not be a medical prescription. Please ensure you have scanned the correct document.',
+        `This may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
         [
-          { text: 'Scan Again', style: 'cancel', onPress: onScanAgain },
+          { text: retryText, style: 'cancel', onPress: onRetry },
           { text: 'Continue', onPress: onProceed },
         ]
       );
@@ -63,7 +67,7 @@ export function usePrescriptionUploadService({
         'Prescription Not Detected',
         'We could not confirm this is a prescription. You can still upload it and our team will verify.',
         [
-          { text: 'Scan Again', style: 'cancel', onPress: onScanAgain },
+          { text: retryText, style: 'cancel', onPress: onRetry },
           { text: 'Upload Anyway', onPress: onProceed },
         ]
       );
@@ -104,7 +108,8 @@ export function usePrescriptionUploadService({
       await checkConfidenceAndProceed(
         [asset],
         () => onAssetsReady([asset]),
-        takePhoto
+        takePhoto,
+        'camera'
       );
     } catch {
       showErr('Error', 'Failed to take photo. Please try again.');
@@ -139,7 +144,8 @@ export function usePrescriptionUploadService({
       await checkConfidenceAndProceed(
         assets,
         () => onAssetsReady(assets),
-        chooseFromGallery
+        chooseFromGallery,
+        'gallery'
       );
     } catch {
       showErr('Error', 'Failed to pick images. Please try again.');
