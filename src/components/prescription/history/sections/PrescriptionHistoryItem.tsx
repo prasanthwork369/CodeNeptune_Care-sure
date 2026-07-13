@@ -5,7 +5,7 @@ import { Text, View } from "react-native";
 import { Image } from "expo-image";
 import { icons } from "@/src/constants/icons";
 import { PrescriptionHistoryItemProps } from "@/src/types/prescription";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const resolveImageSource = (image: any) => {
   if (typeof image === "string") return { uri: image };
@@ -83,45 +83,35 @@ export const PrescriptionHistoryItem: React.FC<
 
   return (
     <View
-      className="mb-4 rounded-xl bg-white overflow-hidden"
+      className="mb-4 rounded-xl bg-white p-4"
       style={{
         borderWidth: 1.05,
         borderColor: "#919EAB33",
       }}
     >
-      {/* Top row: edge-to-edge thumbnail on the left, ID/patient/status on the right */}
-      <View className="flex-row items-stretch">
-        {/* Left: grey block with image */}
-        <View
-          style={{
-            width: 80,
-            backgroundColor: "#F5F6FA",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRightWidth: 1,
-            borderRightColor: "#919EAB1A",
-          }}
-        >
-          {showImage ? (
-            <Image
-              source={imageSource}
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 4,
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-              }}
-              contentFit="cover"
-            />
-          ) : (
-            <icons.pill_gray width={24} height={24} />
-          )}
-        </View>
+      {/* Top row: thumbnail + id/patient + status */}
+      <View className="flex-row items-start justify-between">
+        <View className="flex-row items-start flex-1">
+          <View
+            className="border border-[#919EAB1A] bg-[#F5F6FA] items-center justify-center overflow-hidden mr-3"
+            style={{
+              width: exactScale(56),
+              height: exactScale(56),
+              borderRadius: exactScale(8),
+            }}
+          >
+            {showImage ? (
+              <Image
+                source={imageSource}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+              />
+            ) : (
+              <icons.pill_gray width={22} height={22} />
+            )}
+          </View>
 
-        {/* Right: ID, Patient name, and Status */}
-        <View className="flex-1 flex-row justify-between items-start" style={{ padding: 16 }}>
-          <View className="flex-1 pr-2">
+          <View className="flex-1">
             <Text
               className="font-inter-bold text-[#222222]"
               style={{ fontSize: moderateScale(15) }}
@@ -130,67 +120,86 @@ export const PrescriptionHistoryItem: React.FC<
               #{item.id}
             </Text>
             <Text
-              className="font-inter-medium text-[#6A6A6A] mt-1"
+              className="font-inter-medium text-[#6A6A6A] mt-0.5"
               style={{ fontSize: moderateScale(13) }}
               numberOfLines={1}
             >
               {item.patientName}
             </Text>
           </View>
+        </View>
 
-          <View className="flex-row items-center gap-1">
-            <Text
-              className={`${statusConfig.text} font-inter-semibold`}
-              style={{ fontSize: moderateScale(12) }}
-            >
-              {item.status}
-            </Text>
-            <StatusIcon width={14} height={14} />
-          </View>
+        <View className="flex-row items-center gap-1 ml-2">
+          <Text
+            className={`${statusConfig.text} font-inter-semibold`}
+            style={{ fontSize: moderateScale(12) }}
+          >
+            {item.status}
+          </Text>
+          <StatusIcon width={14} height={14} />
         </View>
       </View>
 
-      {/* Rest of the content wrapped in padding */}
-      <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
-        {/* Status description */}
-        {!!statusConfig.description && (
-          <View className="flex-row items-center gap-2 mt-4">
-            <View className="w-6 h-6 rounded bg-[#F4F6F8] items-center justify-center" style={{ borderRadius: 4 }}>
-              <icons.pill_gray width={14} height={14} />
-            </View>
-            <Text className="font-inter-medium text-[#6A6A6A]" style={{ fontSize: moderateScale(13) }}>
-              {statusConfig.description}
-            </Text>
+      {/* Status description */}
+      {!!statusConfig.description && (
+        <View className="flex-row items-center gap-3 mt-4">
+          <View
+            className="bg-[#F4F6F8] items-center justify-center"
+            style={{
+              width: exactScale(36),
+              height: exactScale(36),
+              borderRadius: exactScale(8),
+            }}
+          >
+            <icons.pill_gray width={18} height={18} />
           </View>
-        )}
-
-        {/* Divider */}
-        <View
-          style={{
-            marginVertical: 16,
-            borderTopWidth: 1,
-            borderColor: "#E5E7EB",
-            borderStyle: "dashed",
-          }}
-        />
-
-        {/* View prescription button */}
-        <Touchable
-          activeOpacity={0.8}
-          onPress={handleView}
-          className="flex-row items-center justify-center rounded-lg bg-[#F1FEF8] border border-[#E8F6ED] py-3"
-        >
-          <Text className="text-[#0F7635] font-inter-bold tracking-wider mr-1.5" style={{ fontSize: moderateScale(13) }}>
-            VIEW PRESCRIPTION
+          <Text
+            className="font-inter-medium text-[#4A4A4A] flex-1"
+            style={{ fontSize: moderateScale(14) }}
+          >
+            {statusConfig.description}
           </Text>
-          <icons.arrow_forward_green width={14} height={14} />
-        </Touchable>
+        </View>
+      )}
 
-        {/* Uploaded date */}
-        <Text className="pt-2 font-inter-medium text-[#6A6A6A] mt-2.5" style={{ fontSize: moderateScale(12) }}>
-          Uploaded on {item.uploadedDate}
+      {/* Divider */}
+      <View
+        style={{
+          marginVertical: exactScale(20),
+          borderTopWidth: 1,
+          borderColor: "#E5E7EB",
+          borderStyle: "dashed",
+        }}
+      />
+
+      {/* View prescription button */}
+      <Touchable
+        activeOpacity={0.8}
+        onPress={handleView}
+        className="flex-row items-center justify-center py-3.5"
+        style={{
+          backgroundColor: "#F1FEF8",
+          borderWidth: 1,
+          borderColor: "#0F763522",
+          borderRadius: exactScale(14),
+        }}
+      >
+        <Text
+          className="text-[#0F7635] font-inter-bold tracking-wider mr-1.5"
+          style={{ fontSize: moderateScale(13) }}
+        >
+          VIEW PRESCRIPTION
         </Text>
-      </View>
+        <icons.arrow_forward_green width={14} height={14} />
+      </Touchable>
+
+      {/* Uploaded date */}
+      <Text
+        className="pt-2 font-inter-medium text-[#6A6A6A] mt-2.5"
+        style={{ fontSize: moderateScale(12) }}
+      >
+        Uploaded on {item.uploadedDate}
+      </Text>
     </View>
   );
 };
