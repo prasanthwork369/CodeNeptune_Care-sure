@@ -100,7 +100,7 @@ export const logisticsBarStyles = StyleSheet.create({
 // Search box used in ProductHeader (search screen header)
 export const searchHeaderStyles = StyleSheet.create({
   box: {
-    height: exactScale(55),
+    height: exactScale(60),
     borderRadius: exactScale(12),
     borderWidth: 1.05,
     borderColor: "#919EAB33",
@@ -113,7 +113,7 @@ export const searchHeaderStyles = StyleSheet.create({
     elevation: 4,
   },
   inputText: {
-    fontSize: moderateScale(13),
+    fontSize: moderateScale(14),
     fontWeight: "400",
     color: "#222222",
     padding: 0,

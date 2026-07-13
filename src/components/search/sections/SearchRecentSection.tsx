@@ -90,7 +90,6 @@ export const SearchRecentSection = ({
             {visibleTrending.length > 0 && (
                 <View className="px-4 pt-5">
                     <View className="flex-row items-center gap-x-1.5 mb-3">
-                        <icons.fire width={16} height={16} />
                         <Text style={s.sectionTitle} className="font-inter-bold text-brand-text">Trending Search</Text>
                     </View>
                     <View className="flex-row flex-wrap gap-2">
@@ -110,7 +109,7 @@ export const SearchRecentSection = ({
                 </View>
             )}
 
-           <View className="pt-5" style={{paddingTop:verticalScale(40)}}>
+           <View  style={{paddingTop:verticalScale(30)}}>
              {showFrequent && frequentlyOrdered.length > 0 && (
                 <FrequentSubstitutes substitutes={frequentlyOrdered} onProductPress={onProductPress} onViewAll={onViewAllFrequent} />
             )}

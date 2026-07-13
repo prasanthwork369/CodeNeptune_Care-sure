@@ -59,7 +59,11 @@ export function useHomeData() {
   const onRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await Promise.all([
+      // allSettled (not all): keep the spinner up until EVERY refetch settles
+      // and the 800ms floor elapses. With Promise.all, a single refetch that
+      // rejects (network hiccup, a failing endpoint) short-circuits the whole
+      // wait, hiding the indicator instantly even though the refresh is ongoing.
+      await Promise.allSettled([
         refetchHome(),
         refetchFeatured(),
         refetchSubcategories(),

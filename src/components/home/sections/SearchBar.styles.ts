@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
   },
   uploadIcon: { width: exactScale(22), height: exactScale(22) },
   container: {
-    height: exactScale(55),
+    height: exactScale(60),
     borderRadius: exactScale(10),
     borderWidth: 1.05,
     borderColor: "#919EAB33",

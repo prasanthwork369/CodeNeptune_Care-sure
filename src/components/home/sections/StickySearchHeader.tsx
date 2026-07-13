@@ -96,7 +96,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
           <View
             style={{
               width: exactScale(55),
-              height: exactScale(55),
+              height: exactScale(60),
               borderRadius: exactScale(10),
               borderWidth: 1.05,
               borderColor: "#919EAB33",
@@ -121,7 +121,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
               flex: 1,
               flexDirection: "row",
               alignItems: "center",
-              height: exactScale(55),
+              height: exactScale(60),
               borderRadius: exactScale(10),
               borderWidth: 1.05,
               borderColor: "#919EAB33",

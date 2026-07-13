@@ -57,7 +57,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             containerStyle,
             { backgroundColor: isPressed ? "#F5F7F9" : "#FFFFFF" },
           ]}
-          className="flex-row items-center rounded-md px-4 py-3.5 border border-[#919EAB33]"
+          className="flex-row items-center rounded-md px-4 py-3 border border-[#919EAB33]"
         >
           <icons.search width={SEARCH_ICON_SIZE} height={SEARCH_ICON_SIZE} />
           <View className="flex-1 ml-2 py-1.5 overflow-hidden">
