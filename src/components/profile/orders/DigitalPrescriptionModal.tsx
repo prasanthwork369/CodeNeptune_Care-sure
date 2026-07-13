@@ -4,7 +4,7 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { Image, Text, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { useSystemTemplate } from "@/src/hooks/queries/useSystemTemplates";
 import { WebView } from "react-native-webview";
@@ -24,7 +24,14 @@ interface MedicineItem {
 interface PrescriptionDetails {
   medicines: MedicineItem[];
   patientId?: string;
-  patientName: string;
+  // The API nests patient info under `patient` (matches the web RxModal).
+  // Flat fields are kept as an optional fallback for older payloads.
+  patient?: {
+    name?: string;
+    age?: string | number;
+    gender?: string;
+  };
+  patientName?: string;
   patientAge?: string | number;
   patientGender?: string;
 }
@@ -67,6 +74,13 @@ export const DigitalPrescriptionModal: React.FC<
   const adjustedBottom = useAdjustedBottomInset();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const [activePatientIdx, setActivePatientIdx] = useState(0);
+  const webViewRef = useRef<WebView>(null);
+
+  // Triggers the WebView's print flow, which on Android/iOS lets the user
+  // save the rendered prescription as a PDF (no extra library needed).
+  const handleDownload = () => {
+    webViewRef.current?.injectJavaScript("window.print(); true;");
+  };
 
   const prescriptions = clinicalData?.prescriptions || [];
   const rx = prescriptions[activePatientIdx] || {};
@@ -88,9 +102,12 @@ export const DigitalPrescriptionModal: React.FC<
   expiryDate.setMonth(expiryDate.getMonth() + 6); // standard 6 months validity
 
   const variables = useMemo(() => {
-    const ageVal = rx.patientAge;
-    const genderVal = rx.patientGender || "";
-    const patientNameVal = rx.patientName || "Not Specified";
+    // Read the nested `patient` object first (the real API shape, same as the
+    // web RxModal); fall back to the flat fields for older payloads.
+    const ageVal = rx.patient?.age ?? rx.patientAge;
+    const genderVal = rx.patient?.gender ?? rx.patientGender ?? "";
+    const patientNameVal =
+      rx.patient?.name ?? rx.patientName ?? "Not Specified";
 
     return {
       doctorName,
@@ -139,7 +156,7 @@ export const DigitalPrescriptionModal: React.FC<
     // Template design width is 680px.
     // Calculate viewport scale based on device screen layout (padding: 20px on each side).
     const containerWidth = screenWidth - 40;
-    const scale = containerWidth / 510;
+    const scale = containerWidth / 530;
     
     const zoomStyle = `
       <style>
@@ -191,14 +208,28 @@ export const DigitalPrescriptionModal: React.FC<
           paddingBottom: Math.max(adjustedBottom, exactScale(32)) + exactScale(24),
         }}
       >
-        {/* Header Row with Title */}
-        <View style={{ marginBottom: exactScale(16) }}>
+        {/* Header Row with Title + download (icon only) on the right */}
+        <View
+          className="flex-row items-center justify-between"
+          style={{ marginBottom: exactScale(16) }}
+        >
           <Text
-            className="font-inter-bold text-[#1A1C1E]"
+            className="font-inter-bold text-[#1A1C1E] flex-1"
             style={{ fontSize: moderateScale(18) }}
           >
             Verified Digital Prescription
           </Text>
+          <Touchable
+            onPress={handleDownload}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={{ marginLeft: exactScale(12) }}
+          >
+            <icons.download
+              width={exactScale(20)}
+              height={exactScale(20)}
+              fill="#0F7635"
+            />
+          </Touchable>
         </View>
 
         {/* Tab System for Multiple Patients */}
@@ -300,6 +331,7 @@ export const DigitalPrescriptionModal: React.FC<
             }}
           >
             <WebView
+              ref={webViewRef}
               originWhitelist={["*"]}
               source={{ html: htmlContent }}
               style={{ flex: 1, backgroundColor: "#ffffff" }}

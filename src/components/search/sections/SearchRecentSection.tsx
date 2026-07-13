@@ -6,7 +6,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { searchRecentStyles as s } from '../search.styles';
-import { moderateScale } from "@/src/utils/exactScale";
+import { moderateScale, verticalScale } from "@/src/utils/exactScale";
 
 const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
     <Touchable
@@ -90,7 +90,7 @@ export const SearchRecentSection = ({
             {visibleTrending.length > 0 && (
                 <View className="px-4 pt-5">
                     <View className="flex-row items-center gap-x-1.5 mb-3">
-                        <icons.trend_up width={16} height={16} />
+                        <icons.fire width={16} height={16} />
                         <Text style={s.sectionTitle} className="font-inter-bold text-brand-text">Trending Search</Text>
                     </View>
                     <View className="flex-row flex-wrap gap-2">
@@ -100,7 +100,7 @@ export const SearchRecentSection = ({
                                     onPress={() => onTermPress(term)}
                                     className="flex-row items-center bg-white border border-[#919EAB33] rounded-sm px-3 py-1.5 gap-x-1.5"
                                 >
-                                    <icons.trend_up width={13} height={13} />
+                                    <icons.fire width={13} height={13} />
                                     <Text style={s.chipText} className="font-inter-medium text-brand-text">{term}</Text>
                                 </Touchable>
                                 <DeleteBadge onPress={() => setHiddenTrending(prev => new Set([...prev, term]))} />
@@ -110,9 +110,11 @@ export const SearchRecentSection = ({
                 </View>
             )}
 
-            {showFrequent && frequentlyOrdered.length > 0 && (
+           <View className="pt-5" style={{paddingTop:verticalScale(40)}}>
+             {showFrequent && frequentlyOrdered.length > 0 && (
                 <FrequentSubstitutes substitutes={frequentlyOrdered} onProductPress={onProductPress} onViewAll={onViewAllFrequent} />
             )}
+           </View>
         </ScrollView>
     );
 };

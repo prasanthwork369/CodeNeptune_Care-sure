@@ -36,7 +36,7 @@ const FrequentItem = React.memo(({ item, onProductPress, disableCart }: { item: 
     const { slideAnim, opacityAnim } = animations;
 
     return (
-        <View className="flex-row items-center border-b border-[#919EAB1A] pb-4">
+        <View className="flex-row items-center  pb-4">
             {/* Tappable area → product detail */}
             <Touchable
                 activeOpacity={0.7}

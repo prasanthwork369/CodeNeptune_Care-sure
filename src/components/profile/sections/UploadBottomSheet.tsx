@@ -173,7 +173,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#EBEBEB",
-    marginBottom: exactScale(4),
+    marginBottom: exactScale(14),
   },
   cancelText: { fontSize: moderateScale(15), fontWeight: "600", color: "#CF1A1A" },
 });

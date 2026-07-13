@@ -61,6 +61,10 @@ export function useOrderTrackingSteps(order: Order | null | undefined): Tracking
     }
 
     const cur = STEP_STATUSES.includes(order?.status ?? -1) ? (order?.status ?? 0) : 0;
+    // Delivered (7) is terminal — the order is done, so no step should show as
+    // "in progress". Without this the final Delivered step is both completed
+    // AND active, and the UI renders it as a pulsing "In progress" step.
+    const isDelivered = cur === 7;
 
     return [
       { status: 1, title: "Order Placed", time: logTime(1) ?? order?.createdAt },
@@ -79,7 +83,11 @@ export function useOrderTrackingSteps(order: Order | null | undefined): Tracking
       time: step.time ? formatDateTime(step.time) : "—",
       completed: cur > 0 && cur >= step.status,
       cancelled: false,
-      isActive: cur > 0 ? cur === step.status : step.status === 1,
+      isActive: isDelivered
+        ? false
+        : cur > 0
+          ? cur === step.status
+          : step.status === 1,
     }));
   }, [order]);
 }

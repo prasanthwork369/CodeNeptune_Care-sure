@@ -632,6 +632,7 @@ export const OrderTrackLayout: React.FC = () => {
           visible={rxModalVisible}
           onClose={() => setRxModalVisible(false)}
           clinicalData={order.clinicalData}
+          orderId={order.orderId}
         />
       )}
 

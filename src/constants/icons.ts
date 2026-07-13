@@ -130,6 +130,7 @@ import shopping_cart from "../../assets/icons/shopping_cart.svg";
 import plus from "../../assets/icons/plus.svg";
 import plus_light from "../../assets/icons/plus_light.svg";
 import cancel_white from "../../assets/icons/cancel_white.svg";
+import fire from "../../assets/icons/fire.svg";
 import prescription_green from "../../assets/icons/prescription_green.svg";
 import prescriptions from "../../assets/icons/prescriptions.svg";
 import prescriptions_list from "../../assets/icons/prescriptions_list.svg";
@@ -256,6 +257,7 @@ export const icons = {
     plus,
     cancel_white,
     eye,
+    fire,
     add_photo,
     plus_light,
     mail,
