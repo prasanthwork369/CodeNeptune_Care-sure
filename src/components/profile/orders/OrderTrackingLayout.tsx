@@ -627,7 +627,7 @@ export const OrderTrackLayout: React.FC = () => {
         steps={trackingSteps}
       />
 
-      {order?.clinicalData && (
+      {order?.clinicalData && order?.status === 7 && (
         <DigitalPrescriptionModal
           visible={rxModalVisible}
           onClose={() => setRxModalVisible(false)}
