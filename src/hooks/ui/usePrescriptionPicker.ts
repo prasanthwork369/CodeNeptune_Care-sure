@@ -2,7 +2,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { validatePrescriptionFile } from "@/src/utils/prescription";
-import { PrescriptionScanner, getConfidenceLevel } from "@/src/features/prescription-scanner";
+import { useScannerCapture } from "@/src/features/prescription-scanner";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
@@ -153,78 +153,13 @@ export function usePrescriptionPicker(
     setTimeout(selectPdfs, 400);
   };
 
-  const takePhoto = async () => {
-    try {
-      // Permission check — must happen before opening the scanner
-      const { status, canAskAgain } =
-        await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== "granted") {
-        if (!canAskAgain)
-          showErr(
-            "Permission Required",
-            "Please allow camera access in Settings to continue.",
-          );
-        return;
-      }
-
-      // Centralised scanner → OCR → validation pipeline
-      const result = await PrescriptionScanner.scan();
-
-      // User cancelled inside the scanner — nothing to do
-      if (result.cancelled || !result.imageUri) return;
-
-      const scannedUri = result.imageUri;
-      const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
-      const asset = {
-        uri: scannedUri,
-        name: filename,
-        fileName: filename,
-        mimeType: "image/jpeg",
-      };
-
-      // Deferred continuation — runs after any warning is dismissed.
-      const continueUpload = async () => {
-        const validated = await processAssets([asset as any]);
-        if (validated.length > 0) navigate(validated);
-      };
-
-      // UX: advisory warning for medium or low confidence.
-      //
-      // WHY Alert.alert() instead of showErr():
-      // The bottom sheet has already been CLOSED (onClose() was called before
-      // setTimeout(takePhoto, 400)), so any InfoModal rendered inside the sheet
-      // component will never be visible. Alert.alert() is a system-level dialog
-      // that renders above ALL components regardless of mount/visibility state.
-      const level = getConfidenceLevel(result.confidence);
-      if (level === 'medium') {
-        Alert.alert(
-          'Check Your Prescription',
-          'This may not be a medical prescription. Please ensure you have scanned the correct document.',
-          [
-            { text: 'Scan Again', style: 'cancel' },
-            { text: 'Continue', onPress: continueUpload },
-          ],
-        );
-        return;
-      }
-      if (level === 'low') {
-        Alert.alert(
-          'Prescription Not Detected',
-          'We could not confirm this is a prescription. You can still upload it and our team will verify.',
-          [
-            { text: 'Scan Again', style: 'cancel' },
-            { text: 'Upload Anyway', onPress: continueUpload },
-          ],
-        );
-        return;
-      }
-
-      // High confidence — proceed silently
-      await continueUpload();
-    } catch {
-      showErr("Error", "Failed to take photo. Please try again.");
-    }
-  };
+  const { capture: takePhoto } = useScannerCapture({
+    onAssetReady: async (asset) => {
+      const validated = await processAssets([asset as any]);
+      if (validated.length > 0) navigate(validated);
+    },
+    onError: (msg) => showErr("Error", msg),
+  });
 
   return { pickImages, pickPdf, takePhoto };
 }

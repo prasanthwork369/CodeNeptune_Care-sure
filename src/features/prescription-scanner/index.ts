@@ -102,3 +102,8 @@ export type { ScanResult, OcrResult, ValidationResult, ConfidenceLevel } from '.
 export { OcrService } from './ocr.service';
 export { ScannerService } from './scanner.service';
 export { PrescriptionValidator } from './prescription-validator';
+
+// ─── Reusable scan-capture hook ───────────────────────────────────────────────
+
+export { useScannerCapture } from './useScannerCapture';
+export type { CapturedAsset, UseScannerCaptureOptions } from './useScannerCapture';

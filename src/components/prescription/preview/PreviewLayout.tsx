@@ -14,14 +14,14 @@ import {
     MAX_FILES,
     MAX_SIZE_BYTES,
     validatePrescriptionFile,
-    capturePrescriptionImage,
 } from "@/src/utils/prescription";
+import { useScannerCapture } from "@/src/features/prescription-scanner";
 import { useFocusEffect } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { BackHandler, View, useWindowDimensions } from "react-native";
+import { BackHandler, Alert, View, useWindowDimensions } from "react-native";
 import {
     DuplicateFileModal,
     FileTooLargeModal,
@@ -50,6 +50,14 @@ export const PreviewLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
+
+  const { capture: takePhoto } = useScannerCapture({
+    onAssetReady: async (asset) => {
+      await processAndAdd([asset as any]);
+    },
+    onError: (msg) => showInfo("Error", msg),
+  });
+
   const {
     uri,
     name,
@@ -330,29 +338,7 @@ export const PreviewLayout: React.FC = () => {
         }}
         onTakePhoto={() => {
           setShowAddSheet(false);
-          setTimeout(async () => {
-            try {
-              const { status, canAskAgain } =
-                await ImagePicker.requestCameraPermissionsAsync();
-              if (status !== "granted") {
-                if (!canAskAgain) showPermissionAlert("camera", showInfo);
-                return;
-              }
-              const scannedUri = await capturePrescriptionImage();
-              if (scannedUri) {
-                const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
-                const asset = {
-                  uri: scannedUri,
-                  name: filename,
-                  fileName: filename,
-                  mimeType: "image/jpeg",
-                };
-                await processAndAdd([asset as any]);
-              }
-            } catch {
-              showInfo("Error", "Failed to take photo. Please try again.");
-            }
-          }, 300);
+          setTimeout(takePhoto, 300);
         }}
         onUploadPdf={() => {
           setShowAddSheet(false);
