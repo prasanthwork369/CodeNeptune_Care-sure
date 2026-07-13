@@ -575,7 +575,7 @@ export const OrderTrackLayout: React.FC = () => {
 
         <PaymentMethodSection />
 
-        {order?.clinicalData && (
+        {order?.clinicalData && order?.status === 7 && (
           <PrescriptionSection onViewRx={() => setRxModalVisible(true)} />
         )}
       </ScrollView>
