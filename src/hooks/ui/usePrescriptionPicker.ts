@@ -172,20 +172,6 @@ export function usePrescriptionPicker(
       // User cancelled inside the scanner — nothing to do
       if (result.cancelled || !result.imageUri) return;
 
-      // UX: advisory warning for medium or low confidence (never blocks)
-      const level = getConfidenceLevel(result.confidence);
-      if (level === 'medium') {
-        showErr(
-          'Check Your Prescription',
-          'This may not be a medical prescription. Please ensure you have scanned the correct document.',
-        );
-      } else if (level === 'low') {
-        showErr(
-          'Prescription Not Detected',
-          'We could not confirm this is a prescription. You can still upload it and our team will verify.',
-        );
-      }
-
       const scannedUri = result.imageUri;
       const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
       const asset = {
@@ -194,8 +180,35 @@ export function usePrescriptionPicker(
         fileName: filename,
         mimeType: "image/jpeg",
       };
-      const validated = await processAssets([asset as any]);
-      if (validated.length > 0) navigate(validated);
+
+      // Deferred continuation — runs after any warning modal is dismissed.
+      const continueUpload = async () => {
+        const validated = await processAssets([asset as any]);
+        if (validated.length > 0) navigate(validated);
+      };
+
+      // UX: advisory warning for medium or low confidence.
+      // Navigation is deferred into onDismiss — user is never blocked.
+      const level = getConfidenceLevel(result.confidence);
+      if (level === 'medium') {
+        showErr(
+          'Check Your Prescription',
+          'This may not be a medical prescription. Please ensure you have scanned the correct document.',
+          continueUpload,   // ← fires only after user taps OK
+        );
+        return;             // ← stop here
+      }
+      if (level === 'low') {
+        showErr(
+          'Prescription Not Detected',
+          'We could not confirm this is a prescription. You can still upload it and our team will verify.',
+          continueUpload,
+        );
+        return;
+      }
+
+      // High confidence — proceed silently
+      await continueUpload();
     } catch {
       showErr("Error", "Failed to take photo. Please try again.");
     }

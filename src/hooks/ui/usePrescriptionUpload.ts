@@ -197,22 +197,6 @@ export function usePrescriptionUpload(
       // User cancelled inside the scanner — nothing to do
       if (result.cancelled || !result.imageUri) return;
 
-      // UX: advisory warning for medium or low confidence
-      // The user is NEVER blocked — they can always continue.
-      const level = getConfidenceLevel(result.confidence);
-      if (level === 'medium') {
-        showErr(
-          'Check Your Prescription',
-          'This may not be a medical prescription. Please ensure you have scanned the correct document.',
-        );
-        // showErr is advisory only — we still proceed
-      } else if (level === 'low') {
-        showErr(
-          'Prescription Not Detected',
-          'We could not confirm this is a prescription. You can still upload it and our team will verify.',
-        );
-      }
-
       const scannedUri = result.imageUri;
       const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
       const asset = {
@@ -221,8 +205,37 @@ export function usePrescriptionUpload(
         fileName: filename,
         mimeType: "image/jpeg",
       };
-      const { validated, hadTooLarge } = await processAssets([asset as any]);
-      handlePicked(validated, hadTooLarge);
+
+      // Deferred continuation — runs after the user dismisses any warning modal.
+      // For high confidence this is called immediately (no modal shown).
+      const continueUpload = async () => {
+        const { validated, hadTooLarge } = await processAssets([asset as any]);
+        handlePicked(validated, hadTooLarge);
+      };
+
+      // UX: advisory warning for medium or low confidence.
+      // Navigation is deferred into onDismiss so the modal stays visible
+      // until the user taps OK — the user is NEVER blocked from uploading.
+      const level = getConfidenceLevel(result.confidence);
+      if (level === 'medium') {
+        showErr(
+          'Check Your Prescription',
+          'This may not be a medical prescription. Please ensure you have scanned the correct document.',
+          continueUpload,   // ← proceed only after user taps OK
+        );
+        return;             // ← stop here; continueUpload fires via onDismiss
+      }
+      if (level === 'low') {
+        showErr(
+          'Prescription Not Detected',
+          'We could not confirm this is a prescription. You can still upload it and our team will verify.',
+          continueUpload,
+        );
+        return;
+      }
+
+      // High confidence — proceed silently with no modal
+      await continueUpload();
     } catch {
       showErr("Error", "Failed to take photo. Please try again.");
     }
