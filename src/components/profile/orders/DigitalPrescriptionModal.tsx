@@ -4,8 +4,10 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
-import React from "react";
-import { Image, Text, useWindowDimensions, View } from "react-native";
+import React, { useState, useMemo } from "react";
+import { Image, Text, useWindowDimensions, View, ActivityIndicator } from "react-native";
+import { useSystemTemplate } from "@/src/hooks/queries/useSystemTemplates";
+import { WebView } from "react-native-webview";
 
 interface MedicineItem {
   name: string;
@@ -48,39 +50,91 @@ interface DigitalPrescriptionModalProps {
   visible: boolean;
   onClose: () => void;
   clinicalData: ClinicalData;
+  orderId?: string;
+  orderCreatedAt?: string | Date;
 }
 
-function formatDate(iso: string) {
-  if (!iso) return "—";
-  const dateObj = new Date(iso);
-  const datePart = dateObj.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-  const timePart = dateObj.toLocaleTimeString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-  return `${datePart}, ${timePart}`;
+function formatDateString(value: Date): string {
+  const day = String(value.getDate()).padStart(2, "0");
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const year = value.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export const DigitalPrescriptionModal: React.FC<
   DigitalPrescriptionModalProps
-> = ({ visible, onClose, clinicalData }) => {
+> = ({ visible, onClose, clinicalData, orderId, orderCreatedAt }) => {
   const adjustedBottom = useAdjustedBottomInset();
   const { height: screenHeight } = useWindowDimensions();
+  const [activePatientIdx, setActivePatientIdx] = useState(0);
 
-  const docName =
-    clinicalData.doctorSnapshot?.name ??
-    clinicalData.doctorName ??
-    "Medical Practitioner";
-  const regNo =
-    clinicalData.doctorSnapshot?.registrationNumber ??
-    clinicalData.registrationNumber ??
-    "—";
-  const signatureUrl = clinicalData.doctorSnapshot?.signatureUrl;
+  const prescriptions = clinicalData?.prescriptions || [];
+  const rx = prescriptions[activePatientIdx] || {};
+  const medicines = rx.medicines || [];
+  const doctorName =
+    clinicalData?.doctorSnapshot?.name ??
+    clinicalData?.doctorName ??
+    "Dr. Raj Kumar";
+  const regNumber =
+    clinicalData?.doctorSnapshot?.registrationNumber ??
+    clinicalData?.registrationNumber ??
+    "Cs-0001";
+  const doctorSignature = clinicalData?.doctorSnapshot?.signatureUrl || "";
+
+  const issueDate = new Date(
+    clinicalData?.approvedAt || orderCreatedAt || new Date()
+  );
+  const expiryDate = new Date(issueDate);
+  expiryDate.setMonth(expiryDate.getMonth() + 6); // standard 6 months validity
+
+  const variables = useMemo(() => {
+    const ageVal = rx.patientAge;
+    const genderVal = rx.patientGender || "";
+    const patientNameVal = rx.patientName || "Not Specified";
+
+    return {
+      doctorName,
+      doctorRegistrationNumber: regNumber,
+      prescriptionNo: orderId ? `RX-${orderId}` : "",
+      date: formatDateString(issueDate),
+      expiryDate: formatDateString(expiryDate),
+      dob: "",
+      age: ageVal !== undefined && ageVal !== null ? String(ageVal) : "",
+      gender: genderVal,
+      patientName: patientNameVal,
+      diagnosis: "",
+      doctorSignature: doctorSignature,
+      medicines: medicines.map((med: any) => ({
+        name: med.name || "Unknown Medicine",
+        description: med.instructions || "",
+        quantity: String(med.quantity ?? 1),
+      })),
+    };
+  }, [
+    doctorName,
+    regNumber,
+    orderId,
+    rx,
+    medicines,
+    doctorSignature,
+    issueDate,
+    expiryDate,
+  ]);
+
+  const {
+    data: template,
+    isLoading,
+    isError,
+  } = useSystemTemplate(
+    "rx.generated",
+    "DOCUMENT",
+    variables,
+    visible && prescriptions.length > 0
+  );
+
+  if (!clinicalData || prescriptions.length === 0) {
+    return null;
+  }
 
   return (
     <GorhomBottomSheet
@@ -99,7 +153,7 @@ export const DigitalPrescriptionModal: React.FC<
           paddingBottom: Math.max(adjustedBottom, exactScale(32)) + exactScale(24),
         }}
       >
-        {/* Header Row with Title (Static) */}
+        {/* Header Row with Title */}
         <View style={{ marginBottom: exactScale(16) }}>
           <Text
             className="font-inter-bold text-[#1A1C1E]"
@@ -109,367 +163,114 @@ export const DigitalPrescriptionModal: React.FC<
           </Text>
         </View>
 
-        {/* Prescription Card Box */}
-        <View
-          className="bg-white border border-[#919EAB33] overflow-hidden shadow-sm"
-          style={{
-            borderRadius: exactScale(16),
-          }}
-        >
-            {/* Green Top Border/Accent Band */}
-            <View
-              style={{ height: exactScale(6), backgroundColor: "#0F7635" }}
-            />
-
-            <View style={{ padding: exactScale(16) }}>
-              {/* Doctor / Clinic Row */}
-              <View
-                className="flex-row justify-between items-start"
-                style={{ marginBottom: exactScale(16) }}
-              >
-                {/* Left: Doctor Information */}
-                <View
-                  className="flex-1"
-                  style={{ paddingRight: exactScale(16) }}
+        {/* Tab System for Multiple Patients */}
+        {prescriptions.length > 1 && (
+          <View
+            className="flex-row flex-wrap gap-2 pb-2 mb-2"
+            style={{
+              borderBottomWidth: 1,
+              borderColor: "#E5E7EB",
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
+            {prescriptions.map((p: any, idx: number) => {
+              const active = activePatientIdx === idx;
+              const name = p.patientName ?? p.patient?.name ?? `Patient ${idx + 1}`;
+              return (
+                <Touchable
+                  key={idx}
+                  onPress={() => setActivePatientIdx(idx)}
+                  className="rounded-xl"
+                  style={{
+                    backgroundColor: active ? "#0F7635" : "#FFFFFF",
+                    borderWidth: 1,
+                    borderColor: active ? "#0F7635" : "#E5E7EB",
+                    paddingHorizontal: exactScale(12),
+                    paddingVertical: exactScale(6),
+                    borderRadius: exactScale(8),
+                    marginRight: exactScale(6),
+                    marginBottom: exactScale(6),
+                  }}
                 >
                   <Text
-                    className="font-inter-bold text-[#1A1C1E]"
-                    style={{ fontSize: moderateScale(15) }}
-                  >
-                    Dr. {docName}
-                  </Text>
-                  <Text
-                    className="font-inter-semibold text-brand-subtext uppercase"
                     style={{
-                      fontSize: moderateScale(9),
-                      letterSpacing: 0.5,
-                      marginTop: exactScale(2),
+                      color: active ? "#FFFFFF" : "#4B5563",
+                      fontSize: moderateScale(12),
+                      fontWeight: "bold",
                     }}
                   >
-                    MEDICAL PRACTITIONER
+                    {name}
                   </Text>
-                  <Text
-                    className="font-inter-semibold text-brand-text"
-                    style={{
-                      fontSize: moderateScale(11),
-                      marginTop: exactScale(8),
-                    }}
-                  >
-                    Reg No: {regNo}
-                  </Text>
-                </View>
-
-                {/* Right: Caresure Clinics Info */}
-                <View className="items-end">
-                  <Text
-                    className="font-inter-bold text-[#0F7635]"
-                    style={{ fontSize: moderateScale(13) }}
-                  >
-                    CARESURE CLINICS
-                  </Text>
-                  <Text
-                    className="font-inter-semibold text-brand-subtext"
-                    style={{
-                      fontSize: moderateScale(9),
-                      marginTop: exactScale(2),
-                    }}
-                  >
-                    Digital Health Service
-                  </Text>
-                  <Text
-                    className="font-inter-semibold text-brand-subtext"
-                    style={{ fontSize: moderateScale(9) }}
-                  >
-                    support@caresure.com
-                  </Text>
-                </View>
-              </View>
-
-              {/* Dynamic Loop rendering across multiple patient prescriptions */}
-              {(clinicalData.prescriptions ?? []).map(
-                (prescription, pIndex) => {
-                  const patientName = prescription.patientName ?? "Patient";
-                  const medicines = prescription.medicines ?? [];
-                  const ageVal = prescription.patientAge;
-                  const genderVal = prescription.patientGender;
-
-                  let ageGenderDisplay = "—";
-                  if (ageVal && genderVal) {
-                    const capitalizedGender =
-                      genderVal.charAt(0).toUpperCase() +
-                      genderVal.slice(1).toLowerCase();
-                    ageGenderDisplay = `${ageVal} Years / ${capitalizedGender}`;
-                  } else if (ageVal) {
-                    ageGenderDisplay = `${ageVal} Years`;
-                  } else if (genderVal) {
-                    ageGenderDisplay =
-                      genderVal.charAt(0).toUpperCase() +
-                      genderVal.slice(1).toLowerCase();
-                  }
-
-                  return (
-                    <View
-                      key={pIndex}
-                      style={
-                        pIndex > 0
-                          ? {
-                              marginTop: exactScale(22),
-                              borderTopWidth: 1,
-                              borderColor: "#EEEFF1",
-                              borderStyle: "dashed",
-                              paddingTop: exactScale(18),
-                            }
-                          : {}
-                      }
-                    >
-                      {/* Patient Details Grid Columns */}
-                      <View
-                        className="bg-[#FAFAFA] border border-[#EEEFF1] flex-row justify-between"
-                        style={{
-                          borderRadius: exactScale(12),
-                          paddingHorizontal: exactScale(12),
-                          paddingVertical: exactScale(10),
-                        }}
-                      >
-                        {/* Column 1: Patient Name */}
-                        <View className="flex-1">
-                          <Text
-                            className="font-inter-semibold text-brand-subtext uppercase"
-                            style={{
-                              fontSize: moderateScale(10),
-                              letterSpacing: 0.5,
-                              marginBottom: exactScale(4),
-                            }}
-                          >
-                            PATIENT NAME
-                          </Text>
-                          <Text
-                            className="font-inter-bold text-[#1A1C1E]"
-                            numberOfLines={1}
-                            style={{ fontSize: moderateScale(13) }}
-                          >
-                            {patientName}
-                          </Text>
-                        </View>
-
-                        {/* Column 2: Age / Gender */}
-                        <View
-                          className="flex-1 border-l border-r border-[#EEEFF1]"
-                          style={{ paddingHorizontal: exactScale(8) }}
-                        >
-                          <Text
-                            className="font-inter-semibold text-brand-subtext uppercase"
-                            style={{
-                              fontSize: moderateScale(10),
-                              letterSpacing: 0.5,
-                              marginBottom: exactScale(4),
-                            }}
-                          >
-                            AGE / GENDER
-                          </Text>
-                          <Text
-                            className="font-inter-bold text-[#1A1C1E]"
-                            style={{ fontSize: moderateScale(13) }}
-                          >
-                            {ageGenderDisplay}
-                          </Text>
-                        </View>
-
-                        {/* Column 3: Date & Time */}
-                        <View
-                          className="flex-1"
-                          style={{ paddingLeft: exactScale(8) }}
-                        >
-                          <Text
-                            className="font-inter-semibold text-brand-subtext uppercase"
-                            style={{
-                              fontSize: moderateScale(10),
-                              letterSpacing: 0.5,
-                              marginBottom: exactScale(4),
-                            }}
-                          >
-                            DATE & TIME
-                          </Text>
-                          <Text
-                            className="font-inter-bold text-[#1A1C1E]"
-                            numberOfLines={2}
-                            style={{ fontSize: moderateScale(11) }}
-                          >
-                            {formatDate(
-                              clinicalData.approvedAt ?? clinicalData.timestamp,
-                            )}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {/* Prescription Green Symbol */}
-                      <Text
-                        className="font-inter-extrabold text-[#0F7635]"
-                        style={{
-                          fontSize: moderateScale(24),
-                          marginTop: exactScale(12),
-                          marginBottom: exactScale(6),
-                          marginLeft: exactScale(4),
-                        }}
-                      >
-                        Rₓ
-                      </Text>
-
-                      {/* Medicines Listing */}
-                      <View style={{ gap: exactScale(12) }}>
-                        {medicines.map((med, index) => (
-                          <View key={index}>
-                            <View
-                              className="flex-row items-center justify-between"
-                              style={{ paddingVertical: exactScale(4) }}
-                            >
-                              <Text
-                                className="font-inter-bold text-[#1A1C1E] flex-1"
-                                numberOfLines={2}
-                                style={{
-                                  fontSize: moderateScale(14),
-                                  paddingRight: exactScale(12),
-                                }}
-                              >
-                                {med.name}
-                              </Text>
-                              <View
-                                className="bg-[#F4F6F8]"
-                                style={{
-                                  borderRadius: exactScale(6),
-                                  paddingHorizontal: exactScale(10),
-                                  paddingVertical: exactScale(4),
-                                }}
-                              >
-                                <Text
-                                  className="font-inter-bold text-[#6A6A6A]"
-                                  style={{ fontSize: moderateScale(11) }}
-                                >
-                                  QTY: {med.quantity}
-                                </Text>
-                              </View>
-                            </View>
-                            {index < medicines.length - 1 && (
-                              <View
-                                style={{
-                                  height: 1,
-                                  backgroundColor: "#F4F6F8",
-                                  marginTop: exactScale(12),
-                                }}
-                              />
-                            )}
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  );
-                },
-              )}
-
-              {/* Compact Digitally Signed Rx Footer */}
-              <View
-                style={{
-                  borderTopWidth: 1,
-                  borderColor: "#EEEFF1",
-                  borderStyle: "solid",
-                  marginTop: exactScale(14),
-                  paddingTop: exactScale(12),
-                }}
-              >
-                <View
-                  className="flex-row justify-between items-center"
-                  style={{ gap: exactScale(12) }}
-                >
-                  {/* Left Side: Digitally Signed Label & Disclaimer */}
-                  <View className="flex-1">
-                    <View
-                      className="flex-row items-center bg-[#F1FFF6] border border-[#0F763522]"
-                      style={{
-                        borderRadius: exactScale(12),
-                        paddingHorizontal: exactScale(8),
-                        paddingVertical: exactScale(2),
-                        alignSelf: "flex-start",
-                        marginBottom: exactScale(6),
-                      }}
-                    >
-                      <icons.verified_user_round
-                        width={exactScale(12)}
-                        height={exactScale(12)}
-                        fill="#0F7635"
-                      />
-                      <Text
-                        className="font-inter-bold text-[#0F7635]"
-                        style={{
-                          fontSize: moderateScale(9),
-                          marginLeft: exactScale(4),
-                          letterSpacing: 0.3,
-                        }}
-                      >
-                        DIGITALLY SIGNED RX
-                      </Text>
-                    </View>
-                    <Text
-                      className="font-inter text-brand-subtext"
-                      style={{
-                        fontSize: moderateScale(9),
-                        lineHeight: moderateScale(13),
-                      }}
-                    >
-                      This is a computer-generated prescription verified via
-                      CareSure Digital Health and does not require a physical
-                      signature.
-                    </Text>
-                  </View>
-
-                  {/* Right Side: Signature Image or Doctor Name */}
-                  <View className="items-center justify-center">
-                    {signatureUrl ? (
-                      <View className="items-center">
-                        <Image
-                          source={{ uri: signatureUrl }}
-                          style={{
-                            width: exactScale(135),
-                            height: exactScale(46),
-                          }}
-                          resizeMode="contain"
-                        />
-                        <Text
-                          className="font-inter-bold text-[#919EAB] text-center"
-                          style={{
-                            fontSize: moderateScale(7.5),
-                            letterSpacing: 0.5,
-                            marginTop: exactScale(4),
-                          }}
-                        >
-                          AUTHORIZED SIGNATORY
-                        </Text>
-                      </View>
-                    ) : (
-                      <View className="items-center">
-                        <Text
-                          className="font-inter-bold text-brand-text"
-                          style={{ fontSize: moderateScale(11) }}
-                        >
-                          Dr. {docName}
-                        </Text>
-                        <Text
-                          className="font-inter-bold text-[#919EAB] text-center"
-                          style={{
-                            fontSize: moderateScale(7.5),
-                            letterSpacing: 0.5,
-                            marginTop: exactScale(2),
-                          }}
-                        >
-                          AUTHORIZED SIGNATORY
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </View>
-            </View>
+                </Touchable>
+              );
+            })}
           </View>
-        </BottomSheetView>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <View style={{ alignItems: "center", justifyContent: "center", height: screenHeight * 0.4 }}>
+            <ActivityIndicator size="large" color="#0F7635" />
+            <Text
+              style={{
+                fontSize: moderateScale(13),
+                color: "#6B7280",
+                marginTop: 12,
+              }}
+            >
+              Loading prescription…
+            </Text>
+          </View>
+        )}
+
+        {/* Error State */}
+        {isError && (
+          <View style={{ alignItems: "center", justifyContent: "center", height: screenHeight * 0.4 }}>
+            <Text
+              style={{
+                fontSize: moderateScale(14),
+                fontWeight: "bold",
+                color: "#DC2626",
+              }}
+            >
+              Could not load prescription
+            </Text>
+            <Text
+              style={{
+                fontSize: moderateScale(12),
+                color: "#9CA3AF",
+                marginTop: 4,
+                textAlign: "center",
+              }}
+            >
+              The prescription template could not be fetched.
+            </Text>
+          </View>
+        )}
+
+        {/* Prescription Document Rendered via WebView */}
+        {!isLoading && !isError && template?.body && (
+          <View
+            style={{
+              height: screenHeight * 0.6,
+              borderRadius: exactScale(12),
+              borderWidth: 1,
+              borderColor: "#EEEFF1",
+              overflow: "hidden",
+              backgroundColor: "#FFFFFF",
+            }}
+          >
+            <WebView
+              originWhitelist={["*"]}
+              source={{ html: template.body }}
+              style={{ flex: 1 }}
+              scalesPageToFit={true}
+              nestedScrollEnabled
+            />
+          </View>
+        )}
+      </BottomSheetView>
     </GorhomBottomSheet>
   );
 };

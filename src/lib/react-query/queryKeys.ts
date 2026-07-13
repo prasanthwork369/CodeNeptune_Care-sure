@@ -71,4 +71,7 @@ export const QUERY_KEYS = {
     CANCELLATION_REASONS: {
         LIST: (params?: CancellationReasonParams) => ['cancellation-reasons', 'list', params] as const,
     },
+    SYSTEM_TEMPLATES: {
+        BY_EVENT: (event: string, channel: string, variables?: Record<string, any>) => ['system-templates', 'by-event', event, channel, variables] as const,
+    },
 } as const;
