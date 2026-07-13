@@ -1,20 +1,24 @@
 import React from 'react';
 import { useUIStore } from '@/src/store/uiStore';
-import { AlertDialog } from '@/src/components/ui/AlertDialog';
+import { RemoveConfirmModal } from '@/src/components/prescription/preview/sections/RemoveConfirmModal';
 
 export const GlobalAlertDialog = () => {
   const globalAlert = useUIStore((s) => s.globalAlert);
-  const setGlobalAlert = useUIStore((s) => s.setGlobalAlert);
 
   if (!globalAlert) return null;
 
   return (
-    <AlertDialog
+    <RemoveConfirmModal
       visible={true}
-      onClose={() => setGlobalAlert(null)}
-      icon={globalAlert.icon}
       title={globalAlert.title}
-      buttons={globalAlert.buttons}
+      message={globalAlert.message}
+      icon={globalAlert.icon}
+      iconBg={globalAlert.iconBg}
+      confirmBg={globalAlert.confirmBg}
+      cancelLabel={globalAlert.cancelLabel}
+      confirmLabel={globalAlert.confirmLabel}
+      onCancel={globalAlert.onCancel}
+      onConfirm={globalAlert.onConfirm}
     />
   );
 };

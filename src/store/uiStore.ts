@@ -3,8 +3,14 @@ import { AlertButton, AlertDialogProps } from "@/src/components/ui/AlertDialog";
 
 export interface GlobalAlertConfig {
   title: string;
-  icon: AlertDialogProps['icon'];
-  buttons: AlertButton[];
+  message: string;
+  icon: any; // ImageSource
+  iconBg?: string;
+  confirmBg?: string;
+  cancelLabel: string;
+  confirmLabel: string;
+  onCancel: () => void;
+  onConfirm: () => void;
 }
 
 interface UIState {

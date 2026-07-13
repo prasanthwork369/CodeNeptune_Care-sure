@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { PrescriptionScanner, getConfidenceLevel } from './index';
 import { ScannerService } from './scanner.service';
 import { useUIStore } from '@/src/store/uiStore';
+import { HOME_IMAGES } from '@/src/constants/images';
 
 export interface CapturedAsset {
   uri: string;
@@ -53,52 +54,42 @@ export function usePrescriptionUploadService({
 
     if (level === 'medium') {
       useUIStore.getState().setGlobalAlert({
-        title: `Check Your Prescription\n\nThis may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
-        icon: 'package',
-        buttons: [
-          {
-            label: retryText,
-            variant: 'outline',
-            onPress: () => {
-              useUIStore.getState().setGlobalAlert(null);
-              onRetry();
-            },
-          },
-          {
-            label: 'Continue',
-            variant: 'green',
-            onPress: () => {
-              useUIStore.getState().setGlobalAlert(null);
-              onProceed();
-            },
-          },
-        ],
+        title: 'Check Your Prescription',
+        message: `This may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
+        icon: HOME_IMAGES.leaveWarning,
+        iconBg: '#FFF1F1',
+        confirmBg: '#0F7635', // Green for Continue
+        cancelLabel: retryText,
+        confirmLabel: 'Continue',
+        onCancel: () => {
+          useUIStore.getState().setGlobalAlert(null);
+          onRetry();
+        },
+        onConfirm: () => {
+          useUIStore.getState().setGlobalAlert(null);
+          onProceed();
+        },
       });
       return;
     }
 
     if (level === 'low') {
       useUIStore.getState().setGlobalAlert({
-        title: `Prescription Not Detected\n\nWe could not confirm this is a prescription. You can still upload it and our team will verify.`,
-        icon: 'delete',
-        buttons: [
-          {
-            label: retryText,
-            variant: 'outline',
-            onPress: () => {
-              useUIStore.getState().setGlobalAlert(null);
-              onRetry();
-            },
-          },
-          {
-            label: 'Upload Anyway',
-            variant: 'green',
-            onPress: () => {
-              useUIStore.getState().setGlobalAlert(null);
-              onProceed();
-            },
-          },
-        ],
+        title: 'Prescription Not Detected',
+        message: 'We could not confirm this is a prescription. You can still upload it and our team will verify.',
+        icon: HOME_IMAGES.leaveWarning,
+        iconBg: '#FFF1F1',
+        confirmBg: '#0F7635', // Green for Upload Anyway
+        cancelLabel: retryText,
+        confirmLabel: 'Upload Anyway',
+        onCancel: () => {
+          useUIStore.getState().setGlobalAlert(null);
+          onRetry();
+        },
+        onConfirm: () => {
+          useUIStore.getState().setGlobalAlert(null);
+          onProceed();
+        },
       });
       return;
     }
