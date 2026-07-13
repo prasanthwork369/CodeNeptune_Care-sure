@@ -92,14 +92,7 @@ export const PrescriptionHistoryItem: React.FC<
       {/* Top row: thumbnail + id/patient + status */}
       <View className="flex-row items-start justify-between">
         <View className="flex-row items-start flex-1">
-          <View
-            className="border border-[#919EAB1A] bg-[#F5F6FA] items-center justify-center overflow-hidden mr-3"
-            style={{
-              width: exactScale(56),
-              height: exactScale(56),
-              borderRadius: exactScale(8),
-            }}
-          >
+          <View className="w-14 h-14 rounded-sm border border-[#919EAB1A] bg-[#F1F0F5] items-center justify-center overflow-hidden mr-3">
             {showImage ? (
               <Image
                 source={imageSource}
@@ -142,20 +135,25 @@ export const PrescriptionHistoryItem: React.FC<
 
       {/* Status description */}
       {!!statusConfig.description && (
-        <View className="flex-row items-center gap-3 mt-4">
+        <View
+          className="flex-row items-center mt-4"
+          style={{ gap: exactScale(10) }}
+        >
           <View
-            className="bg-[#F4F6F8] items-center justify-center"
+            className="items-center justify-center"
             style={{
-              width: exactScale(36),
-              height: exactScale(36),
-              borderRadius: exactScale(8),
+              width: exactScale(24),
+              height: exactScale(24),
+              borderRadius: exactScale(4),
+              backgroundColor: "#F1F0F5",
+              padding: exactScale(4),
             }}
           >
-            <icons.pill_gray width={18} height={18} />
+            <icons.pill_gray width={exactScale(14)} height={exactScale(14)} />
           </View>
           <Text
             className="font-inter-medium text-[#4A4A4A] flex-1"
-            style={{ fontSize: moderateScale(14) }}
+            style={{ fontSize: moderateScale(13) }}
           >
             {statusConfig.description}
           </Text>
