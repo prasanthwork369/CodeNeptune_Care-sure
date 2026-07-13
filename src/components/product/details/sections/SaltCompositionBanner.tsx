@@ -50,12 +50,12 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
         className="flex-row items-center relative z-10 w-full"
         style={{ minHeight: exactScale(46), paddingVertical: exactScale(6) }}
       >
-        <View className="items-center justify-center">
+        <View className="items-center justify-center mr-2">
           <DotLottie
             source={ANIMATIONS.chemicalBeaker}
             autoplay
             loop
-            style={{ width: exactScale(40), height: exactScale(60) }}
+            style={{ width: exactScale(56), height: exactScale(56) }}
           />
         </View>
         <View style={{ flex: 1, marginRight: isTruncatable ? 8 : 0 }}>
