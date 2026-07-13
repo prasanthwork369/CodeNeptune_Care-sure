@@ -1,7 +1,6 @@
 import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { PrescriptionScanner } from './index';
 import { ScannerService } from './scanner.service';
 
 export interface CapturedAsset {
@@ -26,38 +25,6 @@ export function usePrescriptionUploadService({
     } else {
       Alert.alert(title, message);
     }
-  };
-
-  const checkConfidenceAndProceed = async (
-    assets: CapturedAsset[],
-    onProceed: () => void,
-    onRetry: () => void,
-    source: 'camera' | 'gallery'
-  ) => {
-    // Run OCR + validation on all assets in parallel
-    const scanResults = await Promise.all(
-      assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
-    );
-
-    // We still run OCR to preserve the architectural pipeline for future use,
-    // but we no longer block or warn based on confidence scores.
-    if (__DEV__) {
-      const scanResults = await Promise.all(
-        assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
-      );
-      scanResults.forEach((res) => {
-        console.log(`[OCR Pass-through] Source: ${source} | Confidence: ${res.confidence}`);
-      });
-    } else {
-      // In production, we can even run this asynchronously without awaiting if we want,
-      // but to preserve the exact pipeline flow, we'll await it silently.
-      await Promise.all(
-        assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
-      );
-    }
-
-    // Always proceed directly
-    onProceed();
   };
 
   // ── 1. Camera Flow (via PrescriptionScanner) ─────────────────────────────
@@ -87,12 +54,7 @@ export function usePrescriptionUploadService({
         mimeType: 'image/jpeg',
       };
 
-      await checkConfidenceAndProceed(
-        [asset],
-        () => onAssetsReady([asset]),
-        takePhoto,
-        'camera'
-      );
+      await onAssetsReady([asset]);
     } catch {
       showErr('Error', 'Failed to take photo. Please try again.');
     }
@@ -123,12 +85,7 @@ export function usePrescriptionUploadService({
         mimeType: 'image/jpeg',
       }));
 
-      await checkConfidenceAndProceed(
-        assets,
-        () => onAssetsReady(assets),
-        chooseFromGallery,
-        'gallery'
-      );
+      await onAssetsReady(assets);
     } catch {
       showErr('Error', 'Failed to pick images. Please try again.');
     }
