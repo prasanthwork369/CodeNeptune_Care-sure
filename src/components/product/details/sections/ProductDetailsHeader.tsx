@@ -14,6 +14,11 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
   backgroundColor,
   showBorder = true,
   onBack,
+  productId,
+  packLabel,
+  price,
+  manufacturer,
+  dosageForm,
 }) => {
   const { totalItems: cartCount } = useCart();
   const router = useNav();
@@ -22,10 +27,23 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
 
   const handleShare = async () => {
     try {
+      let message = title
+        ? `Check out ${title} on CareSure!`
+        : "Check out this product on CareSure!";
+
+      if (productId) {
+        const details = [];
+        if (dosageForm) details.push(`Dosage Form: ${dosageForm}`);
+        if (packLabel) details.push(`Pack Size: ${packLabel}`);
+        if (price) details.push(`Price: ₹${price}`);
+        if (manufacturer) details.push(`Manufacturer: ${manufacturer}`);
+
+        const detailsText = details.length > 0 ? `\n${details.join("\n")}` : "";
+        message = `💊 *${title}* on CareSure\n${detailsText}\n\nWeb: https://caresure.com/product/${productId}\nApp: caresure://product/${productId}`;
+      }
+
       await Share.share({
-        message: title
-          ? `Check out ${title} on CareSure!`
-          : "Check out this product on CareSure!",
+        message,
       });
     } catch (error: any) {
       Alert.alert("Error", error.message);

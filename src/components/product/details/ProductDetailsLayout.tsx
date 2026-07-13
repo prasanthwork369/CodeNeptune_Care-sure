@@ -168,7 +168,15 @@ export const ProductDetailsLayout: React.FC = () => {
               }}
             />
 
-            <ProductDetailsHeader title={medicineName} onBack={handleBack} />
+            <ProductDetailsHeader
+              title={medicineName}
+              onBack={handleBack}
+              productId={id}
+              packLabel={activeProduct?.packLabel}
+              price={activeProduct?.price}
+              manufacturer={manufacturer}
+              dosageForm={product?.dosageForm}
+            />
 
             {isLoading ? (
               <ProductSkeleton />

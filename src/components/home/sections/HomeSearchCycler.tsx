@@ -1,52 +1,52 @@
 import { MEDICINES } from "@/src/constants/search-cycle";
+import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Platform } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  runOnJS,
-} from "react-native-reanimated";
+import { StyleSheet, Text, View } from "react-native";
 import { exactScale } from "@/src/utils/exactScale";
 
 const SLOT_H = exactScale(20);
-const TYPING_SPEED = 80;
-const HOLD_MS = 2500;
-const FADE_OUT_MS = 300;
+const TYPING_SPEED = 70;
+const DELETING_SPEED = 30;
+const HOLD_MS = 2200;
 
 export const HomeSearchCycler: React.FC = () => {
   const [currentWordIdx, setCurrentWordIdx] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
-  
-  const textOpacity = useSharedValue(1);
+  // Only animate while Home is the focused screen — the tab stays mounted when
+  // the user switches tabs, so without this the typewriter keeps running (and
+  // burning CPU) in the background.
+  const isFocused = useIsFocused();
 
   // Blinking typing cursor effect
   useEffect(() => {
+    if (!isFocused) return;
     const cursorInterval = setInterval(() => {
       setCursorVisible((prev) => !prev);
     }, 530);
     return () => clearInterval(cursorInterval);
-  }, []);
+  }, [isFocused]);
 
   // Typewriter step logic
   useEffect(() => {
+    if (!isFocused) return;
     let timer: ReturnType<typeof setTimeout>;
     const currentWord = MEDICINES[currentWordIdx];
 
-    if (isTyping) {
-      setCursorVisible(true); // Force cursor visible while animating
-      if (displayedText.length === currentWord.length) {
-        setIsTyping(false);
-        // Start hold duration
+    if (isDeleting) {
+      if (displayedText.length === 0) {
+        setIsDeleting(false);
+        setCurrentWordIdx((prev) => (prev + 1) % MEDICINES.length);
+      } else {
         timer = setTimeout(() => {
-          // Trigger fade out on Reanimated thread
-          textOpacity.value = withTiming(0, { duration: FADE_OUT_MS }, (finished) => {
-            if (finished) {
-              runOnJS(goToNextWord)();
-            }
-          });
+          setDisplayedText(currentWord.substring(0, displayedText.length - 1));
+        }, DELETING_SPEED);
+      }
+    } else {
+      if (displayedText.length === currentWord.length) {
+        timer = setTimeout(() => {
+          setIsDeleting(true);
         }, HOLD_MS);
       } else {
         timer = setTimeout(() => {
@@ -56,18 +56,7 @@ export const HomeSearchCycler: React.FC = () => {
     }
 
     return () => clearTimeout(timer);
-  }, [displayedText, isTyping, currentWordIdx]);
-
-  const goToNextWord = () => {
-    setDisplayedText("");
-    setCurrentWordIdx((prev) => (prev + 1) % MEDICINES.length);
-    textOpacity.value = 1;
-    setIsTyping(true);
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: textOpacity.value,
-  }));
+  }, [displayedText, isDeleting, currentWordIdx, isFocused]);
 
   const textStyle = {
     fontSize: exactScale(14),
@@ -85,30 +74,23 @@ export const HomeSearchCycler: React.FC = () => {
         Search for{" "}
       </Text>
       {/* Animated typewriter word with blinking cursor */}
-      <Animated.View style={[styles.window, animatedStyle]}>
-        <Text style={[styles.textBase, styles.bold]} numberOfLines={1} allowFontScaling={false}>
+      <View style={styles.window}>
+        <Text style={[textStyle, styles.bold]} numberOfLines={1} allowFontScaling={false}>
           &quot;{displayedText}&quot;
-          <Text style={styles.cursor}>{cursorVisible ? "|" : " "}</Text>
+          {/* Toggle opacity, not the character — swapping "|" for a space
+              changes width and reflows the text every blink (the jerk). */}
+          <Text style={[styles.cursor, { opacity: cursorVisible ? 1 : 0 }]}>
+            |
+          </Text>
         </Text>
-      </Animated.View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   row: { flex: 1, flexDirection: "row", alignItems: "center", height: SLOT_H },
-  window: { flex: 1, height: SLOT_H, justifyContent: "center" },
-  textBase: {
-    fontSize: exactScale(14),
-    lineHeight: SLOT_H,
-    fontWeight: "500",
-    color: "#9CA3AF",
-    includeFontPadding: false,
-  },
-  bold: {
-    fontWeight: "600",
-    color: "#6B7280",
-    fontFamily: Platform.select({ ios: "Courier", android: "monospace", default: "monospace" }),
-  },
+  window: { flex: 1, height: SLOT_H },
+  bold: { fontWeight: "600", color: "#6B7280" },
   cursor: { color: "#0F7635", fontWeight: "bold" },
 });

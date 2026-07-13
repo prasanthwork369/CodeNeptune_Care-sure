@@ -5,6 +5,11 @@ export interface ProductDetailsHeaderProps {
   backgroundColor?: string;
   showBorder?: boolean;
   onBack?: () => void;
+  productId?: string;
+  packLabel?: string;
+  price?: number;
+  manufacturer?: string;
+  dosageForm?: string;
 }
 
 export interface ProductDetailsFooterProps {

@@ -104,7 +104,12 @@ export const AddMoneyLayout: React.FC = () => {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              width: exactScale(200),
+              // Grow with the amount instead of a fixed width — a fixed width
+              // made long values (5–6 digits) scroll inside the input and clip
+              // the first digit on the left.
+              minWidth: exactScale(200),
+              maxWidth: "92%",
+              paddingHorizontal: exactScale(12),
               borderBottomWidth: 2,
               borderBottomColor: hasError
                 ? "#DC2626"
