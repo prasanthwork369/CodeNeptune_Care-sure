@@ -1,7 +1,7 @@
-import { StyleSheet } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
 
-export const SEARCH_ICON_SIZE = exactScale(18);
+export const SEARCH_ICON_SIZE = exactScale(20);
 
 export const styles = StyleSheet.create({
   cyclerText: {

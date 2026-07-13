@@ -1,7 +1,6 @@
 import { SearchBar } from "@/src/components/home/sections/SearchBar";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { icons } from "@/src/constants/icons";
 import {
     PRESCRIPTION_STATUS,
     PRESCRIPTION_STATUS_LABELS,
@@ -12,8 +11,16 @@ import React, { useState, useMemo, useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { PrescriptionHistoryItem } from "./sections";
+
+// Status options for the filter sheet. `null` = show all.
+const STATUS_FILTERS: { label: string; value: number | null }[] = [
+  { label: "All", value: null },
+  { label: "Pending", value: PRESCRIPTION_STATUS.NEW },
+  { label: "Verified", value: PRESCRIPTION_STATUS.APPROVED },
+  { label: "Rejected", value: PRESCRIPTION_STATUS.CANCELLED },
+];
 
 const formatDate = (iso: string) => {
   if (!iso) return "";
@@ -35,6 +42,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     category: 2,
   });
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
   const mapItem = (item: any) => ({
     id: item.prescriptionOrderId ?? item.id.slice(0, 8).toUpperCase(),
@@ -61,6 +69,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   
   const items = useMemo(() => {
     return prescriptions
+      .filter((p: any) => statusFilter === null || p.status === statusFilter)
       .map(mapItem)
       .filter((item: ReturnType<typeof mapItem>) => {
         if (!query) return true;
@@ -70,7 +79,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           item.doctorName.toLowerCase().includes(query)
         );
       });
-  }, [prescriptions, query, source, toPay]);
+  }, [prescriptions, query, source, toPay, statusFilter]);
 
   const renderItem = useCallback(({ item }: { item: any }) => (
     <PrescriptionHistoryItem item={item} />
@@ -80,19 +89,42 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="My Prescriptions" />
 
+      <View className="px-5 pt-6">
+        <SearchBar placeholder="Search Prescription" onSearch={setSearch} />
+      </View>
+
+      {/* Status filter chips — always visible, "All" selected by default */}
       <View
-        className="flex-row items-stretch px-5 pt-6"
-        style={{ gap: 12 }}
+        className="flex-row flex-wrap px-5 pt-4"
+        style={{ gap: exactScale(8) }}
       >
-        <View className="flex-1">
-          <SearchBar placeholder="Search Prescription" onSearch={setSearch} />
-        </View>
-        <Touchable
-          activeOpacity={0.8}
-          className="aspect-square items-center justify-center rounded-md border border-[#919EAB33] bg-white"
-        >
-          <icons.filter_list width={28} height={28} />
-        </Touchable>
+        {STATUS_FILTERS.map((opt) => {
+          const selected = statusFilter === opt.value;
+          return (
+            <Touchable
+              key={String(opt.value)}
+              activeOpacity={0.8}
+              onPress={() => setStatusFilter(opt.value)}
+              className="rounded-full border"
+              style={{
+                paddingHorizontal: exactScale(16),
+                paddingVertical: exactScale(8),
+                borderColor: selected ? "#0F7635" : "#E0E0E0",
+                backgroundColor: selected ? "#0F7635" : "#FFFFFF",
+              }}
+            >
+              <Text
+                className="font-inter-medium"
+                style={{
+                  fontSize: moderateScale(13),
+                  color: selected ? "#FFFFFF" : "#6A6A6A",
+                }}
+              >
+                {opt.label}
+              </Text>
+            </Touchable>
+          );
+        })}
       </View>
 
       {loading ? (
