@@ -139,13 +139,16 @@ export const DigitalPrescriptionModal: React.FC<
     // Template design width is 680px.
     // Calculate viewport scale based on device screen layout (padding: 20px on each side).
     const containerWidth = screenWidth - 40;
-    const scale = containerWidth / 880;
+    const scale = containerWidth / 510;
     
     const zoomStyle = `
       <style>
         html, body {
+          margin: 0 !important;
+          padding: 0 !important;
           zoom: ${scale.toFixed(3)} !important;
           -webkit-text-size-adjust: none !important;
+          background-color: #ffffff !important;
         }
       </style>
     `;
@@ -299,7 +302,8 @@ export const DigitalPrescriptionModal: React.FC<
             <WebView
               originWhitelist={["*"]}
               source={{ html: htmlContent }}
-              style={{ flex: 1 }}
+              style={{ flex: 1, backgroundColor: "#ffffff" }}
+              containerStyle={{ backgroundColor: "#ffffff" }}
               scalesPageToFit={true}
               nestedScrollEnabled
             />
