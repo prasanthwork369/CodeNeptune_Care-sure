@@ -8,15 +8,14 @@
 // ─── Confidence thresholds ───────────────────────────────────────────────────
 
 /**
- * Confidence ≥ this → proceed silently (no UX warning).
+ * Confidence > 0 -> proceed silently (no UX warning).
  */
-export const HIGH_CONFIDENCE_THRESHOLD = 0.55;
+export const HIGH_CONFIDENCE_THRESHOLD = 0.01;
 
 /**
- * Confidence ≥ this (but < HIGH) → advisory warning shown,
- * user may continue or scan again.
+ * Unused since high is 0.01. Kept for type compatibility.
  */
-export const MEDIUM_CONFIDENCE_THRESHOLD = 0.25;
+export const MEDIUM_CONFIDENCE_THRESHOLD = 0.01;
 
 // ─── OCR performance ─────────────────────────────────────────────────────────
 
