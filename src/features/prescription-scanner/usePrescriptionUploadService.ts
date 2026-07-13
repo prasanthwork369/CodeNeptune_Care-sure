@@ -1,10 +1,8 @@
 import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { PrescriptionScanner, getConfidenceLevel } from './index';
+import { PrescriptionScanner } from './index';
 import { ScannerService } from './scanner.service';
-import { useUIStore } from '@/src/store/uiStore';
-import { HOME_IMAGES } from '@/src/constants/images';
 
 export interface CapturedAsset {
   uri: string;
@@ -41,60 +39,24 @@ export function usePrescriptionUploadService({
       assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
     );
 
-    // Find the lowest confidence score
-    const lowestConfidence = scanResults.reduce(
-      (min, current) => Math.min(min, current.confidence),
-      1.0
-    );
-
-    const level = getConfidenceLevel(lowestConfidence);
-
-    const actionWord = source === 'camera' ? 'scanned' : 'selected';
-    const retryText = source === 'camera' ? 'Scan Again' : 'Choose Again';
-
-    if (level === 'medium') {
-      useUIStore.getState().setGlobalAlert({
-        title: 'Check Your Prescription',
-        message: `This may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
-        icon: HOME_IMAGES.leaveWarning,
-        iconBg: '#FFF1F1',
-        confirmBg: '#0F7635', // Green for Continue
-        cancelLabel: retryText,
-        confirmLabel: 'Continue',
-        onCancel: () => {
-          useUIStore.getState().setGlobalAlert(null);
-          onRetry();
-        },
-        onConfirm: () => {
-          useUIStore.getState().setGlobalAlert(null);
-          onProceed();
-        },
+    // We still run OCR to preserve the architectural pipeline for future use,
+    // but we no longer block or warn based on confidence scores.
+    if (__DEV__) {
+      const scanResults = await Promise.all(
+        assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
+      );
+      scanResults.forEach((res) => {
+        console.log(`[OCR Pass-through] Source: ${source} | Confidence: ${res.confidence}`);
       });
-      return;
+    } else {
+      // In production, we can even run this asynchronously without awaiting if we want,
+      // but to preserve the exact pipeline flow, we'll await it silently.
+      await Promise.all(
+        assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
+      );
     }
 
-    if (level === 'low') {
-      useUIStore.getState().setGlobalAlert({
-        title: 'Prescription Not Detected',
-        message: 'We could not confirm this is a prescription. You can still upload it and our team will verify.',
-        icon: HOME_IMAGES.leaveWarning,
-        iconBg: '#FFF1F1',
-        confirmBg: '#0F7635', // Green for Upload Anyway
-        cancelLabel: retryText,
-        confirmLabel: 'Upload Anyway',
-        onCancel: () => {
-          useUIStore.getState().setGlobalAlert(null);
-          onRetry();
-        },
-        onConfirm: () => {
-          useUIStore.getState().setGlobalAlert(null);
-          onProceed();
-        },
-      });
-      return;
-    }
-
-    // High confidence — proceed immediately
+    // Always proceed directly
     onProceed();
   };
 
