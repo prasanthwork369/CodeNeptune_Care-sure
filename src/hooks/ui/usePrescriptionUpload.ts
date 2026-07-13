@@ -1,7 +1,8 @@
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES, validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
+import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { PrescriptionScanner, getConfidenceLevel } from "@/src/features/prescription-scanner";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useRef } from "react";
@@ -178,6 +179,7 @@ export function usePrescriptionUpload(
 
   const takePhoto = async () => {
     try {
+      // Permission check — must happen before opening the scanner
       const { status, canAskAgain } =
         await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
@@ -188,8 +190,30 @@ export function usePrescriptionUpload(
           );
         return;
       }
-      const scannedUri = await capturePrescriptionImage();
-      if (!scannedUri) return;
+
+      // Centralised scanner → OCR → validation pipeline
+      const result = await PrescriptionScanner.scan();
+
+      // User cancelled inside the scanner — nothing to do
+      if (result.cancelled || !result.imageUri) return;
+
+      // UX: advisory warning for medium or low confidence
+      // The user is NEVER blocked — they can always continue.
+      const level = getConfidenceLevel(result.confidence);
+      if (level === 'medium') {
+        showErr(
+          'Check Your Prescription',
+          'This may not be a medical prescription. Please ensure you have scanned the correct document.',
+        );
+        // showErr is advisory only — we still proceed
+      } else if (level === 'low') {
+        showErr(
+          'Prescription Not Detected',
+          'We could not confirm this is a prescription. You can still upload it and our team will verify.',
+        );
+      }
+
+      const scannedUri = result.imageUri;
       const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
       const asset = {
         uri: scannedUri,
