@@ -36,11 +36,7 @@
 import { OcrService } from './ocr.service';
 import { PrescriptionValidator } from './prescription-validator';
 import { ScannerService } from './scanner.service';
-import { ScanResult, ConfidenceLevel } from './types';
-import {
-  HIGH_CONFIDENCE_THRESHOLD,
-  MEDIUM_CONFIDENCE_THRESHOLD,
-} from './constants';
+import { ScanResult } from './types';
 
 // ─── Public orchestrator ──────────────────────────────────────────────────────
 
@@ -60,8 +56,10 @@ export const PrescriptionScanner = {
         imageUri: null,
         extractedText: '',
         confidence: 0,
+        level: 'LOW',
         likelyPrescription: false,
-        keywords: [],
+        documentDetected: false,
+        matchedKeywords: [],
         cancelled: true,
       };
     }
@@ -82,31 +80,21 @@ export const PrescriptionScanner = {
 
     return {
       imageUri,
-      extractedText: validation.extractedText,
+      extractedText: ocr.text,
       confidence: validation.confidence,
+      level: validation.level,
       likelyPrescription: validation.likelyPrescription,
-      keywords: validation.detectedKeywords,
+      documentDetected: validation.documentDetected,
+      matchedKeywords: validation.matchedKeywords,
+      warningMessage: validation.warningMessage,
       cancelled: false,
     };
   },
 };
 
-// ─── Confidence-level helper (shared by all upload hooks) ─────────────────────
-
-/**
- * Maps a numeric confidence score to one of the three discrete UX levels.
- *
- * @param confidence — value from ScanResult.confidence (0.0 – 1.0)
- */
-export function getConfidenceLevel(confidence: number): ConfidenceLevel {
-  if (confidence >= HIGH_CONFIDENCE_THRESHOLD) return 'high';
-  if (confidence >= MEDIUM_CONFIDENCE_THRESHOLD) return 'medium';
-  return 'low';
-}
-
 // ─── Re-exports for consumers that need the raw types ────────────────────────
 
-export type { ScanResult, OcrResult, ValidationResult, ConfidenceLevel } from './types';
+export type { ScanResult, OcrResult, ValidationResult } from './types';
 export { OcrService } from './ocr.service';
 export { ScannerService } from './scanner.service';
 export { PrescriptionValidator } from './prescription-validator';

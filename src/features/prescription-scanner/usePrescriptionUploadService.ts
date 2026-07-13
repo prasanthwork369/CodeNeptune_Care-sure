@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { PrescriptionScanner, getConfidenceLevel } from './index';
+import { PrescriptionScanner } from './index';
 import { ScannerService } from './scanner.service';
 import { useUIStore } from '@/src/store/uiStore';
 import { HOME_IMAGES } from '@/src/constants/images';
@@ -41,30 +41,33 @@ export function usePrescriptionUploadService({
       assets.map((asset) => PrescriptionScanner.analyzeImage(asset.uri))
     );
 
-    // Find the lowest confidence score
-    const lowestConfidence = scanResults.reduce(
-      (min, current) => Math.min(min, current.confidence),
-      1.0
-    );
+    // Find the worst level in the batch to determine UX path
+    const hasLow = scanResults.some((res) => res.level === 'LOW');
+    const hasMedium = scanResults.some((res) => res.level === 'MEDIUM');
 
-    const level = getConfidenceLevel(lowestConfidence);
+    // Default to 'HIGH' if all are good, else bubble up the most severe warning
+    const worstLevel = hasLow ? 'LOW' : hasMedium ? 'MEDIUM' : 'HIGH';
 
     if (__DEV__) {
-      console.log(`[OCR Validation] Source: ${source} | Lowest Confidence: ${lowestConfidence} | Level: ${level}`);
+      scanResults.forEach(res => {
+        console.log(`[OCR Validation] Source: ${source} | Confidence: ${res.confidence.toFixed(2)} | Level: ${res.level}`);
+      });
     }
 
-    const actionWord = source === 'camera' ? 'scanned' : 'selected';
     const retryText = source === 'camera' ? 'Scan Again' : 'Choose Again';
 
-    if (level === 'medium') {
+    if (worstLevel === 'MEDIUM') {
+      // Find the first warning message from a medium-confidence result
+      const warningMessage = scanResults.find((res) => res.level === 'MEDIUM')?.warningMessage || "We couldn't confidently verify this prescription. If it's handwritten, you can continue and it will be reviewed.";
+      
       useUIStore.getState().setGlobalAlert({
         title: 'Check Your Prescription',
-        message: `This may not be a medical prescription. Please ensure you have ${actionWord} the correct document.`,
+        message: warningMessage,
         icon: HOME_IMAGES.leaveWarning,
         iconBg: '#FFF1F1',
-        confirmBg: '#0F7635', // Green for Continue
+        confirmBg: '#0F7635', // Green for Continue Upload
         cancelLabel: retryText,
-        confirmLabel: 'Continue',
+        confirmLabel: 'Continue Upload',
         onCancel: () => {
           useUIStore.getState().setGlobalAlert(null);
           onRetry();
@@ -77,10 +80,13 @@ export function usePrescriptionUploadService({
       return;
     }
 
-    if (level === 'low') {
+    if (worstLevel === 'LOW') {
+      // Find the first warning message from a low-confidence result
+      const warningMessage = scanResults.find((res) => res.level === 'LOW')?.warningMessage || "This doesn't appear to be a medical prescription.";
+
       useUIStore.getState().setGlobalAlert({
         title: 'Prescription Not Detected',
-        message: 'We could not confirm this is a prescription. You can still upload it and our team will verify.',
+        message: warningMessage,
         icon: HOME_IMAGES.leaveWarning,
         iconBg: '#FFF1F1',
         confirmBg: '#0F7635', // Green for Upload Anyway
