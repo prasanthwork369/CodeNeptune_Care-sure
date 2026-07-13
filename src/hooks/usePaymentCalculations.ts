@@ -6,8 +6,10 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { useNav } from "@/src/hooks/useNav";
+import { prescriptionService } from "@/src/services/prescription.service";
+import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -18,6 +20,8 @@ export function usePaymentCalculations() {
     toPay = "0",
     patientMemberId = "",
     prescriptionId = "",
+    imageUrls = "",
+    category = "",
     problem = "",
     symptoms = "",
     patientPhone = "",
@@ -25,10 +29,31 @@ export function usePaymentCalculations() {
     toPay: string;
     patientMemberId?: string;
     prescriptionId?: string;
+    // Deferred-creation flow: hosted image URLs + category to create the
+    // prescription with, when no prescriptionId was passed.
+    imageUrls?: string;
+    category?: string;
     problem?: string;
     symptoms?: string;
     patientPhone?: string;
   }>();
+
+  // Image URLs carried from the upload flow when the prescription record is
+  // created here (at Place Order) rather than at Preview.
+  const parsedImageUrls: string[] = (() => {
+    try {
+      return imageUrls ? JSON.parse(imageUrls) : [];
+    } catch {
+      return [];
+    }
+  })();
+  const parsedCategory = category
+    ? Number(category)
+    : PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER;
+
+  // Remembers a prescription created during this checkout so a retry after a
+  // failed order does NOT create a duplicate prescription — we reuse the id.
+  const createdRxIdRef = useRef<string>("");
 
   const prescriptionOrderItems = usePrescriptionOrderStore((s) => s.items);
   const clearPrescriptionOrder = usePrescriptionOrderStore((s) => s.clear);
@@ -66,6 +91,10 @@ export function usePaymentCalculations() {
 
   const [selectedMethod, setSelectedMethod] = useState("COD");
   const [showLocationSheet, setShowLocationSheet] = useState(false);
+  // Drives the Place Order button loader for the WHOLE operation — including
+  // the deferred prescription upload that runs before createOrder — so the
+  // button reacts instantly on press instead of after that first call.
+  const [placingOrder, setPlacingOrder] = useState(false);
 
   const { addresses } = useAddress();
   const storeLocation = useLocationStore((s) => s.location);
@@ -88,6 +117,31 @@ export function usePaymentCalculations() {
     if (!hasAddress || !defaultAddress) {
       setShowLocationSheet(true);
       return;
+    }
+
+    // Loader on immediately, before any network call.
+    setPlacingOrder(true);
+
+    // Create the prescription now (deferred from Preview) when we're carrying
+    // image URLs and don't already have an id. createdRxIdRef keeps this
+    // idempotent: a retry after a failed order reuses the created prescription
+    // instead of POSTing a duplicate.
+    let effectivePrescriptionId = prescriptionId || createdRxIdRef.current;
+    if (!effectivePrescriptionId && parsedImageUrls.length > 0) {
+      const rx = await prescriptionService.upload({
+        imageUrls: parsedImageUrls,
+        category: parsedCategory,
+      });
+      if (!rx.success) {
+        setPlacingOrder(false);
+        Alert.alert(
+          "Upload Failed",
+          rx.error ?? "Could not save prescription. Please try again.",
+        );
+        return;
+      }
+      effectivePrescriptionId = rx.data?.id ?? "";
+      createdRxIdRef.current = effectivePrescriptionId;
     }
 
     const orderItems = isPrescriptionFlow
@@ -146,8 +200,8 @@ export function usePaymentCalculations() {
       total: toPay,
       deliveryType: "HOME_DELIVERY" as const,
       patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
-      prescriptionId: prescriptionId || undefined,
-      isPurchased: prescriptionId ? true : undefined,
+      prescriptionId: effectivePrescriptionId || undefined,
+      isPurchased: effectivePrescriptionId ? true : undefined,
       problem: problem || undefined,
       symptoms: symptoms || undefined,
       metadata: {
@@ -162,7 +216,7 @@ export function usePaymentCalculations() {
         patientDetails: {
           phone: patientPhone || undefined,
           problem: problem || undefined,
-          skipPrescription: !prescriptionId,
+          skipPrescription: !effectivePrescriptionId,
           symptoms: symptoms || undefined,
         },
       },
@@ -193,6 +247,8 @@ export function usePaymentCalculations() {
         "Failed to place order. Please try again.";
 
       Alert.alert("Order Failed", errorMessage);
+    } finally {
+      setPlacingOrder(false);
     }
   };
 
@@ -212,7 +268,7 @@ export function usePaymentCalculations() {
     deliveryCity,
     hasAddress,
     defaultAddress,
-    ordering,
+    ordering: placingOrder || ordering,
     handlePlaceOrder,
   };
 }

@@ -212,10 +212,9 @@ export const ReturnProductLayout: React.FC = () => {
             : ext === "webp"
               ? "image/webp"
               : "image/jpeg";
-        itemImages[slot as keyof ReturnItemImages] = await storageApi.upload(
-          { uri, name: `${slot}.${ext}`, type },
-          "returns",
-        );
+        itemImages[slot as keyof ReturnItemImages] = (
+          await storageApi.upload({ uri, name: `${slot}.${ext}`, type }, "returns")
+        ).url;
       }
       uploaded[item.orderItemId] = itemImages;
     }

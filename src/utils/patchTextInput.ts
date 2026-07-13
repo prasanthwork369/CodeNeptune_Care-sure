@@ -3,6 +3,10 @@ import * as RN from "react-native";
 // Deep import: same technique as patchText.ts — resolves to the real,
 // unpatched TextInput component instead of looping back into this file.
 import OriginalTextInputImport from "react-native/Libraries/Components/TextInput/TextInput";
+// The focus/blur registry (currentlyFocusedInput, focusTextInput, ...) that RN
+// and @gorhom/bottom-sheet expect at `TextInput.State`.
+// @ts-ignore - internal RN module without bundled type declarations
+import TextInputState from "react-native/Libraries/Components/TextInput/TextInputState";
 
 import { sanitizeStyle } from "./patchText";
 
@@ -36,6 +40,28 @@ const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
 
 // @ts-ignore
 PatchedTextInput.displayName = "TextInput";
+
+// Carry over the original TextInput's static properties onto the wrapper.
+// The critical one is `State` (currentlyFocusedInput / focusTextInput /
+// blurTextInput): RN internals and libraries like @gorhom/bottom-sheet access
+// `TextInput.State.currentlyFocusedInput()`. Without this, that read is
+// `undefined.currentlyFocusedInput` and crashes when focusing an input inside
+// a bottom sheet.
+for (const key of Object.keys(OriginalTextInput)) {
+  // @ts-ignore
+  if ((PatchedTextInput as any)[key] === undefined) {
+    // @ts-ignore
+    (PatchedTextInput as any)[key] = (OriginalTextInput as any)[key];
+  }
+}
+// Explicit fallback in case `State` is a non-enumerable static: use the
+// original's if present, otherwise the TextInputState module directly.
+// @ts-ignore
+if ((PatchedTextInput as any).State === undefined) {
+  // @ts-ignore
+  (PatchedTextInput as any).State =
+    (OriginalTextInput as any).State ?? TextInputState;
+}
 
 try {
   Object.defineProperty(RN, "TextInput", {

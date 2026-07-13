@@ -1,6 +1,6 @@
 // Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
 // Flip LIVE to switch the app between the live API and QA.
-const LIVE = false;
+const LIVE = true;
 const PROD_URL = process.env.EXPO_PUBLIC_API_BASE_URL_PROD;
 const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
 
@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
   CUSTOMER_ADDRESSES: "/api/v1/customers/addresses",
   CUSTOMER_ADDRESS_BY_ID: (id: string) => `/api/v1/customers/addresses/${id}`,
   STORAGE_UPLOAD: "/api/v1/customers/storage/upload",
+  STORAGE_DELETE: "/api/v1/customers/storage/delete",
   APP_CONTENTS: "/api/v1/app-contents",
 
   // ── Category ─────────────────────────────────────────────────────────────

@@ -215,13 +215,13 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
       </Touchable>
 
       {/* Info below card */}
-      <View style={{ marginTop: exactScale(8) }}>
+      <View style={{ marginTop: exactScale(14) }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             gap: exactScale(8),
-            marginBottom: exactScale(6),
+            marginBottom: exactScale(12),
           }}
         >
           <View
@@ -268,7 +268,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
         </View>
 
         <Text
-          style={[s.name, { marginBottom: exactScale(4) }]}
+          style={[s.name, { marginBottom: exactScale(8) }]}
           numberOfLines={2}
         >
           {product.name}

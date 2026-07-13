@@ -34,6 +34,12 @@ export const SelectPatientLayout: React.FC = () => {
     toPay,
     prescriptionId,
     prescriptionItems,
+    isAddingImage,
+    removingImageIndex,
+    addImageFromLibrary,
+    addImageFromCamera,
+    addImageFromPdf,
+    removeImage,
     members,
     loading,
     setSelectedPatientId,
@@ -131,7 +137,10 @@ export const SelectPatientLayout: React.FC = () => {
             }}
           >
             {prescriptionItems.length > 0 && (
-              <View className="mb-4">
+              // No bottom margin here: the dashed divider below already owns
+              // the spacing (marginVertical), so an extra mb-4 would make the
+              // gap under the line double the gap above it.
+              <View>
                 <Text
                   className="font-inter-semibold text-[#1A1C1E] mb-[10px]"
                   style={{ fontSize: moderateScale(14) }}
@@ -142,35 +151,88 @@ export const SelectPatientLayout: React.FC = () => {
                   <View className="flex-row" style={{ gap: exactScale(10) }}>
                     <Touchable
                       onPress={() => setIsUploadSheetVisible(true)}
+                      disabled={isAddingImage}
                       className="w-[72px] h-[72px] rounded-[10px] border border-[#919EAB33] bg-[#FCFDFF] items-center justify-center"
                     >
-                      <icons.add_photo width={24} height={24} />
+                      {isAddingImage ? (
+                        <ActivityIndicator size="small" color="#0F7635" />
+                      ) : (
+                        <icons.add_photo width={24} height={24} />
+                      )}
                     </Touchable>
                     {prescriptionItems.map((item, index) => (
-                      <Touchable
+                      <View
                         key={index}
-                        activeOpacity={0.8}
-                        onPress={() => handleViewPrescription(index)}
-                        className="w-[72px] h-[72px] rounded-[10px] overflow-hidden border border-[#919EAB33] bg-[#F9FAFB]"
+                        style={{ position: "relative", width: 72, height: 72 }}
                       >
-                        {isPdf(item.localUri, item.type) ? (
-                          <View className="flex-1 items-center justify-center">
-                            <icons.upload_file width={22} height={22} />
-                            <Text
-                              className="font-inter-bold text-[#1A1C1E] mt-0.5"
-                              style={{ fontSize: moderateScale(8) }}
+                        <Touchable
+                          activeOpacity={0.8}
+                          onPress={() => handleViewPrescription(index)}
+                          className="w-[72px] h-[72px] rounded-[10px] overflow-hidden border border-[#919EAB33] bg-[#F9FAFB]"
+                        >
+                          {isPdf(item.localUri, item.type) ? (
+                            <View className="flex-1 items-center justify-center">
+                              <icons.upload_file width={22} height={22} />
+                              <Text
+                                className="font-inter-bold text-[#1A1C1E] mt-0.5"
+                                style={{ fontSize: moderateScale(8) }}
+                              >
+                                PDF
+                              </Text>
+                            </View>
+                          ) : (
+                            <Image
+                              source={{ uri: item.localUri }}
+                              style={{ width: "100%", height: "100%" }}
+                              resizeMode="contain"
+                            />
+                          )}
+                          {removingImageIndex === index && (
+                            <View
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "rgba(255,255,255,0.7)",
+                              }}
                             >
-                              PDF
-                            </Text>
-                          </View>
-                        ) : (
-                          <Image
-                            source={{ uri: item.localUri }}
-                            style={{ width: "100%", height: "100%" }}
-                            resizeMode="contain"
-                          />
-                        )}
-                      </Touchable>
+                              <ActivityIndicator size="small" color="#0F7635" />
+                            </View>
+                          )}
+                        </Touchable>
+
+                        {/* Remove (X) badge — mirrors the web ImageUpload */}
+                        <Touchable
+                          onPress={() => removeImage(index)}
+                          disabled={removingImageIndex !== null}
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                          style={{
+                            position: "absolute",
+                            top: 6,
+                            right: 6,
+                            width: 20,
+                            height: 20,
+                            borderRadius: 10,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#FFFFFF",
+                            borderWidth: 1,
+                            borderColor: "#919EAB33",
+                            elevation: 2,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 1 },
+                            shadowOpacity: 0.1,
+                            shadowRadius: 1,
+                            zIndex: 30,
+                          }}
+                        >
+                          <icons.close_small width={10} height={10} fill="#222222" />
+                        </Touchable>
+                      </View>
                     ))}
                   </View>
                 </ScrollView>
@@ -530,6 +592,21 @@ export const SelectPatientLayout: React.FC = () => {
         onClose={() => setIsUploadSheetVisible(false)}
         toPay={toPay}
         patientMemberId={selectedPatient?.id}
+        // Override the default pickers so images are uploaded and appended to
+        // this screen's list, instead of navigating back into Preview. The
+        // delay lets the sheet dismiss before the OS picker opens.
+        onUploadFile={() => {
+          setIsUploadSheetVisible(false);
+          setTimeout(addImageFromLibrary, 400);
+        }}
+        onTakePhoto={() => {
+          setIsUploadSheetVisible(false);
+          setTimeout(addImageFromCamera, 400);
+        }}
+        onUploadPdf={() => {
+          setIsUploadSheetVisible(false);
+          setTimeout(addImageFromPdf, 400);
+        }}
       />
     </View>
   );

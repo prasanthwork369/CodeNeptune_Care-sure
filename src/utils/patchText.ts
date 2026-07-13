@@ -110,6 +110,19 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
 // @ts-ignore
 PatchedText.displayName = "Text";
 
+// Carry over the original Text's static properties onto the wrapper. Replacing
+// a core RN component globally means WE are responsible for re-exposing
+// everything the original exposed — miss one and a screen crashes only when it
+// touches that member (this is what happened with TextInput.State). Hoisting
+// generically stops that class of bug instead of patching each miss reactively.
+for (const key of Object.keys(OriginalText)) {
+  // @ts-ignore
+  if ((PatchedText as any)[key] === undefined) {
+    // @ts-ignore
+    (PatchedText as any)[key] = (OriginalText as any)[key];
+  }
+}
+
 // Overwrite the property in react-native module exports
 try {
   Object.defineProperty(RN, "Text", {
@@ -130,6 +143,11 @@ try {
 
 // @ts-ignore
 PatchedText.default = PatchedText;
+// Re-attach the named export onto the function. `module.exports = PatchedText`
+// below replaces the entire exports object, which otherwise wipes out the
+// `export function sanitizeStyle` named export (making it undefined at import).
+// @ts-ignore
+PatchedText.sanitizeStyle = sanitizeStyle;
 // @ts-ignore
 module.exports = PatchedText;
 export default PatchedText;

@@ -203,7 +203,7 @@ export const PreviewLayout: React.FC = () => {
     try {
       const uploadedUrls: string[] = [];
       for (const item of uploadedSnapshot.current) {
-        const url = await storageApi.upload(
+        const { url } = await storageApi.upload(
           { uri: item.localUri, name: item.name, type: item.type },
           FOLDER,
         );

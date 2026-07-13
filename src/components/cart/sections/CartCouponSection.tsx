@@ -1,3 +1,4 @@
+import { Skeleton } from "@/src/components/ui/Skeleton";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { icons } from "@/src/constants/icons";
@@ -29,7 +30,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   subtotal,
 }) => {
   const router = useNav();
-  const { data: coupons = [] } = useCoupons();
+  const { data: coupons = [], isLoading } = useCoupons();
   const apply = useCouponStore((s) => s.apply);
   const [applying, setApplying] = useState(false);
 
@@ -114,6 +115,18 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             </Text>
           </Touchable>
         </View>
+      </View>
+    );
+  }
+
+  // While coupons are loading (no cached data yet), reserve the space with a
+  // skeleton instead of the small "Apply Coupon" fallback. Otherwise the small
+  // row shows first and then jumps to the big "Coupons & offers" card once the
+  // query resolves — the flicker/jerk on first load.
+  if (isLoading) {
+    return (
+      <View className="mx-4 mt-3">
+        <Skeleton width="100%" height={exactScale(132)} borderRadius={16} />
       </View>
     );
   }

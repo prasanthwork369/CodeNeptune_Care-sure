@@ -233,6 +233,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
     });
   };
 
+  // Opens the system LOCATION toggle page (GPS on/off). Use this when the
+  // device's location services are disabled.
   const openLocationSettings = async () => {
     try {
       if (Platform.OS === "android" && (Linking as any).sendIntent) {
@@ -246,6 +248,17 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       }
     } catch {}
     // Fallback to opening app settings.
+    try {
+      await Linking.openSettings();
+    } catch {}
+  };
+
+  // Opens THIS app's settings page (App info → Permissions → Location). Use
+  // this when the app's own location permission was denied — the user needs
+  // the permission page, not the device GPS toggle. `Linking.openSettings()`
+  // maps to ACTION_APPLICATION_DETAILS_SETTINGS on Android and the app's
+  // settings pane on iOS.
+  const openAppSettings = async () => {
     try {
       await Linking.openSettings();
     } catch {}
@@ -294,14 +307,22 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
           canAskAgain,
         );
         if (!canAskAgain) {
-          // Permission is permanently denied — go straight to Settings so
-          // the user can re-enable it. This avoids repeated useless taps.
-          try {
-            console.debug(
-              "LocationBottomSheet: opening settings due to permanent denial",
-            );
-            await openLocationSettings();
-          } catch {}
+          // Permission is permanently denied at the app level (this is the
+          // app's location permission, NOT device GPS). Explain that before
+          // sending the user to Settings so it doesn't feel like a random
+          // redirect when GPS itself is already on.
+          Alert.alert(
+            "Location permission is off",
+            "Location access for CareSure is turned off. Open Settings to allow it and auto-detect your address.",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                // App permission issue → app's permission page, not GPS toggle.
+                text: "Open Settings",
+                onPress: () => openAppSettings(),
+              },
+            ],
+          );
           return;
         }
         Alert.alert(

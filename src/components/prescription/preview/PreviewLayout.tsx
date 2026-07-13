@@ -109,8 +109,11 @@ export const PreviewLayout: React.FC = () => {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const showInfo = (title: string, message: string) =>
     setInfoModal({ title, message });
-  const [createdPrescriptionId, setCreatedPrescriptionId] = useState("");
   const uploadedSnapshot = useRef<PrescriptionItem[]>([]);
+  // Hosted image URLs produced at Preview for the order flow. The prescription
+  // record itself is NOT created here anymore — it's created at the final
+  // Place Order step — so we stash the URLs to carry forward to payment.
+  const deferredImageUrls = useRef<string[]>([]);
   const activeItem = items[activeIndex] ?? items[0];
 
   const handleBackPress = useCallback(() => {
@@ -236,19 +239,29 @@ export const PreviewLayout: React.FC = () => {
           uploadedUrls.push(item.localUri);
           continue;
         }
-        const url = await storageApi.upload(
+        const { url } = await storageApi.upload(
           { uri: item.localUri, name: item.name, type: item.type },
           FOLDER,
         );
         uploadedUrls.push(url);
       }
-      const category =
-        source === "cart"
-          ? PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER
-          : PRESCRIPTION_CATEGORY.ORDER;
+      if (source === "cart") {
+        // Order flow: DON'T create the prescription record here. The files are
+        // now hosted URLs (above); the prescription is created in one POST at
+        // the final Place Order step, so any images added later on Select
+        // Patient are saved together. Carry the URLs forward.
+        deferredImageUrls.current = uploadedUrls;
+        clearItems();
+        useUIStore.getState().setIsRxFromCartFlow(true);
+        setShowConfirmed(true);
+        return;
+      }
+
+      // Standalone "upload & notify" flow has no payment step, so it must
+      // create the prescription record now.
       const result = await prescriptionService.upload({
         imageUrls: uploadedUrls,
-        category,
+        category: PRESCRIPTION_CATEGORY.ORDER,
       });
       if (!result.success) {
         showInfo(
@@ -257,14 +270,8 @@ export const PreviewLayout: React.FC = () => {
         );
         return;
       }
-      setCreatedPrescriptionId(result.data?.id ?? "");
       clearItems();
-      if (source === "cart") {
-        useUIStore.getState().setIsRxFromCartFlow(true);
-        setShowConfirmed(true);
-      } else {
-        setShowReviewSheet(true);
-      }
+      setShowReviewSheet(true);
     } catch (error: any) {
       showInfo(
         "Upload Failed",
@@ -434,7 +441,10 @@ export const PreviewLayout: React.FC = () => {
             pathname: "/(prescription)/select-patient",
             params: {
               toPay,
-              prescriptionId: createdPrescriptionId,
+              // Prescription isn't created yet in the order flow — carry the
+              // hosted image URLs + category so payment can create it in one go.
+              imageUrls: JSON.stringify(deferredImageUrls.current),
+              category: String(PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER),
               files: JSON.stringify(uploadedSnapshot.current),
             },
           });

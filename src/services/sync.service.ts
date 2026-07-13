@@ -153,18 +153,6 @@ export const syncService = {
         await Promise.all(invalidations);
       }
       console.log('[SyncService] Synchronization check completed successfully.');
-
-      // Automatically trigger a silent background export dump to dev/ folder in dev mode
-      if (__DEV__) {
-        try {
-          const { autoExportDb } = require("@/dev/debugExport");
-          autoExportDb().catch((e: any) => 
-            console.log('[SyncService] Background database auto-upload skipped/failed:', e)
-          );
-        } catch (importErr) {
-          // ignore
-        }
-      }
     } catch (error) {
       console.error('[SyncService] Sync check execution error:', error);
     }

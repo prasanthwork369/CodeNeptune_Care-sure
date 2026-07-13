@@ -1,5 +1,6 @@
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
+import { useSelectPatientImages } from "@/src/hooks/useSelectPatientImages";
 import { FamilyMember } from "@/src/types/familyMember";
 import { HealthProblem } from "@/src/api/health-problem.api";
 import { useLocalSearchParams } from "expo-router";
@@ -13,20 +14,23 @@ export function useSelectPatient() {
     toPay = "0",
     prescriptionId = "",
     files = "",
+    imageUrls = "",
+    category = "",
   } = useLocalSearchParams<{
     toPay: string;
     prescriptionId: string;
     files: string;
+    // Set when the prescription hasn't been created yet (deferred to payment):
+    // the hosted image URLs + category are carried through to Place Order.
+    imageUrls: string;
+    category: string;
   }>();
 
-  const prescriptionItems: { localUri: string; name: string; type: string }[] =
-    (() => {
-      try {
-        return files ? JSON.parse(files) : [];
-      } catch {
-        return [];
-      }
-    })();
+  // Owns the (mutable) prescription image list: seeded from the params and
+  // extended when the user adds images on this screen. `hostedUrls` is what
+  // gets carried to payment for the deferred prescription creation.
+  const images = useSelectPatientImages(files, imageUrls);
+  const prescriptionItems = images.items;
 
   const { members, loading, addMember, updateMember, deleteMember } =
     useFamilyMembers();
@@ -102,6 +106,11 @@ export function useSelectPatient() {
       params: {
         toPay,
         prescriptionId,
+        // Forwarded only when the prescription is still deferred; payment
+        // creates it from these at Place Order. Uses the live list so images
+        // added on this screen are included.
+        imageUrls: JSON.stringify(images.hostedUrls),
+        category,
         patientMemberId: selectedPatient?.id ?? "",
         problem: selectedHealthProblem?.id === "other" ? customProblemText : (selectedHealthProblem?.label ?? ""),
         symptoms: symptoms ?? "",
@@ -116,6 +125,12 @@ export function useSelectPatient() {
     toPay,
     prescriptionId,
     prescriptionItems,
+    isAddingImage: images.isAddingImage,
+    removingImageIndex: images.removingIndex,
+    addImageFromLibrary: images.addFromLibrary,
+    addImageFromCamera: images.addFromCamera,
+    addImageFromPdf: images.addFromPdf,
+    removeImage: images.removeImage,
     members,
     loading,
     selectedPatientId,

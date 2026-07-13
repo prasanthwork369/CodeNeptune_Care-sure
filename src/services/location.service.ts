@@ -40,47 +40,51 @@ export const locationService = {
         askedBefore: true,
       };
 
-    // If OS doesn't allow re-asking, bail out quickly.
-    if (!existing.canAskAgain)
-      return { granted: false, canAskAgain: false, askedBefore: true };
-
-    // Check whether we've already prompted before. If so and the caller
-    // didn't ask to be interactive, avoid showing the system dialog again.
-    try {
-      const asked = await AsyncStorage.getItem(
-        "@caresure:location_permission_asked",
-      );
-      const askedBefore = asked === "1";
-      if (askedBefore && !opts?.interactive) {
+    // Non-interactive (silent auto-detect on home load): don't nag. Respect the
+    // cached state and the "asked before" flag so the user is never surprised
+    // by a dialog they didn't trigger.
+    if (!opts?.interactive) {
+      let askedBefore = false;
+      try {
+        askedBefore =
+          (await AsyncStorage.getItem(
+            "@caresure:location_permission_asked",
+          )) === "1";
+      } catch {}
+      if (!existing.canAskAgain || askedBefore) {
         return {
           granted: false,
           canAskAgain: existing.canAskAgain,
-          askedBefore: true,
+          askedBefore,
         };
       }
-
-      // Caller either requested interactive prompt or we never asked before.
       const req = await Location.requestForegroundPermissionsAsync();
-      // Persist that we've shown the permission prompt at least once so
-      // we don't repeatedly show it on subsequent app launches.
       try {
         await AsyncStorage.setItem("@caresure:location_permission_asked", "1");
       } catch {}
-
-      return {
-        granted: req.status === "granted",
-        canAskAgain: req.canAskAgain,
-        askedBefore: askedBefore,
-      };
-    } catch (e) {
-      // In case storage fails, still try to request permission interactively.
-      const req = await Location.requestForegroundPermissionsAsync();
       return {
         granted: req.status === "granted",
         canAskAgain: req.canAskAgain,
         askedBefore: false,
       };
     }
+
+    // Interactive (user tapped "Use Current Location"): ALWAYS attempt the OS
+    // request. On "ask every time" / one-time-permission devices (e.g. Vivo)
+    // the cached `canAskAgain` can read false even though the OS will still
+    // show the dialog — so we must not pre-empt with a Settings redirect.
+    // Let the OS decide: it shows the dialog when allowed, or resolves denied
+    // immediately when permanently denied. We then react to THIS fresh result,
+    // which is how mainstream apps re-prompt instead of jumping to Settings.
+    const req = await Location.requestForegroundPermissionsAsync();
+    try {
+      await AsyncStorage.setItem("@caresure:location_permission_asked", "1");
+    } catch {}
+    return {
+      granted: req.status === "granted",
+      canAskAgain: req.canAskAgain,
+      askedBefore: true,
+    };
   },
 
   /**
@@ -112,16 +116,29 @@ export const locationService = {
       }
     }
 
+    // Whether the provider status *definitively* says location services are
+    // off. We deliberately trust `locationServicesEnabled === true` when it's
+    // present: right after the user toggles GPS on, `gpsAvailable` and
+    // `networkAvailable` can both still read false for a moment (providers
+    // haven't initialised a fix yet). The old check treated that as
+    // "disabled" and fired a false "Enable GPS" prompt even though GPS was on.
+    // The gps/network both-off heuristic is only used as a fallback when the
+    // explicit flag isn't reporting "on".
+    const isServicesDisabled = (status: any): boolean => {
+      // `hasServicesEnabledAsync()` fallback returns a plain boolean.
+      if (typeof status === "boolean") return status === false;
+      if (!status || typeof status !== "object") return false;
+      if (status.locationServicesEnabled === false) return true;
+      if (status.locationServicesEnabled === true) return false;
+      return status.gpsAvailable === false && status.networkAvailable === false;
+    };
+
     // If providerStatus explicitly reports services are disabled, avoid
     // calling `getCurrentPositionAsync` — on some Android OEMs that call
     // triggers a system 'Enable location' dialog. In that case return a
     // SERVICES_DISABLED error so callers can show a single, controlled
     // in-app message instead of producing duplicate system+app prompts.
-    const servicesDisabledFromProvider =
-      providerStatus &&
-      (providerStatus.locationServicesEnabled === false ||
-        (providerStatus.gpsAvailable === false &&
-          providerStatus.networkAvailable === false));
+    const servicesDisabledFromProvider = isServicesDisabled(providerStatus);
 
     if (servicesDisabledFromProvider) {
       console.debug(
@@ -142,9 +159,34 @@ export const locationService = {
     // position. This may trigger OS dialogs on some devices only when the
     // provider is actually disabled — we handled that above.
     try {
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
+      // Race the read against a timeout: with GPS on but no fix (indoors /
+      // weak signal) getCurrentPositionAsync can hang indefinitely, leaving
+      // the "Fetching" spinner stuck. On timeout, fall back to the last known
+      // position so the user still gets a usable location instead of a freeze.
+      const POSITION_TIMEOUT_MS = 12000;
+      let position: Location.LocationObject;
+      try {
+        position = await Promise.race([
+          Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error("LOCATION_TIMEOUT")),
+              POSITION_TIMEOUT_MS,
+            ),
+          ),
+        ]);
+      } catch (raceErr: any) {
+        if (raceErr?.message === "LOCATION_TIMEOUT") {
+          const last = await Location.getLastKnownPositionAsync();
+          if (!last) throw raceErr;
+          console.debug("locationService: using last known position");
+          position = last;
+        } else {
+          throw raceErr;
+        }
+      }
       console.debug(
         "locationService: getCurrentPositionAsync success",
         position?.coords,
@@ -195,14 +237,18 @@ export const locationService = {
       // 'disabled', 'services', 'provider', or 'gps'. This covers several
       // Android OEM/Play-services error messages.
       const msg = String(err?.message ?? err ?? "").toLowerCase();
-      const servicesDisabledFromProvider =
-        providerStatus &&
-        (providerStatus.locationServicesEnabled === false ||
-          (providerStatus.gpsAvailable === false &&
-            providerStatus.networkAvailable === false));
+      // Reuse the same conservative check as the pre-read path so a momentary
+      // gps/network "unavailable" right after enabling GPS isn't mistaken for
+      // "services off" when locationServicesEnabled is already true.
+      const servicesDisabledFromProvider = isServicesDisabled(providerStatus);
+      // Only treat the thrown error as "services disabled" when it clearly
+      // says the location provider/services are off — not for generic
+      // timeouts or "denied" messages, which previously produced false
+      // "Enable GPS" prompts even when GPS was on.
       const servicesDisabledFromError =
-        /disabled|service|services|provider|gps|no provider/.test(msg) &&
-        /disabled|off|not available|no provider|denied/.test(msg);
+        /location.*(disabled|not enabled|turned off)|services?.*(disabled|off|not enabled)|no location provider|provider.*(disabled|not available)/.test(
+          msg,
+        );
 
       if (servicesDisabledFromProvider || servicesDisabledFromError) {
         return {
