@@ -326,40 +326,48 @@ export const MyProfileLayout: React.FC = () => {
           </Text>
         ) : null}
 
-        {/* Delete Account */}
-        <View
-          style={{
-            marginTop: 24,
-            borderTopWidth: 1,
-            borderTopColor: "#E8E8E8",
-            paddingTop: 20,
-          }}
-        >
-          <Touchable
-            onPress={handleDeleteAccount}
-            activeOpacity={0.7}
-            style={{ marginBottom: 6 }}
-          >
-            <Text
-              style={{
-                fontSize: moderateScale(14),
-                fontWeight: "700",
-                color: "#CA2B25",
-              }}
-            >
-              Delete Account
-            </Text>
-          </Touchable>
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              color: "#6B7280",
-              lineHeight: moderateScale(20),
-            }}
-          >
-            Deleting your account will remove all your order, wallet amount and
-            any active referral
-          </Text>
+        {/* Delete Account — matches the "Your Information" / Logout card-row
+            pattern so the whole row is the tap target and the style stays
+            consistent with the rest of the app. */}
+        <View style={{ marginTop: 24 }}>
+          <View className="bg-white rounded-lg overflow-hidden border border-[#919EAB33]">
+            <Touchable onPress={handleDeleteAccount} activeOpacity={0.6}>
+              <View className="flex-row items-center px-4 pt-[14px]">
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <icons.delete_red width={20} height={20} />
+                </View>
+                <Text
+                  className="flex-1 ml-[14px] font-inter-semibold"
+                  style={{ fontSize: moderateScale(14), color: "#CA2B25" }}
+                >
+                  Delete Account
+                </Text>
+                <icons.arrow_forward_gray width={16} height={16} />
+              </View>
+              {/* Indent aligns the caption under the label: px-4 (16) + icon (24) + ml-[14px] */}
+              <Text
+                style={{
+                  fontSize: moderateScale(12),
+                  color: "#6B7280",
+                  lineHeight: moderateScale(18),
+                  paddingLeft: 54,
+                  paddingRight: 16,
+                  paddingTop: 4,
+                  paddingBottom: 14,
+                }}
+              >
+                Deleting your account will remove all your order, wallet amount
+                and any active referral
+              </Text>
+            </Touchable>
+          </View>
         </View>
       </ScrollView>
 

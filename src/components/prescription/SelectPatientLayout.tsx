@@ -56,7 +56,8 @@ export const SelectPatientLayout: React.FC = () => {
     setIsAddPatientSheetVisible,
     editingPhone,
     phoneValue,
-    setPhoneValue,
+    handlePhoneChange,
+    phoneError,
     savingPhone,
     editingPatient,
     setEditingPatient,
@@ -230,7 +231,11 @@ export const SelectPatientLayout: React.FC = () => {
                             zIndex: 30,
                           }}
                         >
-                          <icons.close_small width={10} height={10} fill="#222222" />
+                          <icons.close_small
+                            width={10}
+                            height={10}
+                            fill="#222222"
+                          />
                         </Touchable>
                       </View>
                     ))}
@@ -299,58 +304,77 @@ export const SelectPatientLayout: React.FC = () => {
             >
               Doctor will reach you at
             </Text>
-            <View
-              className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] bg-white mb-4"
-              style={{ minHeight: 52 }}
-            >
-              {editingPhone ? (
-                <TextInput
-                  className="flex-1 font-inter-semibold text-[#222222] py-3"
-                  style={{ fontSize: moderateScale(14) }}
-                  value={phoneValue}
-                  onChangeText={setPhoneValue}
-                  keyboardType="number-pad"
-                  maxLength={15}
-                  autoFocus
-                  placeholderTextColor="#6A6A6A"
-                  placeholder="Enter phone number"
-                />
-              ) : (
-                <Text
-                  className="flex-1 py-3"
-                  style={{
-                    fontFamily:
-                      phoneValue || selectedPatient?.phone
-                        ? "Inter_600SemiBold"
-                        : "Inter_400Regular",
-                    color:
-                      phoneValue || selectedPatient?.phone
-                        ? "#222222"
-                        : "#919EAB",
-                    fontSize: moderateScale(14),
-                  }}
-                >
-                  {format.phone(phoneValue || selectedPatient?.phone) ||
-                    "e.g. +91 98765 43210"}
-                </Text>
-              )}
-              <Touchable
-                onPress={handleUpdatePhone}
-                disabled={savingPhone}
-                activeOpacity={0.7}
-                // hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                {savingPhone ? (
-                  <ActivityIndicator size="small" color="#0F7635" />
+            <View className="mb-4">
+              <View className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] bg-white">
+                {editingPhone ? (
+                  <View className="flex-1 flex-row items-center">
+                    <Text
+                      className="font-inter-semibold text-[#222222] mr-1"
+                      style={{ fontSize: moderateScale(14) }}
+                    >
+                      +91
+                    </Text>
+                    <View
+                      style={{
+                        width: 1,
+                        height: 16,
+                        backgroundColor: "#919EAB33",
+                        marginRight: 2,
+                      }}
+                    />
+                    <TextInput
+                      className="flex-1 font-inter-semibold text-[#222222] py-4"
+                      style={{ fontSize: moderateScale(14) }}
+                      value={phoneValue}
+                      onChangeText={handlePhoneChange}
+                      keyboardType="number-pad"
+                      maxLength={10}
+                      autoFocus
+                      placeholderTextColor="#6A6A6A"
+                      placeholder="Enter mobile number"
+                    />
+                  </View>
                 ) : (
                   <Text
-                    className="font-inter-bold text-[#0F7635]"
-                    style={{ fontSize: moderateScale(13) }}
+                    className="flex-1 py-4"
+                    style={{
+                      fontFamily: selectedPatient?.phone
+                        ? "Inter_600SemiBold"
+                        : "Inter_400Regular",
+                      color: selectedPatient?.phone ? "#222222" : "#919EAB",
+                      fontSize: moderateScale(14),
+                    }}
                   >
-                    {editingPhone ? "Done" : "Edit"}
+                    {format.phone(selectedPatient?.phone) ||
+                      "e.g. +91 98765 43210"}
                   </Text>
                 )}
-              </Touchable>
+                <Touchable
+                  onPress={handleUpdatePhone}
+                  disabled={savingPhone}
+                  activeOpacity={0.7}
+                  // hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  {savingPhone ? (
+                    <ActivityIndicator size="small" color="#0F7635" />
+                  ) : (
+                    <Text
+                      className="font-inter-bold text-[#0F7635]"
+                      style={{ fontSize: moderateScale(13) }}
+                    >
+                      {editingPhone ? "Done" : "Edit"}
+                    </Text>
+                  )}
+                </Touchable>
+              </View>
+              {!!phoneError && (
+                <Text
+                  className="font-inter-medium text-[#EF4444] mt-1.5 px-1"
+                  style={{ fontSize: moderateScale(12) }}
+                >
+                  {phoneError}
+                </Text>
+              )}
             </View>
 
             <View className="flex-row mb-4" style={{ gap: exactScale(12) }}>
@@ -404,7 +428,7 @@ export const SelectPatientLayout: React.FC = () => {
                 >
                   Gender
                 </Text>
-                <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-full px-6 py-[14px]">
+                <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-full px-6 py-4">
                   {selectedPatient?.gender === "FEMALE" ? (
                     <icons.female width={18} height={18} color="#0F7635" />
                   ) : (
@@ -431,7 +455,7 @@ export const SelectPatientLayout: React.FC = () => {
             </Text>
             <Touchable
               onPress={() => setShowHealthSheet(true)}
-              className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] py-[10px] bg-white mb-4"
+              className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] py-4 bg-white mb-4"
               activeOpacity={0.85}
             >
               {selectedHealthProblem ? (

@@ -31,6 +31,18 @@ interface ComparisonBoardProps {
   requiresPrescription?: boolean;
 }
 
+// Add-button section sizing. The board height is measured from the columns only,
+// so this section's height is added on top — keep the measurement offset derived
+// from these values so the bottom padding can never drift out of sync and clip.
+const ADD_BTN_HEIGHT = 46;
+const ADD_BTN_PAD_TOP = 6;
+const ADD_BTN_PAD_BOTTOM = 16;
+// Total height of the bottom section. Both the recommended card's Add-button
+// section AND the searched card's status slot use this, so the two cards' dashed
+// dividers always line up. Change the padding above and both follow together.
+const ADD_SECTION_HEIGHT =
+  ADD_BTN_PAD_TOP + ADD_BTN_HEIGHT + ADD_BTN_PAD_BOTTOM;
+
 export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   searched,
   recommended,
@@ -187,7 +199,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     outputRange: ["#FEFFF9", "#FEFFF9"],
   });
 
-  const leftColWidth = cardWidth / 2;
+  // The recommended column lives inside a full-width measurement layer, but in the
+  // collapsed state the visible half-card is narrower by the section's paddingLeft (4)
+  // plus the card's two 1.25px borders. Subtract that so the column's 12px right padding
+  // isn't clipped — matching the searched (left) card's symmetric 12/12 image gap.
+  const leftColWidth = cardWidth / 2 - 6.5;
 
   return (
     <View
@@ -289,10 +305,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             </View>
           </View>
 
-          {/* Status Slot Container at the bottom (aligned with Add Button) */}
+          {/* Status Slot Container at the bottom — same height as the recommended
+              card's Add-button section so both cards' dashed dividers line up. */}
           <View
             className="px-[12px] pt-6"
-            style={{ height: 62, justifyContent: "center" }}
+            style={{ height: ADD_SECTION_HEIGHT, justifyContent: "center" }}
           >
             <Text
               className="font-inter-semibold text-[#EF4444]"
@@ -336,7 +353,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             <View
               style={{ width: cardWidth }}
               onLayout={(e) => {
-                const h = e.nativeEvent.layout.height + 62;
+                const h = e.nativeEvent.layout.height + ADD_SECTION_HEIGHT;
                 if (h !== boardHeight) setBoardHeight(h);
               }}
             >
@@ -535,8 +552,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             <View
               style={{
                 paddingHorizontal: 12,
-                paddingBottom: 10,
-                paddingTop: 6,
+                paddingBottom: ADD_BTN_PAD_BOTTOM,
+                paddingTop: ADD_BTN_PAD_TOP,
               }}
             >
               {count === 0 ? (
@@ -546,7 +563,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                   accessibilityRole="button"
                   accessibilityLabel={`Add ${recommended.name} to cart`}
                   className="bg-brand-primary rounded-[12px] items-center justify-center"
-                  style={{ height: 46 }}
+                  style={{ height: ADD_BTN_HEIGHT }}
                 >
                   <Text
                     className="font-inter-bold text-white"
@@ -558,7 +575,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               ) : (
                 <View
                   className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[12px] bg-white"
-                  style={{ height: 46 }}
+                  style={{ height: ADD_BTN_HEIGHT }}
                 >
                   <Touchable
                     onPress={handleDecrement}

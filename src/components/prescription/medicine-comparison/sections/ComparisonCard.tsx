@@ -1,11 +1,11 @@
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { moderateScale } from "@/src/utils/exactScale";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import { Image } from "expo-image";
 import { ComparisonMedicine } from "../types";
-import { moderateScale } from "@/src/utils/exactScale";
 
 interface ComparisonCardProps {
   item: ComparisonMedicine;
@@ -18,8 +18,6 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
   cardWidth,
   count,
 }) => {
-  const colWidth = cardWidth / 2;
-
   return (
     <View
       style={{
@@ -79,8 +77,8 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         {/* Left — Prescribed */}
         <View
           style={{
-            width: colWidth,
-            padding: 12,
+            flex: 1,
+            padding: 16,
             flexDirection: "column",
             justifyContent: "space-between",
             backgroundColor: "#fff",
@@ -179,7 +177,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={{
-            width: colWidth,
+            flex: 1,
             padding: 12,
             flexDirection: "column",
             justifyContent: "space-between",

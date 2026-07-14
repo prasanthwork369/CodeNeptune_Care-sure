@@ -1,9 +1,9 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { PatientContactInfoProps } from "@/src/types/patient";
+import { moderateScale } from "@/src/utils/exactScale";
 import { format, sanitize, validate } from "@/src/utils/validation";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
 
 const stripCountryCode = (raw: string) =>
   raw.startsWith("+91") ? raw.slice(3) : raw;
@@ -38,7 +38,10 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
 
   return (
     <View className="mb-4">
-      <Text className="font-inter-semibold text-[#222222] mb-2" style={{ fontSize: moderateScale(13) }}>
+      <Text
+        className="font-inter-semibold text-[#222222] mb-2"
+        style={{ fontSize: moderateScale(13) }}
+      >
         Doctor will reach you at
       </Text>
       <View
@@ -47,15 +50,18 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
       >
         {isEditing ? (
           <View className="flex-1 flex-row items-center">
-            <Text className="font-inter-semibold text-[#1A1C1E] mr-2" style={{ fontSize: moderateScale(14) }}>
+            <Text
+              className="font-inter-semibold text-[#1A1C1E] mr-1"
+              style={{ fontSize: moderateScale(14) }}
+            >
               +91
             </Text>
             <View
               style={{
                 width: 1,
-                height: 20,
+                height: 16,
                 backgroundColor: "#919EAB33",
-                marginRight: 10,
+                marginRight: 2,
               }}
             />
             <TextInput
@@ -71,7 +77,7 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
               autoFocus
               cursorColor="#6A6A6A"
               placeholderTextColor="#6A6A6A"
-              placeholder="10 digit number"
+              placeholder="Enter mobile number"
             />
           </View>
         ) : (
@@ -95,14 +101,20 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
           {saving ? (
             <ActivityIndicator size="small" color="#0F7635" />
           ) : (
-            <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(13) }}>
+            <Text
+              className="font-inter-bold text-[#0F7635]"
+              style={{ fontSize: moderateScale(13) }}
+            >
               {isEditing ? "Done" : "Edit"}
             </Text>
           )}
         </Touchable>
       </View>
       {!!error && (
-        <Text className="font-inter-medium text-[#EF4444] mt-1.5 px-1" style={{ fontSize: moderateScale(12) }}>
+        <Text
+          className="font-inter-medium text-[#EF4444] mt-1.5 px-1"
+          style={{ fontSize: moderateScale(12) }}
+        >
           {error}
         </Text>
       )}

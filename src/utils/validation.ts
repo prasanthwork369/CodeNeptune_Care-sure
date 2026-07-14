@@ -15,6 +15,10 @@ export const REGEX = {
 
 // ─── Input sanitisers ─────────────────────────────────────────────────────────
 
+// Local part of a patient's phone, minus the +91 country code we store/display separately.
+export const stripIndianCode = (raw?: string | null): string =>
+    (raw ?? '').replace(/^\+91/, '').replace(REGEX.digitsOnly, '');
+
 export const sanitize = {
     phone: (raw: string) => raw.replace(REGEX.digitsOnly, '').slice(0, 10),
     pincode: (raw: string) => raw.replace(REGEX.digitsOnly, '').slice(0, 6),

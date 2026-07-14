@@ -3,6 +3,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useSelectPatientImages } from "@/src/hooks/useSelectPatientImages";
 import { FamilyMember } from "@/src/types/familyMember";
 import { HealthProblem } from "@/src/api/health-problem.api";
+import { sanitize, stripIndianCode, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -63,18 +64,31 @@ export function useSelectPatient() {
 
   const showEmptyState = !loading && members.length === 0;
 
+  // Keep the edit field to 10 digits only; country code shown separately as a fixed +91.
+  const handlePhoneChange = (text: string) => {
+    setPhoneValue(sanitize.phone(text));
+    setPhoneError("");
+  };
+
   const handleUpdatePhone = async () => {
     if (editingPhone) {
-      if (selectedPatient && phoneValue.trim()) {
+      const result = validate.phone(phoneValue);
+      if (!result.valid) {
+        setPhoneError(result.message);
+        return;
+      }
+      if (selectedPatient) {
         setSavingPhone(true);
         await updateMember(selectedPatient.id, {
-          phone: phoneValue.trim(),
+          phone: `+91${phoneValue.trim()}`,
         });
         setSavingPhone(false);
       }
       setEditingPhone(false);
     } else {
-      setPhoneValue(selectedPatient?.phone ?? "");
+      // Seed with just the local part so the +91 prefix isn't editable.
+      setPhoneValue(stripIndianCode(selectedPatient?.phone));
+      setPhoneError("");
       setEditingPhone(true);
     }
   };
@@ -149,6 +163,8 @@ export function useSelectPatient() {
     editingPhone,
     phoneValue,
     setPhoneValue,
+    handlePhoneChange,
+    phoneError,
     savingPhone,
     editingPatient,
     setEditingPatient,
