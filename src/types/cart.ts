@@ -223,4 +223,9 @@ export interface CouponCardProps {
   coupon: Coupon;
   onApply: (code: string) => void;
   disabled?: boolean;
+  // The coupon currently applied to the cart — the card is faded to feel inactive.
+  isApplied?: boolean;
+  // Failed pre-validation (e.g. usage limit reached) — faded but still pressable
+  // so tapping Apply surfaces the reason toast.
+  isUnavailable?: boolean;
 }

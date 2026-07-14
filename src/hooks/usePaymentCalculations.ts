@@ -5,6 +5,7 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
@@ -114,6 +115,11 @@ export function usePaymentCalculations() {
   const hasAddress = !!deliveryCity && !!defaultAddress;
 
   const handlePlaceOrder = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     if (!hasAddress || !defaultAddress) {
       setShowLocationSheet(true);
       return;

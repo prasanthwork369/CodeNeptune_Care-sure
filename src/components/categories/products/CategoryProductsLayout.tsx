@@ -153,7 +153,7 @@ const CategoryProductsContent: React.FC = () => {
         pointerEvents={totalItems > 0 ? "box-none" : "none"}
         style={{
           position: "absolute",
-          bottom: adjustedBottom + 8,
+          bottom: adjustedBottom + 20,
           left: 0,
           right: 0,
           zIndex: 50,

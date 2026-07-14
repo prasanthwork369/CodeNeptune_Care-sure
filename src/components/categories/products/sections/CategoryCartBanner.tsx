@@ -165,7 +165,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({ onPress 
         }]}
       >
         <Touchable
-          activeOpacity={0.9}
+          activeOpacity={0.7}
           onPress={onPress}
           style={{ width: "100%", height: "100%", flexDirection: "row", alignItems: "center", paddingLeft: exactScale(12), paddingRight: exactScale(16) }}
         >

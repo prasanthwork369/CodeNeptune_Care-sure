@@ -1,5 +1,12 @@
-import { MutationCache, QueryClient } from '@tanstack/react-query';
+import { MutationCache, QueryClient, onlineManager } from '@tanstack/react-query';
+import NetInfo from '@react-native-community/netinfo';
 import { AppError } from '@/src/api/errors';
+
+onlineManager.setEventListener((setOnline) => {
+  return NetInfo.addEventListener((state) => {
+    setOnline(!!state.isConnected);
+  });
+});
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -16,7 +23,8 @@ export const queryClient = new QueryClient({
             error.kind === 'unauthorized' ||
             error.kind === 'forbidden' ||
             error.kind === 'not_found' ||
-            error.kind === 'validation'
+            error.kind === 'validation' ||
+            error.kind === 'network'
           ) {
             return false;
           }

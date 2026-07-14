@@ -3,6 +3,7 @@ import { useCouponStore } from '@/src/store/couponStore';
 import { useToastStore } from '@/src/store/toastStore';
 import { useNav } from '@/src/hooks/useNav';
 import { useCoupons } from '@/src/hooks/queries/useCoupons';
+import { useCouponAvailability } from '@/src/hooks/useCouponAvailability';
 import { couponService } from '@/src/services/coupon.service';
 import { useCart } from '@/src/hooks/queries/useCart';
 import React, { useState } from 'react';
@@ -13,11 +14,12 @@ import { moderateScale } from '@/src/utils/exactScale';
 export const CouponsLayout: React.FC = () => {
     const [couponCode, setCouponCode] = useState('');
     const [validating, setValidating] = useState(false);
-    const { apply } = useCouponStore();
+    const { apply, applied } = useCouponStore();
     const toast = useToastStore();
     const router = useNav();
     const { totalPrice: subtotal } = useCart();
     const { data: coupons = [], isLoading } = useCoupons();
+    const { unavailable } = useCouponAvailability(coupons, subtotal);
 
     const applyCode = async (code: string) => {
         const trimmed = code.trim().toUpperCase();
@@ -31,8 +33,11 @@ export const CouponsLayout: React.FC = () => {
             } else {
                 toast.show(result.message ?? 'This coupon is not valid or has expired.', 'error');
             }
-        } catch {
-            toast.show('Could not validate coupon. Please try again.', 'error');
+        } catch (err) {
+            // Surface the backend's reason (e.g. "usage limit reached") when the
+            // coupon is rejected via a 4xx, instead of a generic fallback.
+            const message = err instanceof Error ? err.message : '';
+            toast.show(message || 'Could not validate coupon. Please try again.', 'error');
         } finally {
             setValidating(false);
         }
@@ -41,15 +46,27 @@ export const CouponsLayout: React.FC = () => {
     return (
         <View className="flex-1 bg-[#F5F6FB]">
             <ScreenHeader title="Apply Coupon" />
-            <ScrollView showsVerticalScrollIndicator={false} className="flex-1 px-4 pt-6">
+
+            {/* Fixed search bar — stays pinned while only the coupon list scrolls */}
+            <View className="px-4 pt-6">
                 <CouponInput
                     value={couponCode}
                     onChangeText={setCouponCode}
                     onApply={() => applyCode(couponCode)}
                     loading={validating}
                 />
+            </View>
 
-                <Text className="font-inter-bold text-brand-text mt-8 mb-4" style={{ fontSize: moderateScale(14) }}>More Coupons</Text>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{ flex: 1 }}
+                contentContainerStyle={{
+                    paddingHorizontal: 16,
+                    paddingTop: 24,
+                    paddingBottom: 40,
+                }}
+            >
+                <Text className="font-inter-bold text-brand-text mb-4" style={{ fontSize: moderateScale(14) }}>More Coupons</Text>
 
                 {isLoading ? (
                     <ActivityIndicator color="#0F7635" />
@@ -58,14 +75,28 @@ export const CouponsLayout: React.FC = () => {
                         No coupons available
                     </Text>
                 ) : (
-                    coupons.map((coupon) => (
-                        <CouponCard
-                            key={coupon.id}
-                            coupon={coupon}
-                            onApply={applyCode}
-                            disabled={subtotal < coupon.minOrderValue}
-                        />
-                    ))
+                    coupons.map((coupon) => {
+                        const isApplied =
+                            applied?.code?.toUpperCase() ===
+                            coupon.code?.toUpperCase();
+                        // Failed pre-validation despite meeting the min order
+                        // (e.g. usage limit reached) → show inactive. The
+                        // min-order case is already covered by `disabled`.
+                        const isUnavailable =
+                            !isApplied &&
+                            subtotal >= coupon.minOrderValue &&
+                            unavailable.has(coupon.code);
+                        return (
+                            <CouponCard
+                                key={coupon.id}
+                                coupon={coupon}
+                                onApply={applyCode}
+                                disabled={subtotal < coupon.minOrderValue}
+                                isApplied={isApplied}
+                                isUnavailable={isUnavailable}
+                            />
+                        );
+                    })
                 )}
             </ScrollView>
         </View>

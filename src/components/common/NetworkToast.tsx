@@ -19,10 +19,27 @@ const NetworkToast = () => {
     const [signalStep, setSignalStep] = useState(1);
 
     const showToast = isConnected === false || isInternetReachable === false;
+    const [showToastDelayed, setShowToastDelayed] = useState(false);
     const isLowNetwork = isConnected === true && isInternetReachable === false;
+    const isRestored = !showToast && showToastDelayed;
+
+    useEffect(() => {
+        if (isConnected === true && isInternetReachable === true && offlineAlertVisible) {
+            hideOfflineAlert();
+        }
+    }, [isConnected, isInternetReachable, offlineAlertVisible]);
 
     useEffect(() => {
         if (showToast) {
+            setShowToastDelayed(true);
+        } else {
+            const t = setTimeout(() => setShowToastDelayed(false), 1800);
+            return () => clearTimeout(t);
+        }
+    }, [showToast]);
+
+    useEffect(() => {
+        if (showToastDelayed) {
             Animated.spring(translateY, {
                 toValue: 0,
                 useNativeDriver: true,
@@ -38,7 +55,7 @@ const NetworkToast = () => {
                 setIsLoading(false);
             });
         }
-    }, [showToast]);
+    }, [showToastDelayed]);
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval> | null = null;
@@ -47,10 +64,10 @@ const NetworkToast = () => {
                 setSignalStep(prev => (prev >= 4 ? 1 : prev + 1));
             }, 400);
         } else {
-            setSignalStep(1);
+            setSignalStep(isRestored ? 4 : 1);
         }
         return () => { if (interval) clearInterval(interval); };
-    }, [isLowNetwork]);
+    }, [isLowNetwork, isRestored]);
 
     const handleRefresh = async () => {
         setIsLoading(true);
@@ -67,6 +84,7 @@ const NetworkToast = () => {
     };
 
     const getMessage = () => {
+        if (isRestored) return 'Connection restored';
         if (isConnected === false) return 'Internet connection lost';
         if (isInternetReachable === false) return 'Low network connection';
         return '';
@@ -82,7 +100,7 @@ const NetworkToast = () => {
             buttons={[{ label: 'Got it', onPress: hideOfflineAlert, variant: 'outline' }]}
         />
         <Animated.View
-            pointerEvents={showToast ? 'auto' : 'none'}
+            pointerEvents={showToastDelayed ? 'auto' : 'none'}
             className="absolute left-0 right-0 items-center z-[1000000]"
             style={[
                 {
@@ -109,7 +127,7 @@ const NetworkToast = () => {
                                 {getMessage()}
                             </Text>
                         </View>
-                        {isLowNetwork ? (
+                        {isLowNetwork || isRestored ? (
                             <View className="ml-4">
                                 {(() => {
                                     const WifiIcon = icons[`wifi_${signalStep}` as keyof typeof icons] || icons.wifi_1;

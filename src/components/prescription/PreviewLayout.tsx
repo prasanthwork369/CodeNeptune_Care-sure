@@ -9,8 +9,10 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
+import { useUIStore } from "@/src/store/uiStore";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { MAX_FILES, validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import * as DocumentPicker from "expo-document-picker";
@@ -198,6 +200,11 @@ export const PreviewLayout: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     setSubmitting(true);
     uploadedSnapshot.current = [...items];
     try {

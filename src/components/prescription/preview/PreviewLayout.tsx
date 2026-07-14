@@ -9,6 +9,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import {
     MAX_FILES,
@@ -194,6 +195,11 @@ export const PreviewLayout: React.FC = () => {
   const removeItem = (index: number) => setShowRemoveModal(index);
 
   const handleSubmit = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     if (__DEV__)
       console.log(
         "[Prescription] Proceed pressed! Starting upload flow for items:",

@@ -42,7 +42,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
 
   const handleIncrement = () => {
     increment();
-    if (flyToCartContext && product.image) {
+    if (flyToCartContext && product.image && Number(product.price) > 0) {
       imageContainerRef.current?.measure(
         (x, y, width, height, pageX, pageY) => {
           if (
@@ -82,42 +82,43 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
 
   return (
     <View style={{ width: cardWidth, marginBottom: exactScale(20) }}>
-      {/* Image container */}
-      <Touchable
-        activeOpacity={0.9}
-        onPress={onPress}
-        style={{
-          height: cardWidth * 1.05,
-          backgroundColor: "#FFFFFF",
-          borderRadius: 14,
-          borderWidth: 0.77,
-          borderColor: "#919EAB33",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <View
-          ref={imageContainerRef}
+      <View style={{ position: "relative" }}>
+        {/* Image container */}
+        <Touchable
+          activeOpacity={0.7}
+          onPress={onPress}
           style={{
-            width: "78%",
-            height: "68%",
+            height: cardWidth * 1.05,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 14,
+            borderWidth: 0.77,
+            borderColor: "#919EAB33",
             alignItems: "center",
             justifyContent: "center",
+            overflow: "hidden",
           }}
-          collapsable={false}
         >
-          {product.image ? (
-            <Image
-              source={product.image}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="contain"
-            />
-          ) : (
-            <icons.placeholder width="78%" height="68%" />
-          )}
-        </View>
+          <View
+            ref={imageContainerRef}
+            style={{
+              width: "78%",
+              height: "68%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            collapsable={false}
+          >
+            {product.image ? (
+              <Image
+                source={product.image}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="contain"
+              />
+            ) : (
+              <icons.placeholder width="78%" height="68%" />
+            )}
+          </View>
+        </Touchable>
 
         {/* Add / Counter — bottom right corner */}
         <View style={{ position: "absolute", bottom: 10, right: 10 }}>
@@ -132,7 +133,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
                 backgroundColor: "#FFFFFF",
                 borderWidth: 1.5,
                 borderColor: "#0F7635",
-                borderRadius: 10,
+                borderRadius: 4,
                 alignItems: "center",
                 justifyContent: "center",
                 shadowColor: "#0F7635",
@@ -145,7 +146,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
               {isPending ? (
                 <ActivityIndicator size="small" color="#0F7635" />
               ) : (
-                <Text style={s.addText}>Add</Text>
+                <Text style={s.addText}>Add.</Text>
               )}
             </Touchable>
           ) : (
@@ -212,7 +213,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
             </View>
           )}
         </View>
-      </Touchable>
+      </View>
 
       {/* Info below card */}
       <View style={{ marginTop: exactScale(14) }}>

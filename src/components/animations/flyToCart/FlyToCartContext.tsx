@@ -80,8 +80,8 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   // Sync visual cart with real cart, checking for item removals to trigger exit animations
   useEffect(() => {
     // 1. Detect if any items were removed from the cart
-    const prevIds = prevItemsRef.current.map((item: any) => item.id);
-    const currentIds = items.map((item: any) => item.id);
+    const prevIds = prevItemsRef.current.map((item: any) => item.medicineId);
+    const currentIds = items.map((item: any) => item.medicineId);
     const removedIds = prevIds.filter((id) => !currentIds.includes(id));
 
     if (removedIds.length > 0) {
@@ -171,7 +171,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           setVisualCartCount((prev) => prev === totalItems ? prev : totalItems);
           const cartItemsWithImage = items.filter((item) => item.image ?? item.metadata?.image);
           const newImages: VisualCartImage[] = cartItemsWithImage.map((i) => ({
-            id: i.id,
+            id: i.medicineId,
             image: i.image ?? i.metadata?.image,
             isPending: false,
           })).slice(-3);
@@ -242,8 +242,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
         // (e.g. incrementing quantity) so this optimistic entry shares the
         // same id the sync effect below will use — preventing two entries
         // for the same product from coexisting with different ids.
-        const matchedCartItem = items.find((i) => i.medicineId === productId);
-        const visualId = matchedCartItem?.id ?? productId;
+        const visualId = productId;
         setVisualCartImages((prev) => {
           const filtered = prev.filter((item) => item.id !== visualId);
           return [...filtered, { id: visualId, image: imageUrl, isPending: !isFirstItem }].slice(-3);
@@ -269,8 +268,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     
     // Once the flying image lands, transition isPending to false so the thumbnail animates in.
     if (imageUrl && productId) {
-      const matchedCartItem = items.find((i) => i.medicineId === productId);
-      const visualId = matchedCartItem?.id ?? productId;
+      const visualId = productId;
       setVisualCartImages((prev) =>
         prev.map((item) =>
           item.id === visualId ? { ...item, isPending: false } : item

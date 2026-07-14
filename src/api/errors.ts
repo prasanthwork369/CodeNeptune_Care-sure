@@ -27,6 +27,10 @@ export class AppError extends Error {
 export function toAppError(err: unknown): AppError {
   if (err instanceof AppError) return err;
 
+  if (err && typeof err === 'object' && (err as any).code === 'NETWORK_OFFLINE') {
+    return new AppError('network', 'No Internet Connection. Please check your connection.');
+  }
+
   if (isAxiosError(err)) {
     if (err.code === 'ECONNABORTED') {
       return new AppError('timeout', 'Request timed out. Please check your connection.');

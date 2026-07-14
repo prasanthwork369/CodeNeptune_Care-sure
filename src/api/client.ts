@@ -59,17 +59,14 @@ apiClient.interceptors.request.use((config) => {
   //     console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
   //   }
   // }
-  const method = config.method?.toLowerCase() ?? "";
-  if (MUTATION_METHODS.has(method)) {
-    const { isConnected } = useNetworkStore.getState();
-    if (isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
-      return Promise.reject(
-        Object.assign(new Error("Network offline"), {
-          code: "NETWORK_OFFLINE",
-        }),
-      );
-    }
+  const { isConnected } = useNetworkStore.getState();
+  if (isConnected === false) {
+    useNetworkStore.getState().showOfflineAlert();
+    return Promise.reject(
+      Object.assign(new Error("Network offline"), {
+        code: "NETWORK_OFFLINE",
+      }),
+    );
   }
   if (_accessToken) {
     config.headers.Authorization = `Bearer ${_accessToken}`;
@@ -85,11 +82,8 @@ apiClient.interceptors.response.use(
       !err.response &&
       err.code !== "ECONNABORTED" &&
       err.code !== "NETWORK_OFFLINE";
-    const isMutation = MUTATION_METHODS.has(
-      err.config?.method?.toLowerCase() ?? "",
-    );
     const { isConnected } = useNetworkStore.getState();
-    if (isNetworkError && isMutation && isConnected === false) {
+    if (isNetworkError && isConnected === false) {
       useNetworkStore.getState().showOfflineAlert();
       return Promise.reject(
         Object.assign(new Error("Network offline"), {

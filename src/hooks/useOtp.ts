@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Keyboard, Platform, TextInput } from "react-native";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 
 // SMS retriever verification module (Android native module, unavailable in Expo Go mock environment)
 const useOtpVerify =
@@ -111,6 +112,11 @@ export function useOtp() {
    * Resends the OTP and prefills it if returned, or resets boxes.
    */
   const handleResend = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     if (!phone || resendCooldown > 0) return;
     try {
       const res = await requestOtp(phone);
@@ -219,6 +225,11 @@ export function useOtp() {
    * without waiting for the otp state to commit.
    */
   const handleVerify = async (codeArg?: string) => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     // Guard against double submission (auto-submit + button tap, or a
     // duplicate SMS event firing while a verify is already in flight).
     if (loading || isRedirecting) return;

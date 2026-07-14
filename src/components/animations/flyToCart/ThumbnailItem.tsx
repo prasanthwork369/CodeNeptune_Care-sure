@@ -1,12 +1,12 @@
+import { Image } from "expo-image";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import { Image } from "expo-image";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
   Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
 } from "react-native-reanimated";
 import { PARTICLE_CONFIGS, SmokeParticle } from "./SmokeParticle";
 
@@ -32,8 +32,14 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
 
   useEffect(() => {
     if (isRemoving) {
-      maskScale.value = withTiming(1, { duration: 250, easing: Easing.out(Easing.quad) });
-      imageScale.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.quad) });
+      maskScale.value = withTiming(1, {
+        duration: 250,
+        easing: Easing.out(Easing.quad),
+      });
+      imageScale.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.quad),
+      });
       scale.value = withDelay(200, withTiming(0, { duration: 200 }));
       opacity.value = withDelay(200, withTiming(0, { duration: 200 }));
     } else if (isBehindRemoving) {
@@ -80,36 +86,38 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
       }}
     >
       {/* Green puff — renders above the thumbnail circle (zIndex: 5) */}
-      {shouldPlaySmoke && PARTICLE_CONFIGS.map((p, idx) => (
-        <SmokeParticle
-          key={`green-${idx}`}
-          dx={p.dx}
-          dy={p.dy}
-          size={p.size}
-          color="#22C55E"
-          delay={p.delay}
-          duration={320}
-          startTrigger={true}
-          upwardDrift={12}
-          zIndex={5}
-        />
-      ))}
+      {shouldPlaySmoke &&
+        PARTICLE_CONFIGS.map((p, idx) => (
+          <SmokeParticle
+            key={`green-${idx}`}
+            dx={p.dx}
+            dy={p.dy}
+            size={p.size}
+            color="#22C55E"
+            delay={p.delay}
+            duration={320}
+            startTrigger={true}
+            upwardDrift={12}
+            zIndex={5}
+          />
+        ))}
 
       {/* White puff — second wave, also above thumbnail */}
-      {shouldPlaySmoke && PARTICLE_CONFIGS.map((p, idx) => (
-        <SmokeParticle
-          key={`white-${idx}`}
-          dx={p.dx}
-          dy={p.dy}
-          size={p.size * 0.9}
-          color="#F1F5F9"
-          delay={p.delay + 220}
-          duration={300}
-          startTrigger={true}
-          upwardDrift={55}
-          zIndex={5}
-        />
-      ))}
+      {shouldPlaySmoke &&
+        PARTICLE_CONFIGS.map((p, idx) => (
+          <SmokeParticle
+            key={`white-${idx}`}
+            dx={p.dx}
+            dy={p.dy}
+            size={p.size * 0.9}
+            color="#F1F5F9"
+            delay={p.delay + 220}
+            duration={300}
+            startTrigger={true}
+            upwardDrift={55}
+            zIndex={5}
+          />
+        ))}
 
       <Animated.View
         style={[
@@ -138,11 +146,20 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
       >
         <Animated.View
           style={[
-            { width: 28, height: 28, alignItems: "center", justifyContent: "center" },
+            {
+              width: 28,
+              height: 28,
+              alignItems: "center",
+              justifyContent: "center",
+            },
             imageAnimatedStyle,
           ]}
         >
-          <Image source={imgUrl} style={{ width: 28, height: 28 }} contentFit="contain" />
+          <Image
+            source={imgUrl}
+            style={{ width: 28, height: 28 }}
+            contentFit="contain"
+          />
         </Animated.View>
 
         {/* Absolute Mask Overlay (Green matching the banner background) */}

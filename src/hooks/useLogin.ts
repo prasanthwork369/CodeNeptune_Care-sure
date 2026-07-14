@@ -7,6 +7,7 @@ import {
 import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
 import { Keyboard } from "react-native";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 
 /**
  * Custom hook managing the business logic for the Login screen.
@@ -60,6 +61,11 @@ export function useLogin() {
    * Submits the sanitized phone number to the API, then routes to the OTP verification screen.
    */
   const handleGetOtp = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     const result = validate.phone(phoneNumber);
     if (!result.valid) {
       setPhoneError(result.message);

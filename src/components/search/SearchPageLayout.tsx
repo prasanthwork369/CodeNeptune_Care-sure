@@ -11,6 +11,8 @@ import { useNav } from '@/src/hooks/useNav';
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsOffline } from '@/src/hooks/ui/useIsOffline';
+import { SearchOfflineState } from '@/src/components/search/sections/SearchOfflineState';
 
 // ─── Data transformers ────────────────────────────────────────────────────────
 
@@ -100,6 +102,7 @@ export const SearchPageLayout = () => {
     const { width } = useWindowDimensions();
     const colWidth = (width - 32) / 2;
 
+    const isOffline = useIsOffline();
     const { totalItems: cartCount } = useCart();
     const {
         query,
@@ -138,7 +141,9 @@ export const SearchPageLayout = () => {
                 isSearching={isSearching}
             />
 
-            {!query.trim() ? (
+            {isOffline ? (
+                <SearchOfflineState />
+            ) : !query.trim() ? (
                 <SearchRecentSection
                     history={history}
                     trending={trendingTerms}

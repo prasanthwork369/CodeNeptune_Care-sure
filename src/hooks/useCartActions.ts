@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
 import { useCart } from "./queries/useCart";
 import { useAuthStore } from "@/src/store/authStore";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 
 /**
  * Product identity for cart operations.
@@ -83,6 +84,11 @@ export const useCartActions = (product: CartActionProduct) => {
   });
 
   const increment = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     if (isPending) return;
     if (isAuthenticated) setPending(pendingKey, true);
     try {
@@ -148,6 +154,11 @@ export const useCartActions = (product: CartActionProduct) => {
   };
 
   const decrement = async () => {
+    const { isConnected } = useNetworkStore.getState();
+    if (isConnected === false) {
+      useNetworkStore.getState().showOfflineAlert();
+      return;
+    }
     if (isPending || count <= 0) return;
     if (isAuthenticated) setPending(pendingKey, true);
     try {

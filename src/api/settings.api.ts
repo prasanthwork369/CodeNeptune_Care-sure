@@ -1,6 +1,7 @@
 import { API_BASE_URL, API_ENDPOINTS } from '../utils/urls';
 import { apiClient } from './client';
 import axios from 'axios';
+import { useNetworkStore } from '../store/useNetworkStore';
 
 export interface MobileAppLinks {
     termsLink: string;
@@ -43,6 +44,19 @@ export interface PaymentSettings {
 const publicAxios = axios.create({
     baseURL: API_BASE_URL,
     headers: { 'Content-Type': 'application/json', 'x-panel-id': 'customer' },
+});
+
+publicAxios.interceptors.request.use((config) => {
+  const { isConnected } = useNetworkStore.getState();
+  if (isConnected === false) {
+    useNetworkStore.getState().showOfflineAlert();
+    return Promise.reject(
+      Object.assign(new Error("Network offline"), {
+        code: "NETWORK_OFFLINE",
+      }),
+    );
+  }
+  return config;
 });
 
 export const settingsApi = {
