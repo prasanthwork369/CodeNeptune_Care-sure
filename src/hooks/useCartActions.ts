@@ -125,7 +125,7 @@ export const useCartActions = (product: CartActionProduct) => {
 
         const formattedPackSize = product.packSize
           ? (product.unit && !String(product.packSize).endsWith(product.unit)
-              ? `${product.packSize} ${product.unit}`
+              ? `${product.packSize}${product.unit}`
               : String(product.packSize))
           : undefined;
 
