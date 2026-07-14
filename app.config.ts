@@ -30,7 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "android.permission.SYSTEM_ALERT_WINDOW",
       "android.permission.READ_EXTERNAL_STORAGE",
       "android.permission.READ_MEDIA_IMAGES",
-      "android.permission.CAMERA"
+      "android.permission.CAMERA",
     ],
   },
   web: {
@@ -74,8 +74,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       "expo-notifications",
       {
-        icon: "./assets/images/icon.png",
-        color: "#0F7635",
+        // Android masks the status-bar icon to a single color using its alpha,
+        // so this MUST be a transparent white silhouette (not the full-colour
+        // icon.png, which renders as a solid square). White CareSure logo on
+        // real transparency.
+        icon: "./assets/images/notification-icon.png",
+        color: "#FFFFFF",
         sounds: [],
         androidMode: "default",
         androidCollapsedTitle: "Caresure",
@@ -84,13 +88,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Resolves the manifest-merger clash between expo-notifications and
     // @react-native-firebase/messaging over default_notification_color.
     "./plugins/withFirebaseNotificationColorFix",
+    // Registers notifee's local Maven repo (its native AAR lives in node_modules).
+    "./plugins/withNotifeeRepo",
     [
       "react-native-document-scanner-plugin",
       {
         cameraPermission:
-          "Allow Caresure to use your camera to scan prescriptions."
-      }
-    ]
+          "Allow Caresure to use your camera to scan prescriptions.",
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

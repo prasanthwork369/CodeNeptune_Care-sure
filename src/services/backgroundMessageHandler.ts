@@ -7,14 +7,22 @@ import { isExpoGo } from '../utils/environment';
  * React component — Android launches a headless JS task for background/killed
  * messages, and only entry-level code runs there.
  *
- * We keep the handler minimal: notification messages are displayed by the OS
- * automatically, so there's nothing to render here. It exists so Firebase stops
- * warning and so data-only messages have somewhere to be processed. Firebase is
- * a native module absent in Expo Go, so we guard + lazy-require it.
+ * Messages WITH a `notification` block are displayed by the OS automatically —
+ * we leave those alone. `data`-only messages are NOT auto-displayed, so we
+ * render them ourselves via notifee to show the CareSure colour large icon
+ * (the industry pattern for branded notifications). Gating on `!notification`
+ * guarantees we never double up with an OS-shown notification.
+ *
+ * Firebase + notifee are native modules absent in Expo Go, so we guard +
+ * lazy-require them.
  */
 if (!isExpoGo) {
   const messaging = require('@react-native-firebase/messaging').default;
-  messaging().setBackgroundMessageHandler(async (remoteMessage: unknown) => {
+  messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
     if (__DEV__) console.log('[BackgroundMessage]', JSON.stringify(remoteMessage));
+    if (!remoteMessage?.notification) {
+      const { notifeeService } = require('./notifeeService');
+      await notifeeService.displayBranded(remoteMessage).catch(() => {});
+    }
   });
 }

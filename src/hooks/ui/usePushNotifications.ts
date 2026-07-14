@@ -5,6 +5,7 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { notificationService } from "../../services/notification.service";
+import { notifeeService } from "../../services/notifeeService";
 import { NotificationNavigation } from "../../services/NotificationNavigation";
 import { useAuthStore } from "../../store/authStore";
 import { useNotificationStore } from "../../store/notificationStore";
@@ -130,16 +131,31 @@ export const usePushNotifications = () => {
           "[PushNotificationHook] Foreground FCM message:",
           JSON.stringify(remoteMessage, null, 2),
         );
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: remoteMessage?.notification?.title ?? "Notification",
-          body: remoteMessage?.notification?.body ?? "",
-          data: (remoteMessage?.data ?? {}) as NotificationData,
-        },
-        trigger: null, // present immediately
-      }).catch(() => {});
+      // Present via notifee so the CareSure colour large icon shows. notifee
+      // notifications don't fire expo's addNotificationReceivedListener, so we
+      // save to the store here directly (single path, no duplicate).
+      await notifeeService.displayBranded(remoteMessage).catch(() => {});
+      addNotification({
+        title: remoteMessage?.notification?.title ?? "Notification",
+        body: remoteMessage?.notification?.body ?? "",
+        data: (remoteMessage?.data ?? {}) as NotificationData,
+      });
     });
 
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addNotification]);
+
+  // Foreground tap on a notifee-displayed notification → route it. (Background/
+  // killed taps still come through the Firebase handlers below.)
+  useEffect(() => {
+    if (isExpoGo || Platform.OS !== "android") return;
+    const unsubscribe = notifeeService.addForegroundPressListener(
+      (data, tapId) => {
+        const { payload } = buildPayloadFromData(data, tapId);
+        NotificationNavigation.handleTap(payload, tapId);
+      },
+    );
     return unsubscribe;
   }, []);
 
@@ -194,6 +210,19 @@ export const usePushNotifications = () => {
       if (!response) return;
       const { payload, tapId } = buildTapPayload(response);
       runColdStart(payload, tapId);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, navReady]);
+
+  // Cold-start tap on a notifee-displayed (data-only) notification. Shares the
+  // same runColdStart guard so it never double-navigates with the FCM/expo
+  // sources above.
+  useEffect(() => {
+    if (!isLoaded || !navReady || isExpoGo) return;
+    notifeeService.getInitialTap().then((res) => {
+      if (!res) return;
+      const { payload } = buildPayloadFromData(res.data, res.tapId);
+      runColdStart(payload, res.tapId);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, navReady]);
