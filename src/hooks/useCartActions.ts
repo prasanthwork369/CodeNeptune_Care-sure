@@ -123,6 +123,12 @@ export const useCartActions = (product: CartActionProduct) => {
           return;
         }
 
+        const formattedPackSize = product.packSize
+          ? (product.unit && !String(product.packSize).endsWith(product.unit)
+              ? `${product.packSize} ${product.unit}`
+              : String(product.packSize))
+          : undefined;
+
         await addItem({
           medicineId: product.medicineId,
           variantId: product.variantId ?? null,
@@ -139,7 +145,7 @@ export const useCartActions = (product: CartActionProduct) => {
             ...(product.variantId
               ? { selectedVariantId: product.variantId }
               : {}),
-            ...(product.packSize ? { packSize: product.packSize } : {}),
+            ...(formattedPackSize ? { packSize: formattedPackSize } : {}),
             ...(product.unit ? { unit: product.unit } : {}),
             price: unitPrice,
             image: imageUri,
