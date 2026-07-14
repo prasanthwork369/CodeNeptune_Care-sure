@@ -221,7 +221,7 @@ export const medicineApi = {
     const response = await apiClient.get(
       API_ENDPOINTS.MEDICINES_FEATURED_CARDS,
       {
-        params: { limit: 105 },
+        params: { limit: 10 },
       },
     );
     return response.data?.data ?? [];

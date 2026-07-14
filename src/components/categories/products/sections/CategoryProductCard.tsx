@@ -35,6 +35,8 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
       originalPrice: product.originalPrice,
       discountPercent: product.discountPercent,
       image: product.image,
+      packSize: product.packSize,
+      unit: product.unit,
     },
   );
 

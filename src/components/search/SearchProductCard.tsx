@@ -30,6 +30,8 @@ interface SearchRowProps {
             savings: number;
             description?: string;
             image?: any;
+            packSize?: string;
+            unit?: string;
         };
     };
 }
@@ -51,6 +53,8 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
         originalPrice: data.recommended.originalPrice,
         image: data.recommended.image,
         requiresPrescription: data.requiresPrescription,
+        packSize: data.recommended.packSize,
+        unit: data.recommended.unit,
     });
 
     const { slideAnim, opacityAnim } = animations;

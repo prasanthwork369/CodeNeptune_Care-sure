@@ -63,6 +63,8 @@ const ProductCard = React.memo(({ product, cardWidth, onProductPress }: { produc
                   discountPercent: product.discountPercent,
                   image: product.image,
                   requiresPrescription: product.requiresPrescription,
+                  packSize: product.packSize,
+                  unit: product.unit,
               },
     );
     const { slideAnim, opacityAnim } = animations;

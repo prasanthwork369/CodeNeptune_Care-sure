@@ -39,11 +39,14 @@ interface ProductCardProps {
     accentColor: string;
     cardWidth: number;
     onPress: (productId: string) => void;
+    packSize?: string;
+    unit?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({
     id, productId, name, slug, description, price, mrp,
     discountPercentage, thumbnailUrl, accentColor, cardWidth, onPress,
+    packSize, unit,
 }) => {
     // Image area height is tied to card width; the details area below it
     // sizes itself to its own content instead of a forced half-split (see
@@ -58,6 +61,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         originalPrice: mrp,
         discountPercent: discountPercentage,
         image: thumbnailUrl ? { uri: resolveAssetUrl(thumbnailUrl) } : undefined,
+        packSize,
+        unit,
     });
     const { slideAnim, opacityAnim } = animations;
 
@@ -187,6 +192,8 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
                     thumbnailUrl={p.thumbnailUrl}
                     cardWidth={cardWidth}
                     onPress={onProductPress}
+                    packSize={String(p.packSize ?? '')}
+                    unit={p.unit}
                 />
             );
         },

@@ -74,6 +74,8 @@ export interface Product {
   image: ImageSource | null;
   requiresPrescription?: boolean;
   defaultVariant?: DefaultVariant;
+  packSize?: string;
+  unit?: string;
 }
 
 export interface SubstituteProduct extends Product {

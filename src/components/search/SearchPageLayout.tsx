@@ -58,6 +58,8 @@ const toComparisonData = (item: ApiSearchMedicine) => {
             savingsPercent: rec.discountPercentage,
             description: recPackLabel,
             image: rec.thumbnailUrl ? { uri: rec.thumbnailUrl } : undefined,
+            packSize: rec.packSize,
+            unit: rec.unit,
         },
     };
 };

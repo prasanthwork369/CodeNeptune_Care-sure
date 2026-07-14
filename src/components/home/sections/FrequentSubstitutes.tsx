@@ -31,6 +31,8 @@ const FrequentItem = React.memo(({ item, onProductPress, disableCart }: { item: 
         discountPercent: item.discountPercent,
         image: item.image,
         requiresPrescription: item.requiresPrescription,
+        packSize: item.packSize,
+        unit: item.unit,
     });
 
     const { slideAnim, opacityAnim } = animations;

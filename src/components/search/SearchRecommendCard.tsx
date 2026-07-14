@@ -45,6 +45,8 @@ export const SearchRecommendCard = React.memo(({
       price: data.price ?? 0,
       originalPrice: data.mrp ?? data.price ?? 0,
       discountPercent: data.discountPercentage ?? 0,
+      packSize: data.packSize,
+      unit: data.unit,
     },
   );
   const { slideAnim, opacityAnim } = animations;

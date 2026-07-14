@@ -61,6 +61,8 @@ export const orderApi = {
                 category: item.category?.name ?? item.category ?? '',
                 orderedTimes: item.orderedTimes ?? item.orderCount ?? item.frequency ?? 0,
                 lastOrdered: item.lastOrdered ?? item.lastOrderedAt ?? undefined,
+                packSize: String(item.packSize ?? ''),
+                unit: item.unit ?? '',
             };
         });
     },

@@ -48,15 +48,17 @@ export const HomeProductCard: React.FC<Props> = React.memo(({
   const { count, increment, decrement, isPending, animations } = useCartActions(
     {
       medicineId: item.id,
-      variantId: null,
+      variantId: item.defaultVariant?.id ?? null,
       productId: item.productId,
       name: item.name,
       slug: item.slug,
-      price: item.price,
-      originalPrice: item.originalPrice,
-      discountPercent: item.discountPercent,
+      price: item.defaultVariant?.sellingPrice ?? item.price,
+      originalPrice: item.defaultVariant?.mrp ?? item.originalPrice,
+      discountPercent: item.defaultVariant?.discountPercent ?? item.discountPercent,
       image: item.image,
       requiresPrescription: item.requiresPrescription,
+      packSize: item.defaultVariant?.packSize ?? item.packSize,
+      unit: item.defaultVariant?.unit ?? item.unit,
     },
   );
 

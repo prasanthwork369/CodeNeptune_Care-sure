@@ -72,6 +72,8 @@ export const useFeaturedMedicines = () => {
       image: med.thumbnailUrl ? { uri: resolveAssetUrl(med.thumbnailUrl) } : null,
       requiresPrescription: med.requiresPrescription,
       defaultVariant,
+      packSize: String(med.packSize ?? ''),
+      unit: med.unit ?? '',
     };
   });
 

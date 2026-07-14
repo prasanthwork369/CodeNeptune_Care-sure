@@ -118,6 +118,8 @@ export const useCategoryProducts = (params: {
         : undefined,
     discountPercent: parseFloat(String(item.discountPercentage)) || 0,
     image: item.thumbnailUrl ? { uri: resolveAssetUrl(item.thumbnailUrl) } : null,
+    packSize: String(item.packSize ?? ''),
+    unit: item.unit ?? '',
   }));
 
   return { products, total: data?.total ?? 0, isLoading, error, refetch };
