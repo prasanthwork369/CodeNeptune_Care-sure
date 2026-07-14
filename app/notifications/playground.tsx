@@ -57,7 +57,7 @@ export default function NotificationPlayground() {
     const triggerAction = async (
         label: string,
         channel: string,
-        action: () => Promise<string | null | undefined>
+        action: () => Promise<any>
     ) => {
         if (isExpoGo) {
             const warning = "Notifee notifications require a native build (Dev Client) and cannot run inside Expo Go.";
@@ -70,7 +70,17 @@ export default function NotificationPlayground() {
         }
 
         try {
-            const returnedId = await action();
+            const builderResult = await action();
+            let returnedId: string | null = null;
+            
+            if (builderResult) {
+                if (typeof builderResult === 'string') {
+                    returnedId = builderResult;
+                } else {
+                    returnedId = await NotificationService.display(builderResult);
+                }
+            }
+
             const id = returnedId || "demo_id";
             const newItem: HistoryItem = {
                 id,
