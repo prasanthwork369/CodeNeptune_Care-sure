@@ -31,4 +31,9 @@ export const INFO_ITEMS = [
   },
   { label: "FAQ", icon: "faq_info", route: "/profile/support/faq" },
   { label: "About App", icon: "info_outline", route: "/profile/about" },
+  {
+    label: "Notification Playground",
+    icon: "notifications",
+    route: "/notifications/playground",
+  },
 ] as const;
