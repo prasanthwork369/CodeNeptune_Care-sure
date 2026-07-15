@@ -10,7 +10,7 @@ import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { format, validate } from "@/src/utils/validation";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useRef, useState } from "react";
@@ -332,40 +332,45 @@ export const MyProfileLayout: React.FC = () => {
         <View style={{ marginTop: 24 }}>
           <View className="bg-white rounded-lg overflow-hidden border border-[#919EAB33]">
             <Touchable onPress={handleDeleteAccount} activeOpacity={0.6}>
-              <View className="flex-row items-center px-4 pt-[14px]">
+              {/* Label and caption share a column so the arrow centres against
+                  the whole block, not just the first line. */}
+              <View className="flex-row items-center px-4 py-[14px]">
+                <View className="flex-1">
+                  <Text
+                    className="font-inter-semibold"
+                    style={{ fontSize: moderateScale(14), color: "#CA2B25" }}
+                  >
+                    Delete Account
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: moderateScale(12),
+                      color: "#6B7280",
+                      lineHeight: moderateScale(18),
+                      paddingTop: 4,
+                    }}
+                  >
+                    Deleting your account will remove all your order, wallet
+                    amount and any active referral
+                  </Text>
+                </View>
                 <View
+                  className="ml-2 items-center justify-center"
                   style={{
-                    width: 24,
-                    height: 24,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    width: exactScale(36),
+                    height: exactScale(36),
+                    borderRadius: exactScale(18),
+                    backgroundColor: "#FFFFFF",
+                    borderWidth: 1,
+                    borderColor: "#919EAB33",
                   }}
                 >
-                  <icons.delete_red width={20} height={20} />
+                  <icons.arrow_forward_gray
+                    width={exactScale(18)}
+                    height={exactScale(18)}
+                  />
                 </View>
-                <Text
-                  className="flex-1 ml-[14px] font-inter-semibold"
-                  style={{ fontSize: moderateScale(14), color: "#CA2B25" }}
-                >
-                  Delete Account
-                </Text>
-                <icons.arrow_forward_gray width={16} height={16} />
               </View>
-              {/* Indent aligns the caption under the label: px-4 (16) + icon (24) + ml-[14px] */}
-              <Text
-                style={{
-                  fontSize: moderateScale(12),
-                  color: "#6B7280",
-                  lineHeight: moderateScale(18),
-                  paddingLeft: 54,
-                  paddingRight: 16,
-                  paddingTop: 4,
-                  paddingBottom: 14,
-                }}
-              >
-                Deleting your account will remove all your order, wallet amount
-                and any active referral
-              </Text>
             </Touchable>
           </View>
         </View>
