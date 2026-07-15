@@ -33,6 +33,16 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# IDE settings — per-developer, not project config
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Local DB exports produced by dev/db_receiver.js
+dev/*.db
+dev/*.json
+
 # local env files
 .env*.local
 
