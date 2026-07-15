@@ -48,12 +48,19 @@ export function useHomeData() {
   useEffect(() => {
     if (!isAuthenticated) return;
     const defaultAddr = pickDefaultAddress(addresses);
-    if (defaultAddr) {
-      const { location, addressId, pincode } = addressToLocation(defaultAddr);
-      setLocation(location, { addressId, pincode });
-    } else {
+    if (!defaultAddr) {
       clearLocation();
+      return;
     }
+    // Only a fallback: a location the user picked must survive an address
+    // refetch. Re-seed it only once their choice is gone (e.g. deleted).
+    const { selectedAddressId } = useLocationStore.getState();
+    const choiceStillExists =
+      !!selectedAddressId && addresses.some((a) => a.id === selectedAddressId);
+    if (choiceStillExists) return;
+
+    const { location, addressId, pincode } = addressToLocation(defaultAddr);
+    setLocation(location, { addressId, pincode });
   }, [addresses, isAuthenticated]);
 
   const onRefresh = async () => {

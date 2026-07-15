@@ -5,8 +5,10 @@ import { profileStyles as s } from '../profile.styles';
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useAuthStore } from "@/src/store/authStore";
+import { useLocationStore } from "@/src/store/locationStore";
 import { icons } from "@/src/constants/icons";
 import { LABELS, LabelType } from "@/src/types/address";
+import { addressToLocation } from "@/src/utils/addressLocation";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
@@ -46,6 +48,7 @@ export const AddAddressLayout: React.FC = () => {
   }>();
   const isEdit = !!id;
   const user = useAuthStore((s) => s.user);
+  const setLocation = useLocationStore((s) => s.setLocation);
   const {
     addresses,
     addAddress,
@@ -183,7 +186,7 @@ export const AddAddressLayout: React.FC = () => {
           isDefault,
         });
       } else {
-        await addAddress({
+        const created = await addAddress({
           label: addressLabel!,
           name: name.trim(),
           phone: mobile.trim(),
@@ -195,13 +198,21 @@ export const AddAddressLayout: React.FC = () => {
           country: "India",
           isDefault,
         });
+
+        const cameFromLocationSheet = !!(
+          from_location_sheet ||
+          prefill_city ||
+          prefill_state ||
+          prefill_pincode
+        );
+        // Coming from the location sheet means the user is picking where to
+        // deliver, so the address they just added becomes the selected one.
+        if (cameFromLocationSheet && created?.id) {
+          const { location, addressId, pincode: addrPincode } =
+            addressToLocation(created);
+          setLocation(location, { addressId, pincode: addrPincode });
+        }
       }
-      const cameFromLocationSheet = !!(
-        from_location_sheet ||
-        prefill_city ||
-        prefill_state ||
-        prefill_pincode
-      );
       router.back();
     } catch (err) {
       if (__DEV__) console.error("[Address Save Error]", err);
