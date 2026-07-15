@@ -4,9 +4,10 @@ import type { Product } from '@/src/types/home';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
-import React, { useCallback } from 'react';
-import { ActivityIndicator, Animated, FlatList, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Animated, FlatList, LayoutChangeEvent, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { HomeProductCardSkeleton } from './HomeProductCardSkeleton';
+import { ViewAllCard } from './ViewAllCard';
 import { styles as s } from './PopularSubstitutes.styles';
 import { exactScale } from "@/src/utils/exactScale";
 
@@ -14,13 +15,16 @@ interface PopularSubstitutesProps {
     products: Product[];
     isLoading?: boolean;
     onProductPress?: (id: string) => void;
+    onViewAll?: () => void;
+    /** Catalogue size from the backend; the subtitle is hidden without it. */
+    totalCount?: number;
 }
 
 const ACCENT = '#0F7635';
 const CONTENT_BG = '#F7FDF9';
 const DISCOUNT_BG = '#E8F5E9';
 
-const ProductCard = React.memo(({ product, cardWidth, onProductPress }: { product: Product; cardWidth: number; onProductPress?: (id: string) => void }) => {
+const ProductCard = React.memo(({ product, cardWidth, onProductPress, onLayout }: { product: Product; cardWidth: number; onProductPress?: (id: string) => void; onLayout?: (e: LayoutChangeEvent) => void }) => {
     // Image area height is tied to card width (so the image proportion matches
     // the design); the details area below it is NOT forced into a matching
     // half-split -- it sizes itself to its actual text/button content instead,
@@ -73,6 +77,7 @@ const ProductCard = React.memo(({ product, cardWidth, onProductPress }: { produc
         <View
             className="bg-white rounded-[12px] overflow-hidden"
             style={{ width: cardWidth, borderWidth: 0.77, borderColor: '#919EAB33' }}
+            onLayout={onLayout}
         >
             {/* Image area — fixed height, tied to card width */}
             <Touchable
@@ -162,17 +167,26 @@ const ProductCard = React.memo(({ product, cardWidth, onProductPress }: { produc
 });
 ProductCard.displayName = 'PopularSubstitutesProductCard';
 
-export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products, isLoading, onProductPress }) => {
+export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products, isLoading, onProductPress, onViewAll, totalCount }) => {
     const { width } = useWindowDimensions();
     const cardWidth = (width - 20 - 14 - 36) / 2;
     const gap = exactScale(14);
+    // Product cards size to their own content (see ProductCard), so there is no
+    // fixed height to copy — measure a real one and match it.
+    const [rowHeight, setRowHeight] = useState(0);
 
     const renderProduct = useCallback(
-        ({ item }: { item: Product }) => (
+        ({ item, index }: { item: Product; index: number }) => (
             <ProductCard
                 product={item}
                 cardWidth={cardWidth}
                 onProductPress={onProductPress}
+                // Measure one real card; the View All card then matches it.
+                onLayout={
+                    index === 0
+                        ? (e) => setRowHeight(e.nativeEvent.layout.height)
+                        : undefined
+                }
             />
         ),
         [cardWidth, onProductPress],
@@ -226,6 +240,21 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
                     directionalLockEnabled
                     contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40) }}
                     ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                    // Sits after the last product so scrolling to the end leads
+                    // into the full catalogue.
+                    ListFooterComponent={
+                        onViewAll && products.length > 0 ? (
+                            <View style={{ marginLeft: gap }}>
+                                <ViewAllCard
+                                    width={cardWidth}
+                                    height={rowHeight}
+                                    accentColor={ACCENT}
+                                    onPress={onViewAll}
+                                    totalCount={totalCount}
+                                />
+                            </View>
+                        ) : null
+                    }
                 />
             )}
         </View>

@@ -11,7 +11,8 @@ import { useResponsiveTier } from "@/src/hooks/ui/useResponsiveTier";
 
 interface CategoryCardsProps {
     cards: CategoryCard[];
-    onCardPress?: (id: string) => void;
+    // Passes the whole card so the handler does not have to look it up again.
+    onCardPress?: (card: CategoryCard) => void;
     isLoading?: boolean;
 }
 
@@ -45,7 +46,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
                 <Touchable
                     key={card.id}
                     activeOpacity={0.5}
-                    onPress={() => onCardPress?.(card.id)}
+                    onPress={() => onCardPress?.(card)}
                     accessibilityRole="button"
                     accessibilityLabel={card.label}
                     style={{ backgroundColor: card.bgColor, width: cardWidth, height: cardHeight, borderRadius: exactScale(10) }}

@@ -217,11 +217,13 @@ export interface ApiProductDetail {
 }
 
 export const medicineApi = {
-  getFeaturedCards: async (): Promise<ApiFeaturedMedicine[]> => {
+  // The endpoint only takes `limit` — it has no paging, so a full listing just
+  // asks for a larger page. Signature matches the web client.
+  getFeaturedCards: async (limit = 10): Promise<ApiFeaturedMedicine[]> => {
     const response = await apiClient.get(
       API_ENDPOINTS.MEDICINES_FEATURED_CARDS,
       {
-        params: { limit: 10 },
+        params: { limit },
       },
     );
     return response.data?.data ?? [];

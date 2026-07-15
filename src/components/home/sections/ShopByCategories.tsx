@@ -8,7 +8,7 @@ import type { CategoryTab, CategoryCard } from '@/src/types/home';
 interface ShopByCategoriesProps {
     tabs: CategoryTab[];
     cards: CategoryCard[];
-    onCardPress: (id: string) => void;
+    onCardPress: (card: CategoryCard) => void;
     isLoading?: boolean;
 }
 

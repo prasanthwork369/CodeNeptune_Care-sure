@@ -14,6 +14,8 @@ import {
   StickySearchHeader,
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
+import { ApiFeaturedSubcategory } from "@/src/api/category.api";
+import type { CategoryCard } from "@/src/types/home";
 import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
@@ -159,20 +161,20 @@ export const HomeLayout: React.FC = () => {
     [router, callSupport, whatsappOrder],
   );
 
+  // Takes the card itself — callers already hold it, so no lookup on press.
   const handleCardPress = useCallback(
-    (id: string) => {
-      const card = cards.find((c) => c.id === id);
+    (card: CategoryCard) => {
       router.push({
         pathname: "/category/[id]",
         params: {
-          id,
-          slug: card?.slug,
-          familySlug: card?.familySlug,
-          name: card?.label.replace("\n", " "),
+          id: card.id,
+          slug: card.slug,
+          familySlug: card.familySlug,
+          name: card.label.replace("\n", " "),
         },
       });
     },
-    [router, cards],
+    [router],
   );
 
   const handleProductPress = useCallback(
@@ -185,6 +187,29 @@ export const HomeLayout: React.FC = () => {
   const handleViewAllFrequent = useCallback(() => {
     router.push("/profile/orders/frequent" as any);
   }, [router]);
+
+  const handleViewAllSubstitutes = useCallback(() => {
+    router.push("/(stack)/featured" as any);
+  }, [router]);
+
+  // Each Health Essentials row is one subcategory. The featured API returns no
+  // parent slug, so match it to a card (cards are subcategories carrying their
+  // familySlug) and reuse the same navigation the category cards already use.
+  const handleViewAllSubcategory = useCallback(
+    (sub: ApiFeaturedSubcategory) => {
+      const card = cards.find((c) => c.id === sub.id || c.slug === sub.slug);
+      if (card) {
+        handleCardPress(card);
+        return;
+      }
+      // Not in the family map — open by slug alone rather than going nowhere.
+      router.push({
+        pathname: "/category/[id]",
+        params: { id: sub.id, slug: sub.slug, name: sub.name },
+      });
+    },
+    [cards, handleCardPress, router],
+  );
 
   const handleScrollStart = useCallback(() => {
     if (feedScrollSettleRef.current) {
@@ -347,6 +372,8 @@ export const HomeLayout: React.FC = () => {
                 products={featuredProducts}
                 isLoading={isFeaturedLoading}
                 onProductPress={handleProductPress}
+                onViewAll={handleViewAllSubstitutes}
+                totalCount={featuredProducts.length}
               />
             </View>
           );
@@ -369,6 +396,7 @@ export const HomeLayout: React.FC = () => {
                 subcategories={featuredSubcategories}
                 isLoading={isSubcategoriesLoading}
                 onProductPress={handleProductPress}
+                onViewAll={handleViewAllSubcategory}
               />
             </View>
           );
@@ -404,6 +432,8 @@ export const HomeLayout: React.FC = () => {
       handleProductPress,
       handleQuickAction,
       handleViewAllFrequent,
+      handleViewAllSubcategory,
+      handleViewAllSubstitutes,
       headerLocation,
       heroHeightShared,
       insets.top,

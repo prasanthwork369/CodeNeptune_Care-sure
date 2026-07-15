@@ -6,24 +6,8 @@ import { formatPackLabel } from "../../utils/packLabel";
 import { resolveAssetUrl } from "../../utils/urls";
 import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 
-export const useFeaturedMedicines = () => {
-  const cachedMed = apiCache.getWithMeta<any[]>('featured_medicines');
-
-  const {
-    data: medicines = [],
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES,
-    queryFn: withSqliteCache('featured_medicines', medicineApi.getFeaturedCards),
-    initialData: () => cachedMed?.data,
-    initialDataUpdatedAt: () => cachedMed?.updatedAt ?? 0,
-    staleTime: 5 * 60_000,
-    refetchInterval: 2 * 60 * 1000,
-  });
-
-  const products: Product[] = medicines.map((med) => {
+// Shared by the home row and the full listing so both show identical pricing.
+export const mapFeaturedMedicine = (med: any): Product => {
     const price = parseFloat(med.price);
     const discountPct = parseFloat(med.discountPercentage);
     const originalPrice =
@@ -72,10 +56,52 @@ export const useFeaturedMedicines = () => {
       image: med.thumbnailUrl ? { uri: resolveAssetUrl(med.thumbnailUrl) } : null,
       requiresPrescription: med.requiresPrescription,
       defaultVariant,
-      packSize: String(med.packSize ?? ''),
-      unit: med.unit ?? '',
-    };
+    packSize: String(med.packSize ?? ''),
+    unit: med.unit ?? '',
+  };
+};
+
+export const useFeaturedMedicines = () => {
+  const cachedMed = apiCache.getWithMeta<any[]>('featured_medicines');
+
+  const {
+    data: medicines = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES,
+    queryFn: withSqliteCache('featured_medicines', () =>
+      medicineApi.getFeaturedCards(),
+    ),
+    initialData: () => cachedMed?.data,
+    initialDataUpdatedAt: () => cachedMed?.updatedAt ?? 0,
+    staleTime: 5 * 60_000,
+    refetchInterval: 2 * 60 * 1000,
   });
+
+  const products: Product[] = medicines.map(mapFeaturedMedicine);
+
+  return { products, isLoading, error, refetch };
+};
+
+/**
+ * Full featured list for the View All page. Kept off the SQLite cache — that
+ * key holds the home row's 10, and a larger page would overwrite it.
+ */
+export const useAllFeaturedMedicines = (limit = 50) => {
+  const {
+    data: medicines = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: [...QUERY_KEYS.CATALOG.FEATURED_MEDICINES, 'all', limit],
+    queryFn: () => medicineApi.getFeaturedCards(limit),
+    staleTime: 5 * 60_000,
+  });
+
+  const products: Product[] = medicines.map(mapFeaturedMedicine);
 
   return { products, isLoading, error, refetch };
 };

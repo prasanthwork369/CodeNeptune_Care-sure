@@ -87,6 +87,8 @@ import add_photo from "../../assets/icons/add_photo.svg";
 import admin_meds from "../../assets/icons/admin_meds.svg";
 import arrow_forward_darkgreen from "../../assets/icons/arrow_forward_darkgreen.svg";
 import arrow_forward_green from "../../assets/icons/arrow_forward_green.svg";
+// Uses fill="currentColor" — tint it with the `color` prop.
+import arrow_right from "../../assets/icons/arrow_right.svg";
 import article from "../../assets/icons/article.svg";
 import business from "../../assets/icons/business.svg";
 import business_light from "../../assets/icons/business_light.svg";
@@ -280,6 +282,7 @@ export const icons = {
     verified_user_outline,
     verified_user_round,
     arrow_forward_green,
+    arrow_right,
     arrow_forward_darkgreen,
     cart_svg,
     account_balance_wallet,

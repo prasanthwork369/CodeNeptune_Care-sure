@@ -5,17 +5,19 @@ import { resolveAssetUrl } from '@/src/utils/urls';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     Animated,
     FlatList,
+    LayoutChangeEvent,
     StyleSheet,
     Text,
     View,
     useWindowDimensions,
 } from 'react-native';
 import { HomeProductCardSkeleton } from './HomeProductCardSkeleton';
+import { ViewAllCard } from './ViewAllCard';
 import { styles as s } from './HealthEssentials.styles';
 import { exactScale } from "@/src/utils/exactScale";
 
@@ -41,12 +43,13 @@ interface ProductCardProps {
     onPress: (productId: string) => void;
     packSize?: string;
     unit?: string;
+    onLayout?: (e: LayoutChangeEvent) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({
     id, productId, name, slug, description, price, mrp,
     discountPercentage, thumbnailUrl, accentColor, cardWidth, onPress,
-    packSize, unit,
+    packSize, unit, onLayout,
 }) => {
     // Image area height is tied to card width; the details area below it
     // sizes itself to its own content instead of a forced half-split (see
@@ -74,6 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         <View
             className="bg-white rounded-[12px] overflow-hidden"
             style={{ width: cardWidth, borderWidth: 0.77, borderColor: '#919EAB33' }}
+            onLayout={onLayout}
         >
             {/* Image area — fixed height, tied to card width */}
             <Touchable
@@ -156,14 +160,17 @@ interface HealthEssentialsSectionProps {
     subcategory: ApiFeaturedSubcategory;
     themeIndex: number;
     onProductPress: (productId: string) => void;
+    onViewAll?: (subcategory: ApiFeaturedSubcategory) => void;
 }
 
-const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subcategory, themeIndex, onProductPress }) => {
+const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subcategory, themeIndex, onProductPress, onViewAll }) => {
     const { width } = useWindowDimensions();
     const meta: ApiFeaturedSubcategoryMetadata | null = subcategory.featuredMetadata;
     const fallback = FALLBACK_THEMES[themeIndex % FALLBACK_THEMES.length];
     const cardWidth = (width - 20 - 14 - 36) / 2;
     const gap = exactScale(14);
+    // Cards size to their own content, so measure a real one to match it.
+    const [rowHeight, setRowHeight] = useState(0);
 
     const gradientStart = meta?.bgGradientStart?.trim() || '#FFFFFF';
     const gradientEnd   = meta?.bgGradientEnd?.trim()   || fallback.gradientEnd;
@@ -174,7 +181,7 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
     const headerImage   = meta?.featuredImageUrl || subcategory.imageUrl;
 
     const renderProduct = useCallback(
-        ({ item: p }: { item: ApiFeaturedSubcategory['products'][number] }) => {
+        ({ item: p, index }: { item: ApiFeaturedSubcategory['products'][number]; index: number }) => {
             const packLabel = formatPackLabel({ packSize: p.packSize, unit: p.unit, dosageForm: p.dosageForm });
             const displayDesc = packLabel || p.description || '';
 
@@ -194,6 +201,8 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
                     onPress={onProductPress}
                     packSize={String(p.packSize ?? '')}
                     unit={p.unit}
+                    // Measure one real card; the View All card then matches it.
+                    onLayout={index === 0 ? (e) => setRowHeight(e.nativeEvent.layout.height) : undefined}
                 />
             );
         },
@@ -244,6 +253,21 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
                         directionalLockEnabled
                         contentContainerStyle={{ paddingLeft: exactScale(20), paddingRight: exactScale(40) }}
                         ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                        // Sits after the last product so scrolling to the end
+                        // leads into this subcategory.
+                        ListFooterComponent={
+                            onViewAll && subcategory.products.length > 0 ? (
+                                <View style={{ marginLeft: gap }}>
+                                    <ViewAllCard
+                                        width={cardWidth}
+                                        height={rowHeight}
+                                        // Same accent the row's product cards use.
+                                        accentColor={lineColor}
+                                        onPress={() => onViewAll(subcategory)}
+                                    />
+                                </View>
+                            ) : null
+                        }
                     />
                 </View>
             </View>
@@ -255,9 +279,10 @@ interface HealthEssentialsProps {
     subcategories: ApiFeaturedSubcategory[];
     isLoading?: boolean;
     onProductPress: (productId: string) => void;
+    onViewAll?: (subcategory: ApiFeaturedSubcategory) => void;
 }
 
-export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ subcategories, isLoading, onProductPress }) => {
+export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ subcategories, isLoading, onProductPress, onViewAll }) => {
     if (isLoading) {
         return <HomeProductCardSkeleton count={3} />;
     }
@@ -272,6 +297,7 @@ export const HealthEssentials: React.FC<HealthEssentialsProps> = React.memo(({ s
                     subcategory={sub}
                     themeIndex={index}
                     onProductPress={onProductPress}
+                    onViewAll={onViewAll}
                 />
             ))}
         </View>
