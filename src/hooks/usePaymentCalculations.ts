@@ -1,6 +1,7 @@
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
+import { orderNotification } from "@/src/services/notifications/orderNotification";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -237,6 +238,20 @@ export function usePaymentCalculations() {
       removeCoupon();
       clearCheckout();
       clearPrescriptionOrder();
+      // Fire-and-forget: a notification failure must never block the success
+      // screen. Logged in dev so a silent failure is still visible.
+      if (order?.id) {
+        orderNotification
+          .showOrderPlaced({
+            orderId: order.id,
+            estimatedDelivery: order.estimatedDelivery,
+            imageUrl: orderItems[0]?.medicineSnapshot?.image,
+            itemCount: orderItems.length,
+          })
+          .catch((e) => {
+            if (__DEV__) console.log("[OrderNotification] failed:", e);
+          });
+      }
       router.replace({
         pathname: "/(stack)/order-success",
         params: { orderId: order?.id ?? "", total: toPay },
