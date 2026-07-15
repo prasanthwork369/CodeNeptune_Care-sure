@@ -20,6 +20,9 @@ import Animated, {
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 
+// Diameter of the prev/next page buttons; also used to centre them vertically.
+const PAGE_BTN = 40;
+
 export const PrescriptionViewerLayout: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
@@ -42,8 +45,15 @@ export const PrescriptionViewerLayout: React.FC = () => {
     }>();
 
   const urls: string[] = imageUrls ? JSON.parse(imageUrls) : [];
-  const currentUrl = urls[0] ?? "";
+  // A prescription can be several files, so the viewer pages through them.
+  const [pageIndex, setPageIndex] = useState(0);
+  const currentUrl = urls[pageIndex] ?? "";
   const isPdf = currentUrl.toLowerCase().endsWith(".pdf");
+  const hasPages = urls.length > 1;
+  // Without a footer the image runs to the screen edge, so the page controls
+  // have to clear the system navigation bar themselves.
+  const hasFooter =
+    (status === "Verified" && !!prescriptionOrderId) || source !== "view_only";
 
   // Zoom shared values
   const scale = useSharedValue(1);
@@ -52,6 +62,18 @@ export const PrescriptionViewerLayout: React.FC = () => {
   const translateY = useSharedValue(0);
   const savedTranslateX = useSharedValue(0);
   const savedTranslateY = useSharedValue(0);
+
+  // Carrying a zoom across pages would land the next file mid-zoom, off-centre.
+  const goToPage = (next: number) => {
+    if (next < 0 || next >= urls.length) return;
+    scale.value = 1;
+    savedScale.value = 1;
+    translateX.value = 0;
+    translateY.value = 0;
+    savedTranslateX.value = 0;
+    savedTranslateY.value = 0;
+    setPageIndex(next);
+  };
 
   const resetZoom = () => {
     "worklet";
@@ -173,6 +195,70 @@ export const PrescriptionViewerLayout: React.FC = () => {
               </Animated.View>
             </GestureDetector>
           ))}
+
+        {/* Page controls — only when the prescription has multiple files. */}
+        {hasPages && (
+          <>
+            {/* Arrows sit level with the middle of the image, like a carousel. */}
+            <Touchable
+              activeOpacity={0.8}
+              disabled={pageIndex === 0}
+              onPress={() => goToPage(pageIndex - 1)}
+              className="absolute items-center justify-center"
+              style={{
+                left: 16,
+                top: containerHeight / 2 - PAGE_BTN / 2,
+                width: PAGE_BTN,
+                height: PAGE_BTN,
+                borderRadius: PAGE_BTN / 2,
+                backgroundColor: "#FFFFFF",
+                opacity: pageIndex === 0 ? 0.35 : 1,
+                borderWidth: 1,
+                borderColor: "#919EAB33",
+              }}
+            >
+              <icons.arrow_back_ios width={14} height={14} fill="#222222" />
+            </Touchable>
+
+            <Touchable
+              activeOpacity={0.8}
+              disabled={pageIndex === urls.length - 1}
+              onPress={() => goToPage(pageIndex + 1)}
+              className="absolute items-center justify-center"
+              style={{
+                right: 16,
+                top: containerHeight / 2 - PAGE_BTN / 2,
+                width: PAGE_BTN,
+                height: PAGE_BTN,
+                borderRadius: PAGE_BTN / 2,
+                backgroundColor: "#FFFFFF",
+                opacity: pageIndex === urls.length - 1 ? 0.35 : 1,
+                borderWidth: 1,
+                borderColor: "#919EAB33",
+              }}
+            >
+              <icons.arrow_forward_ios width={14} height={14} fill="#222222" />
+            </Touchable>
+
+            <View
+              className="absolute self-center"
+              style={{
+                bottom: hasFooter ? 16 : adjustedBottom + 16,
+                backgroundColor: "rgba(0,0,0,0.65)",
+                borderRadius: 12,
+                paddingHorizontal: 12,
+                paddingVertical: 5,
+              }}
+            >
+              <Text
+                className="font-inter-semibold text-white"
+                style={{ fontSize: moderateScale(12) }}
+              >
+                {pageIndex + 1} / {urls.length}
+              </Text>
+            </View>
+          </>
+        )}
       </View>
 
       {/* If the prescription is verified, show a custom inline card to directly compare/order medicines */}
