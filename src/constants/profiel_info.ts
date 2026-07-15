@@ -1,6 +1,6 @@
 export const INFO_ITEMS = [
   { label: "My Profile", icon: "person", route: "/profile/my-profile" },
-  { label: "My Order", icon: "package_icon", route: "/profile/orders" },
+  { label: "My Order", icon: "package_dark", route: "/profile/orders" },
   { label: "Cart", icon: "cart_outline_profile", route: "/(stack)/cart" },
   {
     label: "Frequently Ordered List",
