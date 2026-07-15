@@ -44,6 +44,8 @@ export const RxOrdersLayout: React.FC = () => {
       .trim(),
     doctor: item.doctorName ?? "",
     imageUrls: item.imageUrls ?? [],
+    rejectionReasons: item.ocrData?.rejectionReasons ?? [],
+    reviewNotes: item.reviewNotes ?? null,
   });
 
   return (

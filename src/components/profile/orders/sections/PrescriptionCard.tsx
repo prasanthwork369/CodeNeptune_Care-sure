@@ -1,3 +1,4 @@
+import { PrescriptionRejectedModal } from "@/src/components/prescription/history/sections/PrescriptionRejectedModal";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
 import { CardOptionsMenu } from "@/src/components/ui/CardOptionsMenu";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -23,6 +24,9 @@ export interface Prescription {
   patient: string;
   doctor: string;
   imageUrls: string[];
+  /** One reason per file when rejected; empty otherwise. */
+  rejectionReasons?: string[];
+  reviewNotes?: string | null;
 }
 
 const GradientText: React.FC<{ text: string }> = ({ text }) => {
@@ -158,6 +162,7 @@ export const PrescriptionCard = ({
   const [reminderDate, setReminderDate] = useState<Date | null>(null);
   const [showReminder, setShowReminder] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [showReasons, setShowReasons] = useState(false);
 
   const handleView = () => {
     setShowOptions(false);
@@ -208,6 +213,13 @@ export const PrescriptionCard = ({
   };
 
   const statusStyle = getStatusStyle(item.status);
+  // Per-file reasons when OCR rejected it; otherwise a pharmacist's single note.
+  const reasons = item.rejectionReasons?.length
+    ? item.rejectionReasons
+    : item.reviewNotes?.trim()
+      ? [item.reviewNotes.trim()]
+      : [];
+  const showReason = item.status === "Rejected" && reasons.length > 0;
 
   return (
     <View
@@ -277,66 +289,115 @@ export const PrescriptionCard = ({
             {item.date}
           </Text>
         </View>
-        <View className="flex-row items-center py-2">
-          <icons.person_outline width={17} height={17} fill="#6A6A6A" />
-          <Text
-            className="font-inter-medium ml-2.5"
-            style={[s.labelSm, { color: item.patient ? "#6A6A6A" : "#C0C0C0" }]}
-          >
-            {item.patient || "—"}
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <icons.stethoscope width={16} height={16} fill="#6A6A6A" />
-          <Text
-            className="font-inter-medium ml-2.5"
-            style={[s.labelSm, { color: item.doctor ? "#6A6A6A" : "#C0C0C0" }]}
-          >
-            {item.doctor || "—"}
-          </Text>
-        </View>
+        {/* A rejected prescription was never read, so patient and doctor are
+            always empty — the reason below is all there is to show. */}
+        {!showReason && (
+          <>
+            <View className="flex-row items-center py-2">
+              <icons.person_outline width={17} height={17} fill="#6A6A6A" />
+              <Text
+                className="font-inter-medium ml-2.5"
+                style={[
+                  s.labelSm,
+                  { color: item.patient ? "#6A6A6A" : "#C0C0C0" },
+                ]}
+              >
+                {item.patient || "—"}
+              </Text>
+            </View>
+            <View className="flex-row items-center">
+              <icons.stethoscope width={16} height={16} fill="#6A6A6A" />
+              <Text
+                className="font-inter-medium ml-2.5"
+                style={[
+                  s.labelSm,
+                  { color: item.doctor ? "#6A6A6A" : "#C0C0C0" },
+                ]}
+              >
+                {item.doctor || "—"}
+              </Text>
+            </View>
+          </>
+        )}
       </View>
 
-      <View className="h-px bg-[#919EAB33] mx-4" />
-
-      <View className="flex-row items-center justify-between px-4 py-3.5">
-        <View className="flex-row items-center">
-          <Toggle
-            value={reminder}
-            onToggle={() => {
-              if (!reminder) setShowReminder(true);
-              else setReminder(false);
-            }}
-          />
-          <Text
-            style={s.labelMd}
-            className="font-inter-semibold text-[#222222] ml-3"
-          >
-            Enable Reminder
-          </Text>
-        </View>
+      {showReason && (
         <Touchable
-          activeOpacity={0.85}
-          className="bg-[#0F7635] rounded-md px-5 py-2.5"
-          disabled={!item.prescriptionOrderId}
-          style={{ opacity: item.prescriptionOrderId ? 1 : 0.4 }}
-          onPress={() => {
-            if (item.prescriptionOrderId) {
-              router.push({
-                pathname: "/(prescription)/medicine-comparison",
-                params: {
-                  prescriptionOrderId: item.prescriptionOrderId,
-                  prescriptionId: item.id,
-                },
-              });
-            }
-          }}
+          activeOpacity={0.6}
+          onPress={() => setShowReasons(true)}
+          className="px-4 pb-4"
         >
-          <Text style={s.labelSm} className="font-inter-semibold text-white">
-            Reorder
+          <Text
+            className="font-inter-bold text-[#C22307]"
+            style={{ fontSize: moderateScale(13), letterSpacing: 0.3 }}
+          >
+            CANCELLATION REASON
+          </Text>
+          <Text
+            className="font-inter-medium text-[#222222] mt-1.5"
+            style={{
+              fontSize: moderateScale(14),
+              lineHeight: moderateScale(20),
+            }}
+            // Full text lives in the modal so the card stays a fixed height.
+            numberOfLines={2}
+          >
+            {reasons[0]}
+          </Text>
+          <Text
+            className="font-inter-semibold text-[#C22307] mt-1.5"
+            style={{ fontSize: moderateScale(12) }}
+          >
+            View More
           </Text>
         </Touchable>
-      </View>
+      )}
+
+      {/* Nothing to remind about or reorder once a prescription is rejected. */}
+      {!showReason && (
+        <>
+          <View className="h-px bg-[#919EAB33] mx-4" />
+
+          <View className="flex-row items-center justify-between px-4 py-3.5">
+            <View className="flex-row items-center">
+              <Toggle
+                value={reminder}
+                onToggle={() => {
+                  if (!reminder) setShowReminder(true);
+                  else setReminder(false);
+                }}
+              />
+              <Text
+                style={s.labelMd}
+                className="font-inter-semibold text-[#222222] ml-3"
+              >
+                Enable Reminder
+              </Text>
+            </View>
+            <Touchable
+              activeOpacity={0.85}
+              className="bg-[#0F7635] rounded-md px-5 py-2.5"
+              disabled={!item.prescriptionOrderId}
+              style={{ opacity: item.prescriptionOrderId ? 1 : 0.4 }}
+              onPress={() => {
+                if (item.prescriptionOrderId) {
+                  router.push({
+                    pathname: "/(prescription)/medicine-comparison",
+                    params: {
+                      prescriptionOrderId: item.prescriptionOrderId,
+                      prescriptionId: item.id,
+                    },
+                  });
+                }
+              }}
+            >
+              <Text style={s.labelSm} className="font-inter-semibold text-white">
+                Reorder
+              </Text>
+            </Touchable>
+          </View>
+        </>
+      )}
 
       <ReminderSheet
         isVisible={showReminder}
@@ -345,6 +406,12 @@ export const PrescriptionCard = ({
           setReminderDate(date);
           setReminder(true);
         }}
+      />
+
+      <PrescriptionRejectedModal
+        visible={showReasons}
+        onClose={() => setShowReasons(false)}
+        reasons={reasons}
       />
 
       {showOptions && (

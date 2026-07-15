@@ -63,6 +63,8 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     source: source ?? undefined,
     toPay: toPay ?? undefined,
     prescriptionOrderId: item.prescriptionOrderId ?? null,
+    reviewNotes: item.reviewNotes ?? null,
+    rejectionReasons: item.ocrData?.rejectionReasons ?? [],
   });
 
   const query = search.trim().toLowerCase();

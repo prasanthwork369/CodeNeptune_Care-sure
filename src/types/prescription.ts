@@ -31,7 +31,13 @@ export interface ApiPrescription {
     prescriptionOrderId?: string | null;
     imageUrls?: string[];
     doctorName?: string | null;
-    ocrData?: { patientName?: string } | null;
+    ocrData?: {
+        patientName?: string;
+        /** One reason per uploaded file when automated verification fails. */
+        rejectionReasons?: string[];
+    } | null;
+    /** Why a prescription was rejected — set by automated OCR or a pharmacist. */
+    reviewNotes?: string | null;
     createdAt: string;
     updatedAt?: string;
 }
@@ -70,6 +76,8 @@ export interface PrescriptionHistoryItemData {
     source?: string;
     toPay?: string;
     prescriptionOrderId?: string | null;
+    reviewNotes?: string | null;
+    rejectionReasons?: string[];
 }
 
 export interface PrescriptionHistoryItemProps {

@@ -1,11 +1,12 @@
-import { useNav } from "@/src/hooks/useNav";
 import { Touchable } from "@/src/components/ui/Touchable";
-import React from "react";
-import { Text, View } from "react-native";
-import { Image } from "expo-image";
 import { icons } from "@/src/constants/icons";
+import { useNav } from "@/src/hooks/useNav";
 import { PrescriptionHistoryItemProps } from "@/src/types/prescription";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { Image } from "expo-image";
+import React, { useState } from "react";
+import { Text, View } from "react-native";
+import { PrescriptionRejectedModal } from "./PrescriptionRejectedModal";
 
 const resolveImageSource = (image: any) => {
   if (typeof image === "string") return { uri: image };
@@ -55,11 +56,23 @@ export const PrescriptionHistoryItem: React.FC<
   PrescriptionHistoryItemProps
 > = ({ item }) => {
   const router = useNav();
+  const [showReasons, setShowReasons] = useState(false);
   const statusConfig = getStatusConfig(item.status);
   const StatusIcon = statusConfig.icon;
   const imageSource = resolveImageSource(item.image);
   const pdf = isPdf(item.image);
   const showImage = hasImage(item.image) && !pdf;
+
+  const isRejected = item.status === "Rejected";
+  // Per-file reasons when OCR rejected it; otherwise a pharmacist's single note.
+  const reasons = item.rejectionReasons?.length
+    ? item.rejectionReasons
+    : item.reviewNotes?.trim()
+      ? [item.reviewNotes.trim()]
+      : [];
+  // Prefer the real reason from the reviewer/OCR over the generic fallback.
+  const description = (isRejected && reasons[0]) || statusConfig.description;
+  const canViewMore = isRejected && reasons.length > 0;
 
   const handleView = () => {
     router.push({
@@ -134,9 +147,11 @@ export const PrescriptionHistoryItem: React.FC<
       </View>
 
       {/* Status description */}
-      {!!statusConfig.description && (
+      {!!description && (
         <View
-          className="flex-row items-center mt-4"
+          // Rejected shows wrapped text plus a link, so it aligns to the top;
+          // the single-line statuses sit centred against the icon.
+          className={`flex-row mt-4 ${canViewMore ? "items-start" : "items-center"}`}
           style={{ gap: exactScale(10) }}
         >
           <View
@@ -151,12 +166,36 @@ export const PrescriptionHistoryItem: React.FC<
           >
             <icons.pill_gray width={exactScale(14)} height={exactScale(14)} />
           </View>
-          <Text
-            className="font-inter-medium text-[#4A4A4A] flex-1"
-            style={{ fontSize: moderateScale(13) }}
+          {/* The reason text and the link both open the modal. */}
+          <Touchable
+            className="flex-1"
+            activeOpacity={canViewMore ? 0.6 : 1}
+            disabled={!canViewMore}
+            onPress={canViewMore ? () => setShowReasons(true) : undefined}
           >
-            {statusConfig.description}
-          </Text>
+            <Text
+              className="font-inter-medium text-[#4A4A4A]"
+              style={{
+                fontSize: moderateScale(13),
+                lineHeight: moderateScale(16),
+              }}
+              // Reasons can be long; the full text lives in the modal.
+              numberOfLines={isRejected ? 2 : undefined}
+            >
+              {description}
+            </Text>
+            {canViewMore && (
+              <Text
+                className="font-inter-semibold text-[#C22307]"
+                style={{
+                  fontSize: moderateScale(12),
+                  marginTop: exactScale(4),
+                }}
+              >
+                View More
+              </Text>
+            )}
+          </Touchable>
         </View>
       )}
 
@@ -198,6 +237,12 @@ export const PrescriptionHistoryItem: React.FC<
       >
         Uploaded on {item.uploadedDate}
       </Text>
+
+      <PrescriptionRejectedModal
+        visible={showReasons}
+        onClose={() => setShowReasons(false)}
+        reasons={reasons}
+      />
     </View>
   );
 };
