@@ -39,10 +39,6 @@ yarn-error.*
 !.vscode/settings.json
 !.vscode/extensions.json
 
-# Local DB exports produced by dev/db_receiver.js
-dev/*.db
-dev/*.json
-
 # local env files
 .env*.local
 
