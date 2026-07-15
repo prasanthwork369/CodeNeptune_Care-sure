@@ -550,3 +550,5 @@ const SafeInput = React.forwardRef<React.ElementRef<typeof BottomSheetTextInput>
     );
   }
 );
+
+SafeInput.displayName = "SafeInput";

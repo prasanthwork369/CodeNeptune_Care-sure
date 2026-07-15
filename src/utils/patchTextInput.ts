@@ -1,4 +1,6 @@
 import React from "react";
+// Patches RN internals, so it needs the raw module.
+// eslint-disable-next-line no-restricted-imports
 import * as RN from "react-native";
 // Deep import: same technique as patchText.ts — resolves to the real,
 // unpatched TextInput component instead of looping back into this file.

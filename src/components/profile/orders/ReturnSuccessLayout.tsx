@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Touchable } from '@/src/components/ui/Touchable';
+import { useNav } from '@/src/hooks/useNav';
 import { icons } from '@/src/constants/icons';
 import { moderateScale, exactScale, verticalScale } from '@/src/utils/exactScale';
 import { useAdjustedBottomInset } from '@/src/hooks/ui/useBottomInset';
@@ -9,7 +10,7 @@ import { typography } from '@/src/constants/typography';
 import { colors } from '@/src/constants/theme';
 
 export function ReturnSuccessLayout() {
-  const router = useRouter();
+  const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
 
   return (
@@ -57,7 +58,7 @@ export function ReturnSuccessLayout() {
               paddingHorizontal: exactScale(16),
             }}
           >
-            We've Received Your Return Request And{'\n'}Will Notify You Once It's Approved
+            We&apos;ve Received Your Return Request And{'\n'}Will Notify You Once It&apos;s Approved
           </Text>
         </View>
 
@@ -140,7 +141,7 @@ export function ReturnSuccessLayout() {
               marginBottom: verticalScale(24),
             }}
           >
-            What's Next
+            What&apos;s Next
           </Text>
 
           {/* Timeline Wrapper */}
@@ -250,7 +251,7 @@ export function ReturnSuccessLayout() {
           backgroundColor: '#F8F9FB', // Matches screen background
         }}
       >
-        <TouchableOpacity
+        <Touchable
           onPress={() => router.replace('/(tabs)' as any)}
           style={{
             backgroundColor: colors.primary,
@@ -263,7 +264,7 @@ export function ReturnSuccessLayout() {
           <Text style={{ color: colors.white, fontSize: moderateScale(16), fontWeight: '600' }}>
             Go Home
           </Text>
-        </TouchableOpacity>
+        </Touchable>
       </View>
     </SafeAreaView>
   );

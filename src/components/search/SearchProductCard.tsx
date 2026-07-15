@@ -199,3 +199,5 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
         </Touchable>
     );
 });
+
+SearchProductCard.displayName = "SearchProductCard";

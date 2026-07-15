@@ -355,7 +355,7 @@ export const ReturnProductLayout: React.FC = () => {
             style={s.labelSm}
             className="font-inter-medium text-brand-subtext text-center"
           >
-            We couldn't load the order details for this return request.
+            We couldn&apos;t load the order details for this return request.
           </Text>
         </View>
       </View>

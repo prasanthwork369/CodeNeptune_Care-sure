@@ -231,3 +231,5 @@ export const SearchRecommendCard = React.memo(({
     </Touchable>
   );
 });
+
+SearchRecommendCard.displayName = "SearchRecommendCard";

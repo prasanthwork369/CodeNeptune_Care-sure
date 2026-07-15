@@ -1,4 +1,6 @@
 import React from "react";
+// Patches RN internals, so it needs the raw module.
+// eslint-disable-next-line no-restricted-imports
 import * as RN from "react-native";
 // Deep import: the metro resolver special-cases requests originating from this file
 // so this resolves to the real, unpatched Text component instead of looping back here.
