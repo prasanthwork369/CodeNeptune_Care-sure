@@ -7,16 +7,22 @@ import { useEffect, useState } from "react";
 // inactive before they tap Apply. Returns the set of codes that failed.
 export function useCouponAvailability(coupons: Coupon[], subtotal: number) {
   const [unavailable, setUnavailable] = useState<Set<string>>(new Set());
-  const [checking, setChecking] = useState(false);
+  const [checkedKey, setCheckedKey] = useState<string | null>(null);
+
+  // Identifies which coupons+subtotal the current result belongs to.
+  const key = `${coupons.map((c) => c.code).join(",")}|${subtotal}`;
+
+  // Derived during render, so the list never flashes as available before the check.
+  const checking = coupons.length > 0 && checkedKey !== key;
 
   useEffect(() => {
     if (coupons.length === 0) {
       setUnavailable(new Set());
+      setCheckedKey(key);
       return;
     }
 
     let cancelled = false;
-    setChecking(true);
 
     Promise.all(
       coupons.map(async (c) => {
@@ -31,13 +37,13 @@ export function useCouponAvailability(coupons: Coupon[], subtotal: number) {
     ).then((results) => {
       if (cancelled) return;
       setUnavailable(new Set(results.filter((r) => !r.ok).map((r) => r.code)));
-      setChecking(false);
+      setCheckedKey(key);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [coupons, subtotal]);
+  }, [coupons, subtotal, key]);
 
   return { unavailable, checking };
 }
