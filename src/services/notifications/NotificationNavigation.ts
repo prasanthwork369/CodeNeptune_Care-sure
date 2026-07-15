@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { Linking, Platform } from 'react-native';
-import { NotificationPayload, NotificationType } from '../types/notification';
-import { useAuthStore } from '../store/authStore';
-import { useNotificationNavigationStore } from '../store/notificationNavigationStore';
+import { NotificationPayload, NotificationType } from '../../types/notification';
+import { useAuthStore } from '../../store/authStore';
+import { useNotificationNavigationStore } from '../../store/notificationNavigationStore';
 
 const ANDROID_PACKAGE = 'com.codeneptune.caresure';
 

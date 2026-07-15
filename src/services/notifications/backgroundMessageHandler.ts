@@ -1,4 +1,4 @@
-import { isExpoGo } from '../utils/environment';
+import { isExpoGo } from '../../utils/environment';
 
 /**
  * Registers the Firebase background/quit-state message handler.

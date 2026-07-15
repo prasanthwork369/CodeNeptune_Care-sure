@@ -1,5 +1,5 @@
 import { locationService } from "@/src/services/location.service";
-import { notificationService } from "@/src/services/notification.service";
+import { notificationService } from "@/src/services/notifications/notification.service";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { isExpoGo } from "@/src/utils/environment";

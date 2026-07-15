@@ -2,7 +2,7 @@ import { authApi } from "../api/auth.api";
 import { profileApi } from "../api/profile.api";
 import { tokenStorage } from "../lib/storage";
 import { useAuthStore } from "../store/authStore";
-import { notificationService } from "./notification.service";
+import { notificationService } from "./notifications/notification.service";
 import { getDeviceInfo } from "../lib/deviceInfo";
 
 export const authService = {

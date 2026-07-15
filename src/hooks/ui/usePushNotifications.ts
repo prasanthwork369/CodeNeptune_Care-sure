@@ -4,9 +4,9 @@ import { useRootNavigationState } from "expo-router";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
-import { notificationService } from "../../services/notification.service";
-import { notifeeService } from "../../services/notifeeService";
-import { NotificationNavigation } from "../../services/NotificationNavigation";
+import { notificationService } from "../../services/notifications/notification.service";
+import { notifeeService } from "../../services/notifications/notifeeService";
+import { NotificationNavigation } from "../../services/notifications/NotificationNavigation";
 import { useAuthStore } from "../../store/authStore";
 import { useNotificationStore } from "../../store/notificationStore";
 import {

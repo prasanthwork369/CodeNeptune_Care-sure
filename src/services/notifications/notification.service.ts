@@ -3,10 +3,10 @@ import type FirebaseMessaging from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { notificationApi } from "../api/notification.api";
-import { NOTIFICATION_CHANNELS } from "../constants/notificationChannels";
-import { getDeviceInfo } from "../lib/deviceInfo";
-import { isExpoGo } from "../utils/environment";
+import { notificationApi } from "../../api/notification.api";
+import { NOTIFICATION_CHANNELS } from "../../constants/notificationChannels";
+import { getDeviceInfo } from "../../lib/deviceInfo";
+import { isExpoGo } from "../../utils/environment";
 
 // Single composite cache key holding `${token}:${isAuthenticated}`. Storing one
 // value (instead of token + auth separately) makes the write atomic — the app

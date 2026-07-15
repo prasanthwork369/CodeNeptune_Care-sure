@@ -2,7 +2,7 @@ import { cartApi } from "@/src/api/cart.api";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { NotificationNavigation } from "@/src/services/NotificationNavigation";
+import { NotificationNavigation } from "@/src/services/notifications/NotificationNavigation";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
 import { isExpoGo } from "@/src/utils/environment";

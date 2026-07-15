@@ -1,6 +1,7 @@
-import { NOTIFICATION_CHANNELS } from "../constants/notificationChannels";
-import { NotificationData } from "../types/notification";
-import { isExpoGo } from "../utils/environment";
+import { NOTIFICATION_CHANNELS } from "../../constants/notificationChannels";
+import { NotificationData } from "../../types/notification";
+import { isExpoGo } from "../../utils/environment";
+import { handleNotificationAction } from "./notificationActions";
 
 // CareSure branded notification visuals. `notification_icon` is the white
 // silhouette drawable the expo-notifications plugin generates from
@@ -10,7 +11,7 @@ const SMALL_ICON = "notification_icon";
 // Large icon = the filled green-gradient tile (white logo on a gradient), so it
 // reads big and branded in the shade like other apps' notifications, rather than
 // a small floating mark.
-const LARGE_ICON = require("../../assets/images/notification-tile.png");
+const LARGE_ICON = require("../../../assets/images/notification-tile.png");
 
 // notifee is a native module (absent in Expo Go) — lazy-require after the guard,
 // mirroring how firebase messaging is loaded elsewhere.
@@ -120,10 +121,28 @@ export const notifeeService = {
     const notifee = getNotifee().default;
     const { EventType } = getNotifee();
     return notifee.onForegroundEvent(
-      ({ type, detail }: { type: number; detail: { notification?: any } }) => {
-        if (type !== EventType.PRESS) return;
+      ({
+        type,
+        detail,
+      }: {
+        type: number;
+        detail: { notification?: any; pressAction?: { id: string } };
+      }) => {
         const n = detail.notification;
         if (!n) return;
+
+        // A button whose pressAction is "default" means "open the app here" —
+        // route it like a tap. Any other id is a real action.
+        if (type === EventType.ACTION_PRESS) {
+          const actionId = detail.pressAction?.id;
+          if (actionId && actionId !== "default") {
+            handleNotificationAction(actionId, n.id, n.data);
+            return;
+          }
+        } else if (type !== EventType.PRESS) {
+          return;
+        }
+
         const data = (n.data ?? {}) as NotificationData;
         const tapId =
           data["google.message_id"] || n.id || String(Date.now());
