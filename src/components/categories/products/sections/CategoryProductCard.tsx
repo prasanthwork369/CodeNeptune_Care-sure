@@ -148,7 +148,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
               {isPending ? (
                 <ActivityIndicator size="small" color="#0F7635" />
               ) : (
-                <Text style={s.addText}>Add.</Text>
+                <Text style={s.addText}>Add</Text>
               )}
             </Touchable>
           ) : (
