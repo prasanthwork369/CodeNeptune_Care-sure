@@ -1,57 +1,42 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { Touchable } from "@/src/components/ui/Touchable";
+import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/hooks/queries/useCart";
-import { useOrders } from "@/src/hooks/queries/useOrders";
-import { Order, OrderTabKey } from "@/src/types/order";
-import { FlashList } from "@shopify/flash-list";
-import React, { useCallback, useRef, useState } from "react";
-import { RefreshControl, Text, View } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { MyOrdersSkeleton } from "./MyOrdersSkeleton";
+import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
+import { OrderTabKey } from "@/src/types/order";
+import React, { useRef } from "react";
+import { View } from "react-native";
+import Animated from "react-native-reanimated";
 import { orderStyles as s } from "./orders.styles";
-import { OrderCard } from "./sections/OrderCard";
+import { OrdersPage } from "./sections/OrdersPage";
 
-const TABS: { key: OrderTabKey; label: string }[] = [
-  { key: "all", label: "All Orders" },
-  { key: "delivered", label: "Delivered" },
-  { key: "cancelled", label: "Cancelled" },
+const TABS: {
+  key: OrderTabKey;
+  label: string;
+  params: Record<string, string>;
+}[] = [
+  { key: "all", label: "All Orders", params: {} },
+  { key: "delivered", label: "Delivered", params: { status: "7" } },
+  { key: "cancelled", label: "Cancelled", params: { status: "0" } },
 ];
 
+const TAB_KEYS = TABS.map((t) => t.key);
+
 export const MyOrdersLayout: React.FC = () => {
-  const adjustedBottom = useAdjustedBottomInset();
-  const [activeTab, setActiveTab] = useState<OrderTabKey>("all");
-
-  const statusParam =
-    activeTab === "delivered"
-      ? { status: "7" }
-      : activeTab === "cancelled"
-        ? { status: "0" }
-        : {};
-
   const {
-    orders: filtered,
-    loading,
-    refreshing,
-    refetch,
-  } = useOrders(statusParam);
+    scrollRef,
+    scrollHandler,
+    progress,
+    pageWidth,
+    setPageWidth,
+    activeKey,
+    visitedKeys,
+    goToTab,
+  } = usePagerTabs(TAB_KEYS);
 
+  // One cart subscription for every page, so a cart change re-renders once.
   const { items: cartItems, addItem, updateItem, clearCart } = useCart();
   const cartItemsRef = useRef(cartItems);
   cartItemsRef.current = cartItems;
-
-  const renderItem = useCallback(
-    ({ item }: { item: Order }) => (
-      <OrderCard
-        order={item}
-        cartItemsRef={cartItemsRef}
-        addItem={addItem}
-        updateItem={updateItem}
-        clearCart={clearCart}
-      />
-    ),
-    [addItem, updateItem, clearCart],
-  );
-  const keyExtractor = useCallback((item: Order) => item.id, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
@@ -61,114 +46,48 @@ export const MyOrdersLayout: React.FC = () => {
         backgroundColor="#FFFFFF"
       />
 
-      {/* Tabs */}
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "#fff",
-          borderBottomWidth: 1,
-          borderBottomColor: "#EEEFF1",
-        }}
-      >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
-            <Touchable
-              key={tab.key}
-              onPress={() => setActiveTab(tab.key)}
-              activeOpacity={0.7}
-              style={{ flex: 1, alignItems: "center", paddingVertical: 14 }}
-            >
-              <Text
-                style={[
-                  s.labelMd,
-                  {
-                    fontWeight: isActive ? "700" : "500",
-                    color: isActive ? "#0F7635" : "#6A6A6A",
-                  },
-                ]}
-              >
-                {tab.label}
-              </Text>
-              {isActive && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 4,
-                    backgroundColor: "#0F7635",
-                    borderTopLeftRadius: 4,
-                    borderTopRightRadius: 4,
-                  }}
-                />
-              )}
-            </Touchable>
-          );
-        })}
-      </View>
+      <SlidingTabs
+        tabs={TABS}
+        activeKey={activeKey}
+        onTabPress={goToTab}
+        labelStyle={s.labelMd}
+        progress={progress}
+      />
 
-      {loading ? (
-        <MyOrdersSkeleton />
-      ) : (
-        <FlashList
-          data={filtered}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          drawDistance={300}
-          overrideProps={{ initialDrawBatchSize: 8 }}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingTop: 12,
-            paddingBottom: adjustedBottom + 24,
-          }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={refetch}
-              colors={["#0F7635"]}
-              tintColor="#0F7635"
-            />
-          }
-          ListEmptyComponent={
-            <View
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingTop: 60,
-              }}
-            >
-              <Text
-                style={[
-                  s.labelLg,
-                  {
-                    fontWeight: "600",
-                    color: "#6A6A6A",
-                  },
-                ]}
-              >
-                No orders found
-              </Text>
-              <Text
-                style={[
-                  s.labelSm,
-                  {
-                    fontWeight: "400",
-                    color: "#6A6A6A",
-                    marginTop: 6,
-                  },
-                ]}
-              >
-                {activeTab === "all"
-                  ? "Your orders will appear here"
-                  : `No ${activeTab} orders yet`}
-              </Text>
-            </View>
-          }
-        />
-      )}
+      <View
+        style={{ flex: 1 }}
+        onLayout={(e) => setPageWidth(e.nativeEvent.layout.width)}
+      >
+        {pageWidth > 0 && (
+          <Animated.ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
+            // Keeps each page pinned to the viewport width.
+            decelerationRate="fast"
+          >
+            {TABS.map((tab) =>
+              visitedKeys.includes(tab.key) ? (
+                <OrdersPage
+                  key={tab.key}
+                  tabKey={tab.key}
+                  params={tab.params}
+                  width={pageWidth}
+                  cartItemsRef={cartItemsRef}
+                  addItem={addItem}
+                  updateItem={updateItem}
+                  clearCart={clearCart}
+                />
+              ) : (
+                <View key={tab.key} style={{ width: pageWidth }} />
+              ),
+            )}
+          </Animated.ScrollView>
+        )}
+      </View>
     </View>
   );
 };

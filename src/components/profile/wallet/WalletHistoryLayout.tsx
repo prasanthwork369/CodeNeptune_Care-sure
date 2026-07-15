@@ -1,190 +1,92 @@
 import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
-import { HOME_IMAGES } from '@/src/constants/images';
+import { SlidingTabs } from '@/src/components/ui/SlidingTabs';
 import { useInfiniteWalletLogs } from '@/src/hooks/queries/useWallet';
-import { Transaction, TxIconType, WalletLog } from '@/src/types/wallet';
-import React, { useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
+import { usePagerTabs } from '@/src/hooks/ui/usePagerTabs';
+import React from 'react';
+import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { Touchable } from '@/src/components/ui/Touchable';
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
+import { WalletHistoryPage } from './sections/WalletHistoryPage';
+import {
+    filterTransactions,
+    logToTransactions,
+    WalletTabKey,
+} from './walletHistory.helpers';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+const TABS: { key: WalletTabKey; label: string }[] = [
+    { key: 'All', label: 'All' },
+    { key: 'Debited', label: 'Debited' },
+    { key: 'Credited', label: 'Credited' },
+];
 
-const MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function formatDate(iso: string): string {
-    const d = new Date(iso);
-    return `${String(d.getDate()).padStart(2,'0')} ${MONTH[d.getMonth()]} ${d.getFullYear()}, ${d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
-}
-
-const TITLE_MAP: Record<string, string> = {
-    signup_bonus:      'Welcome Bonus',
-    order_purchase:    'Medicine Purchase',
-    order_refund:      'Refund Received',
-    admin_adjustment:  'Wallet Adjustment',
-    wallet_topup:      'Added to Wallet',
-};
-
-function logToTransactions(log: WalletLog): Transaction[] {
-    const isCredit  = log.type === 'credit';
-    const walletAmt = Number(log.walletAmount);
-    const coinsAmt  = Number(log.coinsAmount);
-    const title     = log.description ?? TITLE_MAP[log.referenceType] ?? 'Transaction';
-    const date      = formatDate(log.createdAt);
-    const results: Transaction[] = [];
-
-    if (walletAmt > 0) {
-        results.push({
-            id:          `${log.id}_wallet`,
-            iconType:    log.referenceType === 'wallet_topup' ? 'cash' : isCredit ? 'plus' : 'bag',
-            title,
-            date,
-            amount:      `${isCredit ? '+' : '-'}₹${walletAmt.toFixed(0)}`,
-            amountColor: isCredit ? '#0F9D58' : '#222222',
-            isCoin:      false,
-        });
-    }
-
-    if (coinsAmt > 0) {
-        results.push({
-            id:          `${log.id}_coins`,
-            iconType:    (isCredit || log.referenceType === 'signup_bonus') ? 'coin_credit' : 'coin_debit',
-            title,
-            date,
-            amount:      `${(isCredit || log.referenceType === 'signup_bonus') ? '+' : '-'}${coinsAmt}`,
-            amountColor: (isCredit || log.referenceType === 'signup_bonus') ? '#F59E0B' : '#222222',
-            isCoin:      true,
-        });
-    }
-
-    return results;
-}
-
-// ─── Icon ─────────────────────────────────────────────────────────────────────
-
-const TransactionIcon = ({ type }: { type: TxIconType }) => {
-    const isCredit = type === 'plus' || type === 'coin_credit' || type === 'cash';
-    const src =
-        type === 'coin_credit' ? HOME_IMAGES.coinCredit :
-        type === 'coin_debit'  ? HOME_IMAGES.coinDebit  :
-        isCredit               ? HOME_IMAGES.accountBalanceCredit :
-                                 HOME_IMAGES.accountBalanceDebit;
-    return (
-        <View style={{ width: exactScale(44), height: exactScale(44), borderRadius: 22, backgroundColor: isCredit ? '#DFF3E6' : '#FCE8E8', alignItems: 'center', justifyContent: 'center' }}>
-            <Image source={src} style={{ width: 26, height: 26 }} resizeMode="contain" />
-        </View>
-    );
-};
-
-// ─── Row ──────────────────────────────────────────────────────────────────────
-
-const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({ tx, isLast }) => (
-    <View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: exactScale(20), paddingVertical: exactScale(14) }}>
-            <TransactionIcon type={tx.iconType} />
-            <View style={{ flex: 1, marginLeft: exactScale(14) }}>
-                <Text style={{ fontSize: moderateScale(14), fontWeight: '600', color: '#111827' }}>{tx.title}</Text>
-                <Text style={{ fontSize: moderateScale(12), color: '#6B7280', marginTop: exactScale(2) }}>{tx.date}</Text>
-            </View>
-            {tx.isCoin ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Image source={HOME_IMAGES.dollarCoins} style={{ width: 16, height: 16 }} resizeMode="contain" />
-                    <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
-                </View>
-            ) : (
-                <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: tx.amountColor }}>{tx.amount}</Text>
-            )}
-        </View>
-        {!isLast && <View style={{ height: 1, backgroundColor: '#F3F4F6', marginHorizontal: exactScale(20) }} />}
-    </View>
-);
-
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
-
-const TABS = ['All', 'Debited', 'Credited'] as const;
-type Tab = typeof TABS[number];
-
-// ─── Layout ───────────────────────────────────────────────────────────────────
+const TAB_KEYS = TABS.map((t) => t.key);
 
 export const WalletHistoryLayout: React.FC = () => {
     const adjustedBottom = useAdjustedBottomInset();
-    const [activeTab, setActiveTab] = useState<Tab>('All');
-    const { logs, loading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteWalletLogs();
+    const {
+        scrollRef,
+        scrollHandler,
+        progress,
+        pageWidth,
+        setPageWidth,
+        activeKey,
+        goToTab,
+    } = usePagerTabs(TAB_KEYS);
+
+    // One query for every page — tabs only filter what is already fetched.
+    const { logs, loading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useInfiniteWalletLogs();
 
     const all = logs.flatMap(logToTransactions);
-    const filtered = activeTab === 'All'
-        ? all
-        : activeTab === 'Debited'
-        ? all.filter(tx => tx.amount.startsWith('-'))
-        : all.filter(tx => tx.amount.startsWith('+'));
+
+    const loadMore = () => {
+        if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+    };
 
     return (
         <View style={{ flex: 1, backgroundColor: '#F5F6FB' }}>
             <ScreenHeader title="Transaction History" backgroundColor="#FFFFFF" showBorder />
 
-            {/* Tabs */}
-            <View style={{ flexDirection: 'row', backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' }}>
-                {TABS.map(tab => (
-                    <Touchable
-                        key={tab}
-                        onPress={() => setActiveTab(tab)}
-                        activeOpacity={0.8}
-                        style={{ flex: 1, alignItems: 'center', paddingVertical: exactScale(12) }}
-                    >
-                        <Text style={{
-                            fontSize: moderateScale(14),
-                            fontWeight: activeTab === tab ? '700' : '500',
-                            color: activeTab === tab ? '#0F7635' : '#6B7280',
-                        }}>
-                            {tab}
-                        </Text>
-                        {activeTab === tab && (
-                            <View
-                            style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 4,
-                    backgroundColor: "#0F7635",
-                    borderTopLeftRadius: 4,
-                    borderTopRightRadius: 4,
-                    marginHorizontal: exactScale(20),
-                  }}
-                              />
-                        )}
-                    </Touchable>
-                ))}
-            </View>
+            <SlidingTabs
+                tabs={TABS}
+                activeKey={activeKey}
+                onTabPress={goToTab}
+                progress={progress}
+                indicatorInset={exactScale(20)}
+                borderColor="#E5E7EB"
+                inactiveColor="#6B7280"
+                paddingVertical={exactScale(12)}
+            />
 
-            {/* List */}
-            {loading ? (
-                <ActivityIndicator color="#0F7635" style={{ marginTop: exactScale(40) }} />
-            ) : filtered.length === 0 ? (
-                <Text style={{ textAlign: 'center', color: '#9CA3AF', fontWeight: '500', fontSize: moderateScale(14), marginTop: 40 }}>
-                    No transactions
-                </Text>
-            ) : (
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: adjustedBottom + 24, backgroundColor: '#FFFFFF' }}
-                    onScroll={({ nativeEvent }) => {
-                        const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
-                        const reachedEnd = contentOffset.y + layoutMeasurement.height >= contentSize.height - 100;
-                        if (reachedEnd && hasNextPage && !isFetchingNextPage) {
-                            fetchNextPage();
-                        }
-                    }}
-                    scrollEventThrottle={200}
-                >
-                    {filtered.map((tx, idx) => (
-                        <TxRow key={tx.id} tx={tx} isLast={idx === filtered.length - 1} />
-                    ))}
-                    {isFetchingNextPage && (
-                        <ActivityIndicator color="#0F7635" style={{ paddingVertical: exactScale(16) }} />
-                    )}
-                </ScrollView>
-            )}
+            <View
+                style={{ flex: 1 }}
+                onLayout={(e) => setPageWidth(e.nativeEvent.layout.width)}
+            >
+                {pageWidth > 0 && (
+                    <Animated.ScrollView
+                        ref={scrollRef}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        onScroll={scrollHandler}
+                        scrollEventThrottle={16}
+                        decelerationRate="fast"
+                    >
+                        {TABS.map((tab) => (
+                            <WalletHistoryPage
+                                key={tab.key}
+                                transactions={filterTransactions(all, tab.key)}
+                                width={pageWidth}
+                                loading={loading}
+                                isFetchingNextPage={isFetchingNextPage}
+                                paddingBottom={adjustedBottom + 24}
+                                onEndReached={loadMore}
+                            />
+                        ))}
+                    </Animated.ScrollView>
+                )}
+            </View>
         </View>
     );
 };
