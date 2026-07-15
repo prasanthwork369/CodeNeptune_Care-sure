@@ -111,7 +111,7 @@ export const HOME_IMAGES = {
   splashIcon: require("../../assets/images/splash-icon.png"),
 
   // Delete Account
-  deleteAccount: require("../../assets/images/delete-account.png"),
+  deleteAccount: require("../../assets/images/icons/delete-account.png"),
 } as const;
 
 export const UPLOAD_IMAGES = {
