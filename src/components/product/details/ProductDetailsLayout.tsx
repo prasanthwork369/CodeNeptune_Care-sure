@@ -172,6 +172,8 @@ export const ProductDetailsLayout: React.FC = () => {
               title={medicineName}
               onBack={handleBack}
               productId={id}
+              productType={product?.productType}
+              slug={product?.slug}
               packLabel={activeProduct?.packLabel}
               price={activeProduct?.price}
               manufacturer={manufacturer}

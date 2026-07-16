@@ -30,6 +30,12 @@ export const useProduct = (productId: string) => {
     const product = data ? {
         name: data.name,
         slug: data.slug,
+        // For the canonical /{productType}/{slug}/{id} share URL. The detail
+        // endpoint exposes `sourceType`, not `productType`; when it matches the
+        // web's 1/2/3 codes the URL gets the right category, and productWebUrl
+        // falls back to "medicines" otherwise — which still resolves, since the
+        // web PDP fetches by id and only needs a valid type slug.
+        productType: data.sourceType,
         requiresPrescription: data.requiresPrescription,
         manufacturer: data.manufacturer?.name ?? data.brand?.name ?? '',
         brandName: data.brand?.name ?? '',

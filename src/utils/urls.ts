@@ -15,6 +15,16 @@ if (!resolvedBaseUrl) {
 export const API_BASE_URL = resolvedBaseUrl;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
+// The public web/store origin used to build shareable product links. Driven by
+// the SAME LIVE flag as the API so a production build can never ship QA links.
+// Falls back to the QA host when the env var is unset (keeps dev zero-config) —
+// but production MUST set EXPO_PUBLIC_WEB_BASE_URL_PROD before launch, or shares
+// will still point at QA.
+const PROD_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD;
+const QA_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_QA;
+export const WEB_BASE_URL =
+  (LIVE ? PROD_WEB_URL : QA_WEB_URL) ?? "https://qa-caresure.codeneptune.com";
+
 /** Prefixes a relative backend path (e.g. "/uploads/icon.png") with the API base URL. */
 export const resolveAssetUrl = (path: string) =>
   path.startsWith("http") ? path : `${API_BASE_URL}${path}`;

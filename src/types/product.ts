@@ -6,6 +6,9 @@ export interface ProductDetailsHeaderProps {
   showBorder?: boolean;
   onBack?: () => void;
   productId?: string;
+  // Carried through so the share link matches the web's /{productType}/{slug}/{id} route.
+  productType?: number;
+  slug?: string;
   packLabel?: string;
   price?: number;
   manufacturer?: string;

@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { productAppUrl, productWebUrl } from "@/src/constants/urls";
+import { productWebUrl } from "@/src/constants/urls";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { colors } from "@/src/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
@@ -16,6 +16,8 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
   showBorder = true,
   onBack,
   productId,
+  productType,
+  slug,
   packLabel,
   price,
   manufacturer,
@@ -40,7 +42,11 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
         if (manufacturer) details.push(`Manufacturer: ${manufacturer}`);
 
         const detailsText = details.length > 0 ? `\n${details.join("\n")}` : "";
-        message = `💊 *${title}* on CareSure\n${detailsText}\n\nWeb: ${productWebUrl(productId)}\nApp: ${productAppUrl(productId)}`;
+        // One https link only. Messaging apps linkify http(s) but not custom
+        // schemes, so a caresure:// line would render as unpressable grey text.
+        // Once App Links are verified this URL opens the app; until then it opens
+        // the web — one link handles both, which is the point of App Links.
+        message = `💊 *${title}* on CareSure\n${detailsText}\n\n${productWebUrl(productId, productType, slug)}`;
       }
 
       await Share.share({
