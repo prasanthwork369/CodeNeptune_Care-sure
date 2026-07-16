@@ -3,11 +3,6 @@
  * exported here — they register side effects on import and must stay direct
  * imports in index.js, before anything else loads.
  */
-export { countdownNotification } from './countdownNotification';
-export type {
-    CountdownAction,
-    CountdownNotificationInput,
-} from './countdownNotification';
 export { NotificationNavigation } from './NotificationNavigation';
 export { orderNotification } from './orderNotification';
 export type { OrderPlacedInput } from './orderNotification';
