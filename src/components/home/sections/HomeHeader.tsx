@@ -70,6 +70,10 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(({
             numberOfLines={1}
             ellipsizeMode="tail"
           >
+            {/* "Chennai - 600040". The pincode is what distinguishes two saved
+                addresses in the same city; the sheet carries the full detail.
+                `location` is the resolved delivery address, so this tracks
+                whichever address is selected. */}
             {location.shortCity && location.pincode
               ? `${location.shortCity} - ${location.pincode}`
               : location.label &&

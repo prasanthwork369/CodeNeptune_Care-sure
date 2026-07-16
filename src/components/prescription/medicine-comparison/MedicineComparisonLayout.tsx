@@ -10,21 +10,23 @@ import { CartSavingsBreakdown } from "@/src/components/cart/sections/CartSavings
 import { CartTerms } from "@/src/components/cart/sections/CartTerms";
 import { CartWalletSection, CartCorporateCreditsSection } from "@/src/components/cart/sections";
 import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
-import { useLocationStore } from "@/src/store/locationStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
-import { ScrollView, View, useWindowDimensions } from "react-native";
-import { useSharedValue } from "react-native-reanimated";
+import { View, useWindowDimensions } from "react-native";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from "react-native-reanimated";
 import {
   AnimatedComparisonHeader,
   ComparisonCard,
@@ -67,10 +69,14 @@ export const MedicineComparisonLayout: React.FC<
   });
   const scrollYShared = useSharedValue(0);
 
-  const handleScroll = (event: any) => {
-    const y = event.nativeEvent.contentOffset.y;
-    scrollYShared.value = y;
-  };
+  // Runs on the UI thread. A JS onScroll lags behind a fast fling, which left
+  // the header translated up while its sticky slot had already settled —
+  // showing as a gap on fast scrolls but not slow ones.
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (e) => {
+      scrollYShared.value = e.contentOffset.y;
+    },
+  });
 
   const playConfetti = () => setConfettiTrigger((n) => n + 1);
 
@@ -87,19 +93,11 @@ export const MedicineComparisonLayout: React.FC<
     });
   };
 
-  // Delivery location
-  const storeLocation = useLocationStore((s) => s.location);
-  const { addresses } = useAddress();
-  const defaultAddress =
-    addresses.find((a) => a.isDefault) ?? addresses[0] ?? null;
+  // Delivery location — the resolved address the order will actually ship to.
+  const { address: defaultAddress, displayLocation } = useDeliveryAddress();
   const deliveryLabel =
-    storeLocation?.label ?? defaultAddress?.label ?? "Address";
-  const deliveryDescription =
-    storeLocation?.city ??
-    [defaultAddress?.line1, defaultAddress?.line2, defaultAddress?.city]
-      .filter(Boolean)
-      .join(", ") ??
-    "No address saved";
+    displayLocation?.label ?? defaultAddress?.label ?? "Address";
+  const deliveryDescription = displayLocation?.city ?? "No address saved";
 
   // Coupon
   const { applied: appliedCoupon, remove: removeCoupon } = useCouponStore();
@@ -207,13 +205,19 @@ export const MedicineComparisonLayout: React.FC<
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
       <ScreenHeader title="Medicine Comparison" showBorder />
 
-      <ScrollView
+      <Animated.ScrollView
         style={{ flex: 1, backgroundColor: "#F9FAFB" }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: exactScale(24) }}
         stickyHeaderIndices={totalSavings > 0 ? [2] : [1]}
+        // A fast fling to the top triggers Android's stretch overscroll, which
+        // pulls the banner away from the header and shows this ScrollView's grey
+        // background as a gap. Slow scrolls never overscroll, hence the
+        // fast-only symptom.
+        overScrollMode="never"
+        bounces={false}
         scrollEventThrottle={16}
-        onScroll={handleScroll}
+        onScroll={scrollHandler}
       >
         {/* Savings banner */}
         {totalSavings > 0 && <SavingsBanner amount={totalSavings} />}
@@ -316,7 +320,7 @@ export const MedicineComparisonLayout: React.FC<
 
         {/* Terms */}
         <CartTerms />
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Footer */}
       <CartFooter

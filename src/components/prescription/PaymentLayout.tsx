@@ -1,11 +1,10 @@
 import { LocationBottomSheet } from "@/src/components/home/sections";
 import { icons } from "@/src/constants/icons";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
-import { useLocationStore } from "@/src/store/locationStore";
 import { buildOrderPayload } from "@/src/utils/order";
 import ArrowForwardIosWhite from "@/assets/icons/arrow_forward_ios_white.svg";
 import { LinearGradient } from "expo-linear-gradient";
@@ -87,20 +86,13 @@ export const PaymentLayout: React.FC = () => {
   const removeCoupon = useCouponStore((s) => s.remove);
   const [selected, setSelected] = useState("COD");
   const [showLocationSheet, setShowLocationSheet] = useState(false);
-  const { addresses } = useAddress();
-  const storeLocation = useLocationStore((s) => s.location);
-  const defaultAddress =
-    addresses.find((a) => a.isDefault) ?? addresses[0] ?? null;
+  // Resolved once, shared by the header text and the order payload below, so
+  // the address on screen is always the address the order ships to.
+  const { address: defaultAddress, displayLocation } = useDeliveryAddress();
   const { items: cartItems } = useCart();
   const { createOrder, loading: ordering } = useCreateOrder();
-  const deliveryLabel = storeLocation?.label ?? defaultAddress?.label ?? null;
-  const deliveryCity =
-    storeLocation?.city ??
-    (defaultAddress
-      ? [defaultAddress.line1, defaultAddress.line2, defaultAddress.city]
-          .filter(Boolean)
-          .join(", ")
-      : null);
+  const deliveryLabel = displayLocation?.label ?? defaultAddress?.label ?? null;
+  const deliveryCity = displayLocation?.city ?? null;
   const hasAddress = !!deliveryCity && !!defaultAddress;
 
   const handlePlaceOrder = async () => {
@@ -493,9 +485,6 @@ export const PaymentLayout: React.FC = () => {
       <LocationBottomSheet
         isVisible={showLocationSheet}
         onClose={() => setShowLocationSheet(false)}
-        onSelect={(label, city) => {
-          useLocationStore.setState({ location: { label, city } });
-        }}
       />
     </View>
   );

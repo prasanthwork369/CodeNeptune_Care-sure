@@ -68,7 +68,6 @@ export const CartLayout: React.FC = () => {
     corporateCreditsRemainingForEligibility,
     handleAddItem,
     handleProceed,
-    setSelectedLocation,
     updateItem,
     removeItem,
     firstName,
@@ -200,7 +199,6 @@ export const CartLayout: React.FC = () => {
       <LocationBottomSheet
         isVisible={showLocationSheet}
         onClose={() => setShowLocationSheet(false)}
-        onSelect={(label, city) => setSelectedLocation({ label, city })}
       />
 
       <CartConfetti trigger={confettiTrigger} />

@@ -13,6 +13,7 @@ import { syncService } from "@/src/services/sync.service";
 export function useHomeData() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { setLocation, clearLocation } = useLocationStore();
+  const hasHydrated = useLocationStore((s) => s.hasHydrated);
 
   useEffect(() => {
     syncService.performSync(queryClient, isAuthenticated).catch((err) => {
@@ -37,16 +38,32 @@ export function useHomeData() {
     isLoading: isSubcategoriesLoading,
     refetch: refetchSubcategories,
   } = useFeaturedSubcategories();
-  const { addresses, refetch: refetchAddresses } = useAddress();
+  const {
+    addresses,
+    loaded: addressesLoaded,
+    refetch: refetchAddresses,
+  } = useAddress();
   const { data: frequentlyOrdered = [], refetch: refetchFrequentlyOrdered } =
     useFrequentlyOrdered({ limit: 5 });
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Sync default address into location store — this is what fills the home
-  // header for returning users who skip the location permission.
+  // Records the resolved default as the concrete selection, and clears a stale
+  // location once the last address is gone. The header no longer depends on
+  // this — it derives from the address via useDeliveryAddress — but writing the
+  // pick down keeps it persisted and tells onboarding not to chase a GPS fix.
   useEffect(() => {
     if (!isAuthenticated) return;
+    // The persisted pick arrives asynchronously. Seeding before it lands would
+    // read selectedAddressId as null and overwrite the restored choice with the
+    // default, so a restart could silently move the user's address.
+    if (!hasHydrated) return;
+    // `addresses` is [] while the request is still in flight, which is
+    // indistinguishable from "this user has no addresses". Acting on that empty
+    // list would clear the restored pick on every cold start and then re-seed
+    // the default — the exact reset this guard exists to prevent.
+    if (!addressesLoaded) return;
+
     const defaultAddr = pickDefaultAddress(addresses);
     if (!defaultAddr) {
       clearLocation();
@@ -61,7 +78,7 @@ export function useHomeData() {
 
     const { location, addressId, pincode } = addressToLocation(defaultAddr);
     setLocation(location, { addressId, pincode });
-  }, [addresses, isAuthenticated]);
+  }, [addresses, isAuthenticated, hasHydrated, addressesLoaded]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

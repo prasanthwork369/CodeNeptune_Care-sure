@@ -1,10 +1,10 @@
-import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { useAuthStore } from "@/src/store/authStore";
@@ -70,19 +70,12 @@ export function useCartCalculations() {
   const { profile } = useProfile();
   const firstName = profile?.firstName ?? "You";
   const isCorporateUser = profile?.isCorporateUser ?? false;
-  const {
-    location: storeLocation,
-    reopenLocationSheet,
-    setReopenLocationSheet,
-  } = useLocationStore();
-  const { addresses } = useAddress();
-  const defaultAddress =
-    addresses.find((a) => a.isDefault) ?? addresses[0] ?? null;
-  const [selectedLocation, setSelectedLocation] = useState<{
-    label: string;
-    city: string;
-  } | null>(null);
-  const deliveryLocation = selectedLocation ?? storeLocation;
+  const { reopenLocationSheet, setReopenLocationSheet } = useLocationStore();
+  // Same resolved address the sheet highlights and checkout ships to. The old
+  // local `selectedLocation` copy is gone: the sheet writes the pick to the
+  // store, so a second copy here could only drift out of sync with it.
+  const { address: defaultAddress, displayLocation: deliveryLocation } =
+    useDeliveryAddress();
 
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
@@ -330,7 +323,6 @@ export function useCartCalculations() {
     corporateCreditsRemainingForEligibility,
     handleAddItem,
     handleProceed,
-    setSelectedLocation,
     updateItem,
     removeItem,
     firstName,

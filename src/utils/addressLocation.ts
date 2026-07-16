@@ -28,3 +28,18 @@ export const addressToLocation = (addr: Address): AddressLocation => {
 /** Picks the address to show by default: the one flagged default, else the first. */
 export const pickDefaultAddress = (addresses: Address[]): Address | undefined =>
     addresses.find((a) => a.isDefault) ?? addresses[0];
+
+/**
+ * The single rule for which address the app delivers to: the user's explicit
+ * pick when it still exists, otherwise the default, otherwise the first.
+ *
+ * Everything that shows or ships an address must resolve through this. The
+ * header and checkout used to decide independently — the header read the
+ * location store while checkout re-derived `isDefault` — so a picked address
+ * could be displayed while the order shipped somewhere else.
+ */
+export const pickDeliveryAddress = (
+    addresses: Address[],
+    selectedAddressId: string | null,
+): Address | undefined =>
+    addresses.find((a) => a.id === selectedAddressId) ?? pickDefaultAddress(addresses);

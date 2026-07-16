@@ -7,7 +7,7 @@ export const useAddress = () => {
     const queryClient = useQueryClient();
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-    const { data: addresses = [], isLoading, isRefetching, refetch } = useQuery({
+    const { data: addresses = [], isLoading, isRefetching, isSuccess, refetch } = useQuery({
         queryKey: QUERY_KEYS.CUSTOMER.ADDRESSES,
         queryFn: addressApi.getAddresses,
         staleTime: 5 * 60_000,
@@ -42,6 +42,12 @@ export const useAddress = () => {
     return {
         addresses,
         loading: isLoading,
+        /**
+         * True only once the list has actually come back from the API. An empty
+         * `addresses` means "still loading" or "the fetch failed" until this is
+         * true, so callers must not treat [] as "the user has no addresses".
+         */
+        loaded: isSuccess,
         refreshing: isRefetching,
         submitting: addMutation.isPending || updateMutation.isPending,
         deleting: deleteMutation.variables ?? null,

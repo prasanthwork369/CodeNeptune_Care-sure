@@ -21,6 +21,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
 import { useHomeData } from "@/src/hooks/home/useHomeData";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useHomeOnboarding } from "@/src/hooks/home/useHomeOnboarding";
 import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
 import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
@@ -97,12 +98,8 @@ export const HomeLayout: React.FC = () => {
   } = useHomeData();
 
   const { callSupport, whatsappOrder } = useContactActions();
-  const {
-    location,
-    pincode: locationPincode,
-    reopenLocationSheet,
-    setReopenLocationSheet,
-  } = useLocationStore();
+  const { displayLocation } = useDeliveryAddress();
+  const { reopenLocationSheet, setReopenLocationSheet } = useLocationStore();
 
   // Sequential onboarding: location → notification → unlock signup popup.
   useHomeOnboarding();
@@ -233,12 +230,11 @@ export const HomeLayout: React.FC = () => {
     () => setIsLocationSheetVisible(true),
     [],
   );
+  // Reads the resolved delivery address, so the header names the same address
+  // the location sheet checks and checkout ships to.
   const headerLocation = useMemo(
-    () =>
-      location
-        ? { ...location, pincode: locationPincode ?? undefined }
-        : DELIVERY_LOCATION,
-    [location, locationPincode],
+    () => displayLocation ?? DELIVERY_LOCATION,
+    [displayLocation],
   );
 
   const sections = useMemo<HomeSection[]>(() => {

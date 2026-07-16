@@ -6,6 +6,7 @@ import { typography } from "@/src/constants/typography";
 import { usePincode } from "@/src/hooks/mutations/usePincode";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useSettings } from "@/src/hooks/queries/useSettings";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { locationService } from "@/src/services/location.service";
@@ -77,7 +78,11 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
 }) => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { setLocation, selectedAddressId } = useLocationStore();
+  const setLocation = useLocationStore((s) => s.setLocation);
+  // Derived, not read straight from the store: this falls back to the default
+  // (then the first) address, so exactly one card is always checked — and it
+  // is the same address checkout will ship to.
+  const { selectedId } = useDeliveryAddress();
   const showToast = useToastStore((s) => s.show);
   const [isLocating, setIsLocating] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -710,7 +715,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
             ]
               .filter(Boolean)
               .join(", ");
-            const isSelected = selectedAddressId === addr.id;
+            const isSelected = selectedId === addr.id;
             return (
               <Touchable
                 key={addr.id}

@@ -1,8 +1,7 @@
-import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
-import { useLocationStore } from "@/src/store/locationStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -98,21 +97,15 @@ export function usePaymentCalculations() {
   // button reacts instantly on press instead of after that first call.
   const [placingOrder, setPlacingOrder] = useState(false);
 
-  const { addresses } = useAddress();
-  const storeLocation = useLocationStore((s) => s.location);
-  const defaultAddress =
-    addresses.find((a) => a.isDefault) ?? addresses[0] ?? null;
+  // The address the user has selected — the same one the location sheet
+  // highlights. Display and payload both read it, so what the screen shows is
+  // what the order ships to.
+  const { address: defaultAddress, displayLocation } = useDeliveryAddress();
   const { items: cartItems } = useCart();
   const { createOrder, loading: ordering } = useCreateOrder();
 
-  const deliveryLabel = storeLocation?.label ?? defaultAddress?.label ?? null;
-  const deliveryCity =
-    storeLocation?.city ??
-    (defaultAddress
-      ? [defaultAddress.line1, defaultAddress.line2, defaultAddress.city]
-          .filter(Boolean)
-          .join(", ")
-      : null);
+  const deliveryLabel = displayLocation?.label ?? defaultAddress?.label ?? null;
+  const deliveryCity = displayLocation?.city ?? null;
   const hasAddress = !!deliveryCity && !!defaultAddress;
 
   const handlePlaceOrder = async () => {

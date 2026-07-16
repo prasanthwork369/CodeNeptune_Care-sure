@@ -1,6 +1,6 @@
 import { locationService } from "@/src/services/location.service";
 import { notificationService } from "@/src/services/notifications/notification.service";
-import { useLocationStore } from "@/src/store/locationStore";
+import { useLocationStore, waitForLocationHydration } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { isExpoGo } from "@/src/utils/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -36,18 +36,29 @@ export const useHomeOnboarding = () => {
 
     (async () => {
       try {
+        // Nothing below may touch the location store until the user's persisted
+        // address pick has been read back — every write also saves, so writing
+        // first would overwrite their choice in storage before it loads.
+        await waitForLocationHydration();
+
         // Load last saved location quickly so header can render immediately.
+        // This payload is a GPS fix and carries no addressId, so writing it
+        // would reset `selectedAddressId` to null. Only fall back to it when
+        // the user has no address pick to lose — otherwise this races the
+        // address-seeding effect and silently reverts their chosen address.
         try {
-          const saved = await AsyncStorage.getItem(
-            "@caresure:last_known_location",
-          );
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed?.location) {
-              useLocationStore.getState().setLocation(parsed.location, {
-                coords: parsed.coords ?? undefined,
-                pincode: parsed.pincode ?? undefined,
-              });
+          if (!useLocationStore.getState().selectedAddressId) {
+            const saved = await AsyncStorage.getItem(
+              "@caresure:last_known_location",
+            );
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (parsed?.location && !useLocationStore.getState().selectedAddressId) {
+                useLocationStore.getState().setLocation(parsed.location, {
+                  coords: parsed.coords ?? undefined,
+                  pincode: parsed.pincode ?? undefined,
+                });
+              }
             }
           }
         } catch {}
@@ -189,6 +200,8 @@ export const useHomeOnboarding = () => {
         return;
       }
       try {
+        // Same rule as startup: never read or write the pick before it loads.
+        await waitForLocationHydration();
         const existing = await Location.getForegroundPermissionsAsync();
         if (existing.status !== "granted") return;
         // Permission granted; try to silently fetch current place.
@@ -205,26 +218,30 @@ export const useHomeOnboarding = () => {
             shortCity: place.city,
             pincode: place.pincode || undefined,
           };
-          const current = useLocationStore.getState().location;
+          const { location: current, selectedAddressId } =
+            useLocationStore.getState();
           const same =
             current &&
             current.city === loc.city &&
             (current.pincode ?? "") === (loc.pincode ?? "");
-          if (!same) {
+          // Always cache the fix for a future cold start, but never let a
+          // resume overwrite an address the user chose — this fires on every
+          // foreground, and `setLocation` without an addressId clears the pick.
+          try {
+            await AsyncStorage.setItem(
+              "@caresure:last_known_location",
+              JSON.stringify({
+                location: loc,
+                coords: place.coords,
+                pincode: place.pincode,
+              }),
+            );
+          } catch {}
+          if (!same && !selectedAddressId) {
             useLocationStore.getState().setLocation(loc, {
               coords: place.coords,
               pincode: place.pincode || undefined,
             });
-            try {
-              await AsyncStorage.setItem(
-                "@caresure:last_known_location",
-                JSON.stringify({
-                  location: loc,
-                  coords: place.coords,
-                  pincode: place.pincode,
-                }),
-              );
-            } catch {}
           }
           try {
             await AsyncStorage.removeItem("@caresure:gps_prompt_not_now");

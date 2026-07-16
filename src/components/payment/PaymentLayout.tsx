@@ -2,7 +2,6 @@ import { LocationBottomSheet } from "@/src/components/home/sections";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePaymentCalculations } from "@/src/hooks/usePaymentCalculations";
-import { useLocationStore } from "@/src/store/locationStore";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -87,9 +86,6 @@ export const PaymentLayout: React.FC = () => {
       <LocationBottomSheet
         isVisible={showLocationSheet}
         onClose={() => setShowLocationSheet(false)}
-        onSelect={(label, city) => {
-          useLocationStore.setState({ location: { label, city } });
-        }}
       />
     </View>
   );
