@@ -455,85 +455,44 @@ export const ReturnProductLayout: React.FC = () => {
             return (
               <View key={item.id}>
                 <View className="flex-row items-start px-4 py-3">
-                  <View className="w-14 h-14 rounded-sm border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center mr-3 overflow-hidden">
-                    {snap?.image ? (
-                      <Image
-                        source={{ uri: snap.image }}
-                        style={{ width: 50, height: 50 }}
-                        contentFit="contain"
-                      />
-                    ) : (
-                      <icons.package_icon width={28} height={28} />
-                    )}
-                  </View>
-                  <View className="flex-1">
-                    <Text
-                      style={[
-                        s.labelSm,
-                        { color: isChecked ? "#222222" : "#9CA3AF" },
-                      ]}
-                      className="font-inter-semibold"
-                      numberOfLines={2}
-                    >
-                      {snap?.name ?? "Medicine Item"}
-                    </Text>
-                    <Text
-                      style={[
-                        s.labelSm,
-                        { color: isChecked ? "#6A6A6A" : "#9CA3AF" },
-                      ]}
-                      className="font-inter-medium mt-0.5"
-                    >
-                      {[snap?.brand, snap?.pack].filter(Boolean).join(" • ")}
-                    </Text>
-                    <View
-                      className="flex-row items-center px-3 py-1 mt-2 gap-3"
-                      style={{
-                        borderWidth: 1,
-                        borderColor: "#919EAB33",
-                        borderRadius: 6,
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      <Touchable
-                        onPress={() => updateQty(item, -1)}
-                        activeOpacity={0.7}
-                      >
-                        <Text
-                          style={[
-                            s.labelXl,
-                            { color: isChecked ? "#222222" : "#9CA3AF" },
-                          ]}
-                          className="font-inter-medium leading-none"
-                        >
-                          −
-                        </Text>
-                      </Touchable>
+                  <Touchable
+                    onPress={() => toggleItem(item)}
+                    activeOpacity={0.7}
+                    className="flex-1 flex-row items-start"
+                  >
+                    <View className="w-14 h-14 rounded-sm border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center mr-3 overflow-hidden">
+                      {snap?.image ? (
+                        <Image
+                          source={{ uri: snap.image }}
+                          style={{ width: 50, height: 50 }}
+                          contentFit="contain"
+                        />
+                      ) : (
+                        <icons.package_icon width={28} height={28} />
+                      )}
+                    </View>
+                    <View className="flex-1 mr-2">
                       <Text
                         style={[
                           s.labelSm,
                           { color: isChecked ? "#222222" : "#9CA3AF" },
                         ]}
-                        className="font-inter-bold min-w-[14px] text-center"
+                        className="font-inter-semibold"
+                        numberOfLines={2}
                       >
-                        {getQty(item)}
+                        {snap?.name ?? "Medicine Item"}
                       </Text>
-                      <Touchable
-                        onPress={() => updateQty(item, 1)}
-                        activeOpacity={0.7}
+                      <Text
+                        style={[
+                          s.labelSm,
+                          { color: isChecked ? "#6A6A6A" : "#9CA3AF" },
+                        ]}
+                        className="font-inter-medium mt-0.5"
                       >
-                        <Text
-                          style={[
-                            s.labelXl,
-                            { color: isChecked ? "#222222" : "#9CA3AF" },
-                          ]}
-                          className="font-inter-medium leading-none"
-                        >
-                          +
-                        </Text>
-                      </Touchable>
+                        {[snap?.brand, snap?.pack].filter(Boolean).join(" • ")}
+                      </Text>
                     </View>
-                  </View>
+                  </Touchable>
                   <Touchable
                     onPress={() => toggleItem(item)}
                     activeOpacity={0.7}
@@ -558,6 +517,57 @@ export const ReturnProductLayout: React.FC = () => {
                     )}
                   </Touchable>
                 </View>
+
+                {/* Separately clickable quantity selector positioned under product details */}
+                <View style={{ paddingLeft: 72, paddingBottom: 12 }}>
+                  <View
+                    className="flex-row items-center px-3 py-1 gap-3"
+                    style={{
+                      borderWidth: 1,
+                      borderColor: "#919EAB33",
+                      borderRadius: 6,
+                      alignSelf: "flex-start",
+                    }}
+                  >
+                    <Touchable
+                      onPress={() => updateQty(item, -1)}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          s.labelXl,
+                          { color: isChecked ? "#222222" : "#9CA3AF" },
+                        ]}
+                        className="font-inter-medium leading-none"
+                      >
+                        −
+                      </Text>
+                    </Touchable>
+                    <Text
+                      style={[
+                        s.labelSm,
+                        { color: isChecked ? "#222222" : "#9CA3AF" },
+                      ]}
+                      className="font-inter-bold min-w-[14px] text-center"
+                    >
+                      {getQty(item)}
+                    </Text>
+                    <Touchable
+                      onPress={() => updateQty(item, 1)}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          s.labelXl,
+                          { color: isChecked ? "#222222" : "#9CA3AF" },
+                        ]}
+                        className="font-inter-medium leading-none"
+                      >
+                        +
+                      </Text>
+                    </Touchable>
+                  </View>
+                </View>
                 {isChecked && reasonData && (
                   <View className="px-4 pb-4">
                     <View
@@ -573,7 +583,7 @@ export const ReturnProductLayout: React.FC = () => {
                     <View className="flex-row items-start justify-between">
                       <View className="flex-1">
                         <View className="flex-row items-center gap-2">
-                          <icons.info_gray width={16} height={16} />
+                          <icons.info_outline width={16} height={16} />
                           <Text
                             style={s.labelMd}
                             className="font-inter-bold text-[#222222]"
@@ -613,9 +623,10 @@ export const ReturnProductLayout: React.FC = () => {
                         }}
                         activeOpacity={0.7}
                         className="mt-1"
+                        style={{ alignSelf: "flex-end", marginBottom: 2 }}
                       >
                         <Text
-                          style={s.labelSm}
+                          style={s.labelMd}
                           className="font-inter-bold text-[#0F7635]"
                         >
                           Edit

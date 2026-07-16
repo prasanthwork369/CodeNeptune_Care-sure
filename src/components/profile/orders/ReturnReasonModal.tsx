@@ -39,6 +39,7 @@ const PHOTO_SLOTS: { key: SlotKey; label: string; type: string }[] = [
 ];
 
 const OTHER_OPTION = "__other__";
+const SNAP_POINTS = ["78%"];
 
 export function ReturnReasonModal({
   isVisible,
@@ -55,7 +56,11 @@ export function ReturnReasonModal({
     initialData?.images || {},
   );
   const [isReasonOpen, setIsReasonOpen] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{
+    reason?: string;
+    details?: string;
+    images?: string;
+  }>({});
 
   const { data: reasons = [], isLoading: reasonsLoading } =
     useCancellationReasons({ applicable_to: 2 });
@@ -81,10 +86,10 @@ export function ReturnReasonModal({
       setDetails(initialData?.details || "");
       setImages(initialData?.images || {});
       setIsReasonOpen(false);
-      setError("");
+      setErrors({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible, initialData]);
+  }, [isVisible]);
 
   const isOtherSelected = selectedReasonId === OTHER_OPTION;
   const selectedReason = reasons.find((r) => r.id === selectedReasonId);
@@ -95,7 +100,7 @@ export function ReturnReasonModal({
   const selectReason = (id: number | typeof OTHER_OPTION) => {
     setSelectedReasonId(id);
     setIsReasonOpen(false);
-    if (error) setError("");
+    setErrors((e) => ({ ...e, reason: undefined }));
     // No snap: content-sized sheet grows on its own; snapping caused the jump.
   };
 
@@ -107,22 +112,26 @@ export function ReturnReasonModal({
     const finalReason = isOtherSelected
       ? otherReason.trim()
       : selectedReason?.label;
-    if (!finalReason) {
-      setError(
-        isOtherSelected
-          ? "Please describe the issue with this return."
-          : "Please select a reason for this return.",
-      );
-      return;
+
+    const newErrors: typeof errors = {};
+
+    if (isOtherSelected && !otherReason.trim()) {
+      newErrors.details = "Please describe the issue with this return.";
+    } else if (!selectedReasonId) {
+      newErrors.reason = "Please select a reason for this return.";
     }
+
     const missingSlot = PHOTO_SLOTS.find((slot) => !images[slot.key]);
     if (missingSlot) {
-      setError(
-        `Please upload a photo for "${missingSlot.label}" -- all 4 photos are required.`,
-      );
+      newErrors.images = `Please upload a photo for "${missingSlot.label}" -- all 4 photos are required.`;
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-    onSave({ reason: finalReason, details, images });
+
+    onSave({ reason: finalReason!, details, images });
     handleClose();
   };
 
@@ -141,7 +150,14 @@ export function ReturnReasonModal({
 
       // Just store the local URI -- no upload yet. The actual upload
       // happens once, for all items, when the user taps "Request Return".
-      setImages((prev) => ({ ...prev, [slot]: result.assets[0].uri }));
+      setImages((prev) => {
+        const next = { ...prev, [slot]: result.assets[0].uri };
+        const missingSlot = PHOTO_SLOTS.find((s) => !next[s.key]);
+        if (!missingSlot) {
+          setErrors((e) => ({ ...e, images: undefined }));
+        }
+        return next;
+      });
     } catch {
       // Silently ignore -- the slot just stays empty and the user can retry
     }
@@ -167,8 +183,8 @@ export function ReturnReasonModal({
       ref={sheetRef}
       isVisible={isVisible}
       onClose={onClose}
-      // Content-sized: fits content, scrolls only past maxSheetHeight.
-      maxDynamicContentSize={maxSheetHeight}
+      snapPoints={SNAP_POINTS}
+      closeButtonOffset="78%"
       keyboardBehavior="extend"
       keyboardBlurBehavior="none"
       backgroundStyle={{
@@ -184,6 +200,7 @@ export function ReturnReasonModal({
           paddingBottom: Math.max(adjustedBottom, 16) + 24,
         }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Item Summary */}
         {item && (
@@ -257,6 +274,14 @@ export function ReturnReasonModal({
           onSelectOther={() => selectReason(OTHER_OPTION)}
           placeholder="Select the reason"
         />
+        {!!errors.reason && (
+          <Text
+            className="font-inter-medium text-[#DC2626] mt-2 mb-2"
+            style={{ fontSize: moderateScale(12) }}
+          >
+            {errors.reason}
+          </Text>
+        )}
 
         {/* Dropdown floats (position:absolute) — no spacer, or the sheet grows. */}
 
@@ -273,30 +298,31 @@ export function ReturnReasonModal({
               placeholder="Please specify the reason for your return"
               placeholderTextColor="#6A6A6A"
               value={otherReason}
-              onChangeText={(value) => {
+              onChangeText={(value: string) => {
                 setOtherReason(value);
-                if (error) setError("");
+                setErrors((e) => ({ ...e, details: undefined }));
               }}
               multiline
               numberOfLines={4}
-              className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
+              className={`p-4 border ${errors.details ? "border-[#EF4444]" : "border-[#919EAB33]"} rounded-xl font-inter-medium min-h-[100px] ${errors.details ? "mb-2" : "mb-6"}`}
               style={{
                 textAlignVertical: "top",
                 backgroundColor: "#FFFFFF",
                 fontSize: moderateScale(14),
               }}
             />
+            {!!errors.details && (
+              <Text
+                className="font-inter-medium text-[#DC2626] mb-4"
+                style={{ fontSize: moderateScale(12) }}
+              >
+                {errors.details}
+              </Text>
+            )}
           </>
         )}
 
-        {!!error && (
-          <Text
-            className="font-inter-medium text-[#DC2626] mt-3 mb-3"
-            style={{ fontSize: moderateScale(12) }}
-          >
-            {error}
-          </Text>
-        )}
+
 
         {/* Hidden for "Other": its field above already captures the free text. */}
         {!isOtherSelected && (
@@ -365,6 +391,15 @@ export function ReturnReasonModal({
             );
           })}
         </View>
+
+        {!!errors.images && (
+          <Text
+            className="font-inter-medium text-[#DC2626] mb-3"
+            style={{ fontSize: moderateScale(12) }}
+          >
+            {errors.images}
+          </Text>
+        )}
 
         {/* Action Button */}
         <Touchable

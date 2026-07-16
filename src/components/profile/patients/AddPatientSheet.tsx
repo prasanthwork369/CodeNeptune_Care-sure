@@ -5,7 +5,7 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
-import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
+import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -194,7 +194,7 @@ export function AddPatientSheet({
               errors.name ? { borderColor: "#EF4444" } : {},
             ]}
           >
-            <SafeInput
+            <SafeBottomSheetInput
               placeholder="Enter the name"
               placeholderTextColor="#6A6A6A"
               style={{
@@ -249,7 +249,7 @@ export function AddPatientSheet({
             >
               +91 |
             </Text>
-            <SafeInput
+            <SafeBottomSheetInput
               ref={setMobileRef}
               placeholder="Enter The number"
               placeholderTextColor="#6A6A6A"
@@ -335,7 +335,7 @@ export function AddPatientSheet({
           )}
           {relationship === "Other" && (
             <>
-              <SafeInput
+              <SafeBottomSheetInput
                 placeholder="Specify relationship"
                 placeholderTextColor="#6A6A6A"
                 style={[
@@ -522,33 +522,3 @@ const inputStyle: object = {
   marginBottom: exactScale(18),
 };
 
-const SafeInput = React.forwardRef<React.ElementRef<typeof BottomSheetTextInput>, any>(
-  ({ value, onChangeText, ...props }, ref) => {
-    const [text, setText] = useState(value);
-    const lastNotifiedValue = useRef(value);
-
-    useEffect(() => {
-      // Only update local state if parent intentionally changed it
-      // (e.g. form reset, not just a slow re-render reflecting our own keystrokes)
-      if (value !== lastNotifiedValue.current) {
-        setText(value);
-        lastNotifiedValue.current = value;
-      }
-    }, [value]);
-
-    return (
-      <BottomSheetTextInput
-        {...props}
-        ref={ref}
-        value={text}
-        onChangeText={(t: string) => {
-          setText(t);
-          lastNotifiedValue.current = t;
-          onChangeText(t);
-        }}
-      />
-    );
-  }
-);
-
-SafeInput.displayName = "SafeInput";
