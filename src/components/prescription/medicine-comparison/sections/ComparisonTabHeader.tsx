@@ -9,6 +9,9 @@ export const ComparisonTabHeader: React.FC = () => (
       borderTopWidth: 1,
       borderBottomWidth: 1,
       borderColor: "#E5E7EB",
+      // Opaque so no sub-pixel seam lets the page background show as a hairline
+      // against the white bar above.
+      backgroundColor: "#fff",
     }}
   >
     <View

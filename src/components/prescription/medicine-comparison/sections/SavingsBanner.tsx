@@ -2,7 +2,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface SavingsBannerProps {
   amount: number;
@@ -16,14 +16,16 @@ export const SavingsBanner: React.FC<SavingsBannerProps> = ({ amount }) => (
     style={{
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      gap: 10,
+      // Centred + scaled to match the cart's banner.
+      justifyContent: "center",
+      paddingHorizontal: exactScale(16),
+      paddingVertical: exactScale(12),
+      gap: exactScale(10),
     }}
   >
     <Image
       source={HOME_IMAGES.discountTag}
-      style={{ width: 32, height: 32 }}
+      style={{ width: exactScale(32), height: exactScale(32) }}
       resizeMode="contain"
     />
     <Text
