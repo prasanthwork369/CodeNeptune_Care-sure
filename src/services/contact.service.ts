@@ -19,11 +19,18 @@ async function openURL(url: string, fallbackMessage: string): Promise<void> {
  * cannot call hooks. `useContactActions` wraps these for screens.
  */
 export const contactService = {
-    call: (phone: string = SUPPORT_PHONE) =>
-        openURL(`tel:${phone}`, `Please dial ${phone} manually to place your order.`),
+    // `||` not a default param: callers pass backend values that can be null,
+    // and a default only fills in for undefined.
+    call: (phone?: string | null) => {
+        const finalPhone = phone || SUPPORT_PHONE;
+        return openURL(
+            `tel:${finalPhone}`,
+            `Please dial ${finalPhone} manually to place your order.`,
+        );
+    },
 
-    whatsapp: (whatsapp: string = SUPPORT_PHONE) => {
-        const clean = whatsapp.replace(/\D/g, '');
+    whatsapp: (whatsapp?: string | null) => {
+        const clean = (whatsapp || SUPPORT_PHONE).replace(/\D/g, '');
         const url =
             clean.startsWith('91') || clean.length > 10
                 ? `https://wa.me/${clean}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
@@ -34,9 +41,11 @@ export const contactService = {
         );
     },
 
-    email: (email: string = SUPPORT_EMAIL) =>
-        openURL(
-            `mailto:${email}?subject=${encodeURIComponent(EMAIL_SUBJECT)}`,
-            `Please email us at ${email} manually.`,
-        ),
+    email: (email?: string | null) => {
+        const finalEmail = email || SUPPORT_EMAIL;
+        return openURL(
+            `mailto:${finalEmail}?subject=${encodeURIComponent(EMAIL_SUBJECT)}`,
+            `Please email us at ${finalEmail} manually.`,
+        );
+    },
 };
