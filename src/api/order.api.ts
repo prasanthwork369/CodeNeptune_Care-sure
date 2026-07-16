@@ -28,7 +28,6 @@ export const orderApi = {
     getFrequentlyOrdered: async (params?: { page?: number; limit?: number }) => {
         const response = await apiClient.get('/api/v1/orders/customer/frequently-ordered', { params });
         const raw: any[] = response.data.data ?? [];
-        if (__DEV__ && raw.length > 0) console.log('[FrequentlyOrdered] raw[0]:', JSON.stringify(raw[0], null, 2));
         return raw.map((item) => {
             const rawPrice = parseFloat(String(item.price || 0));
             const rawMrp = item.mrp ? parseFloat(String(item.mrp)) : undefined;
