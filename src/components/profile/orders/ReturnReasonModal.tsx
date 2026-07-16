@@ -1,6 +1,6 @@
-import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ReasonDropdown } from "@/src/components/ui/ReasonDropdown";
+import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReasons";
@@ -10,7 +10,8 @@ import { moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image, Text, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { orderStyles as s } from "./orders.styles";
 
 export type ReturnReason = {
@@ -65,6 +66,10 @@ export function ReturnReasonModal({
   const [otherReason, setOtherReason] = useState("");
 
   const adjustedBottom = useAdjustedBottomInset();
+  const { height: screenHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  // Cap the content-sized sheet just below the status bar.
+  const maxSheetHeight = screenHeight - insets.top - 12;
 
   useEffect(() => {
     if (isVisible) {
@@ -91,9 +96,7 @@ export function ReturnReasonModal({
     setSelectedReasonId(id);
     setIsReasonOpen(false);
     if (error) setError("");
-    // Selecting "Other" reveals a text area — expand to the tall snap so it's
-    // visible; picking a normal reason hides it again, so shrink back down.
-    sheetRef.current?.snapToIndex(id === OTHER_OPTION ? 1 : 0);
+    // No snap: content-sized sheet grows on its own; snapping caused the jump.
   };
 
   const handleClose = () => {
@@ -164,13 +167,8 @@ export function ReturnReasonModal({
       ref={sheetRef}
       isVisible={isVisible}
       onClose={onClose}
-      // Two snap points: opens at 60%, draggable up to 90%. Fixed snaps (not
-      // dynamic sizing) so the sheet never auto-jumps when Other's text area
-      // appears or the dropdown opens — content just scrolls inside.
-      snapPoints={["75%", "85%"]}
-      // Value only disables dynamic sizing now; the close button tracks the
-      // sheet automatically (see GorhomBottomSheet).
-      closeButtonOffset="75%"
+      // Content-sized: fits content, scrolls only past maxSheetHeight.
+      maxDynamicContentSize={maxSheetHeight}
       keyboardBehavior="extend"
       keyboardBlurBehavior="none"
       backgroundStyle={{
@@ -180,7 +178,6 @@ export function ReturnReasonModal({
       }}
     >
       <BottomSheetScrollView
-        style={{ flex: 1 }}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 8,
@@ -261,29 +258,35 @@ export function ReturnReasonModal({
           placeholder="Select the reason"
         />
 
-        {/* The dropdown list is position:absolute (floats over the fields
-            below), so it needs NO reserved space. A spacer here would grow the
-            dynamically-sized bottom sheet to full height whenever the dropdown
-            opens — which we explicitly don't want. */}
+        {/* Dropdown floats (position:absolute) — no spacer, or the sheet grows. */}
 
         {isOtherSelected && (
-          <SafeBottomSheetInput
-            placeholder="Describe the issue..."
-            placeholderTextColor="#6A6A6A"
-            value={otherReason}
-            onChangeText={(value) => {
-              setOtherReason(value);
-              if (error) setError("");
-            }}
-            multiline
-            numberOfLines={3}
-            className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[80px] mt-2"
-            style={{
-              textAlignVertical: "top",
-              backgroundColor: "#FFFFFF",
-              fontSize: moderateScale(14),
-            }}
-          />
+          <>
+            {/* Mirrors "Add details" so the swap causes no shift. */}
+            <Text
+              className="font-inter-bold text-[#222222] py-3"
+              style={{ fontSize: moderateScale(14) }}
+            >
+              Describe the issue
+            </Text>
+            <SafeBottomSheetInput
+              placeholder="Please specify the reason for your return"
+              placeholderTextColor="#6A6A6A"
+              value={otherReason}
+              onChangeText={(value) => {
+                setOtherReason(value);
+                if (error) setError("");
+              }}
+              multiline
+              numberOfLines={4}
+              className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
+              style={{
+                textAlignVertical: "top",
+                backgroundColor: "#FFFFFF",
+                fontSize: moderateScale(14),
+              }}
+            />
+          </>
         )}
 
         {!!error && (
@@ -295,27 +298,31 @@ export function ReturnReasonModal({
           </Text>
         )}
 
-        {/* Details */}
-        <Text
-          className="font-inter-bold text-[#222222] mb-3"
-          style={{ fontSize: moderateScale(14) }}
-        >
-          Add details
-        </Text>
-        <SafeBottomSheetInput
-          multiline
-          numberOfLines={4}
-          placeholder="Please provide more details about the issue with the product"
-          placeholderTextColor="#6A6A6A"
-          className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
-          style={{
-            textAlignVertical: "top",
-            backgroundColor: "#FFFFFF",
-            fontSize: moderateScale(14),
-          }}
-          value={details}
-          onChangeText={setDetails}
-        />
+        {/* Hidden for "Other": its field above already captures the free text. */}
+        {!isOtherSelected && (
+          <>
+            <Text
+              className="font-inter-bold text-[#222222] py-3"
+              style={{ fontSize: moderateScale(14) }}
+            >
+              Add details
+            </Text>
+            <SafeBottomSheetInput
+              multiline
+              numberOfLines={4}
+              placeholder="Please provide more details about the issue with the product"
+              placeholderTextColor="#6A6A6A"
+              className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
+              style={{
+                textAlignVertical: "top",
+                backgroundColor: "#FFFFFF",
+                fontSize: moderateScale(14),
+              }}
+              value={details}
+              onChangeText={setDetails}
+            />
+          </>
+        )}
 
         {/* Photo Grid */}
         <View className="flex-row flex-wrap gap-3 mb-4">
