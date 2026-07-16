@@ -18,9 +18,12 @@ export const CartFooter: React.FC<CartFooterProps> = ({ toPay, safeAreaBottom, o
             <Touchable
                 onPress={onProceed}
                 activeOpacity={0.85}
-                className="flex-1 ml-10 bg-brand-primary rounded-lg py-4 items-center"
+                 style={{
+                 borderRadius: 8
+                }}
+                className="flex-1 ml-10 bg-brand-primary py-4 items-center"
             >
-                <Text style={s.footerBtn} className="font-inter-semibold text-white">Proceed</Text>
+                <Text style={s.footerBtn} className="font-inter-semibold text-white">Proceed To Pay</Text>
             </Touchable>
         </View>
     );
