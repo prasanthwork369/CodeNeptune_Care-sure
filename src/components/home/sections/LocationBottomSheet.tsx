@@ -302,15 +302,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       const { granted, canAskAgain } = await locationService.requestPermission({
         interactive: true,
       });
-      console.debug("LocationBottomSheet: permission result", {
-        granted,
-        canAskAgain,
-      });
       if (!granted) {
-        console.debug(
-          "LocationBottomSheet: permission denied; canAskAgain=",
-          canAskAgain,
-        );
         if (!canAskAgain) {
           // Permission is permanently denied at the app level (this is the
           // app's location permission, NOT device GPS). Explain that before
@@ -338,7 +330,6 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
         return;
       }
       const result = await locationService.getCurrentPlace();
-      console.debug("LocationBottomSheet: getCurrentPlace result", result);
       const place = result.place;
       if (!place) {
         // If the underlying failure indicates services are disabled,

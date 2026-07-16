@@ -102,17 +102,14 @@ export const locationService = {
     let providerStatus: any = null;
     try {
       providerStatus = await (Location as any).getProviderStatusAsync?.();
-      console.debug("locationService: providerStatus", providerStatus);
     } catch (e) {
-      console.debug("locationService: getProviderStatusAsync failed", e);
+      if (__DEV__)
+        console.debug("locationService: getProviderStatusAsync failed", e);
       try {
         providerStatus = await (Location as any).hasServicesEnabledAsync?.();
-        console.debug(
-          "locationService: hasServicesEnabledAsync",
-          providerStatus,
-        );
       } catch (ee) {
-        console.debug("locationService: hasServicesEnabledAsync failed", ee);
+        if (__DEV__)
+          console.debug("locationService: hasServicesEnabledAsync failed", ee);
       }
     }
 
@@ -141,9 +138,6 @@ export const locationService = {
     const servicesDisabledFromProvider = isServicesDisabled(providerStatus);
 
     if (servicesDisabledFromProvider) {
-      console.debug(
-        "locationService: provider indicates services disabled — skipping position read",
-      );
       return {
         place: null,
         providerStatus,
@@ -181,16 +175,11 @@ export const locationService = {
         if (raceErr?.message === "LOCATION_TIMEOUT") {
           const last = await Location.getLastKnownPositionAsync();
           if (!last) throw raceErr;
-          console.debug("locationService: using last known position");
           position = last;
         } else {
           throw raceErr;
         }
       }
-      console.debug(
-        "locationService: getCurrentPositionAsync success",
-        position?.coords,
-      );
 
       const [place] = await Location.reverseGeocodeAsync({
         latitude: position.coords.latitude,
@@ -230,7 +219,8 @@ export const locationService = {
       };
     } catch (err: any) {
       // Log the raw error for debugging.
-      console.debug("locationService: getCurrentPositionAsync failed", err);
+      if (__DEV__)
+        console.debug("locationService: getCurrentPositionAsync failed", err);
 
       // Heuristic: treat as services-disabled when providerStatus indicates
       // services are off, or when the thrown error message mentions

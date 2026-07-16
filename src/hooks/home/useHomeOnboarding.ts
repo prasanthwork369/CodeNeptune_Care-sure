@@ -76,10 +76,6 @@ export const useHomeOnboarding = () => {
             isFetching = true;
             try {
               const result = await locationService.getCurrentPlace();
-              console.debug(
-                "useHomeOnboarding: getCurrentPlace result",
-                result,
-              );
               const place = result.place;
               // If we got a place, persist and set it.
               if (place?.city) {
@@ -209,7 +205,6 @@ export const useHomeOnboarding = () => {
         isFetching = true;
         try {
           const res = await locationService.getCurrentPlace();
-          console.debug("useHomeOnboarding (resume): getCurrentPlace", res);
           const place = res.place;
           if (!place?.city) return;
           const loc = {

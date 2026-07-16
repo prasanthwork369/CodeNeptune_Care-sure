@@ -78,10 +78,13 @@ try {
     // @ts-ignore
     RN.TextInput = PatchedTextInput;
   } catch (err) {
-    console.error(
-      "Failed to globally patch react-native TextInput component:",
-      err,
-    );
+    // Dev-only: in production the global error handler reports this to
+    // Crashlytics, and nobody reads a release build's console.
+    if (__DEV__)
+      console.error(
+        "Failed to globally patch react-native TextInput component:",
+        err,
+      );
   }
 }
 

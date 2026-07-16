@@ -139,7 +139,10 @@ try {
     // @ts-ignore
     RN.Text = PatchedText;
   } catch (err) {
-    console.error("Failed to globally patch react-native Text component:", err);
+    // Dev-only: in production the global error handler reports this to
+    // Crashlytics, and nobody reads a release build's console.
+    if (__DEV__)
+      console.error("Failed to globally patch react-native Text component:", err);
   }
 }
 

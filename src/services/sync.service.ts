@@ -52,7 +52,7 @@ export const syncService = {
         [componentName, timestamp]
       );
     } catch (e) {
-      console.error(`[SyncService] Failed to update sync timestamp for ${componentName}:`, e);
+      if (__DEV__) console.error(`[SyncService] Failed to update sync timestamp for ${componentName}:`, e);
     }
   },
 
@@ -71,13 +71,12 @@ export const syncService = {
         componentsPayload.frequentlyOrdered = localTimestamps.frequentlyOrdered;
       }
 
-      console.log('[SyncService] Sending sync check request with components:', componentsPayload);
       const response = await apiClient.post(API_ENDPOINTS.SYNC_CHECK, {
         components: componentsPayload,
       });
 
       if (!response.data || response.data.success !== true) {
-        console.warn('[SyncService] Sync check response unsuccessful:', response.data);
+        if (__DEV__) console.warn('[SyncService] Sync check response unsuccessful:', response.data);
         return;
       }
 
@@ -91,9 +90,8 @@ export const syncService = {
           apiCache.set('app_contents', data);
           await this.updateSyncTimestamp('appContents', components.appContents.latestServerTimestamp);
           invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APP.CONTENTS }));
-          console.log('[SyncService] Synced appContents');
         } catch (e) {
-          console.error('[SyncService] Failed to sync appContents:', e);
+          if (__DEV__) console.error('[SyncService] Failed to sync appContents:', e);
         }
       }
 
@@ -104,9 +102,8 @@ export const syncService = {
           apiCache.set('category_family_map', data);
           await this.updateSyncTimestamp('categoryFamilyMap', components.categoryFamilyMap.latestServerTimestamp);
           invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATALOG.CATEGORY_MAP }));
-          console.log('[SyncService] Synced categoryFamilyMap');
         } catch (e) {
-          console.error('[SyncService] Failed to sync categoryFamilyMap:', e);
+          if (__DEV__) console.error('[SyncService] Failed to sync categoryFamilyMap:', e);
         }
       }
 
@@ -117,9 +114,8 @@ export const syncService = {
           apiCache.set('featured_subcategories', data);
           await this.updateSyncTimestamp('featuredSubcategories', components.featuredSubcategories.latestServerTimestamp);
           invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATALOG.FEATURED_SUBCATEGORIES }));
-          console.log('[SyncService] Synced featuredSubcategories');
         } catch (e) {
-          console.error('[SyncService] Failed to sync featuredSubcategories:', e);
+          if (__DEV__) console.error('[SyncService] Failed to sync featuredSubcategories:', e);
         }
       }
 
@@ -130,9 +126,8 @@ export const syncService = {
           apiCache.set('featured_medicines', data);
           await this.updateSyncTimestamp('featuredMedicines', components.featuredMedicines.latestServerTimestamp);
           invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES }));
-          console.log('[SyncService] Synced featuredMedicines');
         } catch (e) {
-          console.error('[SyncService] Failed to sync featuredMedicines:', e);
+          if (__DEV__) console.error('[SyncService] Failed to sync featuredMedicines:', e);
         }
       }
 
@@ -143,18 +138,16 @@ export const syncService = {
           apiCache.set('frequently_ordered', data);
           await this.updateSyncTimestamp('frequentlyOrdered', components.frequentlyOrdered.latestServerTimestamp);
           invalidations.push(queryClient.invalidateQueries({ queryKey: ['frequently-ordered'] }));
-          console.log('[SyncService] Synced frequentlyOrdered');
         } catch (e) {
-          console.error('[SyncService] Failed to sync frequentlyOrdered:', e);
+          if (__DEV__) console.error('[SyncService] Failed to sync frequentlyOrdered:', e);
         }
       }
 
       if (invalidations.length > 0) {
         await Promise.all(invalidations);
       }
-      console.log('[SyncService] Synchronization check completed successfully.');
     } catch (error) {
-      console.error('[SyncService] Sync check execution error:', error);
+      if (__DEV__) console.error('[SyncService] Sync check execution error:', error);
     }
   },
 };
