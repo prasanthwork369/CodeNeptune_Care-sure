@@ -12,21 +12,13 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePrescriptionPicker } from "@/src/hooks/ui/usePrescriptionPicker";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { MAX_SIZE_BYTES } from "@/src/utils/prescription";
-import {
-  BottomSheetModal,
-  BottomSheetScrollView,
-  useBottomSheet,
-} from "@gorhom/bottom-sheet";
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
-import React, { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  runOnJS,
-  useAnimatedReaction,
-} from "react-native-reanimated";
+import React, { useEffect, useState } from "react";
+import { Text, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 interface UploadPrescriptionSheetProps {
   isVisible: boolean;
@@ -46,25 +38,6 @@ const VALID_ITEMS = [
   "Patient's details",
   "Medicine details",
 ];
-
-// Tracks the sheet's animated snap position (rendered as a child of
-// BottomSheetModal) so the "Before You Upload" section toggles live as the
-// user drags, instead of only after the drag settles.
-const BeforeUploadSync: React.FC<{
-  onExpandChange: (expanded: boolean) => void;
-}> = ({ onExpandChange }) => {
-  const { animatedIndex } = useBottomSheet();
-
-  useAnimatedReaction(
-    () => animatedIndex.value,
-    (current, previous) => {
-      if (previous !== null && current === previous) return;
-      runOnJS(onExpandChange)(current > 0.5);
-    },
-  );
-
-  return null;
-};
 
 export const UploadPrescriptionSheet: React.FC<
   UploadPrescriptionSheetProps
@@ -86,6 +59,7 @@ export const UploadPrescriptionSheet: React.FC<
     onDismiss?: () => void;
   } | null>(null);
   const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
+  const { maxSizeLabel, validityLabel } = useUploadConfig();
   const [duplicateFile, setDuplicateFile] = useState<{
     name: string;
     size?: number;
@@ -112,15 +86,18 @@ export const UploadPrescriptionSheet: React.FC<
   }, [isVisible]);
 
   const adjustedBottom = useAdjustedBottomInset();
-  const sheetRef = useRef<BottomSheetModal>(null);
+  const { height: screenHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  // Every pixel the sheet is allowed to use: everything down from just under
+  // the status bar. Derived rather than a flat percentage so a short screen, or
+  // one whose 3-button nav bar eats height, still gets the full room available
+  // and can show "Before You Upload" outright instead of falling back to a
+  // scroll. The sheet only grows this far when the content actually needs it.
+  const maxSheetHeight = screenHeight - insets.top - exactScale(12);
 
-  const handleToggleBeforeUpload = () => {
-    // Expand to the larger snap point when showing the extra content,
-    // shrink back to the normal one when hiding it. `showBeforeUpload`
-    // itself is kept in sync via BeforeUploadSync below, so it also
-    // updates live as the user manually drags between snap points.
-    sheetRef.current?.snapToIndex(showBeforeUpload ? 0 : 1);
-  };
+  // Toggling the section changes the content height, and the sheet resizes to
+  // match — so there is no snap point to drive here any more.
+  const handleToggleBeforeUpload = () => setShowBeforeUpload((v) => !v);
 
   return (
     <>
@@ -136,7 +113,7 @@ export const UploadPrescriptionSheet: React.FC<
       <FileTooLargeModal
         visible={!!tooLargeSizeMB}
         selectedSizeLabel={`${tooLargeSizeMB} MB`}
-        maxSizeLabel={`${(MAX_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB`}
+        maxSizeLabel={maxSizeLabel}
         onClose={() => setTooLargeSizeMB(null)}
         onChooseAnother={() => {
           setTooLargeSizeMB(null);
@@ -162,19 +139,21 @@ export const UploadPrescriptionSheet: React.FC<
         }}
       />
 
+      {/* Content-sized, not percentage-sized. The content is laid out in fixed
+          Figma pixels, so a "65%" snap point resolves to fewer pixels than it
+          needs on a short device and clips the bottom of "Before You Upload".
+          Sizing to the content instead fits every screen, and the sheet grows
+          on its own when the section expands. */}
       <GorhomBottomSheet
-        ref={sheetRef}
         isVisible={isVisible}
         onClose={onClose}
-        snapPoints={["45%", "65%"]}
-        closeButtonOffset="45%"
+        maxDynamicContentSize={maxSheetHeight}
         backgroundStyle={{
           backgroundColor: "#fff",
           borderTopLeftRadius: exactScale(12),
           borderTopRightRadius: exactScale(12),
         }}
       >
-        <BeforeUploadSync onExpandChange={setShowBeforeUpload} />
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -462,6 +441,7 @@ export const UploadPrescriptionSheet: React.FC<
                 }}
               />
 
+              {/* Same three rules the web shows, from the same backend config. */}
               <Text
                 className="font-inter text-brand-subtext"
                 style={{
@@ -469,7 +449,7 @@ export const UploadPrescriptionSheet: React.FC<
                   marginBottom: exactScale(4),
                 }}
               >
-                File size should be less than 5 MB
+                File size should be less than {maxSizeLabel}
               </Text>
               <Text
                 className="font-inter text-brand-subtext"
@@ -479,6 +459,15 @@ export const UploadPrescriptionSheet: React.FC<
                 }}
               >
                 Supported formats: PDF, JPG, JPEG, PNG
+              </Text>
+              <Text
+                className="font-inter text-brand-subtext"
+                style={{
+                  fontSize: moderateScale(12),
+                  marginBottom: exactScale(4),
+                }}
+              >
+                Prescription should be less than {validityLabel} old
               </Text>
             </Animated.View>
           )}
