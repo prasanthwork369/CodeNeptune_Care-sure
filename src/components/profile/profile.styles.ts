@@ -15,7 +15,8 @@ export const profileStyles = StyleSheet.create({
     coinsSub:       { fontSize: moderateScale(15) },
     coinsLabel:     { fontSize: moderateScale(15) },
     coinsBold:      { fontSize: moderateScale(15) },
-    coinsSaved:     { fontSize: moderateScale(13) },
+    // Figma: Inter Medium 14 / line-height 100% / letter-spacing 0
+    coinsSaved:     { fontSize: moderateScale(14), lineHeight: moderateScale(14), letterSpacing: 0 },
 
     // ProfileInfoList
     sectionTitle:   { fontSize: moderateScale(16) },

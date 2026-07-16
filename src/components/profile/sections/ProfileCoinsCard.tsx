@@ -79,7 +79,7 @@ export const ProfileCoinsCard: React.FC = () => {
         </View>
         <Text
           style={s.coinsSaved}
-          className="font-inter-semibold text-[#0F7635] mt-2"
+          className="font-inter-medium text-[#0F7635] mt-2"
         >
           Member since {memberYear}
         </Text>
