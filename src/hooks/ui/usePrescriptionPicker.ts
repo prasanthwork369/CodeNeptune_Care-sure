@@ -1,3 +1,4 @@
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
@@ -18,6 +19,7 @@ export function usePrescriptionPicker(
 ) {
   const router = useNav();
   const { addItems } = usePrescriptionDraftStore();
+  const { maxSizeBytes } = useUploadConfig();
 
   const showErr = (title: string, message: string, onDismiss?: () => void) =>
     onError?.(title, message, onDismiss);
@@ -87,6 +89,7 @@ export function usePrescriptionPicker(
         asset,
         onError,
         onSizeExceeded,
+        maxSizeBytes,
       );
       if (item) validated.push(item);
     }

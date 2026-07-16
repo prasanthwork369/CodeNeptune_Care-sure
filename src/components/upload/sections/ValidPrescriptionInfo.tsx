@@ -1,5 +1,6 @@
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import React from "react";
 import { Text, View } from "react-native";
 import { Image } from "expo-image";
@@ -15,6 +16,7 @@ const VALID_ITEMS = [
 ];
 
 export const ValidPrescriptionInfo: React.FC = () => {
+  const { maxSizeLabel, validityLabel } = useUploadConfig();
   const rxBoxW = Math.round(exactScale(105));
   const rxBoxH = Math.round(rxBoxW * 1.09);
   const rxImgW = Math.round(rxBoxW * 0.71);
@@ -88,11 +90,16 @@ export const ValidPrescriptionInfo: React.FC = () => {
         </Svg>
       </View>
 
+      {/* Wording per the mobile design; the numbers come from the backend so
+          this can never promise a limit the upload check would reject. */}
       <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
-        File size should be less than 5 MB
+        File size should be less than {maxSizeLabel}
       </Text>
       <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
         Supported formats: PDF, JPG, JPEG, PNG
+      </Text>
+      <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+        Prescription should be less than {validityLabel} old
       </Text>
     </View>
   );

@@ -40,6 +40,12 @@ export interface PaymentSettings {
     [key: string]: any;
 }
 
+/** Backend-owned prescription upload rules. */
+export interface UploadConfig {
+    maxFileSizeMb: number;
+    prescriptionValidityMonths: number;
+}
+
 // Public axios instance — no auth headers, used for endpoints accessible without login
 const publicAxios = axios.create({
     baseURL: API_BASE_URL,
@@ -83,6 +89,11 @@ export const settingsApi = {
 
     getPaymentSettings: async (): Promise<PaymentSettings> => {
         const response = await apiClient.get(API_ENDPOINTS.SETTINGS_PAYMENT);
+        return response.data.data;
+    },
+
+    getUploadConfig: async (): Promise<UploadConfig> => {
+        const response = await apiClient.get(API_ENDPOINTS.SETTINGS_UPLOAD);
         return response.data.data;
     },
 };

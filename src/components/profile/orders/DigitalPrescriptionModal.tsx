@@ -7,6 +7,7 @@ import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState, useMemo, useRef } from "react";
 import { Image, Text, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { useSystemTemplate } from "@/src/hooks/queries/useSystemTemplates";
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { WebView } from "react-native-webview";
 
 interface MedicineItem {
@@ -75,6 +76,7 @@ export const DigitalPrescriptionModal: React.FC<
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const [activePatientIdx, setActivePatientIdx] = useState(0);
   const webViewRef = useRef<WebView>(null);
+  const { validityMonths } = useUploadConfig();
 
   // Triggers the WebView's print flow, which on Android/iOS lets the user
   // save the rendered prescription as a PDF (no extra library needed).
@@ -99,7 +101,10 @@ export const DigitalPrescriptionModal: React.FC<
     clinicalData?.approvedAt || orderCreatedAt || new Date()
   );
   const expiryDate = new Date(issueDate);
-  expiryDate.setMonth(expiryDate.getMonth() + 6); // standard 6 months validity
+  // Validity is the backend's rule, not the app's — printing a longer expiry
+  // than the server honours tells the patient the prescription is still valid
+  // when it is not.
+  expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
 
   const variables = useMemo(() => {
     // Read the nested `patient` object first (the real API shape, same as the

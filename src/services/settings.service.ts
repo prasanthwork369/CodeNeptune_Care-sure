@@ -5,4 +5,5 @@ export const settingsService = {
     getCartWalletSettings: () => settingsApi.getCartWalletSettings(),
     getSettings: () => settingsApi.getSettings(),
     getPaymentSettings: () => settingsApi.getPaymentSettings(),
+    getUploadConfig: () => settingsApi.getUploadConfig(),
 };

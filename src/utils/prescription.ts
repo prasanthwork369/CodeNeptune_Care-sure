@@ -4,7 +4,23 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { CapturedAsset } from '../features/prescription-scanner';
 
+/**
+ * Last-resort fallbacks, NOT the real limits.
+ *
+ * The admin owns these values and they arrive from
+ * `/settings/public/customer/upload` via `useUploadConfig()`, which caches them
+ * in SQLite. So these apply only on a first-ever launch that has never reached
+ * the API — after one successful fetch the cached values win, even offline.
+ *
+ * They are deliberately *under* the real limits: guessing low makes the app
+ * reject a file the server would have taken (user retries smaller), while
+ * guessing high would accept a file the server rejects, wasting a full upload
+ * before failing. Rejecting early is the kinder failure.
+ */
 export const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+export const PRESCRIPTION_VALIDITY_MONTHS = 6;
+
+/** Not backend-driven — the API exposes no per-request file count. */
 export const MAX_FILES = 10;
 
 const ALLOWED_MIME_TYPES = new Set([
@@ -81,8 +97,12 @@ const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
 export async function validatePrescriptionFile(
     asset: DocumentPicker.DocumentPickerAsset | ImagePicker.ImagePickerAsset | CapturedAsset,
     onError?: (title: string, message: string) => void,
-    onSizeExceeded?: (sizeMB: string) => void
+    onSizeExceeded?: (sizeMB: string) => void,
+    // Passed in rather than read here: this is a plain util and cannot call the
+    // hook that fetches the backend limit. Callers supply it via useUploadConfig.
+    maxSizeBytes: number = MAX_SIZE_BYTES
 ): Promise<PrescriptionItem | null> {
+    const limitLabel = `${Math.round(maxSizeBytes / (1024 * 1024))} MB`;
     const uri = asset.uri;
     const name =
         (asset as any).name ??
@@ -103,10 +123,10 @@ export async function validatePrescriptionFile(
     
     // Performance optimization: If picker already says it's too big, reject immediately 
     // to avoid the expensive copy/resolve operation.
-    if (size > MAX_SIZE_BYTES) {
+    if (size > maxSizeBytes) {
         const sizeMB = (size / (1024 * 1024)).toFixed(2);
         if (onSizeExceeded) onSizeExceeded(sizeMB);
-        else onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is 5 MB.`);
+        else onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is ${limitLabel}.`);
         return null;
     }
 
@@ -131,7 +151,7 @@ export async function validatePrescriptionFile(
         if (__DEV__) console.error('[Prescription] Failed to resolve/stat file:', e);
     }
 
-    if (__DEV__) console.log(`[Prescription] Final size for "${name}": ${size} bytes (limit: ${MAX_SIZE_BYTES})`);
+    if (__DEV__) console.log(`[Prescription] Final size for "${name}": ${size} bytes (limit: ${maxSizeBytes})`);
 
     const cleanup = () => {
         if (isCopy) {
@@ -150,11 +170,11 @@ export async function validatePrescriptionFile(
         return null;
     }
 
-    if (size > MAX_SIZE_BYTES) {
+    if (size > maxSizeBytes) {
         cleanup();
         const sizeMB = (size / (1024 * 1024)).toFixed(2);
         if (onSizeExceeded) onSizeExceeded(sizeMB);
-        else onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is 5 MB.`);
+        else onError?.('Upload Restriction', `"${name}" is ${sizeMB} MB — maximum allowed is ${limitLabel}.`);
         return null;
     }
 

@@ -3,6 +3,7 @@ import {
   storageApi,
   UploadedImage,
 } from "@/src/api/storage.api";
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { MAX_FILES, validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
@@ -29,6 +30,8 @@ export function useSelectPatientImages(
   filesParam: string,
   imageUrlsParam: string,
 ) {
+  const { maxSizeBytes } = useUploadConfig();
+
   const parse = <T,>(raw: string, fallback: T): T => {
     try {
       return raw ? (JSON.parse(raw) as T) : fallback;
@@ -74,8 +77,11 @@ export function useSelectPatientImages(
           );
           break;
         }
-        const item = await validatePrescriptionFile(asset, (title, message) =>
-          Alert.alert(title, message),
+        const item = await validatePrescriptionFile(
+          asset,
+          (title, message) => Alert.alert(title, message),
+          undefined,
+          maxSizeBytes,
         );
         if (!item) continue;
         const uploaded = await storageApi.upload(

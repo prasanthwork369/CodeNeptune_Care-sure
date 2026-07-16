@@ -1,3 +1,4 @@
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
@@ -16,6 +17,7 @@ export function usePrescriptionUpload(
 ) {
   const router = useNav();
   const { addItems } = usePrescriptionDraftStore();
+  const { maxSizeBytes } = useUploadConfig();
   // Valid files from a batch that also contained an oversized file —
   // held back until the "file too large" notice is dismissed, so the
   // preview screen never appears underneath it.
@@ -34,10 +36,15 @@ export function usePrescriptionUpload(
     const validated: PrescriptionItem[] = [];
     let hadTooLarge = false;
     for (const asset of assets) {
-      const item = await validatePrescriptionFile(asset, onError, (sizeMB) => {
-        hadTooLarge = true;
-        onSizeExceeded?.(sizeMB);
-      });
+      const item = await validatePrescriptionFile(
+        asset,
+        onError,
+        (sizeMB) => {
+          hadTooLarge = true;
+          onSizeExceeded?.(sizeMB);
+        },
+        maxSizeBytes,
+      );
       if (item) validated.push(item);
     }
     return { validated, hadTooLarge };

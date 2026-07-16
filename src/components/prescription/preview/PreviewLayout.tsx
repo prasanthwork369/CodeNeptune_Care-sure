@@ -4,6 +4,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
@@ -13,7 +14,6 @@ import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import {
     MAX_FILES,
-    MAX_SIZE_BYTES,
     validatePrescriptionFile,
 } from "@/src/utils/prescription";
 import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
@@ -49,6 +49,7 @@ export const PreviewLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
+  const { maxSizeBytes, maxSizeLabel } = useUploadConfig();
 
   const {
     takePhoto,
@@ -157,6 +158,7 @@ export const PreviewLayout: React.FC = () => {
         asset,
         showInfo,
         setTooLargeSizeMB,
+        maxSizeBytes,
       );
       if (!item) continue;
       const isDuplicate =
@@ -372,7 +374,7 @@ export const PreviewLayout: React.FC = () => {
       <FileTooLargeModal
         visible={!!tooLargeSizeMB}
         selectedSizeLabel={`${tooLargeSizeMB} MB`}
-        maxSizeLabel={`${(MAX_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB`}
+        maxSizeLabel={maxSizeLabel}
         onClose={() => setTooLargeSizeMB(null)}
         onChooseAnother={() => {
           setTooLargeSizeMB(null);

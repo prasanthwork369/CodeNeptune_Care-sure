@@ -126,6 +126,7 @@ export const API_ENDPOINTS = {
   SETTINGS_MOBILE_APP_LINKS: "/api/v1/settings/mobile-app-links",
   SETTINGS_CART_WALLET: "/api/v1/settings/public/customer/cart-wallet",
   SETTINGS_PAYMENT: "/api/v1/settings/public/customer/payment-settings",
+  SETTINGS_UPLOAD: "/api/v1/settings/public/customer/upload",
 
   // ── Sync ─────────────────────────────────────────────────────────────────
   SYNC_CHECK: "/api/v1/sync/check",
