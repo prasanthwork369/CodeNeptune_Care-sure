@@ -121,13 +121,13 @@ export const EmailVerifyModal: React.FC<EmailVerifyModalProps> = ({
             </Text>
 
             <OtpForm
-              otp={otp.otp}
+              slots={otp.slots}
+              inputValue={otp.inputValue}
               otpError=""
               error={verifyError}
               loading={verifying || requesting}
               resendCooldown={resendCooldown}
               activeIndex={otp.activeIndex}
-              selection={otp.selection}
               onBoxPress={otp.handleBoxPress}
               onOtpChange={handleChange}
               onResend={handleResend}
@@ -135,12 +135,12 @@ export const EmailVerifyModal: React.FC<EmailVerifyModalProps> = ({
             />
 
             <Touchable
-              onPress={() => handleVerify(otp.otp)}
-              disabled={otp.otp.length !== 6 || verifying}
+              onPress={() => handleVerify(otp.code)}
+              disabled={otp.code.length !== 6 || verifying}
               activeOpacity={0.85}
               style={[
                 s.verifyBtn,
-                { opacity: otp.otp.length !== 6 || verifying ? 0.5 : 1 },
+                { opacity: otp.code.length !== 6 || verifying ? 0.5 : 1 },
               ]}
             >
               {verifying ? (

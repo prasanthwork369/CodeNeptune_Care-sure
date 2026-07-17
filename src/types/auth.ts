@@ -15,13 +15,15 @@ export interface LoginSubmitButtonProps {
 }
 
 export interface OtpFormProps {
-  otp: string;
+  /** One entry per box; "" renders an empty box. */
+  slots: string[];
+  /** Text held by the hidden input — filled digits only. */
+  inputValue: string;
   otpError: string;
   error: string | null;
   loading: boolean;
   resendCooldown: number;
   activeIndex: number;
-  selection?: { start: number; end: number };
   onBoxPress: (index: number) => void;
   onOtpChange: (value: string) => void;
   onResend: () => void;

@@ -13,6 +13,8 @@ import Animated, {
 import { styles as s } from "./OtpForm.styles";
 
 const OTP_LENGTH = 6;
+// One over the code length, or replacing a digit in a full code fires no change event.
+const INPUT_MAX_LENGTH = OTP_LENGTH + 1;
 
 // Blinking caret shown in the active empty box — the real TextInput is
 // invisible, so this stands in for its cursor.
@@ -32,13 +34,13 @@ const Caret = () => {
 };
 
 export const OtpForm: React.FC<OtpFormProps> = ({
-  otp,
+  slots,
+  inputValue,
   otpError,
   error,
   loading,
   resendCooldown,
   activeIndex,
-  selection,
   onBoxPress,
   onOtpChange,
   onResend,
@@ -49,7 +51,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
   // wrong code clears the boxes, the field is empty — red on empty boxes
   // hides the active highlight and looks broken. The error message below
   // still shows; the boxes go back to a clean active-green state to retype.
-  const showError = !!(otpError || error) && otp.length > 0;
+  const showError = !!(otpError || error) && slots.some(Boolean);
 
   return (
     <View>
@@ -62,7 +64,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
       <View style={s.boxRow}>
         {[...Array(OTP_LENGTH)].map((_, index) => {
           const isActive = focused && index === activeIndex;
-          const isFilled = !!otp[index];
+          const isFilled = !!slots[index];
           return (
             <Pressable
               key={index}
@@ -83,7 +85,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               ]}
             >
               {isFilled ? (
-                <Text style={s.otpDigit}>{otp[index]}</Text>
+                <Text style={s.otpDigit}>{slots[index]}</Text>
               ) : isActive ? (
                 <Caret />
               ) : null}
@@ -102,13 +104,12 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               }
             }
           }}
-          value={otp}
-          selection={selection}
+          value={inputValue}
           onChangeText={onOtpChange}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           keyboardType="number-pad"
-          maxLength={OTP_LENGTH}
+          maxLength={INPUT_MAX_LENGTH}
           textContentType="oneTimeCode"
           autoComplete="sms-otp"
           accessibilityLabel="OTP code"

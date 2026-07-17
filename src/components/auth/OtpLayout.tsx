@@ -29,14 +29,14 @@ export const OtpLayout: React.FC = () => {
   const {
     router,
     phone,
-    otp,
+    slots,
+    inputValue,
     otpError,
     error,
     resendCooldown,
     isButtonLoading,
     isValid,
     inputRef,
-    selection,
     activeIndex,
     handleBoxPress,
     handleResend,
@@ -64,13 +64,13 @@ export const OtpLayout: React.FC = () => {
           </View>
 
           <OtpForm
-            otp={otp}
+            slots={slots}
+            inputValue={inputValue}
             otpError={otpError}
             error={error}
             loading={isButtonLoading}
             resendCooldown={resendCooldown}
             activeIndex={activeIndex}
-            selection={selection}
             onBoxPress={handleBoxPress}
             onOtpChange={handleOtpChange}
             onResend={handleResend}
