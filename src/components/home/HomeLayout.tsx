@@ -37,9 +37,10 @@ import { useUIStore } from "@/src/store/uiStore";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const EMPTY_BANNERS: NonNullable<
@@ -103,6 +104,11 @@ export const HomeLayout: React.FC = () => {
 
   // Sequential onboarding: location → notification → unlock signup popup.
   useHomeOnboarding();
+
+  usePerformanceTrace({
+    traceName: PERF_TRACES.HOME_SCREEN_LOAD,
+    isLoading: isHomeLoading,
+  });
 
   const [isScreenFocused, setIsScreenFocused] = useState(true);
   // Settles the "scrolling" flag back to false shortly after the last scroll

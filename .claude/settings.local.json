@@ -6,7 +6,9 @@
       "Bash(xargs grep -l \"profileStore\\\\|addressStore\\\\|homeStore\\\\|categoryStore\\\\|profile\\\\.service\\\\|address\\\\.service\\\\|home\\\\.service\\\\|category\\\\.service\")",
       "Read(//c/Code Neptune/ShaN/Jay/care-sure-main/care-sure-main/customer-website/**)",
       "Bash(git checkout *)",
-      "Bash(adb devices *)"
+      "Bash(adb devices *)",
+      "Bash(cd \"C:/Code Neptune/App_Development/W/customer-website\" && echo \"=== product-type slugs \\(valid productTypes\\) ===\" && sed -n '1,60p' src/constants/product-type.ts 2>/dev/null | head -60 && echo \"\" && echo \"=== does product API return canonical/share/url/productType/slug? ===\" && grep -rn \"canonicalUrl\\\\|shareUrl\\\\|productUrl\\\\|productType\\\\|\\\\\"slug\\\\\"\\\\|canonical\" src/lib/hooks/queries/useSearch.ts src/types 2>/dev/null | head -15)",
+      "Read(//c/Code Neptune/App_Development/W/customer-website/**)"
     ]
   }
 }

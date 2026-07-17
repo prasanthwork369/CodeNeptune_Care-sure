@@ -30,6 +30,7 @@ import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
 import "../global.css";
 
 initDb();
@@ -92,6 +93,11 @@ export default function RootLayout() {
   // The app renders and initialises underneath while the splash plays —
   // so when the curtain lifts the home screen is already ready, no white flash.
   const showSplash = !interFontsLoaded || !isAnimationDone || !isAuthLoaded;
+
+  usePerformanceTrace({
+    traceName: PERF_TRACES.APP_LAUNCH,
+    isLoading: showSplash,
+  });
 
   return (
     <ErrorBoundary>

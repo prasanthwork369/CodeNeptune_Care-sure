@@ -6,7 +6,7 @@ import { handleNotificationAction } from "./notificationActions";
 // CareSure branded notification visuals. `notification_icon` is the white
 // silhouette drawable the expo-notifications plugin generates from
 // notification-icon.png; the large icon is the full-colour logo.
-const BRAND_COLOR = "#0F7635";
+const BRAND_COLOR = "#FFFFFF";
 const SMALL_ICON = "notification_icon";
 // Large icon = the filled green-gradient tile (white logo on a gradient), so it
 // reads big and branded in the shade like other apps' notifications, rather than
@@ -105,7 +105,9 @@ export const notifeeService = {
     if (!initial?.notification) return null;
     const data = (initial.notification.data ?? {}) as NotificationData;
     const tapId =
-      data["google.message_id"] || initial.notification.id || String(Date.now());
+      data["google.message_id"] ||
+      initial.notification.id ||
+      String(Date.now());
     return { data, tapId };
   },
 
@@ -144,8 +146,7 @@ export const notifeeService = {
         }
 
         const data = (n.data ?? {}) as NotificationData;
-        const tapId =
-          data["google.message_id"] || n.id || String(Date.now());
+        const tapId = data["google.message_id"] || n.id || String(Date.now());
         onPress(data, tapId);
       },
     );

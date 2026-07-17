@@ -102,6 +102,7 @@ export function useCartCalculations() {
     addItem,
     removeItem,
     updateItem,
+    isLoading: isCartLoading,
   } = useCart();
   const { products: featuredProducts } = useFeaturedMedicines();
   const { data: settings } = useCartWalletSettings();
@@ -326,5 +327,6 @@ export function useCartCalculations() {
     updateItem,
     removeItem,
     firstName,
+    isCartLoading,
   };
 }

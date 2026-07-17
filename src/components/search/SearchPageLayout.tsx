@@ -8,7 +8,9 @@ import { useCart } from '@/src/hooks/queries/useCart';
 import { useSearch, useSearchHistory, useSearchSuggestions, useTrendingSearches } from '@/src/hooks/queries/useSearch';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
-import React from 'react';
+import { perfService } from '@/src/services/performance/perfService';
+import { PERF_TRACES } from '@/src/services/performance';
+import React, { useEffect, useRef } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from '@/src/hooks/ui/useIsOffline';
@@ -116,6 +118,34 @@ export const SearchPageLayout = () => {
         hasNextPage,
         debouncedQuery,
     } = useSearch();
+
+    // Trace each search query end-to-end: start when a new query begins, stop
+    // when its results arrive. A new query ends the previous trace first so
+    // fast successive searches are each measured (the service guards duplicates).
+    const tracedQueryRef = useRef("");
+    useEffect(() => {
+        const q = debouncedQuery.trim();
+        if (q.length === 0 || q === tracedQueryRef.current) return;
+        perfService.stopTrace(PERF_TRACES.SEARCH_QUERY_LOAD);
+        tracedQueryRef.current = q;
+        perfService.startTrace(PERF_TRACES.SEARCH_QUERY_LOAD, {
+            query_length: String(q.length),
+        });
+    }, [debouncedQuery]);
+
+    useEffect(() => {
+        if (tracedQueryRef.current && !isLoading) {
+            perfService.stopTrace(PERF_TRACES.SEARCH_QUERY_LOAD, undefined, {
+                result_count: results.length,
+            });
+            tracedQueryRef.current = "";
+        }
+    }, [isLoading, results.length]);
+
+    // Flush an in-flight trace if the user leaves mid-search.
+    useEffect(() => () => {
+        perfService.stopTrace(PERF_TRACES.SEARCH_QUERY_LOAD);
+    }, []);
 
     const { history, recordHistory, clearHistory, isClearingHistory, deleteHistoryItem } = useSearchHistory(5);
     const { suggestions } = useSearchSuggestions(query, 5);

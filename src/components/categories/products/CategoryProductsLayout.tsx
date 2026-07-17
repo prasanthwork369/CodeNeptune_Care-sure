@@ -12,6 +12,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { moderateScale } from "@/src/utils/exactScale";
 import { useLocalSearchParams } from "expo-router";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
 import React from "react";
 import {
   RefreshControl,
@@ -40,6 +41,12 @@ const CategoryProductsContent: React.FC = () => {
     categorySlug: familySlug || slug,
     subCategorySlug: familySlug ? slug : undefined,
   });
+
+  usePerformanceTrace({
+    traceName: PERF_TRACES.PRODUCT_LIST_LOAD,
+    isLoading: isLoading,
+  });
+
   const cardWidth = (width - GRID_PADDING * 2 - GRID_GAP) / 2;
 
   return (

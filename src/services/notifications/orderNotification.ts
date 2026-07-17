@@ -4,7 +4,7 @@ import { isExpoGo } from "../../utils/environment";
 import { NOTIFICATION_ACTIONS } from "./notificationActions";
 
 // Same branded visuals as notifeeService so local and push notifications match.
-const BRAND_COLOR = "#0F7635";
+const BRAND_COLOR = "#FFFFFF";
 const SMALL_ICON = "notification_icon";
 const LARGE_ICON = require("../../../assets/images/notification-tile.png");
 

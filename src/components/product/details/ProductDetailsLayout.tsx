@@ -12,6 +12,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { LinearGradient } from "expo-linear-gradient";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -46,6 +47,11 @@ export const ProductDetailsLayout: React.FC = () => {
     useProduct(id);
   const { items: cartItems } = useCart();
   const { appContent, isLoading: isHomeLoading } = useHome();
+
+  usePerformanceTrace({
+    traceName: PERF_TRACES.PRODUCT_DETAILS_LOAD,
+    isLoading,
+  });
 
   const [locationSheetVisible, setLocationSheetVisible] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(

@@ -9,6 +9,8 @@ import { useRef, useState } from "react";
 import { Keyboard } from "react-native";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 
+import { perfService } from "@/src/services/performance/perfService";
+
 /**
  * Custom hook managing the business logic for the Login screen.
  * Handles phone number sanitization, validation, native SIM suggestions, and triggering OTP request mutations.
@@ -72,9 +74,11 @@ export function useLogin() {
       return;
     }
     Keyboard.dismiss();
+    perfService.startTrace("login_submit");
     try {
       const formattedPhone = `+91${phoneNumber}`;
       const res = await requestOtp(formattedPhone);
+      perfService.stopTrace("login_submit");
       // Prefill the OTP only when the backend returns it (QA/staging convenience).
       // Consistent with the resend path in useOtp. The production backend must
       // NOT include `otp` in the response, or it would auto-fill for real users.
@@ -84,6 +88,7 @@ export function useLogin() {
         params: { phone: formattedPhone, prefillOtp },
       });
     } catch {
+      perfService.stopTrace("login_submit");
       // Error state is captured and handled by useAuth hook
     }
   };

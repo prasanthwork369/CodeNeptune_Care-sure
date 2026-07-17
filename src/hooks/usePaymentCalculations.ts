@@ -2,6 +2,8 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
+import { perfService } from "@/src/services/performance/perfService";
+import { PERF_TRACES } from "@/src/services/performance";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -121,6 +123,9 @@ export function usePaymentCalculations() {
 
     // Loader on immediately, before any network call.
     setPlacingOrder(true);
+    // Trace the real checkout latency (prescription upload + createOrder),
+    // starting only once the order is actually in flight — not screen dwell.
+    perfService.startTrace(PERF_TRACES.CHECKOUT_FLOW, { method: selectedMethod });
 
     // Create the prescription now (deferred from Preview) when we're carrying
     // image URLs and don't already have an id. createdRxIdRef keeps this
@@ -134,6 +139,7 @@ export function usePaymentCalculations() {
       });
       if (!rx.success) {
         setPlacingOrder(false);
+        perfService.stopTrace(PERF_TRACES.CHECKOUT_FLOW, { status: "rx_upload_failed" });
         Alert.alert(
           "Upload Failed",
           rx.error ?? "Could not save prescription. Please try again.",
@@ -226,8 +232,10 @@ export function usePaymentCalculations() {
       console.log("[handlePlaceOrder] payload:", JSON.stringify(payload, null, 2));
     }
 
+    let orderSucceeded = false;
     try {
       const order: any = await createOrder(payload);
+      orderSucceeded = true;
       removeCoupon();
       clearCheckout();
       clearPrescriptionOrder();
@@ -263,6 +271,11 @@ export function usePaymentCalculations() {
       Alert.alert("Order Failed", errorMessage);
     } finally {
       setPlacingOrder(false);
+      perfService.stopTrace(
+        PERF_TRACES.CHECKOUT_FLOW,
+        { status: orderSucceeded ? "success" : "failed" },
+        { item_count: orderItems.length },
+      );
     }
   };
 
