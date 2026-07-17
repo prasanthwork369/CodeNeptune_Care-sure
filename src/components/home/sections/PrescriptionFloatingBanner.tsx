@@ -20,7 +20,6 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { HOME_IMAGES } from "@/src/constants/images";
-import PRESCRIPTION_ICON from "../../../../assets/images/prescription/prescription-pending.png";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 
@@ -201,7 +200,7 @@ export const PrescriptionFloatingBanner = ({
                   />
                 ) : (
                   <Image
-                    source={PRESCRIPTION_ICON}
+                    source={HOME_IMAGES.prescription}
                     style={{ width: exactScale(44), height: exactScale(44) }}
                     contentFit="contain"
                   />
