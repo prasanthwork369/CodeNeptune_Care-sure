@@ -41,6 +41,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { useScrollJankTrace } from "@/src/hooks/home/useScrollJankTrace";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const EMPTY_BANNERS: NonNullable<
@@ -110,6 +111,11 @@ export const HomeLayout: React.FC = () => {
     isLoading: isHomeLoading,
   });
 
+  // Reports scroll smoothness (janky frames) to Firebase per scroll session.
+  const { start: startScrollJank, stop: stopScrollJank } = useScrollJankTrace(
+    PERF_TRACES.HOME_SCROLL,
+  );
+
   const [isScreenFocused, setIsScreenFocused] = useState(true);
   // Settles the "scrolling" flag back to false shortly after the last scroll
   // event so a single drag→fling doesn't flip it true/false/true/false.
@@ -136,6 +142,7 @@ export const HomeLayout: React.FC = () => {
           feedScrollSettleRef.current = null;
         }
         setFeedScrolling(false);
+        stopScrollJank();
       };
     }, [
       reopenLocationSheet,
@@ -143,6 +150,7 @@ export const HomeLayout: React.FC = () => {
       setTabBarVisible,
       setUploadButtonCollapsed,
       setFeedScrolling,
+      stopScrollJank,
     ]),
   );
   const heroHeightShared = useSharedValue(0);
@@ -220,15 +228,17 @@ export const HomeLayout: React.FC = () => {
       feedScrollSettleRef.current = null;
     }
     setFeedScrolling(true);
-  }, [setFeedScrolling]);
+    startScrollJank();
+  }, [setFeedScrolling, startScrollJank]);
 
   const handleScrollStop = useCallback(() => {
     if (feedScrollSettleRef.current) clearTimeout(feedScrollSettleRef.current);
     feedScrollSettleRef.current = setTimeout(() => {
       setFeedScrolling(false);
       feedScrollSettleRef.current = null;
+      stopScrollJank();
     }, 120);
-  }, [setFeedScrolling]);
+  }, [setFeedScrolling, stopScrollJank]);
 
   // Stable identity for the memoized HomeHeader — a fresh object/closure each
   // render would defeat its React.memo and re-render the header needlessly.

@@ -1,6 +1,7 @@
 export type PerfTraceName =
   | "app_launch"
   | "home_screen_load"
+  | "home_scroll"
   | "product_list_load"
   | "product_details_load"
   | "search_query_load"

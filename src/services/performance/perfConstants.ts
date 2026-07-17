@@ -7,6 +7,7 @@ import { PerfTraceName } from "./types";
 export const PERF_TRACES = {
   APP_LAUNCH: "app_launch" as PerfTraceName,
   HOME_SCREEN_LOAD: "home_screen_load" as PerfTraceName,
+  HOME_SCROLL: "home_scroll" as PerfTraceName,
   PRODUCT_LIST_LOAD: "product_list_load" as PerfTraceName,
   PRODUCT_DETAILS_LOAD: "product_details_load" as PerfTraceName,
   SEARCH_QUERY_LOAD: "search_query_load" as PerfTraceName,
