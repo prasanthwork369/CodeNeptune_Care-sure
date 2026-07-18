@@ -34,15 +34,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const token = await tokenStorage.get();
             if (token) {
                 setAccessToken(token);
-                set({ token, isAuthenticated: true });
-                try {
-                    const profile = await profileApi.getProfile();
-                    set({ user: profile, isLoaded: true });
-                } catch {
-                    // Token is invalid/expired — clear it so socket doesn't attempt connection
+
+                // Load from cache instantly, then refresh in the background.
+                const cachedProfile = apiCache.get<CustomerProfile>('customer_profile');
+                set({ token, isAuthenticated: true, user: cachedProfile, isLoaded: true });
+
+                profileApi.getProfile().then((profile) => {
+                    set({ user: profile });
+                    apiCache.set('customer_profile', profile);
+                }).catch(async () => {
+                    // Token expired — logout silently.
                     await get().logout();
-                    set({ isLoaded: true });
-                }
+                });
             } else {
                 const isGuest = await guestStorage.get();
                 set({ isGuest, isLoaded: true });

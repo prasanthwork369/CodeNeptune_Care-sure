@@ -9,29 +9,47 @@ interface SkeletonProps {
     style?: ViewStyle;
 }
 
-// Shared animation value so all skeletons shimmer in sync
+// Shared animation value so all active skeletons shimmer in perfect sync.
 const sharedTranslate = new Animated.Value(0);
-let animationStarted = false;
+
+// Ref-counter: start the loop when the first Skeleton mounts, stop when the last unmounts.
+let mountedCount = 0;
+let loopAnimation: Animated.CompositeAnimation | null = null;
 
 const startSharedAnimation = (screenWidth: number) => {
-    if (animationStarted) return;
-    animationStarted = true;
+    if (mountedCount !== 1) return; // already running; do not create duplicate
     sharedTranslate.setValue(-screenWidth);
-    Animated.loop(
+    loopAnimation = Animated.loop(
         Animated.timing(sharedTranslate, {
             toValue: screenWidth,
             duration: 1100,
             useNativeDriver: true,
         })
-    ).start();
+    );
+    loopAnimation.start();
+};
+
+const stopSharedAnimation = () => {
+    if (mountedCount !== 0) return; // other skeletons still visible
+    loopAnimation?.stop();
+    loopAnimation = null;
 };
 
 export const Skeleton: React.FC<SkeletonProps> = ({ width, height, borderRadius = 4, style }) => {
     const { width: screenWidth } = useWindowDimensions();
+    const screenWidthRef = useRef(screenWidth);
+    screenWidthRef.current = screenWidth;
 
     useEffect(() => {
-        startSharedAnimation(screenWidth);
-    }, [screenWidth]);
+        mountedCount += 1;
+        startSharedAnimation(screenWidthRef.current);
+
+        return () => {
+            mountedCount -= 1;
+            stopSharedAnimation();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <View

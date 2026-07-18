@@ -240,9 +240,20 @@ export function useOtp() {
       Keyboard.dismiss();
       setIsRedirecting(true);
 
-      // Merge guest cart items into backend database cart sequentially (one by one) to prevent database collisions in real-time sync
-      const guestCart = useCartPendingStore.getState().guestCart;
-      if (guestCart && guestCart.items.length > 0) {
+      // Navigate immediately; cart merge runs in the background.
+      const pendingNotification = useNotificationNavigationStore.getState().pendingNotification;
+      if (pendingNotification) {
+        NotificationNavigation.executeNavigation(pendingNotification);
+        useNotificationNavigationStore.getState().clearPendingNotification();
+      } else {
+        router.replace("/(tabs)");
+      }
+
+      // Detached background merge — sequential to avoid backend write collisions.
+      void (async () => {
+        const guestCart = useCartPendingStore.getState().guestCart;
+        if (!guestCart || guestCart.items.length === 0) return;
+
         for (const item of guestCart.items) {
           try {
             await cartApi.addItem({
@@ -266,21 +277,12 @@ export function useOtp() {
             if (__DEV__) console.warn("[CartMerge] Failed to merge item:", item.medicineId, err);
           }
         }
+
         useCartPendingStore.getState().clearGuestCart();
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
-      }
-
-      const pendingNotification = useNotificationNavigationStore.getState().pendingNotification;
-      if (pendingNotification) {
-        NotificationNavigation.executeNavigation(pendingNotification);
-        useNotificationNavigationStore.getState().clearPendingNotification();
-      } else {
-        router.replace("/(tabs)");
-      }
+      })();
     } catch {
-      // Wrong or expired code (error text is surfaced by useAuth). Clear the
-      // boxes and refocus so the user can retype immediately — the standard
-      // recovery pattern in GPay/WhatsApp/banking OTP screens.
+      // Wrong/expired code — clear boxes and refocus.
       resetOtp();
       setTimeout(() => inputRef.current?.focus(), 50);
     }

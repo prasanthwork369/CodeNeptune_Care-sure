@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUIStore } from '@/src/store/uiStore';
-import { RemoveConfirmModal } from '@/src/components/prescription/preview/sections/RemoveConfirmModal';
+import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
 
 export const GlobalAlertDialog = () => {
   const globalAlert = useUIStore((s) => s.globalAlert);
@@ -8,7 +8,7 @@ export const GlobalAlertDialog = () => {
   if (!globalAlert) return null;
 
   return (
-    <RemoveConfirmModal
+    <ConfirmModal
       visible={true}
       title={globalAlert.title}
       message={globalAlert.message}

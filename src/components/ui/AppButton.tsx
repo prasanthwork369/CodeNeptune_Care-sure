@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, Text, View, ViewStyle, TextStyle, StyleSheet } from "react-native";
+import { ActivityIndicator, Text, View, ViewStyle, TextStyle, StyleSheet, TouchableOpacityProps } from "react-native";
 import { Touchable } from "./Touchable";
 import { colors } from "@/src/theme/colors";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -23,6 +23,13 @@ interface AppButtonProps {
   throttleMs?: number;
   activeOpacity?: number;
   children?: React.ReactNode;
+  // Standard accessibility & testing props forwarded to the underlying Touchable
+  testID?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityRole?: TouchableOpacityProps['accessibilityRole'];
+  accessibilityState?: TouchableOpacityProps['accessibilityState'];
+  hitSlop?: TouchableOpacityProps['hitSlop'];
 }
 
 export const AppButton: React.FC<AppButtonProps> = ({
@@ -41,6 +48,12 @@ export const AppButton: React.FC<AppButtonProps> = ({
   throttleMs = 500,
   activeOpacity = 0.85,
   children,
+  testID,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilityRole,
+  accessibilityState,
+  hitSlop,
 }) => {
   // Variant container classes (excluding padding and border radius which are scaled below)
   const getVariantContainerClass = () => {
@@ -132,6 +145,12 @@ export const AppButton: React.FC<AppButtonProps> = ({
       disabled={isBtnDisabled}
       throttleMs={throttleMs}
       activeOpacity={activeOpacity}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityRole={accessibilityRole ?? 'button'}
+      accessibilityState={accessibilityState ?? { disabled: isBtnDisabled }}
+      hitSlop={hitSlop}
       className={`flex-row items-center justify-center ${getVariantContainerClass()} ${
         isBtnDisabled ? "opacity-60" : ""
       } ${className}`}

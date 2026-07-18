@@ -63,10 +63,32 @@ export const useSearch = () => {
 };
 
 export const useSearchSuggestions = (query: string, limit = 8) => {
+    // Debounce suggestions by 250ms — avoids firing a query on every keystroke.
+    const [debouncedSuggestionQuery, setDebouncedSuggestionQuery] = useState(query);
+    const suggestionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        if (suggestionDebounceRef.current) clearTimeout(suggestionDebounceRef.current);
+
+        if (query.trim().length < 1) {
+            // Clear immediately so suggestions hide the moment input is empty
+            setDebouncedSuggestionQuery('');
+            return;
+        }
+
+        suggestionDebounceRef.current = setTimeout(() => {
+            setDebouncedSuggestionQuery(query.trim());
+        }, 250);
+
+        return () => {
+            if (suggestionDebounceRef.current) clearTimeout(suggestionDebounceRef.current);
+        };
+    }, [query]);
+
     const { data, isLoading } = useQuery({
-        queryKey: QUERY_KEYS.SEARCH.SUGGESTIONS(query),
-        queryFn: () => searchService.getSuggestions(query, limit),
-        enabled: query.trim().length >= 1,
+        queryKey: QUERY_KEYS.SEARCH.SUGGESTIONS(debouncedSuggestionQuery),
+        queryFn: () => searchService.getSuggestions(debouncedSuggestionQuery, limit),
+        enabled: debouncedSuggestionQuery.trim().length >= 1,
         staleTime: 5 * 60_000,
     });
 
