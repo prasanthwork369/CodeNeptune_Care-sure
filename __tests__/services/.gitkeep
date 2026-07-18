@@ -1,0 +1,4 @@
+# services tests
+
+Placeholder so the folder is tracked. Add services .test.ts(x) files here.
+See ../stores/cartStore.test.ts for the reference pattern.
