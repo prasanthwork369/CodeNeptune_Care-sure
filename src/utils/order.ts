@@ -132,9 +132,11 @@ const round2 = (n: number) => parseFloat(n.toFixed(2));
 // snapshot carries no discount, the item shows unitPrice with no strikethrough.
 export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
   const mrp = Number(item.unitPrice ?? 0);
+  // Use `||` (not `??`) to match the web: a stored discountPercent of 0 must fall
+  // through to discountPercentage, where the real value lives for some items.
   const discount = Number(
-    item.medicineSnapshot?.discountPercent ??
-      item.medicineSnapshot?.discountPercentage ??
+    item.medicineSnapshot?.discountPercent ||
+      item.medicineSnapshot?.discountPercentage ||
       0,
   );
 
