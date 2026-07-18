@@ -15,6 +15,9 @@ interface ItemsOrderedSectionProps {
   orderId: string | undefined;
   orderStatus?: number;
   isCancelling: boolean;
+  // paid itemTotal / MRP total — fallback per-item discount when the item's own
+  // snapshot has none but the order did (keeps the row consistent with the bill).
+  discountRatio?: number;
 }
 
 export function ItemsOrderedSection({
@@ -22,6 +25,7 @@ export function ItemsOrderedSection({
   orderId,
   orderStatus,
   isCancelling,
+  discountRatio,
 }: ItemsOrderedSectionProps) {
   const router = useNav();
 
@@ -98,7 +102,10 @@ export function ItemsOrderedSection({
       </View>
       {items.map((item, index, arr) => {
         // unitPrice is stored as the MRP — derive the discounted price paid.
-        const { sellingPrice, mrp, discountPercent } = getOrderItemPricing(item);
+        const { sellingPrice, mrp, discountPercent } = getOrderItemPricing(
+          item,
+          discountRatio,
+        );
         const hasDiscount = discountPercent > 0;
         return (
         <View key={item.id}>

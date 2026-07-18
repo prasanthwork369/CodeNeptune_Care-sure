@@ -126,11 +126,15 @@ export interface OrderItemPricing {
 
 const round2 = (n: number) => parseFloat(n.toFixed(2));
 
-// Mirrors the web order details page (customer-website orders/[id]/page.tsx):
-// unitPrice is the MRP (strikethrough), and the discount is read from the
-// snapshot; the paid price is derived as MRP * (1 - discount/100). When the
-// snapshot carries no discount, the item shows unitPrice with no strikethrough.
-export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
+// Derives an order item's display prices. unitPrice is the MRP (strikethrough).
+// Preferred source is the per-item snapshot discount (mirrors the web). When the
+// snapshot carries no discount but the order as a whole did (its billBreakdown
+// shows a product discount), fall back to the order-level ratio so the item row
+// stays consistent with the bill summary instead of showing the full MRP.
+export function getOrderItemPricing(
+  item: OrderItem,
+  orderDiscountRatio?: number,
+): OrderItemPricing {
   const mrp = Number(item.unitPrice ?? 0);
   // Use `||` (not `??`) to match the web: a stored discountPercent of 0 must fall
   // through to discountPercentage, where the real value lives for some items.
@@ -140,7 +144,28 @@ export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
       0,
   );
 
-  const sellingPrice = discount > 0 ? round2(mrp * (1 - discount / 100)) : mrp;
+  // 1. Per-item snapshot discount (exact stored %).
+  if (discount > 0) {
+    return {
+      sellingPrice: round2(mrp * (1 - discount / 100)),
+      mrp,
+      discountPercent: discount,
+    };
+  }
 
-  return { sellingPrice, mrp, discountPercent: discount };
+  // 2. No per-item discount, but the order had one → distribute it by MRP.
+  if (
+    orderDiscountRatio != null &&
+    orderDiscountRatio > 0 &&
+    orderDiscountRatio < 1
+  ) {
+    return {
+      sellingPrice: round2(mrp * orderDiscountRatio),
+      mrp,
+      discountPercent: round2((1 - orderDiscountRatio) * 100),
+    };
+  }
+
+  // 3. No discount anywhere — single price, no strikethrough.
+  return { sellingPrice: mrp, mrp, discountPercent: 0 };
 }
