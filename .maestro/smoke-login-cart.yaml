@@ -1,46 +1,52 @@
 appId: com.codeneptune.caresure
 ---
-# CareSure smoke test: login (OTP) -> search -> add to cart -> cart.
-# Staging backend prefills the OTP, so we just type a number and tap through.
-# Number is typed directly (the autofill hint sheet is dismissed by typing),
-# which is far more reliable than driving the "Choose a phone number" sheet.
+# CareSure smoke test: login (OTP) -> search -> add -> cart.
+# Prefers stable testIDs over visible text. Waits are used only for transitions
+# that are legitimately slow (splash, network, post-action UI), never as fixed
+# delays for their own sake.
 
 - launchApp:
     clearState: true
 
-# --- Login ---
+# A clean launch replays the splash animation, so wait for the login field.
 - extendedWaitUntil:
-    visible: "Why pay more for the same medicine?"
-    timeout: 15000
+    visible:
+      id: "phone-input"
+    timeout: 20000
 - tapOn:
     id: "phone-input"
-# If the autofill hint sheet pops, dismiss it (Back closes the system sheet, not
-# the app) so the field is ready for typing.
+
+# Focusing the field can trigger Android's autofill hint sheet. Dismiss it only
+# if it appears (Back closes the system sheet, not the app) so typing succeeds.
 - runFlow:
     when:
       visible: "Choose a phone number"
     commands:
       - pressKey: Back
-- inputText: "9999999999"
-- tapOn: "Get OTP"
 
-# --- OTP (backend-prefilled) ---
-- extendedWaitUntil:
-    visible: "Verify & Continue"
-    timeout: 15000
+- inputText: "9999999999"
+- tapOn:
+    id: "get-otp-btn"
+
+# OTP screen: the code is backend-prefilled and lands in the boxes a moment after
+# the screen renders, so let it settle before submitting (empty submit stays here).
+- waitForAnimationToEnd:
+    timeout: 1000
 - tapOn: "Verify & Continue"
 
-# --- Home ---
+# Login -> Home involves navigation + first data load; wait for the Home marker.
 - extendedWaitUntil:
     visible:
       id: "home-search-bar"
     timeout: 15000
-
-# --- Search -> product ---
 - tapOn:
     id: "home-search-bar"
+
 - inputText: "Montecip"
-# Wait for the result card (testID in SearchProductCard.tsx) and tap it.
+# The search input auto-focuses; its keyboard can cover the results, so close it.
+- pressKey: Back
+
+# Results are fetched from the network — wait for the result card before tapping.
 - extendedWaitUntil:
     visible:
       id: "search-result-item"
@@ -48,20 +54,37 @@ appId: com.codeneptune.caresure
 - tapOn:
     id: "search-result-item"
 
-# --- Product comparison -> Add ---
-# The result opens a comparison page; its button is exactly "Add" (^Add$ avoids
-# matching words like "Address").
-- extendedWaitUntil:
-    visible:
-      text: "^Add$"
-    timeout: 10000
+# Comparison page: the add button label is exactly "Add" (^Add$ prevents matching
+# words such as "Address").
 - tapOn:
     text: "^Add$"
 
-# --- Cart ---
-# After adding, the comparison footer shows "View Cart" -> cart screen.
+# "View Cart" only appears in the footer after the item is added — wait for it.
 - extendedWaitUntil:
     visible: "View Cart"
     timeout: 10000
 - tapOn: "View Cart"
 - assertVisible: "Cart"
+
+# --- Checkout -> Place Order ---
+# Cart's primary CTA -> payment/checkout screen.
+- extendedWaitUntil:
+    visible: "Proceed To Pay"
+    timeout: 10000
+- tapOn: "Proceed To Pay"
+
+# NOTE: with clearState the account has no saved address, so checkout may first
+# require selecting/adding a delivery address before "Place Order" is enabled.
+# Handle that here if your test account has no default address.
+
+# Placing the order hits the network (create order), so wait for the button, tap,
+# then wait for the success screen.
+- extendedWaitUntil:
+    visible: "Place Order"
+    timeout: 15000
+- tapOn: "Place Order"
+
+- extendedWaitUntil:
+    visible: "Order Placed"
+    timeout: 20000
+- assertVisible: "Order Placed"
