@@ -123,10 +123,19 @@ export interface OrderItemPricing {
   mrp: number; // per unit, original (strikethrough)
 }
 
+const round2 = (n: number) => parseFloat(n.toFixed(2));
+
 // Derives an order item's per-unit prices for display (paid price + strikethrough
-// MRP). The MRP and discount can live either inside medicineSnapshot or at the
-// item level depending on the order's age/source, so both are checked.
-export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
+// MRP). unitPrice is stored as the MRP. The discount can come from three places,
+// in order of preference:
+//   1. An explicit per-item discount% / MRP (snapshot or item level).
+//   2. The order-level discount ratio (paid itemTotal / MRP total), passed in —
+//      this is where the discount lives for most orders (see billBreakdown).
+//   3. None → no discount shown.
+export function getOrderItemPricing(
+  item: OrderItem,
+  orderDiscountRatio?: number,
+): OrderItemPricing {
   const snap = item.medicineSnapshot;
   const unit = Number(item.unitPrice ?? 0);
 
@@ -137,21 +146,28 @@ export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
       item.discountPercentage ??
       0,
   );
+  const explicitMrp = snap?.mrp ?? item.mrp;
 
-  // Prefer an explicit MRP; if absent, fall back to unitPrice (which is stored
-  // as the MRP for app-created orders).
-  const mrpRaw = snap?.mrp ?? item.mrp;
-  const mrp = mrpRaw != null ? Number(mrpRaw) : unit;
-
-  let sellingPrice: number;
+  // 1. Explicit per-item discount%.
   if (discountPercent > 0) {
-    // unitPrice is the MRP → derive the discounted price the customer paid.
-    sellingPrice = parseFloat((mrp * (1 - discountPercent / 100)).toFixed(2));
-  } else {
-    // No explicit discount: trust unitPrice as the paid price and only show a
-    // strikethrough if a genuinely higher MRP was provided.
-    sellingPrice = Math.min(unit, mrp);
+    const mrp = explicitMrp != null ? Number(explicitMrp) : unit;
+    return { sellingPrice: round2(mrp * (1 - discountPercent / 100)), mrp };
   }
 
-  return { sellingPrice, mrp: Math.max(mrp, sellingPrice) };
+  // 1b. Explicit MRP higher than the paid unitPrice.
+  if (explicitMrp != null && Number(explicitMrp) > unit) {
+    return { sellingPrice: unit, mrp: Number(explicitMrp) };
+  }
+
+  // 2. Order-level discount ratio (unitPrice is the MRP; paid = MRP * ratio).
+  if (
+    orderDiscountRatio != null &&
+    orderDiscountRatio > 0 &&
+    orderDiscountRatio < 1
+  ) {
+    return { sellingPrice: round2(unit * orderDiscountRatio), mrp: unit };
+  }
+
+  // 3. No discount info — single price, no strikethrough.
+  return { sellingPrice: unit, mrp: unit };
 }

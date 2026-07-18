@@ -495,6 +495,7 @@ export const OrderTrackLayout: React.FC = () => {
           orderId={orderId}
           orderStatus={order?.status}
           isCancelling={isCancelling}
+          discountRatio={mrpTotal > 0 ? subtotal / mrpTotal : 1}
         />
 
         <SectionCard>

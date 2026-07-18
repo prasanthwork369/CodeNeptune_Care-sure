@@ -15,6 +15,9 @@ interface ItemsOrderedSectionProps {
   orderId: string | undefined;
   orderStatus?: number;
   isCancelling: boolean;
+  // paid itemTotal / MRP total — used to derive per-item discount when the item
+  // itself carries no discount (the discount lives in the order totals).
+  discountRatio?: number;
 }
 
 export function ItemsOrderedSection({
@@ -22,6 +25,7 @@ export function ItemsOrderedSection({
   orderId,
   orderStatus,
   isCancelling,
+  discountRatio,
 }: ItemsOrderedSectionProps) {
   const router = useNav();
 
@@ -98,7 +102,7 @@ export function ItemsOrderedSection({
       </View>
       {items.map((item, index, arr) => {
         // unitPrice is stored as the MRP — derive the discounted price paid.
-        const { sellingPrice, mrp } = getOrderItemPricing(item);
+        const { sellingPrice, mrp } = getOrderItemPricing(item, discountRatio);
         const hasDiscount = mrp > sellingPrice;
         return (
         <View key={item.id}>
