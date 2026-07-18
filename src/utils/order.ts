@@ -123,18 +123,35 @@ export interface OrderItemPricing {
   mrp: number; // per unit, original (strikethrough)
 }
 
-// Derives an order item's per-unit prices. unitPrice is stored as the MRP, so
-// the discounted price is mrp*(1-discount/100). Falls back to trusting unitPrice
-// when it's already below the MRP (older/enriched orders that stored it that way).
+// Derives an order item's per-unit prices for display (paid price + strikethrough
+// MRP). The MRP and discount can live either inside medicineSnapshot or at the
+// item level depending on the order's age/source, so both are checked.
 export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
+  const snap = item.medicineSnapshot;
   const unit = Number(item.unitPrice ?? 0);
-  const mrp = Number(item.medicineSnapshot?.mrp ?? unit);
-  const discountPercent = Number(item.medicineSnapshot?.discountPercent ?? 0);
 
-  const sellingPrice =
-    discountPercent > 0
-      ? parseFloat((mrp * (1 - discountPercent / 100)).toFixed(2))
-      : Math.min(unit, mrp);
+  const discountPercent = Number(
+    snap?.discountPercent ??
+      snap?.discountPercentage ??
+      item.discountPercent ??
+      item.discountPercentage ??
+      0,
+  );
 
-  return { sellingPrice, mrp };
+  // Prefer an explicit MRP; if absent, fall back to unitPrice (which is stored
+  // as the MRP for app-created orders).
+  const mrpRaw = snap?.mrp ?? item.mrp;
+  const mrp = mrpRaw != null ? Number(mrpRaw) : unit;
+
+  let sellingPrice: number;
+  if (discountPercent > 0) {
+    // unitPrice is the MRP → derive the discounted price the customer paid.
+    sellingPrice = parseFloat((mrp * (1 - discountPercent / 100)).toFixed(2));
+  } else {
+    // No explicit discount: trust unitPrice as the paid price and only show a
+    // strikethrough if a genuinely higher MRP was provided.
+    sellingPrice = Math.min(unit, mrp);
+  }
+
+  return { sellingPrice, mrp: Math.max(mrp, sellingPrice) };
 }

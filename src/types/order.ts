@@ -65,6 +65,7 @@ export interface MedicineSnapshot {
   // Persisted at order creation so tracking can derive the discounted price the
   // customer paid — unitPrice is stored as the MRP (see buildOrderPayload).
   discountPercent?: number;
+  discountPercentage?: number;
   requiresPrescription?: boolean;
 }
 
@@ -77,6 +78,11 @@ export interface OrderItem {
   quantity: number;
   unitPrice?: string;
   status: string;
+  // The backend may surface MRP/discount at the item level (as in
+  // getFrequentlyOrdered) rather than inside medicineSnapshot — read both.
+  mrp?: number | string;
+  discountPercent?: number | string;
+  discountPercentage?: number | string;
 }
 
 export interface StatusLog {
