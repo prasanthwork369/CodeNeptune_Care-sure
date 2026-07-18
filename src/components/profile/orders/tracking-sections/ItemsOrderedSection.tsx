@@ -98,8 +98,8 @@ export function ItemsOrderedSection({
       </View>
       {items.map((item, index, arr) => {
         // unitPrice is stored as the MRP — derive the discounted price paid.
-        const { sellingPrice, mrp } = getOrderItemPricing(item);
-        const hasDiscount = mrp > sellingPrice;
+        const { sellingPrice, mrp, discountPercent } = getOrderItemPricing(item);
+        const hasDiscount = discountPercent > 0;
         return (
         <View key={item.id}>
           <Touchable
@@ -202,15 +202,15 @@ export function ItemsOrderedSection({
                   </Text>
                 </View>
 
-                {/* Discount % on the right — green "X% off", same as the cart,
-                    shown only when MRP is higher than the paid price. */}
+                {/* Discount % on the right — show the stored discount directly
+                    (like the web) so it matches the product page exactly, rather
+                    than re-deriving it from the rounded paid price. */}
                 {hasDiscount && (
                   <Text
                     style={s.labelSm}
                     className="font-inter-bold text-brand-primary"
                   >
-                    {parseFloat((((mrp - sellingPrice) / mrp) * 100).toFixed(2))}
-                    % off
+                    {parseFloat(discountPercent.toFixed(2))}% off
                   </Text>
                 )}
               </View>

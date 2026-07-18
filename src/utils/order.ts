@@ -121,6 +121,7 @@ export function buildOrderPayload({
 export interface OrderItemPricing {
   sellingPrice: number; // per unit, discounted — what the customer paid
   mrp: number; // per unit, original (strikethrough)
+  discountPercent: number; // stored discount %, shown directly (not re-derived)
 }
 
 const round2 = (n: number) => parseFloat(n.toFixed(2));
@@ -139,5 +140,5 @@ export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
 
   const sellingPrice = discount > 0 ? round2(mrp * (1 - discount / 100)) : mrp;
 
-  return { sellingPrice, mrp };
+  return { sellingPrice, mrp, discountPercent: discount };
 }
