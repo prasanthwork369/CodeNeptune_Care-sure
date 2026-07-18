@@ -42,6 +42,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   if (onPress) {
     return (
       <Touchable
+        testID="home-search-bar"
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onPress();

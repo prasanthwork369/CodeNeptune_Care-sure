@@ -35,6 +35,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View style={s.divider} />
         <TextInput
           ref={applyDigitsOnlyFilter}
+          testID="phone-input"
           allowFontScaling={false}
           placeholder="Enter your mobile number"
           placeholderTextColor="#6A6A6A"

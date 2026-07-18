@@ -1,0 +1,59 @@
+appId: com.codeneptune.caresure
+---
+# CareSure smoke test: login (OTP) -> search -> add to cart -> cart.
+#
+# REQUIREMENTS:
+# - Run against a STAGING/QA build whose backend RETURNS the OTP, so it
+#   auto-prefills on the Verify screen (no real SMS needed).
+# - TEST_NUMBER below must be a staging test number the backend accepts,
+#   otherwise the flow will stop at "Verify & Continue".
+
+- launchApp:
+    clearState: true
+
+# --- Login screen ---
+- assertVisible: "Why pay more for the same medicine?"
+
+# Phone field is matched by testID (added in LoginForm.tsx). Type the number
+# directly — no Google "Choose a phone number" picker involved.
+- tapOn:
+    id: "phone-input"
+- inputText: "9999999999"      # <-- replace with your staging test number
+- hideKeyboard
+
+- tapOn: "Get OTP"
+
+# --- OTP screen ---
+- assertVisible: "Verify OTP"
+# In staging the OTP is prefilled by the backend, enabling the button.
+- extendedWaitUntil:
+    visible: "Verify & Continue"
+    timeout: 30000
+- tapOn: "Verify & Continue"
+
+# --- Home ---
+# The home search bar (testID added in SearchBar.tsx) is a reliable Home marker.
+- extendedWaitUntil:
+    visible:
+      id: "home-search-bar"
+    timeout: 30000
+
+# --- Search ---
+- tapOn:
+    id: "home-search-bar"
+# The search screen input auto-focuses, so text goes straight in.
+- inputText: "Montecip"
+- extendedWaitUntil:
+    visible: "Montecip"
+    timeout: 15000
+- tapOn: "Montecip"
+
+# --- Product details ---
+- extendedWaitUntil:
+    visible: "Add to Cart"
+    timeout: 15000
+- tapOn: "Add to Cart"
+
+# --- Cart ---
+- tapOn: "View Cart"
+- assertVisible: "Cart"
