@@ -3,6 +3,7 @@ import {
   FloatingBannersCarousel,
   FrequentSubstitutes,
   HealthEssentials,
+  HealthEssentialsSection,
   HeroBanner,
   HomeFooter,
   HomeHeader,
@@ -60,7 +61,16 @@ type HomeSectionId =
   | "trust"
   | "footer";
 
-type HomeSection = { id: HomeSectionId };
+// Health Essentials is flattened into one row per subcategory so the parent
+// FlatList virtualizes each row instead of mounting every horizontal list at once.
+type HomeSection =
+  | { id: HomeSectionId }
+  | {
+      id: string;
+      kind: "healthEssentialsRow";
+      subcategory: ApiFeaturedSubcategory;
+      themeIndex: number;
+    };
 
 export const HomeLayout: React.FC = () => {
   const router = useNav();
@@ -267,17 +277,42 @@ export const HomeLayout: React.FC = () => {
       feedSections.push({ id: "frequent" });
     }
 
-    feedSections.push(
-      { id: "healthEssentials" },
-      { id: "trust" },
-      { id: "footer" },
-    );
+    // While loading, keep a single skeleton row; once loaded, emit one
+    // virtualized row per subcategory so the list mounts them lazily on scroll.
+    if (isSubcategoriesLoading) {
+      feedSections.push({ id: "healthEssentials" });
+    } else {
+      featuredSubcategories.forEach((sub, index) => {
+        feedSections.push({
+          id: `healthEssentials-${sub.id}`,
+          kind: "healthEssentialsRow",
+          subcategory: sub,
+          themeIndex: index,
+        });
+      });
+    }
+
+    feedSections.push({ id: "trust" }, { id: "footer" });
 
     return feedSections;
-  }, [frequentlyOrdered.length]);
+  }, [frequentlyOrdered.length, isSubcategoriesLoading, featuredSubcategories]);
 
   const renderSection: ListRenderItem<HomeSection> = useCallback(
     ({ item }) => {
+      // Flattened Health Essentials row — one subcategory per list item.
+      if ("kind" in item && item.kind === "healthEssentialsRow") {
+        return (
+          <View style={{ marginTop: exactScale(10) }}>
+            <HealthEssentialsSection
+              subcategory={item.subcategory}
+              themeIndex={item.themeIndex}
+              onProductPress={handleProductPress}
+              onViewAll={handleViewAllSubcategory}
+            />
+          </View>
+        );
+      }
+
       switch (item.id) {
         case "hero":
           return (

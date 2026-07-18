@@ -12,13 +12,11 @@ const OriginalText = OriginalTextImport as unknown as typeof RN.Text;
 // @expo-google-fonts/inter (see app/_layout.tsx useFonts call). Android's
 // system font (Roboto) does not render numeric fontWeight reliably, so we
 // render Inter there instead; iOS keeps the native SF Pro system font.
+// Only the weights the app actually uses are loaded (see useAndroidInterFonts):
+// 400/500/600/700/800. Thin/ExtraLight/Light/Black are unused project-wide, so
+// they're intentionally absent — any unmapped weight falls back to Inter_400Regular
+// below, never to Android's broken numeric-weight system font.
 const ANDROID_WEIGHT_TO_INTER_FAMILY: Record<string, string> = {
-  "100": "Inter_100Thin",
-  thin: "Inter_100Thin",
-  "200": "Inter_200ExtraLight",
-  extralight: "Inter_200ExtraLight",
-  "300": "Inter_300Light",
-  light: "Inter_300Light",
   "400": "Inter_400Regular",
   normal: "Inter_400Regular",
   "500": "Inter_500Medium",
@@ -29,8 +27,6 @@ const ANDROID_WEIGHT_TO_INTER_FAMILY: Record<string, string> = {
   bold: "Inter_700Bold",
   "800": "Inter_800ExtraBold",
   extrabold: "Inter_800ExtraBold",
-  "900": "Inter_900Black",
-  black: "Inter_900Black",
 };
 
 /**

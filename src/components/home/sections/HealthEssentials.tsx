@@ -163,7 +163,9 @@ interface HealthEssentialsSectionProps {
     onViewAll?: (subcategory: ApiFeaturedSubcategory) => void;
 }
 
-const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subcategory, themeIndex, onProductPress, onViewAll }) => {
+// Exported so the Home feed can render each subcategory as its own virtualized
+// row (see HomeLayout) instead of mounting every row at once.
+export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = React.memo(({ subcategory, themeIndex, onProductPress, onViewAll }) => {
     const { width } = useWindowDimensions();
     const meta: ApiFeaturedSubcategoryMetadata | null = subcategory.featuredMetadata;
     const fallback = FALLBACK_THEMES[themeIndex % FALLBACK_THEMES.length];
@@ -273,7 +275,8 @@ const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> = ({ subca
             </View>
         </View>
     );
-};
+});
+HealthEssentialsSection.displayName = 'HealthEssentialsSection';
 
 interface HealthEssentialsProps {
     subcategories: ApiFeaturedSubcategory[];

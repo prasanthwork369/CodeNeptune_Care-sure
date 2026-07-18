@@ -18,7 +18,9 @@ export const useCart = () => {
         queryKey: QUERY_KEYS.CUSTOMER.CART,
         queryFn: cartService.getCart,
         enabled: isAuthenticated,
-        staleTime: 0,
+        // Mutations keep this cache fresh via setQueryData, so a short staleTime
+        // just avoids redundant refetches on every screen focus/tab switch.
+        staleTime: 10_000,
     });
 
     const addItemMutation = useMutation({

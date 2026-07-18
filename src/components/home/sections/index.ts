@@ -19,7 +19,7 @@ export { ShopByCategories } from './ShopByCategories';
 export { StickySearchHeader } from './StickySearchHeader';
 export { SmartSubstitution } from './SmartSubstitution';
 export { WhyFamiliesTrustUs } from './WhyFamiliesTrustUs';
-export { HealthEssentials } from './HealthEssentials';
+export { HealthEssentials, HealthEssentialsSection } from './HealthEssentials';
 export { FloatingBannersCarousel } from './FloatingBannersCarousel';
 
 
