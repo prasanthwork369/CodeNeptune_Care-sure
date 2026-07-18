@@ -12,6 +12,7 @@ export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
 }) => {
   return (
     <Touchable
+      testID="get-otp-btn"
       activeOpacity={0.8}
       onPress={onGetOtp}
       disabled={loading || !isValid}

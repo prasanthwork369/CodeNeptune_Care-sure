@@ -1,59 +1,67 @@
 appId: com.codeneptune.caresure
 ---
 # CareSure smoke test: login (OTP) -> search -> add to cart -> cart.
-#
-# REQUIREMENTS:
-# - Run against a STAGING/QA build whose backend RETURNS the OTP, so it
-#   auto-prefills on the Verify screen (no real SMS needed).
-# - TEST_NUMBER below must be a staging test number the backend accepts,
-#   otherwise the flow will stop at "Verify & Continue".
+# Staging backend prefills the OTP, so we just type a number and tap through.
+# Number is typed directly (the autofill hint sheet is dismissed by typing),
+# which is far more reliable than driving the "Choose a phone number" sheet.
 
 - launchApp:
     clearState: true
 
-# --- Login screen ---
-- assertVisible: "Why pay more for the same medicine?"
-
-# Phone field is matched by testID (added in LoginForm.tsx). Type the number
-# directly — no Google "Choose a phone number" picker involved.
+# --- Login ---
+- extendedWaitUntil:
+    visible: "Why pay more for the same medicine?"
+    timeout: 15000
 - tapOn:
     id: "phone-input"
-- inputText: "9999999999"      # <-- replace with your staging test number
-- hideKeyboard
-
+# If the autofill hint sheet pops, dismiss it (Back closes the system sheet, not
+# the app) so the field is ready for typing.
+- runFlow:
+    when:
+      visible: "Choose a phone number"
+    commands:
+      - pressKey: Back
+- inputText: "9999999999"
 - tapOn: "Get OTP"
 
-# --- OTP screen ---
-- assertVisible: "Verify OTP"
-# In staging the OTP is prefilled by the backend, enabling the button.
+# --- OTP (backend-prefilled) ---
 - extendedWaitUntil:
     visible: "Verify & Continue"
-    timeout: 30000
+    timeout: 15000
 - tapOn: "Verify & Continue"
 
 # --- Home ---
-# The home search bar (testID added in SearchBar.tsx) is a reliable Home marker.
 - extendedWaitUntil:
     visible:
       id: "home-search-bar"
-    timeout: 30000
+    timeout: 15000
 
-# --- Search ---
+# --- Search -> product ---
 - tapOn:
     id: "home-search-bar"
-# The search screen input auto-focuses, so text goes straight in.
 - inputText: "Montecip"
+# Wait for the result card (testID in SearchProductCard.tsx) and tap it.
 - extendedWaitUntil:
-    visible: "Montecip"
-    timeout: 15000
-- tapOn: "Montecip"
+    visible:
+      id: "search-result-item"
+    timeout: 10000
+- tapOn:
+    id: "search-result-item"
 
-# --- Product details ---
+# --- Product comparison -> Add ---
+# The result opens a comparison page; its button is exactly "Add" (^Add$ avoids
+# matching words like "Address").
 - extendedWaitUntil:
-    visible: "Add to Cart"
-    timeout: 15000
-- tapOn: "Add to Cart"
+    visible:
+      text: "^Add$"
+    timeout: 10000
+- tapOn:
+    text: "^Add$"
 
 # --- Cart ---
+# After adding, the comparison footer shows "View Cart" -> cart screen.
+- extendedWaitUntil:
+    visible: "View Cart"
+    timeout: 10000
 - tapOn: "View Cart"
 - assertVisible: "Cart"

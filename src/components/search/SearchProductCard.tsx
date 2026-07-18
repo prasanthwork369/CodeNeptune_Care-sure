@@ -63,6 +63,7 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
 
     return (
         <Touchable
+            testID="search-result-item"
             activeOpacity={0.5}
             onPress={handleCardPress}
             style={{ borderWidth: 1, borderColor: '#919EAB33' }}
