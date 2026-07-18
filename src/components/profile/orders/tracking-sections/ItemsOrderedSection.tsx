@@ -3,6 +3,7 @@ import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { OrderItem } from "@/src/types/order";
 import { exactScale } from "@/src/utils/exactScale";
+import { getOrderItemPricing } from "@/src/utils/order";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, View } from "react-native";
@@ -95,7 +96,11 @@ export function ItemsOrderedSection({
           )}
         </View>
       </View>
-      {items.map((item, index, arr) => (
+      {items.map((item, index, arr) => {
+        // unitPrice is stored as the MRP — derive the discounted price paid.
+        const { sellingPrice, mrp } = getOrderItemPricing(item);
+        const hasDiscount = mrp > sellingPrice;
+        return (
         <View key={item.id}>
           <Touchable
             activeOpacity={0.7}
@@ -147,28 +152,21 @@ export function ItemsOrderedSection({
                     style={s.labelSm}
                     className="font-inter-bold text-brand-text"
                   >
-                    {item.unitPrice
-                      ? `₹${parseFloat((Number(item.unitPrice) * item.quantity).toFixed(2))}`
+                    {sellingPrice
+                      ? `₹${parseFloat((sellingPrice * item.quantity).toFixed(2))}`
                       : "—"}
                   </Text>
                   {/* Only show the struck-through MRP when there's an actual
                       discount (mrp > selling price) — otherwise it renders a
                       strikethrough over the same price on non-discounted items. */}
-                  {item.medicineSnapshot?.mrp != null &&
-                    Number(item.medicineSnapshot.mrp) >
-                      Number(item.unitPrice) && (
-                      <Text
-                        style={[s.statusBadge, { marginTop: exactScale(2) }]}
-                        className="font-inter text-brand-subtext line-through"
-                      >
-                        ₹
-                        {parseFloat(
-                          (item.medicineSnapshot.mrp * item.quantity).toFixed(
-                            2,
-                          ),
-                        )}
-                      </Text>
-                    )}
+                  {hasDiscount && (
+                    <Text
+                      style={[s.statusBadge, { marginTop: exactScale(2) }]}
+                      className="font-inter text-brand-subtext line-through"
+                    >
+                      ₹{parseFloat((mrp * item.quantity).toFixed(2))}
+                    </Text>
+                  )}
                 </View>
               </View>
               {(item.medicineSnapshot?.brand ||
@@ -206,24 +204,15 @@ export function ItemsOrderedSection({
 
                 {/* Discount % on the right — green "X% off", same as the cart,
                     shown only when MRP is higher than the paid price. */}
-                {item.medicineSnapshot?.mrp != null &&
-                  Number(item.medicineSnapshot.mrp) >
-                    Number(item.unitPrice) && (
-                    <Text
-                      style={s.labelSm}
-                      className="font-inter-bold text-brand-primary"
-                    >
-                      {parseFloat(
-                        (
-                          ((Number(item.medicineSnapshot.mrp) -
-                            Number(item.unitPrice)) /
-                            Number(item.medicineSnapshot.mrp)) *
-                          100
-                        ).toFixed(2),
-                      )}
-                      % off
-                    </Text>
-                  )}
+                {hasDiscount && (
+                  <Text
+                    style={s.labelSm}
+                    className="font-inter-bold text-brand-primary"
+                  >
+                    {parseFloat((((mrp - sellingPrice) / mrp) * 100).toFixed(2))}
+                    % off
+                  </Text>
+                )}
               </View>
             </View>
           </Touchable>
@@ -238,7 +227,8 @@ export function ItemsOrderedSection({
             />
           )}
         </View>
-      ))}
+        );
+      })}
     </SectionCard>
   );
 }

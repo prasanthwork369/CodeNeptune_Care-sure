@@ -1,4 +1,5 @@
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
+import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -185,6 +186,7 @@ export function AddPatientSheet({
 
           <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Name
+            <RequiredMark />
           </Text>
           <View
             style={[
@@ -230,6 +232,7 @@ export function AddPatientSheet({
 
           <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Mobile Number
+            <RequiredMark />
           </Text>
           <View
             style={[
@@ -286,6 +289,7 @@ export function AddPatientSheet({
 
           <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Relationship
+            <RequiredMark />
           </Text>
           <View
             style={{
@@ -368,6 +372,7 @@ export function AddPatientSheet({
 
           <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Date Of Birth
+            <RequiredMark />
           </Text>
           {errors.dob && (
             <Text style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(6) }}>
@@ -420,6 +425,7 @@ export function AddPatientSheet({
 
           <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
             Gender
+            <RequiredMark />
           </Text>
           <View
             style={{

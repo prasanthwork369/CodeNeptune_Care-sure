@@ -12,6 +12,7 @@ import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
+import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import React, { useRef, useState } from "react";
 import {
@@ -231,6 +232,7 @@ export function CancelOrderLayout() {
               }}
             >
               Why do you want to cancel this order?
+              <RequiredMark />
             </Text>
 
             {/* Options List */}

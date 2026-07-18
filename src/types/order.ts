@@ -62,6 +62,9 @@ export interface MedicineSnapshot {
   brand?: string;
   pack?: string;
   mrp?: number;
+  // Persisted at order creation so tracking can derive the discounted price the
+  // customer paid — unitPrice is stored as the MRP (see buildOrderPayload).
+  discountPercent?: number;
   requiresPrescription?: boolean;
 }
 

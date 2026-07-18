@@ -6,6 +6,7 @@ import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
+import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
@@ -165,7 +166,7 @@ export const AddPatientLayout: React.FC = () => {
           }}
           className="flex-1"
         >
-          <Text className={labelStyle} style={labelTextStyle}>Name</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Name<RequiredMark /></Text>
           <TextInput
             placeholder="Enter the name"
             placeholderTextColor="#6A6A6A"
@@ -178,7 +179,7 @@ export const AddPatientLayout: React.FC = () => {
           />
           {errors.name && <Text style={errorText}>{errors.name}</Text>}
 
-          <Text className={labelStyle} style={labelTextStyle}>Mobile Number</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Mobile Number<RequiredMark /></Text>
           <View
             style={[
               { flexDirection: "row", alignItems: "center", height: 52 },
@@ -219,7 +220,7 @@ export const AddPatientLayout: React.FC = () => {
           </View>
           {errors.mobile && <Text style={errorText}>{errors.mobile}</Text>}
 
-          <Text className={labelStyle} style={labelTextStyle}>Relationship</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Relationship<RequiredMark /></Text>
           <View
             style={{
               flexDirection: "row",
@@ -293,7 +294,7 @@ export const AddPatientLayout: React.FC = () => {
             </View>
           )}
 
-          <Text className={labelStyle} style={labelTextStyle}>Date Of Birth</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Date Of Birth<RequiredMark /></Text>
           <Touchable
             onPress={() => {
               setShowDatePicker(true);
@@ -332,7 +333,7 @@ export const AddPatientLayout: React.FC = () => {
             }}
           />
 
-          <Text className={labelStyle} style={labelTextStyle}>Gender</Text>
+          <Text className={labelStyle} style={labelTextStyle}>Gender<RequiredMark /></Text>
           <View
             style={{
               flexDirection: "row",

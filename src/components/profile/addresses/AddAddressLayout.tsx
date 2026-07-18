@@ -259,6 +259,7 @@ export const AddAddressLayout: React.FC = () => {
         >
           <FormField
             label="Full Name"
+            required
             value={name}
             onChangeText={setName}
             placeholder="Enter Full Name"
@@ -278,6 +279,7 @@ export const AddAddressLayout: React.FC = () => {
           <FormField
             ref={setMobileRef}
             label="Mobile Number"
+            required
             value={mobile}
             onChangeText={handleMobileChange}
             placeholder="Enter Mobile Number"
@@ -301,6 +303,7 @@ export const AddAddressLayout: React.FC = () => {
           <FormField
             ref={line1Ref}
             label="House Number"
+            required
             value={line1}
             onChangeText={setLine1}
             placeholder="Enter House Number"
@@ -335,6 +338,7 @@ export const AddAddressLayout: React.FC = () => {
           <FormField
             ref={cityRef}
             label="City"
+            required
             value={city}
             onChangeText={setCity}
             placeholder="Enter City"
@@ -352,6 +356,7 @@ export const AddAddressLayout: React.FC = () => {
           <FormField
             ref={stateRef}
             label="State"
+            required
             value={state}
             onChangeText={setState}
             placeholder="Enter State"
@@ -369,6 +374,7 @@ export const AddAddressLayout: React.FC = () => {
           <FormField
             ref={pincodeRef}
             label="Pincode"
+            required
             value={pincode}
             onChangeText={handlePincodeChange}
             placeholder="Enter Pincode"

@@ -1,7 +1,7 @@
 import { Address } from '@/src/api/address.api';
 import { BillBreakdown } from '@/src/store/checkoutStore';
 import { CartItem } from '@/src/types/cart';
-import { CreateOrderRequest, OrderMetadata } from '@/src/types/order';
+import { CreateOrderRequest, OrderItem, OrderMetadata } from '@/src/types/order';
 
 export interface BuildOrderPayloadParams {
   cartItems: CartItem[];
@@ -53,21 +53,31 @@ export function buildOrderPayload({
     billBreakdown.coinsDiscount;
 
   return {
-    items: cartItems.map((i) => ({
-      medicineId: i.medicineId,
-      quantity: i.quantity,
-      unitPrice: String(i.unitPrice),
-      medicineSnapshot: {
-        name: i.medicineName,
-        slug: i.medicineSlug,
-        productId: i.productId ?? i.metadata?.productId ?? undefined,
-        image: i.image ?? i.metadata?.image ?? undefined,
-        brand: i.metadata?.brand ?? undefined,
-        pack: i.metadata?.pack ?? undefined,
-        mrp: i.metadata?.mrp ?? undefined,
-        requiresPrescription: i.requiresPrescription,
-      },
-    })),
+    items: cartItems.map((i) => {
+      // unitPrice from the cart is the MRP; the customer pays mrp*(1-disc/100).
+      // Persist the MRP and discount so tracking can show the discounted price
+      // (matches useCartCalculations).
+      const mrp = parseFloat(String(i.unitPrice));
+      const discountPercent = Number(
+        i.discountPercent ?? i.metadata?.discountPercent ?? 0,
+      );
+      return {
+        medicineId: i.medicineId,
+        quantity: i.quantity,
+        unitPrice: String(i.unitPrice),
+        medicineSnapshot: {
+          name: i.medicineName,
+          slug: i.medicineSlug,
+          productId: i.productId ?? i.metadata?.productId ?? undefined,
+          image: i.image ?? i.metadata?.image ?? undefined,
+          brand: i.metadata?.brand ?? undefined,
+          pack: i.metadata?.pack ?? undefined,
+          mrp: i.metadata?.mrp ?? mrp,
+          discountPercent,
+          requiresPrescription: i.requiresPrescription,
+        },
+      };
+    }),
     deliveryAddress: {
       name: address.name,
       phone: address.phone,
@@ -106,4 +116,25 @@ export function buildOrderPayload({
       },
     },
   };
+}
+
+export interface OrderItemPricing {
+  sellingPrice: number; // per unit, discounted — what the customer paid
+  mrp: number; // per unit, original (strikethrough)
+}
+
+// Derives an order item's per-unit prices. unitPrice is stored as the MRP, so
+// the discounted price is mrp*(1-discount/100). Falls back to trusting unitPrice
+// when it's already below the MRP (older/enriched orders that stored it that way).
+export function getOrderItemPricing(item: OrderItem): OrderItemPricing {
+  const unit = Number(item.unitPrice ?? 0);
+  const mrp = Number(item.medicineSnapshot?.mrp ?? unit);
+  const discountPercent = Number(item.medicineSnapshot?.discountPercent ?? 0);
+
+  const sellingPrice =
+    discountPercent > 0
+      ? parseFloat((mrp * (1 - discountPercent / 100)).toFixed(2))
+      : Math.min(unit, mrp);
+
+  return { sellingPrice, mrp };
 }

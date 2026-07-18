@@ -1,5 +1,6 @@
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ReasonDropdown } from "@/src/components/ui/ReasonDropdown";
+import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -260,6 +261,7 @@ export function ReturnReasonModal({
           style={{ fontSize: moderateScale(14) }}
         >
           {"What's the issue with your order?"}
+          <RequiredMark />
         </Text>
         <ReasonDropdown
           options={reasons}
@@ -293,6 +295,7 @@ export function ReturnReasonModal({
               style={{ fontSize: moderateScale(14) }}
             >
               Describe the issue
+              <RequiredMark />
             </Text>
             <SafeBottomSheetInput
               placeholder="Please specify the reason for your return"

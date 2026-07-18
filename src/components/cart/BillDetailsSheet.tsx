@@ -200,23 +200,25 @@ export const BillDetailsSheet: React.FC<BillDetailsSheetProps> = ({
             </Text>
           </View>
 
-          <View
-            className="flex-row justify-between"
-            style={{ marginTop: exactScale(16) }}
-          >
-            <Text
-              className="font-inter text-[#6A6A6A]"
-              style={{ fontSize: moderateScale(14) }}
+          {handlingCharge > 0 && (
+            <View
+              className="flex-row justify-between"
+              style={{ marginTop: exactScale(16) }}
             >
-              Handling Charge
-            </Text>
-            <Text
-              className="font-inter text-[#6A6A6A]"
-              style={{ fontSize: moderateScale(14) }}
-            >
-              ₹{Number(handlingCharge).toFixed(2)}
-            </Text>
-          </View>
+              <Text
+                className="font-inter text-[#6A6A6A]"
+                style={{ fontSize: moderateScale(14) }}
+              >
+                Handling Charge
+              </Text>
+              <Text
+                className="font-inter text-[#6A6A6A]"
+                style={{ fontSize: moderateScale(14) }}
+              >
+                ₹{Number(handlingCharge).toFixed(2)}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View

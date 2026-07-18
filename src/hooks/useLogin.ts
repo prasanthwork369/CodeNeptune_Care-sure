@@ -4,10 +4,10 @@ import {
   getPhoneNumberHint,
   normalizeIndianPhone,
 } from "@/src/modules/PhoneNumberHint";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
 import { Keyboard } from "react-native";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
 
 import { perfService } from "@/src/services/performance/perfService";
 
@@ -20,7 +20,7 @@ export function useLogin() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const { requestOtp, loading, error } = useAuth();
-  
+
   // Guard ref to prevent showing the phone number hint picker multiple times concurrently
   const hintInProgress = useRef(false);
 
@@ -82,6 +82,7 @@ export function useLogin() {
       // Prefill the OTP only when the backend returns it (QA/staging convenience).
       // Consistent with the resend path in useOtp. The production backend must
       // NOT include `otp` in the response, or it would auto-fill for real users.
+      console.log(res);
       const prefillOtp = res?.data?.otp ?? "";
       router.push({
         pathname: "/otp",

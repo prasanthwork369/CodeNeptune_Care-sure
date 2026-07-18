@@ -1,8 +1,16 @@
 import { moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { KeyboardTypeOptions, Text, TextInput, TextInputProps, View } from "react-native";
+import { RequiredMark } from "./RequiredMark";
 
 type FormFieldVariant = "outline" | "boxed";
+
+// Opaque green so the caret is always visible. A translucent selectionColor
+// makes the cursor invisible: on iOS the caret and selection share this color,
+// and on older Android (e.g. Android 10) selectionColor also tints the cursor
+// drawable, overriding cursorColor. The caret must stay opaque; the selection
+// highlight being solid green is acceptable.
+const SELECTION_COLOR = "#0F7635";
 
 export type FormFieldProps = {
   label: string;
@@ -27,6 +35,7 @@ export type FormFieldProps = {
     | "yesExcludeDescendants";
   rightSlot?: React.ReactNode;
   variant?: FormFieldVariant;
+  required?: boolean;
 };
 
 // Two visual variants preserved from the layouts this was extracted from:
@@ -55,6 +64,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
       importantForAutofill = "no",
       rightSlot,
       variant = "outline",
+      required = false,
     },
     ref,
   ) => {
@@ -70,6 +80,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
             }}
           >
             {label}
+            {required && <RequiredMark />}
           </Text>
           <View
             style={{
@@ -80,7 +91,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
               borderWidth: 1,
               borderColor: "#E8E8E8",
               paddingHorizontal: 14,
-              height: 48,
+              minHeight: 48,
             }}
           >
             <TextInput
@@ -94,16 +105,16 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
               // Explicit caret/selection colors — some OEM keyboards/themes
               // render the default caret invisible against the white field.
               cursorColor="#0F7635"
-              selectionColor="#0F763533"
-              // Fill the box height so the whole field (not just the text line)
-              // is a tap target, and the caret sits vertically centered.
-              textAlignVertical="center"
+              selectionColor={SELECTION_COLOR}
+              // Vertical padding (not a fixed height) sizes the field so the
+              // caret has room to draw — a height-constrained input clips the
+              // blinking caret on Android 10. The padded area stays the tap target.
               style={{
                 flex: 1,
-                height: "100%",
+                paddingVertical: 12,
                 fontSize: moderateScale(14),
                 color: editable ? "#111827" : "#637381",
-                padding: 0,
+                paddingHorizontal: 0,
               }}
             />
             {rightSlot}
@@ -135,6 +146,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           }}
         >
           {label}
+          {required && <RequiredMark />}
         </Text>
         <TextInput
           ref={ref}
@@ -150,7 +162,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           // Explicit caret/selection colors so the cursor is visible on all
           // devices (some OEM themes render the default caret invisible).
           cursorColor="#0F7635"
-          selectionColor="#0F763533"
+          selectionColor={SELECTION_COLOR}
           autoCorrect={false}
           autoComplete={autoComplete}
           textContentType={textContentType}

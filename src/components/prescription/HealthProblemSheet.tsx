@@ -3,15 +3,15 @@ import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { typography } from "@/src/constants/typography";
 import { useHealthProblems } from "@/src/hooks/queries/useHealthProblems";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { resolveAssetUrl } from "@/src/utils/urls";
-import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { typography } from "@/src/constants/typography";
+import { SafeBottomSheetInput } from "../ui/SafeBottomSheetInput";
 
 interface HealthProblemSheetProps {
   isVisible: boolean;
@@ -93,6 +93,8 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
       onClose={handleClose}
       snapPoints={snapPoints}
       closeButtonOffset="75%"
+      keyboardBehavior="extend"
+      keyboardBlurBehavior="none"
     >
       <View style={{ flex: 1, paddingTop: exactScale(8) }}>
         <View
@@ -104,14 +106,29 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
             paddingBottom: exactScale(12),
           }}
         >
-          <Text style={{ fontSize: moderateScale(17), fontWeight: "700", color: "#1A1C1E" }}>
+          <Text
+            style={{
+              fontSize: moderateScale(17),
+              fontWeight: "700",
+              color: "#1A1C1E",
+            }}
+          >
             {isCustomMode ? "Enter Health Problem" : "Select Health Problem"}
           </Text>
           <Touchable
             onPress={handleClose}
-            hitSlop={{ top: exactScale(10), bottom: exactScale(10), left: exactScale(10), right: exactScale(10) }}
+            hitSlop={{
+              top: exactScale(10),
+              bottom: exactScale(10),
+              left: exactScale(10),
+              right: exactScale(10),
+            }}
           >
-            <icons.close_icon width={exactScale(18)} height={exactScale(18)} fill="#6A6A6A" />
+            <icons.close_icon
+              width={exactScale(18)}
+              height={exactScale(18)}
+              fill="#6A6A6A"
+            />
           </Touchable>
         </View>
 
@@ -123,7 +140,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               paddingBottom: Math.max(adjustedBottom, exactScale(20)),
             }}
           >
-            <BottomSheetTextInput
+            <SafeBottomSheetInput
               value={customText}
               onChangeText={setCustomText}
               placeholder="E.g., Back pain, acidity, etc."
@@ -199,7 +216,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
               }}
             >
               <icons.search width={exactScale(16)} height={exactScale(16)} />
-              <BottomSheetTextInput
+              <SafeBottomSheetInput
                 value={query}
                 onChangeText={setQuery}
                 placeholder="Search health problem..."
@@ -243,9 +260,13 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{
                   paddingHorizontal: exactScale(16),
-                  paddingBottom: Math.max(adjustedBottom, exactScale(16)) + exactScale(8),
+                  paddingBottom:
+                    Math.max(adjustedBottom, exactScale(16)) + exactScale(8),
                 }}
-                columnWrapperStyle={{ gap: exactScale(10), marginBottom: exactScale(10) }}
+                columnWrapperStyle={{
+                  gap: exactScale(10),
+                  marginBottom: exactScale(10),
+                }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 renderItem={({ item }) => {
@@ -284,7 +305,12 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                               size={exactScale(44)}
                             />
                           ) : (
-                            <Text style={{ fontSize: typography.h2.fontSize, lineHeight: typography.h2.lineHeight }}>
+                            <Text
+                              style={{
+                                fontSize: typography.h2.fontSize,
+                                lineHeight: typography.h2.lineHeight,
+                              }}
+                            >
                               {item.icon}
                             </Text>
                           )}

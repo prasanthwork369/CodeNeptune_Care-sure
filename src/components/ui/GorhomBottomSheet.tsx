@@ -13,7 +13,7 @@ import React, {
     useImperativeHandle,
     useRef,
 } from 'react';
-import { Keyboard, Platform } from 'react-native';
+import { BackHandler, Keyboard, Platform } from 'react-native';
 
 interface GorhomBottomSheetProps
     extends Pick<
@@ -120,6 +120,17 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
             Keyboard.dismiss();
             internalRef.current?.dismiss();
         }, []);
+
+        // The sheet lives in a portal, not a native Modal, so Android back would
+        // otherwise fall through to the navigator and exit the app.
+        useEffect(() => {
+            if (Platform.OS !== 'android' || !isVisible) return;
+            const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+                handleClose();
+                return true;
+            });
+            return () => sub.remove();
+        }, [isVisible, handleClose]);
 
         const enableDynamicSizing = closeButtonOffset === undefined;
 
