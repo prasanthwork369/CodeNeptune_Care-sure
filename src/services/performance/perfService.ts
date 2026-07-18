@@ -20,6 +20,17 @@ class PerformanceService {
   // during development — Firebase's own data only surfaces in the console hours
   // later, and not at all in Expo Go. Independent of the native perf module.
   private devTimers = new Map<string, number>();
+  // Safety timers that force-stop a trace that outlives maxDurationMs, so a
+  // trace whose stop is missed can't report minutes of idle/background time.
+  private autoStopTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+  private clearAutoStop(traceName: string) {
+    const timer = this.autoStopTimers.get(traceName);
+    if (timer) {
+      clearTimeout(timer);
+      this.autoStopTimers.delete(traceName);
+    }
+  }
 
   /**
    * Starts a custom performance trace with optional initial attributes and metrics.
@@ -28,10 +39,23 @@ class PerformanceService {
   async startTrace(
     traceName: PerfTraceName,
     attributes?: TraceAttributes,
-    metrics?: TraceMetrics
+    metrics?: TraceMetrics,
+    maxDurationMs?: number
   ): Promise<void> {
     if (__DEV__ && !this.devTimers.has(traceName)) {
       this.devTimers.set(traceName, Date.now());
+    }
+
+    // Bound the trace so a missed stop can't inflate the average. Fires once;
+    // the recorded sample is tagged so it can be filtered out in the console.
+    if (maxDurationMs && maxDurationMs > 0 && !this.autoStopTimers.has(traceName)) {
+      this.autoStopTimers.set(
+        traceName,
+        setTimeout(() => {
+          this.autoStopTimers.delete(traceName);
+          this.stopTrace(traceName, { timed_out: "true" });
+        }, maxDurationMs)
+      );
     }
 
     const perf = getPerf();
@@ -78,6 +102,8 @@ class PerformanceService {
     additionalAttributes?: TraceAttributes,
     additionalMetrics?: TraceMetrics
   ): Promise<void> {
+    this.clearAutoStop(traceName);
+
     if (__DEV__) {
       const startedAt = this.devTimers.get(traceName);
       if (startedAt !== undefined) {

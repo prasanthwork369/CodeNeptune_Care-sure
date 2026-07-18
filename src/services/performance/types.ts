@@ -28,4 +28,6 @@ export interface UsePerformanceTraceOptions {
   metrics?: TraceMetrics;
   /** If true, the trace will not auto-start on mount (requires manual trigger) */
   manualStart?: boolean;
+  /** Force-stops the trace after this many ms so a missed stop can't report idle/background time. Defaults to 20s for screen-load traces. */
+  maxDurationMs?: number;
 }
