@@ -2,7 +2,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { analyticsService, PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -241,6 +241,13 @@ export function usePaymentCalculations() {
 
       const order: any = await createOrder(payload);
       traceStatus = "success";
+      if (order?.id) {
+        void analyticsService.logPurchase(
+          String(order.id),
+          Number(billBreakdown.toPay),
+          orderItems.length,
+        );
+      }
       removeCoupon();
       clearCheckout();
       clearPrescriptionOrder();

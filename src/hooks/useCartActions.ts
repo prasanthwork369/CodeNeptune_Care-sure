@@ -4,6 +4,7 @@ import { Animated } from "react-native";
 import { useCart } from "./queries/useCart";
 import { useAuthStore } from "@/src/store/authStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { analyticsService } from "@/src/services/firebase";
 
 /**
  * Product identity for cart operations.
@@ -94,6 +95,7 @@ export const useCartActions = (product: CartActionProduct) => {
     try {
       if (cartItem) {
         await updateItem(cartItem.id, { quantity: count + 1 });
+        void analyticsService.logAddToCart();
       } else {
         const medicineName =
           String(product.name ?? "").trim() || product.medicineId;
@@ -153,6 +155,7 @@ export const useCartActions = (product: CartActionProduct) => {
             ...(discountPercent > 0 ? { discountPercent } : {}),
           },
         });
+        void analyticsService.logAddToCart();
       }
     } finally {
       if (isAuthenticated) setPending(pendingKey, false);

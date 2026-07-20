@@ -1,7 +1,7 @@
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as NavigationBar from "expo-navigation-bar";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -24,13 +24,13 @@ import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationSc
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
-import { initCrashReporting } from "@/src/lib/crashlytics";
+import { analyticsService, initCrashReporting } from "@/src/services/firebase";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import "../global.css";
 
 initDb();
@@ -48,7 +48,26 @@ const PushNotificationProvider = () => {
 
 SplashScreen.preventAutoHideAsync();
 
+const screenNameForPath = (pathname: string) => {
+  if (pathname === "/") return "launch";
+  if (pathname.startsWith("/product/")) return "product_details";
+  if (pathname.startsWith("/search/product/")) return "product_comparison";
+  if (pathname.startsWith("/search")) return "search";
+  if (pathname.startsWith("/category/")) return "category_products";
+  if (pathname.startsWith("/profile/orders")) return "orders";
+  if (pathname.startsWith("/profile")) return "profile";
+  if (pathname.startsWith("/notifications")) return "notifications";
+  if (pathname.startsWith("/cart")) return "cart";
+  if (pathname.startsWith("/payment")) return "checkout";
+  if (pathname.startsWith("/upload")) return "prescription_upload";
+  if (pathname.startsWith("/login")) return "login";
+  if (pathname.startsWith("/otp")) return "otp";
+  if (pathname.startsWith("/categories")) return "categories";
+  return "other";
+};
+
 export default function RootLayout() {
+  const pathname = usePathname();
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
   const interFontsLoaded = useAndroidInterFonts();
@@ -61,6 +80,13 @@ export default function RootLayout() {
   useEffect(() => {
     initialize();
   }, []);
+
+  // Expo Router keeps a single Android Activity, so native automatic screen
+  // reporting cannot distinguish route changes. Track an allow-listed screen
+  // name only; never include route params, ids, search terms, or URLs.
+  useEffect(() => {
+    analyticsService.logScreenView(screenNameForPath(pathname));
+  }, [pathname]);
 
   useEffect(() => {
     if (Platform.OS === "android") {

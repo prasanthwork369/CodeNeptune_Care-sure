@@ -1,4 +1,4 @@
-import { isExpoGo } from "../../utils/environment";
+import { isExpoGo } from "../../../utils/environment";
 import { PerfTraceName, TraceAttributes, TraceMetrics } from "./types";
 
 /**

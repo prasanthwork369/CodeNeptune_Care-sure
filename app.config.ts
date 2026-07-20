@@ -57,6 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-sqlite",
     "@react-native-firebase/app",
+    "@react-native-firebase/analytics",
     "@react-native-firebase/crashlytics",
     "@react-native-firebase/messaging",
     "@react-native-firebase/perf",

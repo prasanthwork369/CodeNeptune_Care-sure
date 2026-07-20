@@ -1,2 +1,2 @@
 // Compatibility export for existing consumers outside this application.
-export * from "@/src/services/firebase/performance";
+export { analyticsService } from "@/src/services/firebase/analytics";

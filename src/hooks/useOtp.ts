@@ -3,6 +3,7 @@ import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { NotificationNavigation } from "@/src/services/notifications/NotificationNavigation";
+import { analyticsService } from "@/src/services/firebase";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
 import { isExpoGo } from "@/src/utils/environment";
@@ -237,6 +238,7 @@ export function useOtp() {
     if (!phone) return;
     try {
       await verifyOtp(phone, otpCode);
+      void analyticsService.logLoginSuccess();
       Keyboard.dismiss();
       setIsRedirecting(true);
 

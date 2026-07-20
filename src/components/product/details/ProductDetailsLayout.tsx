@@ -12,7 +12,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { LinearGradient } from "expo-linear-gradient";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { analyticsService, PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -52,6 +52,10 @@ export const ProductDetailsLayout: React.FC = () => {
     traceName: PERF_TRACES.PRODUCT_DETAILS_LOAD,
     isLoading,
   });
+
+  useEffect(() => {
+    if (product) void analyticsService.logProductView(raw?.sourceType);
+  }, [product, raw?.sourceType]);
 
   const [locationSheetVisible, setLocationSheetVisible] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(

@@ -41,8 +41,7 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
-import { useScrollJankTrace } from "@/src/hooks/home/useScrollJankTrace";
+import { PERF_TRACES, usePerformanceTrace, useScrollJankTrace } from "@/src/services/firebase";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const EMPTY_BANNERS: NonNullable<

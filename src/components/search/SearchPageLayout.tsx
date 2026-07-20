@@ -8,7 +8,7 @@ import { useCart } from '@/src/hooks/queries/useCart';
 import { useSearch, useSearchHistory, useSearchSuggestions, useTrendingSearches } from '@/src/hooks/queries/useSearch';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
-import { PERF_TRACES, usePerformanceTrace } from '@/src/services/performance';
+import { analyticsService, PERF_TRACES, usePerformanceTrace } from '@/src/services/firebase';
 import React, { useEffect, useRef } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -136,6 +136,7 @@ export const SearchPageLayout = () => {
         startSearchTrace({
             query_length: String(q.length),
         });
+        void analyticsService.logSearchStarted();
     }, [debouncedQuery, isFetching, startSearchTrace, stopSearchTrace]);
 
     useEffect(() => {
@@ -143,6 +144,7 @@ export const SearchPageLayout = () => {
             stopSearchTrace(error ? { status: 'error' } : { status: 'success' }, {
                 result_count: results.length,
             });
+            if (!error) void analyticsService.logSearchCompleted(results.length);
             tracedQueryRef.current = "";
         }
     }, [error, isFetching, results.length, stopSearchTrace]);

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { AppState } from "react-native";
-import { perfService } from "@/src/services/performance/perfService";
-import { PerfTraceName } from "@/src/services/performance";
+import { perfService } from "./perfService";
+import { PerfTraceName } from "./types";
 
 // A frame longer than this counts as janky (60fps target ≈ 16.67ms per frame).
 const JANK_FRAME_MS = 17;

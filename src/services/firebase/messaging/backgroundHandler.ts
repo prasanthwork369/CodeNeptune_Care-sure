@@ -1,4 +1,4 @@
-import { isExpoGo } from '../../utils/environment';
+import { isExpoGo } from '../../../utils/environment';
 
 /**
  * Registers the Firebase background/quit-state message handler.
@@ -21,7 +21,7 @@ if (!isExpoGo) {
   messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
     if (__DEV__) console.log('[BackgroundMessage]', JSON.stringify(remoteMessage));
     if (!remoteMessage?.notification) {
-      const { notifeeService } = require('./notifeeService');
+      const { notifeeService } = require('../../notifications/notifeeService');
       await notifeeService.displayBranded(remoteMessage).catch(() => {});
     }
   });

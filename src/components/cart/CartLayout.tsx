@@ -5,7 +5,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";
 import { exactScale } from "@/src/utils/exactScale";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import {

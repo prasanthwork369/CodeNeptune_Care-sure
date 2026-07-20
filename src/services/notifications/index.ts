@@ -6,6 +6,6 @@
 export { NotificationNavigation } from './NotificationNavigation';
 export { orderNotification } from './orderNotification';
 export type { OrderPlacedInput } from './orderNotification';
-export { notificationService } from './notification.service';
+export { messagingService as notificationService } from '@/src/services/firebase';
 export { notifeeService } from './notifeeService';
 export { handleNotificationAction, NOTIFICATION_ACTIONS } from './notificationActions';

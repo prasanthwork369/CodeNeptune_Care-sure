@@ -11,6 +11,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
+import { analyticsService } from "@/src/services/firebase";
 import { CartLine } from "@/src/types/cart";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -270,6 +271,8 @@ export function useCartCalculations() {
       router.push("/(auth)/login");
       return;
     }
+
+    void analyticsService.logBeginCheckout(lines.length, toPay);
 
     router.push({
       pathname: targetPath as any,

@@ -12,7 +12,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { moderateScale } from "@/src/utils/exactScale";
 import { useLocalSearchParams } from "expo-router";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import React from "react";
 import {
   RefreshControl,

@@ -9,7 +9,7 @@ import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
 import { Keyboard } from "react-native";
 
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 
 /**
  * Custom hook managing the business logic for the Login screen.
