@@ -8,8 +8,7 @@ import { useCart } from '@/src/hooks/queries/useCart';
 import { useSearch, useSearchHistory, useSearchSuggestions, useTrendingSearches } from '@/src/hooks/queries/useSearch';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
-import { perfService } from '@/src/services/performance/perfService';
-import { PERF_TRACES } from '@/src/services/performance';
+import { PERF_TRACES, usePerformanceTrace } from '@/src/services/performance';
 import React, { useEffect, useRef } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -113,39 +112,40 @@ export const SearchPageLayout = () => {
         setQuery,
         results,
         isLoading,
+        isFetching,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,
+        error,
         debouncedQuery,
     } = useSearch();
 
-    // Trace each search query end-to-end: start when a new query begins, stop
-    // when its results arrive. A new query ends the previous trace first so
-    // fast successive searches are each measured (the service guards duplicates).
+    // Trace only an active query fetch. Cached results render immediately and
+    // intentionally do not produce a near-zero network/load trace.
+    const { start: startSearchTrace, stop: stopSearchTrace } = usePerformanceTrace({
+        traceName: PERF_TRACES.SEARCH_QUERY_LOAD,
+        manualStart: true,
+        maxDurationMs: 15_000,
+    });
     const tracedQueryRef = useRef("");
     useEffect(() => {
         const q = debouncedQuery.trim();
-        if (q.length === 0 || q === tracedQueryRef.current) return;
-        perfService.stopTrace(PERF_TRACES.SEARCH_QUERY_LOAD);
+        if (!isFetching || q.length === 0 || q === tracedQueryRef.current) return;
+        if (tracedQueryRef.current) stopSearchTrace({ status: 'superseded' });
         tracedQueryRef.current = q;
-        perfService.startTrace(PERF_TRACES.SEARCH_QUERY_LOAD, {
+        startSearchTrace({
             query_length: String(q.length),
         });
-    }, [debouncedQuery]);
+    }, [debouncedQuery, isFetching, startSearchTrace, stopSearchTrace]);
 
     useEffect(() => {
-        if (tracedQueryRef.current && !isLoading) {
-            perfService.stopTrace(PERF_TRACES.SEARCH_QUERY_LOAD, undefined, {
+        if (tracedQueryRef.current && !isFetching) {
+            stopSearchTrace(error ? { status: 'error' } : { status: 'success' }, {
                 result_count: results.length,
             });
             tracedQueryRef.current = "";
         }
-    }, [isLoading, results.length]);
-
-    // Flush an in-flight trace if the user leaves mid-search.
-    useEffect(() => () => {
-        perfService.stopTrace(PERF_TRACES.SEARCH_QUERY_LOAD);
-    }, []);
+    }, [error, isFetching, results.length, stopSearchTrace]);
 
     const { history, recordHistory, clearHistory, isClearingHistory, deleteHistoryItem } = useSearchHistory(5);
     const { suggestions } = useSearchSuggestions(query, 5);

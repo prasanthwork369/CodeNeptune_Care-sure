@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import { perfService } from "./perfService";
-import { UsePerformanceTraceOptions } from "./types";
+import { TraceAttributes, TraceMetrics, UsePerformanceTraceOptions } from "./types";
 
 // Screen loads should finish in seconds; anything longer is a missed stop, not
 // a slow load. The cap keeps such samples from inflating the Firebase average.
@@ -28,10 +28,15 @@ export function usePerformanceTrace({
 }: UsePerformanceTraceOptions) {
   const hasStartedRef = useRef(false);
 
-  const start = useCallback(() => {
+  const start = useCallback((startAttributes?: TraceAttributes, startMetrics?: TraceMetrics) => {
     if (!hasStartedRef.current) {
       hasStartedRef.current = true;
-      perfService.startTrace(traceName, attributes, metrics, maxDurationMs);
+      perfService.startTrace(
+        traceName,
+        startAttributes ?? attributes,
+        startMetrics ?? metrics,
+        maxDurationMs,
+      );
     }
   }, [traceName, attributes, metrics, maxDurationMs]);
 
@@ -49,7 +54,7 @@ export function usePerformanceTrace({
   // already loaded (isLoading === false at mount) — there is nothing to measure,
   // and starting would leave a trace running until unmount.
   useEffect(() => {
-    if (!manualStart && !hasStartedRef.current && isLoading !== false) {
+    if (!manualStart && isLoading === true && !hasStartedRef.current) {
       start();
     }
 
@@ -59,10 +64,7 @@ export function usePerformanceTrace({
         hasStartedRef.current = false;
       }
     };
-    // isLoading intentionally read only at mount for the start decision; the
-    // stop-on-load effect below handles later transitions.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [manualStart, start, traceName]);
+  }, [isLoading, manualStart, start, traceName]);
 
   // Auto-stop when isLoading transitions to false
   useEffect(() => {

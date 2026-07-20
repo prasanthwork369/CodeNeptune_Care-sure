@@ -15,7 +15,7 @@ const getPerf = () => {
 };
 
 class PerformanceService {
-  private activeTraces = new Map<string, any>();
+  private activeTraces = new Map<string, TraceSession>();
   // Dev-only wall-clock timers so trace durations print to the console instantly
   // during development — Firebase's own data only surfaces in the console hours
   // later, and not at all in Expo Go. Independent of the native perf module.
@@ -32,6 +32,42 @@ class PerformanceService {
     }
   }
 
+  private async finishTrace(
+    traceName: PerfTraceName,
+    session: TraceSession,
+    additionalAttributes?: TraceAttributes,
+    additionalMetrics?: TraceMetrics,
+  ) {
+    if (session.stopping || !session.trace) return;
+    session.stopping = true;
+
+    try {
+      if (additionalAttributes) {
+        Object.entries(additionalAttributes).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            session.trace.putAttribute(key, String(value));
+          }
+        });
+      }
+
+      if (additionalMetrics) {
+        Object.entries(additionalMetrics).forEach(([key, value]) => {
+          if (typeof value === "number" && !Number.isNaN(value)) {
+            session.trace.putMetric(key, value);
+          }
+        });
+      }
+
+      await session.trace.stop();
+    } catch (err) {
+      if (__DEV__) console.warn(`[PerfService] Stop trace error (${traceName}):`, err);
+    } finally {
+      if (this.activeTraces.get(traceName) === session) {
+        this.activeTraces.delete(traceName);
+      }
+    }
+  }
+
   /**
    * Starts a custom performance trace with optional initial attributes and metrics.
    * Prevents duplicate trace initialization for the same trace name.
@@ -42,9 +78,14 @@ class PerformanceService {
     metrics?: TraceMetrics,
     maxDurationMs?: number
   ): Promise<void> {
-    if (__DEV__ && !this.devTimers.has(traceName)) {
-      this.devTimers.set(traceName, Date.now());
-    }
+    // Reserve the name synchronously, before the async native trace creation.
+    // Without this, two renders can both call newTrace(), and a stop that lands
+    // before newTrace() resolves can leave the late trace running indefinitely.
+    if (this.activeTraces.has(traceName)) return;
+    const session: TraceSession = { trace: null, stopping: false, stopRequested: false };
+    this.activeTraces.set(traceName, session);
+
+    if (__DEV__) this.devTimers.set(traceName, Date.now());
 
     // Bound the trace so a missed stop can't inflate the average. Fires once;
     // the recorded sample is tagged so it can be filtered out in the console.
@@ -62,10 +103,6 @@ class PerformanceService {
     if (!perf) return;
 
     try {
-      if (this.activeTraces.has(traceName)) {
-        return; // Guard against duplicate trace starts
-      }
-
       const trace = await perf().newTrace(traceName);
 
       // Attach custom attributes if provided
@@ -87,9 +124,25 @@ class PerformanceService {
       }
 
       await trace.start();
-      this.activeTraces.set(traceName, trace);
+      session.trace = trace;
+
+      // stopTrace may have been called while the native module was creating
+      // this trace. Stop immediately in that case; never leave a late trace
+      // measuring screen dwell/background time.
+      if (session.stopRequested) {
+        await this.finishTrace(
+          traceName,
+          session,
+          session.stopAttributes,
+          session.stopMetrics,
+        );
+      }
     } catch (err) {
       if (__DEV__) console.warn(`[PerfService] Start trace error (${traceName}):`, err);
+      this.clearAutoStop(traceName);
+      if (this.activeTraces.get(traceName) === session) {
+        this.activeTraces.delete(traceName);
+      }
     }
   }
 
@@ -113,32 +166,18 @@ class PerformanceService {
       }
     }
 
-    const trace = this.activeTraces.get(traceName);
-    if (!trace) return;
+    const session = this.activeTraces.get(traceName);
+    if (!session || session.stopping) return;
 
-    try {
-      if (additionalAttributes) {
-        Object.entries(additionalAttributes).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            trace.putAttribute(key, String(value));
-          }
-        });
-      }
-
-      if (additionalMetrics) {
-        Object.entries(additionalMetrics).forEach(([key, value]) => {
-          if (typeof value === "number" && !Number.isNaN(value)) {
-            trace.putMetric(key, value);
-          }
-        });
-      }
-
-      await trace.stop();
-    } catch (err) {
-      if (__DEV__) console.warn(`[PerfService] Stop trace error (${traceName}):`, err);
-    } finally {
-      this.activeTraces.delete(traceName); // Prevent memory leaks
+    if (!session.trace) {
+      // Keep the requested terminal data until asynchronous creation finishes.
+      session.stopRequested = true;
+      session.stopAttributes = additionalAttributes;
+      session.stopMetrics = additionalMetrics;
+      return;
     }
+
+    await this.finishTrace(traceName, session, additionalAttributes, additionalMetrics);
   }
 
   /**
@@ -164,5 +203,13 @@ class PerformanceService {
     }
   }
 }
+
+type TraceSession = {
+  trace: any | null;
+  stopping: boolean;
+  stopRequested: boolean;
+  stopAttributes?: TraceAttributes;
+  stopMetrics?: TraceMetrics;
+};
 
 export const perfService = new PerformanceService();

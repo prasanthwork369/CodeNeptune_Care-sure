@@ -9,7 +9,7 @@ import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
 import { Keyboard } from "react-native";
 
-import { perfService } from "@/src/services/performance/perfService";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
 
 /**
  * Custom hook managing the business logic for the Login screen.
@@ -20,6 +20,11 @@ export function useLogin() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const { requestOtp, loading, error } = useAuth();
+  const { start: startLoginTrace, stop: stopLoginTrace } = usePerformanceTrace({
+    traceName: PERF_TRACES.LOGIN_SUBMIT,
+    manualStart: true,
+    maxDurationMs: 15_000,
+  });
 
   // Guard ref to prevent showing the phone number hint picker multiple times concurrently
   const hintInProgress = useRef(false);
@@ -74,11 +79,12 @@ export function useLogin() {
       return;
     }
     Keyboard.dismiss();
-    perfService.startTrace("login_submit");
+    startLoginTrace();
+    let succeeded = false;
     try {
       const formattedPhone = `+91${phoneNumber}`;
       const res = await requestOtp(formattedPhone);
-      perfService.stopTrace("login_submit");
+      succeeded = true;
       // Prefill the OTP only when the backend returns it (QA/staging convenience).
       // Consistent with the resend path in useOtp. The production backend must
       // NOT include `otp` in the response, or it would auto-fill for real users.
@@ -89,8 +95,9 @@ export function useLogin() {
         params: { phone: formattedPhone, prefillOtp },
       });
     } catch {
-      perfService.stopTrace("login_submit");
       // Error state is captured and handled by useAuth hook
+    } finally {
+      stopLoginTrace({ status: succeeded ? "success" : "error" });
     }
   };
 

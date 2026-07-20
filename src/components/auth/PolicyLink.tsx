@@ -1,5 +1,5 @@
 import * as WebBrowser from "expo-web-browser";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

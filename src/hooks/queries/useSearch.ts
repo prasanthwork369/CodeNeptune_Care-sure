@@ -31,6 +31,7 @@ export const useSearch = () => {
     const {
         data,
         isLoading,
+        isFetching,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,
@@ -54,6 +55,7 @@ export const useSearch = () => {
         setQuery,
         results,
         isLoading,
+        isFetching,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,

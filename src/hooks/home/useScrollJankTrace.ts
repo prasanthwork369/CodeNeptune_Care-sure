@@ -1,4 +1,5 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { AppState } from "react-native";
 import { perfService } from "@/src/services/performance/perfService";
 import { PerfTraceName } from "@/src/services/performance";
 
@@ -55,6 +56,18 @@ export function useScrollJankTrace(traceName: PerfTraceName) {
       jank_percent: jankPercent,
     });
   }, [traceName]);
+
+  // A scroll session is meaningful only while the app is interactive. End it
+  // before background time can inflate duration or keep requestAnimationFrame alive.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state !== "active") stop();
+    });
+    return () => {
+      sub.remove();
+      stop();
+    };
+  }, [stop]);
 
   return { start, stop };
 }

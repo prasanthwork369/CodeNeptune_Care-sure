@@ -2,8 +2,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
-import { perfService } from "@/src/services/performance/perfService";
-import { PERF_TRACES } from "@/src/services/performance";
+import { PERF_TRACES, usePerformanceTrace } from "@/src/services/performance";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -98,6 +97,11 @@ export function usePaymentCalculations() {
   // the deferred prescription upload that runs before createOrder — so the
   // button reacts instantly on press instead of after that first call.
   const [placingOrder, setPlacingOrder] = useState(false);
+  const { start: startCheckoutTrace, stop: stopCheckoutTrace } = usePerformanceTrace({
+    traceName: PERF_TRACES.CHECKOUT_FLOW,
+    manualStart: true,
+    maxDurationMs: 30_000,
+  });
 
   // The address the user has selected — the same one the location sheet
   // highlights. Display and payload both read it, so what the screen shows is
@@ -125,21 +129,24 @@ export function usePaymentCalculations() {
     setPlacingOrder(true);
     // Trace the real checkout latency (prescription upload + createOrder),
     // starting only once the order is actually in flight — not screen dwell.
-    perfService.startTrace(PERF_TRACES.CHECKOUT_FLOW, { method: selectedMethod });
+    startCheckoutTrace({ method: selectedMethod });
 
     // Create the prescription now (deferred from Preview) when we're carrying
     // image URLs and don't already have an id. createdRxIdRef keeps this
     // idempotent: a retry after a failed order reuses the created prescription
     // instead of POSTing a duplicate.
     let effectivePrescriptionId = prescriptionId || createdRxIdRef.current;
+    let orderItems: any[] = [];
+    let payload: any;
+    let traceStatus = "failed";
+    try {
     if (!effectivePrescriptionId && parsedImageUrls.length > 0) {
       const rx = await prescriptionService.upload({
         imageUrls: parsedImageUrls,
         category: parsedCategory,
       });
       if (!rx.success) {
-        setPlacingOrder(false);
-        perfService.stopTrace(PERF_TRACES.CHECKOUT_FLOW, { status: "rx_upload_failed" });
+        traceStatus = "rx_upload_failed";
         Alert.alert(
           "Upload Failed",
           rx.error ?? "Could not save prescription. Please try again.",
@@ -150,7 +157,7 @@ export function usePaymentCalculations() {
       createdRxIdRef.current = effectivePrescriptionId;
     }
 
-    const orderItems = isPrescriptionFlow
+    orderItems = isPrescriptionFlow
       ? prescriptionOrderItems.map((i) => ({
           medicineId: i.medicineId,
           quantity: i.quantity,
@@ -180,7 +187,7 @@ export function usePaymentCalculations() {
           },
         }));
 
-    const payload = {
+    payload = {
       items: orderItems,
       deliveryAddress: {
         name: defaultAddress.name,
@@ -232,10 +239,8 @@ export function usePaymentCalculations() {
       console.log("[handlePlaceOrder] payload:", JSON.stringify(payload, null, 2));
     }
 
-    let orderSucceeded = false;
-    try {
       const order: any = await createOrder(payload);
-      orderSucceeded = true;
+      traceStatus = "success";
       removeCoupon();
       clearCheckout();
       clearPrescriptionOrder();
@@ -271,9 +276,8 @@ export function usePaymentCalculations() {
       Alert.alert("Order Failed", errorMessage);
     } finally {
       setPlacingOrder(false);
-      perfService.stopTrace(
-        PERF_TRACES.CHECKOUT_FLOW,
-        { status: orderSucceeded ? "success" : "failed" },
+      stopCheckoutTrace(
+        { status: traceStatus },
         { item_count: orderItems.length },
       );
     }
