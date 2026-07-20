@@ -451,6 +451,8 @@ export const NotificationsLayout: React.FC = () => {
   })).filter((g) => g.items.length > 0);
 
   const showEmpty = !isLoading && !isEntryLoading && notifications.length === 0;
+  const shouldShowInitialShimmer =
+    (isLoading || isEntryLoading) && notifications.length === 0;
 
   const handlePress = (notification: NotificationLog) => {
     if (!notification.isRead) markRead(notification.id);
@@ -528,7 +530,7 @@ export const NotificationsLayout: React.FC = () => {
         }
       />
 
-      {isLoading || isEntryLoading ? (
+      {shouldShowInitialShimmer ? (
         <NotificationsSkeleton />
       ) : (
         <ScrollView

@@ -2,6 +2,7 @@ import { useCartActions } from '@/src/hooks/useCartActions';
 import type { SubstituteProduct } from '@/src/types/home';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { OfferShine } from '@/src/components/ui/offerShine';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Animated, Text, View } from 'react-native';
 import { styles as s } from './FrequentSubstitutes.styles';
@@ -50,8 +51,9 @@ const FrequentItem = React.memo(({ item, onProductPress, disableCart }: { item: 
                         <Image source={item.image?.uri ? item.image : undefined} style={s.imgInner} contentFit="contain" />
                     </View>
                     {!!item.discount && (
-                        <View style={{ position: 'absolute', top: exactScale(6), left: exactScale(6), backgroundColor: '#E8F5E9', paddingHorizontal: exactScale(5), paddingVertical: exactScale(2), borderRadius: exactScale(4), zIndex: 10 }}>
+                        <View style={{ position: 'absolute', top: exactScale(6), left: exactScale(6), backgroundColor: '#E8F5E9', paddingHorizontal: exactScale(5), paddingVertical: exactScale(2), borderRadius: exactScale(4), zIndex: 10, overflow: 'hidden' }}>
                             <Text style={[s.badge, { fontWeight: '800', color: '#0F7635' }]}>{item.discount}</Text>
+                            <OfferShine borderRadius={exactScale(4)} />
                         </View>
                     )}
                 </View>

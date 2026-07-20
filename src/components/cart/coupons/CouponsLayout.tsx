@@ -20,8 +20,9 @@ export const CouponsLayout: React.FC = () => {
   const router = useNav();
   const { totalPrice: subtotal } = useCart();
   const { data: coupons = [], isLoading } = useCoupons();
-  const { unavailable, checking } = useCouponAvailability(coupons, subtotal);
+  const { unavailable } = useCouponAvailability(coupons, subtotal);
   const visibleCoupons = useCouponSearch(coupons, couponCode);
+  const shouldShowInitialShimmer = isLoading && coupons.length === 0;
 
   const applyCode = async (code: string) => {
     const trimmed = code.trim().toUpperCase();
@@ -86,7 +87,7 @@ export const CouponsLayout: React.FC = () => {
           Featured Coupons
         </Text>
 
-        {isLoading || checking ? (
+        {shouldShowInitialShimmer ? (
           <>
             <CouponCardSkeleton />
             <CouponCardSkeleton />

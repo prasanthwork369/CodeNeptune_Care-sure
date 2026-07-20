@@ -3,6 +3,7 @@ export { CartDeliveringTo } from './CartDeliveringTo';
 export { CartSavingsBanner } from './CartSavingsBanner';
 export { CartFreeDeliveryProgress } from './CartFreeDeliveryProgress';
 export { CartItemsList } from './CartItemsList';
+export { CartInitialSkeleton } from './CartInitialSkeleton';
 export { CartCouponSection } from './CartCouponSection';
 export { CartWalletSection } from './CartWalletSection';
 export { CartCorporateCreditsSection } from './CartCorporateCreditsSection';

@@ -1,4 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
@@ -439,6 +440,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                             paddingVertical: 4,
                             borderRadius: 6,
                             marginTop: 6,
+                            overflow: "hidden",
                           }}
                         >
                           <Text
@@ -447,6 +449,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                           >
                             Save ₹{effectiveSaving.toFixed(2)}
                           </Text>
+                          <OfferShine borderRadius={6} />
                         </LinearGradient>
                       );
                     })()}

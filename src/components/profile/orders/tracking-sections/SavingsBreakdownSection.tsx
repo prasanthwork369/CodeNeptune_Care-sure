@@ -1,4 +1,5 @@
 import { icons } from "@/src/constants/icons";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -50,7 +51,7 @@ export function SavingsBreakdownSection({
             colors={["#68D36C", "#329939"]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
-            style={{ borderRadius: exactScale(6) }}
+            style={{ borderRadius: exactScale(6), overflow: "hidden" }}
           >
             <View style={{ paddingHorizontal: exactScale(10), paddingVertical: exactScale(4) }}>
               <Text
@@ -60,6 +61,7 @@ export function SavingsBreakdownSection({
                 ₹{totalSaved.toFixed(2)}
               </Text>
             </View>
+            <OfferShine borderRadius={exactScale(6)} />
           </LinearGradient>
         </View>
       </LinearGradient>

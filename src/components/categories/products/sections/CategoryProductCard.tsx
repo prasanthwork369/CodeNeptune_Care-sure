@@ -1,5 +1,6 @@
 import { useFlyToCartSafe } from "@/src/components/animations/flyToCart";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { CategoryProductCardProps } from "@/src/types/category";
@@ -255,6 +256,8 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
               end={{ x: 1, y: 0.1 }} // slight y-offset approximates the 92.48deg angle vs. a flat 90deg
               style={{
                 borderRadius: exactScale(4),
+                overflow: "hidden",
+                position: "relative",
               }}
             >
               <View
@@ -266,6 +269,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
               >
                 <Text style={s.discount}>{product.discount}</Text>
               </View>
+              <OfferShine borderRadius={exactScale(4)} />
             </LinearGradient>
           )}
         </View>

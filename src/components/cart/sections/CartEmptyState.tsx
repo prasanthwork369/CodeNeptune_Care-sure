@@ -2,6 +2,7 @@ import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
 import { CartEmptyStateProps } from "@/src/types/cart";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { useNav } from "@/src/hooks/useNav";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
@@ -96,10 +97,11 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
 
                     {/* Discount badge */}
                     {!!product.discount && (
-                      <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: exactScale(6), paddingVertical: exactScale(2), backgroundColor: '#008097' }}>
+                      <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: exactScale(6), paddingVertical: exactScale(2), backgroundColor: '#008097', overflow: 'hidden' }}>
                         <Text style={{ fontSize: moderateScale(10), fontWeight: '700', color: '#fff' }}>
                           {String(product.discount).toUpperCase()}
                         </Text>
+                        <OfferShine borderRadius={exactScale(4)} />
                       </View>
                     )}
                   </View>

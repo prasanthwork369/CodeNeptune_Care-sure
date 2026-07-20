@@ -1,4 +1,5 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { icons } from "@/src/constants/icons";
@@ -89,7 +90,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               style={{ width: exactScale(22), height: exactScale(22) }}
               resizeMode="contain"
             />
-            <View className="bg-[#E8F5E9] px-2 py-1 rounded flex-shrink-0">
+            <View className="bg-[#E8F5E9] px-2 py-1 rounded flex-shrink-0 relative overflow-hidden">
               <Text
                 style={s.couponText}
                 className="font-inter-bold text-brand-primary"
@@ -97,6 +98,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               >
                 {appliedCoupon.code}
               </Text>
+              <OfferShine borderRadius={exactScale(4)} />
             </View>
             <Text
               style={s.couponText}

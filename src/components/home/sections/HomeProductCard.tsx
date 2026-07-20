@@ -1,9 +1,11 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { useHeroTransitionStore } from "@/src/store/heroTransitionStore";
 import { Product } from "@/src/types/home";
+import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React, { useCallback, useRef } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
@@ -97,6 +99,7 @@ export const HomeProductCard: React.FC<Props> = React.memo(({
               >
                 {item.discount}
               </Text>
+              <OfferShine borderRadius={exactScale(4)} />
             </View>
           )}
           {item.image ? (

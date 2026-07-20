@@ -5,6 +5,7 @@ import { resolveAssetUrl } from '@/src/utils/urls';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Touchable } from '@/src/components/ui/Touchable';
+import { OfferShine } from '@/src/components/ui/offerShine';
 import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
@@ -93,8 +94,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
                     />
                 </View>
                 {!!discountLabel && (
-                    <View style={[s.badgeContainer, { backgroundColor: discountBg, zIndex: 10 }]}>
+                    <View style={[s.badgeContainer, { backgroundColor: discountBg, zIndex: 10, overflow: 'hidden' }]}>
                         <Text style={[s.badge, { color: accentColor, fontWeight: '800' }]}>{discountLabel}</Text>
+                        <OfferShine borderRadius={exactScale(4)} />
                     </View>
                 )}
             </Touchable>

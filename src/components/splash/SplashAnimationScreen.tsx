@@ -1,7 +1,8 @@
 import { ANIMATIONS } from "@/src/constants/images";
-import { DotLottie } from "@lottiefiles/dotlottie-react-native";
+import { HOME_IMAGES } from "@/src/constants/images";
+import Constants from "expo-constants";
 import React, { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -13,7 +14,14 @@ import Animated, {
 } from "react-native-reanimated";
 
 const EASE_IN = Easing.in(Easing.ease);
-const SPLASH_DURATION_MS = 2500; // Duration to show the splash screen
+const IS_EXPO_GO = Constants.executionEnvironment === "storeClient";
+const SPLASH_DURATION_MS = IS_EXPO_GO ? 650 : 2500;
+
+// Expo Go cannot load custom native modules. Keep this require out of its
+// startup path so the splash never flashes black before the router mounts.
+const NativeDotLottie = IS_EXPO_GO
+  ? null
+  : require("@lottiefiles/dotlottie-react-native").DotLottie;
 
 interface Props {
   onComplete: () => void;
@@ -44,13 +52,21 @@ export const SplashAnimationScreen: React.FC<Props> = ({ onComplete }) => {
   return (
     <Animated.View style={[styles.container, screenStyle]}>
       <View style={styles.lottieWrapper}>
-        <DotLottie
-          source={ANIMATIONS.splash}
-          autoplay
-          loop={false}
-          layout={{ fit: "cover" }}
-          style={StyleSheet.absoluteFillObject}
-        />
+        {NativeDotLottie ? (
+          <NativeDotLottie
+            source={ANIMATIONS.splash}
+            autoplay
+            loop={false}
+            layout={{ fit: "cover" }}
+            style={StyleSheet.absoluteFillObject}
+          />
+        ) : (
+          <Image
+            source={HOME_IMAGES.splashIcon}
+            resizeMode="contain"
+            style={styles.expoGoFallback}
+          />
+        )}
       </View>
     </Animated.View>
   );
@@ -68,5 +84,9 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
+  },
+  expoGoFallback: {
+    width: "52%",
+    height: "52%",
   },
 });

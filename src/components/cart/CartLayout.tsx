@@ -18,6 +18,7 @@ import {
     CartFooter,
     CartFreeDeliveryProgress,
     CartItemsList,
+    CartInitialSkeleton,
     CartSavingsBanner,
     CartSavingsBreakdown,
     CartTerms,
@@ -81,6 +82,17 @@ export const CartLayout: React.FC = () => {
     traceName: PERF_TRACES.CART_LOAD,
     isLoading: isCartLoading,
   });
+
+  // React Query's isLoading is initial-load only. Do not replace an already
+  // restored cart during mutations or background work.
+  if (isCartLoading && lines.length === 0) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Cart" showBorder={true} />
+        <CartInitialSkeleton />
+      </View>
+    );
+  }
 
   if (lines.length === 0) {
     return (

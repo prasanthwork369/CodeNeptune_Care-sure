@@ -1,4 +1,5 @@
 import { HOME_IMAGES } from "@/src/constants/images";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { CartSavingsBannerProps } from "@/src/types/cart";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +24,7 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
         paddingHorizontal: exactScale(16),
         paddingVertical: exactScale(12),
         gap: exactScale(10),
+        overflow: "hidden",
       }}
     >
       <Image
@@ -39,6 +41,7 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
         </Text>
         {" on this Order"}
       </Text>
+      <OfferShine />
     </LinearGradient>
   );
 };

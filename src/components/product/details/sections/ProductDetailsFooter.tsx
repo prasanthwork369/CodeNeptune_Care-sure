@@ -1,4 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { OfferShine } from "@/src/components/ui/offerShine";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
@@ -65,7 +66,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
         {!!product.savingsPercent && (
           <View
             className="px-2 py-0.5 rounded-sm"
-            style={{ backgroundColor: "#DBE9FE" }}
+            style={{ backgroundColor: "#DBE9FE", position: "relative" }}
           >
             <Text
               className="font-inter-bold"
@@ -73,6 +74,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             >
               {product.savingsPercent}% off
             </Text>
+            <OfferShine borderRadius={exactScale(2)} />
           </View>
         )}
       </View>

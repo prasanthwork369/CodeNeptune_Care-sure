@@ -54,8 +54,9 @@ const AddressCard = ({ item, onEdit, onDelete, deleting }: { item: Address; onEd
 export const MyAddressesLayout: React.FC = () => {
     const adjustedBottom = useAdjustedBottomInset();
     const router = useNav();
-    const { addresses, loading, refreshing, error, deleteAddress } = useAddress();
+    const { addresses, loading, error, deleteAddress } = useAddress();
     const [confirmId, setConfirmId] = useState<string | null>(null);
+    const shouldShowInitialShimmer = loading && addresses.length === 0;
 
     const handleDeleteConfirm = async () => {
         if (!confirmId) return;
@@ -76,7 +77,7 @@ export const MyAddressesLayout: React.FC = () => {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: adjustedBottom + 24, flexGrow: 1 }} className="flex-1">
                 <Text style={s.addrAddBtn} className="font-inter-bold text-brand-text mb-3">Saved Addresses</Text>
                 {error ? <Text style={s.addrAction} className="text-red-500 font-inter-medium mb-3">{error}</Text> : null}
-                {loading || refreshing ? <AddressSkeleton /> : (
+                {shouldShowInitialShimmer ? <AddressSkeleton /> : (
                     <>
                         {addresses.map((item) => (
                             <AddressCard key={item.id} item={item} onEdit={(id) => router.push({ pathname: '/profile/addresses/add', params: { id } })} onDelete={(id) => setConfirmId(id)} deleting={null} />
