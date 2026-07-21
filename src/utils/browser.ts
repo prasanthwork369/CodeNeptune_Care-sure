@@ -1,5 +1,5 @@
 import * as WebBrowser from 'expo-web-browser';
-import { Linking, Alert } from 'react-native';
+import { Linking, Alert, Platform } from 'react-native';
 import { queryClient } from '@/src/lib/react-query/queryClient';
 import { MobileAppLinks } from '@/src/api/settings.api';
 
@@ -30,6 +30,44 @@ function resolveUrl(url: string): string {
     }
 
     return url;
+}
+
+/**
+ * Opens a legal/policy URL in a browser without allowing this app's broad
+ * Android App Link filter to compete for the URL.
+ */
+export async function openLegalLink(url: string): Promise<void> {
+    if (!url) return;
+
+    try {
+        if (Platform.OS === 'android') {
+            let browserPackage: string | undefined;
+
+            try {
+                const supported = await WebBrowser.getCustomTabsSupportingBrowsersAsync();
+                browserPackage =
+                    supported.defaultBrowserPackage || supported.browserPackages?.[0];
+            } catch (error) {
+                if (__DEV__) {
+                    console.warn('[LegalLink] Failed to resolve an Android browser package', error);
+                }
+            }
+
+            // With a package, Android targets the browser directly instead of
+            // resolving the URL against CareSure's broad App Link filter. The
+            // unscoped call is a graceful fallback for devices without a
+            // discoverable Custom Tabs browser.
+            await WebBrowser.openBrowserAsync(
+                url,
+                browserPackage ? { browserPackage } : {},
+            );
+            return;
+        }
+
+        await WebBrowser.openBrowserAsync(url);
+    } catch (error) {
+        console.warn('[LegalLink] Failed to open URL', error);
+    }
 }
 
 /**

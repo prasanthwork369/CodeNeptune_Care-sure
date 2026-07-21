@@ -1,4 +1,4 @@
-import * as WebBrowser from "expo-web-browser";
+import { openLegalLink } from "@/src/utils/browser";
 import React, { useEffect } from "react";
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -19,9 +19,14 @@ export const PolicyLink: React.FC<PolicyLinkProps> = ({
     if (!isVisible || !url) return;
 
     let active = true;
-    WebBrowser.openBrowserAsync(url).finally(() => {
-      if (active) onClose();
-    });
+    void openLegalLink(url).then(
+      () => {
+        if (active) onClose();
+      },
+      () => {
+        if (active) onClose();
+      },
+    );
 
     return () => {
       active = false;

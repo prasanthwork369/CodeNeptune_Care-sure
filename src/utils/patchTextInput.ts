@@ -1,12 +1,10 @@
 import React from "react";
-// Patches RN internals, so it needs the raw module.
+// Uses the same Android Inter and iOS SF Pro rules as Text.
 // eslint-disable-next-line no-restricted-imports
 import * as RN from "react-native";
-// Deep import: same technique as patchText.ts — resolves to the real,
-// unpatched TextInput component instead of looping back into this file.
+// Metro lets this patch import the original component without recursing.
 import OriginalTextInputImport from "react-native/Libraries/Components/TextInput/TextInput";
-// The focus/blur registry (currentlyFocusedInput, focusTextInput, ...) that RN
-// and @gorhom/bottom-sheet expect at `TextInput.State`.
+// Fallback for the TextInput.State static used by @gorhom/bottom-sheet.
 // @ts-ignore - internal RN module without bundled type declarations
 import TextInputState from "react-native/Libraries/Components/TextInput/TextInputState";
 
@@ -15,27 +13,14 @@ import { sanitizeStyle } from "./patchText";
 const OriginalTextInput =
   OriginalTextInputImport as unknown as typeof RN.TextInput;
 
-/**
- * TextInput.defaultProps does not work on this RN/React version (defaultProps
- * support for function/forwardRef components was removed) — so this has to be
- * injected as a render-time prop instead, mirroring patchText.ts's pattern.
- *
- * Matches patchText.ts: the OS accessibility text-size setting is ignored
- * entirely by default so it can't affect layout/spacing at all — text always
- * renders at the exact Figma-designed size via moderateScale()/exactScale().
- */
 const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
   (props, ref) => {
     const sanitizedStyle = sanitizeStyle(props.style);
     return React.createElement(OriginalTextInput, {
       ...props,
       ref,
-      allowFontScaling:
-        props.allowFontScaling !== undefined ? props.allowFontScaling : false,
-      style: [
-        { fontFamily: undefined, includeFontPadding: false }, // Default reset
-        sanitizedStyle,
-      ],
+      allowFontScaling: props.allowFontScaling ?? false,
+      style: [{ includeFontPadding: false }, sanitizedStyle],
     });
   },
 );
@@ -43,12 +28,7 @@ const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
 // @ts-ignore
 PatchedTextInput.displayName = "TextInput";
 
-// Carry over the original TextInput's static properties onto the wrapper.
-// The critical one is `State` (currentlyFocusedInput / focusTextInput /
-// blurTextInput): RN internals and libraries like @gorhom/bottom-sheet access
-// `TextInput.State.currentlyFocusedInput()`. Without this, that read is
-// `undefined.currentlyFocusedInput` and crashes when focusing an input inside
-// a bottom sheet.
+// Preserve original statics for React Native and library compatibility.
 for (const key of Object.keys(OriginalTextInput)) {
   // @ts-ignore
   if ((PatchedTextInput as any)[key] === undefined) {
@@ -56,8 +36,8 @@ for (const key of Object.keys(OriginalTextInput)) {
     (PatchedTextInput as any)[key] = (OriginalTextInput as any)[key];
   }
 }
-// Explicit fallback in case `State` is a non-enumerable static: use the
-// original's if present, otherwise the TextInputState module directly.
+
+// State may be non-enumerable, so preserve it explicitly.
 // @ts-ignore
 if ((PatchedTextInput as any).State === undefined) {
   // @ts-ignore
@@ -73,13 +53,11 @@ try {
     configurable: true,
     enumerable: true,
   });
-} catch (e) {
+} catch {
   try {
     // @ts-ignore
     RN.TextInput = PatchedTextInput;
   } catch (err) {
-    // Dev-only: in production the global error handler reports this to
-    // Crashlytics, and nobody reads a release build's console.
     if (__DEV__)
       console.error(
         "Failed to globally patch react-native TextInput component:",
