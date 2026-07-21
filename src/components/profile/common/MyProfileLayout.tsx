@@ -1,6 +1,5 @@
 import { UpdateProfilePayload } from "@/src/api/profile.api";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
-import { FormField } from "@/src/components/ui/FormField";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -14,7 +13,15 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { format, validate } from "@/src/utils/validation";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Keyboard, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Keyboard,
+  type KeyboardTypeOptions,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmailVerifyModal } from "./EmailVerifyModal";
 
@@ -25,6 +32,88 @@ const GENDERS = [
   { label: "Female", value: "FEMALE" },
   { label: "Prefer not to say", value: "OTHER" },
 ];
+
+type ProfileEditFieldProps = {
+  label: string;
+  value: string;
+  onChangeText?: (value: string) => void;
+  placeholder?: string;
+  editable?: boolean;
+  keyboardType?: KeyboardTypeOptions;
+  error?: string;
+  rightSlot?: React.ReactNode;
+};
+
+const ProfileEditField: React.FC<ProfileEditFieldProps> = ({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  editable = true,
+  keyboardType = "default",
+  error,
+  rightSlot,
+}) => (
+  <View style={{ marginBottom: 16 }}>
+    <Text
+      style={{
+        fontSize: moderateScale(13),
+        fontWeight: "600",
+        color: "#222222",
+        marginBottom: 6,
+      }}
+    >
+      {label}
+    </Text>
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: editable ? "#FFFFFF" : "#F5F6FB",
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: "#E8E8E8",
+        paddingHorizontal: 14,
+        minHeight: 48,
+      }}
+    >
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#6A6A6A"
+        editable={editable}
+        keyboardType={keyboardType}
+        // Explicit caret colors — the OEM default renders invisible against the
+        // white field on Android 10.
+        cursorColor="#0F7635"
+        selectionColor="#0F7635"
+        caretHidden={false}
+        style={{
+          flex: 1,
+          paddingVertical: 12,
+          fontSize: moderateScale(14),
+          color: editable ? "#111827" : "#637381",
+          paddingLeft: 0,
+          paddingRight: rightSlot ? 10 : 0,
+        }}
+      />
+      {rightSlot}
+    </View>
+    {error ? (
+      <Text
+        style={{
+          fontSize: moderateScale(12),
+          fontWeight: "500",
+          color: "#EF4444",
+          marginTop: 4,
+        }}
+      >
+        {error}
+      </Text>
+    ) : null}
+  </View>
+);
 
 export const MyProfileLayout: React.FC = () => {
   const router = useNav();
@@ -144,8 +233,7 @@ export const MyProfileLayout: React.FC = () => {
         contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
       >
         {/* First Name */}
-        <FormField
-          variant="boxed"
+        <ProfileEditField
           label="First Name"
           value={firstName}
           onChangeText={setFirstName}
@@ -153,8 +241,7 @@ export const MyProfileLayout: React.FC = () => {
         />
 
         {/* Last Name */}
-        <FormField
-          variant="boxed"
+        <ProfileEditField
           label="Last Name"
           value={lastName}
           onChangeText={setLastName}
@@ -162,8 +249,7 @@ export const MyProfileLayout: React.FC = () => {
         />
 
         {/* Mobile Number */}
-        <FormField
-          variant="boxed"
+        <ProfileEditField
           label="Mobile Number"
           value={format.phone(profile?.phoneNumber)}
           editable={false}
@@ -171,8 +257,7 @@ export const MyProfileLayout: React.FC = () => {
         />
 
         {/* Email */}
-        <FormField
-          variant="boxed"
+        <ProfileEditField
           label="Email"
           value={email}
           onChangeText={(t) => {
@@ -184,8 +269,10 @@ export const MyProfileLayout: React.FC = () => {
           error={emailError}
           rightSlot={
             isCurrentEmailVerified ? (
-              // Already verified — show a green badge, no action needed
+              // Already verified — show a green badge, no action needed.
+              // Not interactive: let taps near it fall through to the input.
               <View
+                pointerEvents="none"
                 style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
               >
                 <icons.check_circle width={16} height={16} fill="#0F7635" />

@@ -12,6 +12,10 @@ type FormFieldVariant = "outline" | "boxed";
 // highlight being solid green is acceptable.
 const SELECTION_COLOR = "#0F7635";
 
+// Android tints the drag handle with selectionColor unless this is given, so the
+// dark green read as a heavy blob. A lighter brand green keeps it legible.
+const SELECTION_HANDLE_COLOR = "#16A34A";
+
 export type FormFieldProps = {
   label: string;
   value: string;
@@ -106,6 +110,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
               // render the default caret invisible against the white field.
               cursorColor="#0F7635"
               selectionColor={SELECTION_COLOR}
+              caretHidden={false}
               // Vertical padding (not a fixed height) sizes the field so the
               // caret has room to draw — a height-constrained input clips the
               // blinking caret on Android 10. The padded area stays the tap target.
@@ -114,7 +119,11 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
                 paddingVertical: 12,
                 fontSize: moderateScale(14),
                 color: editable ? "#111827" : "#637381",
-                paddingHorizontal: 0,
+                paddingLeft: 0,
+                // With a rightSlot the flex:1 input ends flush against the badge,
+                // so a caret at the end of a long value lands on the clip edge and
+                // never paints. This gutter keeps it inside the drawable bounds.
+                paddingRight: rightSlot ? 10 : 0,
               }}
             />
             {rightSlot}
@@ -163,6 +172,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           // devices (some OEM themes render the default caret invisible).
           cursorColor="#0F7635"
           selectionColor={SELECTION_COLOR}
+          selectionHandleColor={SELECTION_HANDLE_COLOR}
           autoCorrect={false}
           autoComplete={autoComplete}
           textContentType={textContentType}

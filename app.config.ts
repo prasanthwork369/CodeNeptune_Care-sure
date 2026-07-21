@@ -107,6 +107,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withFirebaseNotificationColorFix",
     // Registers notifee's local Maven repo (its native AAR lives in node_modules).
     "./plugins/withNotifeeRepo",
+    // Keeps expo-image-picker's crop toolbar readable on light-themed devices.
+    "./plugins/withCropScreenColors",
     [
       "react-native-document-scanner-plugin",
       {
