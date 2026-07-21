@@ -1,0 +1,50 @@
+appId: com.codeneptune.caresure
+---
+# CareSure Logout & Re-login Flow
+
+- launchApp:
+    clearState: false
+
+# Navigate to Profile / Account tab
+- tapOn: "Account"
+
+- extendedWaitUntil:
+    visible: "Log Out"
+    timeout: 10000
+
+# Tap Log Out
+- tapOn: "Log Out"
+
+# Confirm Logout in alert dialog if prompt appears
+- runFlow:
+    when:
+      visible: "Are you sure?"
+    commands:
+      - tapOn: "Log Out"
+
+# Assert redirected back to Login screen
+- extendedWaitUntil:
+    visible:
+      id: "phone-input"
+    timeout: 10000
+- assertVisible:
+    id: "phone-input"
+
+# Re-login with test credentials
+- tapOn:
+    id: "phone-input"
+- inputText: "9999999999"
+- tapOn:
+    id: "get-otp-btn"
+
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn: "Verify & Continue"
+
+# Assert Home screen rendered
+- extendedWaitUntil:
+    visible:
+      id: "home-search-bar"
+    timeout: 15000
+- assertVisible:
+    id: "home-search-bar"

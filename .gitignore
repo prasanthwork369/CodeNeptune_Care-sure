@@ -53,3 +53,7 @@ app-example
 
 # Firebase service account (SECRET - never commit)
 service-account.json
+
+# Jest coverage output
+coverage/
+

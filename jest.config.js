@@ -9,6 +9,7 @@ module.exports = {
   // Path alias: imports use "@/src/..." which resolves from the project root.
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
+    "\\.(lottie|png|jpg|jpeg|gif|webp|svg)$": "<rootDir>/__tests__/__mocks__/fileMock.js",
   },
   // Rely on the jest-expo preset's transformIgnorePatterns (it already handles
   // expo-modules-core and all RN/Expo packages). Extend it only if a specific
