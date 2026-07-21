@@ -20,6 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from '@/src/utils/exactScale';
+import { formatOrderId } from '@/src/utils/order';
 
 // ── Confetti ──────────────────────────────────────────────────────────────────
 
@@ -185,7 +186,7 @@ export const OrderSuccessLayout: React.FC = () => {
                         {orderId ? (
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Text style={{ fontSize: moderateScale(13), fontWeight: '500', color: '#6A6A6A' }}>Order ID</Text>
-                                <Text style={{ fontSize: moderateScale(13), fontWeight: '700', color: '#1A1C1E' }}>{orderId.slice(-8).toUpperCase()}</Text>
+                                <Text style={{ fontSize: moderateScale(13), fontWeight: '700', color: '#1A1C1E' }}>{formatOrderId(orderId)}</Text>
                             </View>
                         ) : null}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>

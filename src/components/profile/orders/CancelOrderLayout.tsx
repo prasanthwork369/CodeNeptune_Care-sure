@@ -11,6 +11,7 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import { formatOrderId } from "@/src/utils/order";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { resolveAssetUrl } from "@/src/utils/urls";
@@ -62,12 +63,7 @@ export function CancelOrderLayout() {
   const selectedReason = reasons.find((r) => r.id === selectedReasonId);
   const selectedLabel = isOtherSelected ? "Other" : selectedReason?.label;
 
-  const orderNumber = order?.orderId
-    ? String(order.orderId)
-        .replace(/[^a-zA-Z_]/g, "")
-        .slice(0, 2)
-        .toUpperCase() + String(order.orderId).slice(-5)
-    : undefined;
+  const orderNumber = formatOrderId(order?.orderId || orderId);
   const itemsCount = order?.items?.length ?? 0;
   const totalAmount = Number(order?.total ?? 0);
 

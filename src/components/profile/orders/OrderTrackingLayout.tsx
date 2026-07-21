@@ -13,6 +13,7 @@ import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { downloadLocalAsset } from "@/src/utils/fileDownload";
 import { buildCartInputs } from "@/src/utils/reorderCart";
+import { formatOrderId } from "@/src/utils/order";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -366,8 +367,8 @@ export const OrderTrackLayout: React.FC = () => {
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader
         title={
-          order?.orderId
-            ? `${String(order.orderId).replace(/[^a-zA-Z_]/g, "") + "-" + String(order.orderId).slice(-6).toUpperCase()}`
+          order?.orderId || orderId
+            ? formatOrderId(order?.orderId || orderId)
             : "Order Details"
         }
         showBorder

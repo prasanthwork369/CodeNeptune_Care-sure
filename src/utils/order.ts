@@ -169,3 +169,19 @@ export function getOrderItemPricing(
   // 3. No discount anywhere — single price, no strikethrough.
   return { sellingPrice: mrp, mrp, discountPercent: 0 };
 }
+
+/**
+ * Formats raw order IDs (UUIDs, ObjectIds, numeric strings) into a clean,
+ * consistent, human-readable standard format: `CS-XXXXXX` (e.g. `CS-6F5A2B`).
+ */
+export function formatOrderId(rawId?: string | number): string {
+  if (rawId == null) return "";
+  const str = String(rawId).trim();
+  if (!str) return "";
+
+  const cleanAlphanumeric = str.replace(/[^a-zA-Z0-9]/g, "");
+  if (!cleanAlphanumeric) return str.toUpperCase();
+
+  const suffix = cleanAlphanumeric.slice(-6).toUpperCase();
+  return `CS-${suffix}`;
+}

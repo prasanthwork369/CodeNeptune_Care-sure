@@ -5,6 +5,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { Order, ORDER_STATUS } from "@/src/types/order";
 import { AddToCartInput, CartItem, UpdateCartItemInput } from "@/src/types/cart";
 import { buildCartInputs } from "@/src/utils/reorderCart";
+import { formatOrderId } from "@/src/utils/order";
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -173,7 +174,7 @@ export const OrderCard = React.memo(function OrderCard({
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {String(order.orderId).replace(/[^a-zA-Z_]/g, '') +"-"+ String(order.orderId).slice(-6).toUpperCase()}
+                {formatOrderId(order.orderId || order.id)}
               </Text>
             </View>
           </View>
