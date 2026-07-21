@@ -82,7 +82,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         useNotificationStore.getState().clear();
         useLocationStore.getState().clearLocation();
         queryClient.clear();
-        apiCache.remove('customer_profile');
+        // Whole cache, not just the profile: frequently_ordered is user-specific
+        // too, and withSqliteCache serves stale entries whenever a fetch fails.
+        apiCache.clear();
 
         await tokenStorage.clear();
         await tokenStorage.clearExpiresAt();

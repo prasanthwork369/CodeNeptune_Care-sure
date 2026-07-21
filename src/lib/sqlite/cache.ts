@@ -44,6 +44,16 @@ export const apiCache = {
       // ignore
     }
   },
+
+  /** Drops every cached response — used on logout so no account's data can be
+   * served to the next user via the offline fallback. */
+  clear(): void {
+    try {
+      db.runSync('DELETE FROM api_cache');
+    } catch {
+      // ignore
+    }
+  },
 };
 
 /**
