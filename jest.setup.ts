@@ -53,7 +53,30 @@ jest.mock("react-native-reanimated", () => {
 
 // Firebase native modules — no-op so imports don't hit the native bridge.
 jest.mock("@react-native-firebase/app", () => ({ __esModule: true, default: () => ({}) }));
-jest.mock("@react-native-firebase/crashlytics", () => ({ __esModule: true, default: () => ({}) }));
+jest.mock("@react-native-firebase/crashlytics", () => {
+  const crashInstance = {
+    getCrashlytics: jest.fn(),
+    setCrashlyticsCollectionEnabled: jest.fn(),
+    setAttribute: jest.fn(),
+    recordError: jest.fn(),
+    log: jest.fn(),
+  };
+  const mockFn: any = jest.fn(() => crashInstance);
+  mockFn.getCrashlytics = jest.fn();
+  mockFn.setCrashlyticsCollectionEnabled = jest.fn();
+  mockFn.setAttribute = jest.fn();
+  mockFn.recordError = jest.fn();
+  mockFn.log = jest.fn();
+  return {
+    __esModule: true,
+    default: mockFn,
+    getCrashlytics: jest.fn(),
+    setCrashlyticsCollectionEnabled: jest.fn(),
+    setAttribute: jest.fn(),
+    recordError: jest.fn(),
+    log: jest.fn(),
+  };
+});
 jest.mock("@react-native-firebase/perf", () => ({ __esModule: true, default: () => ({}) }));
 jest.mock("@react-native-firebase/messaging", () => ({ __esModule: true, default: () => ({}) }));
 
