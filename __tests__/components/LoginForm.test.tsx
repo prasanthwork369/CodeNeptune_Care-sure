@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
 import { LoginForm } from "@/src/components/auth/sections/LoginForm";
 
 describe("LoginForm Component", () => {
@@ -16,7 +16,7 @@ describe("LoginForm Component", () => {
   });
 
   it("renders phone input with +91 prefix and placeholder", () => {
-    const { getByTestId, getByText, getByPlaceholderText } = render(
+    const { getByTestId, getByText, getByPlaceholderText } = renderWithProviders(
       <LoginForm {...defaultProps} />
     );
 
@@ -27,7 +27,7 @@ describe("LoginForm Component", () => {
 
   it("filters non-digit inputs and calls onPhoneChange with sanitized digits", () => {
     const onPhoneChange = jest.fn();
-    const { getByTestId } = render(
+    const { getByTestId } = renderWithProviders(
       <LoginForm {...defaultProps} onPhoneChange={onPhoneChange} />
     );
 
@@ -39,7 +39,7 @@ describe("LoginForm Component", () => {
   });
 
   it("displays phoneError when provided", () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <LoginForm {...defaultProps} phoneError="Invalid mobile number" />
     );
 
@@ -48,7 +48,7 @@ describe("LoginForm Component", () => {
 
   it("triggers onPhoneFocus on input focus", () => {
     const onPhoneFocus = jest.fn();
-    const { getByTestId } = render(
+    const { getByTestId } = renderWithProviders(
       <LoginForm {...defaultProps} onPhoneFocus={onPhoneFocus} />
     );
 

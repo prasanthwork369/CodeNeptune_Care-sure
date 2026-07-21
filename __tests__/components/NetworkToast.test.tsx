@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react-native";
+import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
 import NetworkToast from "@/src/components/common/NetworkToast";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 
@@ -27,14 +27,14 @@ describe("NetworkToast Component", () => {
   it("renders offline alert dialog when offlineAlertVisible is true and device is offline", () => {
     useNetworkStore.setState({ isConnected: false, offlineAlertVisible: true });
 
-    const { getByText } = render(<NetworkToast />);
+    const { getByText } = renderWithProviders(<NetworkToast />);
     expect(getByText(/No Internet Connection/i)).toBeTruthy();
   });
 
   it("displays 'Internet connection lost' toast message when offline", () => {
     useNetworkStore.setState({ isConnected: false });
 
-    const { getByText } = render(<NetworkToast />);
+    const { getByText } = renderWithProviders(<NetworkToast />);
     expect(getByText("Internet connection lost")).toBeTruthy();
     expect(getByText(/Refresh/i)).toBeTruthy();
   });
@@ -42,7 +42,7 @@ describe("NetworkToast Component", () => {
   it("displays 'Low network connection' toast message when reachability is false", () => {
     useNetworkStore.setState({ isConnected: true, isInternetReachable: false });
 
-    const { getByText } = render(<NetworkToast />);
+    const { getByText } = renderWithProviders(<NetworkToast />);
     expect(getByText("Low network connection")).toBeTruthy();
   });
 });

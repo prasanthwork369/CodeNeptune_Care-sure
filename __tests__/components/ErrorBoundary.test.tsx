@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react-native";
+import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
 import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
 import { reportError } from "@/src/services/firebase";
 import { Text, View } from "react-native";
@@ -24,7 +24,7 @@ describe("ErrorBoundary Component", () => {
   });
 
   it("renders children normally when no error occurs", () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <View>
           <Text>Normal App Component</Text>
@@ -37,7 +37,7 @@ describe("ErrorBoundary Component", () => {
   });
 
   it("catches render errors, reports to Crashlytics, and displays fallback UI", () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ErrorBoundary>
         <ThrowingComponent />
       </ErrorBoundary>,

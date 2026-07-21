@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { renderWithProviders, fireEvent, waitFor } from "@/__tests__/test-utils/renderWithProviders";
 import { CartItemCounter } from "@/src/components/cart/CartItemCounter";
 
 describe("CartItemCounter Component", () => {
@@ -12,7 +12,7 @@ describe("CartItemCounter Component", () => {
   });
 
   it("renders current quantity correctly", () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <CartItemCounter
         item={mockItem}
         updateItem={mockUpdateItem}
@@ -24,7 +24,7 @@ describe("CartItemCounter Component", () => {
   });
 
   it("increments item quantity when plus (+) button is pressed", async () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <CartItemCounter
         item={mockItem}
         updateItem={mockUpdateItem}
@@ -41,7 +41,7 @@ describe("CartItemCounter Component", () => {
   });
 
   it("decrements item quantity when minus (−) button is pressed", async () => {
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <CartItemCounter
         item={mockItem}
         updateItem={mockUpdateItem}
@@ -60,7 +60,7 @@ describe("CartItemCounter Component", () => {
   it("invokes removeItem when quantity drops to zero or below", async () => {
     const singleItem = { id: "item-101", qty: 1 };
 
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <CartItemCounter
         item={singleItem}
         updateItem={mockUpdateItem}
