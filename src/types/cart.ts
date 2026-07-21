@@ -184,6 +184,9 @@ export interface CartFooterProps {
   toPay: number;
   safeAreaBottom: number;
   onProceed: () => void;
+  /** False while admin charge settings are still loading — blocks checkout so
+   * a bill without delivery/handling can't be frozen into an order. */
+  canProceed?: boolean;
 }
 
 

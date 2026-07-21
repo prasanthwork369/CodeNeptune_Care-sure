@@ -2,7 +2,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useProfile } from "@/src/hooks/queries/useProfile";
-import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
+import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
@@ -106,7 +106,6 @@ export function useCartCalculations() {
     isLoading: isCartLoading,
   } = useCart();
   const { products: featuredProducts } = useFeaturedMedicines();
-  const { data: settings } = useCartWalletSettings();
 
   const lines: CartLine[] = cartItems.map((item): CartLine => {
     // unitPrice from the backend is the MRP (strikethrough price); the
@@ -147,12 +146,13 @@ export function useCartCalculations() {
   const mrpTotal = lines.reduce((sum, l) => sum + l.mrp * l.qty, 0);
   const productSavings = Math.max(0, mrpTotal - subtotal);
 
-  const FREE_DELIVERY_THRESHOLD = settings?.cart?.freeDeliveryAbove ?? 500;
-  const DELIVERY_FEE =
-    subtotal >= FREE_DELIVERY_THRESHOLD
-      ? 0
-      : (settings?.cart?.standardDeliveryCharge ?? 49);
-  const HANDLING_CHARGE = settings?.cart?.handlingCharge ?? 15;
+  const {
+    isReady: chargesReady,
+    deliveryFee: DELIVERY_FEE,
+    handlingCharge: HANDLING_CHARGE,
+    remainingForFreeDelivery,
+    freeDeliveryProgress,
+  } = useDeliveryCharges(subtotal);
 
   // 1. Coupon — recomputed live from the coupon's own rule (not the frozen
   // apply-time amount), so it tracks quantity changes in either direction.
@@ -211,11 +211,6 @@ export function useCartCalculations() {
   });
 
   const coinsUsed = coinsOn ? Math.floor(maxCoinsUsable) : 0;
-  const remainingForFreeDelivery = Math.max(
-    0,
-    FREE_DELIVERY_THRESHOLD - subtotal,
-  );
-  const freeDeliveryProgress = Math.min(1, subtotal / FREE_DELIVERY_THRESHOLD);
 
   const handleAddItem = (product: any) => {
     const imageUri =
@@ -241,6 +236,9 @@ export function useCartCalculations() {
   };
 
   const handleProceed = () => {
+    // Charges come from admin settings; proceeding before they land would
+    // freeze a bill with no delivery or handling fee into the order.
+    if (!chargesReady) return;
     setBill(
       {
         subtotal,
@@ -309,6 +307,7 @@ export function useCartCalculations() {
     coinValue,
     DELIVERY_FEE,
     HANDLING_CHARGE,
+    chargesReady,
     COUPON_DISCOUNT,
     coinsUsed,
     COINS_DISCOUNT,

@@ -53,6 +53,7 @@ export const CartLayout: React.FC = () => {
     productSavings,
     coinValue,
     DELIVERY_FEE,
+    chargesReady,
     HANDLING_CHARGE,
     COUPON_DISCOUNT,
     COINS_DISCOUNT,
@@ -194,6 +195,7 @@ export const CartLayout: React.FC = () => {
         toPay={toPay}
         safeAreaBottom={adjustedBottom}
         onProceed={handleProceed}
+        canProceed={chargesReady}
       />
 
       <BillDetailsSheet

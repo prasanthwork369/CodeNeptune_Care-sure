@@ -14,6 +14,7 @@ import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
+import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -130,6 +131,14 @@ export const MedicineComparisonLayout: React.FC<
     0,
   );
 
+  // Same admin-driven charges the cart applies — this screen previously hardcoded
+  // them to 0, so prescription orders shipped free regardless of order value.
+  const {
+    isReady: chargesReady,
+    deliveryFee,
+    handlingCharge,
+  } = useDeliveryCharges(subtotal);
+
   // Use reusable calculations hook
   const {
     walletBalance,
@@ -153,9 +162,14 @@ export const MedicineComparisonLayout: React.FC<
     walletOn,
     coinsOn,
     corporateCreditsOn,
+    deliveryFee,
+    handlingCharge,
   });
 
   const handleProceed = () => {
+    // Charges come from admin settings; proceeding before they land would
+    // freeze a bill with no delivery or handling fee into the order.
+    if (!chargesReady) return;
     setPrescriptionOrderItems(
       mergedMedicines.map((item) => ({
         medicineId: item.recommended.id,
@@ -180,8 +194,8 @@ export const MedicineComparisonLayout: React.FC<
         walletDiscount: WALLET_DISCOUNT,
         coinsDiscount: COINS_DISCOUNT,
         corporateCreditsDiscount: CORPORATE_CREDITS_DISCOUNT,
-        deliveryFee: 0,
-        handlingCharge: 0,
+        deliveryFee,
+        handlingCharge,
         totalSaved: totalSavings,
         toPay,
       },
@@ -327,6 +341,7 @@ export const MedicineComparisonLayout: React.FC<
         toPay={toPay}
         safeAreaBottom={adjustedBottom}
         onProceed={handleProceed}
+        canProceed={chargesReady}
       />
 
       {/* Sheets & Modals */}
@@ -340,8 +355,8 @@ export const MedicineComparisonLayout: React.FC<
         walletDiscount={WALLET_DISCOUNT}
         coinsDiscount={COINS_DISCOUNT}
         corporateCreditsDiscount={CORPORATE_CREDITS_DISCOUNT}
-        deliveryFee={0}
-        handlingCharge={0}
+        deliveryFee={deliveryFee}
+        handlingCharge={handlingCharge}
         toPay={toPay}
       />
 
