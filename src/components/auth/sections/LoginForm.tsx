@@ -48,7 +48,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           autoComplete="tel"
           accessibilityLabel="Mobile number"
           style={s.input}
-          maxLength={10}
+          // No maxLength: it truncates a pasted "+91…" before sanitize.phone can
+          // strip the country code, silently producing a wrong number.
           cursorColor="#0F7635"
           value={phoneNumber}
           onChangeText={handleText}

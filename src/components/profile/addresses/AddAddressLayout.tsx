@@ -284,7 +284,6 @@ export const AddAddressLayout: React.FC = () => {
             onChangeText={handleMobileChange}
             placeholder="Enter Mobile Number"
             keyboardType="number-pad"
-            maxLength={10}
             error={mobileError}
             autoComplete="off"
             textContentType="none"

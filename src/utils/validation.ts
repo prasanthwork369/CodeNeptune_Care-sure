@@ -20,7 +20,14 @@ export const stripIndianCode = (raw?: string | null): string =>
     (raw ?? '').replace(/^\+91/, '').replace(REGEX.digitsOnly, '');
 
 export const sanitize = {
-    phone: (raw: string) => raw.replace(REGEX.digitsOnly, '').slice(0, 10),
+    // Pasted numbers usually carry a +91 or a leading 0. Drop the prefix rather
+    // than slicing the first 10 digits, which would keep "91" and lose the tail.
+    phone: (raw: string) => {
+        let digits = raw.replace(REGEX.digitsOnly, '');
+        if (digits.length > 10 && digits.startsWith('91')) digits = digits.slice(2);
+        else if (digits.length > 10 && digits.startsWith('0')) digits = digits.slice(1);
+        return digits.slice(0, 10);
+    },
     pincode: (raw: string) => raw.replace(REGEX.digitsOnly, '').slice(0, 6),
     otpDigit: (raw: string) => raw.replace(REGEX.digitsOnly, '').slice(0, 1),
     date: (raw: string) => {

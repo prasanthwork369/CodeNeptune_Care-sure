@@ -73,7 +73,6 @@ export const PatientContactInfo: React.FC<PatientContactInfoProps> = ({
                 setError("");
               }}
               keyboardType="number-pad"
-              maxLength={10}
               autoFocus
               cursorColor="#6A6A6A"
               placeholderTextColor="#6A6A6A"
