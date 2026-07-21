@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { Touchable } from '@/src/components/ui/Touchable';
 import { useNav } from '@/src/hooks/useNav';
+import { openInAppBrowser } from '@/src/utils/browser';
 import { ApiBanner, CategoryCard } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { useUIStore } from '@/src/store/uiStore';
@@ -26,8 +27,8 @@ const BANNER_ROUTE_MAP: Record<string, string> = {
     '/upload':      '/upload',
 };
 
-const resolveRoute = (link: string): string =>
-    BANNER_ROUTE_MAP[link.toLowerCase()] ?? link;
+// Only http(s) is treated as external — other schemes are not opened.
+const EXTERNAL_LINK_RE = /^https?:\/\//i;
 
 // Banner links point at a category by slug, e.g. `/category/baby-mom-care`,
 // `/categories/skin-care`, or just `/baby-mom-care`. Pull the slug out and
@@ -78,6 +79,12 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banne
 
     const handlePress = useCallback((rawLink: string) => {
         if (!rawLink) return;
+        // Optional external campaign links open in a browser — normalising them
+        // as a route below would push "/https://..." and hit the 404 screen.
+        if (EXTERNAL_LINK_RE.test(rawLink)) {
+            void openInAppBrowser(rawLink.trim());
+            return;
+        }
         // Admin panel stores links without a leading slash (e.g. `baby-and-mom-care`).
         const link = rawLink.startsWith('/') ? rawLink : `/${rawLink}`;
         const card = findCardBySlug(link, categories);
@@ -99,7 +106,10 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(({ banne
                 categories.map((c) => ({ slug: c.slug, familySlug: c.familySlug }))
             );
         }
-        router.push(resolveRoute(link) as any);
+        // Unknown slug (typo, renamed, or a category missing from the family
+        // map): land on the category list rather than pushing an unmatched path,
+        // which would drop the user on the router's raw "Unmatched Route" screen.
+        router.push((BANNER_ROUTE_MAP[link.toLowerCase()] ?? '/categories') as any);
     }, [router, categories]);
 
     const renderItem = useCallback(({ item }: { item: ApiBanner }) => (
