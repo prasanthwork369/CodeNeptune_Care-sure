@@ -1,4 +1,3 @@
-import { HomeSearchCycler } from "@/src/components/home/sections/HomeSearchCycler";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
@@ -30,9 +29,6 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
 
-  const [isFocused, setIsFocused] = React.useState(false);
-  const showCycler = !!onQueryChange && !query && !isFocused;
-
   return (
     <View
       className="px-4 z-10 mb-2"
@@ -57,28 +53,14 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
 
           {onQueryChange ? (
             <View style={{ flex: 1, justifyContent: "center" }}>
-              {/* Cycling placeholder — visible only when input is empty */}
-              {showCycler && (
-                <View
-                  pointerEvents="none"
-                  style={{ position: "absolute", left: 0, right: 0 }}
-                >
-                  <HomeSearchCycler />
-                </View>
-              )}
               <TextInput
                 value={query}
                 onChangeText={onQueryChange}
                 onSubmitEditing={onSubmit}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder={
-                  isFocused && !query
-                    ? " Search medicines & health products"
-                    : ""
-                }
+                placeholder="Search medicines & health products"
                 placeholderTextColor="#6A6A6A"
                 style={hs.inputText}
+                textAlignVertical="center"
                 allowFontScaling={false}
                 autoFocus
                 returnKeyType="search"
