@@ -3,7 +3,7 @@ import { Redirect, Stack, useSegments } from "expo-router";
 
 export default function StackLayout() {
   const { isAuthenticated } = useAuthStore();
-  const segments = useSegments();
+  const segments = useSegments() as string[];
   const currentRoute = segments[1];
 
   const isGuestAllowed =
