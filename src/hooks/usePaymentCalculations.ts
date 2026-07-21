@@ -2,7 +2,8 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
-import { analyticsService, PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
+import { analyticsService, PERF_TRACES, reportError, usePerformanceTrace } from "@/src/services/firebase";
+import { orderErrorMessage } from "@/src/utils/orderError";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -274,13 +275,8 @@ export function usePaymentCalculations() {
         console.log("[PlaceOrder] payload:", JSON.stringify(payload, null, 2));
         console.log("[PlaceOrder] error:", JSON.stringify(err?.data ?? err?.response?.data ?? err, null, 2));
       }
-      const errorMessage =
-        err?.response?.data?.message ??
-        err?.data?.message ??
-        err?.message ??
-        "Failed to place order. Please try again.";
-
-      Alert.alert("Order Failed", errorMessage);
+      reportError(err, "placeOrder:cart");
+      Alert.alert("Order Failed", orderErrorMessage(err));
     } finally {
       setPlacingOrder(false);
       stopCheckoutTrace(

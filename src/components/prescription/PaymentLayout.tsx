@@ -6,6 +6,8 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { buildOrderPayload } from "@/src/utils/order";
+import { orderErrorMessage } from "@/src/utils/orderError";
+import { reportError } from "@/src/services/firebase";
 import ArrowForwardIosWhite from "@/assets/icons/arrow_forward_ios_white.svg";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNav } from "@/src/hooks/useNav";
@@ -128,13 +130,8 @@ export const PaymentLayout: React.FC = () => {
         console.log("[PlaceOrder] payload:", JSON.stringify(payload, null, 2));
         console.log("[PlaceOrder] error:", JSON.stringify(err?.data ?? err?.response?.data ?? err, null, 2));
       }
-      const errorMessage =
-        err?.response?.data?.message ??
-        err?.data?.message ??
-        err?.message ??
-        "Failed to place order. Please try again.";
-
-      Alert.alert("Order Failed", errorMessage);
+      reportError(err, "placeOrder:prescription");
+      Alert.alert("Order Failed", orderErrorMessage(err));
     }
   };
 
