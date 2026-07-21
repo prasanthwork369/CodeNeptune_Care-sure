@@ -37,7 +37,9 @@ export const HomeProductCard: React.FC<Props> = React.memo(({
   disableCart = false,
 }) => {
   const cardRef = useRef<View>(null);
-  const { setOriginRect } = useHeroTransitionStore();
+  // Selector, not the whole store: writing originRect on press would otherwise
+  // re-render every mounted card in the frame that starts the navigation.
+  const setOriginRect = useHeroTransitionStore((s) => s.setOriginRect);
 
   const handleCardPress = useCallback(() => {
     if (!onPress) return;

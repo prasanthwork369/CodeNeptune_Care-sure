@@ -29,11 +29,15 @@ const isActionable = (p: ApiPrescription): boolean => {
 export const usePrescriptionBanner = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [isFocusRefetching, setIsFocusRefetching] = useState(false);
-  const {
-    hasJustUploadedPrescription,
-    setHasJustUploadedPrescription,
-    isRxFromCartFlow,
-  } = useUIStore();
+  // Per-field selectors: a whole-store subscription here would re-render every
+  // Home consumer on each scroll-start/stop isFeedScrolling toggle.
+  const hasJustUploadedPrescription = useUIStore(
+    (s) => s.hasJustUploadedPrescription,
+  );
+  const setHasJustUploadedPrescription = useUIStore(
+    (s) => s.setHasJustUploadedPrescription,
+  );
+  const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
 
   // Ref so the callback can read the latest value without being a dep
   const hasJustUploadedRef = useRef(hasJustUploadedPrescription);

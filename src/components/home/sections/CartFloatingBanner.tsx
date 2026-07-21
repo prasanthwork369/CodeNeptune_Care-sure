@@ -37,12 +37,12 @@ export const CartFloatingBanner = ({
 }: CartFloatingBannerProps) => {
   const [isClearing, setIsClearing] = useState(false);
   const { totalItems, items, clearCart } = useCart();
-  const {
-    isUploadButtonCollapsed,
-    isTabBarVisible,
-    setTabBarVisible,
-    setUploadButtonCollapsed,
-  } = useUIStore();
+  const isUploadButtonCollapsed = useUIStore((s) => s.isUploadButtonCollapsed);
+  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
+  const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
+  const setUploadButtonCollapsed = useUIStore(
+    (s) => s.setUploadButtonCollapsed,
+  );
   const lastAddedItem =
     [...items].reverse().find((i) => i.image ?? i.metadata?.image) ??
     items[items.length - 1] ??

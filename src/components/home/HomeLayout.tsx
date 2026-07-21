@@ -110,7 +110,10 @@ export const HomeLayout: React.FC = () => {
 
   const { callSupport, whatsappOrder } = useContactActions();
   const { displayLocation } = useDeliveryAddress();
-  const { reopenLocationSheet, setReopenLocationSheet } = useLocationStore();
+  const reopenLocationSheet = useLocationStore((s) => s.reopenLocationSheet);
+  const setReopenLocationSheet = useLocationStore(
+    (s) => s.setReopenLocationSheet,
+  );
 
   // Sequential onboarding: location → notification → unlock signup popup.
   useHomeOnboarding();

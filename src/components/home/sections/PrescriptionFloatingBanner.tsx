@@ -64,7 +64,8 @@ export const PrescriptionFloatingBanner = ({
   onPress,
   onClose,
 }: PrescriptionFloatingBannerProps) => {
-  const { isUploadButtonCollapsed, isTabBarVisible } = useUIStore();
+  const isUploadButtonCollapsed = useUIStore((s) => s.isUploadButtonCollapsed);
+  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
 
   const slideY = useSharedValue(visible ? 0 : 150);
   const opacity = useSharedValue(visible ? 1 : 0);

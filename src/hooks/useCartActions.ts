@@ -45,9 +45,13 @@ export const useCartActions = (product: CartActionProduct) => {
   );
 
   const count = cartItem?.quantity ?? 0;
-  const { pendingIds, setPending } = useCartPendingStore();
+  // Subscribe to this product's pending flag only — a whole-store subscription
+  // re-rendered every mounted card on each setPending call.
+  const isPending = useCartPendingStore(
+    (s) => s.pendingIds[pendingKey] ?? false,
+  );
+  const setPending = useCartPendingStore((s) => s.setPending);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isPending = pendingIds[pendingKey] ?? false;
 
   const prevCountRef = useRef(count);
   const prevIsPendingRef = useRef(false);

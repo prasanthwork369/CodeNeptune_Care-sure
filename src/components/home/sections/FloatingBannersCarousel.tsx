@@ -80,9 +80,9 @@ export const FloatingBannersCarousel = ({
   const extraGap = exactScale(6);
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
-  const { isTabBarVisible } = useUIStore();
+  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
   const { latestPrescription, hasPendingPrescription, dismissBanner } = usePrescriptionBanner();
-  const { isRxFromCartFlow } = useUIStore();
+  const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
   // Pause autoplay while the home feed is scrolling. Read from the store here
   // (rather than via a prop) so scroll toggles don't re-render the whole feed.
   const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);

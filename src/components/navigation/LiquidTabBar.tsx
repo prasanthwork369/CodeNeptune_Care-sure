@@ -83,7 +83,9 @@ const TAB_LABEL_MARGIN_TOP = exactScale(4);
 
 const AnimatedUploadButton = React.memo(
   ({ onPress }: { onPress: () => void }) => {
-    const { isUploadButtonCollapsed } = useUIStore();
+    const isUploadButtonCollapsed = useUIStore(
+      (s) => s.isUploadButtonCollapsed,
+    );
     const iconTranslate = useSharedValue(0);
     const textTranslate = useSharedValue(TEXT_OFF_RIGHT);
     const buttonWidth = useSharedValue(
@@ -351,8 +353,8 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const adjustedBottom = useAdjustedBottomInset();
   const extraGap = exactScale(6);
   const router = useNav();
-  const { isTabBarVisible } = useUIStore();
-  const { setTabBarHeight } = useTabBarStore();
+  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
+  const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
   const [barWidth, setBarWidth] = useState(0);
 
   const pillRoutes = useMemo(
