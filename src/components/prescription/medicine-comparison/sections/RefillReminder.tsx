@@ -3,15 +3,18 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import React from "react";
 import { Image, Text, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
+import { formatReminderDateTime } from "@/src/utils/reminderDate";
 
 interface RefillReminderProps {
   value: boolean;
   onToggle: (v: boolean) => void;
+  reminderDate?: Date | null;
 }
 
 export const RefillReminder: React.FC<RefillReminderProps> = ({
   value,
   onToggle,
+  reminderDate,
 }) => (
   <View
     style={{
@@ -60,7 +63,9 @@ export const RefillReminder: React.FC<RefillReminderProps> = ({
           marginTop: 10,
         }}
       >
-        {"We'll send your reminder in 7 days"}
+        {reminderDate
+          ? `We'll remind you on ${formatReminderDateTime(reminderDate)}`
+          : "We'll remind you at the time you set"}
       </Text>
     )}
   </View>

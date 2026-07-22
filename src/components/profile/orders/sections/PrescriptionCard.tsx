@@ -1,5 +1,6 @@
 import { PrescriptionRejectedModal } from "@/src/components/prescription/history/sections/PrescriptionRejectedModal";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
+import { formatReminderDateShort } from "@/src/utils/reminderDate";
 import { CardOptionsMenu } from "@/src/components/ui/CardOptionsMenu";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -51,25 +52,6 @@ const GradientText: React.FC<{ text: string }> = ({ text }) => {
       </SvgText>
     </Svg>
   );
-};
-
-const formatReminderDate = (date: Date) => {
-  const day = String(date.getDate()).padStart(2, "0");
-  const months = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-  ];
-  return `NEXT REMINDER: ${day} ${months[date.getMonth()]}`;
 };
 
 const getStatusStyle = (status: string) => {
@@ -273,7 +255,7 @@ export const PrescriptionCard = ({
           </Text>
           {reminder && reminderDate && (
             <View className="mt-0.5">
-              <GradientText text={formatReminderDate(reminderDate)} />
+              <GradientText text={`NEXT REMINDER: ${formatReminderDateShort(reminderDate)}`} />
             </View>
           )}
         </View>

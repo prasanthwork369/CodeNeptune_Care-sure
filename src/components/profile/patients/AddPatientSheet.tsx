@@ -1,18 +1,22 @@
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
-import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
+import { RequiredMark } from "@/src/components/ui/RequiredMark";
+import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
-import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { profileStyles as s } from "../profile.styles";
+// This app's reanimated keyboard reporting is inert (see AuthScreenShell), so
+// gorhom's keyboardBehavior can't move the sheet. KeyboardEvents is the only
+// keyboard pipeline that fires here — we drive a manual scroll from it.
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { KeyboardEvents } from "react-native-keyboard-controller";
+import { profileStyles as s } from "../profile.styles";
 
 interface AddPatientSheetProps {
   isVisible: boolean;
@@ -26,7 +30,11 @@ interface AddPatientSheetProps {
 const RELATIONSHIPS = ["Self", "Wife", "Husband", "Mother", "Father", "Other"];
 
 const GENDERS = [
-  { label: "Male", value: "MALE", icon: <icons.male width={exactScale(16)} height={exactScale(16)} /> },
+  {
+    label: "Male",
+    value: "MALE",
+    icon: <icons.male width={exactScale(16)} height={exactScale(16)} />,
+  },
   {
     label: "Female",
     value: "FEMALE",
@@ -67,6 +75,42 @@ export function AddPatientSheet({
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inFlight = useRef(false);
+
+  // Manual keyboard avoidance for the dynamic "Other" relationship input.
+  const scrollRef =
+    useRef<React.ElementRef<typeof BottomSheetScrollView>>(null);
+  const otherRelY = useRef(0);
+  const otherFocusedRef = useRef(false);
+  const [kbHeight, setKbHeight] = useState(0);
+
+  // Lift the focused "Other" field to the top of the list, clear of the bottom
+  // keyboard. Double rAF waits out the dynamic field's layout + the padding
+  // relayout before scrolling (onFocus fires before layout with autoFocus).
+  const scrollOtherAboveKeyboard = () => {
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({
+          y: Math.max(0, otherRelY.current - exactScale(0)),
+          animated: true,
+        });
+      }),
+    );
+  };
+
+  // KeyboardEvents (react-native-keyboard-controller) is the only keyboard
+  // channel that reports in this app. Padding by the keyboard height gives the
+  // scroll view the range to bring any input above the keyboard.
+  useEffect(() => {
+    if (!isVisible) return;
+    const subs = [
+      KeyboardEvents.addListener("keyboardDidShow", (e) => {
+        setKbHeight(e.height);
+        if (otherFocusedRef.current) scrollOtherAboveKeyboard();
+      }),
+      KeyboardEvents.addListener("keyboardDidHide", () => setKbHeight(0)),
+    ];
+    return () => subs.forEach((sub) => sub.remove());
+  }, [isVisible]);
 
   const isEditMode = !!editPatient;
   const mobileRef = useRef<any>(null);
@@ -150,6 +194,9 @@ export function AddPatientSheet({
         onClose={onClose}
         snapPoints={snapPoints}
         closeButtonOffset="80%"
+        // gorhom's keyboardBehavior can't move the sheet in this app (its
+        // reanimated keyboard source is inert), so keyboard avoidance is handled
+        // manually via KeyboardEvents + scrollRef below.
         keyboardBehavior="extend"
         keyboardBlurBehavior="none"
         backgroundStyle={{
@@ -159,10 +206,11 @@ export function AddPatientSheet({
         }}
       >
         <BottomSheetScrollView
+          ref={scrollRef}
           style={{ flex: 1, paddingHorizontal: exactScale(20) }}
           contentContainerStyle={{
-            paddingTop: exactScale(24),
-            paddingBottom: adjustedBottom + exactScale(24),
+            paddingTop: exactScale(0),
+            paddingBottom: adjustedBottom + exactScale(10) + kbHeight,
           }}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -184,7 +232,10 @@ export function AddPatientSheet({
             </Text>
           </View>
 
-          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
+          <Text
+            className="font-inter-bold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}
+          >
             Name
             <RequiredMark />
           </Text>
@@ -230,16 +281,27 @@ export function AddPatientSheet({
             </Text>
           )}
 
-          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
+          <Text
+            className="font-inter-bold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}
+          >
             Mobile Number
             <RequiredMark />
           </Text>
           <View
             style={[
-              { flexDirection: "row", alignItems: "center", height: exactScale(52) },
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                height: exactScale(52),
+              },
               inputStyle,
               errors.mobile ? { borderColor: "#EF4444" } : {},
-              { paddingVertical: 0, paddingHorizontal: exactScale(16), marginBottom: exactScale(18) },
+              {
+                paddingVertical: 0,
+                paddingHorizontal: exactScale(16),
+                marginBottom: exactScale(18),
+              },
             ]}
           >
             <Text
@@ -287,7 +349,10 @@ export function AddPatientSheet({
             </Text>
           )}
 
-          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
+          <Text
+            className="font-inter-bold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}
+          >
             Relationship
             <RequiredMark />
           </Text>
@@ -297,7 +362,9 @@ export function AddPatientSheet({
               flexWrap: "wrap",
               gap: exactScale(8),
               marginBottom:
-                errors.relationship && relationship !== "Other" ? exactScale(6) : exactScale(18),
+                errors.relationship && relationship !== "Other"
+                  ? exactScale(6)
+                  : exactScale(18),
             }}
           >
             {RELATIONSHIPS.map((item) => {
@@ -324,7 +391,10 @@ export function AddPatientSheet({
                 >
                   <Text
                     className="font-inter-medium"
-                    style={{ fontSize: moderateScale(13), color: sel ? "#0F7635" : "#6A6A6A" }}
+                    style={{
+                      fontSize: moderateScale(13),
+                      color: sel ? "#0F7635" : "#6A6A6A",
+                    }}
                   >
                     {item}
                   </Text>
@@ -333,7 +403,13 @@ export function AddPatientSheet({
             })}
           </View>
           {errors.relationship && relationship !== "Other" && (
-            <Text style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(12) }}>
+            <Text
+              style={{
+                color: "#EF4444",
+                fontSize: moderateScale(12),
+                marginBottom: exactScale(12),
+              }}
+            >
               {errors.relationship}
             </Text>
           )}
@@ -346,7 +422,9 @@ export function AddPatientSheet({
                   inputStyle,
                   {
                     marginTop: exactScale(-10),
-                    marginBottom: errors.relationship ? exactScale(6) : exactScale(18),
+                    marginBottom: errors.relationship
+                      ? exactScale(6)
+                      : exactScale(18),
                   },
                   errors.relationship ? { borderColor: "#EF4444" } : {},
                 ]}
@@ -357,12 +435,27 @@ export function AddPatientSheet({
                     e.relationship ? { ...e, relationship: undefined } : e,
                   );
                 }}
+                onLayout={(e) => {
+                  otherRelY.current = e.nativeEvent.layout.y;
+                }}
+                onFocus={() => {
+                  otherFocusedRef.current = true;
+                  // Handles an already-open keyboard (no new didShow event fires).
+                  if (kbHeight > 0) scrollOtherAboveKeyboard();
+                }}
+                onBlur={() => {
+                  otherFocusedRef.current = false;
+                }}
                 autoCorrect={false}
                 autoFocus
               />
               {errors.relationship && (
                 <Text
-                  style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(12) }}
+                  style={{
+                    color: "#EF4444",
+                    fontSize: moderateScale(12),
+                    marginBottom: exactScale(12),
+                  }}
                 >
                   {errors.relationship}
                 </Text>
@@ -370,12 +463,21 @@ export function AddPatientSheet({
             </>
           )}
 
-          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
+          <Text
+            className="font-inter-bold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}
+          >
             Date Of Birth
             <RequiredMark />
           </Text>
           {errors.dob && (
-            <Text style={{ color: "#EF4444", fontSize: moderateScale(12), marginBottom: exactScale(6) }}>
+            <Text
+              style={{
+                color: "#EF4444",
+                fontSize: moderateScale(12),
+                marginBottom: exactScale(6),
+              }}
+            >
               {errors.dob}
             </Text>
           )}
@@ -407,7 +509,11 @@ export function AddPatientSheet({
             >
               {formatDobDisplay(dob) || "DD-MM-YYYY"}
             </Text>
-            <icons.calendar_month width={exactScale(20)} height={exactScale(20)} fill="#919EAB" />
+            <icons.calendar_month
+              width={exactScale(20)}
+              height={exactScale(20)}
+              fill="#919EAB"
+            />
           </Touchable>
           <DatePickerModal
             visible={showDatePicker}
@@ -423,7 +529,10 @@ export function AddPatientSheet({
             }}
           />
 
-          <Text className="font-inter-bold text-brand-text" style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}>
+          <Text
+            className="font-inter-bold text-brand-text"
+            style={{ fontSize: moderateScale(14), marginBottom: exactScale(8) }}
+          >
             Gender
             <RequiredMark />
           </Text>
@@ -462,7 +571,10 @@ export function AddPatientSheet({
                   })}
                   <Text
                     className="font-inter-medium"
-                    style={{ fontSize: moderateScale(12), color: sel ? "#0F7635" : "#6A6A6A" }}
+                    style={{
+                      fontSize: moderateScale(12),
+                      color: sel ? "#0F7635" : "#6A6A6A",
+                    }}
                   >
                     {g}
                   </Text>
@@ -527,4 +639,3 @@ const inputStyle: object = {
   backgroundColor: "#fff",
   marginBottom: exactScale(18),
 };
-

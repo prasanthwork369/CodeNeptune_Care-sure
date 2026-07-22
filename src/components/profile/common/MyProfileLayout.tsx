@@ -84,10 +84,11 @@ const ProfileEditField: React.FC<ProfileEditFieldProps> = ({
         placeholderTextColor="#6A6A6A"
         editable={editable}
         keyboardType={keyboardType}
-        // Explicit caret colors — the OEM default renders invisible against the
-        // white field on Android 10.
+        // Caret color only — the OEM default caret is invisible on the white
+        // field on Android 10. selectionColor is intentionally NOT set: on
+        // Android it tints/enlarges the insertion handle into an oversized green
+        // teardrop over the text. Add Patient sets neither and renders correctly.
         cursorColor="#0F7635"
-        selectionColor="#0F7635"
         caretHidden={false}
         style={{
           flex: 1,
@@ -96,6 +97,10 @@ const ProfileEditField: React.FC<ProfileEditFieldProps> = ({
           color: editable ? "#111827" : "#637381",
           paddingLeft: 0,
           paddingRight: rightSlot ? 10 : 0,
+          // Override the global patch's includeFontPadding:false — on Android 10
+          // the collapsed line box renders an oversized selection handle over the
+          // text. Restoring font padding matches Add Patient's working input.
+          includeFontPadding: true,
         }}
       />
       {rightSlot}

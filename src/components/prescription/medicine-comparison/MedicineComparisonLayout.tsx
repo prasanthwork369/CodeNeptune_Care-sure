@@ -63,6 +63,7 @@ export const MedicineComparisonLayout: React.FC<
   const [corporateCreditsOn, setCorporateCreditsOn] = useState(false);
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
   const [refillOn, setRefillOn] = useState(false);
+  const [reminderDate, setReminderDate] = useState<Date | null>(null);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
   const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({
     y: 0,
@@ -269,11 +270,13 @@ export const MedicineComparisonLayout: React.FC<
         {/* Refill Reminder */}
         <RefillReminder
           value={refillOn}
+          reminderDate={reminderDate}
           onToggle={(v) => {
             if (v) {
               setShowReminderSheet(true);
             } else {
               setRefillOn(false);
+              setReminderDate(null);
             }
           }}
         />
@@ -376,7 +379,10 @@ export const MedicineComparisonLayout: React.FC<
       <ReminderSheet
         isVisible={showReminderSheet}
         onClose={() => setShowReminderSheet(false)}
-        onConfirm={() => setRefillOn(true)}
+        onConfirm={(date) => {
+          setReminderDate(date);
+          setRefillOn(true);
+        }}
       />
 
       <CartConfetti trigger={confettiTrigger} />
