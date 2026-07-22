@@ -4,8 +4,9 @@ import { SUPPORT_PHONE } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import React from "react";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useSettings } from "@/src/hooks/queries/useSettings";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
@@ -66,6 +67,7 @@ const HelpSkeleton = () => (
 
 export const HelpLayout: React.FC = () => {
   const { data: settings, isLoading } = useSettings();
+  const adjustedBottom = useAdjustedBottomInset();
   
   const { callSupport, whatsappOrder, emailSupport } = useContactActions({
     phone: settings?.contactPhone,
@@ -84,7 +86,15 @@ export const HelpLayout: React.FC = () => {
       {isLoading ? (
         <HelpSkeleton />
       ) : (
-        <View className="flex-1 px-4 pt-4">
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: adjustedBottom + 24,
+          }}
+        >
           <HelpCard>
             <IconCircle>
               <icons.whatsapp width={28} height={28} />
@@ -149,7 +159,7 @@ export const HelpLayout: React.FC = () => {
               <icons.green_arrow width={15} height={15} />
             </Touchable>
           </HelpCard>
-        </View>
+        </ScrollView>
       )}
     </View>
   );

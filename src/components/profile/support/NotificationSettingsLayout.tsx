@@ -3,9 +3,10 @@ import { CustomSwitch } from '@/src/components/ui/CustomSwitch';
 import { useNotificationPreferences } from '@/src/hooks/queries/useNotificationPreferences';
 import { UpdateNotificationPreferencesInput } from '@/src/api/notification-preferences.api';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { moderateScale } from '@/src/utils/exactScale';
+import { useAdjustedBottomInset } from '@/src/hooks/ui/useBottomInset';
 
 // Only the boolean preference fields are togglable keys.
 type PreferenceKey = keyof UpdateNotificationPreferencesInput;
@@ -74,6 +75,7 @@ const NotificationSkeleton = () => (
 
 export const NotificationSettingsLayout: React.FC = () => {
   const { preferences, isLoading, updating, updatePreferences } = useNotificationPreferences();
+  const adjustedBottom = useAdjustedBottomInset();
 
   const handleToggle = async (key: PreferenceKey, value: boolean) => {
     await updatePreferences({ [key]: value });
@@ -124,7 +126,13 @@ export const NotificationSettingsLayout: React.FC = () => {
       {isLoading ? (
         <NotificationSkeleton />
       ) : (
-        <View style={{ marginTop: 8 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: 8,
+            paddingBottom: adjustedBottom + 24,
+          }}
+        >
           {SECTIONS.map((section, index) => (
             <View key={section.type === 'group' ? section.header : section.label}>
               {section.type === 'group' ? (
@@ -152,7 +160,7 @@ export const NotificationSettingsLayout: React.FC = () => {
               {index < SECTIONS.length - 1 && <Divider />}
             </View>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );

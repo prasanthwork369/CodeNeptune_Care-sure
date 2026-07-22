@@ -6,7 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { DotLottie } from '@lottiefiles/dotlottie-react-native';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Easing,
@@ -147,26 +147,43 @@ export const OrderSuccessLayout: React.FC = () => {
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' }}>
             <StatusBar style="light" />
 
-            <GestureDetector gesture={panGesture}>
-                <Animated.View style={[cardStyle, {
-                    backgroundColor: '#fff',
-                    borderTopLeftRadius: exactScale(32),
-                    borderTopRightRadius: exactScale(32),
-                    overflow: 'hidden',
-                    paddingTop: exactScale(28),
-                    paddingHorizontal: exactScale(24),
-                    paddingBottom: adjustedBottom + exactScale(24),
-                    alignItems: 'center',
-                }]}>
-                    {/* Confetti — clipped inside sheet by overflow:hidden */}
-                    <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}>
-                        {pieces.map(p => (
-                            <ConfettiPiece key={p.id} {...p} screenH={700} />
-                        ))}
-                    </View>
+            <Animated.View style={[cardStyle, {
+                backgroundColor: '#fff',
+                borderTopLeftRadius: exactScale(32),
+                borderTopRightRadius: exactScale(32),
+                overflow: 'hidden',
+                maxHeight: Math.max(0, height - exactScale(16)),
+            }]}>
+                {/* Confetti — clipped inside sheet by overflow:hidden */}
+                <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}>
+                    {pieces.map(p => (
+                        <ConfettiPiece key={p.id} {...p} screenH={700} />
+                    ))}
+                </View>
 
-                    {/* Drag handle */}
-                    <View style={{ width: exactScale(40), height: exactScale(4), borderRadius: exactScale(2), backgroundColor: '#E5E7EB', marginBottom: exactScale(24) }} />
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
+                    contentContainerStyle={{
+                        alignItems: 'center',
+                        paddingTop: exactScale(28),
+                        paddingHorizontal: exactScale(24),
+                        paddingBottom: adjustedBottom + exactScale(24),
+                    }}
+                >
+                    {/* Keep dismissal on the handle so content scrolling stays reliable. */}
+                    <GestureDetector gesture={panGesture}>
+                        <View
+                            hitSlop={16}
+                            style={{
+                                width: exactScale(40),
+                                height: exactScale(4),
+                                borderRadius: exactScale(2),
+                                backgroundColor: '#E5E7EB',
+                                marginBottom: exactScale(24),
+                            }}
+                        />
+                    </GestureDetector>
 
                     <DotLottie
                         source={ANIMATIONS.orderPlaced}
@@ -216,8 +233,8 @@ export const OrderSuccessLayout: React.FC = () => {
                             <icons.arrow_forward_ios width={exactScale(12)} height={exactScale(12)} fill="#374151" />
                         </Touchable>
                     </Animated.View>
-                </Animated.View>
-            </GestureDetector>
+                </ScrollView>
+            </Animated.View>
         </View>
     );
 };
