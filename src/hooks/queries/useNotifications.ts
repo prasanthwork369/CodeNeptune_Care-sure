@@ -6,7 +6,7 @@ import { useAuthStore } from '../../store/authStore';
 export const useNotifications = () => {
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-    const { data, isLoading, isRefetching, refetch } = useQuery({
+    const { data, isLoading, isRefetching, isError, error, refetch } = useQuery({
         queryKey: QUERY_KEYS.CUSTOMER.NOTIFICATIONS,
         queryFn: () => inAppNotificationApi.list({ limit: 50 }),
         enabled: isAuthenticated,
@@ -18,5 +18,13 @@ export const useNotifications = () => {
     const notifications = data?.items ?? [];
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-    return { notifications, unreadCount, isLoading, isRefetching, refetch };
+    return {
+        notifications,
+        unreadCount,
+        isLoading,
+        isRefetching,
+        isError,
+        error,
+        refetch,
+    };
 };

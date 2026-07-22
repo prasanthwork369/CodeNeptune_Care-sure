@@ -12,10 +12,12 @@ import {
 import { useNotifications } from "@/src/hooks/queries/useNotifications";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { useToastStore } from "@/src/store/toastStore";
+import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
+import { SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import {
   RefreshControl,
   ScrollView,
@@ -24,6 +26,7 @@ import {
   View,
 } from "react-native";
 import { NotificationsSkeleton } from "./NotificationsSkeleton";
+import { SwipeableNotificationRow } from "./SwipeableNotificationRow";
 import { styles as s } from "./notifications.styles";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -136,7 +139,7 @@ function getNotificationVisual(n: NotificationLog) {
           icon: (
             <Image
               source={HOME_IMAGES.coinDebit}
-              style={s.notifIcon}
+              style={[s.notifIcon, { tintColor: "#DC2626" }]}
               contentFit="contain"
             />
           ),
@@ -250,7 +253,7 @@ interface NotificationRowItemProps {
   onPress: () => void;
   onDismiss: () => void;
   onMarkRead: () => void;
-  isLast: boolean;
+  onInteraction: () => void;
 }
 
 const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
@@ -259,7 +262,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   onPress,
   onDismiss,
   onMarkRead,
-  isLast,
+  onInteraction,
 }) => {
   const [menuAnchor, setMenuAnchor] = useState<{ top: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -278,50 +281,30 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
     <Touchable
       activeOpacity={0.7}
       onPress={onPress}
-      style={{
-        flexDirection: "row",
-        alignItems: "flex-start",
-        paddingVertical: exactScale(14),
-        borderBottomWidth: isLast ? 0 : 1,
-        borderBottomColor: "#F0F1F3",
-      }}
+      style={s.notifRow}
     >
-      {!notification.isRead && (
+      <View style={s.notifLeading}>
+        {!notification.isRead && <View style={s.unreadDot} />}
         <View
-          style={{
-            height: s.notifIconBox.height,
-            justifyContent: "center",
-            marginRight: exactScale(6),
-          }}
+          style={[
+            s.notifIconBox,
+            s.notifIconPosition,
+            {
+              borderRadius: 999,
+              backgroundColor: visual.bg,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          ]}
         >
-          <View
-            style={[
-              s.unreadDot,
-              { borderRadius: 999, backgroundColor: "#0F7635" },
-            ]}
-          />
+          {visual.icon}
         </View>
-      )}
-
-      <View
-        style={[
-          s.notifIconBox,
-          {
-            borderRadius: 999,
-            backgroundColor: visual.bg,
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: exactScale(12),
-          },
-        ]}
-      >
-        {visual.icon}
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View style={s.notifCopy}>
         <Text style={s.notifTitle}>{getNotificationTitle(notification)}</Text>
         {isLong && !expanded ? (
-          <Text style={[s.notifBody, { marginTop: exactScale(2) }]}>
+          <Text style={[s.notifBody, { marginTop: exactScale(5) }]}>
             {body.substring(0, 100)}...{" "}
             <Text
               onPress={(e) => {
@@ -334,11 +317,11 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
             </Text>
           </Text>
         ) : (
-          <Text style={[s.notifBody, { marginTop: exactScale(2) }]}>
+          <Text style={[s.notifBody, { marginTop: exactScale(5) }]}>
             {body}
           </Text>
         )}
-        <Text style={[s.notifTime, { marginTop: exactScale(4) }]}>
+        <Text style={[s.notifTime, { marginTop: exactScale(6) }]}>
           {formatRowTime(notification.createdAt, section)}
         </Text>
       </View>
@@ -349,14 +332,16 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           onPress={(e) => {
             e.stopPropagation?.();
+            onInteraction();
             openMenu();
           }}
-          style={{ padding: exactScale(2) }}
+          style={s.optionsTarget}
+          accessibilityLabel="Notification options"
         >
           <icons.dots
             width={s.dotsIcon.width}
             height={s.dotsIcon.height}
-            fill="#9CA3AF"
+            fill="#6A6A6A"
           />
         </Touchable>
       </View>
@@ -429,10 +414,14 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
 export const NotificationsLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
+  const showToast = useToastStore((state) => state.show);
+  const openSwipeableRef = useRef<SwipeableMethods | null>(null);
+  const touchStartRef = useRef({ x: 0, y: 0 });
 
-  const { notifications, isLoading, isRefetching, refetch } =
+  const { notifications, isLoading, isRefetching, isError, refetch } =
     useNotifications();
-  const { mutate: dismiss } = useDismissNotification();
+  const { mutate: dismiss, mutateAsync: dismissAsync } =
+    useDismissNotification();
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: dismissAll, isPending: isClearingAll } =
     useDismissAllNotifications();
@@ -450,7 +439,13 @@ export const NotificationsLayout: React.FC = () => {
     items: notifications.filter((n) => getSectionKey(n.createdAt) === key),
   })).filter((g) => g.items.length > 0);
 
-  const showEmpty = !isLoading && !isEntryLoading && notifications.length === 0;
+  const showError =
+    !isLoading && !isEntryLoading && isError && notifications.length === 0;
+  const showEmpty =
+    !isLoading &&
+    !isEntryLoading &&
+    !isError &&
+    notifications.length === 0;
   const shouldShowInitialShimmer =
     (isLoading || isEntryLoading) && notifications.length === 0;
 
@@ -504,6 +499,36 @@ export const NotificationsLayout: React.FC = () => {
     dismissAll();
   };
 
+  const closeOpenRow = useCallback(() => {
+    openSwipeableRef.current?.close();
+    openSwipeableRef.current = null;
+  }, []);
+
+  const handleRowWillOpen = useCallback((methods: SwipeableMethods) => {
+    if (openSwipeableRef.current !== methods) {
+      openSwipeableRef.current?.close();
+      openSwipeableRef.current = methods;
+    }
+  }, []);
+
+  const handleRowDidClose = useCallback((methods: SwipeableMethods) => {
+    if (openSwipeableRef.current === methods) {
+      openSwipeableRef.current = null;
+    }
+  }, []);
+
+  const handleSwipeDelete = useCallback(
+    async (notificationId: string) => {
+      try {
+        await dismissAsync(notificationId);
+      } catch (error) {
+        showToast("Unable to delete notification. Please try again.", "error");
+        throw error;
+      }
+    },
+    [dismissAsync, showToast],
+  );
+
   return (
     <View className="flex-1 bg-white">
       <ScreenHeader
@@ -514,20 +539,18 @@ export const NotificationsLayout: React.FC = () => {
             <Touchable
               onPress={handleClearAll}
               disabled={isClearingAll}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+              style={s.clearAllButton}
+              accessibilityLabel="Clear all notifications"
             >
               <Text
-                style={{
-                  fontSize: moderateScale(13),
-                  fontWeight: "600",
-                  color: isClearingAll ? "#9CA3AF" : "#0F7635",
-                }}
+                style={[s.clearAllText, { color: "#DC2626" }]}
+                numberOfLines={1}
               >
                 Clear All
               </Text>
             </Touchable>
-          ) : null
-        }
+          ) : null}
       />
 
       {shouldShowInitialShimmer ? (
@@ -535,26 +558,65 @@ export const NotificationsLayout: React.FC = () => {
       ) : (
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{
-            paddingHorizontal: exactScale(16),
-            paddingBottom: adjustedBottom + exactScale(16),
-            flexGrow: 1,
-          }}
+          contentContainerStyle={[
+            s.content,
+            {
+              paddingBottom: adjustedBottom + exactScale(16),
+              flexGrow: 1,
+            },
+          ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
-              onRefresh={refetch}
+              onRefresh={() => {
+                closeOpenRow();
+                void refetch();
+              }}
               tintColor="#0F7635"
               colors={["#0F7635"]}
             />
           }
+          onScrollBeginDrag={closeOpenRow}
+          onTouchStart={(event) => {
+            touchStartRef.current = {
+              x: event.nativeEvent.pageX,
+              y: event.nativeEvent.pageY,
+            };
+          }}
+          onTouchEnd={(event) => {
+            const deltaX = Math.abs(
+              event.nativeEvent.pageX - touchStartRef.current.x,
+            );
+            const deltaY = Math.abs(
+              event.nativeEvent.pageY - touchStartRef.current.y,
+            );
+            if (deltaX < exactScale(8) && deltaY < exactScale(8)) {
+              closeOpenRow();
+            }
+          }}
         >
-          {showEmpty && (
+          {showError && (
             <View
               className="flex-1 items-center justify-center"
-              style={{ paddingTop: exactScale(80) }}
+              style={{ paddingHorizontal: exactScale(24) }}
             >
+              <Text style={s.errorTitle}>Unable to load notifications</Text>
+              <Text style={s.errorSub}>
+                Please check your connection and try again.
+              </Text>
+              <Touchable
+                onPress={() => void refetch()}
+                style={s.retryButton}
+                accessibilityLabel="Retry loading notifications"
+              >
+                <Text style={s.retryText}>Try Again</Text>
+              </Touchable>
+            </View>
+          )}
+
+          {showEmpty && (
+            <View className="flex-1 items-center justify-center">
               <icons.notification
                 width={s.emptyIcon.width}
                 height={s.emptyIcon.height}
@@ -575,32 +637,40 @@ export const NotificationsLayout: React.FC = () => {
             </View>
           )}
 
-          {sections.map((section) => (
-            <View key={section.key} style={{ marginTop: exactScale(18) }}>
-              <Text
-                style={[
-                  s.sectionHeader,
-                  {
-                    fontWeight: "600",
-                    color: "#6A6A6A",
-                    letterSpacing: 0,
-                    textTransform: "uppercase",
-                    marginBottom: exactScale(10),
-                  },
-                ]}
-              >
+          {sections.map((section, sectionIndex) => (
+            <View
+              key={section.key}
+              style={[s.section, sectionIndex === 0 && s.firstSection]}
+            >
+              <Text style={s.sectionHeader}>
                 {section.key}
               </Text>
               {section.items.map((notification, idx) => (
-                <NotificationRowItem
+                <SwipeableNotificationRow
                   key={notification.id}
-                  notification={notification}
-                  section={section.key}
                   isLast={idx === section.items.length - 1}
-                  onPress={() => handlePress(notification)}
-                  onDismiss={() => dismiss(notification.id)}
-                  onMarkRead={() => markRead(notification.id)}
-                />
+                  onDelete={() => handleSwipeDelete(notification.id)}
+                  onWillOpen={handleRowWillOpen}
+                  onDidClose={handleRowDidClose}
+                >
+                  <NotificationRowItem
+                    notification={notification}
+                    section={section.key}
+                    onPress={() => {
+                      closeOpenRow();
+                      handlePress(notification);
+                    }}
+                    onDismiss={() => {
+                      closeOpenRow();
+                      dismiss(notification.id);
+                    }}
+                    onMarkRead={() => {
+                      closeOpenRow();
+                      markRead(notification.id);
+                    }}
+                    onInteraction={closeOpenRow}
+                  />
+                </SwipeableNotificationRow>
               ))}
             </View>
           ))}

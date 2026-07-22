@@ -8,24 +8,26 @@ const NotificationRowSkeleton = ({ isLast }: { isLast: boolean }) => (
         style={{
             flexDirection: 'row',
             alignItems: 'flex-start',
-            paddingVertical: exactScale(14),
-            borderBottomWidth: isLast ? 0 : 1,
-            borderBottomColor: '#F0F1F3',
+            marginBottom: isLast ? 0 : exactScale(20),
         }}
     >
-        <Skeleton width={40} height={40} borderRadius={20} style={{ marginRight: exactScale(12) }} />
-        <View style={{ flex: 1, gap: 6 }}>
+        <View style={{ width: exactScale(56) }}>
+            <Skeleton width={40} height={40} borderRadius={20} style={{ marginLeft: exactScale(16) }} />
+        </View>
+        <View style={{ flex: 1, gap: exactScale(5), marginLeft: exactScale(5) }}>
             <Skeleton width="65%" height={14} borderRadius={4} />
             <Skeleton width="90%" height={12} borderRadius={4} />
-            <Skeleton width={60} height={10} borderRadius={4} style={{ marginTop: exactScale(2) }} />
+            <Skeleton width={60} height={10} borderRadius={4} style={{ marginTop: exactScale(1) }} />
         </View>
-        <Skeleton width={4} height={15} borderRadius={2} style={{ marginLeft: exactScale(8), marginTop: exactScale(4) }} />
+        <View style={{ width: exactScale(24), height: exactScale(24), marginLeft: exactScale(34), alignItems: 'center', justifyContent: 'center' }}>
+            <Skeleton width={4.25} height={17} borderRadius={2.125} />
+        </View>
     </View>
 );
 
-const NotificationSectionSkeleton = ({ rows }: { rows: number }) => (
-    <View style={{ marginTop: exactScale(18) }}>
-        <Skeleton width={70} height={12} borderRadius={4} style={{ marginBottom: exactScale(10) }} />
+const NotificationSectionSkeleton = ({ rows, isFirst = false }: { rows: number; isFirst?: boolean }) => (
+    <View style={{ marginTop: exactScale(isFirst ? 12 : 16) }}>
+        <Skeleton width={70} height={14} borderRadius={4} style={{ marginBottom: exactScale(16) }} />
         {Array.from({ length: rows }).map((_, i) => (
             <NotificationRowSkeleton key={i} isLast={i === rows - 1} />
         ))}
@@ -33,8 +35,8 @@ const NotificationSectionSkeleton = ({ rows }: { rows: number }) => (
 );
 
 export const NotificationsSkeleton = () => (
-    <View style={{ paddingHorizontal: exactScale(16) }}>
-        <NotificationSectionSkeleton rows={3} />
+    <View style={{ paddingHorizontal: exactScale(15) }}>
+        <NotificationSectionSkeleton rows={3} isFirst />
         <NotificationSectionSkeleton rows={2} />
     </View>
 );
