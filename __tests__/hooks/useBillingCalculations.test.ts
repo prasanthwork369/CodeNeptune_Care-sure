@@ -145,6 +145,21 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
     expect(result.toPay).toBe(400);
   });
 
+  it("keeps paise exact: ₹130.31 + ₹50 delivery = ₹180.31 (not ₹180.30)", () => {
+    // Regression: the old Math.round(x*10)/10 rounded to 10 paise and dropped
+    // the ₹0.01, showing ₹180.30. Must stay paise-accurate.
+    const result = useBillingCalculations({
+      subtotal: 130.31,
+      mrpTotal: 130.31,
+      walletOn: false,
+      coinsOn: false,
+      corporateCreditsOn: false,
+      deliveryFee: 50,
+    });
+
+    expect(result.toPay).toBe(180.31);
+  });
+
   it("never returns negative toPay value", () => {
     const result = useBillingCalculations({
       subtotal: 50,

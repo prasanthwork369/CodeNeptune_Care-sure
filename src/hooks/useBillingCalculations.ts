@@ -2,6 +2,7 @@ import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useCouponStore } from "@/src/store/couponStore";
+import { roundToPaise } from "@/src/utils/money";
 
 interface BillingInput {
   subtotal: number;
@@ -40,7 +41,7 @@ export const useBillingCalculations = ({
   const coinLimitPct = settings?.wallet?.coinUsagePercentage ?? 10;
 
   // 1. Product savings
-  const productSavings = Math.max(0, mrpTotal - subtotal);
+  const productSavings = roundToPaise(Math.max(0, mrpTotal - subtotal));
 
   // 2. Coupon Discount
   const COUPON_DISCOUNT = couponDiscount !== undefined
@@ -53,7 +54,7 @@ export const useBillingCalculations = ({
     (subtotal * (coinLimitPct / 100)) / coinValue,
   );
   const COINS_DISCOUNT = coinsOn
-    ? Math.round(Math.floor(maxCoinsUsable) * coinValue * 10) / 10
+    ? roundToPaise(Math.floor(maxCoinsUsable) * coinValue)
     : 0;
 
   // 4. Wallet Discount
@@ -62,7 +63,7 @@ export const useBillingCalculations = ({
     0,
   );
   const WALLET_DISCOUNT = walletOn
-    ? Math.round(Math.min(walletBalance, subtotalBeforeWallet) * 10) / 10
+    ? roundToPaise(Math.min(walletBalance, subtotalBeforeWallet))
     : 0;
 
   // 5. Corporate Credits
@@ -79,7 +80,7 @@ export const useBillingCalculations = ({
   const corporateCreditsEligible = subtotal >= corporateCreditsMinOrderValue;
   const corporateCreditsRemainingForEligibility = Math.max(
     0,
-    Math.round((corporateCreditsMinOrderValue - subtotal) * 10) / 10,
+    roundToPaise(corporateCreditsMinOrderValue - subtotal),
   );
   const subtotalBeforeCorporateCredits = Math.max(
     subtotalBeforeWallet - WALLET_DISCOUNT,
@@ -87,21 +88,18 @@ export const useBillingCalculations = ({
   );
   const CORPORATE_CREDITS_DISCOUNT =
     corporateCreditsOn && corporateCreditsEligible
-      ? Math.round(
+      ? roundToPaise(
           Math.min(
             corporateCreditsBalance,
             corporateCreditsMaxDiscount,
             subtotalBeforeCorporateCredits,
-          ) * 10,
-        ) / 10
+          ),
+        )
       : 0;
 
-  const toPay = Math.round(
-    Math.max(
-      subtotalBeforeCorporateCredits - CORPORATE_CREDITS_DISCOUNT,
-      0,
-    ) * 10,
-  ) / 10;
+  const toPay = roundToPaise(
+    Math.max(subtotalBeforeCorporateCredits - CORPORATE_CREDITS_DISCOUNT, 0),
+  );
 
   const savingsRows = [
     { label: "Product Discount", value: productSavings },
@@ -110,7 +108,9 @@ export const useBillingCalculations = ({
     { label: "CareSure Coins", value: COINS_DISCOUNT },
     { label: "Corporate Credits", value: CORPORATE_CREDITS_DISCOUNT },
   ];
-  const totalSavings = savingsRows.reduce((sum, r) => sum + r.value, 0);
+  const totalSavings = roundToPaise(
+    savingsRows.reduce((sum, r) => sum + r.value, 0),
+  );
 
   return {
     isCorporateUser,
