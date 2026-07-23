@@ -178,6 +178,7 @@ export default function RootLayout() {
                   >
                     {interFontsLoaded ? (
                       <SplashAnimationScreen
+                        isAppReady={isAuthLoaded}
                         onComplete={() => setIsAnimationDone(true)}
                       />
                     ) : (
@@ -197,6 +198,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   splashFallback: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F4FAF5",
   },
 });
