@@ -41,13 +41,14 @@ import { ComparisonMedicine } from "./types";
 interface MedicineComparisonLayoutProps {
   medicines: ComparisonMedicine[];
   prescriptionId?: string;
+  prescriptionOrderId?: string;
 }
 
 // ─── Main Layout ──────────────────────────────────────────────────────────────
 
 export const MedicineComparisonLayout: React.FC<
   MedicineComparisonLayoutProps
-> = ({ medicines, prescriptionId }) => {
+> = ({ medicines, prescriptionId, prescriptionOrderId }) => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
@@ -65,7 +66,7 @@ export const MedicineComparisonLayout: React.FC<
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
   // Server-backed refill reminder — state, API calls and error alerts live in the hook.
-  const refill = useRefillReminder({ prescriptionId });
+  const refill = useRefillReminder({ prescriptionId, prescriptionOrderId });
   const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({
     y: 0,
     height: 0,

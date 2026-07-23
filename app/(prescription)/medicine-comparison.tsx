@@ -37,5 +37,11 @@ export default function MedicineComparisonScreen() {
         );
     }
 
-    return <MedicineComparisonLayout medicines={medicines} prescriptionId={resolvedPrescriptionId} />;
+    return (
+        <MedicineComparisonLayout
+            medicines={medicines}
+            prescriptionId={resolvedPrescriptionId}
+            prescriptionOrderId={prescriptionOrderId}
+        />
+    );
 }

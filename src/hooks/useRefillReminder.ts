@@ -10,6 +10,8 @@ import { useNav } from "./useNav";
 
 interface UseRefillReminderOptions {
   prescriptionId?: string;
+  /** When set, hydration uses GET /prescriptions/order/{id} — the only detail endpoint that returns `reminder` (same as web). */
+  prescriptionOrderId?: string;
   /** Pass when the caller already has the reminder (list rows); omit to fetch it. */
   initialReminder?: PrescriptionReminder | null;
 }
@@ -21,6 +23,7 @@ interface UseRefillReminderOptions {
  */
 export function useRefillReminder({
   prescriptionId,
+  prescriptionOrderId,
   initialReminder,
 }: UseRefillReminderOptions) {
   const router = useNav();
@@ -39,17 +42,26 @@ export function useRefillReminder({
   };
 
   // Hydrate from the server only when the caller didn't supply the reminder.
+  // Prefer the by-order endpoint: getById's response omits `reminder`.
   useEffect(() => {
     if (!prescriptionId || initialReminder !== undefined) return;
     let cancelled = false;
-    prescriptionService.getById(prescriptionId).then((res) => {
+    const fetchDetail = prescriptionOrderId
+      ? prescriptionService.getByOrderNumber(prescriptionOrderId)
+      : prescriptionService.getById(prescriptionId);
+    fetchDetail.then((res) => {
+      if (__DEV__)
+        console.log(
+          "[RefillReminder] hydrate:",
+          res.success ? JSON.stringify(res.data.reminder ?? "NO reminder field") : `failed: ${res.error}`,
+        );
       if (!cancelled && res.success) setReminderState(res.data.reminder ?? null);
     });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prescriptionId]);
+  }, [prescriptionId, prescriptionOrderId]);
 
   const isActive = reminder?.status === "active";
   const nextRemindDate = reminder?.nextRemindAt

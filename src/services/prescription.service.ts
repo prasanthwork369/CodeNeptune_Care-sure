@@ -39,6 +39,15 @@ export const prescriptionService = {
     }
   },
 
+  getByOrderNumber: async (orderId: string): Promise<ServiceResult<ApiPrescription>> => {
+    try {
+      const data = await prescriptionApi.getByOrderNumber(orderId);
+      return { success: true, data };
+    } catch (err) {
+      return toFailure(err);
+    }
+  },
+
   list: async (params?: PrescriptionListParams): Promise<ServiceResult<ApiPrescription[]>> => {
     try {
       const data = await prescriptionApi.list(params);

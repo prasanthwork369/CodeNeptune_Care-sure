@@ -32,6 +32,12 @@ export const prescriptionApi = {
     return response.data.data;
   },
 
+  // Richer payload than getById — includes `reminder` (same endpoint the web uses).
+  getByOrderNumber: async (orderId: string): Promise<ApiPrescription> => {
+    const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTION_BY_ORDER(orderId));
+    return response.data.data;
+  },
+
   list: async (params?: PrescriptionListParams): Promise<ApiPrescription[]> => {
     const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTIONS, { params });
     return response.data.data;
