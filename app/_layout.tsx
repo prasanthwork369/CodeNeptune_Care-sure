@@ -33,6 +33,16 @@ import { requestQueue } from "@/src/utils/requestQueue";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import "../global.css";
 
+/**
+ * Expo Router uses this anchor only when it builds a navigation state from an
+ * initial deep link. This gives every cold-start destination a real Home route
+ * beneath it, while normal in-app and warm-start navigation keep their existing
+ * history unchanged.
+ */
+export const unstable_settings = {
+  initialRouteName: "(tabs)",
+};
+
 initDb();
 initCrashReporting();
 

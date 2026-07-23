@@ -25,7 +25,7 @@ describe("LoginForm Component", () => {
     expect(getByTestId("phone-input")).toBeTruthy();
   });
 
-  it("filters non-digit inputs and calls onPhoneChange with sanitized digits", () => {
+  it("forwards raw text so the hook owns sanitization and overflow rejection", () => {
     const onPhoneChange = jest.fn();
     const { getByTestId } = renderWithProviders(
       <LoginForm {...defaultProps} onPhoneChange={onPhoneChange} />
@@ -34,8 +34,7 @@ describe("LoginForm Component", () => {
     const input = getByTestId("phone-input");
     fireEvent.changeText(input, "987-654-3210");
 
-    // sanitize.phone strips non-digits
-    expect(onPhoneChange).toHaveBeenCalledWith("9876543210");
+    expect(onPhoneChange).toHaveBeenCalledWith("987-654-3210");
   });
 
   it("displays phoneError when provided", () => {

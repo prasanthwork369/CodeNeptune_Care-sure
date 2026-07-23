@@ -34,7 +34,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <Text style={s.prefix}>+91</Text>
         <View style={s.divider} />
         <TextInput
-          ref={applyDigitsOnlyFilter}
+          // Native filter caps typed input at 10 so the 11th digit never flashes.
+          ref={(r) => applyDigitsOnlyFilter(r, 10)}
           testID="phone-input"
           allowFontScaling={false}
           placeholder="Enter your mobile number"

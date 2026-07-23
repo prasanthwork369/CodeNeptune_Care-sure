@@ -164,23 +164,26 @@ export const UploadPrescriptionSheet: React.FC<
           }}
         >
           {/* Top action cards */}
-          <View className="flex-row" style={{ gap: exactScale(12) }}>
+          <View className="flex-row" style={{ gap: exactScale(8) }}>
             <Touchable
               activeOpacity={0.85}
               onPress={handleUploadFile}
+              accessibilityRole="button"
+              accessibilityLabel="Upload image"
               style={{
                 borderColor: "#919EAB33",
                 borderRadius: exactScale(8),
-                paddingVertical: exactScale(20),
+                minHeight: exactScale(96),
+                paddingVertical: exactScale(8),
               }}
-              className="flex-1 items-center border bg-white"
+              className="flex-1 items-center justify-center border bg-white"
             >
               <View
                 className="items-center justify-center"
                 style={{
-                  width: exactScale(64),
-                  height: exactScale(64),
-                  borderRadius: exactScale(32),
+                  width: exactScale(48),
+                  height: exactScale(48),
+                  borderRadius: exactScale(24),
                   marginBottom: exactScale(8),
                   backgroundColor: "#E6F4EA",
                 }}
@@ -192,9 +195,12 @@ export const UploadPrescriptionSheet: React.FC<
               </View>
               <Text
                 className="font-inter-medium text-brand-text"
-                style={{ fontSize: moderateScale(13) }}
+                style={{
+                  fontSize: moderateScale(14),
+                  lineHeight: moderateScale(20),
+                }}
               >
-                Upload Images
+                Upload Image
               </Text>
             </Touchable>
 
@@ -204,19 +210,22 @@ export const UploadPrescriptionSheet: React.FC<
                 onClose();
                 setTimeout(handleTakePhoto, 400);
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Take a photo"
               style={{
                 borderColor: "#919EAB33",
                 borderRadius: exactScale(8),
-                paddingVertical: exactScale(20),
+                minHeight: exactScale(96),
+                paddingVertical: exactScale(8),
               }}
-              className="flex-1 items-center border bg-white"
+              className="flex-1 items-center justify-center border bg-white"
             >
               <View
                 className="items-center justify-center"
                 style={{
-                  width: exactScale(64),
-                  height: exactScale(64),
-                  borderRadius: exactScale(32),
+                  width: exactScale(48),
+                  height: exactScale(48),
+                  borderRadius: exactScale(24),
                   marginBottom: exactScale(8),
                   backgroundColor: "#E6F4EA",
                 }}
@@ -228,7 +237,10 @@ export const UploadPrescriptionSheet: React.FC<
               </View>
               <Text
                 className="font-inter-medium text-brand-text"
-                style={{ fontSize: moderateScale(13) }}
+                style={{
+                  fontSize: moderateScale(14),
+                  lineHeight: moderateScale(20),
+                }}
               >
                 Take a Photo
               </Text>
@@ -237,19 +249,22 @@ export const UploadPrescriptionSheet: React.FC<
             <Touchable
               activeOpacity={0.85}
               onPress={handleUploadPdf}
+              accessibilityRole="button"
+              accessibilityLabel="Upload PDF"
               style={{
                 borderColor: "#919EAB33",
                 borderRadius: exactScale(8),
-                paddingVertical: exactScale(20),
+                minHeight: exactScale(96),
+                paddingVertical: exactScale(8),
               }}
-              className="flex-1 items-center border bg-white"
+              className="flex-1 items-center justify-center border bg-white"
             >
               <View
                 className="items-center justify-center"
                 style={{
-                  width: exactScale(64),
-                  height: exactScale(64),
-                  borderRadius: exactScale(32),
+                  width: exactScale(48),
+                  height: exactScale(48),
+                  borderRadius: exactScale(24),
                   marginBottom: exactScale(8),
                   backgroundColor: "#E6F4EA",
                 }}
@@ -261,7 +276,10 @@ export const UploadPrescriptionSheet: React.FC<
               </View>
               <Text
                 className="font-inter-medium text-brand-text"
-                style={{ fontSize: moderateScale(13) }}
+                style={{
+                  fontSize: moderateScale(14),
+                  lineHeight: moderateScale(20),
+                }}
               >
                 Upload PDF
               </Text>
@@ -279,13 +297,15 @@ export const UploadPrescriptionSheet: React.FC<
               });
             }}
             activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Select from My Prescriptions, faster verification"
             style={{
               borderWidth: 1,
               borderColor: "#00000014",
               backgroundColor: "#FFFFFF",
-              borderRadius: exactScale(6),
+              borderRadius: exactScale(8),
               paddingHorizontal: exactScale(16),
-              paddingVertical: exactScale(14),
+              paddingVertical: exactScale(16),
               marginTop: exactScale(16),
             }}
             className="flex-row items-center"
@@ -293,9 +313,9 @@ export const UploadPrescriptionSheet: React.FC<
             <View
               className="items-center justify-center"
               style={{
-                width: exactScale(64),
-                height: exactScale(64),
-                borderRadius: exactScale(32),
+                width: exactScale(48),
+                height: exactScale(48),
+                borderRadius: exactScale(24),
                 backgroundColor: "#E6F4EA",
               }}
             >
@@ -307,7 +327,10 @@ export const UploadPrescriptionSheet: React.FC<
             <View className="flex-1" style={{ marginLeft: exactScale(12) }}>
               <Text
                 className="font-inter-medium text-[#0F2B22]"
-                style={{ fontSize: moderateScale(14) }}
+                style={{
+                  fontSize: moderateScale(15),
+                  lineHeight: moderateScale(22),
+                }}
               >
                 Select from My Prescriptions
               </Text>
@@ -336,12 +359,21 @@ export const UploadPrescriptionSheet: React.FC<
           <Touchable
             activeOpacity={0.8}
             onPress={handleToggleBeforeUpload}
+            accessibilityRole="button"
+            accessibilityLabel="Before You Upload"
+            accessibilityState={{ expanded: showBeforeUpload }}
             className="flex-row items-center"
-            style={{ marginTop: exactScale(20) }}
+            style={{
+              minHeight: exactScale(48),
+              marginTop: exactScale(16),
+            }}
           >
             <Text
               className="font-inter-semibold text-brand-text"
-              style={{ fontSize: moderateScale(14) }}
+              style={{
+                fontSize: moderateScale(16),
+                lineHeight: moderateScale(24),
+              }}
             >
               Before You Upload
             </Text>
