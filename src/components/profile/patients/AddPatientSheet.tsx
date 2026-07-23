@@ -240,8 +240,10 @@ export function AddPatientSheet({
             <RequiredMark />
           </Text>
           <View
+            testID="add-patient-name-field"
             style={[
-              { height: exactScale(52), justifyContent: "center" },
+              s.patientInput,
+              { justifyContent: "center" },
               inputStyle,
               { paddingVertical: 0 },
               errors.name ? { borderColor: "#EF4444" } : {},
@@ -251,10 +253,12 @@ export function AddPatientSheet({
               placeholder="Enter the name"
               placeholderTextColor="#6A6A6A"
               style={{
+                height: "100%",
                 fontSize: moderateScale(14),
                 fontWeight: "400",
                 color: "#1A1C1E",
-                padding: 0,
+                paddingHorizontal: 0,
+                paddingVertical: exactScale(16),
                 margin: 0,
               }}
               value={name}
@@ -289,12 +293,13 @@ export function AddPatientSheet({
             <RequiredMark />
           </Text>
           <View
+            testID="add-patient-mobile-field"
             style={[
               {
                 flexDirection: "row",
                 alignItems: "center",
-                height: exactScale(52),
               },
+              s.patientInput,
               inputStyle,
               errors.mobile ? { borderColor: "#EF4444" } : {},
               {
@@ -327,6 +332,7 @@ export function AddPatientSheet({
                 fontWeight: "400",
                 color: "#1A1C1E",
                 height: "100%",
+                paddingVertical: exactScale(16),
               }}
               value={mobile}
               onChangeText={(t: string) => {
@@ -416,10 +422,12 @@ export function AddPatientSheet({
           {relationship === "Other" && (
             <>
               <SafeBottomSheetInput
+                testID="add-patient-other-relationship-field"
                 placeholder="Specify relationship"
                 placeholderTextColor="#6A6A6A"
                 style={[
                   inputStyle,
+                  s.patientInput,
                   {
                     marginTop: exactScale(-10),
                     marginBottom: errors.relationship
@@ -482,26 +490,30 @@ export function AddPatientSheet({
             </Text>
           )}
           <Touchable
+            testID="add-patient-dob-field"
             onPress={() => {
               setShowDatePicker(true);
               setErrors((e) => ({ ...e, dob: undefined }));
             }}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderWidth: 1,
-              borderColor: errors.dob ? "#EF4444" : "#919EAB33",
-              borderRadius: exactScale(8),
-              paddingHorizontal: exactScale(16),
-              backgroundColor: "#fff",
-              marginBottom: exactScale(18),
-            }}
+            style={[
+              s.patientInput,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: errors.dob ? "#EF4444" : "#919EAB33",
+                borderRadius: exactScale(8),
+                paddingHorizontal: exactScale(16),
+                backgroundColor: "#fff",
+                marginBottom: exactScale(18),
+              },
+            ]}
             activeOpacity={0.8}
           >
             <Text
               style={{
                 flex: 1,
-                paddingVertical: exactScale(14),
+                paddingVertical: exactScale(16),
                 fontSize: moderateScale(14),
                 fontWeight: "400",
                 color: dob ? "#1A1C1E" : "#6A6A6A",
@@ -632,7 +644,7 @@ const inputStyle: object = {
   borderColor: "#919EAB33",
   borderRadius: exactScale(8),
   paddingHorizontal: exactScale(16),
-  paddingVertical: exactScale(14),
+  paddingVertical: exactScale(16),
   fontSize: moderateScale(14),
   fontWeight: "400",
   color: "#6A6A6A",

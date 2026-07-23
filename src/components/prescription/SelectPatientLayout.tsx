@@ -2,12 +2,12 @@ import { HealthProblemSheet } from "@/src/components/prescription/HealthProblemS
 import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
 import { PatientChipSkeleton } from "@/src/components/profile/patients/PatientSkeleton";
 import { PatientEmptyState } from "@/src/components/profile/select-patient/sections";
+import { AppButton } from "@/src/components/ui/AppButton";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { icons } from "@/src/constants/icons";
-import { HOME_IMAGES } from "@/src/constants/images";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useSelectPatient } from "@/src/hooks/useSelectPatient";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -23,6 +23,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { styles as s } from "./SelectPatientLayout.styles";
 
 const isPdf = (uri: string, type?: string) =>
   type === "application/pdf" || uri.toLowerCase().endsWith(".pdf");
@@ -30,9 +31,7 @@ const isPdf = (uri: string, type?: string) =>
 export const SelectPatientLayout: React.FC = () => {
   const {
     router,
-    insets,
     toPay,
-    prescriptionId,
     prescriptionItems,
     isAddingImage,
     removingImageIndex,
@@ -133,7 +132,7 @@ export const SelectPatientLayout: React.FC = () => {
             showsVerticalScrollIndicator={false}
             className="flex-1"
             contentContainerStyle={{
-              padding: exactScale(16),
+              ...s.scrollContent,
               paddingBottom: adjustedBottom + exactScale(90),
             }}
           >
@@ -323,8 +322,8 @@ export const SelectPatientLayout: React.FC = () => {
                       }}
                     />
                     <TextInput
-                      className="flex-1 font-inter-semibold text-[#222222] py-4"
-                      style={{ fontSize: moderateScale(14) }}
+                      className="flex-1 font-inter-semibold text-[#222222]"
+                      style={s.contactInput}
                       value={phoneValue}
                       onChangeText={handlePhoneChange}
                       keyboardType="number-pad"
@@ -336,14 +335,16 @@ export const SelectPatientLayout: React.FC = () => {
                   </View>
                 ) : (
                   <Text
-                    className="flex-1 py-4"
-                    style={{
-                      fontFamily: selectedPatient?.phone
-                        ? "Inter_600SemiBold"
-                        : "Inter_400Regular",
-                      color: selectedPatient?.phone ? "#222222" : "#919EAB",
-                      fontSize: moderateScale(14),
-                    }}
+                    className="flex-1"
+                    style={[
+                      s.contactValue,
+                      {
+                        fontFamily: selectedPatient?.phone
+                          ? "Inter_600SemiBold"
+                          : "Inter_400Regular",
+                        color: selectedPatient?.phone ? "#222222" : "#919EAB",
+                      },
+                    ]}
                   >
                     {format.phone(selectedPatient?.phone) ||
                       "e.g. +91 98765 43210"}
@@ -385,7 +386,10 @@ export const SelectPatientLayout: React.FC = () => {
                 >
                   Age
                 </Text>
-                <View className="border border-[#919EAB33] rounded-md px-[14px] py-[14px] bg-white">
+                <View
+                  className="border border-[#919EAB33] rounded-md px-[14px] bg-white"
+                  style={s.vitalCard}
+                >
                   {selectedPatient?.dateOfBirth ? (
                     (() => {
                       const [, value, unit] =
@@ -428,7 +432,10 @@ export const SelectPatientLayout: React.FC = () => {
                 >
                   Gender
                 </Text>
-                <View className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-full px-6 py-4">
+                <View
+                  className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-full px-6"
+                  style={s.genderCard}
+                >
                   {selectedPatient?.gender === "FEMALE" ? (
                     <icons.female width={18} height={18} color="#0F7635" />
                   ) : (
@@ -455,7 +462,8 @@ export const SelectPatientLayout: React.FC = () => {
             </Text>
             <Touchable
               onPress={() => setShowHealthSheet(true)}
-              className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] py-4 bg-white mb-4"
+              className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] bg-white mb-4"
+              style={s.healthSelector}
               activeOpacity={0.85}
             >
               {selectedHealthProblem ? (
@@ -504,8 +512,8 @@ export const SelectPatientLayout: React.FC = () => {
                   onChangeText={setCustomProblemText}
                   placeholder="Type the health problem..."
                   placeholderTextColor="#6A6A6A"
-                  className="w-full font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px] py-3"
-                  style={{ fontSize: moderateScale(14) }}
+                  className="w-full font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px]"
+                  style={s.customProblemInput}
                 />
               </View>
             )}
@@ -523,73 +531,24 @@ export const SelectPatientLayout: React.FC = () => {
               multiline
               value={symptoms}
               onChangeText={setSymptoms}
-              className="border border-[#919EAB33] rounded-md px-[14px] pt-3 pb-3 bg-white font-inter text-[#1A1C1E]"
-              style={{
-                minHeight: 100,
-                textAlignVertical: "top",
-                fontSize: moderateScale(14),
-              }}
+              className="border border-[#919EAB33] rounded-md px-[14px] bg-white font-inter text-[#1A1C1E]"
+              style={s.symptomsInput}
             />
           </ScrollView>
 
           <View
-            className="bg-white px-4 pt-4"
-            style={{
-              borderTopWidth: 1,
-              borderTopColor: "#919EAB22",
-              paddingBottom: adjustedBottom + 16,
-            }}
+            style={[s.footer, { paddingBottom: adjustedBottom + exactScale(16) }]}
           >
-            <View className="flex-row items-center pb-4">
-              <Image
-                source={HOME_IMAGES.verifiedUser}
-                style={{ width: 22, height: 22, marginRight: exactScale(10) }}
-                resizeMode="contain"
-              />
-              <View className="flex-1">
-                <Text
-                  className="font-inter-bold text-[#1A1C1E]"
-                  style={{ fontSize: moderateScale(14) }}
-                >
-                  Take care, {selectedPatient?.name ?? "there"}
-                </Text>
-                <Text
-                  className="font-inter-medium text-[#6A6A6A] mt-0.5"
-                  style={{ fontSize: moderateScale(12) }}
-                >
-                  Your medicines will be there when you need them
-                </Text>
-              </View>
-            </View>
-            <View style={{ height: 1, backgroundColor: "#919EAB22" }} />
-            <View className="flex-row items-center pt-4">
-              <View className="mr-4">
-                <Text
-                  className="font-inter-medium text-[#222222]"
-                  style={{ fontSize: moderateScale(11) }}
-                >
-                  To Pay
-                </Text>
-                <Text
-                  className="font-inter-extrabold text-[#222222]"
-                  style={{ fontSize: moderateScale(18) }}
-                >
-                  ₹{Number(toPay).toFixed(2)}
-                </Text>
-              </View>
-              <Touchable
-                activeOpacity={0.85}
-                onPress={handleProceed}
-                className="flex-1 items-center ml-5 justify-center py-4 rounded-lg bg-[#0F7635]"
-              >
-                <Text
-                  className="font-inter-semibold text-white"
-                  style={{ fontSize: moderateScale(15) }}
-                >
-                  Proceed
-                </Text>
-              </Touchable>
-            </View>
+            <AppButton
+              title="Continue"
+              onPress={handleProceed}
+              size="md"
+              style={s.continueButton}
+              textStyle={s.continueButtonText}
+              testID="select-patient-continue"
+              accessibilityLabel="Continue"
+              accessibilityHint="Continues with the selected patient details"
+            />
           </View>
         </>
       )}
