@@ -2,11 +2,13 @@ import { isExpoGo } from "../../../utils/environment";
 import { PerfTraceName, TraceAttributes, TraceMetrics } from "./types";
 
 /**
- * Lazy-loads `@react-native-firebase/perf` to avoid native module lookup errors
- * when running in non-native environments (Expo Go, Web, or Jest test runners).
+ * Disable Performance Monitoring in Expo Go, Metro, and Development / Debug builds (__DEV__).
+ * Performance traces & metric collection are ONLY enabled for production / release builds (!__DEV__).
  */
+const isPerfDisabled = isExpoGo || __DEV__;
+
 const getPerf = () => {
-  if (isExpoGo) return null;
+  if (isPerfDisabled) return null;
   try {
     return require("@react-native-firebase/perf").default;
   } catch {
@@ -14,10 +16,18 @@ const getPerf = () => {
   }
 };
 
+// Explicitly toggle performance metric collection based on build environment
+if (!isExpoGo) {
+  try {
+    const perf = require("@react-native-firebase/perf").default;
+    perf().setPerformanceCollectionEnabled(!isPerfDisabled);
+  } catch {
+    // Ignore in non-native / test environments
+  }
+}
+
 class PerformanceService {
   private activeTraces = new Map<string, TraceSession>();
-  // Dev-only wall-clock timers so trace durations print to the console instantly
-  // during development — Firebase's own data only surfaces in the console hours
   // later, and not at all in Expo Go. Independent of the native perf module.
   private devTimers = new Map<string, number>();
   // Safety timers that force-stop a trace that outlives maxDurationMs, so a

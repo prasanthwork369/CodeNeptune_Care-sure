@@ -1,4 +1,5 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
@@ -219,8 +220,10 @@ export const FrequentOrdersLayout: React.FC = () => {
         keyboardShouldPersistTaps="handled"
       >
         {isLoading ? (
-          <View style={{ alignItems: "center", justifyContent: "center" }}>
-            <ActivityIndicator size="large" color="#0F7635" />
+          <View style={{ paddingHorizontal: exactScale(16), paddingTop: exactScale(14), gap: exactScale(12) }}>
+            <ShimmerBlock height={exactScale(96)} borderRadius={12} />
+            <ShimmerBlock height={exactScale(96)} borderRadius={12} />
+            <ShimmerBlock height={exactScale(96)} borderRadius={12} />
           </View>
         ) : filtered.length === 0 ? (
           <View style={{ alignItems: "center", justifyContent: "center" }}>

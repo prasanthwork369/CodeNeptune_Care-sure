@@ -32,6 +32,7 @@ const TAB_SNAP_SPRING = { damping: 28, stiffness: 420, mass: 0.5 } as const;
 import { styles as cardStyles } from "./WalletLayout.styles";
 import { TransactionHistorySheet } from "./TransactionHistorySheet";
 import { WalletInfoModal } from "./WalletInfoModal";
+import { ShimmerBlock } from "@/src/components/ui/shimmer";
 
 /**
  * Renders a stylized circular status badge containing a context icon for transaction rows.
@@ -222,10 +223,7 @@ export const WalletLayout: React.FC = () => {
               <View style={cardStyles.cardInfoSection}>
                 <Text style={cardStyles.cardLabel}>WALLET BALANCE</Text>
                 {isBalancePending ? (
-                  <ActivityIndicator
-                    color="#0F7635"
-                    style={cardStyles.loadingIndicatorLeft}
-                  />
+                  <ShimmerBlock width={120} height={28} borderRadius={6} style={{ marginVertical: 4 }} />
                 ) : (
                   <Text style={cardStyles.cardValue}>
                     ₹{Number(balance?.walletBalance ?? 0).toLocaleString()}
@@ -256,10 +254,7 @@ export const WalletLayout: React.FC = () => {
               <View style={cardStyles.cardInfoSection}>
                 <Text style={cardStyles.cardLabel}>CORPORATE CREDITS</Text>
                 {isBalancePending ? (
-                  <ActivityIndicator
-                    color="#0F7635"
-                    style={cardStyles.loadingIndicatorLeft}
-                  />
+                  <ShimmerBlock width={120} height={28} borderRadius={6} style={{ marginVertical: 4 }} />
                 ) : (
                   <Text style={cardStyles.cardValue}>
                     ₹{Number(balance?.corporateCredits ?? 0).toLocaleString()}
@@ -284,10 +279,7 @@ export const WalletLayout: React.FC = () => {
                     resizeMode="contain"
                   />
                   {isBalancePending ? (
-                    <ActivityIndicator
-                      color="#0F7635"
-                      style={cardStyles.loadingIndicatorInline}
-                    />
+                    <ShimmerBlock width={80} height={28} borderRadius={6} style={{ marginVertical: 4 }} />
                   ) : (
                     <Text style={cardStyles.cardValue}>
                       {balance?.coinsBalance ?? 0}
@@ -317,10 +309,11 @@ export const WalletLayout: React.FC = () => {
         {/* Transaction list container card */}
         <View style={cardStyles.historyCard}>
           {logsLoading ? (
-            <ActivityIndicator
-              color="#0F7635"
-              style={cardStyles.loadingIndicatorCenter}
-            />
+            <View style={{ padding: 12, gap: 12 }}>
+              <ShimmerBlock height={48} borderRadius={8} />
+              <ShimmerBlock height={48} borderRadius={8} />
+              <ShimmerBlock height={48} borderRadius={8} />
+            </View>
           ) : previewTxs.length === 0 ? (
             <Text style={s.walletLabel} className="font-inter text-brand-subtext text-center py-6">
               No transactions yet

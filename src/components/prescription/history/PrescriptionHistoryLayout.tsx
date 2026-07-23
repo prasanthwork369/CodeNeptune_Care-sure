@@ -1,4 +1,5 @@
 import { SearchBar } from "@/src/components/home/sections/SearchBar";
+import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import {
@@ -130,8 +131,10 @@ export const PrescriptionHistoryLayout: React.FC = () => {
       </View>
 
       {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#0F7635" />
+        <View style={{ padding: 20, gap: 12 }}>
+          <ShimmerBlock height={exactScale(110)} borderRadius={12} />
+          <ShimmerBlock height={exactScale(110)} borderRadius={12} />
+          <ShimmerBlock height={exactScale(110)} borderRadius={12} />
         </View>
       ) : (
         <FlashList

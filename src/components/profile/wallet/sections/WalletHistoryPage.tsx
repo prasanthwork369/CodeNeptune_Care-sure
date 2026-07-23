@@ -1,3 +1,4 @@
+import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Transaction } from "@/src/types/wallet";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
@@ -25,8 +26,11 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
 }) => {
   if (loading) {
     return (
-      <View style={{ width }}>
-        <ActivityIndicator color="#0F7635" style={{ marginTop: exactScale(40) }} />
+      <View style={{ width, paddingHorizontal: exactScale(16), paddingTop: exactScale(16), gap: exactScale(12) }}>
+        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
       </View>
     );
   }

@@ -1,9 +1,10 @@
+import { MedicineComparisonSkeleton } from '@/src/components/prescription/medicine-comparison/MedicineComparisonSkeleton';
 import { MedicineComparisonLayout } from '@/src/components/prescription/medicine-comparison/MedicineComparisonLayout';
 import { useComparisonPrescriptionId } from '@/src/hooks/useComparisonPrescriptionId';
 import { usePrescriptionOrderMedicines } from '@/src/hooks/queries/usePrescriptionOrderMedicines';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Touchable } from '@/src/components/ui/Touchable';
 
 export default function MedicineComparisonScreen() {
@@ -13,11 +14,7 @@ export default function MedicineComparisonScreen() {
     const resolvedPrescriptionId = useComparisonPrescriptionId(prescriptionId, prescriptionOrderId);
 
     if (isLoading) {
-        return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F9FAFB' }}>
-                <ActivityIndicator size="large" color="#0F7635" />
-            </View>
-        );
+        return <MedicineComparisonSkeleton />;
     }
 
     if (medicines.length === 0) {

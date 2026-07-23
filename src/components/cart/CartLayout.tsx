@@ -113,6 +113,8 @@ export const CartLayout: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        bounces={false}
         contentContainerStyle={{ paddingBottom: exactScale(24) }}
       >
         <CartSavingsBanner firstName={firstName} totalSavings={totalSavings} />

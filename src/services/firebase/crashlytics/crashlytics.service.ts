@@ -7,14 +7,24 @@ import type * as CrashlyticsModule from "@react-native-firebase/crashlytics";
 const crashlytics = (): typeof CrashlyticsModule =>
   require("@react-native-firebase/crashlytics");
 
-// Collect crashes in all environments (development and production)
-// as requested. Tag every report with `environment` so dev-time test
-// crashes can be filtered out from real production crashes in the
-// Firebase console (filter by the "environment" custom key).
-const instance = isExpoGo ? null : crashlytics().getCrashlytics();
+// Disable Crashlytics in Expo Go and Development / Metro / Debug builds (__DEV__).
+// Crashlytics reporting is ONLY enabled for production / release builds (!__DEV__).
+const isCrashlyticsDisabled = isExpoGo || __DEV__;
+const instance = isCrashlyticsDisabled ? null : crashlytics().getCrashlytics();
+
 if (instance) {
   crashlytics().setCrashlyticsCollectionEnabled(instance, true);
-  crashlytics().setAttribute(instance, "environment", __DEV__ ? "development" : "production");
+  crashlytics().setAttribute(instance, "environment", "production");
+} else if (!isExpoGo) {
+  // Explicitly disable collection at runtime in JS for dev builds
+  try {
+    const devInstance = crashlytics().getCrashlytics();
+    if (devInstance) {
+      crashlytics().setCrashlyticsCollectionEnabled(devInstance, false);
+    }
+  } catch (_) {
+    // Ignore errors in dev environment
+  }
 }
 
 export function reportError(error: unknown, context?: string) {
@@ -24,12 +34,12 @@ export function reportError(error: unknown, context?: string) {
 }
 
 /**
- * Catches uncaught JS exceptions and unhandled promise rejections app-wide
- * and forwards them to Crashlytics before falling back to the default
- * handler (red box in dev, crash in production). Call once at app startup.
+ * Catches uncaught JS exceptions and unhandled promise rejections in production release builds
+ * and forwards them to Crashlytics before falling back to default handling.
+ * In development (__DEV__) or Expo Go, this is a no-op to allow standard RedBox / Metro error handling.
  */
 export function initCrashReporting() {
-  if (isExpoGo) return;
+  if (isCrashlyticsDisabled || !instance) return;
   const defaultHandler = ErrorUtils.getGlobalHandler();
   ErrorUtils.setGlobalHandler((error, isFatal) => {
     reportError(error, isFatal ? "fatal" : "non-fatal");

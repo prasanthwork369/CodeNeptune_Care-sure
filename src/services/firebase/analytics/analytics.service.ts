@@ -2,14 +2,26 @@ import { isExpoGo } from "@/src/utils/environment";
 
 type EventParams = Record<string, string | number | boolean | undefined>;
 
+const isAnalyticsDisabled = isExpoGo || __DEV__;
+
 const getAnalytics = () => {
-  if (isExpoGo) return null;
+  if (isAnalyticsDisabled) return null;
   try {
     return require("@react-native-firebase/analytics").default;
   } catch {
     return null;
   }
 };
+
+// Explicitly toggle analytics data collection based on build environment
+if (!isExpoGo) {
+  try {
+    const analytics = require("@react-native-firebase/analytics").default;
+    analytics().setAnalyticsCollectionEnabled(!isAnalyticsDisabled);
+  } catch {
+    // Ignore in non-native / test environments
+  }
+}
 
 const log = async (name: string, params?: EventParams) => {
   const analytics = getAnalytics();
