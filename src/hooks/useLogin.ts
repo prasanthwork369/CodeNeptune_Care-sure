@@ -33,6 +33,8 @@ export function useLogin() {
    * Sanitizes input to numeric only and performs real-time validation checks.
    */
   const handleChangeText = (text: string) => {
+    // Typed overflow: already 10 digits and new text only appends — ignore it.
+    if (phoneNumber.length === 10 && text.startsWith(phoneNumber)) return;
     const cleaned = sanitize.phone(text);
     setPhoneNumber(cleaned);
     if (cleaned.length > 0) {

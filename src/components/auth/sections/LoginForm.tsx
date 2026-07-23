@@ -1,6 +1,5 @@
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { LoginFormProps } from "@/src/types/auth";
-import { sanitize } from "@/src/utils/validation";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { styles as s } from "./LoginForm.styles";
@@ -13,9 +12,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onPhoneFocus,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-
-  // Strip everything but digits on each keystroke.
-  const handleText = (text: string) => onPhoneChange(sanitize.phone(text));
 
   return (
     <View>
@@ -53,7 +49,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           // strip the country code, silently producing a wrong number.
           cursorColor="#0F7635"
           value={phoneNumber}
-          onChangeText={handleText}
+          // Forward raw text — useLogin owns sanitization and overflow rejection.
+          onChangeText={onPhoneChange}
           // onPhoneFocus triggers the native Android SIM selector hint prompt to pick phone number automatically
           onFocus={() => {
             setIsFocused(true);
