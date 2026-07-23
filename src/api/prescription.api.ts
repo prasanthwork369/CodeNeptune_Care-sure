@@ -1,4 +1,4 @@
-import { ApiPrescription } from '@/src/types/prescription';
+import { ApiPrescription, PrescriptionReminder, ReminderInput } from '@/src/types/prescription';
 import { API_ENDPOINTS } from '@/src/utils/urls';
 import { apiClient } from './client';
 
@@ -40,5 +40,15 @@ export const prescriptionApi = {
   dismiss: async (id: string): Promise<ApiPrescription> => {
     const response = await apiClient.patch(API_ENDPOINTS.PRESCRIPTION_DISMISS(id));
     return response.data.data;
+  },
+
+  // Sets or updates the "Never Miss a Refill" reminder — recurring frequency or custom date.
+  setReminder: async (id: string, input: ReminderInput): Promise<PrescriptionReminder> => {
+    const response = await apiClient.put(API_ENDPOINTS.PRESCRIPTION_REMINDER(id), input);
+    return response.data.data;
+  },
+
+  cancelReminder: async (id: string): Promise<void> => {
+    await apiClient.delete(API_ENDPOINTS.PRESCRIPTION_REMINDER(id));
   },
 };

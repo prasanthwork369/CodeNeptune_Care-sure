@@ -5,6 +5,8 @@ import { CardOptionsMenu } from "@/src/components/ui/CardOptionsMenu";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
+import { useRefillReminder } from "@/src/hooks/useRefillReminder";
+import { PrescriptionReminder } from "@/src/types/prescription";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Share, Text, View } from "react-native";
@@ -28,6 +30,7 @@ export interface Prescription {
   /** One reason per file when rejected; empty otherwise. */
   rejectionReasons?: string[];
   reviewNotes?: string | null;
+  reminder?: PrescriptionReminder | null;
 }
 
 const GradientText: React.FC<{ text: string }> = ({ text }) => {
@@ -140,8 +143,12 @@ export const PrescriptionCard = ({
   onDownloadPress: (url: string, fileName: string) => void;
 }) => {
   const router = useNav();
-  const [reminder, setReminder] = useState(false);
-  const [reminderDate, setReminderDate] = useState<Date | null>(null);
+  // Server-backed refill reminder; undefined lets the hook fetch it when the
+  // list response didn't include the reminder field.
+  const refill = useRefillReminder({
+    prescriptionId: item.id,
+    initialReminder: item.reminder,
+  });
   const [showReminder, setShowReminder] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showReasons, setShowReasons] = useState(false);
@@ -253,9 +260,9 @@ export const PrescriptionCard = ({
           >
             {item.rxId}
           </Text>
-          {reminder && reminderDate && (
+          {refill.isActive && refill.nextRemindDate && (
             <View className="mt-0.5">
-              <GradientText text={`NEXT REMINDER: ${formatReminderDateShort(reminderDate)}`} />
+              <GradientText text={`NEXT REMINDER: ${formatReminderDateShort(refill.nextRemindDate)}`} />
             </View>
           )}
         </View>
@@ -343,10 +350,10 @@ export const PrescriptionCard = ({
           <View className="flex-row items-center justify-between px-4 py-3.5">
             <View className="flex-row items-center">
               <Toggle
-                value={reminder}
+                value={refill.isActive}
                 onToggle={() => {
-                  if (!reminder) setShowReminder(true);
-                  else setReminder(false);
+                  if (!refill.isActive) setShowReminder(true);
+                  else refill.cancelReminder();
                 }}
               />
               <Text
@@ -384,10 +391,7 @@ export const PrescriptionCard = ({
       <ReminderSheet
         isVisible={showReminder}
         onClose={() => setShowReminder(false)}
-        onConfirm={(date) => {
-          setReminderDate(date);
-          setReminder(true);
-        }}
+        onConfirm={(input) => refill.setReminder(input)}
       />
 
       <PrescriptionRejectedModal

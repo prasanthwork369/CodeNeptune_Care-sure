@@ -11,6 +11,7 @@ import { CartTerms } from "@/src/components/cart/sections/CartTerms";
 import { CartWalletSection, CartCorporateCreditsSection } from "@/src/components/cart/sections";
 import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
+import { useRefillReminder } from "@/src/hooks/useRefillReminder";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
@@ -62,9 +63,9 @@ export const MedicineComparisonLayout: React.FC<
   const [coinsOn, setCoinsOn] = useState(false);
   const [corporateCreditsOn, setCorporateCreditsOn] = useState(false);
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
-  const [refillOn, setRefillOn] = useState(false);
-  const [reminderDate, setReminderDate] = useState<Date | null>(null);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
+  // Server-backed refill reminder — state, API calls and error alerts live in the hook.
+  const refill = useRefillReminder({ prescriptionId });
   const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({
     y: 0,
     height: 0,
@@ -267,19 +268,17 @@ export const MedicineComparisonLayout: React.FC<
           ))}
         </View>
 
-        {/* Refill Reminder */}
-        <RefillReminder
-          value={refillOn}
-          reminderDate={reminderDate}
-          onToggle={(v) => {
-            if (v) {
-              setShowReminderSheet(true);
-            } else {
-              setRefillOn(false);
-              setReminderDate(null);
-            }
-          }}
-        />
+        {/* Refill Reminder — hidden without a prescription id (nothing to persist) */}
+        {prescriptionId && (
+          <RefillReminder
+            value={refill.isActive}
+            reminderDate={refill.nextRemindDate}
+            onToggle={(v) => {
+              if (v) setShowReminderSheet(true);
+              else refill.cancelReminder();
+            }}
+          />
+        )}
 
         {/* Coupons */}
         <CartCouponSection
@@ -379,10 +378,7 @@ export const MedicineComparisonLayout: React.FC<
       <ReminderSheet
         isVisible={showReminderSheet}
         onClose={() => setShowReminderSheet(false)}
-        onConfirm={(date) => {
-          setReminderDate(date);
-          setRefillOn(true);
-        }}
+        onConfirm={(input) => refill.setReminder(input)}
       />
 
       <CartConfetti trigger={confettiTrigger} />

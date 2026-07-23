@@ -11,6 +11,10 @@ export const formatReminderDateTime = (d: Date): string => {
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${hour12}:${mins} ${ampm}`;
 };
 
+// "21 Jul 2026" — date only, matches the web's reminder display
+export const formatReminderDate = (d: Date): string =>
+  `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+
 // "21 JUL"
 export const formatReminderDateShort = (d: Date): string =>
   `${String(d.getDate()).padStart(2, "0")} ${MONTHS[d.getMonth()].toUpperCase()}`;

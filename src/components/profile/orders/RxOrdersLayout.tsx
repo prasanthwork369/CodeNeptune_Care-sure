@@ -46,6 +46,9 @@ export const RxOrdersLayout: React.FC = () => {
     imageUrls: item.imageUrls ?? [],
     rejectionReasons: item.ocrData?.rejectionReasons ?? [],
     reviewNotes: item.reviewNotes ?? null,
+    // Keep undefined as-is: undefined = "list didn't include it, fetch it";
+    // null = "known: no reminder set". The hook treats them differently.
+    reminder: item.reminder,
   });
 
   return (

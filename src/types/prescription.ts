@@ -15,6 +15,23 @@ export interface Prescription {
     doctor: string;
 }
 
+/** Backend-accepted "Never Miss a Refill" frequencies. */
+export type ReminderFrequencyDays = 7 | 14 | 21 | 30;
+
+/** Set-reminder payload: recurring every N days, or a one-time custom date ("YYYY-MM-DD"). */
+export type ReminderInput =
+    | { frequencyDays: ReminderFrequencyDays }
+    | { remindAt: string };
+
+/** Refill reminder attached to a prescription; null/absent when never set. */
+export interface PrescriptionReminder {
+    status: 'active' | 'cancelled' | 'completed' | string;
+    /** "once" for custom-date reminders; null frequencyDays goes with it. */
+    type?: 'recurring' | 'once';
+    frequencyDays: ReminderFrequencyDays | null;
+    nextRemindAt: string | null;
+}
+
 /**
  * Shape returned by GET /api/v1/prescriptions (and by id). `isDismissed` and
  * `isPurchased` are server-computed and read-only from the client — there is
@@ -38,6 +55,7 @@ export interface ApiPrescription {
     } | null;
     /** Why a prescription was rejected — set by automated OCR or a pharmacist. */
     reviewNotes?: string | null;
+    reminder?: PrescriptionReminder | null;
     createdAt: string;
     updatedAt?: string;
 }
