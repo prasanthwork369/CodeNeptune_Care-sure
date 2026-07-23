@@ -192,6 +192,9 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
         [cardWidth, onProductPress],
     );
 
+    // Hide the section only when there are no substitutes at all.
+    if (!isLoading && products.length === 0) return null;
+
     return (
         <View className="py-6" style={{ position: 'relative' }}>
             <LinearGradient
