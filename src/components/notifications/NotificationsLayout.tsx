@@ -456,11 +456,16 @@ export const NotificationsLayout: React.FC = () => {
     const prescriptionOrderId =
       notification.metadata?.prescriptionOrderId ?? notification.orderId;
 
-    // Prescription verified with a linked order → jump straight to comparison
+    // Prescription verified with a linked order → jump straight to comparison.
+    // prescriptionId must be the actual prescription's id (from metadata), NOT
+    // notification.id — the refill reminder API 404s on a wrong id.
     if (event === "prescription.approved" && prescriptionOrderId) {
       router.push({
         pathname: "/(prescription)/medicine-comparison",
-        params: { prescriptionOrderId, prescriptionId: notification.id },
+        params: {
+          prescriptionOrderId,
+          prescriptionId: notification.metadata?.prescriptionId ?? "",
+        },
       });
       return;
     }
