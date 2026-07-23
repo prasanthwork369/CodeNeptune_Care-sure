@@ -245,8 +245,9 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({ products
                     ItemSeparatorComponent={() => <View style={{ width: gap }} />}
                     // Sits after the last product so scrolling to the end leads
                     // into the full catalogue.
+                    // View All only earns its card once the row is deep (10+ products).
                     ListFooterComponent={
-                        onViewAll && products.length > 0 ? (
+                        onViewAll && products.length >= 10 ? (
                             <View style={{ marginLeft: gap }}>
                                 <ViewAllCard
                                     width={cardWidth}
