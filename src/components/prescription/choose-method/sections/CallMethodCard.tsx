@@ -34,7 +34,7 @@ export const CallMethodCard: React.FC<CallMethodCardProps> = ({ isSelected, onSe
                             <View className="flex-1 ml-3">
                                 <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14) }}>{"Don't have a prescription? Call us"}</Text>
                                 <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12), lineHeight: moderateScale(17) }}>
-                                    Our Pharmacists Will Assist You And Help You Complete Your Order
+                                    Our pharmacists will assist you and help you complete your order.
                                 </Text>
                             </View>
                         </View>

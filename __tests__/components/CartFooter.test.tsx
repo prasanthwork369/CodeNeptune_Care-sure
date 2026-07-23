@@ -21,7 +21,7 @@ describe("CartFooter Component", () => {
 
     expect(getByText("To Pay")).toBeTruthy();
     expect(getByText("₹450.50")).toBeTruthy();
-    expect(getByText("Proceed To Pay")).toBeTruthy();
+    expect(getByText("Proceed to pay")).toBeTruthy();
   });
 
   it("triggers onProceed callback when Proceed To Pay is pressed", () => {
@@ -34,7 +34,7 @@ describe("CartFooter Component", () => {
       />
     );
 
-    fireEvent.press(getByText("Proceed To Pay"));
+    fireEvent.press(getByText("Proceed to pay"));
     expect(onProceedMock).toHaveBeenCalledTimes(1);
   });
 
@@ -48,7 +48,7 @@ describe("CartFooter Component", () => {
       />
     );
 
-    fireEvent.press(getByText("Proceed To Pay"));
+    fireEvent.press(getByText("Proceed to pay"));
     expect(onProceedMock).not.toHaveBeenCalled();
   });
 });

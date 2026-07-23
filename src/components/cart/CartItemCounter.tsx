@@ -37,6 +37,11 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
         onPress={() => handleChange(item.qty - 1)}
         disabled={isPending}
         activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={
+          item.qty === 1 ? "Remove item from cart" : "Decrease quantity"
+        }
+        accessibilityState={{ disabled: isPending }}
         style={{
           width: COUNTER_BTN,
           paddingVertical: exactScale(8),
@@ -52,6 +57,9 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
         </Text>
       </Touchable>
       <View
+        accessible
+        accessibilityRole="text"
+        accessibilityLabel={`Quantity ${item.qty}`}
         style={{
           flex: 1,
           paddingVertical: exactScale(8),
@@ -75,6 +83,9 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
         onPress={() => handleChange(item.qty + 1)}
         disabled={isPending}
         activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel="Increase quantity"
+        accessibilityState={{ disabled: isPending }}
         style={{
           width: COUNTER_BTN,
           paddingVertical: exactScale(8),

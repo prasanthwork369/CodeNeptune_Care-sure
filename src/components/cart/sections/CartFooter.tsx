@@ -1,32 +1,52 @@
-import { exactScale } from '@/src/utils/exactScale';
-import React from 'react';
-import { View, Text } from 'react-native';
-import { cartStyles as s } from '../cart.styles';
-import { Touchable } from '@/src/components/ui/Touchable';
-import { CartFooterProps } from '@/src/types/cart';
+import { AppButton } from "@/src/components/ui/AppButton";
+import { CartFooterProps } from "@/src/types/cart";
+import { exactScale } from "@/src/utils/exactScale";
+import React from "react";
+import { Text, View } from "react-native";
+import { cartStyles as s } from "../cart.styles";
 
-export const CartFooter: React.FC<CartFooterProps> = ({ toPay, safeAreaBottom, onProceed, canProceed = true }) => {
-    return (
-        <View 
-            className="bg-white border-t border-[#919EAB33] px-4 flex-row items-center justify-between" 
-            style={{ paddingTop: exactScale(12), paddingBottom: safeAreaBottom + exactScale(12) }}
+export const CartFooter: React.FC<CartFooterProps> = ({
+  toPay,
+  safeAreaBottom,
+  onProceed,
+  canProceed = true,
+}) => {
+  const formattedTotal = Number(toPay).toFixed(2);
+
+  return (
+    <View
+      className="bg-white border-t border-[#919EAB33] px-4 flex-row items-center"
+      style={{
+        paddingTop: exactScale(8),
+        paddingBottom: safeAreaBottom + exactScale(8),
+      }}
+    >
+      <View style={{ minWidth: exactScale(96) }}>
+        <Text
+          style={s.footerLabel}
+          className="font-inter-medium text-brand-text"
         >
-            <View>
-                <Text style={s.footerLabel} className="font-inter-medium text-brand-text">To Pay</Text>
-                <Text style={s.footerTotal} className="font-inter-extrabold text-brand-text">₹{Number(toPay).toFixed(2)}</Text>
-            </View>
-            <Touchable
-                onPress={onProceed}
-                disabled={!canProceed}
-                activeOpacity={0.85}
-                 style={{
-                 borderRadius: 8,
-                 opacity: canProceed ? 1 : 0.5
-                }}
-                className="flex-1 ml-10 bg-brand-primary py-4 items-center"
-            >
-                <Text style={s.footerBtn} className="font-inter-semibold text-white">Proceed To Pay</Text>
-            </Touchable>
-        </View>
-    );
+          To Pay
+        </Text>
+        <Text
+          style={s.footerTotal}
+          className="font-inter-extrabold text-brand-text"
+          numberOfLines={1}
+        >
+          ₹{formattedTotal}
+        </Text>
+      </View>
+
+      <AppButton
+        title="Proceed to pay"
+        onPress={onProceed}
+        disabled={!canProceed}
+        size="md"
+        className="flex-1"
+        style={{ marginLeft: exactScale(24) }}
+        accessibilityLabel={`Proceed to pay ₹${formattedTotal}`}
+        accessibilityHint="Continues to delivery and payment"
+      />
+    </View>
+  );
 };

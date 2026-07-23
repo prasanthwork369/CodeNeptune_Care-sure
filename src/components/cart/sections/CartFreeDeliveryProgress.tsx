@@ -10,6 +10,8 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
     remainingForFreeDelivery, 
     progress 
 }) => {
+    const progressPercent = Math.min(100, Math.max(0, Math.round(progress * 100)));
+
     return (
         <LinearGradient 
             colors={['#FFF6ED', '#FFFFFF']} 
@@ -17,7 +19,17 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
             end={{ x: 0.5, y: 1 }} 
             style={{ marginHorizontal: exactScale(16), marginTop: exactScale(12), borderRadius: 12, borderWidth: 1, borderColor: '#919EAB33' }}
         >
-            <View style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}>
+            <View
+                style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16) }}
+                accessible
+                accessibilityRole="progressbar"
+                accessibilityLabel={
+                    remainingForFreeDelivery > 0
+                        ? `Shop ₹${Number(remainingForFreeDelivery).toFixed(2)} more for free delivery`
+                        : "Free delivery unlocked"
+                }
+                accessibilityValue={{ min: 0, max: 100, now: progressPercent }}
+            >
                 <View className="flex-row items-center">
                     <icons.moped_package width={exactScale(22)} height={exactScale(20)} />
                     <Text style={[s.progressText, { marginLeft: exactScale(8) }]} className="font-inter-medium text-[#1A1C1E]">
@@ -31,7 +43,7 @@ export const CartFreeDeliveryProgress: React.FC<CartFreeDeliveryProgressProps> =
                 <View style={{ height: exactScale(6), marginTop: exactScale(12) }} className="bg-[#F1E2C9] rounded-full overflow-hidden">
                     <View
                         className="h-full bg-[#0B0D10] rounded-full"
-                        style={{ width: `${Math.round(progress * 100)}%` }}
+                        style={{ width: `${progressPercent}%` }}
                     />
                 </View>
             </View>

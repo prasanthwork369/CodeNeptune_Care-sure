@@ -22,7 +22,11 @@ export const CartCorporateCreditsSection: React.FC<CartCorporateCreditsSectionPr
                     <Text style={s.walletSub} className="font-inter-medium text-brand-subtext mt-0.5">Available Balance: ₹{Number(balance).toFixed(2)}</Text>
                 </View>
                 {eligible ? (
-                    <CustomSwitch value={value} onValueChange={onToggle} />
+                    <CustomSwitch
+                        value={value}
+                        onValueChange={onToggle}
+                        accessibilityLabel="Use Corporate Credits"
+                    />
                 ) : null}
             </View>
             {!eligible && (

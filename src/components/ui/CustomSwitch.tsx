@@ -5,6 +5,7 @@ interface CustomSwitchProps {
   value: boolean;
   onValueChange: (v: boolean) => void;
   disabled?: boolean;
+  accessibilityLabel?: string;
 }
 
 const TRACK_WIDTH = 48;
@@ -21,6 +22,7 @@ export const CustomSwitch: React.FC<CustomSwitchProps> = ({
   value,
   onValueChange,
   disabled = false,
+  accessibilityLabel,
 }) => {
   const translateX = useRef(
     new Animated.Value(value ? KNOB_TRAVEL : 0),
@@ -39,6 +41,12 @@ export const CustomSwitch: React.FC<CustomSwitchProps> = ({
     <Pressable
       onPress={() => !disabled && onValueChange(!value)}
       disabled={disabled}
+      accessibilityRole={accessibilityLabel ? "switch" : undefined}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={
+        accessibilityLabel ? { checked: value, disabled } : undefined
+      }
+      hitSlop={accessibilityLabel ? 12 : undefined}
       style={{
         opacity: disabled ? 0.6 : 1,
         width: TRACK_WIDTH,

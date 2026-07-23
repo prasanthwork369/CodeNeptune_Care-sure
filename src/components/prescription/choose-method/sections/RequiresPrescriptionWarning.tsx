@@ -3,6 +3,15 @@ import { View, Text } from 'react-native';
 import { RequiresPrescriptionWarningProps } from '@/src/types/prescription';
 import { moderateScale } from '@/src/utils/exactScale';
 
+const formatMedicineLabel = (label: string) =>
+    label
+        .replace(/\s*-\s*/g, ' – ')
+        .replace(/(\d)\s*(mcg|mg|ml|g)\b/gi, '$1 $2')
+        .replace(/\b(\d+)\s+Tablets?\b/gi, (_, count: string) =>
+            `${count} ${Number(count) === 1 ? 'tablet' : 'tablets'}`,
+        )
+        .replace(/\bInjection\b/g, 'injection');
+
 export const RequiresPrescriptionWarning: React.FC<RequiresPrescriptionWarningProps> = ({ 
     itemCount, 
     items 
@@ -24,7 +33,7 @@ export const RequiresPrescriptionWarning: React.FC<RequiresPrescriptionWarningPr
                     <Text style={{ color: '#fff', fontSize: moderateScale(12), fontWeight: '700', lineHeight: moderateScale(14) }}>i</Text>
                 </View>
                 <Text style={{ color: '#E56F07', fontSize: moderateScale(13) }} className="font-inter-bold">
-                    {itemCount} Item{itemCount > 1 ? 's' : ''} Requires Prescription
+                    {itemCount} {itemCount === 1 ? 'item requires' : 'items require'} a prescription
                 </Text>
             </View>
             {items.map((item) => (
@@ -34,7 +43,7 @@ export const RequiresPrescriptionWarning: React.FC<RequiresPrescriptionWarningPr
                         style={{ color: '#6A6A6A', fontSize: moderateScale(12), lineHeight: moderateScale(18) }}
                         className="font-inter-medium flex-1"
                     >
-                        {item.medicineName}
+                        {formatMedicineLabel(String(item.medicineName ?? ''))}
                     </Text>
                 </View>
             ))}

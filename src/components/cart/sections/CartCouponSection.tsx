@@ -108,7 +108,12 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
               - ₹{displayedDiscount.toFixed(2)} saved
             </Text>
           </View>
-          <Touchable onPress={onRemove} style={{ flexShrink: 0 }}>
+          <Touchable
+            onPress={onRemove}
+            style={{ flexShrink: 0 }}
+            accessibilityRole="button"
+            accessibilityLabel={`Remove coupon ${appliedCoupon.code}`}
+          >
             <Text
               style={s.couponText}
               className="font-inter-semibold text-[#E16D09]"
@@ -139,6 +144,8 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
         <Touchable
           onPress={() => router.push("/(stack)/coupons")}
           className="flex-row items-center justify-between"
+          accessibilityRole="button"
+          accessibilityLabel="View available coupons"
         >
           <View className="flex-row items-center gap-x-3">
             <Image
@@ -228,6 +235,9 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
           <Touchable
             disabled={isLocked || applying}
             onPress={handleDirectApply}
+            accessibilityRole="button"
+            accessibilityLabel={`Apply coupon ${bestCoupon.code}`}
+            accessibilityState={{ disabled: isLocked || applying, busy: applying }}
             style={{
               backgroundColor: "white",
               borderWidth: 1,
@@ -271,6 +281,8 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
         onPress={() => router.push("/(stack)/coupons")}
         activeOpacity={0.8}
         className="bg-white flex-row items-center justify-between px-4 py-3.5"
+        accessibilityRole="button"
+        accessibilityLabel="View all coupons"
       >
         <Text
           style={{

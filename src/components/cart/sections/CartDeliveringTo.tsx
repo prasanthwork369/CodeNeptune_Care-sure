@@ -15,7 +15,12 @@ export const CartDeliveringTo: React.FC<CartDeliveringToProps> = ({ label, descr
                 <Text style={s.deliverTitle} className="font-inter-bold text-[#000000]">Delivering to {label}</Text>
                 <Text numberOfLines={1} style={s.deliverSub} className="font-inter-medium text-brand-subtext mt-0.5">{description}</Text>
             </View>
-            <Touchable onPress={onChange} className="flex-row items-center">
+            <Touchable
+                onPress={onChange}
+                className="flex-row items-center"
+                accessibilityRole="button"
+                accessibilityLabel="Change delivery address"
+            >
                 <Text style={s.deliverChange} className="font-inter-bold text-[#E16D09]">Change</Text>
             </Touchable>
         </View>

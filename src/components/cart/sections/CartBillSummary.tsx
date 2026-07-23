@@ -12,6 +12,8 @@ export const CartBillSummary: React.FC<CartBillSummaryProps> = ({ mrpTotal, toPa
         <Touchable 
             onPress={onPress} 
             activeOpacity={0.7} 
+            accessibilityRole="button"
+            accessibilityLabel={`View bill details, total ₹${Number(toPay).toFixed(2)}`}
             className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3.5 flex-row items-center"
         >
             <View style={[s.billIconBox, { borderRadius: 4, backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', alignItems: 'center', justifyContent: 'center' }]}>

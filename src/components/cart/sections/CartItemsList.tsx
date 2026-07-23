@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { exactScale } from '@/src/utils/exactScale';
 import { cartStyles as s } from '../cart.styles';
@@ -14,6 +14,8 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
     onRemoveItem,
 }) => {
     const router = useNav();
+    const { width } = useWindowDimensions();
+    const compact = width < 360;
 
     return (
         <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 pt-4 pb-2">
@@ -24,9 +26,13 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
                     {idx > 0 && (
                         <View style={{ borderTopWidth: 1, borderColor: '#E5E7EB', borderStyle: 'dashed' }} />
                     )}
-                    <View className="flex-row py-4">
+                    <View className="flex-row py-4" style={compact ? { flexWrap: 'wrap' } : undefined}>
                         <Pressable
                             className="flex-row flex-1"
+                            style={compact ? { width: '100%', flexGrow: 0 } : undefined}
+                            accessibilityRole="link"
+                            accessibilityLabel={`${line.name}, ${line.pack || 'medicine details'}`}
+                            accessibilityHint="Opens product details"
                             onPress={() => router.push({ pathname: '/product/[id]', params: { id: line.productId } } as any)}
                         >
                             <View style={[s.itemImgBox, { backgroundColor: 'white', borderWidth: 1, borderColor: '#919EAB33', borderRadius: 10, alignItems: 'center', justifyContent: 'center', position: 'relative' }]}>
@@ -61,9 +67,23 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
                                 )}
                             </View>
                         </Pressable>
-                        <View className="items-end justify-between ml-2">
+                        <View
+                            className="items-end justify-between ml-2"
+                            style={compact ? {
+                                width: '100%',
+                                flexDirection: 'row-reverse',
+                                alignItems: 'center',
+                                marginLeft: 0,
+                                marginTop: exactScale(16),
+                            } : undefined}
+                        >
                             <CartItemCounter item={line} updateItem={onUpdateItem} removeItem={onRemoveItem} />
-                            <View className="flex-row items-baseline mt-3">
+                            <View
+                                className="flex-row items-baseline mt-3"
+                                style={compact ? { marginTop: 0 } : undefined}
+                                accessible
+                                accessibilityLabel={`Price ₹${Number(line.price * line.qty).toFixed(2)}${line.mrp > line.price ? `, MRP ₹${Number(line.mrp * line.qty).toFixed(2)}` : ''}`}
+                            >
                                 {line.mrp > line.price && (
                                     <Text style={s.itemMrp} className="font-inter text-brand-subtext line-through mr-1.5">₹{Number(line.mrp * line.qty).toFixed(2)}</Text>
                                 )}

@@ -26,6 +26,9 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
         gap: exactScale(10),
         overflow: "hidden",
       }}
+      accessible
+      accessibilityRole="summary"
+      accessibilityLabel={`You saved ₹${Number(totalSavings).toFixed(2)} on this order`}
     >
       <Image
         source={HOME_IMAGES.discountTag}

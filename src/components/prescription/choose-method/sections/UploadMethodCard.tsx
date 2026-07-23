@@ -31,7 +31,7 @@ export const UploadMethodCard: React.FC<UploadMethodCardProps> = ({ isSelected, 
                         <View className="flex-1 ml-3">
                             <Text className="font-inter-bold text-[#1A1C1E]" style={{ fontSize: moderateScale(14) }}>Upload Prescription</Text>
                             <Text className="font-inter-medium text-[#6A6A6A] mt-0.5" style={{ fontSize: moderateScale(12), lineHeight: moderateScale(17) }}>
-                                The Following Item Requires Verification Before Purchase
+                                The following items require verification before purchase.
                             </Text>
                         </View>
                     </View>
