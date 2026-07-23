@@ -6,6 +6,10 @@ import { PerfTraceName } from "./types";
 // A frame longer than this counts as janky (60fps target ≈ 16.67ms per frame).
 const JANK_FRAME_MS = 17;
 
+// Report ~1 in 10 scroll sessions: enough production signal without paying the
+// rAF + trace cost on every scroll for every user. Applies in dev too.
+const SAMPLE_RATE = 0.1;
+
 /**
  * Measures JS-thread frame drops during a scroll session and reports them to
  * Firebase as a custom trace (janky_frames / total_frames / jank_percent).
@@ -18,6 +22,7 @@ export function useScrollJankTrace(traceName: PerfTraceName) {
   const totalFramesRef = useRef(0);
   const jankyFramesRef = useRef(0);
   const startedRef = useRef(false);
+  const sampledRef = useRef(false);
 
   // Runs once per animation frame; a delayed callback means the JS thread was
   // busy, so the gap since the last frame reveals jank.
@@ -33,6 +38,9 @@ export function useScrollJankTrace(traceName: PerfTraceName) {
   const start = useCallback(() => {
     if (startedRef.current) return; // Keep one session across drag→momentum
     startedRef.current = true;
+    // Unsampled sessions skip the trace AND the rAF loop — zero overhead.
+    sampledRef.current = Math.random() < SAMPLE_RATE;
+    if (!sampledRef.current) return;
     totalFramesRef.current = 0;
     jankyFramesRef.current = 0;
     lastFrameRef.current = Date.now();
@@ -43,6 +51,7 @@ export function useScrollJankTrace(traceName: PerfTraceName) {
   const stop = useCallback(() => {
     if (!startedRef.current) return;
     startedRef.current = false;
+    if (!sampledRef.current) return;
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
