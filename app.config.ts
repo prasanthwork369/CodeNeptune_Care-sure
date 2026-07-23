@@ -1,5 +1,18 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
 
+const appEnv = process.env.EXPO_PUBLIC_APP_ENV ?? "development";
+const rawWebUrl =
+  appEnv === "production"
+    ? process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD ?? "https://caresure.com"
+    : process.env.EXPO_PUBLIC_WEB_BASE_URL_QA ?? "https://qa-caresure.codeneptune.com";
+
+let webHost = "qa-caresure.codeneptune.com";
+try {
+  webHost = new URL(rawWebUrl).hostname;
+} catch {
+  // fallback if unparseable
+}
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Caresure",
@@ -13,10 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: "com.codeneptune.caresure",
     supportsTablet: true,
-    // Universal Links. Requires an apple-app-site-association file served at
-    // https://<domain>/.well-known/ listing this app's Team ID + bundle id.
-    // Add the production domain here once the LIVE flip happens.
-    associatedDomains: ["applinks:qa-caresure.codeneptune.com"],
+    associatedDomains: [`applinks:${webHost}`],
   },
   android: {
     package: "com.codeneptune.caresure",
@@ -29,14 +39,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     softwareKeyboardLayoutMode: "resize",
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
-    // App Links. autoVerify makes Android open these URLs directly in the app
-    // (no chooser) — but only once /.well-known/assetlinks.json at the domain
-    // lists the RELEASE keystore's SHA-256. Add the prod domain after go-live.
     intentFilters: [
       {
         action: "VIEW",
         autoVerify: true,
-        data: [{ scheme: "https", host: "qa-caresure.codeneptune.com" }],
+        data: [{ scheme: "https", host: webHost }],
         category: ["BROWSABLE", "DEFAULT"],
       },
     ],
