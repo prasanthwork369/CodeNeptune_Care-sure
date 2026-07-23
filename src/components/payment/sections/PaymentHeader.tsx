@@ -15,7 +15,10 @@ export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
+        paddingBottom: exactScale(12),
         marginBottom: exactScale(24),
+        borderBottomWidth: 1,
+        borderBottomColor: "#919EAB33",
       }}
     >
       <Touchable
