@@ -26,6 +26,7 @@ if (__DEV__) {
     imageUrl: Image.resolveAssetSource(HOME_IMAGES.medicineStrip).uri,
     buttonText: "VIEW PRODUCT",
     deepLink: "caresure://product/CS-0173",
+    subText: "Shop Now on CareSure",
   };
 
   (globalThis as Record<string, unknown>).testProductOffer = (

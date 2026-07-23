@@ -33,6 +33,8 @@ data class ProductOfferData(
     val imageUrl: String?,
     val buttonText: String,
     val deepLink: String,
+    /** Optional header line (e.g. "Shop Now on CareSure") shown in the system decoration. */
+    val subText: String?,
 )
 
 /**
@@ -74,6 +76,9 @@ object ProductOfferRenderer {
             .setContentIntent(tapIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        // Myntra-style header line next to the app name ("Shop Now on …").
+        if (!data.subText.isNullOrBlank()) builder.setSubText(data.subText)
 
         try {
             NotificationManagerCompat.from(context).notify(notificationId, builder.build())

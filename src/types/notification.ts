@@ -77,4 +77,6 @@ export interface ProductOfferNotificationData {
   couponText?: string;
   imageUrl?: string;
   buttonText?: string;
+  /** Header line next to the app name in the system decoration. */
+  subText?: string;
 }

@@ -8,7 +8,9 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:paddingStart="4dp"
-    android:paddingEnd="4dp">
+    android:paddingEnd="4dp"
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -20,7 +22,7 @@
             android:id="@+id/notif_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary"
             android:maxLines="1"
@@ -31,14 +33,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="2dp">
+            android:layout_marginTop="4dp">
 
             <!-- Strike-through applied in code via StrikethroughSpan (no HTML) -->
             <TextView
                 android:id="@+id/notif_mrp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textColor="?android:attr/textColorSecondary"
                 android:maxLines="1" />
 
@@ -46,8 +48,8 @@
                 android:id="@+id/notif_offer_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:textSize="13sp"
+                android:layout_marginStart="4dp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#F05423"
                 android:maxLines="1" />
@@ -56,9 +58,9 @@
 
     <ImageView
         android:id="@+id/notif_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="10dp"
         android:scaleType="centerCrop"
         android:contentDescription="@null" />
 
@@ -66,13 +68,13 @@
         android:id="@+id/notif_action_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:paddingTop="7dp"
-        android:paddingBottom="7dp"
+        android:layout_marginStart="12dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:background="@drawable/bg_notification_action_btn"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:maxLines="1" />

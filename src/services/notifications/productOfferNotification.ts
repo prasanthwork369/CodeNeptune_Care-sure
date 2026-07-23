@@ -27,6 +27,7 @@ const toProductOfferData = (
     couponText: data.couponText,
     imageUrl: data.imageUrl,
     buttonText: data.buttonText,
+    subText: data.subText,
   };
 };
 

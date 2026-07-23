@@ -42,6 +42,7 @@ class ProductOfferNotificationModule(private val reactContext: ReactApplicationC
             imageUrl = payload.getStringSafe("imageUrl"),
             buttonText = payload.getStringSafe("buttonText")?.takeIf { it.isNotBlank() } ?: "VIEW",
             deepLink = deepLink,
+            subText = payload.getStringSafe("subText"),
         )
 
         executor.execute {
