@@ -1,96 +1,123 @@
 import { MEDICINES } from "@/src/constants/search-cycle";
+import { exactScale } from "@/src/utils/exactScale";
 import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { exactScale } from "@/src/utils/exactScale";
+import { AccessibilityInfo, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  Easing,
+  FadeInRight,
+  FadeOutLeft,
+} from "react-native-reanimated";
 
-const SLOT_H = exactScale(20);
-const TYPING_SPEED = 70;
-const DELETING_SPEED = 30;
-const HOLD_MS = 2200;
+const SLOT_HEIGHT = exactScale(20);
+const CYCLE_INTERVAL_MS = 3_000;
+const ENTER_DURATION_MS = 240;
+const EXIT_DURATION_MS = 200;
+const SLIDE_EASING = Easing.out(Easing.cubic);
 
+/**
+ * Horizontal slide with a soft fade for the Home search placeholder.
+ *
+ * Each cycle performs one React update. Reanimated moves the outgoing term
+ * left while the next enters from the right, entirely on the UI thread.
+ */
 export const HomeSearchCycler: React.FC = () => {
-  const [currentWordIdx, setCurrentWordIdx] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(true);
-  // Only animate while Home is the focused screen — the tab stays mounted when
-  // the user switches tabs, so without this the typewriter keeps running (and
-  // burning CPU) in the background.
   const isFocused = useIsFocused();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
-  // Blinking typing cursor effect
   useEffect(() => {
-    if (!isFocused) return;
-    const cursorInterval = setInterval(() => {
-      setCursorVisible((prev) => !prev);
-    }, 530);
-    return () => clearInterval(cursorInterval);
-  }, [isFocused]);
+    let mounted = true;
 
-  // Typewriter step logic
+    void AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (mounted) setReduceMotion(enabled);
+    });
+    const subscription = AccessibilityInfo.addEventListener(
+      "reduceMotionChanged",
+      setReduceMotion,
+    );
+
+    return () => {
+      mounted = false;
+      subscription.remove();
+    };
+  }, []);
+
   useEffect(() => {
-    if (!isFocused) return;
-    let timer: ReturnType<typeof setTimeout>;
-    const currentWord = MEDICINES[currentWordIdx];
+    if (!isFocused || reduceMotion || MEDICINES.length <= 1) return;
 
-    if (isDeleting) {
-      if (displayedText.length === 0) {
-        setIsDeleting(false);
-        setCurrentWordIdx((prev) => (prev + 1) % MEDICINES.length);
-      } else {
-        timer = setTimeout(() => {
-          setDisplayedText(currentWord.substring(0, displayedText.length - 1));
-        }, DELETING_SPEED);
-      }
-    } else {
-      if (displayedText.length === currentWord.length) {
-        timer = setTimeout(() => {
-          setIsDeleting(true);
-        }, HOLD_MS);
-      } else {
-        timer = setTimeout(() => {
-          setDisplayedText(currentWord.substring(0, displayedText.length + 1));
-        }, TYPING_SPEED);
-      }
-    }
+    const timer = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % MEDICINES.length);
+    }, CYCLE_INTERVAL_MS);
 
-    return () => clearTimeout(timer);
-  }, [displayedText, isDeleting, currentWordIdx, isFocused]);
-
-  const textStyle = {
-    fontSize: exactScale(14),
-    lineHeight: SLOT_H,
-    fontWeight: "500" as const,
-    color: "#9CA3AF",
-    includeFontPadding: false,
-    verticalAlign: "middle" as const,
-  };
+    return () => clearInterval(timer);
+  }, [isFocused, reduceMotion]);
 
   return (
-    <View style={styles.row}>
-      {/* Fixed prefix */}
-      <Text style={textStyle} numberOfLines={1} allowFontScaling={false}>
+    <View
+      style={styles.row}
+      accessible
+      accessibilityLabel="Search medicines and health products"
+    >
+      <Text style={styles.prefix} numberOfLines={1} allowFontScaling={false}>
         Search for{" "}
       </Text>
-      {/* Animated typewriter word with blinking cursor */}
+
       <View style={styles.window}>
-        <Text style={[textStyle, styles.bold]} numberOfLines={1} allowFontScaling={false}>
-          &quot;{displayedText}&quot;
-          {/* Toggle opacity, not the character — swapping "|" for a space
-              changes width and reflows the text every blink (the jerk). */}
-          <Text style={[styles.cursor, { opacity: cursorVisible ? 1 : 0 }]}>
-            |
-          </Text>
-        </Text>
+        <Animated.Text
+          key={MEDICINES[activeIndex]}
+          entering={
+            reduceMotion
+              ? undefined
+              : FadeInRight.duration(ENTER_DURATION_MS).easing(SLIDE_EASING)
+          }
+          exiting={
+            reduceMotion
+              ? undefined
+              : FadeOutLeft.duration(EXIT_DURATION_MS).easing(SLIDE_EASING)
+          }
+          style={styles.suggestion}
+          numberOfLines={1}
+          allowFontScaling={false}
+        >
+          &quot;{MEDICINES[activeIndex]}&quot;
+        </Animated.Text>
       </View>
     </View>
   );
 };
 
+const sharedText = {
+  fontSize: exactScale(14),
+  lineHeight: SLOT_HEIGHT,
+  includeFontPadding: false,
+} as const;
+
 const styles = StyleSheet.create({
-  row: { flex: 1, flexDirection: "row", alignItems: "center", height: SLOT_H },
-  window: { flex: 1, height: SLOT_H },
-  bold: { fontWeight: "600", color: "#6B7280" },
-  cursor: { color: "#0F7635", fontWeight: "bold" },
+  row: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    height: SLOT_HEIGHT,
+    minWidth: 0,
+  },
+  window: {
+    flex: 1,
+    height: SLOT_HEIGHT,
+    overflow: "hidden",
+  },
+  prefix: {
+    ...sharedText,
+    flexShrink: 0,
+    color: "#6A6A6A",
+    fontWeight: "500",
+  },
+  suggestion: {
+    ...sharedText,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    color: "#4B5563",
+    fontWeight: "600",
+  },
 });
