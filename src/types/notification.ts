@@ -60,3 +60,21 @@ export interface NotificationPayload {
   id?: string;
   data?: NotificationData;
 }
+
+/**
+ * Data block of a marketing product-offer push rendered with the custom
+ * native RemoteViews layout. All values are strings (FCM data contract);
+ * optional fields hide their views in the layout.
+ */
+export interface ProductOfferNotificationData {
+  notificationType: "product_offer";
+  productId: string;
+  title: string;
+  deepLink: string;
+  mrp?: string;
+  offerPrice?: string;
+  discountText?: string;
+  couponText?: string;
+  imageUrl?: string;
+  buttonText?: string;
+}

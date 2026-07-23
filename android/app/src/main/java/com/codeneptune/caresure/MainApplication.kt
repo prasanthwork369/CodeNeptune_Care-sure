@@ -27,6 +27,7 @@ class MainApplication : Application(), ReactApplication {
               // add(MyReactNativePackage())
               add(TextInputFilterPackage())
               add(PhoneNumberHintPackage())
+              add(com.codeneptune.caresure.notifications.ProductOfferNotificationPackage())
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
