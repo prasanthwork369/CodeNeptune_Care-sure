@@ -1,4 +1,5 @@
 import { MedicineComparisonLayout } from '@/src/components/prescription/medicine-comparison/MedicineComparisonLayout';
+import { useComparisonPrescriptionId } from '@/src/hooks/useComparisonPrescriptionId';
 import { usePrescriptionOrderMedicines } from '@/src/hooks/queries/usePrescriptionOrderMedicines';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
@@ -8,6 +9,8 @@ import { Touchable } from '@/src/components/ui/Touchable';
 export default function MedicineComparisonScreen() {
     const { prescriptionOrderId, prescriptionId } = useLocalSearchParams<{ prescriptionOrderId: string; prescriptionId?: string }>();
     const { medicines, isLoading, refetch } = usePrescriptionOrderMedicines(prescriptionOrderId ?? '');
+    // Entry points without a prescriptionId (notifications) resolve it via the order id.
+    const resolvedPrescriptionId = useComparisonPrescriptionId(prescriptionId, prescriptionOrderId);
 
     if (isLoading) {
         return (
@@ -34,5 +37,5 @@ export default function MedicineComparisonScreen() {
         );
     }
 
-    return <MedicineComparisonLayout medicines={medicines} prescriptionId={prescriptionId} />;
+    return <MedicineComparisonLayout medicines={medicines} prescriptionId={resolvedPrescriptionId} />;
 }
