@@ -87,19 +87,17 @@ export const ProductDetailsLayout: React.FC = () => {
   const selectedVariant =
     variants.find((v) => v.id === selectedVariantId) ?? variants[0] ?? null;
 
-  // Merge selected variant price into product for footer/cart
-  // selectedVariant.price = MRP; selling price = MRP * (1 - discount%)
+  // Merge selected variant price into product for footer/cart.
+  // The variant's `price` is ALREADY the discounted selling price and `mrp` is
+  // the strikethrough MRP — do NOT re-apply the discount (that double-discounts).
   const effectiveDiscountPct = selectedVariant
     ? selectedVariant.discountPercentage > 0
       ? selectedVariant.discountPercentage
       : (product?.savingsPercent ?? 0)
     : 0;
-  const variantSellingPrice = selectedVariant
-    ? effectiveDiscountPct > 0
-      ? parseFloat(
-          (selectedVariant.price * (1 - effectiveDiscountPct / 100)).toFixed(2),
-        )
-      : selectedVariant.price
+  const variantSellingPrice = selectedVariant?.price ?? 0;
+  const variantMrp = selectedVariant
+    ? (selectedVariant.mrp ?? selectedVariant.price)
     : 0;
   const activeProduct =
     product && selectedVariant
@@ -107,7 +105,7 @@ export const ProductDetailsLayout: React.FC = () => {
           ...product,
           price: variantSellingPrice,
           originalPrice:
-            effectiveDiscountPct > 0 ? selectedVariant.price : undefined,
+            variantMrp > variantSellingPrice ? variantMrp : undefined,
           savingsPercent:
             effectiveDiscountPct > 0 ? effectiveDiscountPct : undefined,
           packSize: parseFloat(selectedVariant.packSize) || product.packSize,

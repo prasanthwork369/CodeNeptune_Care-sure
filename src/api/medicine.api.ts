@@ -159,6 +159,7 @@ export interface MedicineVariant {
   id: string;
   sku: string | null;
   unit: string;
+  mrp: number;   // strikethrough MRP; `price` below is the already-discounted selling price
   price: number;
   status: number;
   packSize: string;

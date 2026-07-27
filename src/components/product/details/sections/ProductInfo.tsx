@@ -170,13 +170,9 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             >
               {variants.map((v) => {
                 const isSelected = v.id === selectedVariantId;
-                const discountPct = product.savingsPercent ?? 0;
-                // v.price is MRP; selling price = MRP * (1 - discount%)
-                const sellingPrice =
-                  discountPct > 0
-                    ? parseFloat((v.price * (1 - discountPct / 100)).toFixed(2))
-                    : v.price;
-                const mrp = discountPct > 0 ? v.price.toFixed(0) : null;
+                // v.price is ALREADY the discounted selling price — never re-apply
+                // the discount here (that double-discounts the pack-size price).
+                const sellingPrice = v.price;
                 const packNum = parseFloat(v.packSize);
                 const unitPrice =
                   packNum > 0
