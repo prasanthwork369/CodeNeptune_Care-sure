@@ -60,6 +60,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    // Resolves the manifest-merger clash between expo-notifications and
+    // @react-native-firebase/messaging over default_notification_color.
+    "./plugins/withFirebaseNotificationColorFix",
     "expo-router",
     "expo-secure-store",
     "expo-sqlite",
@@ -109,9 +112,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         androidCollapsedTitle: "Caresure",
       },
     ],
-    // Resolves the manifest-merger clash between expo-notifications and
-    // @react-native-firebase/messaging over default_notification_color.
-    "./plugins/withFirebaseNotificationColorFix",
     // Registers notifee's local Maven repo (its native AAR lives in node_modules).
     "./plugins/withNotifeeRepo",
     // Keeps expo-image-picker's crop toolbar readable on light-themed devices.
