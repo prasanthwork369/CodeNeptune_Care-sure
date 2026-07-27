@@ -118,8 +118,8 @@ export const SearchRecommendCard = React.memo(({
         className="flex-row items-center justify-between p-4"
       >
         {/* Price + savings row */}
-        <View className="flex-row items-center flex-wrap flex-1 mr-2">
-          <View className="flex-row items-baseline gap-x-2">
+        <View className="flex-row items-center flex-1 mr-2">
+          <View className="flex-row items-baseline gap-x-1.5 shrink min-w-0">
             {data.price != null && (
               <Text
                 style={s.price}
@@ -131,6 +131,7 @@ export const SearchRecommendCard = React.memo(({
             {hasSavings && data.mrp != null && (
               <Text
                 style={s.mrp}
+                numberOfLines={1}
                 className="font-inter-medium text-brand-subtext line-through"
               >
                 ₹{Number(data.mrp).toFixed(2)}
@@ -138,7 +139,7 @@ export const SearchRecommendCard = React.memo(({
             )}
           </View>
           {hasSavings && (
-            <View className="flex-row items-center ml-3">
+            <View className="flex-row items-center ml-2 shrink-0">
               <icons.sell
                 width={15}
                 height={15}

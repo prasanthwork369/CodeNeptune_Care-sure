@@ -6,7 +6,9 @@ export const COUNTER_WIDTH = exactScale(90);
 export const COUNTER_BTN_W = exactScale(36);
 export const cartCounterStyles = StyleSheet.create({
   wrap: { width: COUNTER_WIDTH },
-  wrapActive: { width: COUNTER_WIDTH, backgroundColor: "#0F7635" },
+  // Match addBtn's fixed height so swapping Add ↔ stepper (count 0 ↔ 1) never
+  // changes the row/card height.
+  wrapActive: { width: COUNTER_WIDTH, height: exactScale(35), backgroundColor: "#0F7635" },
   btn: {
     width: COUNTER_BTN_W,
     paddingVertical: exactScale(6),
