@@ -41,7 +41,14 @@ export const useCartActions = (product: CartActionProduct) => {
     (i) =>
       i.medicineId === product.medicineId ||
       (product.baseMedicineId != null && i.medicineId === product.baseMedicineId) ||
-      (product.variantId != null && i.metadata?.selectedVariantId === product.variantId),
+      (product.variantId != null && i.metadata?.selectedVariantId === product.variantId) ||
+      // Stable catalog-id fallback: reconciles the same product across surfaces
+      // (e.g. a recommended item shown both in a comparison card and a standalone
+      // card) when their medicineId differs. Excludes variant lines so it never
+      // conflates two pack-size variants that share one productId.
+      (product.productId != null &&
+        !i.metadata?.selectedVariantId &&
+        i.metadata?.productId === product.productId),
   );
 
   const count = cartItem?.quantity ?? 0;
