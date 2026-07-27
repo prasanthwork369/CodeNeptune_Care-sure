@@ -57,16 +57,13 @@ export const useBillingCalculations = ({
     ? roundToPaise(Math.floor(maxCoinsUsable) * coinValue)
     : 0;
 
-  // 4. Wallet Discount
-  const subtotalBeforeWallet = Math.max(
+  // Amount owed after product discounts + charges; the credits→wallet waterfall applies to this.
+  const subtotalBeforeCredits = Math.max(
     subtotal - COUPON_DISCOUNT - COINS_DISCOUNT + deliveryFee + handlingCharge,
     0,
   );
-  const WALLET_DISCOUNT = walletOn
-    ? roundToPaise(Math.min(walletBalance, subtotalBeforeWallet))
-    : 0;
 
-  // 5. Corporate Credits
+  // 4. Corporate Credits — applied first so company money is spent before the customer's own wallet.
   const corporateCreditsBalance =
     isCorporateUser && balance != null ? Number(balance.corporateCredits ?? 0) : 0;
   const corporateCreditsMinOrderValue = Number(
@@ -82,23 +79,28 @@ export const useBillingCalculations = ({
     0,
     roundToPaise(corporateCreditsMinOrderValue - subtotal),
   );
-  const subtotalBeforeCorporateCredits = Math.max(
-    subtotalBeforeWallet - WALLET_DISCOUNT,
-    0,
-  );
   const CORPORATE_CREDITS_DISCOUNT =
     corporateCreditsOn && corporateCreditsEligible
       ? roundToPaise(
           Math.min(
             corporateCreditsBalance,
             corporateCreditsMaxDiscount,
-            subtotalBeforeCorporateCredits,
+            subtotalBeforeCredits,
           ),
         )
       : 0;
 
+  // 5. Wallet — applied to whatever remains after corporate credits.
+  const subtotalBeforeWallet = Math.max(
+    subtotalBeforeCredits - CORPORATE_CREDITS_DISCOUNT,
+    0,
+  );
+  const WALLET_DISCOUNT = walletOn
+    ? roundToPaise(Math.min(walletBalance, subtotalBeforeWallet))
+    : 0;
+
   const toPay = roundToPaise(
-    Math.max(subtotalBeforeCorporateCredits - CORPORATE_CREDITS_DISCOUNT, 0),
+    Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0),
   );
 
   const savingsRows = [

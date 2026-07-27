@@ -120,6 +120,31 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
     expect(result.toPay).toBe(400);
   });
 
+  it("spends corporate credits before the customer's wallet (credits-first waterfall)", () => {
+    (useProfile as jest.Mock).mockReturnValue({ profile: { isCorporateUser: true } });
+    (useWalletBalance as jest.Mock).mockReturnValue({
+      balance: {
+        walletBalance: 100,
+        coinsBalance: 0,
+        corporateCredits: 300,
+        minOrderValueForDiscount: 0,
+      },
+    });
+
+    const result = useBillingCalculations({
+      subtotal: 250,
+      mrpTotal: 250,
+      walletOn: true,
+      coinsOn: false,
+      corporateCreditsOn: true,
+    });
+
+    // Credits cover the full ₹250 first, leaving nothing for the wallet to apply.
+    expect(result.CORPORATE_CREDITS_DISCOUNT).toBe(250);
+    expect(result.WALLET_DISCOUNT).toBe(0);
+    expect(result.toPay).toBe(0);
+  });
+
   it("disallows Corporate Credits when order subtotal is below minimum threshold", () => {
     (useProfile as jest.Mock).mockReturnValue({ profile: { isCorporateUser: true } });
     (useWalletBalance as jest.Mock).mockReturnValue({
