@@ -1,6 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/hooks/useCartActions";
+import { moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { Image } from "expo-image";
@@ -34,7 +35,7 @@ export const SearchRecommendCard = React.memo(({
     data.mrp != null && data.price != null ? data.mrp - data.price : 0;
   const hasSavings = savings > 0;
   const base = [data.packSize?.trim(), data.unit].filter(Boolean).join(" ");
-  const packLabel = data.dosageForm ? `${base} ${data.dosageForm}` : base;
+  const packLabel = data.dosageForm ? `${base} in ${data.dosageForm}` : base;
 
   const { count, increment, decrement, isPending, animations } = useCartActions(
     {
@@ -118,8 +119,11 @@ export const SearchRecommendCard = React.memo(({
         className="flex-row items-center justify-between p-4"
       >
         {/* Price + savings row */}
-        <View className="flex-row items-center flex-1 mr-2">
-          <View className="flex-row items-baseline gap-x-1.5 shrink min-w-0">
+        <View
+          className="flex-row items-center flex-wrap flex-1 mr-2"
+          style={{ rowGap: moderateScale(5) }}
+        >
+          <View className="flex-row items-baseline gap-x-1.5 shrink-0">
             {data.price != null && (
               <Text
                 style={s.price}
@@ -147,7 +151,7 @@ export const SearchRecommendCard = React.memo(({
                 style={s.sellIcon}
               />
               <Text
-                style={s.savings}
+                style={[s.savings, { lineHeight: moderateScale(16) }]}
                 className="font-inter-bold text-brand-primary ml-1.5 tracking-tight"
               >
                 Save ₹{Number(savings).toFixed(2)}

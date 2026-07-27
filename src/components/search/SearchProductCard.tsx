@@ -4,6 +4,7 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { icons } from '@/src/constants/icons';
 import { useNav } from '@/src/hooks/useNav';
 import { useCartActions } from '@/src/hooks/useCartActions';
+import { moderateScale } from '@/src/utils/exactScale';
 import { cartCounterStyles as cc, searchCardStyles as s, COUNTER_WIDTH, COUNTER_BTN_W } from './search.styles';
 
 interface SearchRowProps {
@@ -114,14 +115,24 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
                         ) : null}
                     </View>
                     <View className="mt-auto">
-                        <View className="flex-row items-baseline flex-wrap gap-x-2 mb-1.5">
+                        <View
+                            className="flex-row items-baseline flex-wrap gap-x-2 mb-1.5"
+                            style={{ rowGap: moderateScale(2) }}
+                        >
                             {data.recommended.price != null && (
-                                <Text style={s.price} className="font-inter-extrabold text-brand-text tracking-tight">
+                                <Text
+                                    style={[s.price, { lineHeight: moderateScale(20) }]}
+                                    className="font-inter-extrabold text-brand-text tracking-tight"
+                                >
                                     ₹{Number(data.recommended.price).toFixed(2)}
                                 </Text>
                             )}
                             {data.recommended.originalPrice != null && data.recommended.originalPrice > data.recommended.price && (
-                                <Text style={s.mrp} className="font-inter-semibold text-brand-subtext line-through" numberOfLines={1}>
+                                <Text
+                                    style={[s.mrp, { lineHeight: moderateScale(16) }]}
+                                    className="font-inter-semibold text-brand-subtext line-through"
+                                    numberOfLines={1}
+                                >
                                     ₹{Number(data.recommended.originalPrice).toFixed(2)}
                                 </Text>
                             )}

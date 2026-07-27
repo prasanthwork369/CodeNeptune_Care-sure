@@ -40,7 +40,7 @@ export const SearchSkeleton = () => {
                             </View>
 
                             {/* Right Side */}
-                            <View className="flex-1 p-4 bg-[#FFFDEB]">
+                            <View className="flex-1 p-4">
                                 <View className="mb-6">
                                     <Skeleton width="90%" height={16} style={{ marginBottom: 8 }} />
                                     <Skeleton width="60%" height={12} />
