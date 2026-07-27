@@ -8,6 +8,11 @@ import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
 import { useLocationStore } from "@/src/store/locationStore";
+import { useCheckoutStore } from "@/src/store/checkoutStore";
+import { useReturnDraftStore } from "@/src/store/returnDraftStore";
+import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
+import { useCartPendingStore } from "@/src/store/cartStore";
+import { AppError } from "@/src/api/errors";
 
 jest.mock("@/src/lib/storage", () => ({
   tokenStorage: {
@@ -79,6 +84,10 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     useCouponStore.setState({ applied: { code: "SAVE20", discount: 20 } as any });
     useNotificationStore.setState({ notifications: [{ id: "n1" } as any], unreadCount: 1 });
     useLocationStore.setState({ location: { label: "Home" } as any });
+    useCheckoutStore.setState({ bill: { toPay: 500 } as any, couponCode: "SAVE20" });
+    useReturnDraftStore.setState({ orderId: "o1", items: [{ orderItemId: "i1" } as any] });
+    usePrescriptionOrderStore.setState({ items: [{ medicineId: "m1" } as any] });
+    useCartPendingStore.setState({ guestCart: { items: [{ id: "g1" } as any] } as any });
 
     const queryClearSpy = jest.spyOn(queryClient, "clear");
 
@@ -98,6 +107,10 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     expect(useCouponStore.getState().applied).toBeNull();
     expect(useNotificationStore.getState().notifications).toEqual([]);
     expect(useLocationStore.getState().location).toBeNull();
+    expect(useCheckoutStore.getState().bill).toBeNull();
+    expect(useReturnDraftStore.getState().items).toEqual([]);
+    expect(usePrescriptionOrderStore.getState().items).toEqual([]);
+    expect(useCartPendingStore.getState().guestCart.items).toEqual([]);
 
     // Verify cache & storage purges
     expect(queryClearSpy).toHaveBeenCalled();
@@ -123,10 +136,12 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     expect(apiCache.set).toHaveBeenCalledWith("customer_profile", { id: "u1", firstName: "RefreshedUser" });
   });
 
-  it("initialize logs out silently if background profile fetch fails (expired token)", async () => {
+  it("initialize logs out silently on a confirmed auth failure (401 expired token)", async () => {
     (tokenStorage.get as jest.Mock).mockResolvedValueOnce("expired-token");
     (apiCache.get as jest.Mock).mockReturnValueOnce(null);
-    (profileApi.getProfile as jest.Mock).mockRejectedValueOnce(new Error("401 Unauthorized"));
+    (profileApi.getProfile as jest.Mock).mockRejectedValueOnce(
+      new AppError("unauthorized", "401 Unauthorized", 401),
+    );
 
     const logoutSpy = jest.spyOn(useAuthStore.getState(), "logout");
 
@@ -135,5 +150,24 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     await Promise.resolve();
 
     expect(logoutSpy).toHaveBeenCalled();
+  });
+
+  it("initialize preserves the session when the profile fetch fails on a network error", async () => {
+    (tokenStorage.get as jest.Mock).mockResolvedValueOnce("valid-token");
+    (apiCache.get as jest.Mock).mockReturnValueOnce({ id: "u1", firstName: "CachedUser" });
+    (profileApi.getProfile as jest.Mock).mockRejectedValueOnce(
+      new AppError("network", "No Internet Connection."),
+    );
+
+    const logoutSpy = jest.spyOn(useAuthStore.getState(), "logout");
+
+    await useAuthStore.getState().initialize();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // Network failure must NOT log the user out — session stays on cached profile.
+    expect(logoutSpy).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(getAccessToken()).toBe("valid-token");
   });
 });

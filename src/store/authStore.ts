@@ -8,6 +8,11 @@ import { usePrescriptionDraftStore } from './prescriptionDraftStore';
 import { useCouponStore } from './couponStore';
 import { useNotificationStore } from './notificationStore';
 import { useLocationStore } from './locationStore';
+import { useCheckoutStore } from './checkoutStore';
+import { useReturnDraftStore } from './returnDraftStore';
+import { usePrescriptionOrderStore } from './prescriptionOrderStore';
+import { useCartPendingStore } from './cartStore';
+import { AppError } from '../api/errors';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -42,9 +47,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 profileApi.getProfile().then((profile) => {
                     set({ user: profile });
                     apiCache.set('customer_profile', profile);
-                }).catch(async () => {
-                    // Token expired — logout silently.
-                    await get().logout();
+                }).catch(async (err) => {
+                    // Only drop the session on a confirmed auth failure (401/403).
+                    // A network, timeout, or 5xx error at startup must keep the
+                    // user signed in so offline launches work off the cached profile.
+                    const isAuthFailure =
+                        err instanceof AppError && (err.status === 401 || err.status === 403);
+                    if (isAuthFailure) {
+                        await get().logout();
+                    }
                 });
             } else {
                 const isGuest = await guestStorage.get();
@@ -81,6 +92,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         useCouponStore.getState().remove();
         useNotificationStore.getState().clear();
         useLocationStore.getState().clearLocation();
+        useCheckoutStore.getState().clear();
+        useReturnDraftStore.getState().clearReturnDraft();
+        usePrescriptionOrderStore.getState().clear();
+        useCartPendingStore.getState().clearGuestCart();
         queryClient.clear();
         // Whole cache, not just the profile: frequently_ordered is user-specific
         // too, and withSqliteCache serves stale entries whenever a fetch fails.
