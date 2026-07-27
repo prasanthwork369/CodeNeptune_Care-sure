@@ -1,6 +1,12 @@
 import { moderateScale } from "@/src/utils/exactScale";
 import React from "react";
-import { KeyboardTypeOptions, Text, TextInput, TextInputProps, View } from "react-native";
+import {
+  KeyboardTypeOptions,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+} from "react-native";
 import { RequiredMark } from "./RequiredMark";
 
 type FormFieldVariant = "outline" | "boxed";
@@ -145,7 +151,10 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
     }
 
     return (
-      <View className="mb-5" onLayout={(e) => onLayout?.(e.nativeEvent.layout.y)}>
+      <View
+        className="mb-5"
+        onLayout={(e) => onLayout?.(e.nativeEvent.layout.y)}
+      >
         <Text
           style={{
             fontSize: moderateScale(13),
@@ -178,7 +187,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           textContentType={textContentType}
           importantForAutofill={importantForAutofill}
           onFocus={onFocus}
-          className="bg-white rounded-[10px] px-4 py-[14px] font-inter-regular text-[#1A1C1E]"
+          className="bg-white rounded-[8px] px-4 py-[14px] font-inter-regular text-[#1A1C1E]"
           style={{
             fontSize: moderateScale(15),
             borderWidth: 1,

@@ -24,7 +24,7 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
                 activeOpacity={0.85}
                 onPress={onProceed}
                 disabled={!canProceed}
-                className="flex-1 ml-10 rounded-lg py-4 items-center"
+                className="flex-1 ml-10 rounded-md py-4 items-center"
                 style={{ backgroundColor: canProceed ? '#0F7635' : '#919EAB66' }}
             >
                 <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(15) }}>
