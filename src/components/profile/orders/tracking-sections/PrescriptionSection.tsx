@@ -12,7 +12,13 @@ interface PrescriptionSectionProps {
 
 export function PrescriptionSection({ onViewRx }: PrescriptionSectionProps) {
   return (
-    <SectionCard style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(16), marginBottom: exactScale(8) }}>
+    <SectionCard
+      style={{
+        paddingHorizontal: exactScale(16),
+        paddingVertical: exactScale(16),
+        marginBottom: exactScale(4),
+      }}
+    >
       <Text
         style={[s.labelMd, { color: "#0F1724", marginBottom: exactScale(12) }]}
         className="font-inter-semibold"
@@ -20,7 +26,10 @@ export function PrescriptionSection({ onViewRx }: PrescriptionSectionProps) {
         Prescription Details
       </Text>
       <View className="flex-row items-center justify-between">
-        <View className="flex-1 flex-row items-center" style={{ gap: exactScale(12), marginRight: exactScale(8) }}>
+        <View
+          className="flex-1 flex-row items-center"
+          style={{ gap: exactScale(12), marginRight: exactScale(8) }}
+        >
           <View
             style={{
               backgroundColor: "#FFFFFF",
@@ -32,17 +41,23 @@ export function PrescriptionSection({ onViewRx }: PrescriptionSectionProps) {
             }}
             className="items-center justify-center"
           >
-            <icons.prescription_green width={exactScale(22)} height={exactScale(22)} />
+            <icons.prescription_green
+              width={exactScale(22)}
+              height={exactScale(22)}
+            />
           </View>
           <View className="flex-1">
-            <Text
-              style={s.labelSm}
-              className="font-inter-bold text-[#0F1724]"
-            >
+            <Text style={s.labelSm} className="font-inter-bold text-[#0F1724]">
               Prescription Attached
             </Text>
-            <View className="flex-row items-center" style={{ gap: exactScale(4), marginTop: exactScale(2) }}>
-              <icons.verified_user_round width={exactScale(14)} height={exactScale(14)} />
+            <View
+              className="flex-row items-center"
+              style={{ gap: exactScale(4), marginTop: exactScale(2) }}
+            >
+              <icons.verified_user_round
+                width={exactScale(14)}
+                height={exactScale(14)}
+              />
               <Text
                 style={s.labelSm}
                 className="font-inter-medium text-[#16A34A]"

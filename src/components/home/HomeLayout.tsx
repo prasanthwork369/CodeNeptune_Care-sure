@@ -404,7 +404,7 @@ export const HomeLayout: React.FC = () => {
 
         case "categories":
           return (
-            <View style={{ marginTop: exactScale(5) }}>
+            <View>
               <ShopByCategories
                 tabs={tabs}
                 cards={cards}
