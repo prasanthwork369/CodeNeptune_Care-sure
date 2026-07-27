@@ -4,24 +4,26 @@ import { Touchable } from '@/src/components/ui/Touchable';
 import { useNav } from '@/src/hooks/useNav';
 import { icons } from '@/src/constants/icons';
 import { useCart } from '@/src/hooks/queries/useCart';
-import { moderateScale } from '@/src/utils/exactScale';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 export const CategoriesHeaderActions: React.FC = () => {
     const router = useNav();
     const { totalItems } = useCart();
 
     return (
-        <View className="flex-row items-center gap-2.5">
+        <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
             <Touchable
                 onPress={() => router.push('/search')}
-                className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center"
+                className="rounded-full bg-white border border-[#919EAB33] items-center justify-center"
+                style={{ width: exactScale(44), height: exactScale(44) }}
             >
                 <icons.search width={20} height={20} />
             </Touchable>
             <View className="relative">
                 <Touchable
                     onPress={() => router.push('/(stack)/cart')}
-                    className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center"
+                    className="rounded-full bg-white border border-[#919EAB33] items-center justify-center"
+                    style={{ width: exactScale(44), height: exactScale(44) }}
                 >
                     <icons.cart_outline width={22} height={22} />
                 </Touchable>

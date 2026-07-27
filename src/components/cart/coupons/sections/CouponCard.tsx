@@ -35,7 +35,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
   return (
     <View
       style={{
-        marginBottom: exactScale(16),
+        marginBottom: exactScale(12),
         position: "relative",
         opacity: inactive ? 0.5 : 1,
       }}
@@ -45,19 +45,21 @@ export const CouponCard: React.FC<CouponCardProps> = ({
         onPress={() => onApply(coupon.code)}
         style={{
           backgroundColor: "#FFFFFF",
-          borderRadius: exactScale(16),
+          borderRadius: exactScale(13),
           borderWidth: 1,
           borderColor: "#919EAB33",
         }}
       >
         <View
           style={{
-            padding: exactScale(16),
+            minHeight: exactScale(67),
+            paddingHorizontal: exactScale(16),
+            paddingVertical: exactScale(12),
             flexDirection: "row",
             alignItems: "center",
             overflow: "hidden",
-            borderTopLeftRadius: exactScale(16),
-            borderTopRightRadius: exactScale(16),
+            borderTopLeftRadius: exactScale(13),
+            borderTopRightRadius: exactScale(13),
           }}
         >
           <View style={styles.iconWrapper}>
@@ -67,10 +69,11 @@ export const CouponCard: React.FC<CouponCardProps> = ({
               fill={colors.primary}
             />
           </View>
-          <View style={{ marginLeft: exactScale(16), flex: 1 }}>
+          <View style={{ marginLeft: exactScale(12), flex: 1 }}>
             <Text
               style={{
                 fontSize: moderateScale(17),
+                lineHeight: moderateScale(22),
                 fontWeight: "700",
                 color: "#000000",
               }}
@@ -80,9 +83,10 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             <Text
               style={{
                 color: "#E53827",
-                fontSize: moderateScale(12),
-                fontWeight: "600",
-                marginTop: exactScale(4),
+                fontSize: moderateScale(13),
+                lineHeight: moderateScale(17),
+                fontWeight: "500",
+                marginTop: exactScale(2),
               }}
             >
               {description}
@@ -90,9 +94,10 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             <Text
               style={{
                 fontSize: moderateScale(11),
+                lineHeight: moderateScale(15),
                 fontWeight: "500",
                 color: "#6A6A6A",
-                marginTop: exactScale(6),
+                marginTop: exactScale(3),
               }}
             >
               Expires {formatExpiry(coupon.expiresAt)}
@@ -110,14 +115,14 @@ export const CouponCard: React.FC<CouponCardProps> = ({
         <View style={styles.dashedDivider} />
         <View
           style={{
-            height: exactScale(56),
+            height: exactScale(46),
             paddingHorizontal: exactScale(16),
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
             backgroundColor: "#ffffff",
-            borderBottomLeftRadius: exactScale(16),
-            borderBottomRightRadius: exactScale(16),
+            borderBottomLeftRadius: exactScale(13),
+            borderBottomRightRadius: exactScale(13),
           }}
         >
           <Text
@@ -139,15 +144,18 @@ export const CouponCard: React.FC<CouponCardProps> = ({
               backgroundColor: disabled || inactive ? "#FFFFFF" : colors.primary,
               borderWidth: disabled || inactive ? 1 : 0,
               borderColor: disabled || inactive ? "#E4E7EC" : "transparent",
-              paddingHorizontal: exactScale(12),
-              paddingVertical: exactScale(8),
+              width: exactScale(55),
+              height: exactScale(28),
               borderRadius: exactScale(4),
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Text
               style={{
                 color: disabled || inactive ? "#9CA3AF" : "#FFFFFF",
                 fontSize: moderateScale(13),
+                lineHeight: moderateScale(17),
                 fontWeight: "700",
               }}
             >
@@ -198,12 +206,11 @@ const styles = StyleSheet.create({
   leftNotchWrapper: {
     position: "absolute",
     left: 0,
-    bottom: exactScale(46), // Center exactly at the 56px divider line (56 - 20/2)
+    bottom: exactScale(36),
     width: exactScale(10),
     height: exactScale(20),
     overflow: "hidden",
     zIndex: 10,
-    elevation: 10,
   },
   leftNotchCircle: {
     width: exactScale(20),
@@ -219,12 +226,11 @@ const styles = StyleSheet.create({
   rightNotchWrapper: {
     position: "absolute",
     right: 0,
-    bottom: exactScale(46), // Center exactly at the 56px divider line (56 - 20/2)
+    bottom: exactScale(36),
     width: exactScale(10),
     height: exactScale(20),
     overflow: "hidden",
     zIndex: 10,
-    elevation: 10,
   },
   rightNotchCircle: {
     width: exactScale(20),

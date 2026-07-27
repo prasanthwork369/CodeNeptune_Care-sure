@@ -50,16 +50,16 @@ export const categoryCardStyles = StyleSheet.create({
 
 // CategoriesSidebar
 export const sidebarStyles = StyleSheet.create({
-  icon: { width: exactScale(28), height: exactScale(28) },
-  iconWrap: { width: exactScale(40), height: exactScale(40) },
+  icon: { width: exactScale(26), height: exactScale(26) },
+  iconWrap: { width: exactScale(36), height: exactScale(36) },
   label: { fontSize: moderateScale(12) },
 });
 
 // CategoriesGrid
-export const CARD_WIDTH = exactScale(124);
-export const CARD_HEIGHT = exactScale(110);
-export const GRID_GAP = exactScale(12);
-export const GRID_PADDING = exactScale(10);
+export const CARD_WIDTH = exactScale(136);
+export const CARD_HEIGHT = exactScale(96);
+export const GRID_GAP = exactScale(8);
+export const GRID_PADDING = exactScale(12);
 export const CARD_RADIUS = exactScale(10);
 
 export const CARD_IMAGE_WIDTH = exactScale(91.34);

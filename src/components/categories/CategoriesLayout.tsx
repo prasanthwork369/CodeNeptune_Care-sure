@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { exactScale } from "@/src/utils/exactScale";
 import { CategoriesSidebar, CategoriesGrid, CategoriesHeaderActions } from './sections';
 import { CARD_HEIGHT, CARD_WIDTH, GRID_PADDING, GRID_GAP } from './categories.styles';
 
-const SIDEBAR_WIDTH = 76;
+const SIDEBAR_WIDTH = exactScale(86);
 
 export const CategoriesLayout: React.FC = () => {
     const { width: windowWidth } = useWindowDimensions();
@@ -44,6 +45,7 @@ export const CategoriesLayout: React.FC = () => {
                     activeTabId={activeTabId}
                     onTabPress={setActiveTabId}
                     width={SIDEBAR_WIDTH}
+                    safeAreaBottom={adjustedBottom}
                     isLoading={isLoading}
                 />
 

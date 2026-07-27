@@ -7,6 +7,7 @@ import { Image } from "expo-image";
 import Svg, { Line } from "react-native-svg";
 import { styles as s } from "./ValidPrescriptionInfo.styles";
 import { exactScale } from "@/src/utils/exactScale";
+import { Skeleton } from "@/src/components/ui/Skeleton";
 
 const VALID_ITEMS = [
   "Doctor's details",
@@ -16,7 +17,13 @@ const VALID_ITEMS = [
 ];
 
 export const ValidPrescriptionInfo: React.FC = () => {
-  const { maxSizeLabel, validityLabel } = useUploadConfig();
+  const {
+    data: uploadConfig,
+    isError: isUploadConfigError,
+    maxSizeLabel,
+    validityLabel,
+  } = useUploadConfig();
+  const uploadRulesReady = Boolean(uploadConfig) || isUploadConfigError;
   const rxBoxW = Math.round(exactScale(105));
   const rxBoxH = Math.round(rxBoxW * 1.09);
   const rxImgW = Math.round(rxBoxW * 0.71);
@@ -90,17 +97,27 @@ export const ValidPrescriptionInfo: React.FC = () => {
         </Svg>
       </View>
 
-      {/* Wording per the mobile design; the numbers come from the backend so
-          this can never promise a limit the upload check would reject. */}
-      <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
-        File size should be less than {maxSizeLabel}
-      </Text>
-      <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
-        Supported formats: PDF, JPG, JPEG, PNG
-      </Text>
-      <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
-        Prescription should be less than {validityLabel} old
-      </Text>
+      {uploadRulesReady ? (
+        <>
+          {/* Values come from the backend. The centralized hook supplies the
+              safe offline fallback only when that request has actually failed. */}
+          <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+            File size should be less than {maxSizeLabel}
+          </Text>
+          <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+            Supported formats: PDF, JPG, JPEG, PNG
+          </Text>
+          <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+            Prescription should be less than {validityLabel} old
+          </Text>
+        </>
+      ) : (
+        <View style={{ gap: exactScale(6) }}>
+          <Skeleton width="72%" height={exactScale(12)} borderRadius={4} />
+          <Skeleton width="84%" height={exactScale(12)} borderRadius={4} />
+          <Skeleton width="78%" height={exactScale(12)} borderRadius={4} />
+        </View>
+      )}
     </View>
   );
 };

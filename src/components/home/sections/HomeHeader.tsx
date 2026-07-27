@@ -64,24 +64,41 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(({
           className="flex-row items-center mt-1.5"
           style={{ minWidth: 0 }}
         >
-          <Text
-            style={[s.locationText, { flexShrink: 1 }]}
-            className="font-inter-bold capitalize"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {/* "Chennai - 600040". The pincode is what distinguishes two saved
-                addresses in the same city; the sheet carries the full detail.
-                `location` is the resolved delivery address, so this tracks
-                whichever address is selected. */}
-            {location.shortCity && location.pincode
-              ? `${location.shortCity} - ${location.pincode}`
-              : location.label &&
-                  location.label !== "DELIVER TO" &&
-                  location.label !== location.city
+          {location.shortCity && location.pincode ? (
+            <View
+              className="flex-row items-center"
+              style={{ flexShrink: 1, minWidth: 0 }}
+            >
+              <Text
+                style={[s.locationText, { flexShrink: 1 }]}
+                className="font-inter-bold capitalize"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {location.shortCity}
+              </Text>
+              <Text
+                style={[s.locationText, { flexShrink: 0 }]}
+                className="font-inter-bold"
+                numberOfLines={1}
+              >
+                {` - ${location.pincode}`}
+              </Text>
+            </View>
+          ) : (
+            <Text
+              style={[s.locationText, { flexShrink: 1 }]}
+              className="font-inter-bold capitalize"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {location.label &&
+              location.label !== "DELIVER TO" &&
+              location.label !== location.city
                 ? `${location.label} - ${location.city}`
                 : location.city}
-          </Text>
+            </Text>
+          )}
           <icons.arrow_drop_down
             fill="#1C1B1F"
             style={[s.dropDownIcon, { flexShrink: 0 }]}

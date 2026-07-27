@@ -7,7 +7,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useToastStore } from "@/src/store/toastStore";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
@@ -62,7 +62,12 @@ export const CouponsLayout: React.FC = () => {
       <ScreenHeader title="Apply Coupon" />
 
       {/* Fixed search bar — stays pinned while only the coupon list scrolls */}
-      <View className="px-4 pt-6">
+      <View
+        style={{
+          paddingHorizontal: exactScale(16),
+          paddingTop: exactScale(32),
+        }}
+      >
         <CouponInput
           value={couponCode}
           onChangeText={setCouponCode}
@@ -75,14 +80,18 @@ export const CouponsLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 24,
-          paddingBottom: 40,
+          paddingHorizontal: exactScale(16),
+          paddingTop: exactScale(18),
+          paddingBottom: exactScale(40),
         }}
       >
         <Text
-          className="font-inter-bold text-brand-text mb-4"
-          style={{ fontSize: moderateScale(14) }}
+          className="font-inter-bold text-brand-text"
+          style={{
+            fontSize: moderateScale(16),
+            lineHeight: moderateScale(21),
+            marginBottom: exactScale(14),
+          }}
         >
           Featured Coupons
         </Text>

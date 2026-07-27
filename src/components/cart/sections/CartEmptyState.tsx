@@ -30,31 +30,67 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View className="items-center justify-center px-8 py-6">
+    <ScrollView
+      className="flex-1"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: exactScale(28) }}
+    >
+      <View
+        className="items-center justify-center px-8"
+        style={{
+          paddingTop: exactScale(24),
+          paddingBottom: exactScale(58),
+        }}
+      >
         <DotLottie
           source={ANIMATIONS.emptyCart}
           autoplay
           loop
           style={{ width: exactScale(140), height: exactScale(140) }}
         />
-        <Text className="font-inter-semibold text-[#008097] mt-2" style={{ fontSize: moderateScale(16) }}>
+        <Text
+          className="font-inter-bold text-[#111111]"
+          style={{
+            fontSize: moderateScale(17),
+            lineHeight: moderateScale(22),
+            marginTop: exactScale(8),
+          }}
+        >
           Your cart is empty
         </Text>
         <Touchable
           activeOpacity={0.85}
           onPress={() => router.replace("/(tabs)")}
-          className="bg-brand-primary rounded-[12px] px-8 py-3 mt-4"
+          className="bg-brand-primary items-center justify-center"
+          style={{
+            width: exactScale(122),
+            height: exactScale(50),
+            borderRadius: exactScale(12),
+            marginTop: exactScale(20),
+          }}
         >
-          <Text className="font-inter-semibold text-white" style={{ fontSize: moderateScale(14) }}>
+          <Text
+            className="font-inter-semibold text-white"
+            style={{
+              fontSize: moderateScale(16),
+              lineHeight: moderateScale(20),
+            }}
+          >
             Add More
           </Text>
         </Touchable>
       </View>
 
       {featuredProducts.length > 0 && (
-        <View className="mt-2">
-          <Text className="px-4 mb-2 font-inter-bold text-brand-text" style={{ fontSize: moderateScale(16) }}>
+        <View>
+          <Text
+            className="px-4 font-inter-bold text-brand-text"
+            style={{
+              fontSize: moderateScale(16),
+              lineHeight: moderateScale(21),
+              marginBottom: exactScale(10),
+            }}
+          >
             Before you go
           </Text>
           <ScrollView
@@ -62,7 +98,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{
               paddingHorizontal: exactScale(16),
-              paddingTop: exactScale(4),
+              paddingTop: exactScale(0),
               paddingBottom: exactScale(16),
             }}
           >
@@ -76,151 +112,167 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     params: { id: product.productId ?? product.id },
                   } as any)
                 }
-                style={{ width: exactScale(165), marginRight: exactScale(12) }}
+                style={{ width: exactScale(167), marginRight: exactScale(10) }}
               >
-                {/* Unified Premium Card Wrapper */}
+                {/* Product image card */}
                 <View
                   style={{
-                    height: exactScale(300),
-                    borderRadius: 12,
-                    backgroundColor: '#FFFFFF',
-                    overflow: 'hidden',
+                    height: exactScale(163),
+                    borderRadius: exactScale(13),
+                    borderWidth: 1,
+                    borderColor: "#DDE1E8",
+                    backgroundColor: "#FFFFFF",
+                    overflow: "hidden",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
                   }}
                 >
-                  {/* Image wrapper */}
-                  <View style={{ height: exactScale(115), backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                    {product.image?.uri ? (
-                      <Image source={product.image as any} style={{ width: '70%', height: '70%' }} resizeMode="contain" />
-                    ) : (
-                      <icons.placeholder width="55%" height="55%" />
-                    )}
+                  {product.image?.uri ? (
+                    <Image
+                      source={product.image as any}
+                      style={{ width: "82%", height: "82%" }}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <icons.placeholder width="58%" height="58%" />
+                  )}
 
-                    {/* Discount badge */}
-                    {!!product.discount && (
-                      <View style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, borderRadius: 4, paddingHorizontal: exactScale(6), paddingVertical: exactScale(2), backgroundColor: '#008097', overflow: 'hidden' }}>
-                        <Text style={{ fontSize: moderateScale(10), fontWeight: '700', color: '#fff' }}>
-                          {String(product.discount).toUpperCase()}
-                        </Text>
-                        <OfferShine borderRadius={exactScale(4)} />
-                      </View>
-                    )}
-                  </View>
+                  {!!product.discount && (
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: exactScale(12),
+                        left: exactScale(11),
+                        zIndex: 10,
+                        borderRadius: exactScale(4),
+                        paddingHorizontal: exactScale(8),
+                        paddingVertical: exactScale(5),
+                        backgroundColor: "#008FA3",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: moderateScale(13),
+                          lineHeight: moderateScale(16),
+                          fontWeight: "700",
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        {String(product.discount).toUpperCase()}
+                      </Text>
+                      <OfferShine borderRadius={exactScale(4)} />
+                    </View>
+                  )}
+                </View>
 
-                  {/* Content section */}
-                  <View
+                {/* Product information */}
+                <View style={{ marginTop: exactScale(14) }}>
+                  <Text
+                    numberOfLines={2}
                     style={{
-                      flex: 1,
-                      backgroundColor: "#F5F6FB",
-                      padding: exactScale(10),
-                      justifyContent: "space-between",
+                      minHeight: moderateScale(42),
+                      fontSize: moderateScale(15),
+                      fontWeight: "500",
+                      color: "#252525",
+                      lineHeight: moderateScale(21),
                     }}
                   >
-                    {/* Top Text block */}
-                    <View>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          fontSize: moderateScale(13.5),
-                          fontWeight: "500",
-                          color: "#222222",
-                          lineHeight: moderateScale(18),
-                        }}
-                      >
-                        {product.name}
-                      </Text>
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          fontSize: moderateScale(12),
-                          fontWeight: "700",
-                          color: "#009989",
-                          marginTop: exactScale(2),
-                        }}
-                      >
-                        {product.brand}
-                      </Text>
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          fontSize: moderateScale(11),
-                          fontWeight: "500",
-                          color: "#6A6A6A",
-                          marginTop: exactScale(1),
-                        }}
-                      >
-                        {product.pack || " "}
-                      </Text>
-                    </View>
+                    {product.name}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      fontSize: moderateScale(13),
+                      lineHeight: moderateScale(18),
+                      fontWeight: "700",
+                      color: "#009B8D",
+                      marginTop: exactScale(6),
+                    }}
+                  >
+                    {product.brand}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      fontSize: moderateScale(12),
+                      lineHeight: moderateScale(17),
+                      fontWeight: "500",
+                      color: "#6A6A6A",
+                      marginTop: exactScale(2),
+                    }}
+                  >
+                    {product.pack || " "}
+                  </Text>
 
-                    {/* Bottom Action & Price block */}
-                    <View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "baseline",
-                          marginBottom: exactScale(4),
-                        }}
-                      >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "baseline",
+                      minHeight: moderateScale(23),
+                      marginTop: exactScale(8),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: moderateScale(17),
+                        lineHeight: moderateScale(22),
+                        fontWeight: "700",
+                        color: "#111827",
+                      }}
+                    >
+                      ₹{Number(product.price).toFixed(2)}
+                    </Text>
+                    {!!product.originalPrice &&
+                      product.originalPrice > product.price && (
                         <Text
                           style={{
-                            fontSize: moderateScale(15),
-                            fontWeight: "700",
-                            color: "#0F172A",
+                            fontSize: moderateScale(13),
+                            lineHeight: moderateScale(18),
+                            fontWeight: "400",
+                            color: "#777777",
+                            textDecorationLine: "line-through",
+                            marginLeft: exactScale(7),
                           }}
                         >
-                          ₹{Number(product.price).toFixed(2)}
+                          ₹{Number(product.originalPrice).toFixed(2)}
                         </Text>
-                        {!!product.originalPrice && product.originalPrice > product.price && (
-                          <Text
-                            style={{
-                              fontSize: moderateScale(11),
-                              fontWeight: "400",
-                              color: "#637381",
-                              textDecorationLine: "line-through",
-                              marginLeft: exactScale(6),
-                            }}
-                          >
-                            ₹{Number(product.originalPrice).toFixed(2)}
-                          </Text>
-                        )}
-                      </View>
-                      
-                      <View onStartShouldSetResponder={() => true}>
-                        <Touchable
-                          activeOpacity={0.85}
-                          disabled={addingProductId !== null}
-                          onPress={() => handleAdd(product)}
+                      )}
+                  </View>
+
+                  <View onStartShouldSetResponder={() => true}>
+                    <Touchable
+                      activeOpacity={0.85}
+                      disabled={addingProductId !== null}
+                      onPress={() => handleAdd(product)}
+                      style={{
+                        height: exactScale(39),
+                        backgroundColor: "transparent",
+                        borderWidth: 1,
+                        borderColor: "#0F7635",
+                        borderRadius: exactScale(12),
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: exactScale(10),
+                        opacity: addingProductId !== null ? 0.7 : 1,
+                      }}
+                    >
+                      {addingProductId === product.id ? (
+                        <ActivityIndicator size="small" color="#0F7635" />
+                      ) : (
+                        <Text
                           style={{
-                            backgroundColor: "#fff",
-                            borderWidth: 1,
-                            borderColor: "#0F7635",
-                            borderRadius: 10,
-                            paddingVertical: exactScale(9),
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginVertical: exactScale(4),
-                            opacity: addingProductId !== null ? 0.7 : 1,
+                            fontSize: moderateScale(14),
+                            lineHeight: moderateScale(18),
+                            fontWeight: "700",
+                            color: "#0F7635",
                           }}
                         >
-                          {addingProductId === product.id ? (
-                            <View style={{ height: 17, justifyContent: "center", alignItems: "center" }}>
-                              <ActivityIndicator size="small" color="#0F7635" />
-                            </View>
-                          ) : (
-                            <Text
-                              style={{
-                                fontSize: moderateScale(14),
-                                fontWeight: "700",
-                                color: "#0F7635",
-                              }}
-                            >
-                              Add
-                            </Text>
-                          )}
-                        </Touchable>
-                      </View>
-                    </View>
-
+                          Add
+                        </Text>
+                      )}
+                    </Touchable>
                   </View>
                 </View>
               </Touchable>

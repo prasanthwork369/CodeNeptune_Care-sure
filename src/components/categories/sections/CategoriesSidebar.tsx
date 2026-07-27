@@ -1,5 +1,6 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import type { CategoryTab } from "@/src/types/home";
+import { components } from "@/src/constants/theme";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef } from "react";
@@ -18,6 +19,7 @@ interface CategoriesSidebarProps {
   activeTabId: string;
   onTabPress: (id: string) => void;
   width: number;
+  safeAreaBottom: number;
   isLoading?: boolean;
 }
 
@@ -28,6 +30,7 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
   activeTabId,
   onTabPress,
   width,
+  safeAreaBottom,
   isLoading,
 }) => {
   const tabLayouts = useRef<Record<string, { y: number; height: number }>>({});
@@ -73,7 +76,11 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: exactScale(10) }}
+          contentContainerStyle={{
+            paddingTop: exactScale(10),
+            paddingBottom:
+              components.tabBar.height + safeAreaBottom + exactScale(16),
+          }}
         >
           {Array.from({ length: 7 }).map((_, i) => (
             <View key={i} className="items-center py-5 gap-y-2">
@@ -89,12 +96,16 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
   return (
     <View
       className="bg-white border-r border-[#919EAB33] z-10"
-      style={{ width, boxShadow: "4px 0px 20px 0px #0000000D" } as any}
+      style={{ width }}
     >
       <ScrollView
         ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingVertical: exactScale(10) }}
+        contentContainerStyle={{
+          paddingTop: exactScale(10),
+          paddingBottom:
+            components.tabBar.height + safeAreaBottom + exactScale(16),
+        }}
         onLayout={(e) => {
           viewportHeight.current = e.nativeEvent.layout.height;
         }}
@@ -120,7 +131,7 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
               key={tab.id}
               onPress={() => onTabPress(tab.id)}
               activeOpacity={0.8}
-              className="items-center py-5"
+              className="items-center py-4"
               onLayout={(e) => {
                 const { y, height } = e.nativeEvent.layout;
                 tabLayouts.current[tab.id] = { y, height };
