@@ -1,3 +1,4 @@
+import { ApiFeaturedSubcategory } from "@/src/api/category.api";
 import {
   BannerCarousel,
   FloatingBannersCarousel,
@@ -15,14 +16,11 @@ import {
   StickySearchHeader,
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
-import { ApiFeaturedSubcategory } from "@/src/api/category.api";
-import type { CategoryCard } from "@/src/types/home";
 import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
 import { useHomeData } from "@/src/hooks/home/useHomeData";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useHomeOnboarding } from "@/src/hooks/home/useHomeOnboarding";
 import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
 import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
@@ -32,16 +30,27 @@ import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
+import {
+  PERF_TRACES,
+  usePerformanceTrace,
+  useScrollJankTrace,
+} from "@/src/services/firebase";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
+import type { CategoryCard } from "@/src/types/home";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
-import { PERF_TRACES, usePerformanceTrace, useScrollJankTrace } from "@/src/services/firebase";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const EMPTY_BANNERS: NonNullable<
@@ -84,12 +93,13 @@ export const HomeLayout: React.FC = () => {
   const searchBarAnim = useSlideUp(350);
   const quickActionsAnim = useSlideUp(500);
 
-
   // Select stable setters individually so HomeLayout never subscribes to the
   // whole UI store — otherwise every isFeedScrolling toggle would re-render
   // the entire feed, which is exactly the jank we're removing here.
   const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
-  const setUploadButtonCollapsed = useUIStore((s) => s.setUploadButtonCollapsed);
+  const setUploadButtonCollapsed = useUIStore(
+    (s) => s.setUploadButtonCollapsed,
+  );
   const setFeedScrolling = useUIStore((s) => s.setFeedScrolling);
   const { totalItems } = useCart();
   const { hasPendingPrescription } = usePrescriptionBanner();
@@ -131,7 +141,9 @@ export const HomeLayout: React.FC = () => {
   const [isScreenFocused, setIsScreenFocused] = useState(true);
   // Settles the "scrolling" flag back to false shortly after the last scroll
   // event so a single drag→fling doesn't flip it true/false/true/false.
-  const feedScrollSettleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const feedScrollSettleRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useFocusEffect(
     useCallback(() => {
