@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { icons } from '@/src/constants/icons';
 import { colors } from '@/src/constants/theme';
-import { moderateScale } from '@/src/utils/exactScale';
+import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
 interface TrustBadgeProps {
     searchedName: string;
@@ -34,14 +34,17 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
             colors={['#F0F8FF', '#FFFFFF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 0.8 }}
-            className="py-6"
+            style={{
+                paddingTop: exactScale(24),
+                paddingBottom: exactScale(24),
+            }}
         >
             <View className="px-4 mb-6">
                 <Text className="font-inter-bold text-brand-text mb-4 text-center" style={{ fontSize: moderateScale(14) }}>
                     Medicine Comparison
                 </Text>
 
-                <View className="bg-white rounded-[16px] p-5 shadow-sm border border-[#919EAB33]">
+                <View className="bg-white rounded-[16px] p-5 border border-[#919EAB33]">
 
                     {/* MEDICINE */}
                     <View>

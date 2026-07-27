@@ -42,7 +42,18 @@ export const LogisticsBar: React.FC<LogisticsBarProps> = ({
           </Text>
         </Text>
       </View>
-      <View className="flex-row items-center pl-4" style={{ flexShrink: 0 }}>
+      <Touchable
+        onPress={onChangeLocation}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Change delivery location, current ${displayLabel}`}
+        className="flex-row items-center pl-4"
+        style={{
+          flexShrink: 0,
+          minHeight: exactScale(44),
+          justifyContent: "center",
+        }}
+      >
         <icons.location width={18} height={18} />
         <Text
           numberOfLines={1}
@@ -52,15 +63,13 @@ export const LogisticsBar: React.FC<LogisticsBarProps> = ({
         >
           {displayLabel}
         </Text>
-        <Touchable onPress={onChangeLocation} style={{ flexShrink: 0 }}>
-          <Text
-            className="font-inter-semibold text-brand-primary"
-            style={{ fontSize: moderateScale(14) }}
-          >
-            Change
-          </Text>
-        </Touchable>
-      </View>
+        <Text
+          className="font-inter-semibold text-brand-primary"
+          style={{ fontSize: moderateScale(14), flexShrink: 0 }}
+        >
+          Change
+        </Text>
+      </Touchable>
     </View>
   );
 };

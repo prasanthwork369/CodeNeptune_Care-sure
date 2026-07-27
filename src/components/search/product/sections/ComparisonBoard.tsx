@@ -8,6 +8,7 @@ import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
 import { moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
+import Svg, { Line } from "react-native-svg";
 import {
   ActivityIndicator,
   Animated,
@@ -43,6 +44,23 @@ const ADD_BTN_PAD_BOTTOM = 16;
 // dividers always line up. Change the padding above and both follow together.
 const ADD_SECTION_HEIGHT =
   ADD_BTN_PAD_TOP + ADD_BTN_HEIGHT + ADD_BTN_PAD_BOTTOM;
+
+const ComparisonDivider = () => (
+  <View style={{ height: 1, marginVertical: 8 }}>
+    <Svg width="100%" height="1">
+      <Line
+        x1="0"
+        y1="0.5"
+        x2="100%"
+        y2="0.5"
+        stroke="#E5E7EB"
+        strokeWidth="1"
+        strokeDasharray="2 4"
+        strokeLinecap="round"
+      />
+    </Svg>
+  </View>
+);
 
 export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   searched,
@@ -321,14 +339,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 setSearchedBottomHeight(event.nativeEvent.layout.height)
               }
             >
-              <View
-                style={{
-                  borderTopWidth: 1,
-                  borderColor: "#E5E7EB",
-                  borderStyle: "dashed",
-                  marginVertical: 8,
-                }}
-              />
+              <ComparisonDivider />
               {/* Price Slot */}
               <View style={{ height: 28, justifyContent: "center" }}>
                 <Text
@@ -515,14 +526,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     })()}
                   </View>
                   <View style={{ marginTop: "auto" }}>
-                    <View
-                      style={{
-                        borderTopWidth: 1,
-                        borderColor: "#E5E7EB",
-                        borderStyle: "dashed",
-                        marginVertical: 8,
-                      }}
-                    />
+                    <ComparisonDivider />
                     {/* Price & Strikethrough Slot */}
                     <View style={{ height: 28, justifyContent: "center" }}>
                       <View className="flex-row items-baseline gap-x-2">
