@@ -3,8 +3,14 @@ import { API_ENDPOINTS } from '../utils/urls';
 import { apiClient } from './client';
 
 export const orderApi = {
-    createOrder: async (data: CreateOrderRequest): Promise<Order> => {
-        const response = await apiClient.post(API_ENDPOINTS.ORDERS, data);
+    createOrder: async (data: CreateOrderRequest, idempotencyKey?: string): Promise<Order> => {
+        // Idempotency-Key lets the backend dedupe a retried order instead of
+        // creating a duplicate; sent as a standard header when provided.
+        const response = await apiClient.post(
+            API_ENDPOINTS.ORDERS,
+            data,
+            idempotencyKey ? { headers: { "Idempotency-Key": idempotencyKey } } : undefined,
+        );
         return response.data.data;
     },
 

@@ -7,7 +7,8 @@ export const useCreateOrder = () => {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: (data: CreateOrderRequest) => orderService.createOrder(data),
+        mutationFn: (vars: { data: CreateOrderRequest; idempotencyKey?: string }) =>
+            orderService.createOrder(vars.data, vars.idempotencyKey),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST() });
@@ -16,7 +17,8 @@ export const useCreateOrder = () => {
     });
 
     return {
-        createOrder: (data: CreateOrderRequest) => mutation.mutateAsync(data),
+        createOrder: (data: CreateOrderRequest, idempotencyKey?: string) =>
+            mutation.mutateAsync({ data, idempotencyKey }),
         loading: mutation.isPending,
         error: mutation.error?.message ?? null,
     };

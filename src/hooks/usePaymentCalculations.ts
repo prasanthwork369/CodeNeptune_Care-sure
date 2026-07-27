@@ -10,6 +10,7 @@ import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
+import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
@@ -57,6 +58,10 @@ export function usePaymentCalculations() {
   // Remembers a prescription created during this checkout so a retry after a
   // failed order does NOT create a duplicate prescription — we reuse the id.
   const createdRxIdRef = useRef<string>("");
+
+  // One idempotency key per checkout attempt (this screen session). Retries
+  // reuse it so the backend can dedupe; leaving the screen starts a fresh key.
+  const idempotencyKeyRef = useRef<string>("");
 
   const prescriptionOrderItems = usePrescriptionOrderStore((s) => s.items);
   const clearPrescriptionOrder = usePrescriptionOrderStore((s) => s.clear);
@@ -128,6 +133,12 @@ export function usePaymentCalculations() {
 
     // Loader on immediately, before any network call.
     setPlacingOrder(true);
+
+    // Generate the idempotency key once; a retry after failure reuses it so
+    // the backend dedupes instead of creating a duplicate order.
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = newIdempotencyKey();
+    }
     // Trace the real checkout latency (prescription upload + createOrder),
     // starting only once the order is actually in flight — not screen dwell.
     startCheckoutTrace({ method: selectedMethod });
@@ -211,7 +222,9 @@ export function usePaymentCalculations() {
       deliveryCharge: String(billBreakdown.deliveryFee),
       taxAmount: "0",
       discountAmount: String(totalDiscount.toFixed(2)),
-      total: toPay,
+      // Use the calculated bill total, never the route param — the backend is
+      // authoritative and re-validates, but we must not send a spoofable value.
+      total: String(Number(billBreakdown.toPay).toFixed(2)),
       deliveryType: "HOME_DELIVERY" as const,
       patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
       prescriptionId: effectivePrescriptionId || undefined,
@@ -220,6 +233,7 @@ export function usePaymentCalculations() {
       symptoms: symptoms || undefined,
       metadata: {
         billBreakdown,
+        idempotencyKey: idempotencyKeyRef.current,
         preferences: {
           walletUsed: walletUsed,
           coinsUsed: coinsUsed,
@@ -240,7 +254,7 @@ export function usePaymentCalculations() {
       console.log("[handlePlaceOrder] payload:", JSON.stringify(payload, null, 2));
     }
 
-      const order: any = await createOrder(payload);
+      const order: any = await createOrder(payload, idempotencyKeyRef.current);
       traceStatus = "success";
       if (order?.id) {
         void analyticsService.logPurchase(
@@ -268,7 +282,10 @@ export function usePaymentCalculations() {
       }
       router.replace({
         pathname: "/(stack)/order-success",
-        params: { orderId: order?.id ?? "", total: toPay },
+        params: {
+          orderId: order?.id ?? "",
+          total: String(Number(billBreakdown.toPay).toFixed(2)),
+        },
       });
     } catch (err: any) {
       if (__DEV__) {

@@ -123,8 +123,16 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     );
     expect(mockRouter.replace).toHaveBeenCalledWith({
       pathname: "/(stack)/order-success",
-      params: { orderId: "ord-100", total: "200" },
+      params: { orderId: "ord-100", total: "200.00" },
     });
+    // Order is created with an idempotency key (2nd arg) + it in metadata.
+    expect(mockCreateOrder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        total: "200.00",
+        metadata: expect.objectContaining({ idempotencyKey: expect.any(String) }),
+      }),
+      expect.any(String),
+    );
   });
 
   it("performs deferred prescription upload before order creation when image URLs are present", async () => {
@@ -152,6 +160,7 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     });
     expect(mockCreateOrder).toHaveBeenCalledWith(
       expect.objectContaining({ prescriptionId: "rx-999" }),
+      expect.any(String),
     );
   });
 
@@ -189,7 +198,14 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     expect(prescriptionService.upload).toHaveBeenCalledTimes(1); // STILL 1 call!
     expect(mockCreateOrder).toHaveBeenLastCalledWith(
       expect.objectContaining({ prescriptionId: "rx-idempotent-1" }),
+      expect.any(String),
     );
+
+    // The idempotency key is reused across the retry so the backend can dedupe.
+    const firstKey = mockCreateOrder.mock.calls[0][1];
+    const retryKey = mockCreateOrder.mock.calls[1][1];
+    expect(firstKey).toBeTruthy();
+    expect(retryKey).toBe(firstKey);
 
     spyAlert.mockRestore();
   });
