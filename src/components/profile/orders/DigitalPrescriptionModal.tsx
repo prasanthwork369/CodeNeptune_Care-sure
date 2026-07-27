@@ -4,11 +4,14 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useState, useMemo, useRef } from "react";
-import { Image, Text, useWindowDimensions, View, ActivityIndicator } from "react-native";
+import React, { useState, useMemo } from "react";
+import { Alert, Image, Platform, Text, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { useSystemTemplate } from "@/src/hooks/queries/useSystemTemplates";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { WebView } from "react-native-webview";
+import * as Print from "expo-print";
+import { File } from "expo-file-system";
+import { downloadLocalFile } from "@/src/utils/fileDownload";
 
 interface MedicineItem {
   name: string;
@@ -75,13 +78,36 @@ export const DigitalPrescriptionModal: React.FC<
   const adjustedBottom = useAdjustedBottomInset();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const [activePatientIdx, setActivePatientIdx] = useState(0);
-  const webViewRef = useRef<WebView>(null);
+  const [downloading, setDownloading] = useState(false);
   const { validityMonths } = useUploadConfig();
 
-  // Triggers the WebView's print flow, which on Android/iOS lets the user
-  // save the rendered prescription as a PDF (no extra library needed).
-  const handleDownload = () => {
-    webViewRef.current?.injectJavaScript("window.print(); true;");
+  // Renders the prescription HTML to a PDF and saves it — no print dialog.
+  // printToFileAsync writes a temp cache file we clean up after the download.
+  const handleDownload = async () => {
+    if (downloading || !printHtml) return;
+    setDownloading(true);
+    try {
+      const { uri } = await Print.printToFileAsync({ html: printHtml });
+      const sanitizedOrderId = (orderId ?? "prescription").replace(/[^a-zA-Z0-9-_]/g, "");
+      await downloadLocalFile(uri, `RX-${sanitizedOrderId}.pdf`);
+      // Android already copied the file into Downloads, so the temp is safe to
+      // remove; iOS still references it for the preview/share, so leave it for
+      // the OS cache to purge.
+      if (Platform.OS === "android") {
+        try {
+          new File(uri).delete();
+        } catch (cleanupError) {
+          if (__DEV__) console.log("[RxDownload] temp cleanup failed:", cleanupError);
+        }
+      }
+    } catch (error: any) {
+      Alert.alert(
+        "Download Error",
+        error?.message || "Could not download the prescription. Please try again.",
+      );
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const prescriptions = clinicalData?.prescriptions || [];
@@ -192,6 +218,36 @@ export const DigitalPrescriptionModal: React.FC<
     return body;
   }, [template?.body, screenWidth]);
 
+  // Print variant of the same template — no device-width `zoom` (that fits the
+  // phone screen, not a PDF page). Renders at the design's natural width with
+  // page margins so long medicine lists flow onto extra pages without clipping,
+  // and color-exact so logos/signatures/coloured backgrounds print correctly.
+  const printHtml = useMemo(() => {
+    if (!template?.body) return "";
+    let body = template.body;
+
+    const printStyle = `
+      <style>
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background-color: #ffffff !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        @page { margin: 24px; }
+      </style>
+    `;
+    const metaTag = `<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
+
+    if (body.includes("<head>")) {
+      body = body.replace("<head>", `<head>${metaTag}${printStyle}`);
+    } else {
+      body = metaTag + printStyle + body;
+    }
+    return body;
+  }, [template?.body]);
+
   if (!clinicalData || prescriptions.length === 0) {
     return null;
   }
@@ -226,14 +282,19 @@ export const DigitalPrescriptionModal: React.FC<
           </Text>
           <Touchable
             onPress={handleDownload}
+            disabled={downloading}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={{ marginLeft: exactScale(12) }}
           >
-            <icons.download
-              width={exactScale(20)}
-              height={exactScale(20)}
-              fill="#0F7635"
-            />
+            {downloading ? (
+              <ActivityIndicator size="small" color="#0F7635" />
+            ) : (
+              <icons.download
+                width={exactScale(20)}
+                height={exactScale(20)}
+                fill="#0F7635"
+              />
+            )}
           </Touchable>
         </View>
 
@@ -336,7 +397,6 @@ export const DigitalPrescriptionModal: React.FC<
             }}
           >
             <WebView
-              ref={webViewRef}
               originWhitelist={["*"]}
               source={{ html: htmlContent }}
               style={{ flex: 1, backgroundColor: "#ffffff" }}
