@@ -77,6 +77,7 @@ export interface OrderItem {
   medicineSnapshot?: MedicineSnapshot;
   quantity: number;
   unitPrice?: string;
+  sellingPrice?: number | string;
   status: string;
   // The backend may surface MRP/discount at the item level (as in
   // getFrequentlyOrdered) rather than inside medicineSnapshot — read both.

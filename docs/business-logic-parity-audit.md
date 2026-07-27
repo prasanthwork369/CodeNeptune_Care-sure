@@ -9,6 +9,7 @@
 Both clients call the same backend, so where a **business rule** (money, eligibility, state) is computed client-side, the two should agree. This audit lists where they **don't**. Platform-inherent differences (offline cache, cookie vs stored token) are separated out at the end.
 
 > **Decisions taken 2026-07-27** (money path): handling charge = **charge per admin setting** (mobile correct); free delivery = **free at threshold and above** (mobile correct); wallet vs credits = **corporate credits first** (mobile changed to match). See per-section status.
+>
 > - ✅ **#1 fixed on mobile** — `useBillingCalculations` now applies corporate credits before wallet, with a new credits-first test.
 > - 🔵 **#2, #3** — mobile is already correct; the fix is **web-side** (documented here, not actionable from this repo).
 
@@ -18,19 +19,19 @@ Both clients call the same backend, so where a **business rule** (money, eligibi
 
 ## Severity summary
 
-| # | Area | Divergence | Impact | Severity |
-|---|------|-----------|--------|----------|
-| 1 | Billing | Wallet vs Corporate-Credits **application order** | Different balance drained first → different remaining balances | ✅ Fixed (mobile) |
-| 2 | Billing | Web **hardcodes handling charge = 0** | Web never charges admin handling fee; mobile does | 🔵 Web-side fix |
-| 3 | Billing | **Free-delivery boundary** (`>=` vs `<=`) | At subtotal *exactly* = threshold, mobile is free, web charges | 🔵 Web-side fix |
-| 4 | Coupon | Mobile **recomputes live + auto-removes**; web **freezes** apply-time discount | Web can keep a stale/ineligible coupon discount after cart edits | 🟠 Medium (money) |
-| 5 | Prescription | Web refill reminder is **frequency-only**; mobile also has **custom date** | Feature gap | 🟠 Medium |
-| 6 | Account | **Delete Account** exists on mobile only | Feature gap (compliance-relevant) | 🟠 Medium |
-| 7 | Billing | **Live Price Sync** is a web-only checkout option | Feature gap; mobile always sends `false` | 🟡 Low |
-| 8 | Checkout | Web has a **checkout-session token + 10-min expiry**; mobile has none | Behavioural difference | 🟡 Low |
-| 9 | Billing | **Fallback defaults differ** (`coinUsagePercentage` 10 vs 100, etc.) | Only bites if admin settings fail to load | 🟡 Low |
-| 10 | Pincode | Mobile tolerates non-2xx serviceability bodies; web does not | Web may error where mobile shows "not serviceable" | 🟡 Low |
-| 11 | Auth | verify-otp payload differs (`deviceId` vs `platform`) | Expected, but worth tracking | ⚪ Info |
+| #   | Area         | Divergence                                                                     | Impact                                                           | Severity          |
+| --- | ------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------------------- | ----------------- |
+| 1   | Billing      | Wallet vs Corporate-Credits **application order**                              | Different balance drained first → different remaining balances   | ✅ Fixed (mobile) |
+| 2   | Billing      | Web **hardcodes handling charge = 0**                                          | Web never charges admin handling fee; mobile does                | 🔵 Web-side fix   |
+| 3   | Billing      | **Free-delivery boundary** (`>=` vs `<=`)                                      | At subtotal _exactly_ = threshold, mobile is free, web charges   | 🔵 Web-side fix   |
+| 4   | Coupon       | Mobile **recomputes live + auto-removes**; web **freezes** apply-time discount | Web can keep a stale/ineligible coupon discount after cart edits | 🟠 Medium (money) |
+| 5   | Prescription | Web refill reminder is **frequency-only**; mobile also has **custom date**     | Feature gap                                                      | 🟠 Medium         |
+| 6   | Account      | **Delete Account** exists on mobile only                                       | Feature gap (compliance-relevant)                                | 🟠 Medium         |
+| 7   | Billing      | **Live Price Sync** is a web-only checkout option                              | Feature gap; mobile always sends `false`                         | 🟡 Low            |
+| 8   | Checkout     | Web has a **checkout-session token + 10-min expiry**; mobile has none          | Behavioural difference                                           | 🟡 Low            |
+| 9   | Billing      | **Fallback defaults differ** (`coinUsagePercentage` 10 vs 100, etc.)           | Only bites if admin settings fail to load                        | 🟡 Low            |
+| 10  | Pincode      | Mobile tolerates non-2xx serviceability bodies; web does not                   | Web may error where mobile shows "not serviceable"               | 🟡 Low            |
+| 11  | Auth         | verify-otp payload differs (`deviceId` vs `platform`)                          | Expected, but worth tracking                                     | ⚪ Info           |
 
 ---
 
@@ -53,7 +54,6 @@ The order in which wallet balance and corporate credits are consumed differs, so
 
 **Decision (2026-07-27):** Handling charge should follow the admin setting — mobile is correct, no mobile change. Action below is on web.
 
-
 - **Mobile** — reads handling charge from admin settings: `src/hooks/useDeliveryCharges.ts:21` (`cart.handlingCharge`).
 - **Web** — `const handlingCharge = 0;` hardcoded in the bill calculator: `src/lib/utils/cart-utils.ts:82`. The UI only renders it when `> 0`, so it's always hidden on web.
 
@@ -67,11 +67,10 @@ The order in which wallet balance and corporate credits are consumed differs, so
 
 **Decision (2026-07-27):** Free delivery applies **at the threshold and above** — mobile is correct (`>=`), no mobile change. Web should change `<=` so exactly-at-threshold is free.
 
-
 - **Mobile** — free when `subtotal >= freeDeliveryThreshold`: `src/hooks/useDeliveryCharges.ts:17-20`.
 - **Web** — charges when `totalSellingPrice <= freeDeliveryAbove`: `src/lib/utils/cart-utils.ts:81`.
 
-**Effect:** At a subtotal *exactly equal* to the threshold (e.g. ₹500 with threshold ₹500): **mobile = free delivery, web = charged**. Web also uses `threshold + 1` as the progress-bar target (`Hero.tsx:306`), reinforcing the "not free until you exceed it" behaviour.
+**Effect:** At a subtotal _exactly equal_ to the threshold (e.g. ₹500 with threshold ₹500): **mobile = free delivery, web = charged**. Web also uses `threshold + 1` as the progress-bar target (`Hero.tsx:306`), reinforcing the "not free until you exceed it" behaviour.
 
 **Recommendation:** Agree on inclusive vs exclusive at the boundary and align both comparisons.
 
@@ -129,11 +128,11 @@ The order in which wallet balance and corporate credits are consumed differs, so
 
 When admin settings are present both clients use the same values. The **hardcoded fallbacks** differ:
 
-| Setting | Mobile fallback | Web fallback |
-|---|---|---|
-| `coinUsagePercentage` | `10` (`useBillingCalculations.ts:41`) | `100` (`cart-utils.ts:63`) |
-| `freeDeliveryAbove` | gated — `isReady=false`, charges = 0 until settings land (`useDeliveryCharges.ts`) | `500` (`cart-utils.ts:60`) |
-| `standardDeliveryCharge` | gated (0 until ready) | `50` (`cart-utils.ts:61`) |
+| Setting                  | Mobile fallback                                                                    | Web fallback               |
+| ------------------------ | ---------------------------------------------------------------------------------- | -------------------------- |
+| `coinUsagePercentage`    | `10` (`useBillingCalculations.ts:41`)                                              | `100` (`cart-utils.ts:63`) |
+| `freeDeliveryAbove`      | gated — `isReady=false`, charges = 0 until settings land (`useDeliveryCharges.ts`) | `500` (`cart-utils.ts:60`) |
+| `standardDeliveryCharge` | gated (0 until ready)                                                              | `50` (`cart-utils.ts:61`)  |
 
 **Effect:** If settings fail to load, web would let coins cover **100%** of the order vs mobile's **10%**, and web would invent a ₹50 / ₹500 delivery rule while mobile blocks checkout until real settings arrive (`handleProceed` returns early when `!chargesReady`). Mobile's "gate until ready" is the safer posture.
 
@@ -186,3 +185,276 @@ Expected and correct per platform; listed for completeness. Related: web appears
 3. **#4 coupon live recompute** — protects against stale discounts at order creation (backend re-validation is a good backstop regardless).
 4. **#6 delete account** and **#5 refill custom date** — feature gaps; prioritise delete-account if there's a compliance driver.
 5. **#9 fallback defaults / #10 pincode / #7 live price sync / #8 session expiry** — lower urgency; batch as cleanup.
+
+/////////////////
+
+## Summary for senior review
+
+The change prevents the order-level discount ratio from being displayed as every medicine’s individual discount percentage.
+
+Previously, when item-level discount data was missing, the application calculated one order-wide ratio and displayed that same percentage for every medicine.
+
+## Files changed
+
+- `src/utils/order.ts`
+- `src/types/order.ts`
+- `src/components/profile/orders/OrderTrackingLayout.tsx`
+- `src/components/profile/orders/tracking-sections/ItemsOrderedSection.tsx`
+- `__tests__/utils/orderItemPricing.test.ts`
+- `src/api/order.api.ts` — development logging only
+
+## Previous behavior
+
+`OrderTrackingLayout` calculated one ratio:
+
+```tsx
+discountRatio={mrpTotal > 0 ? subtotal / mrpTotal : 1}
+```
+
+`getOrderItemPricing()` converted it into a percentage:
+
+```ts
+discountPercent: (1 - orderDiscountRatio) * 100;
+```
+
+Therefore, if three items lacked snapshot discount data, all three received the same calculated discount.
+
+The old utility also checked only:
+
+```ts
+item.medicineSnapshot?.discountPercent;
+item.medicineSnapshot?.discountPercentage;
+```
+
+It ignored top-level backend fields such as:
+
+```ts
+item.discountPercent;
+item.discountPercentage;
+item.mrp;
+```
+
+## New discount priority
+
+The displayed percentage now uses the first valid item-specific value:
+
+```ts
+const directDiscount = firstValidDiscount(
+  item.discountPercent,
+  item.discountPercentage,
+  item.medicineSnapshot?.discountPercent,
+  item.medicineSnapshot?.discountPercentage,
+);
+```
+
+A valid percentage must be:
+
+```ts
+Number.isFinite(value);
+value > 0;
+value <= 100;
+```
+
+Numeric strings such as `"21.05"` are supported.
+
+## Item price resolution
+
+MRP priority:
+
+```ts
+item.mrp;
+item.medicineSnapshot?.mrp;
+item.unitPrice;
+item.sellingPrice; // only when no separate MRP exists
+```
+
+Selling-price priority:
+
+```ts
+item.sellingPrice;
+```
+
+For legacy records, `unitPrice` is treated as selling price only when an explicit, larger item MRP exists:
+
+```ts
+explicitMrp != null && unitPrice != null && unitPrice < explicitMrp;
+```
+
+## Derived percentage
+
+Calculation happens only if no valid direct or snapshot discount exists:
+
+```ts
+if (
+  mrp > 0 &&
+  itemSellingPrice != null &&
+  itemSellingPrice >= 0 &&
+  itemSellingPrice < mrp
+) {
+  return {
+    sellingPrice: round2(itemSellingPrice),
+    mrp,
+    discountPercent: round2(((mrp - itemSellingPrice) / mrp) * 100),
+  };
+}
+```
+
+Example:
+
+```ts
+mrp = 100;
+sellingPrice = 78.95;
+```
+
+Result:
+
+```ts
+discountPercent = 21.05;
+```
+
+## Order-level fallback
+
+The prop was renamed from:
+
+```ts
+discountRatio;
+```
+
+to:
+
+```ts
+priceEstimateRatio;
+```
+
+Call site:
+
+```tsx
+<ItemsOrderedSection
+  items={items}
+  orderId={orderId}
+  orderStatus={order?.status}
+  isCancelling={isCancelling}
+  priceEstimateRatio={mrpTotal > 0 ? subtotal / mrpTotal : 1}
+/>
+```
+
+The ratio may estimate a missing selling price for old orders, but it explicitly returns zero as the item percentage:
+
+```ts
+if (mrp > 0 && validEstimateRatio != null) {
+  return {
+    sellingPrice: round2(mrp * validEstimateRatio),
+    mrp,
+    discountPercent: 0,
+  };
+}
+```
+
+Therefore, it cannot generate a discount badge.
+
+## Invalid data handling
+
+The utility rejects:
+
+- `undefined` and `null`
+- Empty strings
+- `NaN` and infinity
+- Negative prices
+- Discount percentages ≤0
+- Discount percentages >100
+- Selling price equal to or greater than MRP
+
+When no reliable item discount exists:
+
+```ts
+return {
+  sellingPrice: mrp,
+  mrp,
+  discountPercent: 0,
+};
+```
+
+No badge is displayed.
+
+## Type compatibility
+
+Added optional backend compatibility:
+
+```ts
+export interface OrderItem {
+  // existing fields...
+  unitPrice?: string;
+  sellingPrice?: number | string;
+  mrp?: number | string;
+  discountPercent?: number | string;
+  discountPercentage?: number | string;
+}
+```
+
+No backend contract was changed; this only allows the client to consume an existing optional response field.
+
+## Development logging
+
+`order.api.ts` now logs normalized item pricing in development:
+
+```ts
+if (__DEV__) {
+  console.log(
+    "[getOrderById] item pricing:",
+    data.items?.map((item: any) => ({
+      name: item.medicineSnapshot?.name,
+      unitPrice: item.unitPrice,
+      sellingPrice: item.sellingPrice,
+      mrp: item.mrp,
+      discountPercent: item.discountPercent,
+      discountPercentage: item.discountPercentage,
+      snapshotMrp: item.medicineSnapshot?.mrp,
+      snapshotDiscountPercent: item.medicineSnapshot?.discountPercent,
+      snapshotDiscountPercentage: item.medicineSnapshot?.discountPercentage,
+    })),
+  );
+}
+```
+
+This does not execute in production.
+
+## Tests added
+
+Focused tests verify:
+
+- Direct `discountPercent`
+- Direct `discountPercentage`
+- Snapshot discount fields
+- Priority between item and snapshot fields
+- Numeric strings
+- Derived percentage
+- Different discounts within one order
+- Missing values
+- Invalid MRP/selling-price combinations
+- Negative, `NaN`, infinity and >100 values
+- Order-ratio percentage leakage prevention
+
+Validation:
+
+- TypeScript passed
+- 2 Jest suites passed
+- 23 tests passed
+- Modified-file lint: zero errors
+
+## Important remaining consideration
+
+The active order-creation mapping in `usePaymentCalculations.ts` currently does not copy the cart’s exact discount into:
+
+```ts
+medicineSnapshot.discountPercent;
+```
+
+Therefore, if the backend returns `0` and does not provide an item selling price, an existing order cannot recover the original `21.05%`.
+
+The display correction is complete, but preserving the exact percentage for newly created orders should additionally copy:
+
+```ts
+discountPercent: i.discountPercent ?? i.metadata?.discountPercent ?? 0;
+```
+
+into the order item’s `medicineSnapshot`. This would only preserve display metadata; it would not alter totals or payment calculations.

@@ -2,7 +2,7 @@ import { ScreenHeader } from '@/src/components/ui/ScreenHeader';
 import { CustomSwitch } from '@/src/components/ui/CustomSwitch';
 import { useNotificationPreferences } from '@/src/hooks/queries/useNotificationPreferences';
 import { UpdateNotificationPreferencesInput } from '@/src/api/notification-preferences.api';
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { moderateScale } from '@/src/utils/exactScale';
@@ -74,11 +74,24 @@ const NotificationSkeleton = () => (
 );
 
 export const NotificationSettingsLayout: React.FC = () => {
-  const { preferences, isLoading, updating, updatePreferences } = useNotificationPreferences();
+  const { preferences, isLoading, updatePreferences } = useNotificationPreferences();
   const adjustedBottom = useAdjustedBottomInset();
+  const [pendingKeys, setPendingKeys] = useState<Set<PreferenceKey>>(
+    () => new Set(),
+  );
 
   const handleToggle = async (key: PreferenceKey, value: boolean) => {
-    await updatePreferences({ [key]: value });
+    if (pendingKeys.has(key)) return;
+    setPendingKeys((current) => new Set(current).add(key));
+    try {
+      await updatePreferences({ [key]: value });
+    } finally {
+      setPendingKeys((current) => {
+        const next = new Set(current);
+        next.delete(key);
+        return next;
+      });
+    }
   };
 
   // A single label + description + switch row (used for both channel sub-rows
@@ -114,7 +127,7 @@ export const NotificationSettingsLayout: React.FC = () => {
       <CustomSwitch
         value={preferences?.[keyName] ?? false}
         onValueChange={(v) => handleToggle(keyName, v)}
-        disabled={updating}
+        disabled={pendingKeys.has(keyName)}
       />
     </View>
   );

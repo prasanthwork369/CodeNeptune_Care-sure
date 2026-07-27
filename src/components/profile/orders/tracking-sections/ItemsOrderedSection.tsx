@@ -15,9 +15,9 @@ interface ItemsOrderedSectionProps {
   orderId: string | undefined;
   orderStatus?: number;
   isCancelling: boolean;
-  // paid itemTotal / MRP total — fallback per-item discount when the item's own
-  // snapshot has none but the order did (keeps the row consistent with the bill).
-  discountRatio?: number;
+  // paid itemTotal / MRP total; used only to estimate a missing selling price.
+  // It must never be displayed as an individual item's discount percentage.
+  priceEstimateRatio?: number;
 }
 
 export function ItemsOrderedSection({
@@ -25,7 +25,7 @@ export function ItemsOrderedSection({
   orderId,
   orderStatus,
   isCancelling,
-  discountRatio,
+  priceEstimateRatio,
 }: ItemsOrderedSectionProps) {
   const router = useNav();
 
@@ -104,7 +104,7 @@ export function ItemsOrderedSection({
         // unitPrice is stored as the MRP — derive the discounted price paid.
         const { sellingPrice, mrp, discountPercent } = getOrderItemPricing(
           item,
-          discountRatio,
+          priceEstimateRatio,
         );
         const hasDiscount = discountPercent > 0;
         return (

@@ -121,52 +121,113 @@ export function buildOrderPayload({
 export interface OrderItemPricing {
   sellingPrice: number; // per unit, discounted — what the customer paid
   mrp: number; // per unit, original (strikethrough)
-  discountPercent: number; // stored discount %, shown directly (not re-derived)
+  discountPercent: number; // item-specific only; never derived from order totals
 }
 
 const round2 = (n: number) => parseFloat(n.toFixed(2));
 
-// Derives an order item's display prices. unitPrice is the MRP (strikethrough).
-// Preferred source is the per-item snapshot discount (mirrors the web). When the
-// snapshot carries no discount but the order as a whole did (its billBreakdown
-// shows a product discount), fall back to the order-level ratio so the item row
-// stays consistent with the bill summary instead of showing the full MRP.
+const toNonNegativeFinite = (value: unknown): number | undefined => {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+};
+
+const toValidDiscount = (value: unknown): number | undefined => {
+  const parsed = toNonNegativeFinite(value);
+  return parsed != null && parsed > 0 && parsed <= 100
+    ? round2(parsed)
+    : undefined;
+};
+
+const firstNonNegativeFinite = (...values: unknown[]): number | undefined => {
+  for (const value of values) {
+    const parsed = toNonNegativeFinite(value);
+    if (parsed != null) return parsed;
+  }
+  return undefined;
+};
+
+const firstValidDiscount = (...values: unknown[]): number | undefined => {
+  for (const value of values) {
+    const discount = toValidDiscount(value);
+    if (discount != null) return discount;
+  }
+  return undefined;
+};
+
+// New orders store MRP in unitPrice. Some legacy/backend records expose an
+// explicit item MRP and use unitPrice or sellingPrice as the paid price.
 export function getOrderItemPricing(
   item: OrderItem,
-  orderDiscountRatio?: number,
+  orderPriceEstimateRatio?: number,
 ): OrderItemPricing {
-  const mrp = Number(item.unitPrice ?? 0);
-  // Use `||` (not `??`) to match the web: a stored discountPercent of 0 must fall
-  // through to discountPercentage, where the real value lives for some items.
-  const discount = Number(
-    item.medicineSnapshot?.discountPercent ||
-      item.medicineSnapshot?.discountPercentage ||
-      0,
+  const unitPrice = toNonNegativeFinite(item.unitPrice);
+  const explicitMrp = firstNonNegativeFinite(
+    item.mrp,
+    item.medicineSnapshot?.mrp,
+  );
+  const explicitSellingPrice = toNonNegativeFinite(item.sellingPrice);
+  const mrp = explicitMrp ?? unitPrice ?? explicitSellingPrice ?? 0;
+  const itemSellingPrice =
+    explicitSellingPrice ??
+    (explicitMrp != null && unitPrice != null && unitPrice < explicitMrp
+      ? unitPrice
+      : undefined);
+
+  const directDiscount = firstValidDiscount(
+    item.discountPercent,
+    item.discountPercentage,
+    item.medicineSnapshot?.discountPercent,
+    item.medicineSnapshot?.discountPercentage,
   );
 
-  // 1. Per-item snapshot discount (exact stored %).
-  if (discount > 0) {
+  // Exact item fields have priority over values derived from item prices.
+  if (directDiscount != null) {
+    const calculatedSellingPrice =
+      mrp > 0 ? round2(mrp * (1 - directDiscount / 100)) : 0;
+    const sellingPrice =
+      itemSellingPrice != null && (mrp <= 0 || itemSellingPrice <= mrp)
+        ? itemSellingPrice
+        : calculatedSellingPrice;
     return {
-      sellingPrice: round2(mrp * (1 - discount / 100)),
+      sellingPrice: round2(sellingPrice),
       mrp,
-      discountPercent: discount,
+      discountPercent: directDiscount,
     };
   }
 
-  // 2. No per-item discount, but the order had one → distribute it by MRP.
+  // Without a direct field, derive only from this item's own prices.
   if (
-    orderDiscountRatio != null &&
-    orderDiscountRatio > 0 &&
-    orderDiscountRatio < 1
+    mrp > 0 &&
+    itemSellingPrice != null &&
+    itemSellingPrice >= 0 &&
+    itemSellingPrice < mrp
   ) {
     return {
-      sellingPrice: round2(mrp * orderDiscountRatio),
+      sellingPrice: round2(itemSellingPrice),
       mrp,
-      discountPercent: round2((1 - orderDiscountRatio) * 100),
+      discountPercent: round2(((mrp - itemSellingPrice) / mrp) * 100),
     };
   }
 
-  // 3. No discount anywhere — single price, no strikethrough.
+  // The order ratio may estimate a missing selling price for legacy records,
+  // but deliberately returns 0% so it never leaks into an item discount badge.
+  const validEstimateRatio =
+    orderPriceEstimateRatio != null &&
+    Number.isFinite(orderPriceEstimateRatio) &&
+    orderPriceEstimateRatio > 0 &&
+    orderPriceEstimateRatio <= 1
+      ? orderPriceEstimateRatio
+      : undefined;
+  if (mrp > 0 && validEstimateRatio != null) {
+    return {
+      sellingPrice: round2(mrp * validEstimateRatio),
+      mrp,
+      discountPercent: 0,
+    };
+  }
+
+  // No reliable item discount data — single price, no badge.
   return { sellingPrice: mrp, mrp, discountPercent: 0 };
 }
 

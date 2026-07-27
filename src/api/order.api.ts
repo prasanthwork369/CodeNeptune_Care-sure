@@ -16,6 +16,22 @@ export const orderApi = {
         if (!data.items?.length) {
             data.items = data.orderItems ?? data.lineItems ?? data.items ?? [];
         }
+        if (__DEV__) {
+            console.log(
+                '[getOrderById] item pricing:',
+                data.items?.map((item: any) => ({
+                    name: item.medicineSnapshot?.name,
+                    unitPrice: item.unitPrice,
+                    sellingPrice: item.sellingPrice,
+                    mrp: item.mrp,
+                    discountPercent: item.discountPercent,
+                    discountPercentage: item.discountPercentage,
+                    snapshotMrp: item.medicineSnapshot?.mrp,
+                    snapshotDiscountPercent: item.medicineSnapshot?.discountPercent,
+                    snapshotDiscountPercentage: item.medicineSnapshot?.discountPercentage,
+                })),
+            );
+        }
         return data;
     },
 
