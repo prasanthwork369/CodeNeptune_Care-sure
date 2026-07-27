@@ -1,4 +1,8 @@
-const { withDangerousMod, withMainApplication } = require("@expo/config-plugins");
+const {
+  withDangerousMod,
+  withMainApplication,
+  withAppBuildGradle,
+} = require("@expo/config-plugins");
 const fs = require("fs");
 const path = require("path");
 
@@ -8,6 +12,13 @@ const CUSTOM_PACKAGES = [
   "com.codeneptune.caresure.TextInputFilterPackage()",
   "com.codeneptune.caresure.PhoneNumberHintPackage()",
   "com.codeneptune.caresure.notifications.ProductOfferNotificationPackage()",
+];
+
+// Gradle deps the copied sources need. PhoneNumberHintModule uses the Google
+// Identity APIs (com.google.android.gms.auth.api.identity), which live in
+// play-services-auth. Injected here so it survives `expo prebuild --clean`.
+const CUSTOM_DEPENDENCIES = [
+  'implementation("com.google.android.gms:play-services-auth:21.3.0")',
 ];
 
 function copyRecursive(src, dest) {
@@ -54,6 +65,17 @@ module.exports = function withCustomNativeFiles(config) {
         /(PackageList\(this\)\.packages\.apply \{)/,
         `$1\n              ${line}`,
       );
+    }
+    config.modResults.contents = contents;
+    return config;
+  });
+
+  config = withAppBuildGradle(config, (config) => {
+    let contents = config.modResults.contents;
+    for (const dep of CUSTOM_DEPENDENCIES) {
+      if (contents.includes(dep)) continue;
+      // Insert right after the first `dependencies {` (the app module's block).
+      contents = contents.replace(/(dependencies\s*\{)/, `$1\n    ${dep}`);
     }
     config.modResults.contents = contents;
     return config;
