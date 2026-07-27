@@ -149,11 +149,7 @@ export const PreviewLayout: React.FC = () => {
 
   const pickImages = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showPermissionAlert("photo library");
-        return;
-      }
+      // Uses the Android system Photo Picker — no media-library permission needed.
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"] as ImagePicker.MediaType[],
         quality: 0.9,
@@ -167,11 +163,7 @@ export const PreviewLayout: React.FC = () => {
   };
   const pickPdfs = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        showPermissionAlert("photo library");
-        return;
-      }
+      // DocumentPicker uses the Storage Access Framework — no permission needed.
       const result = await DocumentPicker.getDocumentAsync({
         type: ["application/pdf"],
         copyToCacheDirectory: true,

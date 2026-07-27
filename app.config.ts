@@ -47,12 +47,22 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         category: ["BROWSABLE", "DEFAULT"],
       },
     ],
+    // Only what the app actually needs. CAMERA covers capture, the prescription
+    // scanner, and avatars; location powers nearby pharmacies + delivery.
     permissions: [
       "android.permission.INTERNET",
-      "android.permission.SYSTEM_ALERT_WINDOW",
-      "android.permission.READ_EXTERNAL_STORAGE",
-      "android.permission.READ_MEDIA_IMAGES",
       "android.permission.CAMERA",
+    ],
+    // Strip broad permissions that libraries (e.g. expo-image-picker) inject but
+    // we don't need: the photo/PDF pickers use the system Photo Picker / Storage
+    // Access Framework (no media-read permission), and SYSTEM_ALERT_WINDOW is unused.
+    // Removing READ_MEDIA_IMAGES/READ_EXTERNAL_STORAGE avoids the Play Store
+    // "Photos and videos" permission declaration. WRITE_EXTERNAL_STORAGE is kept
+    // for PDF downloads on Android 9 and below.
+    blockedPermissions: [
+      "android.permission.READ_MEDIA_IMAGES",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.SYSTEM_ALERT_WINDOW",
     ],
   },
   web: {
