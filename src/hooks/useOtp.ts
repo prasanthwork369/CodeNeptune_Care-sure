@@ -256,6 +256,7 @@ export function useOtp() {
         const guestCart = useCartPendingStore.getState().guestCart;
         if (!guestCart || guestCart.items.length === 0) return;
 
+        let anyMerged = false;
         for (const item of guestCart.items) {
           try {
             await cartApi.addItem({
@@ -275,13 +276,18 @@ export function useOtp() {
               image: item.image,
               metadata: item.metadata,
             });
+            // Remove only items that actually merged, so a single failure does
+            // not wipe the whole guest cart — failed items stay for a retry.
+            useCartPendingStore.getState().removeGuestItem(item.id);
+            anyMerged = true;
           } catch (err) {
             if (__DEV__) console.warn("[CartMerge] Failed to merge item:", item.medicineId, err);
           }
         }
 
-        useCartPendingStore.getState().clearGuestCart();
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
+        if (anyMerged) {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
+        }
       })();
     } catch {
       // Wrong/expired code — clear boxes and refocus.
