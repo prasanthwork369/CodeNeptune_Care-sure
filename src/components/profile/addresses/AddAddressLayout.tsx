@@ -486,7 +486,7 @@ export const AddAddressLayout: React.FC = () => {
             activeOpacity={0.85}
             onPress={handleSave}
             disabled={submitting || !isValid || isOffline}
-            className="bg-brand-primary rounded-lg py-4 flex-row items-center justify-center gap-x-2"
+            className="bg-brand-primary rounded-md py-4 flex-row items-center justify-center gap-x-2"
             style={{ opacity: submitting || !isValid || isOffline ? 0.5 : 1 }}
           >
             {submitting ? (
