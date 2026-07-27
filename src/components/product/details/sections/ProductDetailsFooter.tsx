@@ -108,17 +108,21 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             onPress={increment}
             disabled={isPending}
             activeOpacity={0.85}
-            className="bg-brand-primary rounded-[10px] px-8 items-center justify-center"
+            className="bg-brand-primary rounded-[8px] items-center justify-center"
             style={{
-              minWidth: exactScale(140),
+              flexBasis: "42%",
+              minWidth: exactScale(128),
+              maxWidth: exactScale(140),
               height: CART_BUTTON_HEIGHT,
               flexShrink: 0,
+              paddingHorizontal: exactScale(2),
             }}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text
+                numberOfLines={1}
                 className="font-inter-bold text-white"
                 style={{ fontSize: moderateScale(16) }}
               >
@@ -132,7 +136,12 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
           {/* Left — qty counter (outline, mirrors ComparisonBoard) */}
           <View
             className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white"
-            style={{ width: exactScale(120), height: FOOTER_CONTROL_HEIGHT }}
+            style={{
+              width: "34%",
+              minWidth: exactScale(100),
+              maxWidth: exactScale(120),
+              height: FOOTER_CONTROL_HEIGHT,
+            }}
           >
             <Touchable
               onPress={decrement}
@@ -196,16 +205,29 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             }}
           >
             {/* Price + items */}
-            <View className="px-4 justify-center">
+            <View
+              className="justify-center"
+              style={{
+                flex: 1,
+                minWidth: 0,
+                paddingHorizontal: exactScale(12),
+              }}
+            >
               <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
                 className="font-inter-extrabold text-white"
                 style={{ fontSize: moderateScale(15) }}
               >
                 ₹{Number(totalPrice).toFixed(2)}
               </Text>
               <Text
+                numberOfLines={1}
                 className="font-inter-medium"
-                style={[{ fontSize: moderateScale(11) }, { color: "rgba(255,255,255,0.75)" }]}
+                style={[
+                  { fontSize: moderateScale(11) },
+                  { color: "rgba(255,255,255,0.75)" },
+                ]}
               >
                 {totalItems} Item{totalItems !== 1 ? "s" : ""}
               </Text>
@@ -221,8 +243,16 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             />
 
             {/* View Cart label */}
-            <View className="px-4 justify-center items-center flex-row gap-x-1.5">
+            <View
+              className="justify-center items-center flex-row gap-x-1.5"
+              style={{
+                flexShrink: 1,
+                minWidth: 0,
+                paddingHorizontal: exactScale(8),
+              }}
+            >
               <Text
+                numberOfLines={1}
                 className="font-inter-bold text-white"
                 style={{ fontSize: moderateScale(15) }}
               >

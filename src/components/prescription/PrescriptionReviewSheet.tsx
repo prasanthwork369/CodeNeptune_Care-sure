@@ -8,11 +8,14 @@ import {
   Easing,
   Modal,
   Pressable,
+  ScrollView,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
   isVisible: boolean;
@@ -28,6 +31,8 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
   onClosed,
 }) => {
   const adjustedBottom = useAdjustedBottomInset();
+  const { height: screenHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   // Single value drives backdrop + card opacity + card scale together.
   // One animation = one visual event, no perception of "double open".
@@ -112,12 +117,15 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
         <Animated.View
           style={{
             width: "100%",
+            maxHeight: Math.max(
+              0,
+              screenHeight - insets.top - insets.bottom - 32,
+            ),
             backgroundColor: "#FFFFFF",
             borderRadius: 24,
             paddingHorizontal: 24,
             paddingTop: 28,
             paddingBottom: 24,
-            alignItems: "center",
             opacity: enterAnim,
             transform: [{ scale: cardScale }],
             shadowColor: "#000",
@@ -127,39 +135,46 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
             elevation: 16,
           }}
         >
-          <DotLottie
-            source={ANIMATIONS.pharmacy}
-            autoplay
-            loop
-            style={{ width: 200, height: 200 }}
-          />
-
-          <Text
-            style={{
-              fontSize: moderateScale(20),
-              fontWeight: "700",
-              color: "#111827",
-              textAlign: "center",
-              marginTop: 4,
-              marginBottom: 8,
-            }}
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            style={{ flexShrink: 1 }}
+            contentContainerStyle={{ alignItems: "center" }}
           >
-            Reviewing Your Prescription
-          </Text>
+            <DotLottie
+              source={ANIMATIONS.pharmacy}
+              autoplay
+              loop
+              style={{ width: 200, height: 200 }}
+            />
 
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              fontWeight: "400",
-              color: "#6B7280",
-              textAlign: "center",
-              lineHeight: moderateScale(20),
-              marginBottom: 24,
-            }}
-          >
-            Our licensed pharmacist is carefully checking your prescription and
-            preparing your medicines
-          </Text>
+            <Text
+              style={{
+                fontSize: moderateScale(20),
+                fontWeight: "700",
+                color: "#111827",
+                textAlign: "center",
+                marginTop: 4,
+                marginBottom: 8,
+              }}
+            >
+              Reviewing Your Prescription
+            </Text>
+
+            <Text
+              style={{
+                fontSize: moderateScale(13),
+                fontWeight: "400",
+                color: "#6B7280",
+                textAlign: "center",
+                lineHeight: moderateScale(20),
+                marginBottom: 24,
+              }}
+            >
+              Our licensed pharmacist is carefully checking your prescription
+              and preparing your medicines
+            </Text>
+          </ScrollView>
 
           <Touchable
             activeOpacity={0.8}

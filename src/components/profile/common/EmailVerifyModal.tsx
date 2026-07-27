@@ -5,14 +5,17 @@ import { useOtpInput } from "@/src/hooks/ui/useOtpInput";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    Pressable,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
     StyleSheet,
     Text,
+    useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface EmailVerifyModalProps {
   isVisible: boolean;
@@ -34,6 +37,8 @@ export const EmailVerifyModal: React.FC<EmailVerifyModalProps> = ({
   onClose,
   onVerified,
 }) => {
+  const { height: screenHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const {
     verify,
     verifying,
@@ -113,50 +118,68 @@ export const EmailVerifyModal: React.FC<EmailVerifyModalProps> = ({
         {/* Dim backdrop — tapping outside the card closes the modal */}
         <Pressable style={s.backdrop} onPress={onClose}>
           {/* Card — stop backdrop-close when the user taps inside */}
-          <Pressable style={s.card} onPress={(e) => e.stopPropagation()}>
-            <Text style={s.title}>Verify Email</Text>
-            <Text style={s.subtitle}>
-              Enter the 6-digit code sent to{"\n"}
-              <Text style={s.emailHighlight}>{email}</Text>
-            </Text>
-
-            <OtpForm
-              slots={otp.slots}
-              inputValue={otp.inputValue}
-              otpError=""
-              error={verifyError}
-              loading={verifying || requesting}
-              resendCooldown={resendCooldown}
-              activeIndex={otp.activeIndex}
-              onBoxPress={otp.handleBoxPress}
-              onOtpChange={handleChange}
-              onResend={handleResend}
-              inputRef={otp.inputRef}
-            />
-
-            <Touchable
-              onPress={() => handleVerify(otp.code)}
-              disabled={otp.code.length !== 6 || verifying}
-              activeOpacity={0.85}
-              style={[
-                s.verifyBtn,
-                { opacity: otp.code.length !== 6 || verifying ? 0.5 : 1 },
-              ]}
+          <Pressable
+            style={[
+              s.card,
+              {
+                maxHeight: Math.max(
+                  0,
+                  screenHeight - insets.top - insets.bottom - 32,
+                ),
+              },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <ScrollView
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={s.cardContent}
             >
-              {verifying ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Text style={s.verifyBtnText}>Verify</Text>
-              )}
-            </Touchable>
+              <Text style={s.title}>Verify Email</Text>
+              <Text style={s.subtitle}>
+                Enter the 6-digit code sent to{"\n"}
+                <Text style={s.emailHighlight}>{email}</Text>
+              </Text>
 
-            <Touchable
-              onPress={onClose}
-              activeOpacity={0.7}
-              style={s.cancelBtn}
-            >
-              <Text style={s.cancelBtnText}>Cancel</Text>
-            </Touchable>
+              <OtpForm
+                slots={otp.slots}
+                inputValue={otp.inputValue}
+                otpError=""
+                error={verifyError}
+                loading={verifying || requesting}
+                resendCooldown={resendCooldown}
+                activeIndex={otp.activeIndex}
+                onBoxPress={otp.handleBoxPress}
+                onOtpChange={handleChange}
+                onResend={handleResend}
+                inputRef={otp.inputRef}
+              />
+
+              <Touchable
+                onPress={() => handleVerify(otp.code)}
+                disabled={otp.code.length !== 6 || verifying}
+                activeOpacity={0.85}
+                style={[
+                  s.verifyBtn,
+                  { opacity: otp.code.length !== 6 || verifying ? 0.5 : 1 },
+                ]}
+              >
+                {verifying ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={s.verifyBtnText}>Verify</Text>
+                )}
+              </Touchable>
+
+              <Touchable
+                onPress={onClose}
+                activeOpacity={0.7}
+                style={s.cancelBtn}
+              >
+                <Text style={s.cancelBtnText}>Cancel</Text>
+              </Touchable>
+            </ScrollView>
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>
@@ -184,14 +207,17 @@ const s = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 20,
     width: "100%",
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 20,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 12,
+  },
+  cardContent: {
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 20,
   },
   title: {
     fontSize: moderateScale(17),

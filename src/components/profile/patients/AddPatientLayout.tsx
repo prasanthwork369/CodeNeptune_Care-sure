@@ -396,7 +396,7 @@ export const AddPatientLayout: React.FC = () => {
 
         <View
           className="absolute bottom-0 left-0 right-0 px-5 bg-[#F5F6FB]"
-          style={{ paddingBottom: Math.max(adjustedBottom, 20) + 4 }}
+          style={{ paddingBottom: Math.max(adjustedBottom, 20) + 14 }}
         >
           <Touchable
             activeOpacity={0.85}

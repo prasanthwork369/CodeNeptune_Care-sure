@@ -77,7 +77,13 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
 
                 {/* Right Side — no substitute message */}
                 <View className="flex-1 p-4 bg-[#FEF1F1] justify-start">
-                    <Text className="font-inter-bold text-[#730404]" style={{ fontSize: moderateScale(14), lineHeight: moderateScale(20) }}>
+                    <Text
+                        className="font-inter-bold text-[#730404]"
+                        style={{
+                            fontSize: moderateScale(14),
+                            lineHeight: moderateScale(20),
+                        }}
+                    >
                         Sorry! We couldn&apos;t find a substitute
                     </Text>
                 </View>
@@ -88,18 +94,14 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
 
             {/* Bottom Section: Uniform Actions Row */}
             <View className="flex-row justify-between items-center px-4 py-3.5 bg-white">
-                <View className="flex-row items-center">
+                <View className="flex-row items-center flex-1 min-w-0">
                     <icons.info_error width={18} height={18} />
-                    <Text style={s.sameComp} className="font-inter-semibold text-brand-text ml-3">
+                    <Text numberOfLines={2} style={[s.sameComp, { flexShrink: 1 }]} className="font-inter-semibold text-brand-text ml-3">
                         No substitute available
                     </Text>
                 </View>
 
-                <Touchable
-                    onPress={handleRequest}
-                    activeOpacity={0.85}
-                    style={[cc.addBtn, { borderColor: '#FF383C' }]}
-                >
+                <Touchable onPress={handleRequest} activeOpacity={0.85} style={[cc.addBtn, { borderColor: '#FF383C', flexShrink: 0 }]}>
                     <Text style={[s.label, { color: '#FF383C' }]} className="font-inter-bold">
                         Request
                     </Text>

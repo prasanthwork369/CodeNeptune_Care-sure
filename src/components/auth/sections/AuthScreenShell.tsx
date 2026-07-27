@@ -8,9 +8,9 @@ import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
-  Dimensions,
   Keyboard,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -40,12 +40,9 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   const router = useNav();
   const insets = useSafeAreaInsets();
   const adjustedBottom = useAdjustedBottomInset();
-  const { width } = useWindowDimensions();
-
-  // Captured once (non-reactive) so a stray native window resize never
-  // shrinks our root layout and double-stacks with the keyboard offset below.
-  const [screenHeight] = React.useState(() => Dimensions.get("window").height);
-  const [backgroundHeight] = React.useState(() => screenHeight * 0.6);
+  const { width, height: screenHeight } = useWindowDimensions();
+  const backgroundHeight = screenHeight * 0.6;
+  const [keyboardHeight, setKeyboardHeight] = React.useState(0);
 
   // Real-time native tracking (useReanimatedKeyboardAnimation) turned out to
   // report no movement at all in this app's setup — confirmed by removing
@@ -62,6 +59,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   React.useEffect(() => {
     const animateTo = (height: number, duration: number) => {
       kbTarget.current = height;
+      setKeyboardHeight(height);
       kbHeight.value = withTiming(height, {
         duration,
         easing: Easing.out(Easing.ease),
@@ -82,6 +80,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
         if (Math.abs(kbTarget.current - e.height) > 1) animateTo(e.height, 120);
       }),
       KeyboardEvents.addListener("keyboardDidHide", () => {
+        setKeyboardHeight(0);
         if (kbTarget.current !== 0) animateTo(0, 120);
       }),
     ];
@@ -95,6 +94,11 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   const isTablet = width >= 600;
   const panelMaxWidth = isTablet ? 560 : undefined;
   const panelPaddingH = isTablet ? Math.round(width * 0.08) : scale(32);
+  const keyboardOffset = Math.max(0, keyboardHeight - adjustedBottom);
+  const availableContentHeight = Math.max(
+    0,
+    screenHeight - keyboardOffset - insets.top - verticalScale(8),
+  );
   const skipScale = useSharedValue(1);
   const skipStyle = useAnimatedStyle(() => ({
     transform: [{ scale: skipScale.value }],
@@ -103,7 +107,11 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   const handleSkip = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     useAuthStore.getState().continueAsGuest();
-    onSkip ? onSkip() : router.replace("/(tabs)");
+    if (onSkip) {
+      onSkip();
+    } else {
+      router.replace("/(tabs)");
+    }
   };
 
   return (
@@ -163,35 +171,48 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
         <Pressable onPress={Keyboard.dismiss} style={styles.dismissTapArea} />
 
         {/* Entire bottom block (panel + footer incl. policy links) rides as one unit, translating in sync with the keyboard */}
-        <Animated.View style={stickyStyle}>
-          {/* White panel */}
-          <View
-            style={[
-              styles.panel,
-              {
-                paddingHorizontal: panelPaddingH,
-                maxWidth: panelMaxWidth,
-                paddingBottom: footer ? 0 : adjustedBottom + verticalScale(24),
-              },
-            ]}
+        <Animated.View
+          style={[stickyStyle, { maxHeight: availableContentHeight }]}
+        >
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={styles.scrollContent}
           >
-            {children}
-          </View>
-
-          {footer && (
+            {/* White panel */}
             <View
               style={[
-                styles.footer,
+                styles.panel,
                 {
                   paddingHorizontal: panelPaddingH,
-                  paddingBottom: Math.max(insets.bottom, 16) + verticalScale(16),
                   maxWidth: panelMaxWidth,
+                  paddingBottom: footer
+                    ? 0
+                    : adjustedBottom + verticalScale(24),
                 },
               ]}
             >
-              {footer}
+              {children}
             </View>
-          )}
+
+            {footer && (
+              <View
+                style={[
+                  styles.footer,
+                  {
+                    paddingHorizontal: panelPaddingH,
+                    paddingBottom:
+                      Math.max(insets.bottom, 16) + verticalScale(16),
+                    maxWidth: panelMaxWidth,
+                  },
+                ]}
+              >
+                {footer}
+              </View>
+            )}
+          </ScrollView>
         </Animated.View>
       </View>
     </View>
@@ -251,6 +272,10 @@ const styles = StyleSheet.create({
   },
   dismissTapArea: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "flex-end",
   },
   panel: {
     backgroundColor: "white",

@@ -3,11 +3,14 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
-    ActivityIndicator,
-    Modal,
-    Text,
-    View,
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface AlreadyHaveItemsModalProps {
   visible: boolean;
@@ -24,6 +27,9 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
   onReplace,
   isProceeding = false,
 }) => {
+  const { height: screenHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
   return (
     <Modal
       visible={visible}
@@ -49,7 +55,10 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
             padding: 32,
             width: "100%",
             maxWidth: 380,
-            alignItems: "center",
+            maxHeight: Math.max(
+              0,
+              screenHeight - insets.top - insets.bottom - 32,
+            ),
             position: "relative",
             shadowColor: "#919EAB33",
             shadowOffset: { width: 0, height: 6 },
@@ -78,51 +87,58 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
             <icons.close_small width={14} height={14} />
           </Touchable>
 
-          {/* Top Green Circle with Icon */}
-          <View
-            style={{
-              width: 96,
-              height: 96,
-              borderRadius: 48,
-              backgroundColor: "#EDFDF4",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 24,
-            }}
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            style={{ flexShrink: 1 }}
+            contentContainerStyle={{ alignItems: "center" }}
           >
-            <icons.drug_basket width={48} height={48} />
-          </View>
+            {/* Top Green Circle with Icon */}
+            <View
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: 48,
+                backgroundColor: "#EDFDF4",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 24,
+              }}
+            >
+              <icons.drug_basket width={48} height={48} />
+            </View>
 
-          {/* Title */}
-          <Text
-            style={{
-              fontSize: moderateScale(21),
-              fontWeight: "700",
-              color: "#111827",
-              textAlign: "center",
-              marginBottom: 10,
-              paddingHorizontal: 12,
-              lineHeight: moderateScale(28),
-            }}
-          >
-            You Already Have Items in Your Cart
-          </Text>
+            {/* Title */}
+            <Text
+              style={{
+                fontSize: moderateScale(21),
+                fontWeight: "700",
+                color: "#111827",
+                textAlign: "center",
+                marginBottom: 10,
+                paddingHorizontal: 12,
+                lineHeight: moderateScale(28),
+              }}
+            >
+              You Already Have Items in Your Cart
+            </Text>
 
-          {/* Subtitle */}
-          <Text
-            style={{
-              fontSize: moderateScale(14.5),
-              fontWeight: "400",
-              color: "#6B7280",
-              textAlign: "center",
-              lineHeight: moderateScale(22),
-              marginBottom: 28,
-              paddingHorizontal: 12,
-            }}
-          >
-            Your cart already has items. Add these medicines or replace your
-            cart.
-          </Text>
+            {/* Subtitle */}
+            <Text
+              style={{
+                fontSize: moderateScale(14.5),
+                fontWeight: "400",
+                color: "#6B7280",
+                textAlign: "center",
+                lineHeight: moderateScale(22),
+                marginBottom: 28,
+                paddingHorizontal: 12,
+              }}
+            >
+              Your cart already has items. Add these medicines or replace your
+              cart.
+            </Text>
+          </ScrollView>
 
           {/* Actions */}
           {isProceeding ? (

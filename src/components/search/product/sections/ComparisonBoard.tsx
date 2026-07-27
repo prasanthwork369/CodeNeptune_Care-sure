@@ -75,12 +75,32 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   const { width: screenWidth } = useWindowDimensions();
   const cardWidth = screenWidth - 32;
 
-  // Measure the right-section content row to determine the correct board height
+  // Both cards can have different two-line names/manufacturers. Measure each
+  // side and use the taller requirement so neither card is clipped.
   const [boardHeight, setBoardHeight] = useState(380);
+  const [searchedTopHeight, setSearchedTopHeight] = useState(0);
+  const [searchedBottomHeight, setSearchedBottomHeight] = useState(0);
+  const [recommendedHeight, setRecommendedHeight] = useState(0);
 
   useEffect(() => {
     setBoardHeight(380);
+    setSearchedTopHeight(0);
+    setSearchedBottomHeight(0);
+    setRecommendedHeight(0);
   }, [productId]);
+
+  useEffect(() => {
+    const searchedHeight =
+      searchedTopHeight > 0 && searchedBottomHeight > 0
+        ? searchedTopHeight + searchedBottomHeight + 12 + ADD_SECTION_HEIGHT
+        : 0;
+    const nextHeight = Math.ceil(
+      Math.max(380, searchedHeight, recommendedHeight),
+    );
+    setBoardHeight((current) =>
+      current === nextHeight ? current : nextHeight,
+    );
+  }, [recommendedHeight, searchedBottomHeight, searchedTopHeight]);
 
   // Animated value driving the expandable We Recommended section: 0 = half-width, 1 = full-width
   const expandAnim = useRef(new Animated.Value(0)).current;
@@ -145,7 +165,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         swapBtnOpacity.value = Math.max(0, 1 - newVal * 2.5);
       },
       onPanResponderRelease: (_, gestureState) => {
-        const { vx, dx } = gestureState;
+        const { vx } = gestureState;
         const pos = currentExpandVal.current;
 
         // Velocity-first: even a light flick at vx > 0.2 is decisive
@@ -234,7 +254,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
           }}
         >
           <View className="px-[12px] pt-[12px] pb-0 flex-1 flex-col justify-between">
-            <View>
+            <View
+              onLayout={(event) =>
+                setSearchedTopHeight(event.nativeEvent.layout.height)
+              }
+            >
               <Text
                 className="font-inter-bold text-[#4B5563] uppercase tracking-[0.8px] mb-2"
                 style={{
@@ -258,27 +282,45 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               </View>
               <Text
                 className="font-inter-bold text-[#111827] mb-1 leading-[17px]"
-                style={{ fontSize: moderateScale(15) }}
+                style={{
+                  fontSize: moderateScale(15),
+                  lineHeight: moderateScale(17),
+                  minHeight: moderateScale(34),
+                }}
                 numberOfLines={2}
               >
                 {searched.name}
               </Text>
               <Text
                 className="font-inter-medium text-brand-subtext mb-[3px]"
-                style={{ fontSize: moderateScale(12) }}
+                style={{
+                  fontSize: moderateScale(12),
+                  lineHeight: moderateScale(15),
+                  minHeight: moderateScale(15),
+                }}
+                numberOfLines={1}
               >
                 {searched.manufacturer}
               </Text>
               <Text
                 className="font-inter text-brand-subtext"
-                style={{ fontSize: moderateScale(11) }}
+                style={{
+                  fontSize: moderateScale(11),
+                  lineHeight: moderateScale(15),
+                  minHeight: moderateScale(30),
+                }}
                 numberOfLines={2}
               >
                 {searched.description}
               </Text>
             </View>
 
-            <View style={{ marginTop: "auto" }}>
+            <View
+              style={{ marginTop: "auto" }}
+              onLayout={(event) =>
+                setSearchedBottomHeight(event.nativeEvent.layout.height)
+              }
+            >
               <View
                 style={{
                   borderTopWidth: 1,
@@ -352,14 +394,17 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
           <View className="flex-1 flex-col justify-between">
             {/* WRAPPER FOR MEASUREMENT */}
             <View
-              style={{ width: cardWidth }}
+              style={{
+                width: cardWidth,
+                minHeight: Math.max(0, boardHeight - ADD_SECTION_HEIGHT),
+              }}
               onLayout={(e) => {
                 const h = e.nativeEvent.layout.height + ADD_SECTION_HEIGHT;
-                if (h !== boardHeight) setBoardHeight(h);
+                setRecommendedHeight(h);
               }}
             >
               {/* TOP INNER ROW HOLDING COLUMNS */}
-              <View className="flex-row">
+              <View className="flex-row flex-1">
                 {/* LEFT PRODUCT INFO COLUMN */}
                 <Animated.View
                   style={{ width: leftColWidth }}
@@ -389,20 +434,35 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     </View>
                     <Text
                       className="font-inter-bold text-[#111827] leading-[17px]"
-                      style={{ fontSize: moderateScale(15) }}
+                      style={{
+                        fontSize: moderateScale(15),
+                        lineHeight: moderateScale(17),
+                        minHeight: moderateScale(34),
+                        marginBottom: moderateScale(4),
+                      }}
                       numberOfLines={2}
                     >
                       {recommended.name}
                     </Text>
                     <Text
-                      className="font-inter-bold text-[#0F7635] mt-0.5"
-                      style={{ fontSize: moderateScale(12) }}
+                      className="font-inter-bold text-[#0F7635]"
+                      style={{
+                        fontSize: moderateScale(12),
+                        lineHeight: moderateScale(15),
+                        minHeight: moderateScale(15),
+                        marginBottom: 3,
+                      }}
+                      numberOfLines={1}
                     >
                       {recommended.manufacturer}
                     </Text>
                     <Text
-                      className="font-inter text-brand-subtext mt-0.5"
-                      style={{ fontSize: moderateScale(11) }}
+                      className="font-inter text-brand-subtext"
+                      style={{
+                        fontSize: moderateScale(11),
+                        lineHeight: moderateScale(15),
+                        minHeight: moderateScale(30),
+                      }}
                       numberOfLines={2}
                     >
                       {recommended.description}
