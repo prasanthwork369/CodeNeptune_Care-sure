@@ -133,7 +133,7 @@ export const SearchRecommendCard = React.memo(({
                 style={s.mrp}
                 className="font-inter-medium text-brand-subtext line-through"
               >
-                ₹{Number(data.mrp).toFixed(1)}
+                ₹{Number(data.mrp).toFixed(2)}
               </Text>
             )}
           </View>
@@ -149,7 +149,7 @@ export const SearchRecommendCard = React.memo(({
                 style={s.savings}
                 className="font-inter-bold text-brand-primary ml-1.5 tracking-tight"
               >
-                Save ₹{Number(savings).toFixed(0)}
+                Save ₹{Number(savings).toFixed(2)}
               </Text>
             </View>
           )}

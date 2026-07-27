@@ -25,9 +25,13 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     const recPrice = recRaw != null && recRaw !== '' ? parseFloat(recRaw) : null;
     const recMrpRaw = rec.mrp || rec.price;
     const recMrp = recMrpRaw != null && recMrpRaw !== '' ? parseFloat(recMrpRaw) : null;
-    const crossSavings = searchedMrp != null && recPrice != null ? parseFloat((searchedMrp - recPrice).toFixed(2)) : 0;
-    const ownSavings = recMrp != null && recPrice != null && recMrp > recPrice ? parseFloat((recMrp - recPrice).toFixed(2)) : 0;
-    const savings = crossSavings > 0 ? crossSavings : ownSavings;
+    // Savings must reconcile with THIS card's own shown MRP and price
+    // (strikethrough MRP − price), so the on-screen numbers add up and match
+    // SearchRecommendCard. Previously it used cross-brand savings vs the
+    // searched item, which didn't equal the recommended item's shown MRP − price.
+    const savings = recMrp != null && recPrice != null && recMrp > recPrice
+        ? parseFloat((recMrp - recPrice).toFixed(2))
+        : 0;
     const buildPackLabel = (packSize?: string, unit?: string, dosageForm?: string) => {
         const base = [packSize?.trim(), unit].filter(Boolean).join(' ');
         return dosageForm ? `${base} in ${dosageForm}` : base;
