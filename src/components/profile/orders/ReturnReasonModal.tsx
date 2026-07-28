@@ -5,13 +5,12 @@ import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReasons";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { ReturnItemImages } from "@/src/types/return";
 import { moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
-import { Image, Text, useWindowDimensions, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { orderStyles as s } from "./orders.styles";
 
@@ -71,11 +70,7 @@ export function ReturnReasonModal({
   >(null);
   const [otherReason, setOtherReason] = useState("");
 
-  const adjustedBottom = useAdjustedBottomInset();
-  const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  // Cap the content-sized sheet just below the status bar.
-  const maxSheetHeight = screenHeight - insets.top - 12;
 
   useEffect(() => {
     if (isVisible) {
@@ -194,11 +189,12 @@ export function ReturnReasonModal({
         borderTopRightRadius: 12,
       }}
     >
+      <View style={{ flex: 1 }}>
       <BottomSheetScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 8,
-          paddingBottom: Math.max(adjustedBottom, 16) + 24,
+          paddingBottom: 16,
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -404,10 +400,22 @@ export function ReturnReasonModal({
           </Text>
         )}
 
-        {/* Action Button */}
+      </BottomSheetScrollView>
+
+      {/* Sticky: scrolling can't bury it, and it clears a 3-button nav bar. */}
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: Math.max(insets.bottom, 16) + 12,
+          backgroundColor: "#FFFFFF",
+          borderTopWidth: 1,
+          borderTopColor: "#F0F1F3",
+        }}
+      >
         <Touchable
           onPress={handleSave}
-          className="bg-[#0F7635] rounded-lg py-4 flex-row items-center justify-center mb-4"
+          className="bg-[#0F7635] rounded-lg py-4 flex-row items-center justify-center"
           activeOpacity={0.8}
         >
           <Text
@@ -418,7 +426,8 @@ export function ReturnReasonModal({
           </Text>
           <icons.arrow_forward width={18} height={18} fill="#FFFFFF" />
         </Touchable>
-      </BottomSheetScrollView>
+      </View>
+      </View>
     </GorhomBottomSheet>
   );
 }
