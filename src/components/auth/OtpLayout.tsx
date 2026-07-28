@@ -55,6 +55,7 @@ export const OtpLayout: React.FC = () => {
               <Text style={s.phone}>{formatPhoneNumber(phone || "")}</Text>
               <Touchable
                 onPress={() => router.back()}
+                style={s.editBtnUnderline}
                 accessibilityRole="button"
                 accessibilityLabel="Edit phone number"
               >

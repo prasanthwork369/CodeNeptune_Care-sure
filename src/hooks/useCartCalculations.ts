@@ -259,10 +259,11 @@ export function useCartCalculations() {
         couponCode: appliedCoupon?.code ?? "",
       },
     );
+    // All-OTC carts have nothing to collect, so they skip to payment.
     const hasRxItem = lines.some((l) => l.rx);
     const targetPath = hasRxItem
       ? "/(prescription)/choose-method"
-      : "/(prescription)/select-patient";
+      : "/(prescription)/payment";
     const targetParams = { toPay: String(toPay) };
 
     if (!useAuthStore.getState().isAuthenticated) {

@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import React from "react";
 import {
   Keyboard,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -90,6 +91,12 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   const stickyStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: -Math.max(0, kbHeight.value - adjustedBottom) }],
   }));
+
+  // iOS lifts by nearly the full keyboard, so the bottom inset would double as a gap.
+  const footerPaddingBottom =
+    Platform.OS === "ios" && keyboardHeight > 0
+      ? verticalScale(16)
+      : Math.max(insets.bottom, 16) + verticalScale(16);
 
   const isTablet = width >= 600;
   const panelMaxWidth = isTablet ? 560 : undefined;
@@ -203,8 +210,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                   styles.footer,
                   {
                     paddingHorizontal: panelPaddingH,
-                    paddingBottom:
-                      Math.max(insets.bottom, 16) + verticalScale(16),
+                    paddingBottom: footerPaddingBottom,
                     maxWidth: panelMaxWidth,
                   },
                 ]}

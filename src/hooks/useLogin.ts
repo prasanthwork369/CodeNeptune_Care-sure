@@ -7,7 +7,7 @@ import {
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
-import { Keyboard } from "react-native";
+import { Keyboard, Platform, TextInput } from "react-native";
 
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 
@@ -26,8 +26,13 @@ export function useLogin() {
     maxDurationMs: 15_000,
   });
 
-  // Guard ref to prevent showing the phone number hint picker multiple times concurrently
-  const hintInProgress = useRef(false);
+  const phoneInputRef = useRef<TextInput | null>(null);
+  // Spends the first tap so the field never focuses; iOS has no picker.
+  const [hintShieldVisible, setHintShieldVisible] = useState(
+    Platform.OS === "android",
+  );
+  // Guards a double tap landing before the state update hides the shield.
+  const hintRequested = useRef(false);
 
   /**
    * Sanitizes input to numeric only and performs real-time validation checks.
@@ -45,25 +50,21 @@ export function useLogin() {
     }
   };
 
-  /**
-   * Triggers the SIM picker / phone number auto-fill prompt if the input field is currently empty.
-   */
-  const handlePhoneFocus = async () => {
-    // Only show picker on first focus when input is empty to avoid interrupting user edits
-    if (phoneNumber.length > 0 || hintInProgress.current) return;
-    hintInProgress.current = true;
-    try {
-      const raw = await getPhoneNumberHint();
-      if (raw) {
-        const digits = normalizeIndianPhone(raw);
-        if (digits.length === 10) {
-          handleChangeText(digits);
-          Keyboard.dismiss();
-        }
-      }
-    } finally {
-      hintInProgress.current = false;
+  /** Shows the SIM picker on the first tap; the shield keeps the keyboard shut. */
+  const handleHintPress = async () => {
+    setHintShieldVisible(false);
+    if (hintRequested.current) return;
+    hintRequested.current = true;
+
+    // Null on cancel, missing Play Services, or any native error.
+    const raw = await getPhoneNumberHint();
+    const digits = raw ? normalizeIndianPhone(raw) : "";
+    if (digits.length === 10 && validate.phone(digits).valid) {
+      handleChangeText(digits);
+      return;
     }
+
+    phoneInputRef.current?.focus();
   };
 
   /**
@@ -113,8 +114,10 @@ export function useLogin() {
     loading,
     error,
     isValid,
+    phoneInputRef,
+    hintShieldVisible,
     handleChangeText,
-    handlePhoneFocus,
+    handleHintPress,
     handleGetOtp,
   };
 }

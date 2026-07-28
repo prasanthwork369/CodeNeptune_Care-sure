@@ -1,5 +1,6 @@
 import { authApi } from "../api/auth.api";
-import { profileApi } from "../api/profile.api";
+import { CustomerProfile, profileApi } from "../api/profile.api";
+import { setAccessToken } from "../api/client";
 import { tokenStorage } from "../lib/storage";
 import { useAuthStore } from "../store/authStore";
 import { messagingService as notificationService } from "./firebase";
@@ -17,18 +18,21 @@ export const authService = {
     const data = await authApi.verifyOtp(phone, otp, deviceId);
     const { accessToken, refreshToken, expiresIn } = data.data;
 
-    // 1. Save tokens and set basic auth state
-    await useAuthStore.getState().login(accessToken, expiresIn);
-    if (refreshToken) {
-      await tokenStorage.setRefreshToken(refreshToken);
-    }
+    // Flipping `isAuthenticated` early starts useProfile()'s fetch, and the
+    // backend clears isFirstTimeLogin on whichever profile fetch lands first.
+    setAccessToken(accessToken);
 
-    // 2. Fetch and store full profile immediately (Matching Warehouse Flow)
+    let profile: CustomerProfile | null = null;
     try {
-      const profile = await profileApi.getProfile();
-      useAuthStore.getState().setUser(profile);
+      profile = await profileApi.getProfile();
     } catch (error) {
       if (__DEV__) console.error("Failed to load profile after login:", error);
+    }
+
+    await useAuthStore.getState().login(accessToken, expiresIn);
+    if (profile) useAuthStore.getState().setUser(profile);
+    if (refreshToken) {
+      await tokenStorage.setRefreshToken(refreshToken);
     }
 
     return data;

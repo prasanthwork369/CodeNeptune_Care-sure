@@ -3,9 +3,8 @@ import { icons } from "@/src/constants/icons";
 import { useMobileAppLinks } from "@/src/hooks/queries/useSettings";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { styles as s } from "./AuthFooter.styles";
-import { exactScale } from "@/src/utils/exactScale";
 
 type LinkKey = "terms" | "privacy" | "refund";
 
@@ -16,34 +15,34 @@ export const AuthFooter: React.FC = () => {
   );
   const [pressedLink, setPressedLink] = useState<LinkKey | null>(null);
 
-  const linkStyle = (key: LinkKey, enabled?: string) => [
-    s.link,
-    {
-      opacity: enabled ? 1 : 0.5,
-      borderRadius: 6,
-      paddingHorizontal: exactScale(3),
-      backgroundColor:
-        pressedLink === key ? "rgba(15, 118, 53, 0.18)" : "transparent",
-    },
-  ];
-
-  const handlePressTerms = () => {
-    if (!links?.termsLink) return;
+  const handlePress = (title: string, url?: string) => {
+    if (!url) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPolicy({ title: "Terms", url: links.termsLink });
+    setPolicy({ title, url });
   };
 
-  const handlePressPrivacy = () => {
-    if (!links?.privacyLink) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPolicy({ title: "Privacy Policy", url: links.privacyLink });
-  };
-
-  const handlePressRefund = () => {
-    if (!links?.refundLink) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPolicy({ title: "Refund Policy", url: links.refundLink });
-  };
+  // Bordered element, not an inline <Text>: borders don't apply to text spans.
+  const renderLink = (key: LinkKey, label: string, url?: string) => (
+    <Pressable
+      accessibilityRole="link"
+      accessibilityLabel={label}
+      onPress={() => handlePress(label, url)}
+      onPressIn={() => url && setPressedLink(key)}
+      onPressOut={() => setPressedLink(null)}
+      style={[
+        s.linkPress,
+        {
+          opacity: url ? 1 : 0.5,
+          backgroundColor:
+            pressedLink === key ? "rgba(15, 118, 53, 0.18)" : "transparent",
+        },
+      ]}
+    >
+      <View style={s.linkUnderline}>
+        <Text style={s.linkText}>{label}</Text>
+      </View>
+    </Pressable>
+  );
 
   return (
     <View style={s.wrap}>
@@ -51,38 +50,15 @@ export const AuthFooter: React.FC = () => {
         <icons.verified_user width={s.icon.width} height={s.icon.height} />
         <Text style={s.secureText}>Secure & Encrypted</Text>
       </View>
-      <Text style={s.policyText}>
-        By continuing, you agree to our{" "}
-        <Text
-          style={linkStyle("terms", links?.termsLink)}
-          onPress={handlePressTerms}
-          onPressIn={() => links?.termsLink && setPressedLink("terms")}
-          onPressOut={() => setPressedLink(null)}
-          suppressHighlighting
-        >
-          Terms
-        </Text>
-        {", "}
-        <Text
-          style={linkStyle("privacy", links?.privacyLink)}
-          onPress={handlePressPrivacy}
-          onPressIn={() => links?.privacyLink && setPressedLink("privacy")}
-          onPressOut={() => setPressedLink(null)}
-          suppressHighlighting
-        >
-          Privacy Policy
-        </Text>
-        {" & "}
-        <Text
-          style={linkStyle("refund", links?.refundLink)}
-          onPress={handlePressRefund}
-          onPressIn={() => links?.refundLink && setPressedLink("refund")}
-          onPressOut={() => setPressedLink(null)}
-          suppressHighlighting
-        >
-          Refund Policy
-        </Text>
-      </Text>
+
+      <View style={s.policyRow}>
+        <Text style={s.policyText}>By continuing, you agree to our </Text>
+        {renderLink("terms", "Terms", links?.termsLink)}
+        <Text style={s.policyText}>, </Text>
+        {renderLink("privacy", "Privacy Policy", links?.privacyLink)}
+        <Text style={s.policyText}> & </Text>
+        {renderLink("refund", "Refund Policy", links?.refundLink)}
+      </View>
 
       <PolicyLink
         isVisible={!!policy}

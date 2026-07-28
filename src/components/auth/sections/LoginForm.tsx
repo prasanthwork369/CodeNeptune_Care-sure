@@ -1,7 +1,7 @@
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { LoginFormProps } from "@/src/types/auth";
 import React, { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { styles as s } from "./LoginForm.styles";
 
 export const LoginForm: React.FC<LoginFormProps> = ({
@@ -9,7 +9,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   phoneError,
   error,
   onPhoneChange,
-  onPhoneFocus,
+  inputRef,
+  hintShieldVisible,
+  onHintPress,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -31,7 +33,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View style={s.divider} />
         <TextInput
           // Native filter caps typed input at 10 so the 11th digit never flashes.
-          ref={(r) => applyDigitsOnlyFilter(r, 10)}
+          ref={(r) => {
+            applyDigitsOnlyFilter(r, 10);
+            if (inputRef) inputRef.current = r;
+          }}
           testID="phone-input"
           allowFontScaling={false}
           placeholder="Enter your mobile number"
@@ -51,13 +56,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           value={phoneNumber}
           // Forward raw text — useLogin owns sanitization and overflow rejection.
           onChangeText={onPhoneChange}
-          // onPhoneFocus triggers the native Android SIM selector hint prompt to pick phone number automatically
-          onFocus={() => {
-            setIsFocused(true);
-            onPhoneFocus?.();
-          }}
+          onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
+
+        {/* Spends the first tap on the hint so the field never focuses. */}
+        {hintShieldVisible ? (
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={onHintPress}
+            accessibilityRole="button"
+            accessibilityLabel="Mobile number"
+          />
+        ) : null}
       </View>
 
       {phoneError || error ? (

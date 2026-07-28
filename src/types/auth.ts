@@ -5,7 +5,10 @@ export interface LoginFormProps {
   phoneError: string;
   error: string | null;
   onPhoneChange: (text: string) => void;
-  onPhoneFocus?: () => void;
+  inputRef?: React.RefObject<TextInput | null>;
+  /** Transparent overlay that spends the first tap on the number hint. */
+  hintShieldVisible?: boolean;
+  onHintPress?: () => void;
 }
 
 export interface LoginSubmitButtonProps {

@@ -1,4 +1,5 @@
 import React from "react";
+import { TextInput } from "react-native";
 import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
 import { LoginForm } from "@/src/components/auth/sections/LoginForm";
 
@@ -8,7 +9,6 @@ describe("LoginForm Component", () => {
     phoneError: "",
     error: "",
     onPhoneChange: jest.fn(),
-    onPhoneFocus: jest.fn(),
   };
 
   beforeEach(() => {
@@ -45,15 +45,22 @@ describe("LoginForm Component", () => {
     expect(getByText("Invalid mobile number")).toBeTruthy();
   });
 
-  it("triggers onPhoneFocus on input focus", () => {
-    const onPhoneFocus = jest.fn();
+  it("exposes the input instance through inputRef", () => {
+    const inputRef = React.createRef<TextInput>();
     const { getByTestId } = renderWithProviders(
-      <LoginForm {...defaultProps} onPhoneFocus={onPhoneFocus} />
+      <LoginForm {...defaultProps} inputRef={inputRef} />
     );
 
-    const input = getByTestId("phone-input");
-    fireEvent(input, "focus");
+    expect(getByTestId("phone-input")).toBeTruthy();
+    expect(inputRef.current).not.toBeNull();
+  });
 
-    expect(onPhoneFocus).toHaveBeenCalledTimes(1);
+  it("does not request a hint on input focus", () => {
+    const { getByTestId } = renderWithProviders(
+      <LoginForm {...defaultProps} />
+    );
+
+    // Focus is visual state only now — the hint is requested on screen mount.
+    expect(() => fireEvent(getByTestId("phone-input"), "focus")).not.toThrow();
   });
 });

@@ -63,22 +63,29 @@ export const SignupBonusPopup: React.FC<Props> = ({
   useEffect(() => {
     if (testMode) return;
 
-    if (!isAuthenticated || !user?.id) return;
+    // TEMP diagnostics — remove once the new-number popup is confirmed.
+    const why = (reason: string) => {
+      if (__DEV__) console.log("[SignupBonus] blocked:", reason);
+    };
+
+    if (!isAuthenticated || !user?.id) return why("not authenticated");
 
     // isFirstTimeLogin is set by the backend and shared across web and
     // mobile -- once either platform has shown the popup (or skipped it
     // because bonuses are off), the backend flips it to false so it never
     // shows again on any device.
-    if (user.isFirstTimeLogin === false) return;
+    if (user.isFirstTimeLogin === false) return why("isFirstTimeLogin=false");
 
     // Wait until we've actually landed on the Home screen before
     // checking/showing the bonus — avoids it popping up mid-navigation
     // (OTP screen -> Home transition).
-    if (pathname !== "/") return;
+    if (pathname !== "/") return why(`pathname=${pathname}`);
 
     // Wait for the location + notification permission flow to finish first, so
     // the bonus popup never overlaps a permission dialog.
-    if (!permissionFlowComplete) return;
+    if (!permissionFlowComplete) return why("permissionFlowComplete=false");
+
+    if (__DEV__) console.log("[SignupBonus] all gates passed, checking logs");
 
     let cancelled = false;
     let confettiTimer: ReturnType<typeof setTimeout> | null = null;
@@ -86,8 +93,9 @@ export const SignupBonusPopup: React.FC<Props> = ({
     const checkBonus = async () => {
       // Wait for wallet/coins bonus settings to load before deciding whether
       // to fetch logs — if admin has disabled both bonuses, skip entirely.
-      if (!cartWalletSettings) return;
+      if (!cartWalletSettings) return why("wallet settings not loaded");
       if (!isBonusOn) {
+        why("bonuses disabled in admin settings");
         markShown();
         return;
       }
@@ -100,8 +108,23 @@ export const SignupBonusPopup: React.FC<Props> = ({
           (log) => log.referenceType === "signup_bonus",
         );
 
+        if (__DEV__)
+          console.log(
+            "[SignupBonus] log types:",
+            logs.map((l) => l.referenceType),
+            "| signup_bonus found:",
+            !!signupLog,
+          );
+
         if (signupLog) {
           const age = Date.now() - new Date(signupLog.createdAt).getTime();
+          if (__DEV__)
+            console.log(
+              "[SignupBonus] age(s):",
+              Math.round(age / 1000),
+              "| window(s):",
+              BONUS_WINDOW_MS / 1000,
+            );
           if (age < BONUS_WINDOW_MS) {
             setBonusData({
               wallet: Number(signupLog.walletAmount),

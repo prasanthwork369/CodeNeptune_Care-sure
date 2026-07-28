@@ -140,7 +140,9 @@ export const OtpForm: React.FC<OtpFormProps> = ({
             hitSlop={{ top: 16, bottom: 16, left: 24, right: 24 }}
             className="py-2 px-4"
           >
-            <Text style={s.resendBtn}>Resend OTP</Text>
+            <View style={s.resendUnderline}>
+              <Text style={s.resendBtn}>Resend OTP</Text>
+            </View>
           </Touchable>
         )}
       </View>

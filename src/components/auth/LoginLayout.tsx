@@ -19,8 +19,10 @@ export const LoginLayout: React.FC = () => {
     loading,
     error,
     isValid,
+    phoneInputRef,
+    hintShieldVisible,
     handleChangeText,
-    handlePhoneFocus,
+    handleHintPress,
     handleGetOtp,
   } = useLogin();
 
@@ -42,7 +44,9 @@ export const LoginLayout: React.FC = () => {
             phoneError={phoneError}
             error={error}
             onPhoneChange={handleChangeText}
-            onPhoneFocus={handlePhoneFocus}
+            inputRef={phoneInputRef}
+            hintShieldVisible={hintShieldVisible}
+            onHintPress={handleHintPress}
           />
           <LoginSubmitButton
             loading={loading}

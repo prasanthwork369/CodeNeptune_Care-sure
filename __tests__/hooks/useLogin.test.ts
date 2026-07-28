@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { Platform } from "react-native";
 import { useLogin } from "@/src/hooks/useLogin";
 import { getPhoneNumberHint } from "@/src/modules/PhoneNumberHint";
 
@@ -38,6 +39,14 @@ jest.mock("@/src/modules/PhoneNumberHint", () => {
 });
 
 describe("useLogin phone input", () => {
+  beforeAll(() => {
+    // The hint flow is Android-only and jest-expo reports iOS by default.
+    Object.defineProperty(Platform, "OS", {
+      get: () => "android",
+      configurable: true,
+    });
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -96,15 +105,63 @@ describe("useLogin phone input", () => {
     expect(result.current.isValid).toBe(true);
   });
 
-  it("preserves the Google phone-number picker flow", async () => {
+  it("fills the number from the hint on the first tap", async () => {
     (getPhoneNumberHint as jest.Mock).mockResolvedValue("+91 98765 43210");
     const { result } = renderHook(() => useLogin());
 
+    // Shield is up on Android so the first tap never reaches the field.
+    expect(result.current.hintShieldVisible).toBe(true);
+    result.current.phoneInputRef.current = { focus: jest.fn() } as never;
     await act(async () => {
-      await result.current.handlePhoneFocus();
+      await result.current.handleHintPress();
     });
 
+    expect(result.current.hintShieldVisible).toBe(false);
     expect(result.current.phoneNumber).toBe("9876543210");
     expect(result.current.isValid).toBe(true);
+  });
+
+  it("focuses the input for manual entry when the hint is cancelled", async () => {
+    (getPhoneNumberHint as jest.Mock).mockResolvedValue(null);
+    const { result } = renderHook(() => useLogin());
+
+    const focus = jest.fn();
+    result.current.phoneInputRef.current = { focus, blur: jest.fn() } as never;
+    await act(async () => {
+      await result.current.handleHintPress();
+    });
+
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(result.current.phoneNumber).toBe("");
+  });
+
+  it("ignores a hinted number that is not a valid Indian mobile", async () => {
+    (getPhoneNumberHint as jest.Mock).mockResolvedValue("+1 415 555 0134");
+    const { result } = renderHook(() => useLogin());
+
+    const focus = jest.fn();
+    result.current.phoneInputRef.current = { focus, blur: jest.fn() } as never;
+    await act(async () => {
+      await result.current.handleHintPress();
+    });
+
+    expect(result.current.phoneNumber).toBe("");
+    expect(focus).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not reopen the hint on later taps", async () => {
+    (getPhoneNumberHint as jest.Mock).mockResolvedValue(null);
+    const { result } = renderHook(() => useLogin());
+
+    result.current.phoneInputRef.current = {
+      focus: jest.fn(),
+      blur: jest.fn(),
+    } as never;
+    await act(async () => {
+      await result.current.handleHintPress();
+      await result.current.handleHintPress();
+    });
+
+    expect(getPhoneNumberHint).toHaveBeenCalledTimes(1);
   });
 });

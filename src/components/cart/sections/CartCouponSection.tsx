@@ -241,7 +241,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             style={{
               backgroundColor: "white",
               borderWidth: 1,
-              borderColor: isLocked ? "#E4E7EC" : "#0F7635",
+              borderColor: isLocked ? "#E4E7EC" : "#919EAB33",
               borderRadius: 6,
               width: exactScale(72),
               height: exactScale(42),
@@ -251,13 +251,13 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             }}
           >
             {applying ? (
-              <ActivityIndicator size="small" color="#0F7635" />
+              <ActivityIndicator size="small" color="#222222" />
             ) : (
               <Text
                 style={{
                   fontSize: moderateScale(13),
                   fontWeight: "700",
-                  color: isLocked ? "#9CA3AF" : "#0F7635",
+                  color: isLocked ? "#9CA3AF" : "#222222",
                 }}
               >
                 Apply

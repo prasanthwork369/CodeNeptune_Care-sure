@@ -1,8 +1,10 @@
 import { locationService } from "@/src/services/location.service";
 import { messagingService as notificationService } from "@/src/services/firebase";
+import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore, waitForLocationHydration } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { isExpoGo } from "@/src/utils/environment";
+import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useEffect, useRef } from "react";
@@ -10,29 +12,32 @@ import { Alert, AppState } from "react-native";
 
 /**
  * Runs the Home onboarding permission flow strictly in order, one dialog at a
- * time, then unlocks the SignupBonusPopup:
+ * time:
  *
  *   1. Location   — prompt (if not already granted) and fill the header.
  *   2. Notification — prompt (if not already granted) and register the token.
- *   3. Mark `permissionFlowComplete` so the SignupBonusPopup may show.
  *
  * Each `requestPermission()` resolves only after the user answers its dialog,
  * so awaiting them sequences the prompts — no overlap, no race. Already-granted
- * steps resolve instantly (no dialog), so they're effectively skipped. Runs once.
+ * steps resolve instantly (no dialog), so they're effectively skipped. Runs once,
+ * and only while Home is focused and the user is past auth.
  */
 export const useHomeOnboarding = () => {
   const hasRun = useRef(false);
+  const isFetching = useRef(false);
+  const isFocused = useIsFocused();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isGuest = useAuthStore((s) => s.isGuest);
 
   useEffect(() => {
-    if (hasRun.current) return;
+    // Home also mounts under the login screen (root anchor route).
+    if (hasRun.current || !isFocused || !(isAuthenticated || isGuest)) return;
     hasRun.current = true;
 
     // Close the gate up front so a stale `true` from a previous session
     // (the flag isn't reset on logout) can't show the popup before this
     // session's flow finishes.
     useUIStore.getState().setPermissionFlowComplete(false);
-
-    let isFetching = false;
 
     (async () => {
       try {
@@ -72,8 +77,8 @@ export const useHomeOnboarding = () => {
           // background and persist it as the last-known location.
           const { granted } = await locationService.requestPermission();
           if (granted) {
-            if (isFetching) return;
-            isFetching = true;
+            if (isFetching.current) return;
+            isFetching.current = true;
             try {
               const result = await locationService.getCurrentPlace();
               const place = result.place;
@@ -165,7 +170,7 @@ export const useHomeOnboarding = () => {
                 } catch {}
               }
             } finally {
-              isFetching = false;
+              isFetching.current = false;
             }
           }
           // Note: if location is skipped/denied, the header still fills
@@ -185,9 +190,10 @@ export const useHomeOnboarding = () => {
         useUIStore.getState().setPermissionFlowComplete(true);
       }
     })();
+  }, [isFocused, isAuthenticated, isGuest]);
 
-    // Listen for app resume to silently refresh location if permissions
-    // are granted and GPS was enabled while the user was in Settings.
+  // Silent refresh on resume; never prompts, so it stays out of the gated flow.
+  useEffect(() => {
     const skipInitialActive = { current: true } as { current: boolean };
     const sub = AppState.addEventListener("change", async (next) => {
       if (next !== "active") return;
@@ -201,8 +207,8 @@ export const useHomeOnboarding = () => {
         const existing = await Location.getForegroundPermissionsAsync();
         if (existing.status !== "granted") return;
         // Permission granted; try to silently fetch current place.
-        if (isFetching) return;
-        isFetching = true;
+        if (isFetching.current) return;
+        isFetching.current = true;
         try {
           const res = await locationService.getCurrentPlace();
           const place = res.place;
@@ -242,7 +248,7 @@ export const useHomeOnboarding = () => {
             await AsyncStorage.removeItem("@caresure:gps_prompt_not_now");
           } catch {}
         } finally {
-          isFetching = false;
+          isFetching.current = false;
         }
       } catch {}
     });
