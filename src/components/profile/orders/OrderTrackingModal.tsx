@@ -367,7 +367,13 @@ export function OrderTrackingModal({ visible, onClose, steps }: Props) {
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingHorizontal: exactScale(20) }}
+          contentContainerStyle={{
+            paddingHorizontal: exactScale(20),
+            // The first active step has no preceding row to provide overflow
+            // space. Reserve room for its expanding pulse so "Order Placed"
+            // and its timestamp are not clipped at the scroll-frame top.
+            paddingTop: exactScale(12),
+          }}
         >
           {steps.map((step, index) => (
             <ModalStepRow

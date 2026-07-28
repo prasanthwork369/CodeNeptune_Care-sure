@@ -19,6 +19,7 @@ interface SlidingTabsProps<T extends string> {
   tabs: SlidingTab<T>[];
   activeKey: T;
   onTabPress: (key: T) => void;
+  backgroundColor?: string;
   /** Shrinks the indicator in from each edge of its tab. */
   indicatorInset?: number;
   borderColor?: string;
@@ -40,6 +41,7 @@ export function SlidingTabs<T extends string>({
   tabs,
   activeKey,
   onTabPress,
+  backgroundColor = "#FFFFFF",
   indicatorInset = 0,
   borderColor = "#EEEFF1",
   inactiveColor = INACTIVE_COLOR,
@@ -82,7 +84,7 @@ export function SlidingTabs<T extends string>({
   return (
     <View
       style={{
-        backgroundColor: "#FFFFFF",
+        backgroundColor,
         borderBottomWidth: 1,
         borderBottomColor: borderColor,
       }}

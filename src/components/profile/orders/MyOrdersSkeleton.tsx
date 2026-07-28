@@ -9,8 +9,10 @@ function OrderCardSkeleton() {
             style={{
                 backgroundColor: '#fff',
                 borderRadius: 14,
+                borderWidth: 1,
+                borderColor: '#E3E6E8',
                 marginHorizontal: 16,
-                marginBottom: 12,
+                marginBottom: 20,
             }}
         >
             {/* Top: dates + badge */}
@@ -76,7 +78,7 @@ export const MyOrdersSkeleton: React.FC = () => {
             showsVerticalScrollIndicator={false}
             scrollEnabled={false}
             contentContainerStyle={{
-                paddingTop: 12,
+                paddingTop: 20,
                 paddingBottom: adjustedBottom + 24,
             }}
         >

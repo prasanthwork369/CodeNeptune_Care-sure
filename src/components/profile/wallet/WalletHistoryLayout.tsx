@@ -53,10 +53,11 @@ export const WalletHistoryLayout: React.FC = () => {
                 activeKey={activeKey}
                 onTabPress={goToTab}
                 progress={progress}
-                indicatorInset={exactScale(20)}
+                indicatorInset={exactScale(15)}
                 borderColor="#E5E7EB"
-                inactiveColor="#6B7280"
-                paddingVertical={exactScale(12)}
+                inactiveColor="#222222"
+                paddingVertical={exactScale(16)}
+                labelStyle={{ fontSize: 15 }}
             />
 
             <View

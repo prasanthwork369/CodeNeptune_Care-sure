@@ -17,9 +17,9 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
   return (
     <View
       style={{
-        width: exactScale(40),
-        height: exactScale(40),
-        borderRadius: exactScale(20),
+        width: exactScale(44),
+        height: exactScale(44),
+        borderRadius: exactScale(22),
         backgroundColor: isCredit ? "#DFF3E6" : "#FCE8E8",
         alignItems: "center",
         justifyContent: "center",
@@ -43,15 +43,15 @@ export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
       style={{
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: exactScale(20),
-        paddingVertical: exactScale(14),
+        paddingHorizontal: exactScale(24),
+        paddingVertical: exactScale(15),
       }}
     >
       <TransactionIcon type={tx.iconType} />
-      <View style={{ flex: 1, marginLeft: exactScale(14) }}>
+      <View style={{ flex: 1, marginLeft: exactScale(16) }}>
         <Text
           style={{
-            fontSize: moderateScale(14),
+            fontSize: moderateScale(15),
             fontWeight: "600",
             color: "#111827",
           }}
@@ -60,7 +60,7 @@ export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
         </Text>
         <Text
           style={{
-            fontSize: moderateScale(12),
+            fontSize: moderateScale(13),
             color: "#6B7280",
             marginTop: exactScale(2),
           }}
@@ -77,7 +77,7 @@ export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
           />
           <Text
             style={{
-              fontSize: moderateScale(14),
+              fontSize: moderateScale(15),
               fontWeight: "700",
               color: tx.amountColor,
             }}
@@ -88,7 +88,7 @@ export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
       ) : (
         <Text
           style={{
-            fontSize: moderateScale(14),
+            fontSize: moderateScale(15),
             fontWeight: "700",
             color: tx.amountColor,
           }}
@@ -101,8 +101,8 @@ export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
       <View
         style={{
           height: 1,
-          backgroundColor: "#F3F4F6",
-          marginHorizontal: exactScale(20),
+          backgroundColor: "#E5E7EB",
+          marginHorizontal: exactScale(16),
         }}
       />
     )}

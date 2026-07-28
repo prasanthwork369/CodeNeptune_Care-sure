@@ -50,7 +50,11 @@ export const MyOrdersLayout: React.FC = () => {
         tabs={TABS}
         activeKey={activeKey}
         onTabPress={goToTab}
-        labelStyle={s.labelMd}
+        backgroundColor="#F5F6FB"
+        borderColor="#F5F6FB"
+        indicatorInset={8}
+        paddingVertical={18}
+        labelStyle={[s.labelMd, { fontSize: 15 }]}
         progress={progress}
       />
 

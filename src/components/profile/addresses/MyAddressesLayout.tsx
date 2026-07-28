@@ -39,22 +39,25 @@ const AddressCard = ({
   deleting: string | null;
 }) => {
   const type = labelToType(item.label);
-  const fullAddress = [
-    item.line1,
-    item.line2,
-    item.city,
-    item.state,
-    item.pincode,
-  ]
+  const addressLine = [item.line1, item.line2, item.city]
     .filter(Boolean)
     .join(", ");
+  const regionLine = [item.state, item.pincode].filter(Boolean).join(" - ");
+  const fullAddress = [addressLine, regionLine].filter(Boolean).join(", ");
   const isDeleting = deleting === item.id;
   return (
     <View
-      className="bg-white mb-3 rounded-lg py-2 overflow-hidden"
-      style={{ borderWidth: 1, borderColor: "#F0F0F0" }}
+      className="bg-white mb-3 overflow-hidden"
+      style={{
+        borderWidth: 1,
+        borderColor: "#DFE3E8",
+        borderRadius: 12,
+      }}
     >
-      <View className="flex-row items-center px-4 py-2 gap-x-2">
+      <View
+        className="flex-row items-center gap-x-3"
+        style={{ paddingHorizontal: 14, paddingTop: 18, paddingBottom: 10 }}
+      >
         <TypeIcon type={type} />
         <Text
           style={s.addrAddBtn}
@@ -74,20 +77,31 @@ const AddressCard = ({
         )}
       </View>
       <Text
-        style={s.addrAction}
-        className="font-inter-regular text-[#6A6A6A] leading-[20px] px-4 pb-4"
+        style={[
+          s.addrAction,
+          { paddingHorizontal: 10, paddingBottom: 14 },
+        ]}
+        className="font-inter-regular text-[#6A6A6A] leading-[22px]"
+        numberOfLines={3}
+        ellipsizeMode="tail"
       >
         {fullAddress}
       </Text>
-      <View style={{ height: 1, backgroundColor: "#F0F0F0" }} />
-      <View className="flex-row items-center justify-between px-4 py-3">
+      <View
+        style={{
+          height: 1,
+          backgroundColor: "#E1E5E8",
+          marginHorizontal: 10,
+        }}
+      />
+      <View className="flex-row items-center justify-between px-3 py-3">
         <Touchable
           className="flex-row items-center gap-x-1.5"
           activeOpacity={0.6}
           onPress={() => onEdit(item.id)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <icons.edit_icon width={15} height={15} fill="#6A6A6A" />
+          <icons.edit_icon width={18} height={18} fill="#6A6A6A" />
           <Text
             style={s.addrAction}
             className="font-inter-semibold text-[#6A6A6A]"
@@ -106,7 +120,7 @@ const AddressCard = ({
             <ActivityIndicator size="small" color="#6A6A6A" />
           ) : (
             <>
-              <icons.delete_icon width={15} height={15} fill="#6A6A6A" />
+              <icons.delete_icon width={18} height={18} fill="#6A6A6A" />
               <Text
                 style={s.addrAction}
                 className="font-inter-semibold text-[#6A6A6A]"
@@ -137,13 +151,14 @@ export const MyAddressesLayout: React.FC = () => {
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="My Addresses" backgroundColor="#FFFFFF" />
-      <View className="px-4 pt-4 pb-3 bg-[#F5F6FB]">
+      <View className="px-4 pt-5 pb-1 bg-[#F5F6FB]">
         <Touchable
           activeOpacity={0.85}
           onPress={() => router.push("/profile/addresses/add")}
-          className="bg-[#0F7635] rounded-lg py-4 flex-row items-center justify-center"
+          className="bg-[#0F7635] flex-row items-center justify-center"
+          style={{ height: 50, borderRadius: 12 }}
         >
-          <icons.plus_light width={16} height={16} />
+          <icons.plus_light width={18} height={18} />
           <Text
             style={s.addrTitle}
             className="font-inter-semibold text-white ml-2"
@@ -151,19 +166,12 @@ export const MyAddressesLayout: React.FC = () => {
             Add New Address
           </Text>
         </Touchable>
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderColor: "#E0E0E0",
-            borderStyle: "dashed",
-            marginTop: 16,
-          }}
-        />
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          padding: 16,
+          paddingHorizontal: 16,
+          paddingTop: 16,
           paddingBottom: adjustedBottom + 24,
           flexGrow: 1,
         }}

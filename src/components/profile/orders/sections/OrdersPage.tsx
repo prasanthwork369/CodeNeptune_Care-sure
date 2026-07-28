@@ -61,7 +61,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
           overrideProps={{ initialDrawBatchSize: 8 }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingTop: 12,
+            paddingTop: 20,
             paddingBottom: adjustedBottom + 24,
           }}
           refreshControl={

@@ -5,6 +5,7 @@ import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType } from "@/src/types/wallet";
 import { logToTransactions } from "@/src/utils/walletTransactions";
@@ -63,6 +64,7 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
  * Manages tab switching, details rendering, and shows the log of recent transaction history.
  */
 export const WalletLayout: React.FC = () => {
+  const adjustedBottom = useAdjustedBottomInset();
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   const [isHistorySheetVisible, setIsHistorySheetVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<"wallet" | "credits" | "coins">("wallet");
@@ -133,8 +135,12 @@ export const WalletLayout: React.FC = () => {
         backgroundColor="#FFFFFF"
       />
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={cardStyles.scrollContent}
+        contentContainerStyle={[
+          cardStyles.scrollContent,
+          { paddingBottom: adjustedBottom + 40 },
+        ]}
       >
         {/* Balance Dashboard Card */}
         <View style={cardStyles.card}>

@@ -74,7 +74,7 @@ export const OrderCard = React.memo(function OrderCard({
   const items = order.items ?? [];
   const thumbs = items.slice(0, 4);
   const extraCount = Math.max(0, items.length - 4);
-  const showDetails = true;
+  const showDetails = order.status !== 0;
 
   const [isProceeding, setIsProceeding] = useState(false);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
@@ -121,8 +121,11 @@ export const OrderCard = React.memo(function OrderCard({
       style={{
         backgroundColor: "#fff",
         borderRadius: 14,
+        borderWidth: 1,
+        borderColor: "#E3E6E8",
         marginHorizontal: 16,
-        marginBottom: 12,
+        marginBottom: 20,
+        overflow: "hidden",
       }}
     >
       <Touchable

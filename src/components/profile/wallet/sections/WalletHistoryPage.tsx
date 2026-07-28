@@ -27,10 +27,10 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
   if (loading) {
     return (
       <View style={{ width, paddingHorizontal: exactScale(16), paddingTop: exactScale(16), gap: exactScale(12) }}>
-        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
-        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
-        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
-        <ShimmerBlock height={exactScale(54)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(74)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(74)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(74)} borderRadius={8} />
+        <ShimmerBlock height={exactScale(74)} borderRadius={8} />
       </View>
     );
   }
@@ -54,8 +54,9 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
   }
 
   return (
-    <View style={{ width }}>
+    <View style={{ width, flex: 1 }}>
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom, backgroundColor: "#FFFFFF" }}
         onScroll={({ nativeEvent }) => {

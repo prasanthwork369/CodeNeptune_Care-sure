@@ -4,15 +4,24 @@ import { Skeleton } from '@/src/components/ui/Skeleton';
 
 export const PatientSkeleton = () => {
     return (
-        <View className="flex-1">
+        <View
+            className="flex-1 bg-white overflow-hidden"
+            style={{ borderWidth: 1, borderColor: '#EEF0F2', borderRadius: 12 }}
+        >
             {[1, 2, 3, 4].map((i) => (
                 <View
                     key={i}
-                    className="bg-white rounded-2xl mb-3 px-4 py-4 flex-row items-center"
-                    style={{ borderWidth: 1, borderColor: '#F0F0F0' }}
+                    className="bg-white flex-row items-center"
+                    style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 14,
+                        borderBottomWidth: i < 4 ? 1 : 0,
+                        borderBottomColor: '#DDE2E6',
+                        borderStyle: 'dashed',
+                    }}
                 >
                     {/* Avatar */}
-                    <Skeleton width={46} height={46} borderRadius={23} style={{ marginRight: 12 }} />
+                    <Skeleton width={48} height={48} borderRadius={24} style={{ marginRight: 12 }} />
 
                     {/* Info */}
                     <View className="flex-1">
@@ -25,10 +34,8 @@ export const PatientSkeleton = () => {
 
                     {/* Actions */}
                     <View className="flex-row items-center">
-                        <View className="flex-row items-center mr-4">
-                            <Skeleton width={14} height={14} style={{ marginRight: 4 }} />
-                            <Skeleton width={30} height={12} />
-                        </View>
+                        <View style={{ width: 1, height: 16, backgroundColor: '#E1E5E8', marginRight: 8 }} />
+                        <Skeleton width={30} height={12} style={{ marginRight: 12 }} />
                         <Skeleton width={20} height={20} borderRadius={4} />
                     </View>
                 </View>

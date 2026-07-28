@@ -5,9 +5,9 @@ import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import React, { useMemo, useState } from "react";
 import {
-    ActivityIndicator,
     ScrollView,
     Text,
     TextInput,
@@ -18,6 +18,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const FrequentOrdersLayout: React.FC = () => {
   const router = useNav();
+  const adjustedBottom = useAdjustedBottomInset();
   const { totalItems } = useCart();
   const { data: frequentlyOrdered = [], isLoading } = useFrequentlyOrdered();
   const [search, setSearch] = useState("");
@@ -123,7 +124,7 @@ export const FrequentOrdersLayout: React.FC = () => {
               flexDirection: "row",
               alignItems: "center",
               backgroundColor: "#F5F6FB",
-              borderRadius: 12,
+              borderRadius: 8,
               borderWidth: 1,
               borderColor: "#EEEFF1",
               height: 46,
@@ -206,6 +207,7 @@ export const FrequentOrdersLayout: React.FC = () => {
       <View style={{ height: 1, backgroundColor: "#F0F1F3" }} />
 
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={
           filtered.length === 0
@@ -213,9 +215,12 @@ export const FrequentOrdersLayout: React.FC = () => {
                 flexGrow: 1,
                 justifyContent: "center",
                 paddingHorizontal: exactScale(32),
-                paddingBottom: exactScale(80),
+                paddingBottom: adjustedBottom + exactScale(80),
               }
-            : { paddingTop: exactScale(14), paddingBottom: exactScale(32) }
+            : {
+                paddingTop: exactScale(14),
+                paddingBottom: adjustedBottom + exactScale(32),
+              }
         }
         keyboardShouldPersistTaps="handled"
       >

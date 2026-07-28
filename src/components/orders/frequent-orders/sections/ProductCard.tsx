@@ -353,13 +353,12 @@ export function ProductCard({
         </View>
       </Touchable>
 
-      {/* Dashed divider */}
+      {/* Match the clean dashed divider used on the Profile page. */}
       <View
         style={{
+          borderTopWidth: 1,
+          borderColor: "#E5E7EB",
           borderStyle: "dashed",
-          borderWidth: 1,
-          borderColor: "#EEEFF1",
-          height: 0,
           marginVertical: isStepperVariant ? 12 : exactScale(12),
         }}
       />
@@ -471,7 +470,7 @@ export function ProductCard({
         </View>
       ) : (
         <Touchable
-          style={{ height: CART_BUTTON_HEIGHT, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F763533', backgroundColor: '#fff' }}
+          style={{ height: CART_BUTTON_HEIGHT, borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F763533', backgroundColor: '#fff' }}
           activeOpacity={0.6}
           onPress={handleAddToCart}
           disabled={isAdding}

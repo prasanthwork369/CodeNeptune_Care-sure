@@ -4,8 +4,8 @@ import { Skeleton } from '@/src/components/ui/Skeleton';
 
 export const PrescriptionCardSkeleton = () => (
   <View
-    className="bg-white rounded-lg mb-4 p-4"
-    style={{ borderWidth: 1, borderColor: "#919EAB33" }}
+    className="bg-white mb-4 p-4"
+    style={{ borderWidth: 1, borderColor: "#DFE3E8", borderRadius: 12 }}
   >
     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>

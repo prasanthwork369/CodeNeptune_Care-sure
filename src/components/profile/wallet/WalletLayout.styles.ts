@@ -23,8 +23,8 @@ export const styles = StyleSheet.create({
     borderRadius: exactScale(26),
     borderWidth: 1,
     borderColor: "#919EAB24", // Subtle border that blends in with card background
-    paddingHorizontal: exactScale(20),
-    paddingVertical: exactScale(16),
+    paddingHorizontal: exactScale(12),
+    paddingVertical: exactScale(12),
     height: exactScale(242),
     position: "relative",
     overflow: "hidden",
@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#ECF7E4",
     borderRadius: exactScale(100), // Perfect capsule layout matching Figma
-    marginBottom: exactScale(12),
+    marginBottom: exactScale(16),
     zIndex: 20, // Ensure tabs sit above absolute illustrations
     position: "relative",
   },
@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    height: exactScale(38),
+    height: exactScale(46),
     borderRadius: exactScale(100), // Perfect capsule layout matching Figma
     gap: exactScale(6),
   },
@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
   tabPill: {
     position: "absolute",
     top: 0,
-    height: exactScale(38),
+    height: exactScale(46),
     borderRadius: exactScale(100), // Perfect capsule layout matching Figma
     backgroundColor: "#FFFFFF",
     ...Platform.select({
@@ -84,7 +84,7 @@ export const styles = StyleSheet.create({
   },
   // Unselected tab label typography
   tabText: {
-    fontSize: moderateScale(13),
+    fontSize: moderateScale(14),
     fontFamily: "Inter",
     fontWeight: "500",
     color: "#222222", // Matches dark charcoal unselected text in mockup
@@ -104,6 +104,7 @@ export const styles = StyleSheet.create({
   cardInfoSection: {
     flex: 1,
     justifyContent: "flex-start",
+    maxWidth: exactScale(185),
   },
   // Card title label (e.g. WALLET BALANCE)
   cardLabel: {
@@ -189,19 +190,18 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#919EAB33",
     overflow: "hidden",
-    padding: exactScale(4),
   },
   // Individual transaction item row
   txRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: exactScale(16),
-    paddingVertical: exactScale(14),
+    paddingHorizontal: exactScale(10),
+    paddingVertical: exactScale(20),
   },
   // Transaction description details block
   txDetails: {
     flex: 1,
-    marginLeft: exactScale(12),
+    marginLeft: exactScale(16),
   },
   // Date subtitle in transaction item
   txDateText: {
@@ -209,7 +209,7 @@ export const styles = StyleSheet.create({
   },
   // Amount adjusting display text (wallet/credits/coins)
   txAmountText: {
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(16),
     fontFamily: "Inter",
     fontWeight: "700",
   },
@@ -228,13 +228,12 @@ export const styles = StyleSheet.create({
   txSeparator: {
     height: 1,
     backgroundColor: "#919EAB33",
-    marginHorizontal: exactScale(16),
   },
   // Transaction circular icon wrapper
   txIconContainer: {
-    width: exactScale(40),
-    height: exactScale(40),
-    borderRadius: exactScale(20),
+    width: exactScale(44),
+    height: exactScale(44),
+    borderRadius: exactScale(22),
     alignItems: "center",
     justifyContent: "center",
   },

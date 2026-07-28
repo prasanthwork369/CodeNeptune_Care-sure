@@ -12,8 +12,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Share, Text, View } from "react-native";
 import Svg, {
   Defs,
-  Stop,
   LinearGradient as SvgGradient,
+  Stop,
   Text as SvgText,
 } from "react-native-svg";
 import { orderStyles as s } from "../orders.styles";
@@ -33,23 +33,27 @@ export interface Prescription {
   reminder?: PrescriptionReminder | null;
 }
 
-const GradientText: React.FC<{ text: string }> = ({ text }) => {
-  const width = text.length * 7;
+const ReminderText: React.FC<{ date: string }> = ({ date }) => {
+  const text = `NEXT REMINDER: ${date.toUpperCase()}`;
+  const width = Math.max(130, text.length * moderateScale(6.8));
+
   return (
-    <Svg height={16} width={width}>
+    <Svg width={width} height={moderateScale(16)}>
       <Defs>
-        <SvgGradient id="rg" x1="0" y1="0" x2="1" y2="0">
-          <Stop offset="0" stopColor="#C22923" />
-          <Stop offset="1" stopColor="#FF8A00" />
+        <SvgGradient id="reminderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <Stop offset="0%" stopColor="#C92A2A" />
+          <Stop offset="58%" stopColor="#E4471A" />
+          <Stop offset="100%" stopColor="#F57C00" />
         </SvgGradient>
       </Defs>
       <SvgText
-        fill="url(#rg)"
-        stroke="url(#rg)"
-        strokeWidth={0.3}
-        fontWeight="700"
         x={0}
-        y={12}
+        y={moderateScale(12.5)}
+        fill="url(#reminderGradient)"
+        fontFamily="Inter"
+        fontSize={moderateScale(11)}
+        fontWeight="800"
+        letterSpacing={0.35}
       >
         {text}
       </SvgText>
@@ -85,18 +89,18 @@ const Toggle = ({
       friction: 8,
       tension: 50,
     }).start();
-  }, [value]);
+  }, [anim, value]);
   const translateX = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [2, 22],
+    outputRange: [0, 18],
   });
   return (
     <Touchable onPress={onToggle} activeOpacity={0.85}>
       <View
         style={{
-          width: 44,
-          height: 24,
-          borderRadius: 12,
+          width: 40,
+          height: 22,
+          borderRadius: 11,
           backgroundColor: value ? "#0F7635" : "#D1D5DB",
           justifyContent: "center",
           padding: 2,
@@ -212,11 +216,18 @@ export const PrescriptionCard = ({
 
   return (
     <View
-      className="bg-white rounded-lg mb-4 p-2"
-      style={{ borderWidth: 1, borderColor: "#919EAB33" }}
+      className="bg-white mb-4 overflow-hidden"
+      style={{
+        borderWidth: 1,
+        borderColor: "#DFE3E8",
+        borderRadius: 12,
+      }}
     >
-      {/* Top row: status badge (left) + three dots (right) */}
-      <View className="flex-row items-center justify-between px-3 pt-3 pb-1">
+      {/* Keep the status badge and overflow menu in their original top row. */}
+      <View
+        className="flex-row items-center justify-between"
+        style={{ paddingHorizontal: 10, paddingTop: 12, paddingBottom: 4 }}
+      >
         <View
           style={{
             backgroundColor: statusStyle.bg,
@@ -244,15 +255,18 @@ export const PrescriptionCard = ({
         </Touchable>
       </View>
 
-      {/* Icon + RxId row */}
-      <View className="flex-row items-center px-4 pt-2 ">
+      {/* Prescription icon and reference. */}
+      <View
+        className="flex-row items-center"
+        style={{ paddingHorizontal: 10, paddingTop: 4, paddingBottom: 12 }}
+      >
         <View
-          className="w-10 h-10 rounded-sm items-center justify-center mr-3"
-          style={{ backgroundColor: "#E8F6ED" }}
+          className="w-10 h-10 items-center justify-center mr-3"
+          style={{ backgroundColor: "#E8F6ED", borderRadius: 10 }}
         >
           <icons.note_book width={22} height={22} />
         </View>
-        <View className="flex-1 py-1">
+        <View className="flex-1">
           <Text
             style={s.labelXl}
             className="font-inter-bold text-[#0F1724]"
@@ -262,13 +276,21 @@ export const PrescriptionCard = ({
           </Text>
           {refill.isActive && refill.nextRemindDate && (
             <View className="mt-0.5">
-              <GradientText text={`NEXT REMINDER: ${formatReminderDateShort(refill.nextRemindDate)}`} />
+              <ReminderText
+                date={formatReminderDateShort(refill.nextRemindDate)}
+              />
             </View>
           )}
         </View>
       </View>
 
-      <View className="px-4 pb-4 gap-y-1 py-2">
+      <View
+        style={{
+          paddingHorizontal: 10,
+          paddingBottom: 16,
+          gap: 16,
+        }}
+      >
         <View className="flex-row items-center">
           <icons.calendar_today width={17} height={17} fill="#6A6A6A" />
           <Text
@@ -282,7 +304,7 @@ export const PrescriptionCard = ({
             always empty — the reason below is all there is to show. */}
         {!showReason && (
           <>
-            <View className="flex-row items-center py-2">
+            <View className="flex-row items-center">
               <icons.person_outline width={17} height={17} fill="#6A6A6A" />
               <Text
                 className="font-inter-medium ml-2.5"
@@ -314,7 +336,7 @@ export const PrescriptionCard = ({
         <Touchable
           activeOpacity={0.6}
           onPress={() => setShowReasons(true)}
-          className="px-4 pb-4"
+          style={{ paddingHorizontal: 10, paddingBottom: 16 }}
         >
           <Text
             className="font-inter-bold text-[#C22307]"
@@ -345,9 +367,18 @@ export const PrescriptionCard = ({
       {/* Nothing to remind about or reorder once a prescription is rejected. */}
       {!showReason && (
         <>
-          <View className="h-px bg-[#919EAB33] mx-4" />
+          <View
+            style={{
+              height: 1,
+              backgroundColor: "#E1E5E8",
+              marginHorizontal: 10,
+            }}
+          />
 
-          <View className="flex-row items-center justify-between px-4 py-3.5">
+          <View
+            className="flex-row items-center justify-between"
+            style={{ paddingHorizontal: 10, paddingVertical: 14 }}
+          >
             <View className="flex-row items-center">
               <Toggle
                 value={refill.isActive}
@@ -358,16 +389,19 @@ export const PrescriptionCard = ({
               />
               <Text
                 style={s.labelMd}
-                className="font-inter-semibold text-[#222222] ml-3"
+                className="font-inter-semibold text-[#222222] ml-2.5"
               >
                 Enable Reminder
               </Text>
             </View>
             <Touchable
               activeOpacity={0.85}
-              className="bg-[#0F7635] rounded-md px-5 py-2.5"
+              className="bg-[#0F7635] px-5 py-2.5"
               disabled={!item.prescriptionOrderId}
-              style={{ opacity: item.prescriptionOrderId ? 1 : 0.4 }}
+              style={{
+                opacity: item.prescriptionOrderId ? 1 : 0.4,
+                borderRadius: 10,
+              }}
               onPress={() => {
                 if (item.prescriptionOrderId) {
                   router.push({

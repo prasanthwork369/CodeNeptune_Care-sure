@@ -186,8 +186,8 @@ export const ORDER_STATUS: Record<
   number,
   { label: string; bg: string; text: string; border: string }
 > = {
-  0:  { label: "CANCELLED",    bg: "#FFF0F2", text: "#DC2626", border: "#FECDD3" },
-  1:  { label: "ORDER PLACED", bg: "#FFFBE8", text: "#92600A", border: "#FFE998" },
+  0:  { label: "CANCELED",      bg: "#FFF7ED", text: "#C47A00", border: "#FED7AA" },
+  1:  { label: "PLACED",        bg: "#FFFBE8", text: "#7A7600", border: "#FDE047" },
   2:  { label: "CONFIRMED",    bg: "#ECFDF5", text: "#16A34A", border: "#BBF7D0" },
   3:  { label: "VERIFIED",     bg: "#ECFDF5", text: "#16A34A", border: "#BBF7D0" },
   4:  { label: "PROCESSING",   bg: "#FFFBE8", text: "#92600A", border: "#FFE998" },
