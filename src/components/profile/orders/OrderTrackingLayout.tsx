@@ -11,13 +11,17 @@ import { useNav } from "@/src/hooks/useNav";
 import { useOrderTrackingSteps } from "@/src/hooks/useOrderTrackingSteps";
 import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { downloadLocalAsset } from "@/src/utils/fileDownload";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -26,6 +30,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
+import { InvoiceModal } from "./InvoiceModal";
 import { orderStyles as s } from "./orders.styles";
 import { OrderTrackingModal } from "./OrderTrackingModal";
 import { OrderTrackingSkeleton } from "./OrderTrackingSkeleton";
@@ -37,8 +42,6 @@ import {
   SavingsBreakdownSection,
   SectionCard,
 } from "./tracking-sections";
-
-const invoiceAsset = require("../../../../assets/pdf/Invoice.pdf");
 
 const EASE_OUT = Easing.out(Easing.cubic);
 
@@ -254,6 +257,7 @@ export const OrderTrackLayout: React.FC = () => {
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
   const [isProceeding, setIsProceeding] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [invoiceModalVisible, setInvoiceModalVisible] = useState(false);
 
   const [alertState, setAlertState] = useState<{
     visible: boolean;
@@ -378,7 +382,7 @@ export const OrderTrackLayout: React.FC = () => {
               className="flex-row items-center"
               style={{ gap: exactScale(4) }}
               activeOpacity={0.7}
-              onPress={() => downloadLocalAsset(invoiceAsset, "Invoice")}
+              onPress={() => setInvoiceModalVisible(true)}
             >
               <Text
                 style={s.labelMd}
@@ -627,6 +631,12 @@ export const OrderTrackLayout: React.FC = () => {
         visible={trackingModalVisible}
         onClose={() => setTrackingModalVisible(false)}
         steps={trackingSteps}
+      />
+
+      <InvoiceModal
+        visible={invoiceModalVisible}
+        onClose={() => setInvoiceModalVisible(false)}
+        order={order}
       />
 
       {order?.clinicalData && order?.status === 7 && (

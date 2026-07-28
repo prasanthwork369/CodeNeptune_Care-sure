@@ -185,10 +185,10 @@ export const DigitalPrescriptionModal: React.FC<
     let body = template.body;
 
     // Template design width is 680px.
-    // Calculate viewport scale based on device screen layout (padding: 20px on each side).
+    // Calculate viewport scale based on device screen layout.
     const containerWidth = screenWidth - 40;
     const scale = containerWidth / 530;
-    
+
     const zoomStyle = `
       <style>
         html, body {
@@ -209,11 +209,8 @@ export const DigitalPrescriptionModal: React.FC<
       } else {
         body = metaTag + zoomStyle + body;
       }
-    } else {
-      // If template already has head, inject the zoomStyle
-      if (body.includes("<head>")) {
-        body = body.replace("<head>", `<head>${zoomStyle}`);
-      }
+    } else if (body.includes("<head>")) {
+      body = body.replace("<head>", `<head>${zoomStyle}`);
     }
     return body;
   }, [template?.body, screenWidth]);
@@ -403,6 +400,7 @@ export const DigitalPrescriptionModal: React.FC<
               containerStyle={{ backgroundColor: "#ffffff" }}
               scalesPageToFit={true}
               nestedScrollEnabled
+              showsVerticalScrollIndicator={false}
             />
           </View>
         ) : null}

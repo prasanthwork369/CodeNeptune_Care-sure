@@ -101,6 +101,11 @@ export interface Order {
   id: string;
   orderId: string;
   customerId: string;
+  customer?: {
+    identifier?: string;
+    firstName?: string;
+    lastName?: string;
+  };
   deliveryType?: string;
   status: number;
   deliveryAddress?: {
@@ -120,6 +125,7 @@ export interface Order {
   handlingCharge?: string;
   discountAmount?: string;
   prescriptionId?: string | null;
+  paymentMethod?: number | string;
   createdAt: string;
   updatedAt?: string;
   estimatedDelivery?: string;
