@@ -32,7 +32,8 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
           scrollEnabled={false}
           contentContainerStyle={{
             paddingHorizontal: exactScale(16),
-            paddingTop: exactScale(14),
+            // Matches the loaded state so the row doesn't jump when data lands.
+            paddingTop: exactScale(4),
             paddingBottom: exactScale(12),
             gap: exactScale(32),
           }}

@@ -45,13 +45,16 @@ export const TabItem: React.FC<TabItemProps> = ({ tab, isActive, onPress, onLayo
             className="items-center mx-4 pb-3 px-1"
         >
             <Animated.View style={[animatedStyle, { alignItems: 'center' }]}>
-                <View style={s.iconWrap} className="mb-1 justify-center items-center">
-                    {iconSource ? (
-                        <Image source={iconSource} style={s.icon} contentFit="contain" />
-                    ) : (
-                        <Text style={s.emoji}>{tab.emoji}</Text>
-                    )}
-                </View>
+                {/* Skipped entirely when there is no icon, so no blank box is reserved. */}
+                {iconSource || tab.emoji ? (
+                    <View style={s.iconWrap} className="mb-1 justify-center items-center">
+                        {iconSource ? (
+                            <Image source={iconSource} style={s.icon} contentFit="contain" />
+                        ) : (
+                            <Text style={s.emoji}>{tab.emoji}</Text>
+                        )}
+                    </View>
+                ) : null}
                 <Text style={s.label} className={`text-brand-text ${isActive ? 'font-inter-semibold' : 'font-inter-medium'}`}>
                     {tab.label}
                 </Text>

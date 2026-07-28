@@ -35,16 +35,18 @@ export const useCategories = () => {
 
   const tabs: CategoryTab[] = useMemo(
     () =>
-      families.map((family) => ({
-        id: family.id,
-        label: family.mobileShortName || family.name,
-        imageActive: family.mobIconUrl
-          ? { uri: family.mobIconUrl }
-          : { uri: family.iconActive },
-        imageInactive: family.mobIconUrl
-          ? { uri: family.mobIconUrl }
-          : { uri: family.iconInactive },
-      })),
+      families.map((family) => {
+        // `{ uri: undefined }` is truthy, so callers would render a blank icon.
+        const toSource = (url?: string) => (url ? { uri: url } : undefined);
+        return {
+          id: family.id,
+          label: family.mobileShortName || family.name,
+          imageActive:
+            toSource(family.mobIconUrl) ?? toSource(family.iconActive),
+          imageInactive:
+            toSource(family.mobIconUrl) ?? toSource(family.iconInactive),
+        };
+      }),
     [families],
   );
 

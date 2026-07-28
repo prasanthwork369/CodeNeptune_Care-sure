@@ -100,6 +100,8 @@ export const NotificationNavigation = {
               prescriptionId: data.prescriptionId,
               status: data.status || '',
               imageUrls: data.imageUrls || '[]',
+              // Lets the viewer fetch the order id the payload cannot carry.
+              source: 'notification',
             },
           } as any);
         } else {

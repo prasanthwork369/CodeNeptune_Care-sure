@@ -88,7 +88,6 @@ export const PreviewLayout: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    if (usePrescriptionDraftStore.getState().items.length > 0) return;
     const seed: PrescriptionItem[] = [];
     if (files) {
       try {
@@ -101,7 +100,9 @@ export const PreviewLayout: React.FC = () => {
         type: type ?? "image/jpeg",
       });
     }
-    if (seed.length > 0) addItems(seed);
+    if (seed.length === 0) return;
+    // Merges with anything already picked; addItems dedupes and caps at MAX_FILES.
+    addItems(seed);
   }, []);
 
   const [submitting, setSubmitting] = useState(false);

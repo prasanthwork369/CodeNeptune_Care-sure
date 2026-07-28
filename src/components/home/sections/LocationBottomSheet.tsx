@@ -403,7 +403,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       onPresent={refetch}
       snapPoints={snapPoints}
       closeButtonOffset="70%"
-      keyboardBehavior="interactive"
+      // iOS "interactive" translates the sheet up by the keyboard height, past the snap point.
+      keyboardBehavior={Platform.OS === "ios" ? "extend" : "interactive"}
       keyboardBlurBehavior="none"
       style={{ zIndex: 999 }}
     >
@@ -439,6 +440,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               borderRadius: exactScale(6),
               paddingHorizontal: exactScale(16),
               paddingVertical: exactScale(10),
+              // iOS text fields have no intrinsic height, so the row needs its own.
+              minHeight: exactScale(48),
             }}
             className="flex-row items-center bg-white"
           >
@@ -463,6 +466,11 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
               style={{
                 marginLeft: exactScale(12),
                 fontSize: moderateScale(14),
+                // iOS has no intrinsic height; fixing it keeps both platforms identical.
+                height: exactScale(32),
+                paddingVertical: 0,
+                includeFontPadding: false,
+                textAlignVertical: "center",
               }}
               onFocus={() => {
                 setIsSearchFocused(true);

@@ -4,7 +4,9 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
 import { icons } from "@/src/constants/icons";
-import React, { useState } from "react";
+import { PRESCRIPTION_STATUS_LABELS } from "@/src/constants/prescription-status";
+import { prescriptionService } from "@/src/services/prescription.service";
+import React, { useEffect, useState } from "react";
 import {
     LayoutChangeEvent,
     Text,
@@ -44,6 +46,41 @@ export const PrescriptionViewerLayout: React.FC = () => {
       prescriptionOrderId?: string;
     }>();
 
+  // The push payload carries no order id, so resolve it before the footer decides.
+  const [resolved, setResolved] = useState<{
+    status: string;
+    orderId: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (source !== "notification" || !prescriptionId || prescriptionOrderId)
+      return;
+    let isActive = true;
+    (async () => {
+      const res = await prescriptionService.getById(prescriptionId);
+      if (!isActive || !res.success || !res.data) return;
+      setResolved({
+        status: PRESCRIPTION_STATUS_LABELS[res.data.status] ?? "",
+        orderId: res.data.prescriptionOrderId ?? "",
+      });
+    })();
+    return () => {
+      isActive = false;
+    };
+  }, [source, prescriptionId, prescriptionOrderId]);
+
+  const effectiveStatus = resolved?.status ?? status;
+  const effectiveOrderId = resolved?.orderId ?? prescriptionOrderId;
+  // Only the notification and the upload screen offer ordering; the upload
+  // bottom sheet is picking a file for a new order, so it stays on Select.
+  const isOrderEntry = source === "notification" || source === "upload";
+  const showVerifiedCard =
+    isOrderEntry && effectiveStatus === "Verified" && !!effectiveOrderId;
+  // A rejected prescription cannot be reused, so it is view-only.
+  const isRejected = effectiveStatus === "Rejected" || source === "rejection";
+  const showSelect =
+    !showVerifiedCard && !isRejected && source !== "view_only";
+
   const urls: string[] = imageUrls ? JSON.parse(imageUrls) : [];
   // A prescription can be several files, so the viewer pages through them.
   const [pageIndex, setPageIndex] = useState(0);
@@ -52,8 +89,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
   const hasPages = urls.length > 1;
   // Without a footer the image runs to the screen edge, so the page controls
   // have to clear the system navigation bar themselves.
-  const hasFooter =
-    (status === "Verified" && !!prescriptionOrderId) || source !== "view_only";
+  const hasFooter = showVerifiedCard || showSelect;
 
   // Zoom shared values
   const scale = useSharedValue(1);
@@ -262,7 +298,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
       </View>
 
       {/* If the prescription is verified, show a custom inline card to directly compare/order medicines */}
-      {status === "Verified" && prescriptionOrderId ? (
+      {showVerifiedCard ? (
         <View style={{ paddingBottom: adjustedBottom + 12 }} className="px-5 pt-4 bg-white border-t border-[#EEEFF1]">
           <Touchable
             activeOpacity={0.85}
@@ -270,7 +306,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
               router.push({
                 pathname: "/(prescription)/medicine-comparison",
                 params: {
-                  prescriptionOrderId: prescriptionOrderId,
+                  prescriptionOrderId: effectiveOrderId,
                   prescriptionId: prescriptionId,
                 },
               });
@@ -291,7 +327,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
             <icons.arrow_forward_green width={16} height={16} />
           </Touchable>
         </View>
-      ) : source !== "view_only" && (
+      ) : showSelect && (
         <View
           className="flex-row gap-3 px-5 pt-3 bg-white border-t border-[#EEEFF1]"
           style={{ paddingBottom: adjustedBottom + 12 }}

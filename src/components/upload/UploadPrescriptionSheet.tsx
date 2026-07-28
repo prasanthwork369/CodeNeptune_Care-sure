@@ -8,17 +8,17 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
+import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePrescriptionPicker } from "@/src/hooks/ui/usePrescriptionPicker";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 interface UploadPrescriptionSheetProps {
   isVisible: boolean;
@@ -394,7 +394,6 @@ export const UploadPrescriptionSheet: React.FC<
           {showBeforeUpload && (
             <Animated.View
               entering={FadeIn.duration(200)}
-              exiting={FadeOut.duration(150)}
               style={{
                 borderColor: "#0F763522",
                 borderRadius: exactScale(16),
