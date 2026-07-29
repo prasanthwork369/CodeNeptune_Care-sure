@@ -126,7 +126,11 @@ export const CouponCard: React.FC<CouponCardProps> = ({
           }}
         >
           <Text
+            numberOfLines={1}
             style={{
+              // Shrinks so a long code can't push the Apply button off the card.
+              flexShrink: 1,
+              marginRight: exactScale(8),
               fontSize: moderateScale(14),
               fontWeight: "700",
               color: "#000000",
@@ -144,7 +148,10 @@ export const CouponCard: React.FC<CouponCardProps> = ({
               backgroundColor: disabled || inactive ? "#FFFFFF" : colors.primary,
               borderWidth: disabled || inactive ? 1 : 0,
               borderColor: disabled || inactive ? "#E4E7EC" : "transparent",
-              width: exactScale(55),
+              // minWidth, not width: "APPLIED" is wider than "APPLY" and was
+              // wrapping to a clipped second line inside the fixed height.
+              minWidth: exactScale(55),
+              paddingHorizontal: exactScale(8),
               height: exactScale(28),
               borderRadius: exactScale(4),
               alignItems: "center",
@@ -152,6 +159,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             }}
           >
             <Text
+              numberOfLines={1}
               style={{
                 color: disabled || inactive ? "#9CA3AF" : "#FFFFFF",
                 fontSize: moderateScale(13),
