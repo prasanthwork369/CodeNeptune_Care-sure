@@ -2,13 +2,14 @@ import { PolicyLink } from "@/src/components/auth/PolicyLink";
 import { icons } from "@/src/constants/icons";
 import { useMobileAppLinks } from "@/src/hooks/queries/useSettings";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { styles as s } from "./AuthFooter.styles";
 
 type LinkKey = "terms" | "privacy" | "refund";
 
-export const AuthFooter: React.FC = () => {
+// Memoised: takes no props, but the login/OTP panels re-render on every keystroke.
+export const AuthFooter: React.FC = React.memo(() => {
   const { data: links } = useMobileAppLinks();
   const [policy, setPolicy] = useState<{ title: string; url?: string } | null>(
     null,
@@ -20,6 +21,10 @@ export const AuthFooter: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setPolicy({ title, url });
   };
+
+  // Stable identity: PolicyLink keys its open-browser effect on onClose, so a
+  // new closure each render would re-open the link while one is already open.
+  const handleClosePolicy = useCallback(() => setPolicy(null), []);
 
   // Bordered element, not an inline <Text>: borders don't apply to text spans.
   const renderLink = (key: LinkKey, label: string, url?: string) => (
@@ -62,10 +67,12 @@ export const AuthFooter: React.FC = () => {
 
       <PolicyLink
         isVisible={!!policy}
-        onClose={() => setPolicy(null)}
+        onClose={handleClosePolicy}
         title={policy?.title ?? ""}
         url={policy?.url}
       />
     </View>
   );
-};
+});
+
+AuthFooter.displayName = "AuthFooter";

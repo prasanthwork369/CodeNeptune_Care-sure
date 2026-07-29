@@ -19,7 +19,7 @@ export function useLogin() {
   const router = useNav();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const { requestOtp, loading, error } = useAuth();
+  const { requestOtp, loading, error, resetError } = useAuth();
   const { start: startLoginTrace, stop: stopLoginTrace } = usePerformanceTrace({
     traceName: PERF_TRACES.LOGIN_SUBMIT,
     manualStart: true,
@@ -40,6 +40,9 @@ export function useLogin() {
   const handleChangeText = (text: string) => {
     // Typed overflow: already 10 digits and new text only appends — ignore it.
     if (phoneNumber.length === 10 && text.startsWith(phoneNumber)) return;
+    // Editing the number is a fresh attempt — drop the previous number's API
+    // error, or it resurfaces once phoneError clears.
+    if (error) resetError();
     const cleaned = sanitize.phone(text);
     setPhoneNumber(cleaned);
     if (cleaned.length > 0) {
@@ -108,7 +111,6 @@ export function useLogin() {
   const isValid = validate.phone(phoneNumber).valid;
 
   return {
-    router,
     phoneNumber,
     phoneError,
     loading,

@@ -1,8 +1,11 @@
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
+import { colors } from "@/src/theme";
 import { LoginFormProps } from "@/src/types/auth";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { styles as s } from "./LoginForm.styles";
+
+const MAX_PHONE_DIGITS = 10;
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   phoneNumber,
@@ -15,32 +18,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
+  // Stable identity: an inline ref callback is re-invoked on every render, so
+  // the native filter would be re-applied on each keystroke.
+  const setInputRef = useCallback(
+    (r: TextInput | null) => {
+      applyDigitsOnlyFilter(r, MAX_PHONE_DIGITS);
+      if (inputRef) inputRef.current = r;
+    },
+    [inputRef],
+  );
+
+  const borderStyle = phoneError
+    ? s.inputWrapError
+    : isFocused
+      ? s.inputWrapFocused
+      : s.inputWrapIdle;
+
   return (
     <View>
-      <View
-        style={[
-          s.inputWrap,
-          {
-            borderColor: phoneError
-              ? "#EF4444"
-              : isFocused
-                ? "#0F7635"
-                : "#919EAB33",
-          },
-        ]}
-      >
+      <View style={[s.inputWrap, borderStyle]}>
         <Text style={s.prefix}>+91</Text>
         <View style={s.divider} />
         <TextInput
           // Native filter caps typed input at 10 so the 11th digit never flashes.
-          ref={(r) => {
-            applyDigitsOnlyFilter(r, 10);
-            if (inputRef) inputRef.current = r;
-          }}
+          ref={setInputRef}
           testID="phone-input"
           allowFontScaling={false}
           placeholder="Enter your mobile number"
-          placeholderTextColor="#6A6A6A"
+          placeholderTextColor={colors.subtext}
           // MUST stay "number-pad" (maps to Android inputType="number") — a clean
           // 0-9 pad. Do NOT use "phone-pad": it renders the full dialer with
           // symbol keys (, . * Pause Wait N) that QA flagged as enterable at the
@@ -52,7 +57,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           style={s.input}
           // No maxLength: it truncates a pasted "+91…" before sanitize.phone can
           // strip the country code, silently producing a wrong number.
-          cursorColor="#0F7635"
+          cursorColor={colors.primary}
           value={phoneNumber}
           // Forward raw text — useLogin owns sanitization and overflow rejection.
           onChangeText={onPhoneChange}
@@ -72,7 +77,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </View>
 
       {phoneError || error ? (
-        <Text style={s.error}>{phoneError || error}</Text>
+        <Text testID="phone-error" style={s.error}>
+          {phoneError || error}
+        </Text>
       ) : null}
     </View>
   );

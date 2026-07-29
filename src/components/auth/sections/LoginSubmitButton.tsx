@@ -10,15 +10,18 @@ export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
   onGetOtp,
   isValid,
 }) => {
+  const disabled = loading || !isValid;
+
   return (
     <Touchable
       testID="get-otp-btn"
       activeOpacity={0.8}
       onPress={onGetOtp}
-      disabled={loading || !isValid}
+      disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel="Get OTP"
-      style={[s.btn, { opacity: loading || !isValid ? 0.6 : 1 }]}
+      accessibilityState={{ disabled, busy: loading }}
+      style={[s.btn, disabled ? s.btnDisabled : s.btnEnabled]}
     >
       {loading ? (
         <ActivityIndicator color="#fff" size="small" />

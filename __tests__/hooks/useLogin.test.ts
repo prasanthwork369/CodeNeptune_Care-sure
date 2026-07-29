@@ -4,12 +4,16 @@ import { useLogin } from "@/src/hooks/useLogin";
 import { getPhoneNumberHint } from "@/src/modules/PhoneNumberHint";
 
 const mockRequestOtp = jest.fn();
+const mockResetError = jest.fn();
+// Mutable so a test can simulate a lingering request-otp failure.
+let mockAuthError: string | null = null;
 
 jest.mock("@/src/hooks/mutations/useAuth", () => ({
   useAuth: () => ({
     requestOtp: mockRequestOtp,
     loading: false,
-    error: null,
+    error: mockAuthError,
+    resetError: mockResetError,
   }),
 }));
 
@@ -49,6 +53,7 @@ describe("useLogin phone input", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAuthError = null;
   });
 
   it("becomes valid at 10 digits and ignores appended overflow digits", () => {
@@ -103,6 +108,23 @@ describe("useLogin phone input", () => {
 
     expect(result.current.phoneNumber).toBe("9876543210");
     expect(result.current.isValid).toBe(true);
+  });
+
+  it("clears a lingering API error when the number is edited", () => {
+    mockAuthError = "Too many requests";
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("98765"));
+
+    expect(mockResetError).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not reset the API error when there is none", () => {
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("98765"));
+
+    expect(mockResetError).not.toHaveBeenCalled();
   });
 
   it("fills the number from the hint on the first tap", async () => {

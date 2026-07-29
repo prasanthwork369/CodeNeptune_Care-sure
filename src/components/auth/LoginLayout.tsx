@@ -13,7 +13,6 @@ import { LoginSubmitButton } from "./sections/LoginSubmitButton";
  */
 export const LoginLayout: React.FC = () => {
   const {
-    router,
     phoneNumber,
     phoneError,
     loading,
@@ -27,8 +26,8 @@ export const LoginLayout: React.FC = () => {
   } = useLogin();
 
   return (
+    // Skip is left to AuthScreenShell's default — it already replaces to /(tabs).
     <AuthScreenShell
-      onSkip={() => router.replace("/(tabs)")}
       footer={
         <>
           <View className="items-center" style={s.headerContainer}>

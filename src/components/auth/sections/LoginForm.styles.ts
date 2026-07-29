@@ -1,5 +1,9 @@
+import { colors } from "@/src/theme";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { Platform, StyleSheet } from "react-native";
+
+// Field-level red, deliberately lighter than the app-wide colors.error (#DC2626).
+const FIELD_ERROR = "#EF4444";
 
 export const styles = StyleSheet.create({
   inputWrap: {
@@ -15,14 +19,19 @@ export const styles = StyleSheet.create({
     paddingLeft: scale(16),
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     gap: scale(10),
     marginTop: verticalScale(8),
   },
+  // Border colour is the only thing that varies by field state — keeping the
+  // three variants static avoids rebuilding a style object on every keystroke.
+  inputWrapIdle: { borderColor: colors.border },
+  inputWrapFocused: { borderColor: colors.primary },
+  inputWrapError: { borderColor: FIELD_ERROR },
   prefix: {
     fontSize: moderateScale(17),
     fontWeight: "500",
-    color: "#222222",
+    color: colors.text,
   },
   input: {
     flex: 1,
@@ -37,17 +46,17 @@ export const styles = StyleSheet.create({
     fontFamily: Platform.OS === "android" ? "Inter_400Regular" : undefined,
     fontWeight: Platform.OS === "android" ? "normal" : "400",
     letterSpacing: 0,
-    color: "#222222",
+    color: colors.text,
   },
   divider: {
     width: scale(2),
     height: verticalScale(20),
-    backgroundColor: "#222222",
+    backgroundColor: colors.text,
   },
   error: {
     fontSize: moderateScale(13),
     fontWeight: "500",
-    color: "#EF4444",
+    color: FIELD_ERROR,
     marginTop: verticalScale(6),
     marginBottom: verticalScale(4),
     paddingHorizontal: scale(4),
@@ -66,14 +75,15 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0F7635",
+    backgroundColor: colors.primary,
     marginVertical: verticalScale(16),
   },
+  btnEnabled: { opacity: 1 },
+  btnDisabled: { opacity: 0.6 },
   btnText: {
     fontSize: moderateScale(16),
     fontWeight: "700",
     color: "white",
     marginRight: scale(8),
   },
-  arrow: { width: moderateScale(13), height: moderateScale(13) },
 });

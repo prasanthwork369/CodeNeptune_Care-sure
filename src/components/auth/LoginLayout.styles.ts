@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { scale, verticalScale, moderateScale } from '@/src/utils/exactScale';
+import { verticalScale, moderateScale } from '@/src/utils/exactScale';
 
 export const styles = StyleSheet.create({
     title: { fontSize: moderateScale(26), lineHeight: moderateScale(34) },

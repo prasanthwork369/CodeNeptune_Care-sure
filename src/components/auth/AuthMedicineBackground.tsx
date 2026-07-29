@@ -2,7 +2,7 @@ import { MEDICINE_COLUMNS } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Image, View } from "react-native";
+import { Image, ImageSourcePropType, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -16,7 +16,7 @@ const ScrollingColumn = ({
   duration,
   colorOffset = 0,
 }: {
-  images: readonly any[];
+  images: readonly ImageSourcePropType[];
   duration: number;
   colorOffset?: number;
 }) => {
@@ -40,7 +40,7 @@ const ScrollingColumn = ({
       -1,
       false,
     );
-  }, [cycleHeight, duration]);
+  }, [cycleHeight, duration, translateY]);
 
   return (
     <Animated.View style={animatedStyle} className="mx-2">
@@ -75,7 +75,9 @@ const ScrollingColumn = ({
   );
 };
 
-export const AuthMedicineBackground = () => {
+// Memoised: static decoration, but the auth panels re-render on every keystroke
+// and this tree is 4 columns x 12 tiles.
+export const AuthMedicineBackground = React.memo(() => {
   return (
     <View className="flex-row justify-center h-full overflow-hidden bg-white">
       <View className="mt-10 mx-1">
@@ -133,4 +135,6 @@ export const AuthMedicineBackground = () => {
       />
     </View>
   );
-};
+});
+
+AuthMedicineBackground.displayName = "AuthMedicineBackground";
