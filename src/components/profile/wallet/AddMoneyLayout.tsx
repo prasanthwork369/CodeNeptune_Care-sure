@@ -7,7 +7,7 @@ import { useAddMoney, useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -34,6 +34,16 @@ export const AddMoneyLayout: React.FC = () => {
   const router = useNav();
   const confettiRef = useRef<Dotlottie>(null);
   const inputRef = useRef<TextInput>(null);
+  const backTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Without this, leaving the screen during the 2s confetti still fires
+  // router.back() and pops a screen the user chose to be on.
+  useEffect(
+    () => () => {
+      if (backTimer.current) clearTimeout(backTimer.current);
+    },
+    [],
+  );
 
   const walletBalance = Number(balance?.walletBalance ?? 0);
   const numericAmount = Number(amount) || 0;
@@ -51,7 +61,10 @@ export const AddMoneyLayout: React.FC = () => {
     try {
       await addMoney(numericAmount);
       confettiRef.current?.play();
-      setTimeout(() => router.back(), 2000);
+      backTimer.current = setTimeout(() => {
+        backTimer.current = null;
+        router.back();
+      }, 2000);
     } catch (err: any) {
       Alert.alert(
         "Failed",
