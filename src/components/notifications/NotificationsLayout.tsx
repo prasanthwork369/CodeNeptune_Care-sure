@@ -16,7 +16,7 @@ import { useToastStore } from "@/src/store/toastStore";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import {
   RefreshControl,
@@ -265,6 +265,10 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   onInteraction,
 }) => {
   const [menuAnchor, setMenuAnchor] = useState<{ top: number } | null>(null);
+  // CardOptionsMenu renders an RN Modal even while hidden, so mounting it up
+  // front would put one native Modal on screen per notification row. Mount it
+  // on first open and keep it after, so the fade-out on close still plays.
+  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const triggerRef = useRef<View>(null);
   const visual = getNotificationVisual(notification);
@@ -272,6 +276,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   const isLong = body.length > 100;
 
   const openMenu = () => {
+    setHasOpenedMenu(true);
     triggerRef.current?.measureInWindow((_x, y, _w, h) => {
       setMenuAnchor({ top: y + h + 4 });
     });
@@ -346,6 +351,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
         </Touchable>
       </View>
 
+      {hasOpenedMenu && (
       <CardOptionsMenu
         useModal
         modalVisible={!!menuAnchor}
@@ -405,6 +411,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
             : []),
         ]}
       />
+      )}
     </Touchable>
   );
 };
@@ -434,10 +441,16 @@ export const NotificationsLayout: React.FC = () => {
     }, [refetch]),
   );
 
-  const sections = SECTION_ORDER.map((key) => ({
-    key,
-    items: notifications.filter((n) => getSectionKey(n.createdAt) === key),
-  })).filter((g) => g.items.length > 0);
+  // Memoized: this walks the whole list once per section, so leaving it in the
+  // render body re-grouped every notification on every state change.
+  const sections = useMemo(
+    () =>
+      SECTION_ORDER.map((key) => ({
+        key,
+        items: notifications.filter((n) => getSectionKey(n.createdAt) === key),
+      })).filter((g) => g.items.length > 0),
+    [notifications],
+  );
 
   const showError =
     !isLoading && !isEntryLoading && isError && notifications.length === 0;
@@ -479,7 +492,7 @@ export const NotificationsLayout: React.FC = () => {
 
     // Wallet / coins → wallet screen
     if (event.startsWith("wallet.") || event.includes("coin")) {
-      router.push("/profile/wallet" as any);
+      router.push("/profile/wallet");
       return;
     }
 
@@ -489,9 +502,9 @@ export const NotificationsLayout: React.FC = () => {
         router.push({
           pathname: "/profile/orders/track",
           params: { orderId: notification.orderId },
-        } as any);
+        });
       } else {
-        router.push("/profile/orders" as any);
+        router.push("/profile/orders");
       }
       return;
     }
