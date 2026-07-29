@@ -78,6 +78,10 @@ export const OrderCard = React.memo(function OrderCard({
 
   const [isProceeding, setIsProceeding] = useState(false);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
+  // AlreadyHaveItemsModal renders an RN Modal even while hidden, so mounting it
+  // up front puts one native Modal on screen per order card. Mount on first
+  // open and keep it after, so the close animation still plays.
+  const [hasOpenedCartModal, setHasOpenedCartModal] = useState(false);
 
   const addItemsToCart = async (replace: boolean) => {
     if (!items.length) return;
@@ -100,7 +104,7 @@ export const OrderCard = React.memo(function OrderCard({
       }
       setIsCartModalVisible(false);
       setIsProceeding(false);
-      setTimeout(() => router.push("/(stack)/cart" as any), 100);
+      setTimeout(() => router.push("/(stack)/cart"), 100);
     } catch (err) {
       if (__DEV__) console.error("[OrderAgain]", err);
       setIsProceeding(false);
@@ -110,6 +114,7 @@ export const OrderCard = React.memo(function OrderCard({
   const handleOrderAgain = () => {
     const currentCartItems = cartItemsRef.current ?? [];
     if (currentCartItems.length > 0) {
+      setHasOpenedCartModal(true);
       setIsCartModalVisible(true);
     } else {
       addItemsToCart(false);
@@ -134,7 +139,7 @@ export const OrderCard = React.memo(function OrderCard({
           router.push({
             pathname: "/profile/orders/track",
             params: { orderId: order.id },
-          } as any)
+          })
         }
       >
         {/* Top: dates + badge */}
@@ -298,7 +303,7 @@ export const OrderCard = React.memo(function OrderCard({
                 router.push({
                   pathname: "/profile/orders/track",
                   params: { orderId: order.id },
-                } as any)
+                })
               }
             >
               <Text
@@ -345,13 +350,15 @@ export const OrderCard = React.memo(function OrderCard({
         </Touchable>
       </View>
 
-      <AlreadyHaveItemsModal
-        visible={isCartModalVisible}
-        onClose={() => setIsCartModalVisible(false)}
-        onAdd={() => addItemsToCart(false)}
-        onReplace={() => addItemsToCart(true)}
-        isProceeding={isProceeding}
-      />
+      {hasOpenedCartModal && (
+        <AlreadyHaveItemsModal
+          visible={isCartModalVisible}
+          onClose={() => setIsCartModalVisible(false)}
+          onAdd={() => addItemsToCart(false)}
+          onReplace={() => addItemsToCart(true)}
+          isProceeding={isProceeding}
+        />
+      )}
     </View>
   );
 });

@@ -2,8 +2,9 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
+import { AddToCartInput, UpdateCartItemInput } from "@/src/types/cart";
 import { OrderTabKey } from "@/src/types/order";
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { orderStyles as s } from "./orders.styles";
@@ -34,9 +35,24 @@ export const MyOrdersLayout: React.FC = () => {
   } = usePagerTabs(TAB_KEYS);
 
   // One cart subscription for every page, so a cart change re-renders once.
-  const { items: cartItems, addItem, updateItem, clearCart } = useCart();
-  const cartItemsRef = useRef(cartItems);
-  cartItemsRef.current = cartItems;
+  const cart = useCart();
+  const cartItemsRef = useRef(cart.items);
+  cartItemsRef.current = cart.items;
+
+  // useCart returns fresh arrows each render, which defeated React.memo on
+  // OrderCard. Call through a ref so the identities passed down stay stable.
+  const cartRef = useRef(cart);
+  cartRef.current = cart;
+  const addItem = useCallback(
+    (input: AddToCartInput) => cartRef.current.addItem(input),
+    [],
+  );
+  const updateItem = useCallback(
+    (itemId: string, input: UpdateCartItemInput) =>
+      cartRef.current.updateItem(itemId, input),
+    [],
+  );
+  const clearCart = useCallback(() => cartRef.current.clearCart(), []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
