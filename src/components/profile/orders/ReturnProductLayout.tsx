@@ -54,6 +54,80 @@ function SectionCard({
   );
 }
 
+// Module scope, not inside the layout: a component declared during render is a
+// brand-new type each pass, so React unmounts and remounts both radios.
+function RadioOption({
+  method,
+  selected,
+  onSelect,
+}: {
+  method: RefundMethodValue;
+  selected: RefundMethodValue;
+  onSelect: (m: RefundMethodValue) => void;
+}) {
+  const isSelected = selected === method;
+  return (
+    <Touchable
+      onPress={() => onSelect(method)}
+      activeOpacity={0.8}
+      className="mx-base rounded-lg"
+      style={{
+        borderWidth: 1.33,
+        borderColor: isSelected ? "#0F7635" : "#919EAB33",
+        backgroundColor: isSelected ? "#F4FBF6" : "#FFFFFF",
+      }}
+    >
+      <View className="flex-row items-center px-4 py-4 gap-3">
+        <View
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: 10,
+            borderWidth: 1.5,
+            borderColor: isSelected ? "#0F7635" : "#919EAB",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {isSelected && (
+            <View
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: 5,
+                backgroundColor: "#0F7635",
+              }}
+            />
+          )}
+        </View>
+        <View className="flex-1">
+          <Text
+            style={[
+              s.labelMd,
+              {
+                fontWeight: "700",
+                color: isSelected ? "#0F7635" : "#0F1724",
+              },
+            ]}
+          >
+            {method === REFUND_METHOD.WALLET
+              ? "CareSure Wallet"
+              : "Original Payment Method"}
+          </Text>
+          <Text
+            style={s.labelSm}
+            className="font-inter-medium text-brand-subtext mt-0.5"
+          >
+            {method === REFUND_METHOD.WALLET
+              ? "Instant refund once the item is picked up successfully"
+              : "Refund will reflect in 5-7 business days after pickup"}
+          </Text>
+        </View>
+      </View>
+    </Touchable>
+  );
+}
+
 export const ReturnProductLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
@@ -266,67 +340,6 @@ export const ReturnProductLayout: React.FC = () => {
       );
     }
   };
-
-  const RadioOption = ({ method }: { method: RefundMethodValue }) => (
-    <Touchable
-      onPress={() => setRefundMethod(method)}
-      activeOpacity={0.8}
-      className="mx-base rounded-lg"
-      style={{
-        borderWidth: 1.33,
-        borderColor: refundMethod === method ? "#0F7635" : "#919EAB33",
-        backgroundColor: refundMethod === method ? "#F4FBF6" : "#FFFFFF",
-      }}
-    >
-      <View className="flex-row items-center px-4 py-4 gap-3">
-        <View
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: 10,
-            borderWidth: 1.5,
-            borderColor: refundMethod === method ? "#0F7635" : "#919EAB",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {refundMethod === method && (
-            <View
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: "#0F7635",
-              }}
-            />
-          )}
-        </View>
-        <View className="flex-1">
-          <Text
-            style={[
-              s.labelMd,
-              {
-                fontWeight: "700",
-                color: refundMethod === method ? "#0F7635" : "#0F1724",
-              },
-            ]}
-          >
-            {method === REFUND_METHOD.WALLET
-              ? "CareSure Wallet"
-              : "Original Payment Method"}
-          </Text>
-          <Text
-            style={s.labelSm}
-            className="font-inter-medium text-brand-subtext mt-0.5"
-          >
-            {method === REFUND_METHOD.WALLET
-              ? "Instant refund once the item is picked up successfully"
-              : "Refund will refelect in 5-7 business days after pickup"}
-          </Text>
-        </View>
-      </View>
-    </Touchable>
-  );
 
   if (orderLoading) {
     return (
@@ -651,10 +664,18 @@ export const ReturnProductLayout: React.FC = () => {
         </SectionCard>
 
         {activeReturnMethods.includes(REFUND_METHOD.WALLET) && (
-          <RadioOption method={REFUND_METHOD.WALLET} />
+          <RadioOption
+            method={REFUND_METHOD.WALLET}
+            selected={refundMethod}
+            onSelect={setRefundMethod}
+          />
         )}
         {activeReturnMethods.includes(REFUND_METHOD.ORIGINAL_PAYMENT) && (
-          <RadioOption method={REFUND_METHOD.ORIGINAL_PAYMENT} />
+          <RadioOption
+            method={REFUND_METHOD.ORIGINAL_PAYMENT}
+            selected={refundMethod}
+            onSelect={setRefundMethod}
+          />
         )}
       </ScrollView>
 
