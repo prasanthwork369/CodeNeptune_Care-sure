@@ -83,9 +83,9 @@ export const NotificationNavigation = {
       case NotificationType.REFUND_INITIATED:
       case NotificationType.REFUND_COMPLETED:
         if (data.orderId) {
-          router.push({ pathname: '/profile/orders/track', params: { orderId: data.orderId } } as any);
+          router.push({ pathname: '/profile/orders/track', params: { orderId: data.orderId } });
         } else {
-          router.push('/profile/orders' as any);
+          router.push('/profile/orders');
         }
         break;
 
@@ -103,72 +103,77 @@ export const NotificationNavigation = {
               // Lets the viewer fetch the order id the payload cannot carry.
               source: 'notification',
             },
-          } as any);
+          });
         } else {
-          router.push('/(prescription)/prescription-history' as any);
+          router.push('/(prescription)/prescription-history');
         }
         break;
 
       // --- Product Detail ---
       case NotificationType.PRODUCT:
       case NotificationType.PRODUCT_BACK_IN_STOCK:
-      case NotificationType.PRICE_DROP:
-        if (data.productId || data.id) {
-          router.push({ pathname: '/product/[id]', params: { id: data.productId || data.id } } as any);
+      case NotificationType.PRICE_DROP: {
+        // Bound to a const so the guard narrows away `undefined`.
+        const productId = data.productId || data.id;
+        if (productId) {
+          router.push({ pathname: '/product/[id]', params: { id: productId } });
         } else {
-          router.push('/notifications' as any);
+          router.push('/notifications');
         }
         break;
+      }
 
       // --- Category listing ---
-      case NotificationType.CATEGORY:
-        if (data.categoryId || data.id) {
-          router.push({ pathname: '/category/[id]', params: { id: data.categoryId || data.id } } as any);
+      case NotificationType.CATEGORY: {
+        const categoryId = data.categoryId || data.id;
+        if (categoryId) {
+          router.push({ pathname: '/category/[id]', params: { id: categoryId } });
         } else {
-          router.push('/(tabs)/categories' as any);
+          router.push('/(tabs)/categories');
         }
         break;
+      }
 
       // --- Coupons ---
       case NotificationType.COUPON:
-        router.push('/(stack)/coupons' as any);
+        router.push('/(stack)/coupons');
         break;
 
       // --- Cart ---
       case NotificationType.CART_REMINDER:
-        router.push('/(stack)/cart' as any);
+        router.push('/(stack)/cart');
         break;
 
       // --- Wallet ---
       case NotificationType.WALLET:
-        router.push('/profile/wallet' as any);
+        router.push('/profile/wallet');
         break;
 
       // --- Profile Info ---
       case NotificationType.PROFILE_VERIFICATION:
-        router.push('/profile/my-profile' as any);
+        router.push('/profile/my-profile');
         break;
 
       case NotificationType.WISHLIST:
       case NotificationType.LOYALTY_POINTS:
       case NotificationType.KYC_REQUIRED:
-        router.push('/(tabs)/profile' as any);
+        router.push('/(tabs)/profile');
         break;
 
       // --- Home tab ---
       case NotificationType.HOME:
-        router.push('/(tabs)' as any);
+        router.push('/(tabs)');
         break;
 
       // --- Notifications screen ---
       case NotificationType.NOTIFICATIONS:
       case NotificationType.ANNOUNCEMENT:
-        router.push('/notifications' as any);
+        router.push('/notifications');
         break;
 
       // --- Chat support ---
       case NotificationType.CHAT:
-        router.push('/profile/support/help' as any);
+        router.push('/profile/support/help');
         break;
 
       // --- App update: opens the store listing, not an in-app screen ---
@@ -186,7 +191,7 @@ export const NotificationNavigation = {
       // --- Default Fallback for Unimplemented/Invalid/Unknown Types ---
       default:
         if (__DEV__) console.warn(`[NotificationNavigation] Unhandled or unknown notification type: ${type}. Falling back to Notifications.`);
-        router.push('/notifications' as any);
+        router.push('/notifications');
         break;
     }
   },
