@@ -1,9 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { exactScale, moderateScale } from '@/src/utils/exactScale';
 
-// Widened from 90 -- at 90 the middle quantity slot (90 - 36*2 = 18px) was
-// too narrow for 2-digit quantities (10+), causing the number to wrap
-// vertically instead of staying on one line.
+// The wider counter keeps two-digit quantities on one line.
 export const COUNTER_W   = exactScale(100);
 export const COUNTER_BTN = exactScale(36);
 
@@ -94,7 +92,8 @@ export const cartStyles = StyleSheet.create({
     coinsSheetLabel:   { fontSize: moderateScale(16) },
     coinsSheetSaved:   { fontSize: moderateScale(14) },
     coinsSheetCoinImg: { width: exactScale(22), height: exactScale(22) },
-    coinsSheetBag:     { width: exactScale(90), height: exactScale(90) },
+    // Matching the asset ratio prevents contain from letterboxing its bottom.
+    coinsSheetBag:     { width: exactScale(90), height: exactScale(83) },
 
     // CartEmptyState
     emptyLottie:  { width: exactScale(140), height: exactScale(140) },

@@ -19,11 +19,14 @@ interface CareSureCoinsSheetProps {
 export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
   isVisible,
   onClose,
-  availableCoins = 100,
-  savedAmount = 50,
+  availableCoins = 0,
+  savedAmount = 0,
+  // Match billing's fallback without inventing a balance when data is missing.
   coinValue = 1,
 }) => {
   const adjustedBottom = useAdjustedBottomInset();
+  // Admin can set coinValue to 0, which must not produce Infinity.
+  const coinsSpent = coinValue > 0 ? Math.round(savedAmount / coinValue) : 0;
 
   return (
     <GorhomBottomSheet
@@ -78,9 +81,9 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
               source={HOME_IMAGES.moneyBag}
               style={[
                 s.coinsSheetBag,
-                { position: "absolute", right: 0, bottom: 0 },
+                { position: "absolute", right: -5, bottom: 0 },
               ]}
-              resizeMode="contain"
+              resizeMode="cover"
             />
           </LinearGradient>
 
@@ -120,13 +123,15 @@ export const CareSureCoinsSheet: React.FC<CareSureCoinsSheetProps> = ({
               </View>
             </View>
 
-            <Text
-              style={[s.coinsSheetSaved, { marginTop: exactScale(8) }]}
-              className="font-inter-semibold text-[#0F7635]"
-            >
-              Saved ₹{Number(savedAmount).toFixed(2)} Using{" "}
-              {Math.round(savedAmount / coinValue)} CareSure Coins
-            </Text>
+            {coinsSpent > 0 && (
+              <Text
+                style={[s.coinsSheetSaved, { marginTop: exactScale(8) }]}
+                className="font-inter-semibold text-[#0F7635]"
+              >
+                Saved ₹{parseFloat(savedAmount.toFixed(2))} Using {coinsSpent}{" "}
+                CareSure Coins
+              </Text>
+            )}
           </View>
         </View>
       </BottomSheetView>

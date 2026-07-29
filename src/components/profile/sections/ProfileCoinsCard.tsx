@@ -57,7 +57,7 @@ export const ProfileCoinsCard: React.FC = () => {
             right: 0,
             bottom: -5,
           }}
-          contentFit="contain"
+          contentFit="cover"
         />
       </LinearGradient>
       <View className="bg-white px-5 py-4">
