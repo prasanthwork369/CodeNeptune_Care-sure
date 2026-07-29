@@ -265,10 +265,6 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   onInteraction,
 }) => {
   const [menuAnchor, setMenuAnchor] = useState<{ top: number } | null>(null);
-  // CardOptionsMenu renders an RN Modal even while hidden, so mounting it up
-  // front would put one native Modal on screen per notification row. Mount it
-  // on first open and keep it after, so the fade-out on close still plays.
-  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const triggerRef = useRef<View>(null);
   const visual = getNotificationVisual(notification);
@@ -276,7 +272,6 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   const isLong = body.length > 100;
 
   const openMenu = () => {
-    setHasOpenedMenu(true);
     triggerRef.current?.measureInWindow((_x, y, _w, h) => {
       setMenuAnchor({ top: y + h + 4 });
     });
@@ -351,7 +346,6 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
         </Touchable>
       </View>
 
-      {hasOpenedMenu && (
       <CardOptionsMenu
         useModal
         modalVisible={!!menuAnchor}
@@ -411,7 +405,6 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
             : []),
         ]}
       />
-      )}
     </Touchable>
   );
 };

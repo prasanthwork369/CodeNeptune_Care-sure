@@ -1,7 +1,7 @@
 import { icons } from '@/src/constants/icons';
 import { HOME_IMAGES } from '@/src/constants/images';
 import { Touchable } from '@/src/components/ui/Touchable';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Image, Modal, Text, View } from 'react-native';
 import { moderateScale } from "@/src/utils/exactScale";
 
@@ -60,6 +60,13 @@ function AlertIcon({ variant }: { variant: IconVariant }) {
 export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDialogProps) {
     const isRow = buttons.length > 1;
     const isSingle = buttons.length === 1;
+
+    // RN Modal mounts a native window even when hidden, so callers that render
+    // this unconditionally pay for it on every screen. Stay null until first
+    // opened, then stay mounted so the fade-out on close still plays.
+    const hasOpened = useRef(false);
+    if (visible) hasOpened.current = true;
+    if (!visible && !hasOpened.current) return null;
 
     return (
         <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>

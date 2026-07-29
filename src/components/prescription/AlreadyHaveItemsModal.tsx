@@ -1,6 +1,6 @@
 import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
-import React from "react";
+import React, { useRef } from "react";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   ActivityIndicator,
@@ -29,6 +29,12 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
 }) => {
   const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+
+  // RN Modal mounts a native window even when hidden, and this renders once per
+  // order card. Stay null until first opened, then stay mounted for the fade-out.
+  const hasOpened = useRef(false);
+  if (visible) hasOpened.current = true;
+  if (!visible && !hasOpened.current) return null;
 
   return (
     <Modal

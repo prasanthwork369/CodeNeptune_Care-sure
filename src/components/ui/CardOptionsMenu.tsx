@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Modal,
   StyleProp,
@@ -80,7 +80,14 @@ export const CardOptionsMenu: React.FC<CardOptionsMenuProps> = ({
   modalVisible,
   modalWrapperStyle,
 }) => {
+  // RN Modal mounts a native window even when hidden, and this renders once per
+  // row in notification/order lists. Stay null until first opened, then stay
+  // mounted so the fade-out on close still plays.
+  const hasOpened = useRef(false);
+  if (modalVisible) hasOpened.current = true;
+
   if (useModal) {
+    if (!modalVisible && !hasOpened.current) return null;
     return (
       <Modal
         transparent

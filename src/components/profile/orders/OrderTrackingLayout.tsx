@@ -15,7 +15,7 @@ import { buildCartInputs } from "@/src/utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -271,6 +271,14 @@ export const OrderTrackLayout: React.FC = () => {
   });
 
   const { items: cartItems, addItem, updateItem, clearCart } = useCart();
+  const cartNavTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (cartNavTimer.current) clearTimeout(cartNavTimer.current);
+    },
+    [],
+  );
 
   const closeAlert = () => {
     const onClose = alertState.onClose;
@@ -298,7 +306,10 @@ export const OrderTrackLayout: React.FC = () => {
       }
       setIsCartModalVisible(false);
       setIsProceeding(false);
-      setTimeout(() => router.push("/(stack)/cart" as any), 100);
+      cartNavTimer.current = setTimeout(() => {
+        cartNavTimer.current = null;
+        router.push("/(stack)/cart");
+      }, 100);
     } catch (err) {
       if (__DEV__) console.error("[ReOrder]", err);
       setIsProceeding(false);
