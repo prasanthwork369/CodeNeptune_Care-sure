@@ -5,7 +5,7 @@ import { icons } from '@/src/constants/icons';
 import { useNav } from '@/src/hooks/useNav';
 import { useCartActions } from '@/src/hooks/useCartActions';
 import { moderateScale } from '@/src/utils/exactScale';
-import { cartCounterStyles as cc, searchCardStyles as s, COUNTER_WIDTH, COUNTER_BTN_W } from './search.styles';
+import { cartCounterStyles as cc, searchCardStyles as s } from './search.styles';
 
 interface SearchRowProps {
     data: {
@@ -41,7 +41,7 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
     const router = useNav();
 
     const handleCardPress = useCallback(() => {
-        router.push({ pathname: '/search/product/[id]', params: { id: data.productId ?? data.id } } as any);
+        router.push({ pathname: '/search/product/[id]', params: { id: data.productId ?? data.id } });
     }, [data.productId, data.id, router]);
 
     const { count, increment, decrement, animations, isPending } = useCartActions({

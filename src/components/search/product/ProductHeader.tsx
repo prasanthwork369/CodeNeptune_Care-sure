@@ -38,7 +38,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
         <Touchable
           activeOpacity={onQueryChange ? 1 : 0.5}
           onPress={
-            onQueryChange ? undefined : () => router.push("/search" as any)
+            onQueryChange ? undefined : () => router.push("/search")
           }
           style={[hs.box, { flex: 1, marginRight: 12 }]}
           className="flex-row items-center bg-white"

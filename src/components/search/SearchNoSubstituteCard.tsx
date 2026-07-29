@@ -28,12 +28,11 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({ 
         router.push({
             pathname: '/product/[id]',
             params: { id: data.productId ?? data.id, fromNoSubstitute: 'true' },
-        } as any);
+        });
     };
 
     const handleRequest = () => {
-        // No backend endpoint exists yet for this -- wire the real API call
-        // in here once one exists.
+        // Keep this local until the backend exposes a substitute-request endpoint.
         if (__DEV__) {
             console.log('[SearchNoSubstituteCard] request substitute for', {
                 productId: data.productId ?? data.id,

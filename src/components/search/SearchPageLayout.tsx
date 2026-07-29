@@ -15,8 +15,6 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from '@/src/hooks/ui/useIsOffline';
 import { SearchOfflineState } from '@/src/components/search/sections/SearchOfflineState';
 
-// ─── Data transformers ────────────────────────────────────────────────────────
-
 const toComparisonData = (item: ApiSearchMedicine) => {
     const rec = item.recommendation!;
     const raw = item.mrp || item.price;
@@ -25,10 +23,7 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     const recPrice = recRaw != null && recRaw !== '' ? parseFloat(recRaw) : null;
     const recMrpRaw = rec.mrp || rec.price;
     const recMrp = recMrpRaw != null && recMrpRaw !== '' ? parseFloat(recMrpRaw) : null;
-    // Savings must reconcile with THIS card's own shown MRP and price
-    // (strikethrough MRP − price), so the on-screen numbers add up and match
-    // SearchRecommendCard. Previously it used cross-brand savings vs the
-    // searched item, which didn't equal the recommended item's shown MRP − price.
+    // Use the displayed recommendation values so savings always reconciles on screen.
     const savings = recMrp != null && recPrice != null && recMrp > recPrice
         ? parseFloat((recMrp - recPrice).toFixed(2))
         : 0;
@@ -69,9 +64,7 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     };
 };
 
-// For sourceType===2 items with no recommendation found -- only derives the
-// searched side, never touches item.recommendation (unlike toComparisonData,
-// which assumes it exists).
+// This path cannot dereference recommendation because sourceType 2 can omit it.
 const toSearchedOnlyData = (item: ApiSearchMedicine) => {
     const raw = item.mrp || item.price;
     const searchedMrp = raw != null && raw !== '' ? parseFloat(raw) : null;
@@ -101,8 +94,6 @@ const toRecommendData = (item: ApiSearchMedicine) => ({
     thumbnailUrl: item.thumbnailUrl,
 });
 
-// ─── Layout ───────────────────────────────────────────────────────────────────
-
 export const SearchPageLayout = () => {
     const router = useNav();
     const adjustedBottom = useAdjustedBottomInset();
@@ -124,8 +115,7 @@ export const SearchPageLayout = () => {
         debouncedQuery,
     } = useSearch();
 
-    // Trace only an active query fetch. Cached results render immediately and
-    // intentionally do not produce a near-zero network/load trace.
+    // Cached results skip tracing because they do not represent network load.
     const { start: startSearchTrace, stop: stopSearchTrace } = usePerformanceTrace({
         traceName: PERF_TRACES.SEARCH_QUERY_LOAD,
         manualStart: true,
@@ -190,7 +180,7 @@ export const SearchPageLayout = () => {
                     isClearing={isClearingHistory}
                     onDeleteHistoryItem={deleteHistoryItem}
                     onProductPress={(id) => router.push({ pathname: '/product/[id]', params: { id } })}
-                    onViewAllFrequent={() => router.push('/profile/orders/frequent' as any)}
+                    onViewAllFrequent={() => router.push('/profile/orders/frequent')}
                 />
             ) : isTyping ? (
                 <SearchRecentSection
@@ -214,7 +204,7 @@ export const SearchPageLayout = () => {
                     toComparisonData={toComparisonData}
                     toSearchedOnlyData={toSearchedOnlyData}
                     toRecommendData={toRecommendData}
-                    onRecommendPress={(productId) => router.push({ pathname: '/product/[id]', params: { id: productId } } as any)}
+                    onRecommendPress={(productId) => router.push({ pathname: '/product/[id]', params: { id: productId } })}
                     onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}
                     isFetchingNextPage={isFetchingNextPage}
                 />
