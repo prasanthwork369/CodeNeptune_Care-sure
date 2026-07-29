@@ -15,8 +15,13 @@ jest.mock("@/src/hooks/queries/useSettings", () => ({
   useCartWalletSettings: jest.fn(),
 }));
 
+// Selector-aware: the hook reads useCouponStore((s) => s.applied), so the mock
+// must apply the selector rather than return the whole state object.
 jest.mock("@/src/store/couponStore", () => ({
-  useCouponStore: jest.fn(() => ({ applied: null })),
+  useCouponStore: jest.fn((selector?: (s: { applied: null }) => unknown) => {
+    const state = { applied: null };
+    return selector ? selector(state) : state;
+  }),
 }));
 
 describe("useBillingCalculations — Billing & Discount Engine", () => {

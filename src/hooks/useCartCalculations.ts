@@ -13,8 +13,9 @@ import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { analyticsService } from "@/src/services/firebase";
 import { CartLine } from "@/src/types/cart";
+import { Product } from "@/src/types/home";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export function useCartCalculations() {
   const router = useNav();
@@ -30,7 +31,7 @@ export function useCartCalculations() {
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const confettiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const playConfetti = (delayMs = 0) => {
+  const playConfetti = useCallback((delayMs = 0) => {
     if (confettiTimer.current) clearTimeout(confettiTimer.current);
     if (delayMs > 0) {
       confettiTimer.current = setTimeout(() => {
@@ -40,7 +41,16 @@ export function useCartCalculations() {
     } else {
       setConfettiTrigger((n) => n + 1);
     }
-  };
+  }, []);
+
+  // Without this a pending 350ms confetti timer fires after the user has left
+  // the cart, updating state on an unmounted screen.
+  useEffect(
+    () => () => {
+      if (confettiTimer.current) clearTimeout(confettiTimer.current);
+    },
+    [],
+  );
 
   const handleWalletToggle = (v: boolean) => {
     setWalletOn(v);
@@ -60,18 +70,20 @@ export function useCartCalculations() {
     });
   };
 
-  const {
-    applied: appliedCoupon,
-    remove: removeCoupon,
-    justApplied,
-    clearJustApplied,
-  } = useCouponStore();
+  // Selected field-by-field: a bare useCouponStore()/useLocationStore() would
+  // subscribe the whole cart screen to every write in those stores.
+  const appliedCoupon = useCouponStore((s) => s.applied);
+  const removeCoupon = useCouponStore((s) => s.remove);
+  const justApplied = useCouponStore((s) => s.justApplied);
+  const clearJustApplied = useCouponStore((s) => s.clearJustApplied);
   const { data: coupons = [] } = useCoupons();
   const setBill = useCheckoutStore((s) => s.setBill);
   const { profile } = useProfile();
   const firstName = profile?.firstName ?? "You";
-  const isCorporateUser = profile?.isCorporateUser ?? false;
-  const { reopenLocationSheet, setReopenLocationSheet } = useLocationStore();
+  const reopenLocationSheet = useLocationStore((s) => s.reopenLocationSheet);
+  const setReopenLocationSheet = useLocationStore(
+    (s) => s.setReopenLocationSheet,
+  );
   // Same resolved address the sheet highlights and checkout ships to. The old
   // local `selectedLocation` copy is gone: the sheet writes the pick to the
   // store, so a second copy here could only drift out of sync with it.
@@ -94,7 +106,13 @@ export function useCartCalculations() {
         playConfetti(350);
         clearJustApplied();
       }
-    }, [reopenLocationSheet, justApplied]),
+    }, [
+      reopenLocationSheet,
+      justApplied,
+      setReopenLocationSheet,
+      clearJustApplied,
+      playConfetti,
+    ]),
   );
 
   const {
@@ -107,7 +125,11 @@ export function useCartCalculations() {
   } = useCart();
   const { products: featuredProducts } = useFeaturedMedicines();
 
-  const lines: CartLine[] = cartItems.map((item): CartLine => {
+  // Memoized: this array is the list's data and feeds every total below, so a
+  // fresh identity each render re-renders the whole item list for nothing.
+  const lines: CartLine[] = useMemo(
+    () =>
+      cartItems.map((item): CartLine => {
     // unitPrice from the backend is the MRP (strikethrough price); the
     // payable selling price is derived by applying discountPercent to it —
     // matches customer-website's cart-utils.ts (rawMrp * (1 - discount/100)).
@@ -140,10 +162,15 @@ export function useCartCalculations() {
       image: imageUri ? { uri: imageUri } : null,
       rx: item.requiresPrescription,
     };
-  });
+      }),
+    [cartItems],
+  );
 
   const subtotal = cartTotalPrice;
-  const mrpTotal = lines.reduce((sum, l) => sum + l.mrp * l.qty, 0);
+  const mrpTotal = useMemo(
+    () => lines.reduce((sum, l) => sum + l.mrp * l.qty, 0),
+    [lines],
+  );
   const productSavings = Math.max(0, mrpTotal - subtotal);
 
   const {
@@ -212,10 +239,12 @@ export function useCartCalculations() {
 
   const coinsUsed = coinsOn ? Math.floor(maxCoinsUsable) : 0;
 
-  const handleAddItem = (product: any) => {
+  const handleAddItem = (product: Product) => {
+    const rawImage: unknown = product.image;
     const imageUri =
-      product.image?.uri ??
-      (typeof product.image === "string" ? product.image : undefined);
+      typeof rawImage === "string"
+        ? rawImage
+        : ((rawImage as { uri?: string } | null)?.uri ?? undefined);
     // Send the MRP as unitPrice (backend derives the selling price from
     // unitPrice * (1 - discountPercent/100)) — matches customer-website's
     // ProductCard.tsx (unitPrice: mrp, mrp: mrp, discountPercent).
@@ -239,6 +268,14 @@ export function useCartCalculations() {
     // Charges come from admin settings; proceeding before they land would
     // freeze a bill with no delivery or handling fee into the order.
     if (!chargesReady) return;
+
+    // Checked before setBill: a guest bounced to login must not leave a stale
+    // bill in the checkout store for whatever screen they land on next.
+    if (!useAuthStore.getState().isAuthenticated) {
+      router.push("/(auth)/login");
+      return;
+    }
+
     setBill(
       {
         subtotal,
@@ -261,21 +298,20 @@ export function useCartCalculations() {
     );
     // All-OTC carts have nothing to collect, so they skip to payment.
     const hasRxItem = lines.some((l) => l.rx);
-    const targetPath = hasRxItem
-      ? "/(prescription)/choose-method"
-      : "/(prescription)/payment";
-    const targetParams = { toPay: String(toPay) };
-
-    if (!useAuthStore.getState().isAuthenticated) {
-      router.push("/(auth)/login");
-      return;
-    }
 
     void analyticsService.logBeginCheckout(lines.length, toPay);
 
+    // Rx carts must collect a prescription first; all-OTC carts skip to payment.
+    if (hasRxItem) {
+      router.push({
+        pathname: "/(prescription)/choose-method",
+        params: { toPay: String(toPay) },
+      });
+      return;
+    }
     router.push({
-      pathname: targetPath as any,
-      params: targetParams,
+      pathname: "/(prescription)/payment",
+      params: { toPay: String(toPay) },
     });
   };
 
