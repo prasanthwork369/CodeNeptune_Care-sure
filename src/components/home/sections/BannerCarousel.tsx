@@ -8,7 +8,7 @@ import { openInAppBrowser } from '@/src/utils/browser';
 import { ApiBanner, CategoryCard } from '@/src/types/home';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { useUIStore } from '@/src/store/uiStore';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import { CarouselDot } from '@/src/components/animations/carousel';
 import { exactScale } from "@/src/utils/exactScale";
 

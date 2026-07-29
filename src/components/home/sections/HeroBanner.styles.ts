@@ -14,16 +14,26 @@ export const styles = StyleSheet.create({
     opacity: 1,
     overflow: "visible",
   },
-  skeletonContainer: {
-    height: exactScale(190),
-    marginHorizontal: exactScale(14),
-    marginTop: exactScale(20),
+  // Shared by the loaded card and the skeleton so neither can drift.
+  gradientCard: {
+    flex: 1,
     borderRadius: exactScale(12),
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FAFAFA",
-    opacity: 1,
     overflow: "hidden",
+  },
+  // Placeholders sit on the green gradient, so they read as frosted glass
+  // rather than the default grey, which clashed with the brand card.
+  skeletonPlaceholder: {
+    backgroundColor: "rgba(255,255,255,0.58)",
+  },
+  // Bottom-centred like the real image's contentPosition, so the smaller
+  // placeholder still sits where the person's body will land.
+  skeletonAvatarBox: {
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  // Larger than the text placeholders, so it's kept fainter to stay background.
+  skeletonAvatar: {
+    backgroundColor: "rgba(255,255,255,0.26)",
   },
   titleText: {
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
@@ -92,9 +102,10 @@ export const styles = StyleSheet.create({
 
 export const getDynamicStyles = (scale: number) => {
   const personWidth = Math.round(exactScale(184) * scale);
-  const skeletonLineHeight = Math.round(
-    Math.min(Math.max(Math.round(exactScale(21) * scale), 16), 26) * 1.34,
-  );
+  // One title line occupies TITLE_LINE_HEIGHT; the bar covers the glyphs and
+  // the margin makes up the rest, so the badge lands on the loaded card's y.
+  const titleLine = Math.round(exactScale(30) * scale);
+  const skeletonLineHeight = Math.round(exactScale(16) * scale);
 
   return StyleSheet.create({
     containerHeight: {
@@ -105,22 +116,20 @@ export const getDynamicStyles = (scale: number) => {
       paddingLeft: Math.round(exactScale(10) * scale),
       paddingTop: Math.round(exactScale(32) * scale),
     },
-    skeletonTextBlock: {
-      paddingRight: Math.round(personWidth * 0.4),
-      paddingLeft: Math.round(exactScale(10) * scale),
-      paddingTop: Math.round(exactScale(32) * scale),
-    },
     skeletonLine1: {
-      marginBottom: exactScale(6),
       height: skeletonLineHeight,
+      marginBottom: titleLine - skeletonLineHeight,
     },
     skeletonLine2: {
-      marginBottom: Math.round(exactScale(20) * scale),
       height: skeletonLineHeight,
+      // Extra gap reproduces badgeContainer's marginTop.
+      marginBottom:
+        titleLine - skeletonLineHeight + Math.round(exactScale(10) * scale),
     },
+    // Matches the real pill: 4+4 padding around a 12pt line, plus borders.
     skeletonBadge: {
-      width: Math.round(exactScale(120) * scale),
-      height: Math.round(exactScale(32) * scale),
+      width: Math.round(exactScale(92) * scale),
+      height: Math.round(exactScale(20) * scale),
     },
     titleText: {
       fontSize: Math.round(moderateScale(20) * scale),

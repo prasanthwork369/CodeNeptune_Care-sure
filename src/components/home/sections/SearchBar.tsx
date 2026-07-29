@@ -28,7 +28,9 @@ const containerStyle = {
   elevation: 1,
 } as const;
 
-export const SearchBar: React.FC<SearchBarProps> = ({
+// Memoised: sits in the Home feed and wraps an animated cycler, so it must not
+// re-render every time the feed does.
+export const SearchBar: React.FC<SearchBarProps> = React.memo(({
   placeholder,
   words,
   useHomeCycler = false,
@@ -115,4 +117,5 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {rightSlot && <View className="ml-2">{rightSlot}</View>}
     </View>
   );
-};
+});
+SearchBar.displayName = "SearchBar";

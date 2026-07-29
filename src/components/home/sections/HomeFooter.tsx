@@ -40,7 +40,6 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
       return <View className="h-20" />;
     }
 
-    const promiseTitle = appContent.promise?.title;
     const footerTitle = appContent.footer?.title ?? "";
     const footerImageUrl = appContent.footer?.imageUrl;
     const footerHeartUrl = appContent.footer?.iconUrl;

@@ -16,8 +16,6 @@ interface CategoryCardsProps {
     isLoading?: boolean;
 }
 
-const GAP = 8;
-
 export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress, isLoading }) => {
     const { width, pick } = useResponsiveTier();
     const numColumns = pick(2, 3, 4);
@@ -25,7 +23,6 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({ cards, onCardPress
     const scaledPad = exactScale(16);
     const cardWidth = (width - scaledPad * 2 - scaledGap * (numColumns - 1)) / numColumns;
     const cardHeight = cardWidth * (128 / 114);
-    const imgSize = cardWidth * 0.75;
 
     if (isLoading) {
         return (

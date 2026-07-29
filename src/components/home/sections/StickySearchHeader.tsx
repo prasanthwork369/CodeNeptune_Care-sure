@@ -25,7 +25,7 @@ interface StickySearchHeaderProps {
  * ScrollView so it can use a real BlurView backdrop, which a
  * stickyHeaderIndices section can't host cleanly.
  */
-export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
+export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(({
   visible,
   onPressSearch,
   onPressUpload,
@@ -158,4 +158,5 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = ({
       </BlurView>
     </Animated.View>
   );
-};
+});
+StickySearchHeader.displayName = "StickySearchHeader";

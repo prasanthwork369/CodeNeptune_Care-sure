@@ -90,21 +90,21 @@ export const PrescriptionFloatingBanner = ({
       -1,
       false,
     );
-  }, [isUnderReview]);
+  }, [isUnderReview, progressAnim]);
 
   useEffect(() => {
     tabBarAnim.value = withTiming(isTabBarVisible ? 1 : 0, {
       duration: DURATION,
       easing: EASE_IN_OUT,
     });
-  }, [isTabBarVisible]);
+  }, [isTabBarVisible, tabBarAnim]);
 
   useEffect(() => {
     uploadCollapsedAnim.value = withTiming(isUploadButtonCollapsed ? 1 : 0, {
       duration: DURATION,
       easing: EASE_IN_OUT,
     });
-  }, [isUploadButtonCollapsed]);
+  }, [isUploadButtonCollapsed, uploadCollapsedAnim]);
 
   useEffect(() => {
     if (visible) {
@@ -114,7 +114,7 @@ export const PrescriptionFloatingBanner = ({
       slideY.value = withSpring(150, { damping: 17, stiffness: 110, mass: 0.6 });
       opacity.value = withTiming(0, { duration: DURATION, easing: EASE_IN_OUT });
     }
-  }, [visible, status]);
+  }, [visible, status, opacity, slideY]);
 
   const exact127 = exactScale(127);
   const exact77 = exactScale(77);

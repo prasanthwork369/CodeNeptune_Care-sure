@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { typography } from "@/src/constants/typography";
 
 export const styles = StyleSheet.create({

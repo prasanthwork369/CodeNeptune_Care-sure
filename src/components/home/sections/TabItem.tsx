@@ -24,7 +24,7 @@ export const TabItem: React.FC<TabItemProps> = ({ tab, isActive, onPress, onLayo
 
     useEffect(() => {
         scale.value = withSpring(isActive ? 1.05 : 1, SPRINGS.tab);
-    }, [isActive]);
+    }, [isActive, scale]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ scale: scale.value }],

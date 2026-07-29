@@ -50,7 +50,6 @@ export const CartFloatingBanner = ({
 
   const {
     isSlid,
-    handleSlide,
     handleSnapBack,
     handleClosePress,
     bannerStyle,

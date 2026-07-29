@@ -8,19 +8,22 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
-  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withRepeat,
-  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import { SvgUri } from "react-native-svg";
 import { styles, getDynamicStyles } from "./HeroBanner.styles";
 
 const ease = Easing.out(Easing.cubic);
+
+// Shared by the skeleton and the loaded card so the hero never flashes from a
+// grey placeholder card to the green brand card.
+const HERO_GRADIENT = ["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"] as const;
+const GRADIENT_START = { x: 0.5, y: 0 } as const;
+const GRADIENT_END = { x: 0.5, y: 1 } as const;
 
 function useSlideUp(delayMs: number) {
   const opacity = useSharedValue(0);
@@ -85,31 +88,56 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(({
 
   if (isLoading || !content) {
     return (
-      <View style={[styles.skeletonContainer, dStyles.containerHeight]}>
-        {/* Left: mirrors flex-[1.2] */}
-        <View style={dStyles.skeletonTextBlock}>
-          <Skeleton
-            width="80%"
-            borderRadius={exactScale(8)}
-            style={dStyles.skeletonLine1}
-          />
-          <Skeleton
-            width="65%"
-            borderRadius={exactScale(8)}
-            style={dStyles.skeletonLine2}
-          />
-          <Skeleton
-            borderRadius={exactScale(999)}
-            style={dStyles.skeletonBadge}
-          />
-        </View>
+      // Same container, gradient and geometry as the loaded card — only the
+      // text, badge and person are replaced by shimmer, so nothing shifts.
+      <View style={[styles.container, dStyles.containerHeight]}>
+        <LinearGradient
+          colors={HERO_GRADIENT}
+          start={GRADIENT_START}
+          end={GRADIENT_END}
+          style={styles.gradientCard}
+          className="flex-row items-stretch"
+        >
+          <View
+            style={dStyles.textBlock}
+            className="flex-[1.2] justify-start"
+          >
+            <Skeleton
+              width="72%"
+              borderRadius={exactScale(5)}
+              style={StyleSheet.flatten([
+                dStyles.skeletonLine1,
+                styles.skeletonPlaceholder,
+              ])}
+            />
+            <Skeleton
+              width="54%"
+              borderRadius={exactScale(5)}
+              style={StyleSheet.flatten([
+                dStyles.skeletonLine2,
+                styles.skeletonPlaceholder,
+              ])}
+            />
+            <Skeleton
+              borderRadius={exactScale(9999)}
+              style={StyleSheet.flatten([
+                dStyles.skeletonBadge,
+                styles.skeletonPlaceholder,
+              ])}
+            />
+          </View>
+        </LinearGradient>
 
-        {/* Right: person */}
-        <View style={[styles.avatar, dStyles.avatar]}>
+        {/* Person placeholder — inset within the real image's box so it hints
+            at the figure instead of filling the card with a slab. */}
+        <View
+          style={[styles.avatar, dStyles.avatar, styles.skeletonAvatarBox]}
+        >
           <Skeleton
-            width={dStyles.avatar.width}
-            height={dStyles.avatar.height}
+            width="84%"
+            height="88%"
             borderRadius={exactScale(16)}
+            style={styles.skeletonAvatar}
           />
         </View>
       </View>
@@ -125,10 +153,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(({
     <View style={[styles.container, dStyles.containerHeight]}>
       {/* Background Gradient Card */}
       <LinearGradient
-        colors={["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={{ flex: 1, borderRadius: exactScale(12), overflow: "hidden" }}
+        colors={HERO_GRADIENT}
+        start={GRADIENT_START}
+        end={GRADIENT_END}
+        style={styles.gradientCard}
         className="flex-row items-stretch"
       >
         {/* ── Left: Text block ── */}

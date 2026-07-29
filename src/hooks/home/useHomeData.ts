@@ -6,13 +6,16 @@ import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { addressToLocation, pickDefaultAddress } from "@/src/utils/addressLocation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { syncService } from "@/src/services/sync.service";
 
 export function useHomeData() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { setLocation, clearLocation } = useLocationStore();
+  // Select the actions individually — a bare useLocationStore() subscribes to
+  // the whole store, so any location write would re-render the entire feed.
+  const setLocation = useLocationStore((s) => s.setLocation);
+  const clearLocation = useLocationStore((s) => s.clearLocation);
   const hasHydrated = useLocationStore((s) => s.hasHydrated);
 
   useEffect(() => {
@@ -78,9 +81,17 @@ export function useHomeData() {
 
     const { location, addressId, pincode } = addressToLocation(defaultAddr);
     setLocation(location, { addressId, pincode });
-  }, [addresses, isAuthenticated, hasHydrated, addressesLoaded]);
+  }, [
+    addresses,
+    isAuthenticated,
+    hasHydrated,
+    addressesLoaded,
+    setLocation,
+    clearLocation,
+  ]);
 
-  const onRefresh = async () => {
+  // Stable so Home's memoized RefreshControl isn't rebuilt on every render.
+  const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
       // allSettled (not all): keep the spinner up until EVERY refetch settles
@@ -100,7 +111,13 @@ export function useHomeData() {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [
+    refetchHome,
+    refetchFeatured,
+    refetchSubcategories,
+    refetchAddresses,
+    refetchFrequentlyOrdered,
+  ]);
 
   return {
     tabs,

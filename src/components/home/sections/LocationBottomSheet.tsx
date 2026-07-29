@@ -71,7 +71,9 @@ const labelToIcon = (label: string) => {
   );
 };
 
-export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
+// Memoised: always mounted under the Home feed, so without this the whole
+// sheet re-renders every time the feed does.
+export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = React.memo(({
   isVisible,
   onClose,
   onSelect,
@@ -803,4 +805,5 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = ({
       </BottomSheetScrollView>
     </GorhomBottomSheet>
   );
-};
+});
+LocationBottomSheet.displayName = "LocationBottomSheet";

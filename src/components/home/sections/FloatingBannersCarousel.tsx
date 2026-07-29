@@ -3,7 +3,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import { BAR_HEIGHT, PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { LinearGradient } from "expo-linear-gradient";
@@ -102,23 +102,26 @@ export const FloatingBannersCarousel = ({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const currentScrollX = useRef(bothActive ? width : 0);
 
-  const startAutoplay = () => {
+  // Tab bar vertical transition anim
+  const translateY = useSharedValue(0);
+  // Horizontal transition progress for the carousel
+  const progress = useSharedValue(0);
+
+  const stopAutoplay = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
+      timerRef.current = null;
     }
+  }, []);
+
+  const startAutoplay = useCallback(() => {
+    stopAutoplay();
     if (bothActive && focused && !isCartInteracting) {
       timerRef.current = setInterval(() => {
         setActiveBannerIndex((prev) => (prev === 2 ? 1 : 2));
       }, 4000);
     }
-  };
-
-  const stopAutoplay = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  };
+  }, [bothActive, focused, isCartInteracting, stopAutoplay]);
 
   // Auto-switch between banners when both are active
   useEffect(() => {
@@ -140,7 +143,9 @@ export const FloatingBannersCarousel = ({
     isRxActive,
     width,
     focused,
-    isCartInteracting,
+    progress,
+    startAutoplay,
+    stopAutoplay,
   ]);
 
   // Pause autoplay when user is interacting (revealing or tapping Remove)
@@ -151,20 +156,14 @@ export const FloatingBannersCarousel = ({
       startAutoplay();
     }
     return () => stopAutoplay();
-  }, [isCartInteracting]);
-
-  // Tab bar vertical transition anim
-  const translateY = useSharedValue(0);
+  }, [isCartInteracting, startAutoplay, stopAutoplay]);
 
   useEffect(() => {
     translateY.value = withTiming(isTabBarVisible ? 0 : exactScale(73), {
       duration: 300,
       easing: Easing.inOut(Easing.ease),
     });
-  }, [isTabBarVisible]);
-
-  // Horizontal transition progress for the carousel
-  const progress = useSharedValue(0);
+  }, [isTabBarVisible, translateY]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -186,7 +185,7 @@ export const FloatingBannersCarousel = ({
       progress.value = 0;
       currentScrollX.current = 0;
     }
-  }, [activeBannerIndex, bothActive, width]);
+  }, [activeBannerIndex, bothActive, width, progress]);
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

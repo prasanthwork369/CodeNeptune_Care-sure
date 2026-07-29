@@ -24,7 +24,8 @@ export const ShopByCategories: React.FC<ShopByCategoriesProps> = React.memo(({
         if (tabs.length > 0 && !activeId) {
             setActiveId(tabs[0].id);
         }
-    }, [tabs]);
+        // Guarded by !activeId, so the extra runs this dep causes are no-ops.
+    }, [tabs, activeId]);
 
     const filteredCards = cards.filter(card => card.tabId === activeId);
 

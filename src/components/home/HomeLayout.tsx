@@ -219,6 +219,15 @@ export const HomeLayout: React.FC = () => {
     [router],
   );
 
+  // Stable identities for the memoized search bar and overlays — an inline
+  // arrow would defeat their React.memo on every feed re-render.
+  const goToSearch = useCallback(() => router.push("/search"), [router]);
+  const goToUpload = useCallback(() => router.push("/upload"), [router]);
+  const closeLocationSheet = useCallback(
+    () => setIsLocationSheetVisible(false),
+    [],
+  );
+
   const handleViewAllFrequent = useCallback(() => {
     router.push("/profile/orders/frequent" as any);
   }, [router]);
@@ -275,6 +284,19 @@ export const HomeLayout: React.FC = () => {
   const headerLocation = useMemo(
     () => displayLocation ?? DELIVERY_LOCATION,
     [displayLocation],
+  );
+
+  // Held stable so the search row bails out of re-rendering with the rest.
+  const searchRightSlot = useMemo(
+    () => (
+      <Touchable
+        onPress={goToUpload}
+        className="border-l border-[#919EAB33] pl-3 ml-1"
+      >
+        <icons.uploadActive width={exactScale(22)} height={exactScale(22)} />
+      </Touchable>
+    ),
+    [goToUpload],
   );
 
   const sections = useMemo<HomeSection[]>(() => {
@@ -373,18 +395,8 @@ export const HomeLayout: React.FC = () => {
                 <SearchBar
                   placeholder="Search medicines & health products"
                   useHomeCycler
-                  onPress={() => router.push("/search")}
-                  rightSlot={
-                    <Touchable
-                      onPress={() => router.push("/upload")}
-                      className="border-l border-[#919EAB33] pl-3 ml-1"
-                    >
-                      <icons.uploadActive
-                        width={exactScale(22)}
-                        height={exactScale(22)}
-                      />
-                    </Touchable>
-                  }
+                  onPress={goToSearch}
+                  rightSlot={searchRightSlot}
                 />
               </Animated.View>
             </View>
@@ -504,10 +516,35 @@ export const HomeLayout: React.FC = () => {
       isSubcategoriesLoading,
       openLocationSheet,
       quickActionsAnim,
-      router,
+      goToSearch,
+      searchRightSlot,
       searchBarAnim,
       tabs,
     ],
+  );
+
+  // Only changes when the banner actually appears/disappears — not on every
+  // cart quantity tick, which would churn the list's props.
+  const listContentStyle = useMemo(
+    () => ({
+      backgroundColor: "#FFFFFF",
+      paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
+    }),
+    [TAB_BAR_HEIGHT, hasFloatingBanner],
+  );
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={isRefreshing}
+        onRefresh={onRefresh}
+        tintColor="#36B37E"
+        colors={["#36B37E"]}
+        progressBackgroundColor="#FFFFFF"
+        progressViewOffset={insets.top + 30}
+      />
+    ),
+    [isRefreshing, onRefresh, insets.top],
   );
 
   return (
@@ -536,38 +573,25 @@ export const HomeLayout: React.FC = () => {
         windowSize={7}
         updateCellsBatchingPeriod={32}
         style={{ backgroundColor: "#FFFFFF" }}
-        contentContainerStyle={{
-          backgroundColor: "#FFFFFF",
-          paddingBottom:
-            TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
-        }}
+        contentContainerStyle={listContentStyle}
         onScroll={handleScroll}
         onScrollBeginDrag={handleScrollStart}
         onMomentumScrollBegin={handleScrollStart}
         onScrollEndDrag={handleScrollStop}
         onMomentumScrollEnd={handleScrollStop}
         scrollEventThrottle={16}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-            tintColor="#36B37E"
-            colors={["#36B37E"]}
-            progressBackgroundColor="#FFFFFF"
-            progressViewOffset={insets.top + 30}
-          />
-        }
+        refreshControl={refreshControl}
       />
 
       <StickySearchHeader
         visible={stickySearchVisible}
-        onPressSearch={() => router.push("/search")}
-        onPressUpload={() => router.push("/upload")}
+        onPressSearch={goToSearch}
+        onPressUpload={goToUpload}
       />
 
       <LocationBottomSheet
         isVisible={isLocationSheetVisible}
-        onClose={() => setIsLocationSheetVisible(false)}
+        onClose={closeLocationSheet}
       />
 
       <FloatingBannersCarousel isFocused={isScreenFocused} />
