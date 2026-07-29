@@ -282,7 +282,7 @@ export function usePaymentCalculations() {
       router.replace({
         pathname: "/(stack)/order-success",
         params: {
-          orderId: order?.id ?? "",
+          orderId: order?.orderId ?? order?.id ?? "",
           total: String(Number(billBreakdown.toPay).toFixed(2)),
         },
       });
