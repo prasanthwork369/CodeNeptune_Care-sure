@@ -43,8 +43,7 @@ export function useCartCalculations() {
     }
   }, []);
 
-  // Without this a pending 350ms confetti timer fires after the user has left
-  // the cart, updating state on an unmounted screen.
+  // Or a pending 350ms confetti timer fires after the user has left the cart.
   useEffect(
     () => () => {
       if (confettiTimer.current) clearTimeout(confettiTimer.current);
@@ -70,8 +69,7 @@ export function useCartCalculations() {
     });
   };
 
-  // Selected field-by-field: a bare useCouponStore()/useLocationStore() would
-  // subscribe the whole cart screen to every write in those stores.
+  // Field selectors, or the whole cart re-renders on any write to these stores.
   const appliedCoupon = useCouponStore((s) => s.applied);
   const removeCoupon = useCouponStore((s) => s.remove);
   const justApplied = useCouponStore((s) => s.justApplied);
@@ -125,8 +123,7 @@ export function useCartCalculations() {
   } = useCart();
   const { products: featuredProducts } = useFeaturedMedicines();
 
-  // Memoized: this array is the list's data and feeds every total below, so a
-  // fresh identity each render re-renders the whole item list for nothing.
+  // Memoized, or a fresh identity re-renders the whole item list every time.
   const lines: CartLine[] = useMemo(
     () =>
       cartItems.map((item): CartLine => {
@@ -269,8 +266,7 @@ export function useCartCalculations() {
     // freeze a bill with no delivery or handling fee into the order.
     if (!chargesReady) return;
 
-    // Checked before setBill: a guest bounced to login must not leave a stale
-    // bill in the checkout store for whatever screen they land on next.
+    // Before setBill, or a guest bounced to login leaves a stale bill behind.
     if (!useAuthStore.getState().isAuthenticated) {
       router.push("/(auth)/login");
       return;

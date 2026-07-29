@@ -80,9 +80,7 @@ export const CardOptionsMenu: React.FC<CardOptionsMenuProps> = ({
   modalVisible,
   modalWrapperStyle,
 }) => {
-  // RN Modal mounts a native window even when hidden, and this renders once per
-  // row in notification/order lists. Stay null until first opened, then stay
-  // mounted so the fade-out on close still plays.
+  // Null until first opened, so hidden rows don't each mount a native Modal.
   const hasOpened = useRef(false);
   if (modalVisible) hasOpened.current = true;
 

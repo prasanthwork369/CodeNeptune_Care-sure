@@ -61,9 +61,7 @@ export function AlertDialog({ visible, onClose, icon, title, buttons }: AlertDia
     const isRow = buttons.length > 1;
     const isSingle = buttons.length === 1;
 
-    // RN Modal mounts a native window even when hidden, so callers that render
-    // this unconditionally pay for it on every screen. Stay null until first
-    // opened, then stay mounted so the fade-out on close still plays.
+    // Null until first opened, so a hidden dialog costs no native Modal.
     const hasOpened = useRef(false);
     if (visible) hasOpened.current = true;
     if (!visible && !hasOpened.current) return null;

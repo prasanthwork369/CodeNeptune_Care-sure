@@ -22,8 +22,7 @@ export const AuthFooter: React.FC = React.memo(() => {
     setPolicy({ title, url });
   };
 
-  // Stable identity: PolicyLink keys its open-browser effect on onClose, so a
-  // new closure each render would re-open the link while one is already open.
+  // Stable, or PolicyLink's effect re-opens the link on every render.
   const handleClosePolicy = useCallback(() => setPolicy(null), []);
 
   // Bordered element, not an inline <Text>: borders don't apply to text spans.

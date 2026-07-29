@@ -148,8 +148,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
               backgroundColor: disabled || inactive ? "#FFFFFF" : colors.primary,
               borderWidth: disabled || inactive ? 1 : 0,
               borderColor: disabled || inactive ? "#E4E7EC" : "transparent",
-              // minWidth, not width: "APPLIED" is wider than "APPLY" and was
-              // wrapping to a clipped second line inside the fixed height.
+              // minWidth, not width: "APPLIED" wrapped to a clipped second line.
               minWidth: exactScale(55),
               paddingHorizontal: exactScale(8),
               height: exactScale(28),

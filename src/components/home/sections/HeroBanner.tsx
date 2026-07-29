@@ -19,8 +19,7 @@ import { styles, getDynamicStyles } from "./HeroBanner.styles";
 
 const ease = Easing.out(Easing.cubic);
 
-// Shared by the skeleton and the loaded card so the hero never flashes from a
-// grey placeholder card to the green brand card.
+// Shared with the skeleton so the hero never flashes grey to green.
 const HERO_GRADIENT = ["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"] as const;
 const GRADIENT_START = { x: 0.5, y: 0 } as const;
 const GRADIENT_END = { x: 0.5, y: 1 } as const;
@@ -88,8 +87,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(({
 
   if (isLoading || !content) {
     return (
-      // Same container, gradient and geometry as the loaded card — only the
-      // text, badge and person are replaced by shimmer, so nothing shifts.
+      // Same container and geometry as the loaded card, so nothing shifts.
       <View style={[styles.container, dStyles.containerHeight]}>
         <LinearGradient
           colors={HERO_GRADIENT}

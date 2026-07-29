@@ -39,8 +39,7 @@ export const MyOrdersLayout: React.FC = () => {
   const cartItemsRef = useRef(cart.items);
   cartItemsRef.current = cart.items;
 
-  // useCart returns fresh arrows each render, which defeated React.memo on
-  // OrderCard. Call through a ref so the identities passed down stay stable.
+  // Called through a ref, since useCart's fresh arrows defeated OrderCard's memo.
   const cartRef = useRef(cart);
   cartRef.current = cart;
   const addItem = useCallback(

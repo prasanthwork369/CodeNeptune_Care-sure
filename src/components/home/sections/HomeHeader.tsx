@@ -32,8 +32,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(({
   const { latestPrescription, hasPendingPrescription } =
     usePrescriptionBanner();
 
-  // Field selectors, so the memoized header isn't re-rendered by unrelated
-  // notification-store writes.
+  // Field selectors, or unrelated notification writes re-render this header.
   const lastSeenRxId = useNotificationStore((s) => s.lastSeenRxId);
   const lastSeenRxStatus = useNotificationStore((s) => s.lastSeenRxStatus);
   const setLastSeenRx = useNotificationStore((s) => s.setLastSeenRx);

@@ -54,8 +54,7 @@ function SectionCard({
   );
 }
 
-// Module scope, not inside the layout: a component declared during render is a
-// brand-new type each pass, so React unmounts and remounts both radios.
+// Module scope, or React remounts both radios on every render.
 function RadioOption({
   method,
   selected,

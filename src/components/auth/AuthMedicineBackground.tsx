@@ -75,8 +75,7 @@ const ScrollingColumn = ({
   );
 };
 
-// Memoised: static decoration, but the auth panels re-render on every keystroke
-// and this tree is 4 columns x 12 tiles.
+// Memoised: 4 columns x 12 tiles, and the panel re-renders on every keystroke.
 export const AuthMedicineBackground = React.memo(() => {
   return (
     <View className="flex-row justify-center h-full overflow-hidden bg-white">

@@ -71,8 +71,7 @@ const labelToIcon = (label: string) => {
   );
 };
 
-// Memoised: always mounted under the Home feed, so without this the whole
-// sheet re-renders every time the feed does.
+// Memoised: always mounted under the Home feed, which re-renders often.
 export const LocationBottomSheet: React.FC<LocationBottomSheetProps> = React.memo(({
   isVisible,
   onClose,

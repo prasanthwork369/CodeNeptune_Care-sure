@@ -1,5 +1,9 @@
+import { colors } from "@/src/theme";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { Platform, StyleSheet } from "react-native";
+
+// Field-level red, deliberately lighter than the app-wide colors.error (#DC2626).
+const FIELD_ERROR = "#EF4444";
 
 export const styles = StyleSheet.create({
   boxRow: {
@@ -17,10 +21,18 @@ export const styles = StyleSheet.create({
     maxWidth: 48,
     aspectRatio: 1,
     borderRadius: scale(10),
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     alignItems: "center",
     justifyContent: "center",
   },
+  // Static variants, so six boxes don't rebuild styles per keystroke.
+  boxBorderThin: { borderWidth: 1 },
+  boxBorderThick: { borderWidth: 2 },
+  boxIdle: { borderColor: "#D0D5DD" },
+  boxAccent: { borderColor: colors.primary },
+  boxError: { borderColor: FIELD_ERROR },
+  boxFillActive: { backgroundColor: "#F0FDF4" },
+  boxFillPlain: { backgroundColor: colors.white },
   otpDigit: {
     textAlignVertical: "center",
     includeFontPadding: false,
@@ -57,10 +69,12 @@ export const styles = StyleSheet.create({
   error: {
     fontSize: moderateScale(13),
     fontWeight: "500",
-    color: "#EF4444",
+    color: FIELD_ERROR,
     textAlign: "center",
     marginBottom: verticalScale(8),
   },
+  btnEnabled: { opacity: 1 },
+  btnDisabled: { opacity: 0.6 },
   resendText: {
     fontSize: moderateScale(13),
     fontWeight: "500",

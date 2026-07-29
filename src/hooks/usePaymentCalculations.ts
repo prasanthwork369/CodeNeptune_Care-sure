@@ -67,8 +67,7 @@ export function usePaymentCalculations() {
   const clearPrescriptionOrder = usePrescriptionOrderStore((s) => s.clear);
   const isPrescriptionFlow = prescriptionOrderItems.length > 0;
 
-  // Field selectors — a bare useCheckoutStore() re-runs the whole payment
-  // calculation on any write to that store.
+  // Field selectors, or any checkout write re-runs the whole calculation.
   const bill = useCheckoutStore((s) => s.bill);
   const walletUsed = useCheckoutStore((s) => s.walletUsed);
   const coinsUsed = useCheckoutStore((s) => s.coinsUsed);

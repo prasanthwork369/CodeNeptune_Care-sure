@@ -23,8 +23,7 @@ export const styles = StyleSheet.create({
     gap: scale(10),
     marginTop: verticalScale(8),
   },
-  // Border colour is the only thing that varies by field state — keeping the
-  // three variants static avoids rebuilding a style object on every keystroke.
+  // Static variants, so no style object is rebuilt per keystroke.
   inputWrapIdle: { borderColor: colors.border },
   inputWrapFocused: { borderColor: colors.primary },
   inputWrapError: { borderColor: FIELD_ERROR },

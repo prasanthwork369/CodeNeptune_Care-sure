@@ -30,8 +30,7 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
   const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  // RN Modal mounts a native window even when hidden, and this renders once per
-  // order card. Stay null until first opened, then stay mounted for the fade-out.
+  // Null until first opened, so every order card doesn't mount a native Modal.
   const hasOpened = useRef(false);
   if (visible) hasOpened.current = true;
   if (!visible && !hasOpened.current) return null;

@@ -3,7 +3,6 @@ import { icons } from "@/src/constants/icons";
 import { useOtp } from "@/src/hooks/useOtp";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { exactScale } from "@/src/utils/exactScale";
 import { styles as s } from "./OtpLayout.styles";
 import { AuthFooter } from "./sections/AuthFooter";
 import { AuthScreenShell } from "./sections/AuthScreenShell";
@@ -45,8 +44,8 @@ export const OtpLayout: React.FC = () => {
   } = useOtp();
 
   return (
+    // Skip is left to AuthScreenShell's default — it already replaces to /(tabs).
     <AuthScreenShell
-      onSkip={() => router.replace("/(tabs)")}
       footer={
         <View>
           <View className="items-start" style={s.headerContainer}>
@@ -84,9 +83,15 @@ export const OtpLayout: React.FC = () => {
             disabled={isButtonLoading || !isValid}
             accessibilityRole="button"
             accessibilityLabel="Verify and continue"
+            accessibilityState={{
+              disabled: isButtonLoading || !isValid,
+              busy: isButtonLoading,
+            }}
             style={[
               formStyles.btn,
-              { opacity: isButtonLoading || !isValid ? 0.6 : 1 },
+              isButtonLoading || !isValid
+                ? formStyles.btnDisabled
+                : formStyles.btnEnabled,
             ]}
           >
             {isButtonLoading ? (

@@ -53,6 +53,7 @@ export const SplashAnimationScreen: React.FC<Props> = ({
   const [showSlowLoad, setShowSlowLoad] = useState(false);
   const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
   const completionStarted = useRef(false);
+  const slowLoadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const screenOpacity = useSharedValue(1);
   const markOpacity = useSharedValue(0);
@@ -82,7 +83,7 @@ export const SplashAnimationScreen: React.FC<Props> = ({
         );
       });
 
-    const slowLoadTimer = setTimeout(
+    slowLoadTimer.current = setTimeout(
       () => setShowSlowLoad(true),
       SLOW_LOAD_MESSAGE_MS,
     );
@@ -90,7 +91,7 @@ export const SplashAnimationScreen: React.FC<Props> = ({
     return () => {
       active = false;
       if (minimumTimer) clearTimeout(minimumTimer);
-      clearTimeout(slowLoadTimer);
+      if (slowLoadTimer.current) clearTimeout(slowLoadTimer.current);
     };
   }, []);
 
@@ -151,6 +152,11 @@ export const SplashAnimationScreen: React.FC<Props> = ({
     }
 
     completionStarted.current = true;
+    // Or the 1.8s slow-load bar flashes in mid-fade as the curtain leaves.
+    if (slowLoadTimer.current) {
+      clearTimeout(slowLoadTimer.current);
+      slowLoadTimer.current = null;
+    }
     const finish = () => onComplete();
 
     if (reduceMotion) {

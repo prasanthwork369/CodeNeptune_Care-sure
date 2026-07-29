@@ -1,7 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { OtpFormProps } from "@/src/types/auth";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -53,6 +53,20 @@ export const OtpForm: React.FC<OtpFormProps> = ({
   // still shows; the boxes go back to a clean active-green state to retype.
   const showError = !!(otpError || error) && slots.some(Boolean);
 
+  // Stable, or the native filter re-applies on every keystroke.
+  const setInputRef = useCallback(
+    (el: TextInput | null) => {
+      applyDigitsOnlyFilter(el);
+      if (!inputRef) return;
+      if (typeof inputRef === "function") {
+        inputRef(el);
+      } else {
+        (inputRef as React.MutableRefObject<TextInput | null>).current = el;
+      }
+    },
+    [inputRef],
+  );
+
   return (
     <View>
       {/* Plain View — NOT a Pressable. A parent Pressable competes with the
@@ -71,17 +85,13 @@ export const OtpForm: React.FC<OtpFormProps> = ({
               onPress={() => onBoxPress(index)}
               style={[
                 s.otpBox,
-                {
-                  borderWidth: isActive || showError ? 2 : 1,
-                  borderColor: showError
-                    ? "#EF4444"
-                    : isActive
-                      ? "#0F7635"
-                      : isFilled
-                        ? "#0F7635"
-                        : "#D0D5DD",
-                  backgroundColor: isActive ? "#F0FDF4" : "#FFFFFF",
-                },
+                isActive || showError ? s.boxBorderThick : s.boxBorderThin,
+                showError
+                  ? s.boxError
+                  : isActive || isFilled
+                    ? s.boxAccent
+                    : s.boxIdle,
+                isActive ? s.boxFillActive : s.boxFillPlain,
               ]}
             >
               {isFilled ? (
@@ -94,16 +104,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
         })}
 
         <TextInput
-          ref={(el) => {
-            applyDigitsOnlyFilter(el);
-            if (inputRef) {
-              if (typeof inputRef === 'function') {
-                inputRef(el);
-              } else {
-                (inputRef as React.MutableRefObject<TextInput | null>).current = el;
-              }
-            }
-          }}
+          ref={setInputRef}
           value={inputValue}
           onChangeText={onOtpChange}
           onFocus={() => setFocused(true)}

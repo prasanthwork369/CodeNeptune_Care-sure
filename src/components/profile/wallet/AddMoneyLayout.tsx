@@ -36,8 +36,7 @@ export const AddMoneyLayout: React.FC = () => {
   const inputRef = useRef<TextInput>(null);
   const backTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Without this, leaving the screen during the 2s confetti still fires
-  // router.back() and pops a screen the user chose to be on.
+  // Or leaving during the 2s confetti still fires router.back() and pops a screen.
   useEffect(
     () => () => {
       if (backTimer.current) clearTimeout(backTimer.current);

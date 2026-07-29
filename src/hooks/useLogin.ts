@@ -40,8 +40,7 @@ export function useLogin() {
   const handleChangeText = (text: string) => {
     // Typed overflow: already 10 digits and new text only appends — ignore it.
     if (phoneNumber.length === 10 && text.startsWith(phoneNumber)) return;
-    // Editing the number is a fresh attempt — drop the previous number's API
-    // error, or it resurfaces once phoneError clears.
+    // A fresh attempt — drop the old error or it resurfaces when phoneError clears.
     if (error) resetError();
     const cleaned = sanitize.phone(text);
     setPhoneNumber(cleaned);

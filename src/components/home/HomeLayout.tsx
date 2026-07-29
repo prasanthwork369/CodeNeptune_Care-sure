@@ -219,8 +219,7 @@ export const HomeLayout: React.FC = () => {
     [router],
   );
 
-  // Stable identities for the memoized search bar and overlays — an inline
-  // arrow would defeat their React.memo on every feed re-render.
+  // Stable, or an inline arrow defeats React.memo on the search bar and overlays.
   const goToSearch = useCallback(() => router.push("/search"), [router]);
   const goToUpload = useCallback(() => router.push("/upload"), [router]);
   const closeLocationSheet = useCallback(
@@ -523,8 +522,7 @@ export const HomeLayout: React.FC = () => {
     ],
   );
 
-  // Only changes when the banner actually appears/disappears — not on every
-  // cart quantity tick, which would churn the list's props.
+  // Changes only when the banner appears/disappears, not on every cart tick.
   const listContentStyle = useMemo(
     () => ({
       backgroundColor: "#FFFFFF",

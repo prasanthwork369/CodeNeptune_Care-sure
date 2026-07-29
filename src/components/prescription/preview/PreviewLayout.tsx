@@ -79,8 +79,7 @@ export const PreviewLayout: React.FC = () => {
     prescriptionId?: string;
   }>();
 
-  // Field selectors — the draft store is written on every upload step, and a
-  // bare call would re-render this whole screen each time.
+  // Field selectors — the draft store is written on every upload step.
   const items = usePrescriptionDraftStore((s) => s.items);
   const addItems = usePrescriptionDraftStore((s) => s.addItems);
   const removeFromStore = usePrescriptionDraftStore((s) => s.removeItem);

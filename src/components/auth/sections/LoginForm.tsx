@@ -18,8 +18,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  // Stable identity: an inline ref callback is re-invoked on every render, so
-  // the native filter would be re-applied on each keystroke.
+  // Stable, or the native filter re-applies on every keystroke.
   const setInputRef = useCallback(
     (r: TextInput | null) => {
       applyDigitsOnlyFilter(r, MAX_PHONE_DIGITS);

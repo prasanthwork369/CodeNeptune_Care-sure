@@ -20,13 +20,11 @@ export const styles = StyleSheet.create({
     borderRadius: exactScale(12),
     overflow: "hidden",
   },
-  // Placeholders sit on the green gradient, so they read as frosted glass
-  // rather than the default grey, which clashed with the brand card.
+  // Frosted white, since the default grey clashes with the green card.
   skeletonPlaceholder: {
     backgroundColor: "rgba(255,255,255,0.58)",
   },
-  // Bottom-centred like the real image's contentPosition, so the smaller
-  // placeholder still sits where the person's body will land.
+  // Bottom-centred, matching the real image's contentPosition.
   skeletonAvatarBox: {
     justifyContent: "flex-end",
     alignItems: "center",
@@ -102,8 +100,7 @@ export const styles = StyleSheet.create({
 
 export const getDynamicStyles = (scale: number) => {
   const personWidth = Math.round(exactScale(184) * scale);
-  // One title line occupies TITLE_LINE_HEIGHT; the bar covers the glyphs and
-  // the margin makes up the rest, so the badge lands on the loaded card's y.
+  // Bar covers the glyphs, margin makes up the rest of TITLE_LINE_HEIGHT.
   const titleLine = Math.round(exactScale(30) * scale);
   const skeletonLineHeight = Math.round(exactScale(16) * scale);
 

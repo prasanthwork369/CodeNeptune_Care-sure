@@ -12,8 +12,7 @@ import { syncService } from "@/src/services/sync.service";
 
 export function useHomeData() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  // Select the actions individually — a bare useLocationStore() subscribes to
-  // the whole store, so any location write would re-render the entire feed.
+  // Field selectors, or any location write re-renders the entire feed.
   const setLocation = useLocationStore((s) => s.setLocation);
   const clearLocation = useLocationStore((s) => s.clearLocation);
   const hasHydrated = useLocationStore((s) => s.hasHydrated);

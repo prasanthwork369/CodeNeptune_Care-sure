@@ -28,8 +28,7 @@ const containerStyle = {
   elevation: 1,
 } as const;
 
-// Memoised: sits in the Home feed and wraps an animated cycler, so it must not
-// re-render every time the feed does.
+// Memoised: wraps an animated cycler inside the frequently re-rendering feed.
 export const SearchBar: React.FC<SearchBarProps> = React.memo(({
   placeholder,
   words,

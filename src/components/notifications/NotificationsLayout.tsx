@@ -434,8 +434,7 @@ export const NotificationsLayout: React.FC = () => {
     }, [refetch]),
   );
 
-  // Memoized: this walks the whole list once per section, so leaving it in the
-  // render body re-grouped every notification on every state change.
+  // Memoized, or every notification is re-grouped on every state change.
   const sections = useMemo(
     () =>
       SECTION_ORDER.map((key) => ({

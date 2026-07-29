@@ -1,17 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
-import type { UploadConfig } from '../../api/settings.api';
+import type { MobileAppLinks, UploadConfig } from '../../api/settings.api';
+import { WEB_BASE_URL } from '../../utils/urls';
 import { apiCache, withSqliteCache } from '../../lib/sqlite/cache';
 import { settingsService } from '../../services/settings.service';
 import { MAX_SIZE_BYTES, PRESCRIPTION_VALIDITY_MONTHS } from '../../utils/prescription';
 
+// Falls back to local URLs so one failed request can't leave the links dead all session.
 export function useMobileAppLinks() {
-    return useQuery({
+    const query = useQuery({
         queryKey: ['mobile-app-links'],
         queryFn: () => settingsService.getMobileAppLinks(),
         staleTime: 24 * 60 * 60 * 1000,
         retry: 2,
         refetchOnWindowFocus: false,
     });
+
+    const data: MobileAppLinks = {
+        termsLink: query.data?.termsLink || `${WEB_BASE_URL}/terms`,
+        refundLink: query.data?.refundLink || `${WEB_BASE_URL}/returns`,
+        privacyLink: query.data?.privacyLink || `${WEB_BASE_URL}/privacy`,
+    };
+
+    return { ...query, data };
 }
 
 export function useCartWalletSettings() {

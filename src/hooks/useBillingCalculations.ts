@@ -32,8 +32,7 @@ export const useBillingCalculations = ({
   const { profile } = useProfile();
   const { balance } = useWalletBalance();
   const { data: settings } = useCartWalletSettings();
-  // Selector, not the whole store: this hook runs on cart and payment, so a
-  // bare useCouponStore() would re-run both on any coupon-store write.
+  // Selector, or any coupon write re-runs this on both cart and payment.
   const appliedCoupon = useCouponStore((s) => s.applied);
 
   const isCorporateUser = profile?.isCorporateUser ?? false;
@@ -105,9 +104,7 @@ export const useBillingCalculations = ({
     Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0),
   );
 
-  // Deliberately NOT memoized: this hook must stay callable as a plain
-  // function so the billing math can be unit-tested without a renderer, and
-  // CartSavingsBreakdown is not memoized, so a stable identity buys nothing.
+  // NOT memoized on purpose — this hook stays callable as a plain function so the tests can call it directly.
   const savingsRows = [
     { label: "Product Discount", value: productSavings },
     { label: "Coupon Discount", value: COUPON_DISCOUNT },
