@@ -104,7 +104,8 @@ export const MedicineComparisonLayout: React.FC<
   const deliveryDescription = displayLocation?.city ?? "No address saved";
 
   // Coupon
-  const { applied: appliedCoupon, remove: removeCoupon } = useCouponStore();
+  const appliedCoupon = useCouponStore((s) => s.applied);
+  const removeCoupon = useCouponStore((s) => s.remove);
 
   // Merge duplicate entries for the same recommended medicine, summing quantities
   const mergedMedicines = useMemo(() => {

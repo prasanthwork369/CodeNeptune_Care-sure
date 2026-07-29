@@ -10,7 +10,7 @@ import { io, Socket } from "socket.io-client";
 export const useCartSocketSync = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { setCart } = useCartPendingStore();
+  const setCart = useCartPendingStore((s) => s.setCart);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {

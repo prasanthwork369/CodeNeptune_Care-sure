@@ -11,7 +11,12 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 
 const NetworkToast = () => {
-    const { isConnected, isInternetReachable, setIsConnected, offlineAlertVisible, hideOfflineAlert } = useNetworkStore();
+    // Mounted app-wide, so it selects fields rather than the whole store.
+    const isConnected = useNetworkStore((s) => s.isConnected);
+    const isInternetReachable = useNetworkStore((s) => s.isInternetReachable);
+    const setIsConnected = useNetworkStore((s) => s.setIsConnected);
+    const offlineAlertVisible = useNetworkStore((s) => s.offlineAlertVisible);
+    const hideOfflineAlert = useNetworkStore((s) => s.hideOfflineAlert);
     const adjustedBottom = useAdjustedBottomInset();
 
     const [isLoading, setIsLoading] = useState(false);

@@ -23,7 +23,7 @@ const CLOSE_TIMEOUT_MS = CLOSE_DURATION - 30;
 
 export const useProductHeroAnimation = (onBack: () => void) => {
     const { width: screenW, height: screenH } = useWindowDimensions();
-    const { clear } = useHeroTransitionStore();
+    const clear = useHeroTransitionStore((s) => s.clear);
 
     const snap = useRef<HeroRect | null>(useHeroTransitionStore.getState().originRect).current;
 

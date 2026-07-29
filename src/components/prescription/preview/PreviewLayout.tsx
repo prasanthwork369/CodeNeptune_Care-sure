@@ -79,12 +79,12 @@ export const PreviewLayout: React.FC = () => {
     prescriptionId?: string;
   }>();
 
-  const {
-    items,
-    addItems,
-    removeItem: removeFromStore,
-    clearItems,
-  } = usePrescriptionDraftStore();
+  // Field selectors — the draft store is written on every upload step, and a
+  // bare call would re-render this whole screen each time.
+  const items = usePrescriptionDraftStore((s) => s.items);
+  const addItems = usePrescriptionDraftStore((s) => s.addItems);
+  const removeFromStore = usePrescriptionDraftStore((s) => s.removeItem);
+  const clearItems = usePrescriptionDraftStore((s) => s.clearItems);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {

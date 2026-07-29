@@ -25,7 +25,11 @@ const CONFIG = {
 };
 
 export const Toast: React.FC = () => {
-  const { visible, message, type, hide } = useToastStore();
+  // Mounted app-wide, so it selects fields rather than the whole store.
+  const visible = useToastStore((s) => s.visible);
+  const message = useToastStore((s) => s.message);
+  const type = useToastStore((s) => s.type);
+  const hide = useToastStore((s) => s.hide);
   const insets = useSafeAreaInsets();
   const adjustedBottom = useAdjustedBottomInset();
   const [keyboardVisible, setKeyboardVisible] = useState(false);

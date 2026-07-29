@@ -67,14 +67,14 @@ export function usePaymentCalculations() {
   const clearPrescriptionOrder = usePrescriptionOrderStore((s) => s.clear);
   const isPrescriptionFlow = prescriptionOrderItems.length > 0;
 
-  const {
-    bill,
-    walletUsed,
-    coinsUsed,
-    corporateCreditsUsed,
-    couponCode,
-    clear: clearCheckout,
-  } = useCheckoutStore();
+  // Field selectors — a bare useCheckoutStore() re-runs the whole payment
+  // calculation on any write to that store.
+  const bill = useCheckoutStore((s) => s.bill);
+  const walletUsed = useCheckoutStore((s) => s.walletUsed);
+  const coinsUsed = useCheckoutStore((s) => s.coinsUsed);
+  const corporateCreditsUsed = useCheckoutStore((s) => s.corporateCreditsUsed);
+  const couponCode = useCheckoutStore((s) => s.couponCode);
+  const clearCheckout = useCheckoutStore((s) => s.clear);
   const removeCoupon = useCouponStore((s) => s.remove);
 
   const billBreakdown = {

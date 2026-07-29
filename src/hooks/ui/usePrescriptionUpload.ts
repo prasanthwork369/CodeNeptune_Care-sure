@@ -16,7 +16,7 @@ export function usePrescriptionUpload(
   ) => void,
 ) {
   const router = useNav();
-  const { addItems } = usePrescriptionDraftStore();
+  const addItems = usePrescriptionDraftStore((s) => s.addItems);
   const { maxSizeBytes } = useUploadConfig();
   // Valid files from a batch that also contained an oversized file —
   // held back until the "file too large" notice is dismissed, so the

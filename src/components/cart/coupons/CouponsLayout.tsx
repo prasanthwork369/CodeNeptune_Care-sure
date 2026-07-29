@@ -15,8 +15,9 @@ import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
 export const CouponsLayout: React.FC = () => {
   const [couponCode, setCouponCode] = useState("");
   const [validating, setValidating] = useState(false);
-  const { apply, applied } = useCouponStore();
-  const toast = useToastStore();
+  const apply = useCouponStore((s) => s.apply);
+  const applied = useCouponStore((s) => s.applied);
+  const showToast = useToastStore((s) => s.show);
   const router = useNav();
   const { totalPrice: subtotal } = useCart();
   const { data: coupons = [], isLoading } = useCoupons();
@@ -39,7 +40,7 @@ export const CouponsLayout: React.FC = () => {
         // transition makes Fabric re-parent views and crash.
         requestAnimationFrame(() => router.back());
       } else {
-        toast.show(
+        showToast(
           result.message ?? "This coupon is not valid or has expired.",
           "error",
         );
@@ -48,7 +49,7 @@ export const CouponsLayout: React.FC = () => {
       // Surface the backend's reason (e.g. "usage limit reached") when the
       // coupon is rejected via a 4xx, instead of a generic fallback.
       const message = err instanceof Error ? err.message : "";
-      toast.show(
+      showToast(
         message || "Could not validate coupon. Please try again.",
         "error",
       );

@@ -18,7 +18,7 @@ export function usePrescriptionPicker(
   ) => void,
 ) {
   const router = useNav();
-  const { addItems } = usePrescriptionDraftStore();
+  const addItems = usePrescriptionDraftStore((s) => s.addItems);
   const { maxSizeBytes } = useUploadConfig();
 
   const showErr = (title: string, message: string, onDismiss?: () => void) =>

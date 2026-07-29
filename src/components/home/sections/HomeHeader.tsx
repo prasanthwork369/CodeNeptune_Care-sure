@@ -32,7 +32,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(({
   const { latestPrescription, hasPendingPrescription } =
     usePrescriptionBanner();
 
-  const { lastSeenRxId, lastSeenRxStatus, setLastSeenRx } = useNotificationStore();
+  // Field selectors, so the memoized header isn't re-rendered by unrelated
+  // notification-store writes.
+  const lastSeenRxId = useNotificationStore((s) => s.lastSeenRxId);
+  const lastSeenRxStatus = useNotificationStore((s) => s.lastSeenRxStatus);
+  const setLastSeenRx = useNotificationStore((s) => s.setLastSeenRx);
   const { unreadCount: apiUnreadCount } = useNotifications();
   const isRxUnread =
     hasPendingPrescription &&

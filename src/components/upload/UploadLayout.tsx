@@ -21,7 +21,7 @@ import {
 export const UploadLayout: React.FC = () => {
     const adjustedBottom = useAdjustedBottomInset();
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-    const { clearItems } = usePrescriptionDraftStore();
+    const clearItems = usePrescriptionDraftStore((s) => s.clearItems);
 
     const [infoModal, setInfoModal] = useState<{ title: string; message: string; onDismiss?: () => void } | null>(null);
     const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
