@@ -9,10 +9,14 @@ import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
+import {
+  analyticsService,
+  PERF_TRACES,
+  usePerformanceTrace,
+} from "@/src/services/firebase";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { LinearGradient } from "expo-linear-gradient";
-import { analyticsService, PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
