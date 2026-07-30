@@ -24,7 +24,7 @@ export const LogisticsBar: React.FC<LogisticsBarProps> = ({
     storeLocation?.label || pincode || storePincode || "Select ";
 
   return (
-    <View className="mx-4 bg-white border border-[#919EAB33] rounded-[12px] flex-row items-center justify-between px-4 py-4 mb-6">
+    <View className="mx-4 bg-white border border-[#919EAB33] rounded-[12px] flex-row items-center justify-between px-4 py-2 mb-6">
       <View
         className="flex-row items-center border-r border-[#F3F4F6] pr-4 flex-1"
         style={{ minWidth: 0 }}

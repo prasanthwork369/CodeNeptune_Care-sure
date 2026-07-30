@@ -46,6 +46,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
       <GorhomBottomSheet
         isVisible={visible}
         onClose={onClose}
+        stackBehavior="push"
         backgroundStyle={{ backgroundColor: '#fff', borderTopLeftRadius: exactScale(12), borderTopRightRadius: exactScale(12) }}
       >
         <BottomSheetView style={{ paddingHorizontal: exactScale(20), paddingTop: exactScale(16), paddingBottom: exactScale(32) }}>

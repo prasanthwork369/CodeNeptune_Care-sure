@@ -454,8 +454,8 @@ export function ProductCard({
           </Touchable>
         </View>
       ) : cartItem ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635', height: CART_BUTTON_HEIGHT }}>
-          <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: exactScale(90), height: exactScale(35), alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635' }}>
+          <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: exactScale(36), height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>−</Text>
           </Touchable>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -464,20 +464,20 @@ export function ProductCard({
               : <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#fff' }}>{cartItem.quantity}</Text>
             }
           </View>
-          <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: 44, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+          <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: exactScale(36), height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>+</Text>
           </Touchable>
         </View>
       ) : (
         <Touchable
-          style={{ height: CART_BUTTON_HEIGHT, borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F763533', backgroundColor: '#fff' }}
-          activeOpacity={0.6}
+          style={{ minWidth: exactScale(78), height: exactScale(35), alignSelf: 'flex-end', borderRadius: exactScale(6), alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F7635', paddingHorizontal: exactScale(24), backgroundColor: '#fff' }}
+          activeOpacity={0.85}
           onPress={handleAddToCart}
           disabled={isAdding}
         >
           {isAdding
             ? <ActivityIndicator size="small" color="#0F7635" />
-            : <Text style={{ fontSize: moderateScale(14), fontWeight: '600', color: '#0F7635' }}>Add to cart</Text>
+            : <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#0F7635' }}>Add</Text>
           }
         </Touchable>
       )}

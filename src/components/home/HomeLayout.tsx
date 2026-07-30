@@ -43,12 +43,7 @@ import type { CategoryCard } from "@/src/types/home";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import React, {
-  useCallback,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -561,7 +556,7 @@ export const HomeLayout: React.FC = () => {
         renderItem={renderSection}
         showsVerticalScrollIndicator={false}
         className="flex-1"
-        bounces
+        bounces={false}
         alwaysBounceVertical={false}
         overScrollMode="auto"
         decelerationRate="normal"

@@ -160,14 +160,7 @@ export default function RootLayout() {
                     />
                     <Stack.Screen name="notifications" />
                     <Stack.Screen name="profile" />
-                    <Stack.Screen
-                      name="product"
-                      options={{
-                        presentation: "transparentModal",
-                        animation: "none",
-                        gestureEnabled: false,
-                      }}
-                    />
+                    <Stack.Screen name="product" />
                   </Stack>
                   <CartSyncProvider />
                   <PushNotificationProvider />

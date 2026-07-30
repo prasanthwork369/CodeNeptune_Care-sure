@@ -29,6 +29,7 @@ interface GorhomBottomSheetProps
         | 'maxDynamicContentSize'
         | 'bottomInset'
         | 'onChange'
+        | 'stackBehavior'
     > {
     isVisible: boolean;
     onClose: () => void;
@@ -76,6 +77,7 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
             style,
             children,
             onChange,
+            stackBehavior,
         },
         ref,
     ) => {
@@ -171,6 +173,7 @@ export const GorhomBottomSheet = forwardRef<BottomSheetModal, GorhomBottomSheetP
                 maxDynamicContentSize={maxDynamicContentSize}
                 bottomInset={bottomInset}
                 enablePanDownToClose
+                stackBehavior={stackBehavior}
                 onChange={onChange}
                 onDismiss={handleDismiss}
                 backdropComponent={renderBackdrop}

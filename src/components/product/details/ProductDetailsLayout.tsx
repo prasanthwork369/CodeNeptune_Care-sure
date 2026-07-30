@@ -3,7 +3,6 @@ import {
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { ProductSkeleton } from "@/src/components/product/ProductSkeleton";
-import { useProductHeroAnimation } from "@/src/hooks/animations/useProductHeroAnimation";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
@@ -19,8 +18,7 @@ import { formatPackLabel } from "@/src/utils/packLabel";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import { ScrollView, Text, View } from "react-native";
 import {
   KnowYourMedicine,
   LogisticsBar,
@@ -127,13 +125,6 @@ export const ProductDetailsLayout: React.FC = () => {
   const activeVariantId = selectedVariant?.id ?? null;
 
   const goBack = useCallback(() => router.back(), [router]);
-  const {
-    containerStyle,
-    contentStyle,
-    backdropStyle,
-    screenStyle,
-    handleBack,
-  } = useProductHeroAnimation(goBack);
 
   const manufacturer = raw?.manufacturer?.name ?? raw?.brand?.name ?? "";
   const medicineName = raw?.name ?? "";
@@ -150,164 +141,148 @@ export const ProductDetailsLayout: React.FC = () => {
     : undefined;
 
   return (
-    <Animated.View
-      style={[{ flex: 1, backgroundColor: "#FFFFFF" }, screenStyle]}
-    >
-      {/* Dims home screen during expansion */}
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: "rgba(0,0,0,0.15)" },
-          backdropStyle,
-        ]}
-        pointerEvents="none"
-      />
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <View style={{ flex: 1 }}>
+          <LinearGradient
+            colors={["#EAF7D6", "rgba(234, 247, 214, 0)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: exactScale(180),
+            }}
+          />
 
-      {/* Expanding container — grows from card rect to full screen, clips content */}
-      <Animated.View style={[{ backgroundColor: "#FFFFFF" }, containerStyle]}>
-        <Animated.View style={contentStyle}>
-          <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-            <LinearGradient
-              colors={["#EAF7D6", "rgba(234, 247, 214, 0)"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
+          <ProductDetailsHeader
+            title={medicineName}
+            onBack={goBack}
+            productId={id}
+            productType={product?.productType}
+            slug={product?.slug}
+            packLabel={activeProduct?.packLabel}
+            price={activeProduct?.price}
+            manufacturer={manufacturer}
+            dosageForm={product?.dosageForm}
+          />
+
+          {isLoading ? (
+            <ProductSkeleton />
+          ) : !product ? (
+            <View
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: exactScale(180),
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingHorizontal: exactScale(32),
               }}
-            />
-
-            <ProductDetailsHeader
-              title={medicineName}
-              onBack={handleBack}
-              productId={id}
-              productType={product?.productType}
-              slug={product?.slug}
-              packLabel={activeProduct?.packLabel}
-              price={activeProduct?.price}
-              manufacturer={manufacturer}
-              dosageForm={product?.dosageForm}
-            />
-
-            {isLoading ? (
-              <ProductSkeleton />
-            ) : !product ? (
-              <View
+            >
+              <Text
                 style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingHorizontal: exactScale(32),
+                  fontSize: moderateScale(16),
+                  fontWeight: "600",
+                  color: "#333232",
+                  textAlign: "center",
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: moderateScale(16),
-                    fontWeight: "600",
-                    color: "#333232",
-                    textAlign: "center",
-                  }}
-                >
-                  Product not found
-                </Text>
-              </View>
+                Product not found
+              </Text>
+            </View>
+          ) : (
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
+              style={{ flex: 1 }}
+              bounces={false}
+              overScrollMode="never"
+            >
+              {saltComposition && (
+                <SaltCompositionBanner composition={saltComposition} />
+              )}
+
+              <ProductInfo
+                productId={id}
+                medicineUuid={medicineId}
+                product={activeProduct!}
+                variants={variants}
+                selectedVariantId={selectedVariantId}
+                onVariantSelect={setSelectedVariantId}
+              />
+
+              <LogisticsBar
+                onChangeLocation={() => setLocationSheetVisible(true)}
+              />
+
+              {recommendation && (
+                <TrustBadge
+                  searchedName={product.name}
+                  recommendedName={recommendation?.name}
+                  searchedManufacturer={product.manufacturer}
+                  recommendedManufacturer={recommendation?.manufacturer}
+                  searchedUnitPrice={product.unitPriceDisplay}
+                  recommendedUnitPrice={recUnitPrice}
+                />
+              )}
+
+              <KnowYourMedicine manufacturer={manufacturer} />
+
+              <WhyFamiliesTrustUs
+                promise={appContent?.promise}
+                isLoading={isHomeLoading}
+                showTitle={false}
+              />
+
+              <MoreAboutSection
+                medicineName={medicineName}
+                mobileAdditionalData={raw?.mobileAdditionalData}
+              />
+            </ScrollView>
+          )}
+
+          {activeProduct &&
+            (recommendation || !showNoSubstituteBanner ? (
+              <ProductDetailsFooter
+                productId={id}
+                medicineUuid={medicineId}
+                // Only fall back to base-product matching for
+                // variant-less products. For products with
+                // variants, baseMedicineId is identical across
+                // all variants — matching on it would make the
+                // footer show "in cart" for every variant once
+                // any one of them (or the base id itself) is
+                // in the cart.
+                baseMedicineId={variants.length > 0 ? undefined : raw?.id}
+                variantId={activeVariantId}
+                product={{
+                  ...activeProduct,
+                  packSize: selectedVariant
+                    ? `${selectedVariant.packSize} ${selectedVariant.unit}`
+                    : activeProduct.packSize != null
+                      ? String(activeProduct.packSize)
+                      : undefined,
+                  unit: selectedVariant?.unit,
+                }}
+                safeAreaBottom={adjustedBottom}
+                onViewCart={() => router.push("/(stack)/cart")}
+              />
             ) : (
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
-                style={{ flex: 1 }}
-                bounces={false}
-                overScrollMode="never"
-              >
-                {saltComposition && (
-                  <SaltCompositionBanner composition={saltComposition} />
-                )}
+              <NoSubstituteBanner
+                productId={id}
+                medicineUuid={medicineId}
+                productName={activeProduct.name}
+                safeAreaBottom={adjustedBottom}
+              />
+            ))}
+        </View>
+      </View>
 
-                <ProductInfo
-                  productId={id}
-                  medicineUuid={medicineId}
-                  product={activeProduct!}
-                  variants={variants}
-                  selectedVariantId={selectedVariantId}
-                  onVariantSelect={setSelectedVariantId}
-                />
-
-                <LogisticsBar
-                  onChangeLocation={() => setLocationSheetVisible(true)}
-                />
-
-                {recommendation && (
-                  <TrustBadge
-                    searchedName={product.name}
-                    recommendedName={recommendation?.name}
-                    searchedManufacturer={product.manufacturer}
-                    recommendedManufacturer={recommendation?.manufacturer}
-                    searchedUnitPrice={product.unitPriceDisplay}
-                    recommendedUnitPrice={recUnitPrice}
-                  />
-                )}
-
-                <KnowYourMedicine manufacturer={manufacturer} />
-
-                <WhyFamiliesTrustUs
-                  promise={appContent?.promise}
-                  isLoading={isHomeLoading}
-                  showTitle={false}
-                />
-
-                <MoreAboutSection
-                  medicineName={medicineName}
-                  mobileAdditionalData={raw?.mobileAdditionalData}
-                />
-              </ScrollView>
-            )}
-
-            {activeProduct &&
-              (recommendation || !showNoSubstituteBanner ? (
-                <ProductDetailsFooter
-                  productId={id}
-                  medicineUuid={medicineId}
-                  // Only fall back to base-product matching for
-                  // variant-less products. For products with
-                  // variants, baseMedicineId is identical across
-                  // all variants — matching on it would make the
-                  // footer show "in cart" for every variant once
-                  // any one of them (or the base id itself) is
-                  // in the cart.
-                  baseMedicineId={variants.length > 0 ? undefined : raw?.id}
-                  variantId={activeVariantId}
-                  product={{
-                    ...activeProduct,
-                    packSize: selectedVariant
-                      ? `${selectedVariant.packSize} ${selectedVariant.unit}`
-                      : activeProduct.packSize != null
-                        ? String(activeProduct.packSize)
-                        : undefined,
-                    unit: selectedVariant?.unit,
-                  }}
-                  safeAreaBottom={adjustedBottom}
-                  onViewCart={() => router.push("/(stack)/cart")}
-                />
-              ) : (
-                <NoSubstituteBanner
-                  productId={id}
-                  medicineUuid={medicineId}
-                  productName={activeProduct.name}
-                  safeAreaBottom={adjustedBottom}
-                />
-              ))}
-          </View>
-        </Animated.View>
-      </Animated.View>
-
-      {/* Outside expanding container so modal renders above animation */}
       <LocationBottomSheet
         isVisible={locationSheetVisible}
         onClose={() => setLocationSheetVisible(false)}
       />
-    </Animated.View>
+    </View>
   );
 };
