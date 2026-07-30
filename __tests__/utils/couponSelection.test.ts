@@ -3,6 +3,7 @@ import { Coupon } from "@/src/types/cart";
 import {
   computeCouponDiscount,
   selectCartCoupon,
+  selectNextCouponUpsell,
 } from "@/src/utils/couponSelection";
 
 const coupon = (over: Partial<Coupon> & { code: string }): Coupon => ({
@@ -137,29 +138,112 @@ describe("selectCartCoupon", () => {
     expect(selectCartCoupon([a, b], 1000, new Set(["A", "B"]))).toBeNull();
   });
 
-  it("ignores rejected coupons when picking the nearest locked one", () => {
-    const rejectedNear = coupon({
-      code: "NEARBAD",
+  // Pre-validation runs at the current subtotal, so a below-minimum coupon always comes back
+  // invalid. Honouring that would hide every locked coupon -- the card showed then vanished.
+  it("keeps a below-minimum coupon even when pre-validation rejected it", () => {
+    const near = coupon({
+      code: "NEAR",
       discountValue: 30,
       minOrderValue: 300,
     });
-    const usableFar = coupon({
-      code: "FAROK",
-      discountValue: 90,
-      minOrderValue: 900,
-    });
 
-    const pick = selectCartCoupon(
-      [rejectedNear, usableFar],
-      250,
-      new Set(["NEARBAD"]),
-    );
+    const pick = selectCartCoupon([near], 250, new Set(["NEAR"]));
 
-    expect(pick?.coupon.code).toBe("FAROK");
+    expect(pick?.coupon.code).toBe("NEAR");
     expect(pick?.isLocked).toBe(true);
-    expect(pick?.remaining).toBe(650);
+    expect(pick?.remaining).toBe(50);
   });
 
+  it("prefers the lower threshold when savings tie", () => {
+    const low = coupon({ code: "LOW", discountValue: 40, minOrderValue: 100 });
+    const high = coupon({
+      code: "HIGH",
+      discountValue: 40,
+      minOrderValue: 400,
+    });
+
+    expect(selectCartCoupon([high, low], 800)?.coupon.code).toBe("LOW");
+  });
+});
+
+describe("selectNextCouponUpsell", () => {
+  const applied = coupon({
+    code: "GET20",
+    discountValue: 20,
+    minOrderValue: 100,
+  });
+  const next = coupon({ code: "GET50", discountValue: 50, minOrderValue: 250 });
+  const far = coupon({ code: "GET200", discountValue: 200, minOrderValue: 900 });
+
+  it("points at the closest better coupon", () => {
+    const all = [applied, next, far];
+    const current = selectCartCoupon(all, 200);
+
+    const up = selectNextCouponUpsell(all, 200, current);
+
+    expect(up?.coupon.code).toBe("GET50");
+    expect(up?.gap).toBe(50);
+    expect(up?.savings).toBe(50);
+  });
+
+  it("never points at the coupon already on the card", () => {
+    const all = [applied, next];
+    const current = selectCartCoupon(all, 300);
+
+    expect(current?.coupon.code).toBe("GET50");
+    expect(selectNextCouponUpsell(all, 300, current)?.coupon.code).not.toBe(
+      "GET50",
+    );
+  });
+
+  it("returns null when spending more would not beat the current coupon", () => {
+    const big = coupon({ code: "BIG", discountValue: 100, minOrderValue: 100 });
+    const worse = coupon({
+      code: "WORSE",
+      discountValue: 10,
+      minOrderValue: 500,
+    });
+    const all = [big, worse];
+    const current = selectCartCoupon(all, 200);
+
+    expect(selectNextCouponUpsell(all, 200, current)).toBeNull();
+  });
+
+  // GET50 sits above the subtotal, so its rejection only means "minimum not met" and must be ignored.
+  it("still nudges toward a coupon rejected only for being below its minimum", () => {
+    const all = [applied, next, far];
+    const current = selectCartCoupon(all, 200, new Set(["GET50"]));
+
+    const up = selectNextCouponUpsell(all, 200, current, new Set(["GET50"]));
+
+    expect(up?.coupon.code).toBe("GET50");
+  });
+
+  it("skips a coupon genuinely rejected at a met minimum", () => {
+    const usedUp = coupon({
+      code: "USEDUP",
+      discountValue: 80,
+      minOrderValue: 100,
+    });
+    const all = [applied, usedUp, far];
+    const rejected = new Set(["USEDUP"]);
+    const current = selectCartCoupon(all, 200, rejected);
+
+    expect(current?.coupon.code).toBe("GET20");
+    expect(selectNextCouponUpsell(all, 200, current, rejected)?.coupon.code).toBe(
+      "GET200",
+    );
+  });
+
+  it("returns null when nothing is above the current subtotal", () => {
+    const all = [applied, next];
+    const current = selectCartCoupon(all, 5000);
+
+    expect(selectNextCouponUpsell(all, 5000, current)).toBeNull();
+  });
+});
+
+describe("selectCartCoupon threshold ordering", () => {
   it("prefers the lower threshold when savings tie", () => {
     const low = coupon({ code: "LOW", discountValue: 40, minOrderValue: 100 });
     const high = coupon({

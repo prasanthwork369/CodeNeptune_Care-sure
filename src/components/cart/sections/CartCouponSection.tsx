@@ -11,12 +11,9 @@ import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
 import { CartCouponSectionProps } from "@/src/types/cart";
 import {
-  formatCouponExpiry,
-  formatCouponTerms,
-} from "@/src/utils/couponFormat";
-import {
   computeCouponDiscount,
   selectCartCoupon,
+  selectNextCouponUpsell,
 } from "@/src/utils/couponSelection";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useMemo, useState } from "react";
@@ -45,6 +42,11 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   const pick = useMemo(
     () => selectCartCoupon(coupons, subtotal, unavailable),
     [coupons, subtotal, unavailable],
+  );
+
+  const upsell = useMemo(
+    () => selectNextCouponUpsell(coupons, subtotal, pick, unavailable),
+    [coupons, subtotal, pick, unavailable],
   );
 
   const handleDirectApply = async () => {
@@ -167,7 +169,6 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   }
 
   const { coupon: bestCoupon, savings, isLocked, remaining } = pick;
-  const expiry = formatCouponExpiry(bestCoupon.expiresAt);
 
   return (
     <View className="mx-4 mt-3 rounded-[16px] border border-[#BFE3FF] overflow-hidden bg-white">
@@ -215,42 +216,29 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             >
               Save ₹{savings.toFixed(0)} with {bestCoupon.code}
             </Text>
-            {isLocked && (
+            {/* Locked: how to unlock this one. Unlocked: how to reach the next, better coupon. */}
+            {isLocked ? (
               <Text
                 style={{
                   fontSize: moderateScale(12),
                   fontWeight: "600",
-                  color: "#E16D09",
+                  color: "#FF8A00",
                   marginTop: exactScale(3),
                 }}
               >
                 Shop ₹{remaining.toFixed(0)} more to apply
               </Text>
-            )}
-            {/* Same wording as the coupons screen -- both read from formatCouponTerms. */}
-            <Text
-              numberOfLines={2}
-              style={{
-                fontSize: moderateScale(12),
-                lineHeight: moderateScale(16),
-                fontWeight: "500",
-                color: "#E53827",
-                marginTop: exactScale(3),
-              }}
-            >
-              {formatCouponTerms(bestCoupon)}
-            </Text>
-            {expiry ? (
+            ) : upsell ? (
               <Text
                 style={{
-                  fontSize: moderateScale(11),
-                  lineHeight: moderateScale(15),
-                  fontWeight: "500",
-                  color: "#6A6A6A",
-                  marginTop: exactScale(2),
+                  fontSize: moderateScale(12),
+                  fontWeight: "600",
+                  color: "#FF8A00",
+                  marginTop: exactScale(3),
                 }}
               >
-                Expires {expiry}
+                Shop ₹{upsell.gap.toFixed(0)} more to get ₹
+                {upsell.savings.toFixed(0)} off
               </Text>
             ) : null}
           </View>

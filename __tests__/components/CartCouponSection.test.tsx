@@ -77,7 +77,7 @@ describe("CartCouponSection Component", () => {
   });
 
   it("renders coupon offers card when no coupon is applied", async () => {
-    const { findByText, getByText } = renderWithProviders(
+    const { findByText, getByText, queryByText } = renderWithProviders(
       <CartCouponSection
         appliedCoupon={null}
         onRemove={onRemoveMock}
@@ -88,9 +88,9 @@ describe("CartCouponSection Component", () => {
     expect(await findByText("Coupons & offers")).toBeTruthy();
     expect(getByText(/Save/i)).toBeTruthy();
     expect(getByText("Apply")).toBeTruthy();
-    // Terms and expiry read from the same formatter the coupons screen uses.
-    expect(getByText("20% off on orders above ₹200, max ₹100")).toBeTruthy();
-    expect(getByText(/Expires .*Aug/)).toBeTruthy();
+    // Terms and expiry belong to the coupons screen; the cart card stays to the headline and nudge.
+    expect(queryByText(/off on orders above/)).toBeNull();
+    expect(queryByText(/Expires/)).toBeNull();
   });
 
   it("calls couponService.validateCoupon when Apply is pressed", async () => {
