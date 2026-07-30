@@ -11,6 +11,13 @@ import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
+import {
+  buildCartOrderItems,
+  buildOrderPayload,
+  buildPrescriptionOrderItems,
+  sumOrderDiscounts,
+} from "@/src/utils/orderPayload";
+import { CreateOrderRequest } from "@/src/types/order";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
@@ -89,12 +96,7 @@ export function usePaymentCalculations() {
     toPay: bill?.toPay ?? parseFloat(toPay),
   };
 
-  const totalDiscount =
-    billBreakdown.productDiscount +
-    billBreakdown.couponDiscount +
-    billBreakdown.walletDiscount +
-    billBreakdown.coinsDiscount +
-    billBreakdown.creditsDiscount;
+  const totalDiscount = sumOrderDiscounts(billBreakdown);
 
   const [selectedMethod, setSelectedMethod] = useState("COD");
   const [showLocationSheet, setShowLocationSheet] = useState(false);
@@ -147,8 +149,8 @@ export function usePaymentCalculations() {
     // idempotent: a retry after a failed order reuses the created prescription
     // instead of POSTing a duplicate.
     let effectivePrescriptionId = prescriptionId || createdRxIdRef.current;
-    let orderItems: any[] = [];
-    let payload: any;
+    let orderItems: CreateOrderRequest["items"] = [];
+    let payload: CreateOrderRequest | undefined;
     let traceStatus = "failed";
     try {
     if (!effectivePrescriptionId && parsedImageUrls.length > 0) {
@@ -169,89 +171,25 @@ export function usePaymentCalculations() {
     }
 
     orderItems = isPrescriptionFlow
-      ? prescriptionOrderItems.map((i) => ({
-          medicineId: i.medicineId,
-          quantity: i.quantity,
-          unitPrice: String(i.unitPrice),
-          medicineSnapshot: {
-            name: i.medicineName,
-            slug: i.medicineSlug,
-            productId: i.productId ?? undefined,
-            image: i.image ?? undefined,
-            mrp: i.mrp,
-            requiresPrescription: true,
-          },
-        }))
-      : cartItems.map((i) => ({
-          medicineId: i.medicineId,
-          quantity: i.quantity,
-          unitPrice: String(i.unitPrice),
-          medicineSnapshot: {
-            name: i.medicineName,
-            slug: i.medicineSlug,
-            productId: i.productId ?? i.metadata?.productId ?? undefined,
-            image: i.image ?? i.metadata?.image ?? undefined,
-            brand: i.metadata?.brand ?? undefined,
-            pack: i.metadata?.pack ?? undefined,
-            mrp: i.metadata?.mrp ?? undefined,
-            requiresPrescription: i.requiresPrescription,
-          },
-        }));
+      ? buildPrescriptionOrderItems(prescriptionOrderItems)
+      : buildCartOrderItems(cartItems);
 
-    payload = {
+    payload = buildOrderPayload({
       items: orderItems,
-      deliveryAddress: {
-        name: defaultAddress.name,
-        phone: defaultAddress.phone,
-        line1: defaultAddress.line1,
-        line2: defaultAddress.line2,
-        city: defaultAddress.city,
-        state: defaultAddress.state,
-        pincode: defaultAddress.pincode,
-        country: defaultAddress.country ?? "IN",
-      },
-      subtotal: String(
-        Number(
-          bill?.subtotal ??
-            (isPrescriptionFlow
-              ? prescriptionOrderItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0)
-              : cartItems.reduce((s, i) => s + parseFloat(String(i.unitPrice)) * i.quantity, 0)),
-        ).toFixed(2),
-      ),
-      deliveryCharge: String(billBreakdown.deliveryFee),
-      taxAmount: "0",
-      discountAmount: String(totalDiscount.toFixed(2)),
-      // Use the calculated bill total, never the route param — the backend is
-      // authoritative and re-validates, but we must not send a spoofable value.
-      total: String(Number(billBreakdown.toPay).toFixed(2)),
-      deliveryType: "HOME_DELIVERY" as const,
-      patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
-      prescriptionId: effectivePrescriptionId || undefined,
-      isPurchased: effectivePrescriptionId ? true : undefined,
-      problem: problem || undefined,
-      symptoms: symptoms || undefined,
-      metadata: {
-        billBreakdown,
-        idempotencyKey: idempotencyKeyRef.current,
-        preferences: {
-          walletUsed: walletUsed,
-          coinsUsed: coinsUsed,
-          creditsUsed: corporateCreditsUsed,
-          livePriceSyncUsed: false,
-        },
-        couponCode: couponCode ?? "",
-        patientDetails: {
-          phone: patientPhone || undefined,
-          problem: problem || undefined,
-          skipPrescription: !effectivePrescriptionId,
-          symptoms: symptoms || undefined,
-        },
-      },
-    };
-
-    if (__DEV__) {
-      console.log("[handlePlaceOrder] payload:", JSON.stringify(payload, null, 2));
-    }
+      address: defaultAddress,
+      bill: billBreakdown,
+      subtotal: bill?.subtotal,
+      idempotencyKey: idempotencyKeyRef.current,
+      couponCode,
+      walletUsed,
+      coinsUsed,
+      creditsUsed: corporateCreditsUsed,
+      prescriptionId: effectivePrescriptionId,
+      patientMemberId,
+      patientPhone,
+      problem,
+      symptoms,
+    });
 
       const order: any = await createOrder(payload, idempotencyKeyRef.current);
       traceStatus = "success";
@@ -287,9 +225,14 @@ export function usePaymentCalculations() {
         },
       });
     } catch (err: any) {
+      // Redacted on purpose: the payload carries the delivery address and patient phone.
       if (__DEV__) {
-        console.log("[PlaceOrder] payload:", JSON.stringify(payload, null, 2));
-        console.log("[PlaceOrder] error:", JSON.stringify(err?.data ?? err?.response?.data ?? err, null, 2));
+        console.log("[PlaceOrder] failed", {
+          itemCount: payload?.items.length ?? 0,
+          total: payload?.total,
+          hasPrescription: !!payload?.prescriptionId,
+        });
+        console.log("[PlaceOrder] error:", err?.data ?? err?.response?.data ?? err?.message);
       }
       reportError(err, "placeOrder:cart");
       Alert.alert("Order Failed", orderErrorMessage(err));
