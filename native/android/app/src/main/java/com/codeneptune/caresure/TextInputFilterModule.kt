@@ -52,7 +52,7 @@ class TextInputFilterModule(private val reactContext: ReactApplicationContext) :
                 val uiManager = UIManagerHelper.getUIManager(reactContext, uiManagerType)
                 if (uiManager == null) {
                     Log.w(TAG, "UIManager not found for type $uiManagerType, attempt: $attempt")
-                    retry(reactTag, maxLength, attempt)
+                    retry(reactTag, maxLength, attempt, mode)
                     return@runOnUiThread
                 }
 
