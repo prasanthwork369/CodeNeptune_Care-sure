@@ -9,7 +9,7 @@ export const useCreateReturn = () => {
     const mutation = useMutation({
         mutationFn: (data: CreateReturnRequest) => returnService.createReturn(data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.RETURNS.LIST() });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.RETURNS.LIST_ALL });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(variables.orderId) });
         },
     });

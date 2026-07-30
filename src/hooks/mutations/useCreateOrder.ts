@@ -11,7 +11,7 @@ export const useCreateOrder = () => {
             orderService.createOrder(vars.data, vars.idempotencyKey),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST() });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST_ALL });
             queryClient.invalidateQueries({ queryKey: ['customer', 'prescriptions'] });
         },
     });

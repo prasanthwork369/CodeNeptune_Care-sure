@@ -37,10 +37,13 @@ export const QUERY_KEYS = {
             BY_ID:  (id: string)                      => ['customer', 'prescriptions', 'detail', id] as const,
         },
         ORDERS: {
+            // Invalidate with LIST_ALL, never LIST() -- a trailing `undefined` fails to prefix-match LIST({}).
+            LIST_ALL: ['customer', 'orders', 'list'] as const,
             LIST:   (params?: OrderListParams) => ['customer', 'orders', 'list', params] as const,
             BY_ID:  (id: string)               => ['customer', 'orders', 'detail', id] as const,
         },
         RETURNS: {
+            LIST_ALL: ['customer', 'returns', 'list'] as const,
             LIST:   (params?: ReturnListParams) => ['customer', 'returns', 'list', params] as const,
             BY_ID:  (id: string)                => ['customer', 'returns', 'detail', id] as const,
         },
