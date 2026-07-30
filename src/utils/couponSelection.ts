@@ -24,10 +24,16 @@ export const computeCouponDiscount = (coupon: Coupon, amount: number) => {
 export const selectCartCoupon = (
   coupons: Coupon[],
   subtotal: number,
+  // Codes the backend already rejected (usage limit reached, expired) must never be recommended.
+  unavailableCodes?: ReadonlySet<string>,
 ): CartCouponPick | null => {
-  if (coupons.length === 0) return null;
+  const usable = unavailableCodes?.size
+    ? coupons.filter((c) => !unavailableCodes.has(c.code))
+    : coupons;
 
-  const unlocked = coupons.filter((c) => subtotal >= c.minOrderValue);
+  if (usable.length === 0) return null;
+
+  const unlocked = usable.filter((c) => subtotal >= c.minOrderValue);
 
   if (unlocked.length > 0) {
     const best = unlocked.reduce((a, b) => {
@@ -49,7 +55,7 @@ export const selectCartCoupon = (
   }
 
   // Nothing is usable yet, so surface the closest threshold instead of the largest discount.
-  const nearest = coupons.reduce((a, b) => {
+  const nearest = usable.reduce((a, b) => {
     const aGap = a.minOrderValue - subtotal;
     const bGap = b.minOrderValue - subtotal;
     if (aGap !== bGap) return bGap < aGap ? b : a;

@@ -116,6 +116,50 @@ describe("selectCartCoupon", () => {
     expect(selectCartCoupon([b, a], 800)?.coupon.code).toBe("AAA");
   });
 
+  // A limit-reached coupon used to be recommended and then failed on Apply.
+  it("skips coupons the backend rejected and falls back to the next best", () => {
+    const rejected = coupon({ code: "USEDUP", discountValue: 200 });
+    const usable = coupon({ code: "OK50", discountValue: 50 });
+
+    const pick = selectCartCoupon(
+      [rejected, usable],
+      1000,
+      new Set(["USEDUP"]),
+    );
+
+    expect(pick?.coupon.code).toBe("OK50");
+  });
+
+  it("returns null when every coupon was rejected", () => {
+    const a = coupon({ code: "A", discountValue: 10 });
+    const b = coupon({ code: "B", discountValue: 20 });
+
+    expect(selectCartCoupon([a, b], 1000, new Set(["A", "B"]))).toBeNull();
+  });
+
+  it("ignores rejected coupons when picking the nearest locked one", () => {
+    const rejectedNear = coupon({
+      code: "NEARBAD",
+      discountValue: 30,
+      minOrderValue: 300,
+    });
+    const usableFar = coupon({
+      code: "FAROK",
+      discountValue: 90,
+      minOrderValue: 900,
+    });
+
+    const pick = selectCartCoupon(
+      [rejectedNear, usableFar],
+      250,
+      new Set(["NEARBAD"]),
+    );
+
+    expect(pick?.coupon.code).toBe("FAROK");
+    expect(pick?.isLocked).toBe(true);
+    expect(pick?.remaining).toBe(650);
+  });
+
   it("prefers the lower threshold when savings tie", () => {
     const low = coupon({ code: "LOW", discountValue: 40, minOrderValue: 100 });
     const high = coupon({
