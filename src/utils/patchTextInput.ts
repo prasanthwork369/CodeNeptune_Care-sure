@@ -8,6 +8,7 @@ import OriginalTextInputImport from "react-native/Libraries/Components/TextInput
 // @ts-ignore - internal RN module without bundled type declarations
 import TextInputState from "react-native/Libraries/Components/TextInput/TextInputState";
 
+import { applyAsciiOnlyFilter } from "../modules/TextInputFilter";
 import { sanitizeStyle } from "./patchText";
 
 const OriginalTextInput =
@@ -16,10 +17,23 @@ const OriginalTextInput =
 const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
   (props, ref) => {
     const sanitizedStyle = sanitizeStyle(props.style);
+
+    // English-only input, applied natively so the keyboard cannot defeat it. Numeric fields
+    // add their own digits-only filter afterwards, which supersedes this one.
+    const setRef = React.useCallback(
+      (node: RN.TextInput | null) => {
+        applyAsciiOnlyFilter(node);
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref],
+    );
+
     return React.createElement(OriginalTextInput, {
       ...props,
-      ref,
+      ref: setRef,
       allowFontScaling: props.allowFontScaling ?? false,
+      keyboardType: props.keyboardType ?? "ascii-capable",
       style: [{ includeFontPadding: false }, sanitizedStyle],
     });
   },

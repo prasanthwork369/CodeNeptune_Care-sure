@@ -30,6 +30,9 @@ export const CouponInput: React.FC<CouponInputProps> = ({ value, onChangeText, o
                     paddingVertical: 0,
                 }}
                 autoCapitalize="characters"
+                // A coupon code must match the backend string exactly, so autocorrect can only corrupt it.
+                autoCorrect={false}
+                spellCheck={false}
                 editable={!loading}
             />
             <Touchable

@@ -38,6 +38,8 @@ export const sanitize = {
         return formatted.slice(0, 10);
     },
     money: (raw: string) => raw.replace(REGEX.digitsOnly, '').replace(/^0+/, ''),
+    // The app accepts English input only; the keyboard language itself cannot be forced on either platform.
+    ascii: (raw: string) => raw.replace(/[^\x20-\x7E\n\t]/g, ''),
 };
 
 // ─── Display formatters ───────────────────────────────────────────────────────

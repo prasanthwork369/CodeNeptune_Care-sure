@@ -22,10 +22,30 @@ class TextInputFilterModule(private val reactContext: ReactApplicationContext) :
     @ReactMethod
     fun applyDigitsOnly(reactTag: Int, maxLength: Int) {
         Log.d(TAG, "applyDigitsOnly called for tag: $reactTag maxLength: $maxLength")
-        attemptApplyFilter(reactTag, maxLength, 0)
+        attemptApplyFilter(reactTag, maxLength, 0, MODE_DIGITS)
     }
 
-    private fun attemptApplyFilter(reactTag: Int, maxLength: Int, attempt: Int) {
+    // English-only input. Rejecting at the native level avoids the controlled-input desync
+    // a JS strip causes: React skips the native update when the stripped text is unchanged.
+    @ReactMethod
+    fun applyAsciiOnly(reactTag: Int) {
+        Log.d(TAG, "applyAsciiOnly called for tag: $reactTag")
+        attemptApplyFilter(reactTag, 0, 0, MODE_ASCII)
+    }
+
+    private fun buildAsciiFilter(): InputFilter {
+        return InputFilter { source, start, end, _, _, _ ->
+            val kept = StringBuilder(end - start)
+            for (i in start until end) {
+                val c = source[i]
+                if (c.code in 0x20..0x7E || c == '\n' || c == '\t') kept.append(c)
+            }
+            // null keeps the input untouched (the typing fast path).
+            if (kept.length == end - start) null else kept.toString()
+        }
+    }
+
+    private fun attemptApplyFilter(reactTag: Int, maxLength: Int, attempt: Int, mode: Int) {
         UiThreadUtil.runOnUiThread {
             try {
                 val uiManagerType = ViewUtil.getUIManagerType(reactTag)
@@ -38,7 +58,7 @@ class TextInputFilterModule(private val reactContext: ReactApplicationContext) :
 
                 val view = uiManager.resolveView(reactTag) as? EditText
                 if (view != null) {
-                    val digitsFilter = InputFilter { source, start, end, dest, dstart, dend ->
+                    val digitsFilter = if (mode == MODE_ASCII) buildAsciiFilter() else InputFilter { source, start, end, dest, dstart, dend ->
                         val digits = StringBuilder(end - start)
                         for (i in start until end) {
                             if (Character.isDigit(source[i])) digits.append(source[i])
@@ -61,25 +81,30 @@ class TextInputFilterModule(private val reactContext: ReactApplicationContext) :
                     // Filter out any previous TextInputFilter instances to avoid duplicates
                     val filteredList = currentFilters.filter { !it.toString().contains("TextInputFilterModule") }.toTypedArray()
                     view.filters = arrayOf(digitsFilter) + filteredList
-                    Log.d(TAG, "Successfully applied digits-only filter to tag: $reactTag")
+                    Log.d(TAG, "Successfully applied filter (mode=$mode) to tag: $reactTag")
                 } else {
                     Log.w(TAG, "View resolve returned null for tag: $reactTag, attempt: $attempt")
-                    retry(reactTag, maxLength, attempt)
+                    retry(reactTag, maxLength, attempt, mode)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Exception resolving view/applying filter for tag: $reactTag, attempt: $attempt", e)
-                retry(reactTag, maxLength, attempt)
+                retry(reactTag, maxLength, attempt, mode)
             }
         }
     }
 
-    private fun retry(reactTag: Int, maxLength: Int, attempt: Int) {
+    private fun retry(reactTag: Int, maxLength: Int, attempt: Int, mode: Int) {
         if (attempt < 10) {
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                attemptApplyFilter(reactTag, maxLength, attempt + 1)
+                attemptApplyFilter(reactTag, maxLength, attempt + 1, mode)
             }, 50)
         } else {
             Log.e(TAG, "Failed to resolve view for tag $reactTag after 10 attempts")
         }
+    }
+
+    companion object {
+        private const val MODE_DIGITS = 0
+        private const val MODE_ASCII = 1
     }
 }
