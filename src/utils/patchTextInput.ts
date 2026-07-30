@@ -34,6 +34,10 @@ const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
       ref: setRef,
       allowFontScaling: props.allowFontScaling ?? false,
       keyboardType: props.keyboardType ?? "ascii-capable",
+      // Off on both platforms: autocorrect fights English-only entry and can rewrite what was typed.
+      // spellCheck is an iOS-only prop; React Native ignores it on Android.
+      autoCorrect: props.autoCorrect ?? false,
+      spellCheck: props.spellCheck ?? false,
       style: [{ includeFontPadding: false }, sanitizedStyle],
     });
   },
