@@ -31,7 +31,7 @@ const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
     </Touchable>
 );
 
-export const SearchRecentSection = ({
+export const SearchRecentSection = React.memo(({
     history,
     trending,
     onTermPress,
@@ -116,4 +116,6 @@ export const SearchRecentSection = ({
            </View>
         </ScrollView>
     );
-};
+});
+
+SearchRecentSection.displayName = 'SearchRecentSection';

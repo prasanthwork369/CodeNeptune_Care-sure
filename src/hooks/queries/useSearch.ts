@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { searchApi, ApiSearchMedicine } from '../../api/search.api';
 import { searchService } from '../../services/search.service';
 import { useAuthStore } from '@/src/store/authStore';
@@ -48,7 +48,11 @@ export const useSearch = () => {
         staleTime: 30_000,
     });
 
-    const results: ApiSearchMedicine[] = data?.pages.flatMap(p => p.data) ?? [];
+    // Memoised so the list keeps a stable data reference while the user keeps typing.
+    const results: ApiSearchMedicine[] = useMemo(
+        () => data?.pages.flatMap(p => p.data) ?? [],
+        [data],
+    );
 
     return {
         query,
@@ -110,31 +114,38 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
 
     const HISTORY_KEY_PREFIX = ['search', 'history'];
 
-    const recordMutation = useMutation({
+    const { mutate: recordMutate } = useMutation({
         mutationFn: ({ query, productId }: { query: string; productId?: string }) =>
             searchService.recordHistory(query, productId),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: HISTORY_KEY_PREFIX }),
     });
 
-    const clearMutation = useMutation({
+    const { mutate: clearMutate, isPending: isClearingHistory } = useMutation({
         mutationFn: () => searchService.clearHistory(),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: HISTORY_KEY_PREFIX }),
     });
 
-    const deleteItemMutation = useMutation({
+    const { mutate: deleteItemMutate } = useMutation({
         mutationFn: (id: string) => searchService.deleteHistoryItem(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: HISTORY_KEY_PREFIX }),
     });
+
+    // Stable callbacks so screens can memoise the handlers built on top of them.
+    const recordHistory = useCallback(
+        (query: string, productId?: string) => recordMutate({ query, productId }),
+        [recordMutate],
+    );
+    const clearHistory = useCallback(() => clearMutate(), [clearMutate]);
+    const deleteHistoryItem = useCallback((id: string) => deleteItemMutate(id), [deleteItemMutate]);
 
     return {
         history: data ?? [],
         isLoading,
         refetch,
-        recordHistory: (query: string, productId?: string) =>
-            recordMutation.mutate({ query, productId }),
-        clearHistory: () => clearMutation.mutate(),
-        isClearingHistory: clearMutation.isPending,
-        deleteHistoryItem: (id: string) => deleteItemMutation.mutate(id),
+        recordHistory,
+        clearHistory,
+        isClearingHistory,
+        deleteHistoryItem,
     };
 };
 

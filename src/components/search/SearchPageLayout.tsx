@@ -9,7 +9,7 @@ import { useSearch, useSearchHistory, useSearchSuggestions, useTrendingSearches 
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNav } from '@/src/hooks/useNav';
 import { analyticsService, PERF_TRACES, usePerformanceTrace } from '@/src/services/firebase';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from '@/src/hooks/ui/useIsOffline';
@@ -80,6 +80,9 @@ const toSearchedOnlyData = (item: ApiSearchMedicine) => {
     };
 };
 
+const noop = () => {};
+const EMPTY_HISTORY: never[] = [];
+
 const toRecommendData = (item: ApiSearchMedicine) => ({
     id: item.id,
     productId: item.productId ?? item.id,
@@ -147,10 +150,35 @@ export const SearchPageLayout = () => {
     const { suggestions } = useSearchSuggestions(query, 5);
     const { trending } = useTrendingSearches(5);
 
-    const trendingTerms = trending.map(t => t.query);
+    const trendingTerms = useMemo(() => trending.map(t => t.query), [trending]);
 
     const isSearching = debouncedQuery.length >= 1;
     const isTyping = query.trim().length >= 1 && !isSearching;
+
+    // Stable handlers keep the results list and its rows out of the per-keystroke render.
+    const handleSubmit = useCallback(() => {
+        const term = query.trim();
+        if (term.length >= 1) recordHistory(term);
+    }, [query, recordHistory]);
+
+    const handleTermPress = useCallback((term: string) => {
+        recordHistory(term);
+        setQuery(term);
+    }, [recordHistory, setQuery]);
+
+    const handleProductPress = useCallback(
+        (id: string) => router.push({ pathname: '/product/[id]', params: { id } }),
+        [router],
+    );
+
+    const handleViewAllFrequent = useCallback(
+        () => router.push('/profile/orders/frequent'),
+        [router],
+    );
+
+    const handleEndReached = useCallback(() => {
+        if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     return (
         <View className="flex-1 bg-white">
@@ -165,7 +193,7 @@ export const SearchPageLayout = () => {
                 cartCount={cartCount}
                 query={query}
                 onQueryChange={setQuery}
-                onSubmit={() => { if (query.trim().length >= 1) recordHistory(query.trim()); }}
+                onSubmit={handleSubmit}
                 isSearching={isSearching}
             />
 
@@ -173,23 +201,26 @@ export const SearchPageLayout = () => {
                 <SearchOfflineState />
             ) : !query.trim() ? (
                 <SearchRecentSection
+                    key="idle"
                     history={history}
                     trending={trendingTerms}
-                    onTermPress={(term) => { recordHistory(term); setQuery(term); }}
+                    onTermPress={handleTermPress}
                     onClear={clearHistory}
                     isClearing={isClearingHistory}
                     onDeleteHistoryItem={deleteHistoryItem}
-                    onProductPress={(id) => router.push({ pathname: '/product/[id]', params: { id } })}
-                    onViewAllFrequent={() => router.push('/profile/orders/frequent')}
+                    onProductPress={handleProductPress}
+                    onViewAllFrequent={handleViewAllFrequent}
                 />
             ) : isTyping ? (
+                // Distinct key: shares the component with the idle list, so without it a dismissed trending chip also hides the matching suggestion.
                 <SearchRecentSection
-                    history={[]}
+                    key="typing"
+                    history={EMPTY_HISTORY}
                     trending={suggestions}
-                    onTermPress={(term) => { recordHistory(term); setQuery(term); }}
-                    onClear={() => {}}
-                    onDeleteHistoryItem={() => {}}
-                    onProductPress={(id) => router.push({ pathname: '/product/[id]', params: { id } })}
+                    onTermPress={handleTermPress}
+                    onClear={noop}
+                    onDeleteHistoryItem={noop}
+                    onProductPress={handleProductPress}
                     showFrequent={false}
                 />
             ) : isLoading ? (
@@ -204,8 +235,8 @@ export const SearchPageLayout = () => {
                     toComparisonData={toComparisonData}
                     toSearchedOnlyData={toSearchedOnlyData}
                     toRecommendData={toRecommendData}
-                    onRecommendPress={(productId) => router.push({ pathname: '/product/[id]', params: { id: productId } })}
-                    onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}
+                    onRecommendPress={handleProductPress}
+                    onEndReached={handleEndReached}
                     isFetchingNextPage={isFetchingNextPage}
                 />
             )}

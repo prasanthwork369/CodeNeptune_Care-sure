@@ -3,11 +3,17 @@ import { SearchNoSubstituteCard } from "@/src/components/search/SearchNoSubstitu
 import { SearchProductCard } from "@/src/components/search/SearchProductCard";
 import { SearchRecommendCard } from "@/src/components/search/SearchRecommendCard";
 import { FlashList } from "@shopify/flash-list";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { SearchColumnHeaders } from "./SearchColumnHeaders";
 
-export const SearchResultsList = ({
+const ListFooter = () => (
+  <ActivityIndicator size="small" color="#0F7635" style={{ marginVertical: 12 }} />
+);
+
+const keyExtractor = (item: ApiSearchMedicine) => item.id;
+
+export const SearchResultsList = React.memo(({
   results,
   colWidth,
   bottomPad,
@@ -48,26 +54,30 @@ export const SearchResultsList = ({
     [toComparisonData, toSearchedOnlyData, toRecommendData, onRecommendPress],
   );
 
+  // Hoisted out of the render pass so typing does not rebuild the gradient-SVG header on every keystroke.
+  const listHeader = useMemo(
+    () => <SearchColumnHeaders colWidth={colWidth} />,
+    [colWidth],
+  );
+  const contentStyle = useMemo(
+    () => ({ paddingBottom: bottomPad }),
+    [bottomPad],
+  );
+
   return (
     <FlashList
       data={results}
-      keyExtractor={(item) => item.id}
+      keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: bottomPad }}
+      contentContainerStyle={contentStyle}
       className="flex-1"
-      ListHeaderComponent={<SearchColumnHeaders colWidth={colWidth} />}
+      ListHeaderComponent={listHeader}
       renderItem={renderItem}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.4}
-      ListFooterComponent={
-        isFetchingNextPage ? (
-          <ActivityIndicator
-            size="small"
-            color="#0F7635"
-            style={{ marginVertical: 12 }}
-          />
-        ) : null
-      }
+      ListFooterComponent={isFetchingNextPage ? ListFooter : null}
     />
   );
-};
+});
+
+SearchResultsList.displayName = "SearchResultsList";
