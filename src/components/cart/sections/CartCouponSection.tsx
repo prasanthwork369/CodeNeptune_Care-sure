@@ -1,7 +1,6 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
@@ -9,21 +8,15 @@ import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useNav } from "@/src/hooks/useNav";
 import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
-import { CartCouponSectionProps, Coupon } from "@/src/types/cart";
+import { CartCouponSectionProps } from "@/src/types/cart";
+import {
+  computeCouponDiscount,
+  selectCartCoupon,
+} from "@/src/utils/couponSelection";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";
-
-const computeDiscount = (coupon: Coupon, amount: number) => {
-  if (coupon.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE) {
-    const raw = (amount * coupon.discountValue) / 100;
-    return coupon.maxDiscountAmount
-      ? Math.min(raw, coupon.maxDiscountAmount)
-      : raw;
-  }
-  return coupon.discountValue;
-};
 
 export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   appliedCoupon,
@@ -35,31 +28,23 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   const apply = useCouponStore((s) => s.apply);
   const [applying, setApplying] = useState(false);
 
-  const bestCoupon = coupons.length
-    ? coupons.reduce((best, c) => {
-        const cSavings = computeDiscount(
-          c,
-          Math.max(subtotal, c.minOrderValue),
-        );
-        const bestSavings = computeDiscount(
-          best,
-          Math.max(subtotal, best.minOrderValue),
-        );
-        return cSavings > bestSavings ? c : best;
-      })
-    : null;
+  // Recomputed as the subtotal moves, so the card tracks what this cart can actually use.
+  const pick = useMemo(
+    () => selectCartCoupon(coupons, subtotal),
+    [coupons, subtotal],
+  );
 
   const handleDirectApply = async () => {
-    if (!bestCoupon) return;
+    if (!pick) return;
     setApplying(true);
     try {
       const result = await couponService.validateCoupon(
-        bestCoupon.code,
+        pick.coupon.code,
         subtotal,
       );
       if (result.valid) {
         apply({
-          code: bestCoupon.code,
+          code: pick.coupon.code,
           discount: Number(result.discount) || 0,
           description: result.message ?? "",
         });
@@ -79,7 +64,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   if (appliedCoupon) {
     const appliedCouponDef = coupons.find((c) => c.code === appliedCoupon.code);
     const displayedDiscount = appliedCouponDef
-      ? computeDiscount(appliedCouponDef, subtotal)
+      ? computeCouponDiscount(appliedCouponDef, subtotal)
       : Number(appliedCoupon.discount) || 0;
     return (
       <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3">
@@ -138,7 +123,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
     );
   }
 
-  if (!bestCoupon) {
+  if (!pick) {
     return (
       <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3">
         <Touchable
@@ -166,12 +151,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
     );
   }
 
-  const isLocked = subtotal < bestCoupon.minOrderValue;
-  const savings = computeDiscount(
-    bestCoupon,
-    Math.max(subtotal, bestCoupon.minOrderValue),
-  );
-  const remaining = bestCoupon.minOrderValue - subtotal;
+  const { coupon: bestCoupon, savings, isLocked, remaining } = pick;
 
   return (
     <View className="mx-4 mt-3 rounded-[16px] border border-[#BFE3FF] overflow-hidden bg-white">
