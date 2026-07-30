@@ -1,31 +1,43 @@
 // Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
-// Flip LIVE to switch the app between the live API and QA.
-const LIVE = false;
+// Resolved from EXPO_PUBLIC_APP_ENV so a build can never disagree with its EAS profile; app.config.ts reads the same switch.
+const APP_ENV = process.env.EXPO_PUBLIC_APP_ENV ?? "development";
+const IS_PRODUCTION = APP_ENV === "production";
+
 const PROD_URL = process.env.EXPO_PUBLIC_API_BASE_URL_PROD;
 const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
+const PROD_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD;
+const QA_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_QA;
 
-const resolvedBaseUrl = LIVE ? PROD_URL : QA_URL;
+// Crash at startup rather than let a production build quietly serve customers from QA.
+const requireProdUrl = (value: string | undefined, name: string) => {
+  if (!value || !value.startsWith("https://")) {
+    throw new Error(
+      `${name} must be a valid https:// URL in a production build (got: ${value ?? "undefined"}). Set it as an EAS environment variable for the production profile.`,
+    );
+  }
+  return value;
+};
+
+const resolvedBaseUrl = IS_PRODUCTION
+  ? requireProdUrl(PROD_URL, "EXPO_PUBLIC_API_BASE_URL_PROD")
+  : QA_URL;
 
 if (!resolvedBaseUrl) {
   throw new Error(
-    "Missing API base URL: set EXPO_PUBLIC_API_BASE_URL_PROD and EXPO_PUBLIC_API_BASE_URL_QA in .env.local (see .env.example).",
+    "Missing API base URL: set EXPO_PUBLIC_API_BASE_URL_QA in .env.local (see .env.example).",
   );
 }
 
 export const API_BASE_URL = resolvedBaseUrl;
 // Exposed so auth can refuse QA-only conveniences (OTP prefill) when pointed at the live API.
-export const IS_LIVE_API = LIVE;
+export const IS_LIVE_API = IS_PRODUCTION;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
-// The public web/store origin used to build shareable product links. Driven by
-// the SAME LIVE flag as the API so a production build can never ship QA links.
-// Falls back to the QA host when the env var is unset (keeps dev zero-config) —
-// but production MUST set EXPO_PUBLIC_WEB_BASE_URL_PROD before launch, or shares
-// will still point at QA.
-const PROD_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD;
-const QA_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_QA;
-export const WEB_BASE_URL =
-  (LIVE ? PROD_WEB_URL : QA_WEB_URL) ?? "https://qa-caresure.codeneptune.com";
+// Share links follow the same switch as the API, so a production build can never emit QA links.
+// The QA fallback keeps local dev zero-config; production has no fallback by design.
+export const WEB_BASE_URL = IS_PRODUCTION
+  ? requireProdUrl(PROD_WEB_URL, "EXPO_PUBLIC_WEB_BASE_URL_PROD")
+  : (QA_WEB_URL ?? "https://qa-caresure.codeneptune.com");
 
 /** Prefixes a relative backend path (e.g. "/uploads/icon.png") with the API base URL. */
 export const resolveAssetUrl = (path: string) =>

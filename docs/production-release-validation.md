@@ -7,21 +7,18 @@
 
 ## 🔴 Critical blockers — MUST fix before the production build
 
-### 1. Production build currently connects to **QA**
-`src/utils/urls.ts` resolves the API base URL from a manual flag, **not** from `EXPO_PUBLIC_APP_ENV`:
+### 1. ~~Production build currently connects to QA~~ — FIXED 2026-07-30
+The manual `const LIVE = false` flag is gone. `src/utils/urls.ts` now resolves from
+`EXPO_PUBLIC_APP_ENV` (same switch `app.config.ts` already used), so API and web URLs
+can no longer disagree with the EAS profile, and the production profile in `eas.json`
+is now sufficient to point the app at prod.
 
-```ts
-const LIVE = false;                               // urls.ts:3
-const resolvedBaseUrl = LIVE ? PROD_URL : QA_URL; // urls.ts:7  → always QA
-```
+To test against prod locally, set `EXPO_PUBLIC_APP_ENV=production` in `.env.local` — do
+not edit source.
 
-So even though `eas.json` sets `EXPO_PUBLIC_APP_ENV=production` for the production profile, the **API still points at QA** because `urls.ts` ignores that env var. (The *web* URL in `app.config.ts` does honor `EXPO_PUBLIC_APP_ENV`, so API and web can disagree.)
-
-**Action (one of):**
-- Quick: set `const LIVE = true;` in `urls.ts` immediately before the production build, **or**
-- Proper (Phase-1 item #1, deferred): make `urls.ts` resolve from `EXPO_PUBLIC_APP_ENV` and hard-fail the production build if prod URLs are missing.
-
-> ⚠️ Do not ship a production bundle with `LIVE = false` — customers would hit QA.
+**This makes blocker #2 fail loudly instead of silently.** A production build with the
+prod URL env vars missing (or not `https://`) now **throws at startup** rather than
+falling back to QA. That is deliberate, but it means #2 is now a hard launch dependency.
 
 ### 2. Production URL env vars must be available to the EAS build
 `urls.ts` **throws at startup** if the base URL is undefined:
@@ -60,8 +57,8 @@ are **not** in `eas.json` and are **not** committed (they live in `.env.local`).
 ## ☑️ Pre-submit checklist (run before uploading the .aab)
 
 **Environment / endpoints**
-- [ ] `urls.ts` `LIVE = true` (or #1 implemented) — API points at PROD, not QA.
-- [ ] EAS production profile has `EXPO_PUBLIC_API_BASE_URL_PROD` + `EXPO_PUBLIC_WEB_BASE_URL_PROD` set (valid HTTPS).
+- [x] API points at PROD, not QA — now driven by `EXPO_PUBLIC_APP_ENV` (#1 implemented).
+- [ ] EAS production profile has `EXPO_PUBLIC_API_BASE_URL_PROD` + `EXPO_PUBLIC_WEB_BASE_URL_PROD` set (valid HTTPS). **The app now crashes on launch without these.**
 - [ ] Smoke-test the production build hits the prod backend (login/OTP against prod).
 
 **Versioning** (`app.config.ts`)
