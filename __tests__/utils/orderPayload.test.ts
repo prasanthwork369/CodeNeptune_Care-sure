@@ -218,20 +218,6 @@ describe("buildOrderPayload", () => {
     });
   });
 
-  // iOS paste and dictation bypass the Android input filter, so the boundary strips too.
-  it("strips non-English characters from problem and symptoms", () => {
-    const payload = buildOrderPayload({
-      ...base,
-      problem: "காய்ச்சல் fever",
-      symptoms: "தலைவலி headache",
-    });
-
-    expect(payload.problem).toBe(" fever");
-    expect(payload.symptoms).toBe(" headache");
-    expect(payload.metadata?.patientDetails?.problem).toBe(" fever");
-    expect(payload.metadata?.patientDetails?.symptoms).toBe(" headache");
-  });
-
   it("derives discountAmount from the bill breakdown", () => {
     expect(buildOrderPayload(base).discountAmount).toBe("11.50");
   });

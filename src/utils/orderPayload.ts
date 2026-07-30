@@ -1,5 +1,4 @@
 import { CreateOrderRequest, OrderMetadata } from "@/src/types/order";
-import { sanitize } from "@/src/utils/validation";
 
 export type OrderBillBreakdown = NonNullable<OrderMetadata["billBreakdown"]>;
 
@@ -124,12 +123,7 @@ export const buildOrderPayload = ({
   patientPhone,
   problem,
   symptoms,
-}: BuildOrderPayloadArgs): CreateOrderRequest => {
-  // iOS paste and dictation bypass the Android input filter, so strip the free-text fields here.
-  const cleanProblem = problem ? sanitize.ascii(problem) : undefined;
-  const cleanSymptoms = symptoms ? sanitize.ascii(symptoms) : undefined;
-
-  return {
+}: BuildOrderPayloadArgs): CreateOrderRequest => ({
   items,
   deliveryAddress: {
     name: address.name,
@@ -150,8 +144,8 @@ export const buildOrderPayload = ({
   patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
   prescriptionId: prescriptionId || undefined,
   isPurchased: prescriptionId ? true : undefined,
-  problem: cleanProblem || undefined,
-  symptoms: cleanSymptoms || undefined,
+  problem: problem || undefined,
+  symptoms: symptoms || undefined,
   metadata: {
     billBreakdown: bill,
     idempotencyKey,
@@ -164,11 +158,10 @@ export const buildOrderPayload = ({
     couponCode: couponCode ?? "",
     patientDetails: {
       phone: patientPhone || undefined,
-      problem: cleanProblem || undefined,
+      problem: problem || undefined,
       // No prescription attached means the customer chose to skip it.
       skipPrescription: !prescriptionId,
-      symptoms: cleanSymptoms || undefined,
+      symptoms: symptoms || undefined,
     },
   },
-  };
-};
+});

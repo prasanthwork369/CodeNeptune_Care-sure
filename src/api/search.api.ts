@@ -1,5 +1,4 @@
 import { API_ENDPOINTS } from '../utils/urls';
-import { sanitize } from '../utils/validation';
 import { apiClient } from './client';
 
 export interface ApiSearchRecommendation {
@@ -96,11 +95,7 @@ export const searchApi = {
     },
 
     recordHistory: async (query: string, productId?: string): Promise<void> => {
-        // Persisted server-side, so strip here too -- iOS paste bypasses the Android filter.
-        await apiClient.post(API_ENDPOINTS.SEARCH_HISTORY, {
-            query: sanitize.ascii(query),
-            productId,
-        });
+        await apiClient.post(API_ENDPOINTS.SEARCH_HISTORY, { query, productId });
     },
 
     clearHistory: async (): Promise<void> => {
