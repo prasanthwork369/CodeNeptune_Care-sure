@@ -46,7 +46,7 @@ Never report something as working unless these actually ran. Never claim device 
 A tracker artifact lists all **87 screens, bottom sheets, modals and states**, built from the designer's Figma list:
 https://claude.ai/code/artifact/bbe9ea69-e505-4985-8a74-faee13f423ac
 
-Work it top to bottom. **~18 of 87 audited.**
+Work it top to bottom. **~19 of 87 audited** — `SearchPageLayout` done (`a2b4139`); next unaudited screen is the product detail page.
 
 Order: Auth (done) → Home & discovery → Cart & checkout → Prescription → Patients → Address → Orders → Returns → Wallet → Profile & support → small modals.
 
@@ -87,12 +87,7 @@ c82e1ad  Fix home feed re-renders, banner autoplay effects and hero skeleton
 cb9d2dd  Fix login screen perf, double-open legal links and stale API error
 ```
 
-## Uncommitted right now — verified, needs pushing
-
-1. **Splash** — slow-load bar could flash in mid-fade; timer now cleared on completion
-2. **OTP** — stable ref callback, static box styles, removed duplicate Skip, 2 unused imports
-3. **Legal links fallback** — `useMobileAppLinks` now falls back to `WEB_BASE_URL` paths
-4. **Comment pass** — ~25 comments compressed to one line
+Then pushed as `cbe9a2f` (splash timer, OTP ref/styles, legal-link fallback, comment pass), `543b2a8`, `d3a568f`, `6df32b7`, and `a2b4139` (search screen).
 
 Also in the tree but **NOT yours**: `src/components/auth/SignupBonusPopup.tsx`, `.claude/settings.local.json`. Leave both.
 
@@ -132,4 +127,8 @@ Ask the user to chase these. Nothing in the app can fix them.
 1. Read `CLAUDE.md`.
 2. Run the three verify commands to confirm a clean baseline.
 3. Ask the user whether to push the four uncommitted items first.
-4. Continue the tracker from **Home & discovery** — `SearchPageLayout` (225 lines) is the next unaudited screen.
+4. Continue the tracker from **Home & discovery** — product detail is the next unaudited screen.
+
+## Found in the search audit, deliberately not fixed
+
+- **A failed search request shows "No results for …".** `SearchPageLayout` only branches on `isOffline` and `results.length === 0`; a non-network API error falls through to `SearchEmptyState`. Needs an error-state design before building.
