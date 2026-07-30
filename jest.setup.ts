@@ -38,21 +38,32 @@ jest.mock("react-native", () => {
 // NetInfo native module mock
 jest.mock("@react-native-community/netinfo", () => ({
   addEventListener: jest.fn(() => jest.fn()),
-  fetch: jest.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
-  useNetInfo: jest.fn().mockReturnValue({ isConnected: true, isInternetReachable: true }),
+  fetch: jest
+    .fn()
+    .mockResolvedValue({ isConnected: true, isInternetReachable: true }),
+  useNetInfo: jest
+    .fn()
+    .mockReturnValue({ isConnected: true, isInternetReachable: true }),
 }));
 
 // Reanimated: official mock (avoids native worklet runtime in tests).
 jest.mock("react-native-reanimated", () => {
   try {
-    return require("react-native-reanimated/mock");
+    const reanimated = require("react-native-reanimated/mock");
+    return {
+      ...reanimated,
+      useReducedMotion: () => false,
+    };
   } catch {
     return {};
   }
 });
 
 // Firebase native modules — no-op so imports don't hit the native bridge.
-jest.mock("@react-native-firebase/app", () => ({ __esModule: true, default: () => ({}) }));
+jest.mock("@react-native-firebase/app", () => ({
+  __esModule: true,
+  default: () => ({}),
+}));
 jest.mock("@react-native-firebase/crashlytics", () => {
   const crashInstance = {
     getCrashlytics: jest.fn(),
@@ -77,9 +88,14 @@ jest.mock("@react-native-firebase/crashlytics", () => {
     log: jest.fn(),
   };
 });
-jest.mock("@react-native-firebase/perf", () => ({ __esModule: true, default: () => ({}) }));
-jest.mock("@react-native-firebase/messaging", () => ({ __esModule: true, default: () => ({}) }));
+jest.mock("@react-native-firebase/perf", () => ({
+  __esModule: true,
+  default: () => ({}),
+}));
+jest.mock("@react-native-firebase/messaging", () => ({
+  __esModule: true,
+  default: () => ({}),
+}));
 
 // Silence noisy RN warnings that don't affect assertions.
 jest.spyOn(console, "warn").mockImplementation(() => {});
-

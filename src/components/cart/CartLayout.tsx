@@ -8,23 +8,39 @@ import { exactScale } from "@/src/utils/exactScale";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import React from "react";
 import { ScrollView, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeOutUp,
+  LinearTransition,
+  ReduceMotion,
+} from "react-native-reanimated";
 import {
-    CartBillSummary,
-    CartCoinsSection,
-    CartConfetti,
-    CartCouponSection,
-    CartDeliveringTo,
-    CartEmptyState,
-    CartFooter,
-    CartFreeDeliveryProgress,
-    CartItemsList,
-    CartInitialSkeleton,
-    CartSavingsBanner,
-    CartSavingsBreakdown,
-    CartTerms,
-    CartWalletSection,
-    CartCorporateCreditsSection,
+  CartBillSummary,
+  CartCoinsSection,
+  CartConfetti,
+  CartCouponSection,
+  CartDeliveringTo,
+  CartEmptyState,
+  CartFooter,
+  CartFreeDeliveryProgress,
+  CartItemsList,
+  CartInitialSkeleton,
+  CartSavingsBanner,
+  CartSavingsBreakdown,
+  CartTerms,
+  CartWalletSection,
+  CartCorporateCreditsSection,
 } from "./sections";
+
+const SAVINGS_BANNER_ENTERING = FadeInDown.duration(220).reduceMotion(
+  ReduceMotion.System,
+);
+const SAVINGS_BANNER_EXITING = FadeOutUp.duration(180).reduceMotion(
+  ReduceMotion.System,
+);
+const CART_CONTENT_LAYOUT = LinearTransition.duration(220).reduceMotion(
+  ReduceMotion.System,
+);
 
 export const CartLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
@@ -78,6 +94,8 @@ export const CartLayout: React.FC = () => {
     isCartLoading,
   } = useCartCalculations();
 
+  const shouldShowSavingsBanner = totalSavings > 0;
+
   // Measures how long the cart takes to load its server data, not screen dwell.
   usePerformanceTrace({
     traceName: PERF_TRACES.CART_LOAD,
@@ -117,80 +135,98 @@ export const CartLayout: React.FC = () => {
         bounces={false}
         contentContainerStyle={{ paddingBottom: exactScale(24) }}
       >
-        <CartSavingsBanner firstName={firstName} totalSavings={totalSavings} />
-
-        <CartDeliveringTo
-          label={deliveryLocation?.label ?? defaultAddress?.label ?? "Address"}
-          description={
-            deliveryLocation?.city ??
-            (defaultAddress
-              ? [
-                  defaultAddress.line1,
-                  defaultAddress.line2,
-                  defaultAddress.city,
-                ]
-                  .filter(Boolean)
-                  .join(", ")
-              : "No address saved")
-          }
-          onChange={() => setShowLocationSheet(true)}
-          flat
-        />
-
-        <CartFreeDeliveryProgress
-          remainingForFreeDelivery={remainingForFreeDelivery}
-          progress={freeDeliveryProgress}
-        />
-
-        <CartItemsList
-          lines={lines}
-          onUpdateItem={updateItem}
-          onRemoveItem={removeItem}
-        />
-
-        <CartCouponSection
-          appliedCoupon={appliedCoupon}
-          onRemove={removeCoupon}
-          subtotal={subtotal}
-        />
-
-        {walletBalance > 0 && (
-          <CartWalletSection
-            value={walletOn}
-            walletBalance={walletBalance}
-            onToggle={handleWalletToggle}
-          />
+        {shouldShowSavingsBanner && (
+          <Animated.View
+            entering={SAVINGS_BANNER_ENTERING}
+            exiting={SAVINGS_BANNER_EXITING}
+            layout={CART_CONTENT_LAYOUT}
+          >
+            <CartSavingsBanner
+              firstName={firstName}
+              totalSavings={totalSavings}
+            />
+          </Animated.View>
         )}
 
-        {corporateCreditsBalance > 0 && (
-          <CartCorporateCreditsSection
-            value={corporateCreditsOn}
-            balance={corporateCreditsBalance}
-            onToggle={handleCorporateCreditsToggle}
-            eligible={corporateCreditsEligible}
-            remainingForEligibility={corporateCreditsRemainingForEligibility}
+        <Animated.View layout={CART_CONTENT_LAYOUT}>
+          <CartDeliveringTo
+            label={
+              deliveryLocation?.label ?? defaultAddress?.label ?? "Address"
+            }
+            description={
+              deliveryLocation?.city ??
+              (defaultAddress
+                ? [
+                    defaultAddress.line1,
+                    defaultAddress.line2,
+                    defaultAddress.city,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")
+                : "No address saved")
+            }
+            onChange={() => setShowLocationSheet(true)}
+            flat
           />
-        )}
 
-        {availableCoins > 0 && (
-          <CartCoinsSection
-            value={coinsOn}
-            availableCoins={availableCoins}
-            redeemedCoins={Math.round(COINS_DISCOUNT / coinValue)}
-            onToggle={handleCoinsToggle}
-            onInfoPress={() => setShowCoinsSheet(true)}
+          <CartFreeDeliveryProgress
+            remainingForFreeDelivery={remainingForFreeDelivery}
+            progress={freeDeliveryProgress}
           />
-        )}
 
-        <CartBillSummary
-          mrpTotal={mrpTotal + DELIVERY_FEE + HANDLING_CHARGE}
-          toPay={toPay}
-          onPress={() => setShowBillDetails(true)}
-        />
+          <CartItemsList
+            lines={lines}
+            onUpdateItem={updateItem}
+            onRemoveItem={removeItem}
+          />
 
-        <CartSavingsBreakdown totalSavings={totalSavings} rows={savingsRows} />
+          <CartCouponSection
+            appliedCoupon={appliedCoupon}
+            onRemove={removeCoupon}
+            subtotal={subtotal}
+          />
 
-        <CartTerms />
+          {walletBalance > 0 && (
+            <CartWalletSection
+              value={walletOn}
+              walletBalance={walletBalance}
+              onToggle={handleWalletToggle}
+            />
+          )}
+
+          {corporateCreditsBalance > 0 && (
+            <CartCorporateCreditsSection
+              value={corporateCreditsOn}
+              balance={corporateCreditsBalance}
+              onToggle={handleCorporateCreditsToggle}
+              eligible={corporateCreditsEligible}
+              remainingForEligibility={corporateCreditsRemainingForEligibility}
+            />
+          )}
+
+          {availableCoins > 0 && (
+            <CartCoinsSection
+              value={coinsOn}
+              availableCoins={availableCoins}
+              redeemedCoins={Math.round(COINS_DISCOUNT / coinValue)}
+              onToggle={handleCoinsToggle}
+              onInfoPress={() => setShowCoinsSheet(true)}
+            />
+          )}
+
+          <CartBillSummary
+            mrpTotal={mrpTotal + DELIVERY_FEE + HANDLING_CHARGE}
+            toPay={toPay}
+            onPress={() => setShowBillDetails(true)}
+          />
+
+          <CartSavingsBreakdown
+            totalSavings={totalSavings}
+            rows={savingsRows}
+          />
+
+          <CartTerms />
+        </Animated.View>
       </ScrollView>
 
       <CartFooter
@@ -230,4 +266,3 @@ export const CartLayout: React.FC = () => {
     </View>
   );
 };
-

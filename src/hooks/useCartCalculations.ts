@@ -117,48 +117,62 @@ export function useCartCalculations() {
     items: cartItems,
     totalPrice: cartTotalPrice,
     addItem,
-    removeItem,
-    updateItem,
+    removeItem: removeCartItem,
+    updateItem: updateCartItem,
     isLoading: isCartLoading,
   } = useCart();
+  const removeCartItemRef = useRef(removeCartItem);
+  const updateCartItemRef = useRef(updateCartItem);
+  removeCartItemRef.current = removeCartItem;
+  updateCartItemRef.current = updateCartItem;
+
+  const removeItem = useCallback(
+    (itemId: string) => removeCartItemRef.current(itemId),
+    [],
+  );
+  const updateItem = useCallback(
+    (itemId: string, input: { quantity: number }) =>
+      updateCartItemRef.current(itemId, input),
+    [],
+  );
   const { products: featuredProducts } = useFeaturedMedicines();
 
   // Memoized, or a fresh identity re-renders the whole item list every time.
   const lines: CartLine[] = useMemo(
     () =>
       cartItems.map((item): CartLine => {
-    // unitPrice from the backend is the MRP (strikethrough price); the
-    // payable selling price is derived by applying discountPercent to it —
-    // matches customer-website's cart-utils.ts (rawMrp * (1 - discount/100)).
-    const mrp = parseFloat(String(item.unitPrice));
-    const discountPct = parseFloat(
-      String(item.discountPercent ?? item.metadata?.discountPercent ?? 0),
-    );
-    const price =
-      discountPct > 0
-        ? parseFloat((mrp * (1 - discountPct / 100)).toFixed(2))
-        : mrp;
-    const imageUri = item.image ?? item.metadata?.image;
-    const packSize = item.metadata?.packSize ?? item.packSize;
-    const productId =
-      item.productId ?? item.metadata?.productId ?? item.medicineId;
-    return {
-      id: item.id,
-      productId,
-      productIdResolved: !!(item.productId ?? item.metadata?.productId),
-      medicineId: item.medicineId,
-      name: item.medicineName,
-      brand: item.metadata?.brand ?? "",
-      // Prefer the backend's human-readable packaging string; fall back to raw packSize.
-      pack: item.packagingDetail ?? packSize ?? "",
-      discount:
-        discountPct > 0 ? `${parseFloat(discountPct.toFixed(2))}% off` : "",
-      mrp,
-      price,
-      qty: item.quantity,
-      image: imageUri ? { uri: imageUri } : null,
-      rx: item.requiresPrescription,
-    };
+        // unitPrice from the backend is the MRP (strikethrough price); the
+        // payable selling price is derived by applying discountPercent to it —
+        // matches customer-website's cart-utils.ts (rawMrp * (1 - discount/100)).
+        const mrp = parseFloat(String(item.unitPrice));
+        const discountPct = parseFloat(
+          String(item.discountPercent ?? item.metadata?.discountPercent ?? 0),
+        );
+        const price =
+          discountPct > 0
+            ? parseFloat((mrp * (1 - discountPct / 100)).toFixed(2))
+            : mrp;
+        const imageUri = item.image ?? item.metadata?.image;
+        const packSize = item.metadata?.packSize ?? item.packSize;
+        const productId =
+          item.productId ?? item.metadata?.productId ?? item.medicineId;
+        return {
+          id: item.id,
+          productId,
+          productIdResolved: !!(item.productId ?? item.metadata?.productId),
+          medicineId: item.medicineId,
+          name: item.medicineName,
+          brand: item.metadata?.brand ?? "",
+          // Prefer the backend's human-readable packaging string; fall back to raw packSize.
+          pack: item.packagingDetail ?? packSize ?? "",
+          discount:
+            discountPct > 0 ? `${parseFloat(discountPct.toFixed(2))}% off` : "",
+          mrp,
+          price,
+          qty: item.quantity,
+          image: imageUri ? { uri: imageUri } : null,
+          rx: item.requiresPrescription,
+        };
       }),
     [cartItems],
   );
