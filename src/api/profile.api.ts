@@ -1,5 +1,9 @@
 import { API_ENDPOINTS } from '../utils/urls';
+import { sanitize, sanitizeAsciiFields } from '../utils/validation';
 import { apiClient } from './client';
+
+// iOS paste and dictation bypass the Android input filter, so strip before the payload leaves.
+const PROFILE_TEXT_FIELDS = ['firstName', 'lastName', 'email'] as const;
 
 export interface CustomerProfile {
   id: string;
@@ -31,7 +35,10 @@ export const profileApi = {
         return response.data.data;
     },
     updateProfile: async (payload: UpdateProfilePayload): Promise<CustomerProfile> => {
-        const response = await apiClient.patch(API_ENDPOINTS.CUSTOMER_PROFILE, payload);
+        const response = await apiClient.patch(
+            API_ENDPOINTS.CUSTOMER_PROFILE,
+            sanitizeAsciiFields(payload, PROFILE_TEXT_FIELDS),
+        );
         return response.data?.data ?? profileApi.getProfile();
     },
     // Sends a verification OTP to the given email address.
@@ -45,7 +52,7 @@ export const profileApi = {
     // Permanently deletes the logged-in customer's account. reason is optional.
     deleteAccount: async (reason?: string): Promise<{ success: boolean }> => {
         const response = await apiClient.delete(API_ENDPOINTS.CUSTOMER_PROFILE, {
-            data: reason ? { reason } : undefined,
+            data: reason ? { reason: sanitize.ascii(reason) } : undefined,
         });
         return response.data?.data ?? response.data;
     },

@@ -1,5 +1,6 @@
 import { CreateOrderRequest, Order } from '../types/order';
 import { API_ENDPOINTS } from '../utils/urls';
+import { sanitize } from '../utils/validation';
 import { apiClient } from './client';
 
 export const orderApi = {
@@ -90,7 +91,10 @@ export const orderApi = {
     },
 
     cancelOrder: async (id: string, reason: string) => {
-        const response = await apiClient.post(API_ENDPOINTS.ORDER_CANCEL(id), { reason });
+        // iOS paste and dictation bypass the Android input filter, so strip before sending.
+        const response = await apiClient.post(API_ENDPOINTS.ORDER_CANCEL(id), {
+            reason: sanitize.ascii(reason),
+        });
         return response.data.data;
     },
 };

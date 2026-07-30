@@ -62,7 +62,8 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
       onChangeText,
       placeholder,
       editable = true,
-      keyboardType = "default",
+      // No default: an explicit "default" would bypass the app-wide ascii-capable keyboard.
+      keyboardType,
       maxLength,
       error,
       returnKeyType = "next",
