@@ -42,6 +42,22 @@ export const sanitize = {
     ascii: (raw: string) => raw.replace(/[^\x20-\x7E\n\t]/g, ''),
 };
 
+// Last line of defence before a payload leaves the app: the Android input filter cannot catch
+// iOS paste or dictation, so free-text fields are stripped at the API boundary too.
+export const sanitizeAsciiFields = <T extends object>(
+    payload: T,
+    keys: readonly (keyof T)[],
+): T => {
+    const out = { ...payload };
+    for (const key of keys) {
+        const value = out[key];
+        if (typeof value === 'string') {
+            out[key] = sanitize.ascii(value) as T[keyof T];
+        }
+    }
+    return out;
+};
+
 // ─── Display formatters ───────────────────────────────────────────────────────
 
 export const format = {

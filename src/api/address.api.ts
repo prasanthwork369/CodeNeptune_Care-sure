@@ -1,5 +1,9 @@
 import { API_ENDPOINTS } from '../utils/urls';
+import { sanitizeAsciiFields } from '../utils/validation';
 import { apiClient } from './client';
+
+// iOS paste and dictation bypass the Android input filter, so strip here before the payload leaves.
+const ADDRESS_TEXT_FIELDS = ['label', 'name', 'line1', 'line2', 'city', 'state'] as const;
 
 export interface Address {
     id: string;
@@ -49,11 +53,14 @@ export const addressApi = {
         return response.data.data;
     },
     addAddress: async (payload: CreateAddressPayload): Promise<Address> => {
-        const response = await apiClient.post(API_ENDPOINTS.CUSTOMER_ADDRESSES, payload);
+        const response = await apiClient.post(
+            API_ENDPOINTS.CUSTOMER_ADDRESSES,
+            sanitizeAsciiFields(payload, ADDRESS_TEXT_FIELDS),
+        );
         return response.data.data;
     },
     updateAddress: async (payload: UpdateAddressPayload): Promise<void> => {
-        const { id, ...rest } = payload;
+        const { id, ...rest } = sanitizeAsciiFields(payload, ADDRESS_TEXT_FIELDS);
         await apiClient.patch(API_ENDPOINTS.CUSTOMER_ADDRESS_BY_ID(id), rest);
     },
     deleteAddress: async (id: string): Promise<void> => {
