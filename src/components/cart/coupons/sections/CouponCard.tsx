@@ -3,17 +3,13 @@ import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { CouponCardProps } from "@/src/types/cart";
+import {
+  formatCouponExpiry,
+  formatCouponTerms,
+} from "@/src/utils/couponFormat";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-
-function formatExpiry(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export const CouponCard: React.FC<CouponCardProps> = ({
   coupon,
@@ -28,9 +24,8 @@ export const CouponCard: React.FC<CouponCardProps> = ({
   const discountLabel = isPercentage
     ? `Save ${coupon.discountValue}%`
     : `Save ${coupon.discountValue}`;
-  const description = isPercentage
-    ? `${coupon.discountValue}% off on orders above ₹${coupon.minOrderValue}${coupon.maxDiscountAmount ? `, max ₹${coupon.maxDiscountAmount}` : ""}`
-    : `Flat ₹${coupon.discountValue} off on orders above ₹${coupon.minOrderValue}`;
+  const description = formatCouponTerms(coupon);
+  const expiry = formatCouponExpiry(coupon.expiresAt);
 
   return (
     <View
@@ -91,17 +86,19 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             >
               {description}
             </Text>
-            <Text
-              style={{
-                fontSize: moderateScale(11),
-                lineHeight: moderateScale(15),
-                fontWeight: "500",
-                color: "#6A6A6A",
-                marginTop: exactScale(3),
-              }}
-            >
-              Expires {formatExpiry(coupon.expiresAt)}
-            </Text>
+            {expiry ? (
+              <Text
+                style={{
+                  fontSize: moderateScale(11),
+                  lineHeight: moderateScale(15),
+                  fontWeight: "500",
+                  color: "#6A6A6A",
+                  marginTop: exactScale(3),
+                }}
+              >
+                Expires {expiry}
+              </Text>
+            ) : null}
           </View>
           <View style={styles.fadedIconContainer}>
             <icons.percent_discount

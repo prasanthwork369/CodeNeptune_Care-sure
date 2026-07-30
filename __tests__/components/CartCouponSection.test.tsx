@@ -33,6 +33,7 @@ describe("CartCouponSection Component", () => {
       discountValue: 20,
       minOrderValue: 200,
       maxDiscountAmount: 100,
+      expiresAt: "2027-08-12T00:00:00Z",
       termsAndConditions: [],
     },
   ];
@@ -87,6 +88,9 @@ describe("CartCouponSection Component", () => {
     expect(await findByText("Coupons & offers")).toBeTruthy();
     expect(getByText(/Save/i)).toBeTruthy();
     expect(getByText("Apply")).toBeTruthy();
+    // Terms and expiry read from the same formatter the coupons screen uses.
+    expect(getByText("20% off on orders above ₹200, max ₹100")).toBeTruthy();
+    expect(getByText(/Expires .*Aug/)).toBeTruthy();
   });
 
   it("calls couponService.validateCoupon when Apply is pressed", async () => {
