@@ -7,6 +7,7 @@ import { analyticsService } from "@/src/services/firebase";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
 import { isExpoGo } from "@/src/utils/environment";
+import { IS_LIVE_API } from "@/src/utils/urls";
 import { validate } from "@/src/utils/validation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -120,7 +121,8 @@ export function useOtp() {
     if (!phone || resendCooldown > 0) return;
     try {
       const res = await requestOtp(phone);
-      const newPrefill = res?.data?.otp ?? "";
+      // Same rule as the login path: no auto-fill against the live API.
+      const newPrefill = IS_LIVE_API ? "" : (res?.data?.otp ?? "");
 
       if (newPrefill && newPrefill.length === OTP_LENGTH) {
         setOtpError("");

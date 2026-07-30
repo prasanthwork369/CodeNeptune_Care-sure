@@ -5,6 +5,7 @@ import {
   normalizeIndianPhone,
 } from "@/src/modules/PhoneNumberHint";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { IS_LIVE_API } from "@/src/utils/urls";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
 import { Keyboard, Platform, TextInput } from "react-native";
@@ -90,12 +91,10 @@ export function useLogin() {
       const formattedPhone = `+91${phoneNumber}`;
       const res = await requestOtp(formattedPhone);
       succeeded = true;
-      // Prefill the OTP only when the backend returns it (QA/staging convenience).
-      // Consistent with the resend path in useOtp. The production backend must
-      // NOT include `otp` in the response, or it would auto-fill for real users.
       // DEV-only: the QA response contains the OTP — never log it in release.
       if (__DEV__) console.log("[Login] requestOtp response:", res);
-      const prefillOtp = res?.data?.otp ?? "";
+      // Never auto-fill against the live API — a leaked `otp` there would hand any number's account over.
+      const prefillOtp = IS_LIVE_API ? "" : (res?.data?.otp ?? "");
       router.push({
         pathname: "/otp",
         params: { phone: formattedPhone, prefillOtp },

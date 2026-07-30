@@ -13,6 +13,8 @@ if (!resolvedBaseUrl) {
 }
 
 export const API_BASE_URL = resolvedBaseUrl;
+// Exposed so auth can refuse QA-only conveniences (OTP prefill) when pointed at the live API.
+export const IS_LIVE_API = LIVE;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
 
 // The public web/store origin used to build shareable product links. Driven by
