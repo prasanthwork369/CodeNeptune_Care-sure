@@ -20,13 +20,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 
+const EMPTY_COUPONS: any[] = [];
+
 export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   appliedCoupon,
   onRemove,
   subtotal,
 }) => {
   const router = useNav();
-  const { data: coupons = [], isLoading } = useCoupons();
+  const { data: rawCoupons, isLoading } = useCoupons();
+  const coupons = rawCoupons ?? EMPTY_COUPONS;
   const apply = useCouponStore((s) => s.apply);
   const [applying, setApplying] = useState(false);
   const [validatedOnce, setValidatedOnce] = useState(false);

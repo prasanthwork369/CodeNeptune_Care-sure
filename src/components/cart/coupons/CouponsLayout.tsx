@@ -12,6 +12,8 @@ import React, { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
 
+const EMPTY_COUPONS: any[] = [];
+
 export const CouponsLayout: React.FC = () => {
   const [couponCode, setCouponCode] = useState("");
   const [validating, setValidating] = useState(false);
@@ -20,7 +22,8 @@ export const CouponsLayout: React.FC = () => {
   const showToast = useToastStore((s) => s.show);
   const router = useNav();
   const { totalPrice: subtotal } = useCart();
-  const { data: coupons = [], isLoading } = useCoupons();
+  const { data: rawCoupons, isLoading } = useCoupons();
+  const coupons = rawCoupons ?? EMPTY_COUPONS;
   const { unavailable } = useCouponAvailability(coupons, subtotal);
   const visibleCoupons = useCouponSearch(coupons, couponCode);
   const shouldShowInitialShimmer = isLoading && coupons.length === 0;
