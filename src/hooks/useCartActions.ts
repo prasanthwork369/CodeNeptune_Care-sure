@@ -14,10 +14,10 @@ import { analyticsService } from "@/src/services/firebase";
  * variantId is stored in metadata only (frontend display use).
  */
 export interface CartActionProduct {
-  medicineId: string;         // For variants: the variant UUID. For base products: the medicine UUID.
-  baseMedicineId?: string;    // Base medicine UUID — fallback for items added from listing cards (no variant).
-  variantId?: string | null;  // Stored in metadata; not used for cart matching (backend limitation).
-  productId?: string;         // Catalog ID (e.g. "CS-BDSMYG") — stored in metadata only
+  medicineId: string; // For variants: the variant UUID. For base products: the medicine UUID.
+  baseMedicineId?: string; // Base medicine UUID — fallback for items added from listing cards (no variant).
+  variantId?: string | null; // Stored in metadata; not used for cart matching (backend limitation).
+  productId?: string; // Catalog ID (e.g. "CS-BDSMYG") — stored in metadata only
   name: string;
   slug?: string;
   price: number;
@@ -40,8 +40,10 @@ export const useCartActions = (product: CartActionProduct) => {
   const cartItem = items.find(
     (i) =>
       i.medicineId === product.medicineId ||
-      (product.baseMedicineId != null && i.medicineId === product.baseMedicineId) ||
-      (product.variantId != null && i.metadata?.selectedVariantId === product.variantId) ||
+      (product.baseMedicineId != null &&
+        i.medicineId === product.baseMedicineId) ||
+      (product.variantId != null &&
+        i.metadata?.selectedVariantId === product.variantId) ||
       // Stable catalog-id fallback: reconciles the same product across surfaces
       // (e.g. a recommended item shown both in a comparison card and a standalone
       // card) when their medicineId differs. Excludes variant lines so it never
@@ -137,9 +139,9 @@ export const useCartActions = (product: CartActionProduct) => {
         }
 
         const formattedPackSize = product.packSize
-          ? (product.unit && !String(product.packSize).endsWith(product.unit)
-              ? `${product.packSize}${product.unit}`
-              : String(product.packSize))
+          ? product.unit && !String(product.packSize).endsWith(product.unit)
+            ? `${product.packSize}${product.unit}`
+            : String(product.packSize)
           : undefined;
 
         await addItem({

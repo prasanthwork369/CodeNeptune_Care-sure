@@ -5,9 +5,8 @@ import {
 } from "../../types/notification";
 
 /** True when an FCM data block is a marketing product-offer push. */
-export const isProductOffer = (
-  data: NotificationData | undefined,
-): boolean => data?.notificationType === "product_offer";
+export const isProductOffer = (data: NotificationData | undefined): boolean =>
+  data?.notificationType === "product_offer";
 
 /** Builds the native payload, or null when required fields are missing. */
 const toProductOfferData = (

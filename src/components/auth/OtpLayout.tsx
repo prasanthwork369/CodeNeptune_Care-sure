@@ -12,9 +12,9 @@ import { styles as formStyles } from "./sections/OtpForm.styles";
 // Formats a raw phone number (e.g. +919444444444) into +91 94444 44444 for cleaner display on screen
 const formatPhoneNumber = (rawPhone: string) => {
   if (!rawPhone) return "";
-  const cleaned = rawPhone.replace(/\s+/g, '');
+  const cleaned = rawPhone.replace(/\s+/g, "");
   // Format only standard Indian phone numbers (+91 followed by 10 digits)
-  if (cleaned.startsWith('+91') && cleaned.length === 13) {
+  if (cleaned.startsWith("+91") && cleaned.length === 13) {
     return `+91 ${cleaned.slice(3, 8)} ${cleaned.slice(8)}`;
   }
   return rawPhone;

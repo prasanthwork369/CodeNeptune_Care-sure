@@ -57,7 +57,12 @@ describe("useCheckoutStore — Checkout Bill State Management", () => {
         totalSaved: 0,
         toPay: 100,
       },
-      { walletUsed: false, coinsUsed: false, corporateCreditsUsed: false, couponCode: "" },
+      {
+        walletUsed: false,
+        coinsUsed: false,
+        corporateCreditsUsed: false,
+        couponCode: "",
+      },
     );
 
     useCheckoutStore.getState().clear();

@@ -1,43 +1,47 @@
-import { apiClient } from './client';
-import { API_ENDPOINTS } from '../utils/urls';
+import { apiClient } from "./client";
+import { API_ENDPOINTS } from "../utils/urls";
 
 interface ApiSalt {
-    name: string;
-    amount: number;
-    unit: string;
+  name: string;
+  amount: number;
+  unit: string;
 }
 
 interface ApiPrescriptionMedicine {
-    id: string;
-    productId?: string;
-    name: string;
-    brand: string;
-    form: string;
-    mrp: string | number;
-    sellingPrice: number;
-    discount: number;
-    image: string;
-    salts: ApiSalt[];
-    slug: string;
+  id: string;
+  productId?: string;
+  name: string;
+  brand: string;
+  form: string;
+  mrp: string | number;
+  sellingPrice: number;
+  discount: number;
+  image: string;
+  salts: ApiSalt[];
+  slug: string;
 }
 
 export interface ApiPrescriptionOrderItem {
-    original: ApiPrescriptionMedicine | null;
-    recommended: ApiPrescriptionMedicine;
-    medicineQuantity: number | null;
-    recommendationMedicineQuantity: number;
-    isAddedByCaller?: boolean;
-    originalName?: string | null;
-    notes?: string | null;
-    id?: string;
+  original: ApiPrescriptionMedicine | null;
+  recommended: ApiPrescriptionMedicine;
+  medicineQuantity: number | null;
+  recommendationMedicineQuantity: number;
+  isAddedByCaller?: boolean;
+  originalName?: string | null;
+  notes?: string | null;
+  id?: string;
 }
 
 export const prescriptionOrderApi = {
-    getMedicines: async (orderId: string): Promise<ApiPrescriptionOrderItem[]> => {
-        const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTION_ORDER_MEDICINES(orderId));
-        const raw = response.data?.data;
-        if (Array.isArray(raw?.comparisonData)) return raw.comparisonData;
-        if (Array.isArray(raw)) return raw;
-        return [];
-    },
+  getMedicines: async (
+    orderId: string,
+  ): Promise<ApiPrescriptionOrderItem[]> => {
+    const response = await apiClient.get(
+      API_ENDPOINTS.PRESCRIPTION_ORDER_MEDICINES(orderId),
+    );
+    const raw = response.data?.data;
+    if (Array.isArray(raw?.comparisonData)) return raw.comparisonData;
+    if (Array.isArray(raw)) return raw;
+    return [];
+  },
 };

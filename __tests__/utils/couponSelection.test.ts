@@ -173,7 +173,11 @@ describe("selectNextCouponUpsell", () => {
     minOrderValue: 100,
   });
   const next = coupon({ code: "GET50", discountValue: 50, minOrderValue: 250 });
-  const far = coupon({ code: "GET200", discountValue: 200, minOrderValue: 900 });
+  const far = coupon({
+    code: "GET200",
+    discountValue: 200,
+    minOrderValue: 900,
+  });
 
   it("points at the closest better coupon", () => {
     const all = [applied, next, far];
@@ -230,9 +234,9 @@ describe("selectNextCouponUpsell", () => {
     const current = selectCartCoupon(all, 200, rejected);
 
     expect(current?.coupon.code).toBe("GET20");
-    expect(selectNextCouponUpsell(all, 200, current, rejected)?.coupon.code).toBe(
-      "GET200",
-    );
+    expect(
+      selectNextCouponUpsell(all, 200, current, rejected)?.coupon.code,
+    ).toBe("GET200");
   });
 
   it("returns null when nothing is above the current subtotal", () => {

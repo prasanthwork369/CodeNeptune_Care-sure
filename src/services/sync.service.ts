@@ -1,13 +1,13 @@
-import { apiClient } from '../api/client';
-import { API_ENDPOINTS } from '../utils/urls';
-import { apiCache } from '../lib/sqlite/cache';
-import { db } from '../lib/sqlite/db';
-import { homeApi } from '../api/home.api';
-import { categoryApi } from '../api/category.api';
-import { medicineApi } from '../api/medicine.api';
-import { orderService } from './order.service';
-import { QUERY_KEYS } from '../lib/react-query/queryKeys';
-import { QueryClient } from '@tanstack/react-query';
+import { apiClient } from "../api/client";
+import { API_ENDPOINTS } from "../utils/urls";
+import { apiCache } from "../lib/sqlite/cache";
+import { db } from "../lib/sqlite/db";
+import { homeApi } from "../api/home.api";
+import { categoryApi } from "../api/category.api";
+import { medicineApi } from "../api/medicine.api";
+import { orderService } from "./order.service";
+import { QUERY_KEYS } from "../lib/react-query/queryKeys";
+import { QueryClient } from "@tanstack/react-query";
 
 export interface SyncTimestamps {
   appContents: string;
@@ -18,20 +18,21 @@ export interface SyncTimestamps {
 }
 
 const DEFAULT_TIMESTAMPS: SyncTimestamps = {
-  appContents: '1970-01-01T00:00:00.000Z',
-  categoryFamilyMap: '1970-01-01T00:00:00.000Z',
-  featuredSubcategories: '1970-01-01T00:00:00.000Z',
-  featuredMedicines: '1970-01-01T00:00:00.000Z',
-  frequentlyOrdered: '1970-01-01T00:00:00.000Z',
+  appContents: "1970-01-01T00:00:00.000Z",
+  categoryFamilyMap: "1970-01-01T00:00:00.000Z",
+  featuredSubcategories: "1970-01-01T00:00:00.000Z",
+  featuredMedicines: "1970-01-01T00:00:00.000Z",
+  frequentlyOrdered: "1970-01-01T00:00:00.000Z",
 };
 
 export const syncService = {
   async getSyncTimestamps(): Promise<SyncTimestamps> {
     try {
-      const rows = db.getAllSync<{ component_name: string; last_sync_time: string }>(
-        'SELECT component_name, last_sync_time FROM sync_metadata'
-      );
-      
+      const rows = db.getAllSync<{
+        component_name: string;
+        last_sync_time: string;
+      }>("SELECT component_name, last_sync_time FROM sync_metadata");
+
       const timestamps = { ...DEFAULT_TIMESTAMPS };
       for (const row of rows) {
         const name = row.component_name as keyof SyncTimestamps;
@@ -45,21 +46,31 @@ export const syncService = {
     }
   },
 
-  async updateSyncTimestamp(componentName: keyof SyncTimestamps, timestamp: string): Promise<void> {
+  async updateSyncTimestamp(
+    componentName: keyof SyncTimestamps,
+    timestamp: string,
+  ): Promise<void> {
     try {
       db.runSync(
-        'INSERT OR REPLACE INTO sync_metadata (component_name, last_sync_time) VALUES (?, ?)',
-        [componentName, timestamp]
+        "INSERT OR REPLACE INTO sync_metadata (component_name, last_sync_time) VALUES (?, ?)",
+        [componentName, timestamp],
       );
     } catch (e) {
-      if (__DEV__) console.error(`[SyncService] Failed to update sync timestamp for ${componentName}:`, e);
+      if (__DEV__)
+        console.error(
+          `[SyncService] Failed to update sync timestamp for ${componentName}:`,
+          e,
+        );
     }
   },
 
-  async performSync(queryClient: QueryClient, isAuthenticated: boolean = true): Promise<void> {
+  async performSync(
+    queryClient: QueryClient,
+    isAuthenticated: boolean = true,
+  ): Promise<void> {
     try {
       const localTimestamps = await this.getSyncTimestamps();
-      
+
       const componentsPayload: Record<string, string> = {
         appContents: localTimestamps.appContents,
         categoryFamilyMap: localTimestamps.categoryFamilyMap,
@@ -76,7 +87,11 @@ export const syncService = {
       });
 
       if (!response.data || response.data.success !== true) {
-        if (__DEV__) console.warn('[SyncService] Sync check response unsuccessful:', response.data);
+        if (__DEV__)
+          console.warn(
+            "[SyncService] Sync check response unsuccessful:",
+            response.data,
+          );
         return;
       }
 
@@ -87,11 +102,19 @@ export const syncService = {
       if (components.appContents?.needsSync) {
         try {
           const data = await homeApi.getAppContents();
-          apiCache.set('app_contents', data);
-          await this.updateSyncTimestamp('appContents', components.appContents.latestServerTimestamp);
-          invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APP.CONTENTS }));
+          apiCache.set("app_contents", data);
+          await this.updateSyncTimestamp(
+            "appContents",
+            components.appContents.latestServerTimestamp,
+          );
+          invalidations.push(
+            queryClient.invalidateQueries({
+              queryKey: QUERY_KEYS.APP.CONTENTS,
+            }),
+          );
         } catch (e) {
-          if (__DEV__) console.error('[SyncService] Failed to sync appContents:', e);
+          if (__DEV__)
+            console.error("[SyncService] Failed to sync appContents:", e);
         }
       }
 
@@ -99,11 +122,19 @@ export const syncService = {
       if (components.categoryFamilyMap?.needsSync) {
         try {
           const data = await categoryApi.getCategoryFamilyMap();
-          apiCache.set('category_family_map', data);
-          await this.updateSyncTimestamp('categoryFamilyMap', components.categoryFamilyMap.latestServerTimestamp);
-          invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATALOG.CATEGORY_MAP }));
+          apiCache.set("category_family_map", data);
+          await this.updateSyncTimestamp(
+            "categoryFamilyMap",
+            components.categoryFamilyMap.latestServerTimestamp,
+          );
+          invalidations.push(
+            queryClient.invalidateQueries({
+              queryKey: QUERY_KEYS.CATALOG.CATEGORY_MAP,
+            }),
+          );
         } catch (e) {
-          if (__DEV__) console.error('[SyncService] Failed to sync categoryFamilyMap:', e);
+          if (__DEV__)
+            console.error("[SyncService] Failed to sync categoryFamilyMap:", e);
         }
       }
 
@@ -111,11 +142,22 @@ export const syncService = {
       if (components.featuredSubcategories?.needsSync) {
         try {
           const data = await categoryApi.getFeaturedSubcategories(4);
-          apiCache.set('featured_subcategories', data);
-          await this.updateSyncTimestamp('featuredSubcategories', components.featuredSubcategories.latestServerTimestamp);
-          invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATALOG.FEATURED_SUBCATEGORIES }));
+          apiCache.set("featured_subcategories", data);
+          await this.updateSyncTimestamp(
+            "featuredSubcategories",
+            components.featuredSubcategories.latestServerTimestamp,
+          );
+          invalidations.push(
+            queryClient.invalidateQueries({
+              queryKey: QUERY_KEYS.CATALOG.FEATURED_SUBCATEGORIES,
+            }),
+          );
         } catch (e) {
-          if (__DEV__) console.error('[SyncService] Failed to sync featuredSubcategories:', e);
+          if (__DEV__)
+            console.error(
+              "[SyncService] Failed to sync featuredSubcategories:",
+              e,
+            );
         }
       }
 
@@ -123,11 +165,19 @@ export const syncService = {
       if (components.featuredMedicines?.needsSync) {
         try {
           const data = await medicineApi.getFeaturedCards();
-          apiCache.set('featured_medicines', data);
-          await this.updateSyncTimestamp('featuredMedicines', components.featuredMedicines.latestServerTimestamp);
-          invalidations.push(queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES }));
+          apiCache.set("featured_medicines", data);
+          await this.updateSyncTimestamp(
+            "featuredMedicines",
+            components.featuredMedicines.latestServerTimestamp,
+          );
+          invalidations.push(
+            queryClient.invalidateQueries({
+              queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES,
+            }),
+          );
         } catch (e) {
-          if (__DEV__) console.error('[SyncService] Failed to sync featuredMedicines:', e);
+          if (__DEV__)
+            console.error("[SyncService] Failed to sync featuredMedicines:", e);
         }
       }
 
@@ -135,11 +185,17 @@ export const syncService = {
       if (isAuthenticated && components.frequentlyOrdered?.needsSync) {
         try {
           const data = await orderService.getFrequentlyOrdered({ limit: 5 });
-          apiCache.set('frequently_ordered', data);
-          await this.updateSyncTimestamp('frequentlyOrdered', components.frequentlyOrdered.latestServerTimestamp);
-          invalidations.push(queryClient.invalidateQueries({ queryKey: ['frequently-ordered'] }));
+          apiCache.set("frequently_ordered", data);
+          await this.updateSyncTimestamp(
+            "frequentlyOrdered",
+            components.frequentlyOrdered.latestServerTimestamp,
+          );
+          invalidations.push(
+            queryClient.invalidateQueries({ queryKey: ["frequently-ordered"] }),
+          );
         } catch (e) {
-          if (__DEV__) console.error('[SyncService] Failed to sync frequentlyOrdered:', e);
+          if (__DEV__)
+            console.error("[SyncService] Failed to sync frequentlyOrdered:", e);
         }
       }
 
@@ -147,7 +203,8 @@ export const syncService = {
         await Promise.all(invalidations);
       }
     } catch (error) {
-      if (__DEV__) console.error('[SyncService] Sync check execution error:', error);
+      if (__DEV__)
+        console.error("[SyncService] Sync check execution error:", error);
     }
   },
 };

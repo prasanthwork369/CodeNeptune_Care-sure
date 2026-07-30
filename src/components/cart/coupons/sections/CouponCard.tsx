@@ -142,7 +142,8 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             disabled={disabled}
             onPress={() => onApply(coupon.code)}
             style={{
-              backgroundColor: disabled || inactive ? "#FFFFFF" : colors.primary,
+              backgroundColor:
+                disabled || inactive ? "#FFFFFF" : colors.primary,
               borderWidth: disabled || inactive ? 1 : 0,
               borderColor: disabled || inactive ? "#E4E7EC" : "transparent",
               // minWidth, not width: "APPLIED" wrapped to a clipped second line.

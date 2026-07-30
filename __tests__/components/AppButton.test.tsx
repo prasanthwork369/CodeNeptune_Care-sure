@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { AppButton } from "@/src/components/ui/AppButton";
 import { Text } from "react-native";
 
@@ -12,7 +15,7 @@ describe("AppButton Component", () => {
 
   it("renders title text correctly", () => {
     const { getByText } = renderWithProviders(
-      <AppButton title="Submit Order" onPress={onPressMock} />
+      <AppButton title="Submit Order" onPress={onPressMock} />,
     );
 
     expect(getByText("Submit Order")).toBeTruthy();
@@ -22,7 +25,7 @@ describe("AppButton Component", () => {
     const { getByText } = renderWithProviders(
       <AppButton onPress={onPressMock}>
         <Text>Custom Child Text</Text>
-      </AppButton>
+      </AppButton>,
     );
 
     expect(getByText("Custom Child Text")).toBeTruthy();
@@ -30,7 +33,7 @@ describe("AppButton Component", () => {
 
   it("triggers onPress callback when pressed", () => {
     const { getByText } = renderWithProviders(
-      <AppButton title="Click Me" onPress={onPressMock} />
+      <AppButton title="Click Me" onPress={onPressMock} />,
     );
 
     fireEvent.press(getByText("Click Me"));
@@ -39,7 +42,11 @@ describe("AppButton Component", () => {
 
   it("does not trigger onPress when disabled", () => {
     const { getByText } = renderWithProviders(
-      <AppButton title="Disabled Button" onPress={onPressMock} disabled={true} />
+      <AppButton
+        title="Disabled Button"
+        onPress={onPressMock}
+        disabled={true}
+      />,
     );
 
     fireEvent.press(getByText("Disabled Button"));
@@ -48,7 +55,7 @@ describe("AppButton Component", () => {
 
   it("renders ActivityIndicator and disables press when loading", () => {
     const { queryByText, UNSAFE_getByType } = renderWithProviders(
-      <AppButton title="Loading Button" onPress={onPressMock} loading={true} />
+      <AppButton title="Loading Button" onPress={onPressMock} loading={true} />,
     );
 
     // Title should not be rendered while loading spinner is active
@@ -60,11 +67,21 @@ describe("AppButton Component", () => {
   });
 
   it("renders different button variants without crashing", () => {
-    const variants = ["primary", "secondary", "outline", "ghost", "danger"] as const;
+    const variants = [
+      "primary",
+      "secondary",
+      "outline",
+      "ghost",
+      "danger",
+    ] as const;
 
     variants.forEach((variant) => {
       const { getByText } = renderWithProviders(
-        <AppButton title={`${variant} button`} variant={variant} onPress={onPressMock} />
+        <AppButton
+          title={`${variant} button`}
+          variant={variant}
+          onPress={onPressMock}
+        />,
       );
       expect(getByText(`${variant} button`)).toBeTruthy();
     });

@@ -60,7 +60,8 @@ module.exports = function withCustomNativeFiles(config) {
       const line = `add(${pkg})`;
       // Idempotent: skip if this package (in any qualified/unqualified form) is present.
       const bareName = pkg.split(".").pop();
-      if (contents.includes(`add(${bareName}`) || contents.includes(line)) continue;
+      if (contents.includes(`add(${bareName}`) || contents.includes(line))
+        continue;
       contents = contents.replace(
         /(PackageList\(this\)\.packages\.apply \{)/,
         `$1\n              ${line}`,

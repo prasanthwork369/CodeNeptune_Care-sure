@@ -1,8 +1,5 @@
 import { prescriptionService } from "@/src/services/prescription.service";
-import {
-  PrescriptionReminder,
-  ReminderInput,
-} from "@/src/types/prescription";
+import { PrescriptionReminder, ReminderInput } from "@/src/types/prescription";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
@@ -53,9 +50,12 @@ export function useRefillReminder({
       if (__DEV__)
         console.log(
           "[RefillReminder] hydrate:",
-          res.success ? JSON.stringify(res.data.reminder ?? "NO reminder field") : `failed: ${res.error}`,
+          res.success
+            ? JSON.stringify(res.data.reminder ?? "NO reminder field")
+            : `failed: ${res.error}`,
         );
-      if (!cancelled && res.success) setReminderState(res.data.reminder ?? null);
+      if (!cancelled && res.success)
+        setReminderState(res.data.reminder ?? null);
     });
     return () => {
       cancelled = true;
@@ -95,7 +95,8 @@ export function useRefillReminder({
       return true;
     }
     // Surface the real backend error while debugging integration.
-    if (__DEV__) console.log("[RefillReminder] setReminder failed:", JSON.stringify(res));
+    if (__DEV__)
+      console.log("[RefillReminder] setReminder failed:", JSON.stringify(res));
     if (res.code === "HEALTH_UPDATES_DISABLED") showHealthUpdatesAlert();
     else Alert.alert("Reminder", "Failed to set reminder. Please try again.");
     return false;

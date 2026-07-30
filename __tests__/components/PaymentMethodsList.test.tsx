@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { PaymentMethodsList } from "@/src/components/payment/sections/PaymentMethodsList";
 import { View } from "react-native";
 
@@ -31,7 +34,7 @@ describe("PaymentMethodsList Component", () => {
         methods={mockMethods}
         selectedId="upi"
         onSelect={onSelectMock}
-      />
+      />,
     );
 
     expect(getByText("Payment Method")).toBeTruthy();
@@ -46,7 +49,7 @@ describe("PaymentMethodsList Component", () => {
         methods={mockMethods}
         selectedId="upi"
         onSelect={onSelectMock}
-      />
+      />,
     );
 
     fireEvent.press(getByText("Cash on Delivery"));

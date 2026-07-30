@@ -47,7 +47,9 @@ describe("customer list query invalidation", () => {
     const client = makeClient();
     const query = seed(client, QUERY_KEYS.CUSTOMER.RETURNS.LIST({}));
 
-    client.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.RETURNS.LIST_ALL });
+    client.invalidateQueries({
+      queryKey: QUERY_KEYS.CUSTOMER.RETURNS.LIST_ALL,
+    });
 
     expect(query?.state.isInvalidated).toBe(true);
   });

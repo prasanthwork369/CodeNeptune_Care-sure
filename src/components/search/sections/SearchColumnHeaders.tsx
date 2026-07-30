@@ -2,10 +2,10 @@ import React from "react"; // Re-saved to trigger Metro resolver
 
 import { Text, View } from "react-native";
 import Svg, {
-    Defs,
-    Stop,
-    LinearGradient as SvgLinearGradient,
-    Text as SvgText,
+  Defs,
+  Stop,
+  LinearGradient as SvgLinearGradient,
+  Text as SvgText,
 } from "react-native-svg";
 import { moderateScale } from "@/src/utils/exactScale";
 

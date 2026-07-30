@@ -1,2 +1,2 @@
-import { UploadLayout } from '@/src/components/upload/UploadLayout';
+import { UploadLayout } from "@/src/components/upload/UploadLayout";
 export default UploadLayout;

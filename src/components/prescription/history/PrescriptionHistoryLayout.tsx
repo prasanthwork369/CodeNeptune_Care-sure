@@ -3,8 +3,8 @@ import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import {
-    PRESCRIPTION_STATUS,
-    PRESCRIPTION_STATUS_LABELS,
+  PRESCRIPTION_STATUS,
+  PRESCRIPTION_STATUS_LABELS,
 } from "@/src/constants/prescription-status";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useLocalSearchParams } from "expo-router";
@@ -69,7 +69,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   });
 
   const query = search.trim().toLowerCase();
-  
+
   const items = useMemo(() => {
     return prescriptions
       .filter((p: any) => statusFilter === null || p.status === statusFilter)
@@ -84,9 +84,10 @@ export const PrescriptionHistoryLayout: React.FC = () => {
       });
   }, [prescriptions, query, source, toPay, statusFilter]);
 
-  const renderItem = useCallback(({ item }: { item: any }) => (
-    <PrescriptionHistoryItem item={item} />
-  ), []);
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => <PrescriptionHistoryItem item={item} />,
+    [],
+  );
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -151,7 +152,10 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           onRefresh={refetch}
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center py-16">
-              <Text className="font-inter-medium text-brand-subtext" style={{ fontSize: moderateScale(14) }}>
+              <Text
+                className="font-inter-medium text-brand-subtext"
+                style={{ fontSize: moderateScale(14) }}
+              >
                 No prescriptions found
               </Text>
             </View>

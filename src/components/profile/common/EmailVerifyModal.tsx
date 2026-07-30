@@ -11,9 +11,9 @@ import {
   Platform,
   Pressable,
   ScrollView,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

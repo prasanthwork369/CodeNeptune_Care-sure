@@ -13,14 +13,16 @@ export type SectionDesignTypeValue =
 export const VALID_SECTION_DESIGN_TYPES = Object.values(SECTION_DESIGN_TYPE);
 
 // Labels are for logging only — never render these, section titles come from the API.
-export const SECTION_DESIGN_TYPE_LABELS: Record<SectionDesignTypeValue, string> =
-  {
-    [SECTION_DESIGN_TYPE.TEXT_BLOCK]: "Text Block",
-    [SECTION_DESIGN_TYPE.BULLET_LIST]: "Bullet List",
-    [SECTION_DESIGN_TYPE.FAQ_ACCORDION]: "FAQ Accordion",
-    [SECTION_DESIGN_TYPE.ICON_ADVICE_CARDS]: "Icon Advice Cards",
-    [SECTION_DESIGN_TYPE.KEY_VALUE_TABLE]: "Key Value Table",
-  };
+export const SECTION_DESIGN_TYPE_LABELS: Record<
+  SectionDesignTypeValue,
+  string
+> = {
+  [SECTION_DESIGN_TYPE.TEXT_BLOCK]: "Text Block",
+  [SECTION_DESIGN_TYPE.BULLET_LIST]: "Bullet List",
+  [SECTION_DESIGN_TYPE.FAQ_ACCORDION]: "FAQ Accordion",
+  [SECTION_DESIGN_TYPE.ICON_ADVICE_CARDS]: "Icon Advice Cards",
+  [SECTION_DESIGN_TYPE.KEY_VALUE_TABLE]: "Key Value Table",
+};
 
 // An unknown code must render nothing rather than crash — backend can ship a new type before the app supports it.
 export const isKnownSectionDesignType = (

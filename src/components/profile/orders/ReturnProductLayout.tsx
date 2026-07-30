@@ -6,9 +6,9 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import {
-    CLOSED_RETURN_STATUSES,
-    REFUND_METHOD,
-    RefundMethodValue,
+  CLOSED_RETURN_STATUSES,
+  REFUND_METHOD,
+  RefundMethodValue,
 } from "@/src/constants/return";
 import { useCreateReturn } from "@/src/hooks/mutations/useCreateReturn";
 import { useAddress } from "@/src/hooks/queries/useAddress";
@@ -23,12 +23,12 @@ import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    BackHandler,
-    ScrollView,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  BackHandler,
+  ScrollView,
+  Text,
+  View,
 } from "react-native";
 import { orderStyles as s } from "./orders.styles";
 import { ReturnReason, ReturnReasonModal } from "./ReturnReasonModal";
@@ -286,7 +286,10 @@ export const ReturnProductLayout: React.FC = () => {
               ? "image/webp"
               : "image/jpeg";
         itemImages[slot as keyof ReturnItemImages] = (
-          await storageApi.upload({ uri, name: `${slot}.${ext}`, type }, "returns")
+          await storageApi.upload(
+            { uri, name: `${slot}.${ext}`, type },
+            "returns",
+          )
         ).url;
       }
       uploaded[item.orderItemId] = itemImages;

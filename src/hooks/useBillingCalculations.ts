@@ -45,9 +45,12 @@ export const useBillingCalculations = ({
   const productSavings = roundToPaise(Math.max(0, mrpTotal - subtotal));
 
   // 2. Coupon Discount
-  const COUPON_DISCOUNT = couponDiscount !== undefined
-    ? couponDiscount
-    : (appliedCoupon ? Math.min(Number(appliedCoupon.discount) || 0, subtotal) : 0);
+  const COUPON_DISCOUNT =
+    couponDiscount !== undefined
+      ? couponDiscount
+      : appliedCoupon
+        ? Math.min(Number(appliedCoupon.discount) || 0, subtotal)
+        : 0;
 
   // 3. Coins Discount
   const maxCoinsUsable = Math.min(
@@ -66,7 +69,9 @@ export const useBillingCalculations = ({
 
   // 4. Corporate Credits — applied first so company money is spent before the customer's own wallet.
   const corporateCreditsBalance =
-    isCorporateUser && balance != null ? Number(balance.corporateCredits ?? 0) : 0;
+    isCorporateUser && balance != null
+      ? Number(balance.corporateCredits ?? 0)
+      : 0;
   const corporateCreditsMinOrderValue = Number(
     balance?.minOrderValueForDiscount ?? 0,
   );

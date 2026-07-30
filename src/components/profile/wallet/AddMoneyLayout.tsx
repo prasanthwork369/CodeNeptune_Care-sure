@@ -9,15 +9,18 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const PRESETS = [500, 1000, 2000];
 const MAX_TOPUP = 2000;
@@ -75,7 +78,7 @@ export const AddMoneyLayout: React.FC = () => {
   const hasError = numericAmount > MAX_TOPUP;
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#F5F6FB" }}
       behavior="padding"
       keyboardVerticalOffset={-insets.bottom}

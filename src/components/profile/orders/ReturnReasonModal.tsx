@@ -190,243 +190,240 @@ export function ReturnReasonModal({
       }}
     >
       <View style={{ flex: 1 }}>
-      <BottomSheetScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 8,
-          paddingBottom: 16,
-        }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Item Summary */}
-        {item && (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              padding: 12,
-              marginBottom: 20,
-              backgroundColor: "#FFFFFF",
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: "#919EAB33",
-            }}
-          >
+        <BottomSheetScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 8,
+            paddingBottom: 16,
+          }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Item Summary */}
+          {item && (
             <View
               style={{
-                width: 52,
-                height: 52,
-                borderRadius: 8,
+                flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-                overflow: "hidden",
-                backgroundColor: "#FAFAFA",
+                padding: 12,
+                marginBottom: 20,
+                backgroundColor: "#FFFFFF",
+                borderRadius: 12,
                 borderWidth: 1,
-                borderColor: "#919EAB1A",
+                borderColor: "#919EAB33",
               }}
             >
-              <Image
-                source={item.image}
-                style={{ width: 40, height: 40 }}
-                resizeMode="contain"
+              <View
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 12,
+                  overflow: "hidden",
+                  backgroundColor: "#FAFAFA",
+                  borderWidth: 1,
+                  borderColor: "#919EAB1A",
+                }}
+              >
+                <Image
+                  source={item.image}
+                  style={{ width: 40, height: 40 }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={s.labelMd}
+                  className="font-inter-bold text-[#222222]"
+                >
+                  {item.name}
+                </Text>
+                <Text
+                  style={s.labelSm}
+                  className="font-inter-medium text-brand-subtext"
+                  numberOfLines={1}
+                >
+                  {item.pack} • Qty {quantity}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Reason */}
+          <Text
+            className="font-inter-bold text-[#222222] mb-3"
+            style={{ fontSize: moderateScale(14) }}
+          >
+            {"What's the issue with your order?"}
+            <RequiredMark />
+          </Text>
+          <ReasonDropdown
+            options={reasons}
+            loading={reasonsLoading}
+            isOpen={isReasonOpen}
+            onToggle={() => setIsReasonOpen((v) => !v)}
+            selectedLabel={selectedLabel}
+            selectedId={selectedReasonId}
+            onSelect={(id) => selectReason(id as number)}
+            includeOther
+            isOtherSelected={isOtherSelected}
+            onSelectOther={() => selectReason(OTHER_OPTION)}
+            placeholder="Select the reason"
+          />
+          {!!errors.reason && (
+            <Text
+              className="font-inter-medium text-[#DC2626] mt-2 mb-2"
+              style={{ fontSize: moderateScale(12) }}
+            >
+              {errors.reason}
+            </Text>
+          )}
+
+          {/* Dropdown floats (position:absolute) — no spacer, or the sheet grows. */}
+
+          {isOtherSelected && (
+            <>
+              {/* Mirrors "Add details" so the swap causes no shift. */}
+              <Text
+                className="font-inter-bold text-[#222222] py-3"
+                style={{ fontSize: moderateScale(14) }}
+              >
+                Describe the issue
+                <RequiredMark />
+              </Text>
+              <SafeBottomSheetInput
+                placeholder="Please specify the reason for your return"
+                placeholderTextColor="#6A6A6A"
+                value={otherReason}
+                onChangeText={(value: string) => {
+                  setOtherReason(value);
+                  setErrors((e) => ({ ...e, details: undefined }));
+                }}
+                multiline
+                numberOfLines={4}
+                className={`p-4 border ${errors.details ? "border-[#EF4444]" : "border-[#919EAB33]"} rounded-xl font-inter-medium min-h-[100px] ${errors.details ? "mb-2" : "mb-6"}`}
+                style={{
+                  textAlignVertical: "top",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: moderateScale(14),
+                }}
               />
-            </View>
-            <View style={{ flex: 1 }}>
+              {!!errors.details && (
+                <Text
+                  className="font-inter-medium text-[#DC2626] mb-4"
+                  style={{ fontSize: moderateScale(12) }}
+                >
+                  {errors.details}
+                </Text>
+              )}
+            </>
+          )}
+
+          {/* Hidden for "Other": its field above already captures the free text. */}
+          {!isOtherSelected && (
+            <>
               <Text
-                style={s.labelMd}
-                className="font-inter-bold text-[#222222]"
+                className="font-inter-bold text-[#222222] py-3"
+                style={{ fontSize: moderateScale(14) }}
               >
-                {item.name}
+                Add details
               </Text>
-              <Text
-                style={s.labelSm}
-                className="font-inter-medium text-brand-subtext"
-                numberOfLines={1}
-              >
-                {item.pack} • Qty {quantity}
-              </Text>
-            </View>
+              <SafeBottomSheetInput
+                multiline
+                numberOfLines={4}
+                placeholder="Please provide more details about the issue with the product"
+                placeholderTextColor="#6A6A6A"
+                className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
+                style={{
+                  textAlignVertical: "top",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: moderateScale(14),
+                }}
+                value={details}
+                onChangeText={setDetails}
+              />
+            </>
+          )}
+
+          {/* Photo Grid */}
+          <View className="flex-row flex-wrap gap-3 mb-4">
+            {PHOTO_SLOTS.map((slot) => {
+              const uri = images[slot.key];
+              return (
+                <Touchable
+                  key={slot.key}
+                  className="w-[47.5%] h-24 rounded-xl border border-[#919EAB33] items-center justify-center bg-[#FAFAFA] relative overflow-hidden"
+                  activeOpacity={0.7}
+                  onPress={() => pickImage(slot.key)}
+                >
+                  {uri ? (
+                    <>
+                      <Image
+                        source={{ uri }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
+                      <Touchable
+                        onPress={() => removeImage(slot.key)}
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white items-center justify-center shadow-md"
+                        style={{ elevation: 4 }}
+                      >
+                        <icons.delete_red width={14} height={14} />
+                      </Touchable>
+                    </>
+                  ) : (
+                    <>
+                      <SlotIcon type={slot.type} />
+                      <Text
+                        style={s.labelSm}
+                        className="font-inter-medium text-brand-subtext mt-2"
+                      >
+                        {slot.label}
+                      </Text>
+                    </>
+                  )}
+                </Touchable>
+              );
+            })}
           </View>
-        )}
 
-        {/* Reason */}
-        <Text
-          className="font-inter-bold text-[#222222] mb-3"
-          style={{ fontSize: moderateScale(14) }}
+          {!!errors.images && (
+            <Text
+              className="font-inter-medium text-[#DC2626] mb-3"
+              style={{ fontSize: moderateScale(12) }}
+            >
+              {errors.images}
+            </Text>
+          )}
+        </BottomSheetScrollView>
+
+        {/* Sticky: scrolling can't bury it, and it clears a 3-button nav bar. */}
+        <View
+          style={{
+            paddingHorizontal: 16,
+            paddingTop: 12,
+            paddingBottom: Math.max(insets.bottom, 16) + 12,
+            backgroundColor: "#FFFFFF",
+            borderTopWidth: 1,
+            borderTopColor: "#F0F1F3",
+          }}
         >
-          {"What's the issue with your order?"}
-          <RequiredMark />
-        </Text>
-        <ReasonDropdown
-          options={reasons}
-          loading={reasonsLoading}
-          isOpen={isReasonOpen}
-          onToggle={() => setIsReasonOpen((v) => !v)}
-          selectedLabel={selectedLabel}
-          selectedId={selectedReasonId}
-          onSelect={(id) => selectReason(id as number)}
-          includeOther
-          isOtherSelected={isOtherSelected}
-          onSelectOther={() => selectReason(OTHER_OPTION)}
-          placeholder="Select the reason"
-        />
-        {!!errors.reason && (
-          <Text
-            className="font-inter-medium text-[#DC2626] mt-2 mb-2"
-            style={{ fontSize: moderateScale(12) }}
+          <Touchable
+            onPress={handleSave}
+            className="bg-[#0F7635] rounded-lg py-4 flex-row items-center justify-center"
+            activeOpacity={0.8}
           >
-            {errors.reason}
-          </Text>
-        )}
-
-        {/* Dropdown floats (position:absolute) — no spacer, or the sheet grows. */}
-
-        {isOtherSelected && (
-          <>
-            {/* Mirrors "Add details" so the swap causes no shift. */}
             <Text
-              className="font-inter-bold text-[#222222] py-3"
-              style={{ fontSize: moderateScale(14) }}
+              style={s.labelLg}
+              className="font-inter-semibold text-white mr-2"
             >
-              Describe the issue
-              <RequiredMark />
+              {initialData ? "Edit the Reason" : "Add Reason"}
             </Text>
-            <SafeBottomSheetInput
-              placeholder="Please specify the reason for your return"
-              placeholderTextColor="#6A6A6A"
-              value={otherReason}
-              onChangeText={(value: string) => {
-                setOtherReason(value);
-                setErrors((e) => ({ ...e, details: undefined }));
-              }}
-              multiline
-              numberOfLines={4}
-              className={`p-4 border ${errors.details ? "border-[#EF4444]" : "border-[#919EAB33]"} rounded-xl font-inter-medium min-h-[100px] ${errors.details ? "mb-2" : "mb-6"}`}
-              style={{
-                textAlignVertical: "top",
-                backgroundColor: "#FFFFFF",
-                fontSize: moderateScale(14),
-              }}
-            />
-            {!!errors.details && (
-              <Text
-                className="font-inter-medium text-[#DC2626] mb-4"
-                style={{ fontSize: moderateScale(12) }}
-              >
-                {errors.details}
-              </Text>
-            )}
-          </>
-        )}
-
-
-
-        {/* Hidden for "Other": its field above already captures the free text. */}
-        {!isOtherSelected && (
-          <>
-            <Text
-              className="font-inter-bold text-[#222222] py-3"
-              style={{ fontSize: moderateScale(14) }}
-            >
-              Add details
-            </Text>
-            <SafeBottomSheetInput
-              multiline
-              numberOfLines={4}
-              placeholder="Please provide more details about the issue with the product"
-              placeholderTextColor="#6A6A6A"
-              className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
-              style={{
-                textAlignVertical: "top",
-                backgroundColor: "#FFFFFF",
-                fontSize: moderateScale(14),
-              }}
-              value={details}
-              onChangeText={setDetails}
-            />
-          </>
-        )}
-
-        {/* Photo Grid */}
-        <View className="flex-row flex-wrap gap-3 mb-4">
-          {PHOTO_SLOTS.map((slot) => {
-            const uri = images[slot.key];
-            return (
-              <Touchable
-                key={slot.key}
-                className="w-[47.5%] h-24 rounded-xl border border-[#919EAB33] items-center justify-center bg-[#FAFAFA] relative overflow-hidden"
-                activeOpacity={0.7}
-                onPress={() => pickImage(slot.key)}
-              >
-                {uri ? (
-                  <>
-                    <Image
-                      source={{ uri }}
-                      className="w-full h-full"
-                      resizeMode="cover"
-                    />
-                    <Touchable
-                      onPress={() => removeImage(slot.key)}
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white items-center justify-center shadow-md"
-                      style={{ elevation: 4 }}
-                    >
-                      <icons.delete_red width={14} height={14} />
-                    </Touchable>
-                  </>
-                ) : (
-                  <>
-                    <SlotIcon type={slot.type} />
-                    <Text
-                      style={s.labelSm}
-                      className="font-inter-medium text-brand-subtext mt-2"
-                    >
-                      {slot.label}
-                    </Text>
-                  </>
-                )}
-              </Touchable>
-            );
-          })}
+            <icons.arrow_forward width={18} height={18} fill="#FFFFFF" />
+          </Touchable>
         </View>
-
-        {!!errors.images && (
-          <Text
-            className="font-inter-medium text-[#DC2626] mb-3"
-            style={{ fontSize: moderateScale(12) }}
-          >
-            {errors.images}
-          </Text>
-        )}
-
-      </BottomSheetScrollView>
-
-      {/* Sticky: scrolling can't bury it, and it clears a 3-button nav bar. */}
-      <View
-        style={{
-          paddingHorizontal: 16,
-          paddingTop: 12,
-          paddingBottom: Math.max(insets.bottom, 16) + 12,
-          backgroundColor: "#FFFFFF",
-          borderTopWidth: 1,
-          borderTopColor: "#F0F1F3",
-        }}
-      >
-        <Touchable
-          onPress={handleSave}
-          className="bg-[#0F7635] rounded-lg py-4 flex-row items-center justify-center"
-          activeOpacity={0.8}
-        >
-          <Text
-            style={s.labelLg}
-            className="font-inter-semibold text-white mr-2"
-          >
-            {initialData ? "Edit the Reason" : "Add Reason"}
-          </Text>
-          <icons.arrow_forward width={18} height={18} fill="#FFFFFF" />
-        </Touchable>
-      </View>
       </View>
     </GorhomBottomSheet>
   );

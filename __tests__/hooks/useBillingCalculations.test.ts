@@ -27,7 +27,9 @@ jest.mock("@/src/store/couponStore", () => ({
 describe("useBillingCalculations — Billing & Discount Engine", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (useProfile as jest.Mock).mockReturnValue({ profile: { isCorporateUser: false } });
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: false },
+    });
     (useWalletBalance as jest.Mock).mockReturnValue({
       balance: { walletBalance: 100, coinsBalance: 50, corporateCredits: 0 },
     });
@@ -88,7 +90,7 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
       coinsOn: true,
       corporateCreditsOn: false,
       couponDiscount: 50, // subtotal after coupon = 150
-      deliveryFee: 20,    // + delivery = 170
+      deliveryFee: 20, // + delivery = 170
     });
 
     // Coins: 10% of 200 = 20 -> remaining = 150
@@ -100,7 +102,9 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
   });
 
   it("applies Corporate Credits when user is corporate and order satisfies min order value", () => {
-    (useProfile as jest.Mock).mockReturnValue({ profile: { isCorporateUser: true } });
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: true },
+    });
     (useWalletBalance as jest.Mock).mockReturnValue({
       balance: {
         walletBalance: 0,
@@ -126,7 +130,9 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
   });
 
   it("spends corporate credits before the customer's wallet (credits-first waterfall)", () => {
-    (useProfile as jest.Mock).mockReturnValue({ profile: { isCorporateUser: true } });
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: true },
+    });
     (useWalletBalance as jest.Mock).mockReturnValue({
       balance: {
         walletBalance: 100,
@@ -151,7 +157,9 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
   });
 
   it("disallows Corporate Credits when order subtotal is below minimum threshold", () => {
-    (useProfile as jest.Mock).mockReturnValue({ profile: { isCorporateUser: true } });
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: true },
+    });
     (useWalletBalance as jest.Mock).mockReturnValue({
       balance: {
         walletBalance: 0,

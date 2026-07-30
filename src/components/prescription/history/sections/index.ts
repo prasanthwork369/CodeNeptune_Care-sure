@@ -1,1 +1,1 @@
-export { PrescriptionHistoryItem } from './PrescriptionHistoryItem';
+export { PrescriptionHistoryItem } from "./PrescriptionHistoryItem";

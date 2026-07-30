@@ -19,7 +19,13 @@ import { exactScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Dimensions, Modal, Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 

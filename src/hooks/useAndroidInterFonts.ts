@@ -23,7 +23,7 @@ export function useAndroidInterFonts() {
           Inter_700Bold,
           Inter_800ExtraBold,
         }
-      : {}
+      : {},
   );
   return loaded;
 }

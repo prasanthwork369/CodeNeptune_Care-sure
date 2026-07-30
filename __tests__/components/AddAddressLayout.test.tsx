@@ -1,5 +1,9 @@
 import React from "react";
-import { renderWithProviders, fireEvent, waitFor } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+  waitFor,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { AddAddressLayout } from "@/src/components/profile/addresses/AddAddressLayout";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useAuthStore } from "@/src/store/authStore";
@@ -25,7 +29,11 @@ describe("AddAddressLayout Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAuthStore.setState({
-      user: { id: "user-1", name: "John Doe", email: "john@example.com" } as any,
+      user: {
+        id: "user-1",
+        name: "John Doe",
+        email: "john@example.com",
+      } as any,
     });
     mockUseAddress.mockReturnValue({
       addresses: [],
@@ -38,7 +46,7 @@ describe("AddAddressLayout Component", () => {
 
   it("renders screen header, required form input fields, and address type chips", () => {
     const { getByText, getByPlaceholderText } = renderWithProviders(
-      <AddAddressLayout />
+      <AddAddressLayout />,
     );
 
     expect(getByText("Add New Address")).toBeTruthy();
@@ -64,12 +72,18 @@ describe("AddAddressLayout Component", () => {
 
   it("fills out form fields and triggers addAddress on save", async () => {
     const { getByPlaceholderText, getByText } = renderWithProviders(
-      <AddAddressLayout />
+      <AddAddressLayout />,
     );
 
     fireEvent.changeText(getByPlaceholderText("Enter Full Name"), "Jane Smith");
-    fireEvent.changeText(getByPlaceholderText("Enter Mobile Number"), "9876543210");
-    fireEvent.changeText(getByPlaceholderText("Enter House Number"), "Flat 4B, Sunset Apts");
+    fireEvent.changeText(
+      getByPlaceholderText("Enter Mobile Number"),
+      "9876543210",
+    );
+    fireEvent.changeText(
+      getByPlaceholderText("Enter House Number"),
+      "Flat 4B, Sunset Apts",
+    );
     fireEvent.changeText(getByPlaceholderText("Enter City"), "Mumbai");
     fireEvent.changeText(getByPlaceholderText("Enter State"), "Maharashtra");
     fireEvent.changeText(getByPlaceholderText("Enter Pincode"), "400001");
@@ -88,7 +102,7 @@ describe("AddAddressLayout Component", () => {
           state: "Maharashtra",
           pincode: "400001",
           label: "HOME",
-        })
+        }),
       );
       expect(mockBack).toHaveBeenCalled();
     });

@@ -5,7 +5,10 @@ import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
-import { BAR_HEIGHT, PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
+import {
+  BAR_HEIGHT,
+  PILL_HEIGHT,
+} from "@/src/components/navigation/LiquidTabBar.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   Easing,
@@ -14,7 +17,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CartFloatingBanner } from "./CartFloatingBanner";
@@ -65,7 +68,16 @@ const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
     };
   });
   return (
-    <Animated.View style={[{ width: exactScale(4), height: exactScale(4), borderRadius: exactScale(2) }, style]} />
+    <Animated.View
+      style={[
+        {
+          width: exactScale(4),
+          height: exactScale(4),
+          borderRadius: exactScale(2),
+        },
+        style,
+      ]}
+    />
   );
 });
 Dot.displayName = "Dot";
@@ -81,7 +93,8 @@ export const FloatingBannersCarousel = ({
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
   const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
-  const { latestPrescription, hasPendingPrescription, dismissBanner } = usePrescriptionBanner();
+  const { latestPrescription, hasPendingPrescription, dismissBanner } =
+    usePrescriptionBanner();
   const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
   // Pause autoplay while the home feed is scrolling. Read from the store here
   // (rather than via a prop) so scroll toggles don't re-render the whole feed.
@@ -271,7 +284,8 @@ export const FloatingBannersCarousel = ({
   // paddingBottom (adjustedBottom + extraGap) + vertical centering offset
   // within BAR_HEIGHT = (BAR_HEIGHT + PILL_HEIGHT) / 2.
   // Derived from actual style constants so it stays in sync automatically.
-  const TAB_BAR_HEIGHT = (BAR_HEIGHT + PILL_HEIGHT) / 2 + adjustedBottom + extraGap;
+  const TAB_BAR_HEIGHT =
+    (BAR_HEIGHT + PILL_HEIGHT) / 2 + adjustedBottom + extraGap;
 
   return (
     <>

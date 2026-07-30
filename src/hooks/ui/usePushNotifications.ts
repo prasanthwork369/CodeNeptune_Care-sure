@@ -13,9 +13,9 @@ import { NotificationNavigation } from "../../services/notifications/Notificatio
 import { useAuthStore } from "../../store/authStore";
 import { useNotificationStore } from "../../store/notificationStore";
 import {
-    NotificationData,
-    NotificationPayload,
-    NotificationType,
+  NotificationData,
+  NotificationPayload,
+  NotificationType,
 } from "../../types/notification";
 
 // Firebase Messaging is a native module unavailable in Expo Go — a static
@@ -108,9 +108,7 @@ export const usePushNotifications = () => {
     // Token rotated mid-session — re-register with backend using the new token.
     // Always anonymous (false) — backend links user via deviceId at OTP verify.
     const unsubscribe = messaging().onTokenRefresh((newToken) => {
-      notificationService
-        .updateToken(newToken)
-        .catch(() => {});
+      notificationService.updateToken(newToken).catch(() => {});
     });
 
     return unsubscribe;
@@ -145,7 +143,8 @@ export const usePushNotifications = () => {
         await notifeeService.displayBranded(remoteMessage).catch(() => {});
       }
       addNotification({
-        title: remoteMessage?.notification?.title ?? data.title ?? "Notification",
+        title:
+          remoteMessage?.notification?.title ?? data.title ?? "Notification",
         body: remoteMessage?.notification?.body ?? data.discountText ?? "",
         data,
       });
@@ -205,7 +204,11 @@ export const usePushNotifications = () => {
         runColdStart(payload, tapId);
       })
       .catch((e) => {
-        if (__DEV__) console.log("[PushNotificationHook] getInitialNotification error:", e);
+        if (__DEV__)
+          console.log(
+            "[PushNotificationHook] getInitialNotification error:",
+            e,
+          );
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, navReady]);

@@ -70,7 +70,8 @@ class PerformanceService {
 
       await session.trace.stop();
     } catch (err) {
-      if (__DEV__) console.warn(`[PerfService] Stop trace error (${traceName}):`, err);
+      if (__DEV__)
+        console.warn(`[PerfService] Stop trace error (${traceName}):`, err);
     } finally {
       if (this.activeTraces.get(traceName) === session) {
         this.activeTraces.delete(traceName);
@@ -86,26 +87,34 @@ class PerformanceService {
     traceName: PerfTraceName,
     attributes?: TraceAttributes,
     metrics?: TraceMetrics,
-    maxDurationMs?: number
+    maxDurationMs?: number,
   ): Promise<void> {
     // Reserve the name synchronously, before the async native trace creation.
     // Without this, two renders can both call newTrace(), and a stop that lands
     // before newTrace() resolves can leave the late trace running indefinitely.
     if (this.activeTraces.has(traceName)) return;
-    const session: TraceSession = { trace: null, stopping: false, stopRequested: false };
+    const session: TraceSession = {
+      trace: null,
+      stopping: false,
+      stopRequested: false,
+    };
     this.activeTraces.set(traceName, session);
 
     if (__DEV__) this.devTimers.set(traceName, Date.now());
 
     // Bound the trace so a missed stop can't inflate the average. Fires once;
     // the recorded sample is tagged so it can be filtered out in the console.
-    if (maxDurationMs && maxDurationMs > 0 && !this.autoStopTimers.has(traceName)) {
+    if (
+      maxDurationMs &&
+      maxDurationMs > 0 &&
+      !this.autoStopTimers.has(traceName)
+    ) {
       this.autoStopTimers.set(
         traceName,
         setTimeout(() => {
           this.autoStopTimers.delete(traceName);
           this.stopTrace(traceName, { timed_out: "true" });
-        }, maxDurationMs)
+        }, maxDurationMs),
       );
     }
 
@@ -148,7 +157,8 @@ class PerformanceService {
         );
       }
     } catch (err) {
-      if (__DEV__) console.warn(`[PerfService] Start trace error (${traceName}):`, err);
+      if (__DEV__)
+        console.warn(`[PerfService] Start trace error (${traceName}):`, err);
       this.clearAutoStop(traceName);
       if (this.activeTraces.get(traceName) === session) {
         this.activeTraces.delete(traceName);
@@ -163,14 +173,16 @@ class PerformanceService {
   async stopTrace(
     traceName: PerfTraceName,
     additionalAttributes?: TraceAttributes,
-    additionalMetrics?: TraceMetrics
+    additionalMetrics?: TraceMetrics,
   ): Promise<void> {
     this.clearAutoStop(traceName);
 
     if (__DEV__) {
       const startedAt = this.devTimers.get(traceName);
       if (startedAt !== undefined) {
-        const attrs = additionalAttributes ? ` ${JSON.stringify(additionalAttributes)}` : "";
+        const attrs = additionalAttributes
+          ? ` ${JSON.stringify(additionalAttributes)}`
+          : "";
         console.log(`[Perf] ${traceName}: ${Date.now() - startedAt}ms${attrs}`);
         this.devTimers.delete(traceName);
       }
@@ -187,7 +199,12 @@ class PerformanceService {
       return;
     }
 
-    await this.finishTrace(traceName, session, additionalAttributes, additionalMetrics);
+    await this.finishTrace(
+      traceName,
+      session,
+      additionalAttributes,
+      additionalMetrics,
+    );
   }
 
   /**
@@ -200,7 +217,10 @@ class PerformanceService {
   /**
    * Helper to track manual network requests if needed alongside automatic OkHttp interception.
    */
-  async startHttpMetric(url: string, method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH") {
+  async startHttpMetric(
+    url: string,
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
+  ) {
     const perf = getPerf();
     if (!perf) return null;
     try {
@@ -208,7 +228,8 @@ class PerformanceService {
       await metric.start();
       return metric;
     } catch (err) {
-      if (__DEV__) console.warn(`[PerfService] Start HTTP metric error (${url}):`, err);
+      if (__DEV__)
+        console.warn(`[PerfService] Start HTTP metric error (${url}):`, err);
       return null;
     }
   }

@@ -1,6 +1,9 @@
 import React from "react";
 import { TextInput } from "react-native";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { LoginForm } from "@/src/components/auth/sections/LoginForm";
 
 describe("LoginForm Component", () => {
@@ -16,9 +19,8 @@ describe("LoginForm Component", () => {
   });
 
   it("renders phone input with +91 prefix and placeholder", () => {
-    const { getByTestId, getByText, getByPlaceholderText } = renderWithProviders(
-      <LoginForm {...defaultProps} />
-    );
+    const { getByTestId, getByText, getByPlaceholderText } =
+      renderWithProviders(<LoginForm {...defaultProps} />);
 
     expect(getByText("+91")).toBeTruthy();
     expect(getByPlaceholderText("Enter your mobile number")).toBeTruthy();
@@ -28,7 +30,7 @@ describe("LoginForm Component", () => {
   it("forwards raw text so the hook owns sanitization and overflow rejection", () => {
     const onPhoneChange = jest.fn();
     const { getByTestId } = renderWithProviders(
-      <LoginForm {...defaultProps} onPhoneChange={onPhoneChange} />
+      <LoginForm {...defaultProps} onPhoneChange={onPhoneChange} />,
     );
 
     const input = getByTestId("phone-input");
@@ -39,7 +41,7 @@ describe("LoginForm Component", () => {
 
   it("displays phoneError when provided", () => {
     const { getByText } = renderWithProviders(
-      <LoginForm {...defaultProps} phoneError="Invalid mobile number" />
+      <LoginForm {...defaultProps} phoneError="Invalid mobile number" />,
     );
 
     expect(getByText("Invalid mobile number")).toBeTruthy();
@@ -48,7 +50,7 @@ describe("LoginForm Component", () => {
   it("exposes the input instance through inputRef", () => {
     const inputRef = React.createRef<TextInput>();
     const { getByTestId } = renderWithProviders(
-      <LoginForm {...defaultProps} inputRef={inputRef} />
+      <LoginForm {...defaultProps} inputRef={inputRef} />,
     );
 
     expect(getByTestId("phone-input")).toBeTruthy();
@@ -57,7 +59,7 @@ describe("LoginForm Component", () => {
 
   it("does not request a hint on input focus", () => {
     const { getByTestId } = renderWithProviders(
-      <LoginForm {...defaultProps} />
+      <LoginForm {...defaultProps} />,
     );
 
     // Focus is visual state only now — the hint is requested on screen mount.

@@ -121,7 +121,7 @@ export const styles = StyleSheet.create({
   popoverText: { fontSize: moderateScale(15) },
 
   // 3-dot trigger
-  dotsIcon: { width: exactScale(4.20), height: exactScale(16) },
+  dotsIcon: { width: exactScale(4.2), height: exactScale(16) },
   errorTitle: {
     fontSize: moderateScale(15),
     lineHeight: moderateScale(20),

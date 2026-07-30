@@ -9,10 +9,15 @@ describe("apiCache & withSqliteCache — SQLite Offline Fallback", () => {
   describe("apiCache CRUD Operations", () => {
     it("get returns parsed JSON when DB row exists", () => {
       const mockData = { id: "p1", name: "Paracip" };
-      (db.getFirstSync as jest.Mock).mockReturnValueOnce({ data: JSON.stringify(mockData) });
+      (db.getFirstSync as jest.Mock).mockReturnValueOnce({
+        data: JSON.stringify(mockData),
+      });
 
       const result = apiCache.get<typeof mockData>("profile");
-      expect(db.getFirstSync).toHaveBeenCalledWith("SELECT data FROM api_cache WHERE key = ?", ["profile"]);
+      expect(db.getFirstSync).toHaveBeenCalledWith(
+        "SELECT data FROM api_cache WHERE key = ?",
+        ["profile"],
+      );
       expect(result).toEqual(mockData);
     });
 
@@ -72,8 +77,12 @@ describe("apiCache & withSqliteCache — SQLite Offline Fallback", () => {
 
     it("falls back to SQLite cache when network fetch throws an error", async () => {
       const cachedData = { status: "cached_offline" };
-      const mockFetcher = jest.fn().mockRejectedValue(new Error("Network failed"));
-      (db.getFirstSync as jest.Mock).mockReturnValueOnce({ data: JSON.stringify(cachedData) });
+      const mockFetcher = jest
+        .fn()
+        .mockRejectedValue(new Error("Network failed"));
+      (db.getFirstSync as jest.Mock).mockReturnValueOnce({
+        data: JSON.stringify(cachedData),
+      });
 
       const wrappedFn = withSqliteCache("test_key", mockFetcher);
       const result = await wrappedFn();
@@ -83,7 +92,9 @@ describe("apiCache & withSqliteCache — SQLite Offline Fallback", () => {
     });
 
     it("re-throws network error when fetch fails and no cached entry exists", async () => {
-      const mockFetcher = jest.fn().mockRejectedValue(new Error("Network failed"));
+      const mockFetcher = jest
+        .fn()
+        .mockRejectedValue(new Error("Network failed"));
       (db.getFirstSync as jest.Mock).mockReturnValueOnce(null);
 
       const wrappedFn = withSqliteCache("uncached_key", mockFetcher);

@@ -14,8 +14,14 @@ export function useSlideUp(delayMs: number) {
   const translateY = useSharedValue(20);
 
   useEffect(() => {
-    opacity.value = withDelay(delayMs, withTiming(1, { duration: 480, easing: easeOut }));
-    translateY.value = withDelay(delayMs, withTiming(0, { duration: 480, easing: easeOut }));
+    opacity.value = withDelay(
+      delayMs,
+      withTiming(1, { duration: 480, easing: easeOut }),
+    );
+    translateY.value = withDelay(
+      delayMs,
+      withTiming(0, { duration: 480, easing: easeOut }),
+    );
   }, []);
 
   return useAnimatedStyle(() => ({

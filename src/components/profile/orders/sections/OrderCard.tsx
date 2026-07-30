@@ -3,7 +3,11 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { Order, ORDER_STATUS } from "@/src/types/order";
-import { AddToCartInput, CartItem, UpdateCartItemInput } from "@/src/types/cart";
+import {
+  AddToCartInput,
+  CartItem,
+  UpdateCartItemInput,
+} from "@/src/types/cart";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { Image } from "expo-image";
@@ -38,7 +42,7 @@ function StatusBadge({ status }: { status: number | undefined }) {
         backgroundColor: cfg.bg,
         borderWidth: 1,
         borderColor: cfg.border,
-        position: 'absolute',
+        position: "absolute",
         top: 16,
         right: 16,
         zIndex: 10,

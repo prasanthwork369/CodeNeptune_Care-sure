@@ -16,7 +16,10 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import type { EasingFunction, EasingFunctionFactory } from "react-native-reanimated";
+import type {
+  EasingFunction,
+  EasingFunctionFactory,
+} from "react-native-reanimated";
 
 export interface ShimmerOverlayProps {
   /** Match the host element's radius so the highlight cannot escape its shape. */
@@ -82,13 +85,17 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
       duration,
       easing,
     });
-    progress.value = pause > 0
-      ? withRepeat(
-          withSequence(withDelay(pause, pass), withTiming(0, { duration: 0 })),
-          -1,
-          false,
-        )
-      : withRepeat(pass, -1, false);
+    progress.value =
+      pause > 0
+        ? withRepeat(
+            withSequence(
+              withDelay(pause, pass),
+              withTiming(0, { duration: 0 }),
+            ),
+            -1,
+            false,
+          )
+        : withRepeat(pass, -1, false);
 
     return () => {
       progress.value = 0;
@@ -97,7 +104,8 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
 
   const handleLayout = useCallback(
     (event: { nativeEvent: { layout: { width: number } } }) => {
-      if (bandWidthRatio !== 1) setMeasuredWidth(event.nativeEvent.layout.width);
+      if (bandWidthRatio !== 1)
+        setMeasuredWidth(event.nativeEvent.layout.width);
     },
     [bandWidthRatio],
   );
@@ -129,7 +137,14 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
       onLayout={handleLayout}
       style={[styles.clip, { borderRadius }, style]}
     >
-      <AnimatedView style={[styles.highlightTrack, angle ? styles.diagonalTrack : null, { width: stripWidth }, animatedStyle]}>
+      <AnimatedView
+        style={[
+          styles.highlightTrack,
+          angle ? styles.diagonalTrack : null,
+          { width: stripWidth },
+          animatedStyle,
+        ]}
+      >
         <LinearGradient
           colors={highlight}
           locations={softEdges ? [0, 0.22, 0.5, 0.78, 1] : undefined}

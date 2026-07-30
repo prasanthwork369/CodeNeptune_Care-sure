@@ -94,7 +94,8 @@ export const usePrescriptionBanner = () => {
   // Verified: visible only while isPurchased === false (server-controlled).
   // Browsing, adding items from Home/Search/PDP/etc. never hides it locally
   // — only the backend flipping isPurchased (on order placement) does.
-  const showVerifiedBanner = baseVisible && isVerified && !latestPrescription?.isPurchased;
+  const showVerifiedBanner =
+    baseVisible && isVerified && !latestPrescription?.isPurchased;
 
   // Under Review: stays visible while the prescription is being reviewed.
   const showUnderReviewBanner = baseVisible && isUnderReview;
@@ -107,7 +108,11 @@ export const usePrescriptionBanner = () => {
   // isPurchased is still set exclusively by the backend on order placement.
   const dismissBanner = () => {
     if (latestPrescription) {
-      if (__DEV__) console.log("Dismissing prescription banner for", latestPrescription.id);
+      if (__DEV__)
+        console.log(
+          "Dismissing prescription banner for",
+          latestPrescription.id,
+        );
       dismissPrescription(latestPrescription.id);
     }
   };

@@ -1,4 +1,7 @@
-import Animated, { useAnimatedStyle, SharedValue } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  SharedValue,
+} from "react-native-reanimated";
 import React from "react";
 import { View } from "react-native";
 import { ComparisonTabHeader } from "./ComparisonTabHeader";
@@ -8,10 +11,9 @@ interface AnimatedComparisonHeaderProps {
   medicinesSectionLayout: { y: number; height: number };
 }
 
-export const AnimatedComparisonHeader: React.FC<AnimatedComparisonHeaderProps> = ({
-  scrollYShared,
-  medicinesSectionLayout,
-}) => {
+export const AnimatedComparisonHeader: React.FC<
+  AnimatedComparisonHeaderProps
+> = ({ scrollYShared, medicinesSectionLayout }) => {
   const headerAnimatedStyle = useAnimatedStyle(() => {
     const endOfList = medicinesSectionLayout.y + medicinesSectionLayout.height;
     if (endOfList === 0) return { opacity: 1, transform: [{ translateY: 0 }] };

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export interface PrescriptionOrderItem {
   medicineId: string;
@@ -18,8 +18,10 @@ interface PrescriptionOrderState {
   clear: () => void;
 }
 
-export const usePrescriptionOrderStore = create<PrescriptionOrderState>((set) => ({
-  items: [],
-  setItems: (items) => set({ items }),
-  clear: () => set({ items: [] }),
-}));
+export const usePrescriptionOrderStore = create<PrescriptionOrderState>(
+  (set) => ({
+    items: [],
+    setItems: (items) => set({ items }),
+    clear: () => set({ items: [] }),
+  }),
+);

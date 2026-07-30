@@ -256,7 +256,9 @@ export function CancelOrderLayout() {
 
                   return (
                     <>
-                      <View style={{ width: "100%", maxHeight: verticalScale(260) }}>
+                      <View
+                        style={{ width: "100%", maxHeight: verticalScale(260) }}
+                      >
                         <ScrollView
                           nestedScrollEnabled={true}
                           showsVerticalScrollIndicator={true}
@@ -300,7 +302,9 @@ export function CancelOrderLayout() {
                                   )}
 
                                   {/* Labels */}
-                                  <View style={{ flex: 1, marginRight: scale(8) }}>
+                                  <View
+                                    style={{ flex: 1, marginRight: scale(8) }}
+                                  >
                                     <Text
                                       style={{
                                         fontSize: moderateScale(14),
@@ -330,7 +334,9 @@ export function CancelOrderLayout() {
                                       height: scale(22),
                                       borderRadius: scale(11),
                                       borderWidth: 1.5,
-                                      borderColor: isSelected ? "#0F7635" : "#D1D5DB",
+                                      borderColor: isSelected
+                                        ? "#0F7635"
+                                        : "#D1D5DB",
                                       alignItems: "center",
                                       justifyContent: "center",
                                       backgroundColor: "#fff",

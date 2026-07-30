@@ -537,7 +537,10 @@ export const SelectPatientLayout: React.FC = () => {
           </ScrollView>
 
           <View
-            style={[s.footer, { paddingBottom: adjustedBottom + exactScale(16) }]}
+            style={[
+              s.footer,
+              { paddingBottom: adjustedBottom + exactScale(16) },
+            ]}
           >
             <AppButton
               title="Continue"

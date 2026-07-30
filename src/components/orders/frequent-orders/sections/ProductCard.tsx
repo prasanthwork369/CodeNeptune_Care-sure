@@ -6,13 +6,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import React, { useState } from "react";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Text,
-    View,
-} from "react-native";
+import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 
 function formatDate(dateStr?: string | null) {
   if (!dateStr) return "";
@@ -52,8 +46,11 @@ export function ProductCard({
   const historyQty = item.lastQty ?? item.qty ?? 1;
   const qty = isStepperVariant ? manualQty : historyQty;
   const cartItem = cartItems.find(
-    (c: any) => c.medicineId === productId || c.metadata?.productId === productId
-                || c.medicineId === item.id || c.medicineId === item.medicineId,
+    (c: any) =>
+      c.medicineId === productId ||
+      c.metadata?.productId === productId ||
+      c.medicineId === item.id ||
+      c.medicineId === item.medicineId,
   );
   const [counterPending, setCounterPending] = useState(false);
 
@@ -72,12 +69,15 @@ export function ProductCard({
     setIsAdding(true);
     try {
       const existing = cartItems.find(
-        (c: any) => c.medicineId === productId || c.metadata?.productId === productId,
+        (c: any) =>
+          c.medicineId === productId || c.metadata?.productId === productId,
       );
       if (existing) {
         await updateItem(existing.id, { quantity: existing.quantity + qty });
       } else {
-        const itemId = String(item.medicineId ?? item.productId ?? item.id ?? "").trim();
+        const itemId = String(
+          item.medicineId ?? item.productId ?? item.id ?? "",
+        ).trim();
         if (!itemId) {
           throw new Error(
             isStepperVariant
@@ -87,19 +87,28 @@ export function ProductCard({
         }
         const slug = isStepperVariant
           ? String(item.slug ?? "").trim() || itemId
-          : String(item.slug ?? item.productId ?? item.id ?? "").trim() || itemId;
+          : String(item.slug ?? item.productId ?? item.id ?? "").trim() ||
+            itemId;
         const name = isStepperVariant
           ? String(item.name ?? "").trim() || itemId
-          : String(item.name ?? item.productId ?? item.id ?? "").trim() || itemId;
+          : String(item.name ?? item.productId ?? item.id ?? "").trim() ||
+            itemId;
         const price =
           Number(item.price ?? item.originalPrice ?? item.mrp ?? 0) ||
           Number(item.originalPrice ?? item.price ?? item.mrp ?? 0) ||
           1;
 
         const mrp = Number(item.originalPrice ?? item.mrp ?? price);
-        const imageUri = item.image?.uri ?? (typeof item.image === 'string' ? item.image : undefined);
+        const imageUri =
+          item.image?.uri ??
+          (typeof item.image === "string" ? item.image : undefined);
         const medicineId = await resolveUUID(itemId, slug, item.productId);
-        if (!isStepperVariant && __DEV__) console.log('[FrequentOrders] resolved:', { itemId, slug, medicineId });
+        if (!isStepperVariant && __DEV__)
+          console.log("[FrequentOrders] resolved:", {
+            itemId,
+            slug,
+            medicineId,
+          });
         await addItem({
           medicineId,
           variantId: null,
@@ -122,8 +131,15 @@ export function ProductCard({
       if (isStepperVariant) {
         if (__DEV__) console.log("[FrequentlyOrdered AddToCart] error:", err);
       } else {
-        if (__DEV__) console.error("[FrequentOrders AddToCart] error:", err?.message ?? err);
-        Alert.alert('Failed', err?.message ?? 'Could not add to cart. Please try again.');
+        if (__DEV__)
+          console.error(
+            "[FrequentOrders AddToCart] error:",
+            err?.message ?? err,
+          );
+        Alert.alert(
+          "Failed",
+          err?.message ?? "Could not add to cart. Please try again.",
+        );
       }
     } finally {
       setIsAdding(false);
@@ -140,9 +156,15 @@ export function ProductCard({
       ? `${Math.round(((Number(item.originalPrice) - Number(item.price)) / Number(item.originalPrice)) * 100)}% OFF`
       : undefined);
 
-  const labelMdFontSize = isStepperVariant ? moderateScale(14) : moderateScale(14);
-  const smallFontSize = isStepperVariant ? moderateScale(11) : moderateScale(11);
-  const orderedFontSize = isStepperVariant ? moderateScale(13) : moderateScale(12);
+  const labelMdFontSize = isStepperVariant
+    ? moderateScale(14)
+    : moderateScale(14);
+  const smallFontSize = isStepperVariant
+    ? moderateScale(11)
+    : moderateScale(11);
+  const orderedFontSize = isStepperVariant
+    ? moderateScale(13)
+    : moderateScale(12);
   const imgSize = isStepperVariant ? exactScale(54) : 54;
 
   return (
@@ -211,13 +233,21 @@ export function ProductCard({
           {typeof item.image === "number" || (item.image && !item.image.uri) ? (
             <Image
               source={item.image}
-              style={{ width: imgSize, height: imgSize, marginTop: isStepperVariant && itemDiscount ? 26 : 0 }}
+              style={{
+                width: imgSize,
+                height: imgSize,
+                marginTop: isStepperVariant && itemDiscount ? 26 : 0,
+              }}
               resizeMode="contain"
             />
           ) : item.image?.uri ? (
             <Image
               source={{ uri: item.image.uri }}
-              style={{ width: imgSize, height: imgSize, marginTop: isStepperVariant && itemDiscount ? 26 : 0 }}
+              style={{
+                width: imgSize,
+                height: imgSize,
+                marginTop: isStepperVariant && itemDiscount ? 26 : 0,
+              }}
               resizeMode="contain"
             />
           ) : (
@@ -272,7 +302,10 @@ export function ProductCard({
                       marginTop: isStepperVariant ? 2 : exactScale(2),
                     }}
                   >
-                    ₹{Number(item.originalPrice).toFixed(isStepperVariant ? 2 : 1)}
+                    ₹
+                    {Number(item.originalPrice).toFixed(
+                      isStepperVariant ? 2 : 1,
+                    )}
                   </Text>
                 )}
             </View>
@@ -454,38 +487,122 @@ export function ProductCard({
           </Touchable>
         </View>
       ) : cartItem ? (
-        <View style={{ width: exactScale(90), height: exactScale(35), alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: '#0F7635' }}>
-          <Touchable onPress={() => handleCounterChange(cartItem.quantity - 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: exactScale(36), height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>−</Text>
+        <View
+          style={{
+            width: exactScale(90),
+            height: exactScale(35),
+            alignSelf: "flex-end",
+            flexDirection: "row",
+            alignItems: "center",
+            borderRadius: 10,
+            overflow: "hidden",
+            backgroundColor: "#0F7635",
+          }}
+        >
+          <Touchable
+            onPress={() => handleCounterChange(cartItem.quantity - 1)}
+            disabled={counterPending}
+            activeOpacity={0.7}
+            style={{
+              width: exactScale(36),
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: moderateScale(20),
+                color: "#fff",
+                fontWeight: "500",
+                lineHeight: moderateScale(24),
+              }}
+            >
+              −
+            </Text>
           </Touchable>
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            {counterPending
-              ? <ActivityIndicator size="small" color="#fff" />
-              : <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#fff' }}>{cartItem.quantity}</Text>
-            }
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            {counterPending ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text
+                style={{
+                  fontSize: moderateScale(14),
+                  fontWeight: "700",
+                  color: "#fff",
+                }}
+              >
+                {cartItem.quantity}
+              </Text>
+            )}
           </View>
-          <Touchable onPress={() => handleCounterChange(cartItem.quantity + 1)} disabled={counterPending} activeOpacity={0.7} style={{ width: exactScale(36), height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: moderateScale(20), color: '#fff', fontWeight: '500', lineHeight: moderateScale(24) }}>+</Text>
+          <Touchable
+            onPress={() => handleCounterChange(cartItem.quantity + 1)}
+            disabled={counterPending}
+            activeOpacity={0.7}
+            style={{
+              width: exactScale(36),
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: moderateScale(20),
+                color: "#fff",
+                fontWeight: "500",
+                lineHeight: moderateScale(24),
+              }}
+            >
+              +
+            </Text>
           </Touchable>
         </View>
       ) : (
         <Touchable
-          style={{ minWidth: exactScale(78), height: exactScale(35), alignSelf: 'flex-end', borderRadius: exactScale(6), alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#0F7635', paddingHorizontal: exactScale(24), backgroundColor: '#fff' }}
+          style={{
+            minWidth: exactScale(78),
+            height: exactScale(35),
+            alignSelf: "flex-end",
+            borderRadius: exactScale(6),
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 1,
+            borderColor: "#0F7635",
+            paddingHorizontal: exactScale(24),
+            backgroundColor: "#fff",
+          }}
           activeOpacity={0.85}
           onPress={handleAddToCart}
           disabled={isAdding}
         >
-          {isAdding
-            ? <ActivityIndicator size="small" color="#0F7635" />
-            : <Text style={{ fontSize: moderateScale(14), fontWeight: '700', color: '#0F7635' }}>Add</Text>
-          }
+          {isAdding ? (
+            <ActivityIndicator size="small" color="#0F7635" />
+          ) : (
+            <Text
+              style={{
+                fontSize: moderateScale(14),
+                fontWeight: "700",
+                color: "#0F7635",
+              }}
+            >
+              Add
+            </Text>
+          )}
         </Touchable>
       )}
 
       {/* Ordered X times + last ordered */}
       {(!!item.orderedTimes || !!item.lastOrdered) && (
         <View
-          style={{ flexDirection: "row", alignItems: "center", marginTop: isStepperVariant ? 12 : exactScale(10) }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: isStepperVariant ? 12 : exactScale(10),
+          }}
         >
           <icons.trend_up
             width={14}
@@ -501,7 +618,11 @@ export function ProductCard({
                 color: "#0F7635",
               }}
             >
-              Ordered {isStepperVariant ? String(item.orderedTimes).padStart(2, "0") : item.orderedTimes} times
+              Ordered{" "}
+              {isStepperVariant
+                ? String(item.orderedTimes).padStart(2, "0")
+                : item.orderedTimes}{" "}
+              times
             </Text>
           )}
           {!!item.lastOrdered && (

@@ -21,7 +21,10 @@ export const PatientSelectionChips: React.FC<PatientSelectionChipsProps> = ({
         {loading ? (
           <PatientChipSkeleton />
         ) : members.length === 0 ? (
-          <Text className="font-inter text-[#919EAB] py-2" style={{ fontSize: moderateScale(12) }}>
+          <Text
+            className="font-inter text-[#919EAB] py-2"
+            style={{ fontSize: moderateScale(12) }}
+          >
             No patients yet. Tap &quot;ADD PATIENT&quot;
           </Text>
         ) : (
@@ -40,7 +43,10 @@ export const PatientSelectionChips: React.FC<PatientSelectionChipsProps> = ({
               >
                 <Text
                   className="font-inter-medium"
-                  style={{ color: sel ? "#FFFFFF" : "#6A6A6A", fontSize: moderateScale(13) }}
+                  style={{
+                    color: sel ? "#FFFFFF" : "#6A6A6A",
+                    fontSize: moderateScale(13),
+                  }}
                 >
                   {p.name}{" "}
                   <Text className="font-inter">({p.relationship})</Text>

@@ -3,9 +3,9 @@
  * TanStack Query hook for fetching public system document templates.
  */
 
-import { useQuery } from '@tanstack/react-query';
-import { systemTemplatesService } from '@/src/services/system-templates.service';
-import { QUERY_KEYS } from '@/src/lib/react-query/queryKeys';
+import { useQuery } from "@tanstack/react-query";
+import { systemTemplatesService } from "@/src/services/system-templates.service";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 /**
  * Hook to fetch a single active system template by its unique (event, channel) key.
@@ -22,15 +22,16 @@ import { QUERY_KEYS } from '@/src/lib/react-query/queryKeys';
  */
 export function useSystemTemplate(
   event: string,
-  channel = 'DOCUMENT',
+  channel = "DOCUMENT",
   variables?: Record<string, any>,
-  enabled = true
+  enabled = true,
 ) {
   return useQuery({
     queryKey: QUERY_KEYS.SYSTEM_TEMPLATES.BY_EVENT(event, channel, variables),
-    queryFn: () => systemTemplatesService.getPublicTemplate(event, channel, variables),
+    queryFn: () =>
+      systemTemplatesService.getPublicTemplate(event, channel, variables),
     enabled: enabled && !!event,
     staleTime: 10 * 60 * 1000, // 10 minutes — document templates rarely change
-    gcTime: 30 * 60 * 1000,    // Keep in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
   });
 }

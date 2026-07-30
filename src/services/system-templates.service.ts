@@ -4,7 +4,7 @@
  * These endpoints are public and do not require authentication.
  */
 
-import { apiClient } from '@/src/api/client';
+import { apiClient } from "@/src/api/client";
 
 export interface SystemTemplate {
   id: string;
@@ -34,23 +34,28 @@ export const systemTemplatesService = {
    */
   getPublicTemplate: async (
     event: string,
-    channel = 'DOCUMENT',
-    variables?: Record<string, any>
+    channel = "DOCUMENT",
+    variables?: Record<string, any>,
   ): Promise<SystemTemplate> => {
-    const { data } = await apiClient.get<SystemTemplateResponse>('/api/v1/system-templates/public', {
-      params: {
-        event,
-        channel,
-        ...(variables && Object.keys(variables).length > 0
-          ? { variables: JSON.stringify(variables) }
-          : {}),
+    const { data } = await apiClient.get<SystemTemplateResponse>(
+      "/api/v1/system-templates/public",
+      {
+        params: {
+          event,
+          channel,
+          ...(variables && Object.keys(variables).length > 0
+            ? { variables: JSON.stringify(variables) }
+            : {}),
+        },
       },
-    });
+    );
 
     if (data.success) {
       return data.data;
     }
 
-    throw new Error(data.message || `Failed to fetch system template for event "${event}"`);
+    throw new Error(
+      data.message || `Failed to fetch system template for event "${event}"`,
+    );
   },
 };

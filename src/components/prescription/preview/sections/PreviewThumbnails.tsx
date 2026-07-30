@@ -2,13 +2,7 @@ import { icons } from "@/src/constants/icons";
 import { PreviewThumbnailsProps } from "@/src/types/prescription";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
-import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    Text,
-    View,
-} from "react-native";
+import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
 
 const isPdf = (uri: string, type?: string) =>
@@ -75,7 +69,10 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
               {isPdf(item.localUri, item.type) ? (
                 <View className="flex-1 items-center justify-center">
                   <icons.upload_file width={24} height={24} />
-                  <Text className="font-inter-bold text-[#1A1C1E] mt-1" style={{ fontSize: moderateScale(8) }}>
+                  <Text
+                    className="font-inter-bold text-[#1A1C1E] mt-1"
+                    style={{ fontSize: moderateScale(8) }}
+                  >
                     PDF
                   </Text>
                 </View>
@@ -104,7 +101,10 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
         className="px-3 py-4 border-t border-[#919EAB1A] flex-row items-center justify-between"
         style={{ paddingBottom: Math.max(safeAreaBottom + 8, 24) }}
       >
-        <Text className="font-inter-medium text-[#000000]" style={{ fontSize: moderateScale(14) }}>
+        <Text
+          className="font-inter-medium text-[#000000]"
+          style={{ fontSize: moderateScale(14) }}
+        >
           {items.length} / {maxFiles} Prescription
           {items.length !== 1 ? "s" : ""} Uploaded
         </Text>
@@ -120,7 +120,10 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
           onPress={onSubmit}
         >
           {submitting && <ActivityIndicator size="small" color="#fff" />}
-          <Text className="text-white font-inter-semibold" style={{ fontSize: moderateScale(14) }}>
+          <Text
+            className="text-white font-inter-semibold"
+            style={{ fontSize: moderateScale(14) }}
+          >
             {submitting ? "Uploading..." : "Proceed"}
           </Text>
         </Touchable>

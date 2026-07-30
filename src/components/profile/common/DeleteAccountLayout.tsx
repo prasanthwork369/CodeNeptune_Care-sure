@@ -59,7 +59,11 @@ export const DeleteAccountLayout: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <ScreenHeader title="Delete Account" backgroundColor="#FFFFFF" showBorder />
+      <ScreenHeader
+        title="Delete Account"
+        backgroundColor="#FFFFFF"
+        showBorder
+      />
 
       <ScrollView
         style={{ flex: 1 }}

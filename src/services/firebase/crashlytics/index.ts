@@ -1,4 +1,1 @@
-export {
-  initCrashReporting,
-  reportError,
-} from "./crashlytics.service";
+export { initCrashReporting, reportError } from "./crashlytics.service";

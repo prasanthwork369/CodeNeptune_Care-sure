@@ -1,7 +1,7 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { FormField } from "@/src/components/ui/FormField";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
-import { profileStyles as s } from '../profile.styles';
+import { profileStyles as s } from "../profile.styles";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useAuthStore } from "@/src/store/authStore";
@@ -96,13 +96,13 @@ export const AddAddressLayout: React.FC = () => {
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       (e) => {
         setKeyboardHeight(e.endCoordinates.height);
-      }
+      },
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         setKeyboardHeight(0);
-      }
+      },
     );
     return () => {
       showSub.remove();
@@ -208,8 +208,11 @@ export const AddAddressLayout: React.FC = () => {
         // Coming from the location sheet means the user is picking where to
         // deliver, so the address they just added becomes the selected one.
         if (cameFromLocationSheet && created?.id) {
-          const { location, addressId, pincode: addrPincode } =
-            addressToLocation(created);
+          const {
+            location,
+            addressId,
+            pincode: addrPincode,
+          } = addressToLocation(created);
           setLocation(location, { addressId, pincode: addrPincode });
         }
       }
@@ -254,7 +257,10 @@ export const AddAddressLayout: React.FC = () => {
         <ScrollView
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 20, paddingBottom: keyboardHeight > 0 ? keyboardHeight + 2 : 30 }}
+          contentContainerStyle={{
+            padding: 20,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 2 : 30,
+          }}
           keyboardShouldPersistTaps="handled"
         >
           <FormField
@@ -402,17 +408,28 @@ export const AddAddressLayout: React.FC = () => {
               {LABELS.map((l) => {
                 const isActive = addressLabel === l;
                 const iconColor = isActive ? "#FFFFFF" : "#6A6A6A";
-                const icon = l === 'HOME'
-                  ? isActive
-                    ? <icons.home_add_light width={14} height={14} />
-                    : <icons.home_add width={14} height={14} fill={iconColor} />
-                  : l === 'WORK'
-                  ? isActive
-                    ? <icons.business_light width={14} height={14} />
-                    : <icons.business width={14} height={14} fill={iconColor} />
-                  : isActive
-                    ? <icons.location_pin_light width={14} height={14} />
-                    : <icons.location_pin width={14} height={14} fill={iconColor} />;
+                const icon =
+                  l === "HOME" ? (
+                    isActive ? (
+                      <icons.home_add_light width={14} height={14} />
+                    ) : (
+                      <icons.home_add width={14} height={14} fill={iconColor} />
+                    )
+                  ) : l === "WORK" ? (
+                    isActive ? (
+                      <icons.business_light width={14} height={14} />
+                    ) : (
+                      <icons.business width={14} height={14} fill={iconColor} />
+                    )
+                  ) : isActive ? (
+                    <icons.location_pin_light width={14} height={14} />
+                  ) : (
+                    <icons.location_pin
+                      width={14}
+                      height={14}
+                      fill={iconColor}
+                    />
+                  );
                 return (
                   <Touchable
                     key={l}
@@ -438,43 +455,51 @@ export const AddAddressLayout: React.FC = () => {
             </View>
           </View>
 
-          {!isFirstAddress && <Touchable
-            activeOpacity={0.8}
-            onPress={() => setIsDefault(!isDefault)}
-            className="flex-row items-center mt-2 mb-6"
-          >
-            <View
-              style={{
-                width: 44,
-                height: 24,
-                borderRadius: 12,
-                backgroundColor: isDefault ? "#0F7635" : "#E0E0E0",
-                padding: 2,
-                justifyContent: "center",
-                marginRight: 12,
-              }}
+          {!isFirstAddress && (
+            <Touchable
+              activeOpacity={0.8}
+              onPress={() => setIsDefault(!isDefault)}
+              className="flex-row items-center mt-2 mb-6"
             >
               <View
                 style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 10,
-                  backgroundColor: "#FFFFFF",
-                  transform: [{ translateX: isDefault ? 20 : 0 }],
-                  shadowColor: "#919EAB33",
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 2,
-                  elevation: 2,
+                  width: 44,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: isDefault ? "#0F7635" : "#E0E0E0",
+                  padding: 2,
+                  justifyContent: "center",
+                  marginRight: 12,
                 }}
-              />
-            </View>
-            <Text style={s.addrLabel} className="font-inter-semibold text-[#222222]">
-              Set as default address
-            </Text>
-          </Touchable>}
+              >
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    backgroundColor: "#FFFFFF",
+                    transform: [{ translateX: isDefault ? 20 : 0 }],
+                    shadowColor: "#919EAB33",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 2,
+                    elevation: 2,
+                  }}
+                />
+              </View>
+              <Text
+                style={s.addrLabel}
+                className="font-inter-semibold text-[#222222]"
+              >
+                Set as default address
+              </Text>
+            </Touchable>
+          )}
           {validationError || apiError ? (
-            <Text style={s.addrAction} className="text-red-500 font-inter-medium mb-3">
+            <Text
+              style={s.addrAction}
+              className="text-red-500 font-inter-medium mb-3"
+            >
               {validationError || apiError}
             </Text>
           ) : null}
@@ -492,7 +517,10 @@ export const AddAddressLayout: React.FC = () => {
             {submitting ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text style={s.addrAddBtn} className="font-inter-semibold text-white">
+              <Text
+                style={s.addrAddBtn}
+                className="font-inter-semibold text-white"
+              >
                 {isEdit ? "Save Changes  →" : "Save Address →"}
               </Text>
             )}

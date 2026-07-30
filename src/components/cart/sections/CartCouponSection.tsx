@@ -247,7 +247,10 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
             onPress={handleDirectApply}
             accessibilityRole="button"
             accessibilityLabel={`Apply coupon ${bestCoupon.code}`}
-            accessibilityState={{ disabled: isLocked || applying, busy: applying }}
+            accessibilityState={{
+              disabled: isLocked || applying,
+              busy: applying,
+            }}
             style={{
               backgroundColor: "white",
               borderWidth: 1,

@@ -25,12 +25,5 @@ export const colors = {
   error: "#DC2626",
 
   // Animated background palette
-  pastels: [
-    "#FFEBEB",
-    "#EBF5FF",
-    "#F5EBFF",
-    "#EBFFFF",
-    "#FFF9EB",
-    "#F2FFEB",
-  ],
+  pastels: ["#FFEBEB", "#EBF5FF", "#F5EBFF", "#EBFFFF", "#FFF9EB", "#F2FFEB"],
 } as const;

@@ -62,10 +62,7 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
               >
                 {hasAddress ? "Confirm Order" : "Set Delivery Address"}
               </Text>
-              <ArrowForwardIosWhite
-                width={14}
-                height={14}
-              />
+              <ArrowForwardIosWhite width={14} height={14} />
             </>
           )}
         </LinearGradient>

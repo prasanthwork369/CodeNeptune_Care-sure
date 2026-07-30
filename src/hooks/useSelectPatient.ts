@@ -126,7 +126,10 @@ export function useSelectPatient() {
         imageUrls: JSON.stringify(images.hostedUrls),
         category,
         patientMemberId: selectedPatient?.id ?? "",
-        problem: selectedHealthProblem?.id === "other" ? customProblemText : (selectedHealthProblem?.label ?? ""),
+        problem:
+          selectedHealthProblem?.id === "other"
+            ? customProblemText
+            : (selectedHealthProblem?.label ?? ""),
         symptoms: symptoms ?? "",
         patientPhone: selectedPatient?.phone ?? "",
       },

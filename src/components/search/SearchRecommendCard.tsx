@@ -27,214 +27,212 @@ interface SearchRecommendCardProps {
   onPress: (productId: string) => void;
 }
 
-export const SearchRecommendCard = React.memo(({
-  data,
-  onPress,
-}: SearchRecommendCardProps) => {
-  const savings =
-    data.mrp != null && data.price != null ? data.mrp - data.price : 0;
-  const hasSavings = savings > 0;
-  const base = [data.packSize?.trim(), data.unit].filter(Boolean).join(" ");
-  const packLabel = data.dosageForm ? `${base} in ${data.dosageForm}` : base;
+export const SearchRecommendCard = React.memo(
+  ({ data, onPress }: SearchRecommendCardProps) => {
+    const savings =
+      data.mrp != null && data.price != null ? data.mrp - data.price : 0;
+    const hasSavings = savings > 0;
+    const base = [data.packSize?.trim(), data.unit].filter(Boolean).join(" ");
+    const packLabel = data.dosageForm ? `${base} in ${data.dosageForm}` : base;
 
-  const { count, increment, decrement, isPending, animations } = useCartActions(
-    {
-      medicineId: data.id,
-      variantId: null,
-      productId: data.productId,
-      name: data.name,
-      price: data.price ?? 0,
-      originalPrice: data.mrp ?? data.price ?? 0,
-      discountPercent: data.discountPercentage ?? 0,
-      packSize: data.packSize,
-      unit: data.unit,
-    },
-  );
-  const { slideAnim, opacityAnim } = animations;
+    const { count, increment, decrement, isPending, animations } =
+      useCartActions({
+        medicineId: data.id,
+        variantId: null,
+        productId: data.productId,
+        name: data.name,
+        price: data.price ?? 0,
+        originalPrice: data.mrp ?? data.price ?? 0,
+        discountPercent: data.discountPercentage ?? 0,
+        packSize: data.packSize,
+        unit: data.unit,
+      });
+    const { slideAnim, opacityAnim } = animations;
 
-  return (
-    <Touchable
-      activeOpacity={0.85}
-      onPress={() => onPress(data.productId)}
-      style={[s.recCard, { padding: 0, overflow: "hidden", minHeight: 0 }]}
-      className="w-full rounded-[16px] mb-4"
-    >
-      {/* Top Section: Yellow (#FFFDEB) */}
-      <View
-        style={{ backgroundColor: "#FBFFF2" }}
-        className="flex-row items-start p-4 gap-x-3"
+    return (
+      <Touchable
+        activeOpacity={0.85}
+        onPress={() => onPress(data.productId)}
+        style={[s.recCard, { padding: 0, overflow: "hidden", minHeight: 0 }]}
+        className="w-full rounded-[16px] mb-4"
       >
-        {/* Left: image container */}
+        {/* Top Section: Yellow (#FFFDEB) */}
         <View
-          className="bg-white items-center justify-center"
-          style={s.recImgBox}
+          style={{ backgroundColor: "#FBFFF2" }}
+          className="flex-row items-start p-4 gap-x-3"
         >
-          {data.thumbnailUrl ? (
-            <Image
-              source={{ uri: data.thumbnailUrl }}
-              style={s.imgInner}
-              contentFit="contain"
-            />
-          ) : (
-            <icons.placeholder width={64} height={64} />
-          )}
-        </View>
-
-        {/* Right: info column */}
-        <View className="flex-1 justify-start">
-          <Text
-            style={s.name}
-            className="font-inter-bold text-brand-text"
-            numberOfLines={2}
+          {/* Left: image container */}
+          <View
+            className="bg-white items-center justify-center"
+            style={s.recImgBox}
           >
-            {data.name}
-          </Text>
-          {packLabel ? (
-            <Text
-              style={s.desc}
-              className="font-inter-normal text-brand-subtext mt-0.5"
-              numberOfLines={1}
-            >
-              {packLabel}
-            </Text>
-          ) : null}
-          {data.manufacturer ? (
-            <Text
-              style={s.desc}
-              className="font-inter-medium text-brand-subtext mt-0.5"
-              numberOfLines={1}
-            >
-              {data.manufacturer}
-            </Text>
-          ) : null}
-        </View>
-      </View>
-
-      {/* Divider */}
-      <View style={{ height: 1, backgroundColor: "#E5E7EB" }} />
-
-      {/* Bottom Section: White */}
-      <View
-        style={{ backgroundColor: "#FFFFFF" }}
-        className="flex-row items-center justify-between p-4"
-      >
-        {/* Price + savings row */}
-        <View
-          className="flex-row items-center flex-wrap flex-1 mr-2"
-          style={{ rowGap: moderateScale(5) }}
-        >
-          <View className="flex-row items-baseline gap-x-1.5 shrink-0">
-            {data.price != null && (
-              <Text
-                style={s.price}
-                className="font-inter-extrabold text-brand-text"
-              >
-                ₹{Number(data.price).toFixed(2)}
-              </Text>
-            )}
-            {hasSavings && data.mrp != null && (
-              <Text
-                style={s.mrp}
-                numberOfLines={1}
-                className="font-inter-medium text-brand-subtext line-through"
-              >
-                ₹{Number(data.mrp).toFixed(2)}
-              </Text>
+            {data.thumbnailUrl ? (
+              <Image
+                source={{ uri: data.thumbnailUrl }}
+                style={s.imgInner}
+                contentFit="contain"
+              />
+            ) : (
+              <icons.placeholder width={64} height={64} />
             )}
           </View>
-          {hasSavings && (
-            <View className="flex-row items-center ml-2 shrink-0">
-              <icons.sell
-                width={15}
-                height={15}
-                fill="#0F7635"
-                style={s.sellIcon}
-              />
+
+          {/* Right: info column */}
+          <View className="flex-1 justify-start">
+            <Text
+              style={s.name}
+              className="font-inter-bold text-brand-text"
+              numberOfLines={2}
+            >
+              {data.name}
+            </Text>
+            {packLabel ? (
               <Text
-                style={[s.savings, { lineHeight: moderateScale(16) }]}
-                className="font-inter-bold text-brand-primary ml-1.5 tracking-tight"
+                style={s.desc}
+                className="font-inter-normal text-brand-subtext mt-0.5"
+                numberOfLines={1}
               >
-                Save ₹{Number(savings).toFixed(2)}
+                {packLabel}
               </Text>
-            </View>
-          )}
+            ) : null}
+            {data.manufacturer ? (
+              <Text
+                style={s.desc}
+                className="font-inter-medium text-brand-subtext mt-0.5"
+                numberOfLines={1}
+              >
+                {data.manufacturer}
+              </Text>
+            ) : null}
+          </View>
         </View>
 
-        {/* Add / stepper */}
-        <View>
-          {count === 0 ? (
-            <Touchable
-              onPress={increment}
-              disabled={isPending}
-              activeOpacity={0.85}
-              style={cc.addBtn}
-            >
-              {isPending ? (
-                <ActivityIndicator size="small" color="#0F7635" />
-              ) : (
+        {/* Divider */}
+        <View style={{ height: 1, backgroundColor: "#E5E7EB" }} />
+
+        {/* Bottom Section: White */}
+        <View
+          style={{ backgroundColor: "#FFFFFF" }}
+          className="flex-row items-center justify-between p-4"
+        >
+          {/* Price + savings row */}
+          <View
+            className="flex-row items-center flex-wrap flex-1 mr-2"
+            style={{ rowGap: moderateScale(5) }}
+          >
+            <View className="flex-row items-baseline gap-x-1.5 shrink-0">
+              {data.price != null && (
                 <Text
-                  style={[cc.addText, { color: "#0F7635" }]}
-                  className="font-inter-bold"
+                  style={s.price}
+                  className="font-inter-extrabold text-brand-text"
                 >
-                  Add
+                  ₹{Number(data.price).toFixed(2)}
                 </Text>
               )}
-            </Touchable>
-          ) : (
-            <View
-              className="flex-row items-center justify-between rounded-[10px] overflow-hidden"
-              style={cc.wrapActive}
-            >
-              <Touchable
-                onPress={decrement}
-                disabled={isPending}
-                activeOpacity={0.7}
-                style={cc.btn}
-              >
+              {hasSavings && data.mrp != null && (
                 <Text
-                  style={cc.plusMinus}
-                  className="font-inter-medium text-white leading-none"
+                  style={s.mrp}
+                  numberOfLines={1}
+                  className="font-inter-medium text-brand-subtext line-through"
                 >
-                  −
+                  ₹{Number(data.mrp).toFixed(2)}
                 </Text>
-              </Touchable>
-              <View style={cc.countContainer}>
-                {isPending ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Animated.Text
-                    style={[
-                      cc.countText,
-                      {
-                        transform: [{ translateY: slideAnim }],
-                        opacity: opacityAnim,
-                      },
-                    ]}
-                    className="font-inter-bold text-white text-center"
-                  >
-                    {count}
-                  </Animated.Text>
-                )}
+              )}
+            </View>
+            {hasSavings && (
+              <View className="flex-row items-center ml-2 shrink-0">
+                <icons.sell
+                  width={15}
+                  height={15}
+                  fill="#0F7635"
+                  style={s.sellIcon}
+                />
+                <Text
+                  style={[s.savings, { lineHeight: moderateScale(16) }]}
+                  className="font-inter-bold text-brand-primary ml-1.5 tracking-tight"
+                >
+                  Save ₹{Number(savings).toFixed(2)}
+                </Text>
               </View>
+            )}
+          </View>
+
+          {/* Add / stepper */}
+          <View>
+            {count === 0 ? (
               <Touchable
                 onPress={increment}
                 disabled={isPending}
-                activeOpacity={0.7}
-                style={cc.btn}
+                activeOpacity={0.85}
+                style={cc.addBtn}
               >
-                <Text
-                  style={cc.plusMinus}
-                  className="font-inter-medium text-white leading-none"
-                >
-                  +
-                </Text>
+                {isPending ? (
+                  <ActivityIndicator size="small" color="#0F7635" />
+                ) : (
+                  <Text
+                    style={[cc.addText, { color: "#0F7635" }]}
+                    className="font-inter-bold"
+                  >
+                    Add
+                  </Text>
+                )}
               </Touchable>
-            </View>
-          )}
+            ) : (
+              <View
+                className="flex-row items-center justify-between rounded-[10px] overflow-hidden"
+                style={cc.wrapActive}
+              >
+                <Touchable
+                  onPress={decrement}
+                  disabled={isPending}
+                  activeOpacity={0.7}
+                  style={cc.btn}
+                >
+                  <Text
+                    style={cc.plusMinus}
+                    className="font-inter-medium text-white leading-none"
+                  >
+                    −
+                  </Text>
+                </Touchable>
+                <View style={cc.countContainer}>
+                  {isPending ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Animated.Text
+                      style={[
+                        cc.countText,
+                        {
+                          transform: [{ translateY: slideAnim }],
+                          opacity: opacityAnim,
+                        },
+                      ]}
+                      className="font-inter-bold text-white text-center"
+                    >
+                      {count}
+                    </Animated.Text>
+                  )}
+                </View>
+                <Touchable
+                  onPress={increment}
+                  disabled={isPending}
+                  activeOpacity={0.7}
+                  style={cc.btn}
+                >
+                  <Text
+                    style={cc.plusMinus}
+                    className="font-inter-medium text-white leading-none"
+                  >
+                    +
+                  </Text>
+                </Touchable>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-    </Touchable>
-  );
-});
+      </Touchable>
+    );
+  },
+);
 
 SearchRecommendCard.displayName = "SearchRecommendCard";

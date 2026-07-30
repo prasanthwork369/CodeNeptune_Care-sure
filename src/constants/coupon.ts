@@ -8,12 +8,13 @@ export const COUPON_STATUS = {
   INACTIVE: 2,
 } as const;
 
-export type CouponStatusValue = typeof COUPON_STATUS[keyof typeof COUPON_STATUS];
+export type CouponStatusValue =
+  (typeof COUPON_STATUS)[keyof typeof COUPON_STATUS];
 
 export const COUPON_STATUS_LABELS: Record<CouponStatusValue, string> = {
-  [COUPON_STATUS.DELETED]: 'Deleted',
-  [COUPON_STATUS.ACTIVE]: 'Active',
-  [COUPON_STATUS.INACTIVE]: 'Inactive',
+  [COUPON_STATUS.DELETED]: "Deleted",
+  [COUPON_STATUS.ACTIVE]: "Active",
+  [COUPON_STATUS.INACTIVE]: "Inactive",
 };
 
 /**
@@ -25,9 +26,13 @@ export const COUPON_DISCOUNT_TYPE = {
   PERCENTAGE: 2,
 } as const;
 
-export type CouponDiscountTypeValue = typeof COUPON_DISCOUNT_TYPE[keyof typeof COUPON_DISCOUNT_TYPE];
+export type CouponDiscountTypeValue =
+  (typeof COUPON_DISCOUNT_TYPE)[keyof typeof COUPON_DISCOUNT_TYPE];
 
-export const COUPON_DISCOUNT_TYPE_LABELS: Record<CouponDiscountTypeValue, string> = {
-  [COUPON_DISCOUNT_TYPE.FLAT]: 'Flat',
-  [COUPON_DISCOUNT_TYPE.PERCENTAGE]: 'Percentage',
+export const COUPON_DISCOUNT_TYPE_LABELS: Record<
+  CouponDiscountTypeValue,
+  string
+> = {
+  [COUPON_DISCOUNT_TYPE.FLAT]: "Flat",
+  [COUPON_DISCOUNT_TYPE.PERCENTAGE]: "Percentage",
 };

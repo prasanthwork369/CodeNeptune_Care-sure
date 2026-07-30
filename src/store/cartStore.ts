@@ -1,5 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AddToCartInput, Cart, CartItem, UpdateCartItemInput } from "@/src/types/cart";
+import {
+  AddToCartInput,
+  Cart,
+  CartItem,
+  UpdateCartItemInput,
+} from "@/src/types/cart";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -15,7 +20,9 @@ const createGuestCart = (items: CartItem[] = []): Cart => ({
 
 const getGuestItemId = (input: AddToCartInput) => {
   const variantId = input.metadata?.selectedVariantId ?? input.variantId;
-  return variantId ? `${input.medicineId}-${variantId}` : String(input.medicineId);
+  return variantId
+    ? `${input.medicineId}-${variantId}`
+    : String(input.medicineId);
 };
 
 const toGuestCartItem = (input: AddToCartInput): CartItem => {
@@ -88,7 +95,11 @@ export const useCartPendingStore = create<CartState>()(
             )
           : [...current.items, toGuestCartItem(input)];
 
-        const guestCart = { ...current, items, updatedAt: new Date().toISOString() };
+        const guestCart = {
+          ...current,
+          items,
+          updatedAt: new Date().toISOString(),
+        };
         set({ guestCart });
         return guestCart;
       },
@@ -99,10 +110,18 @@ export const useCartPendingStore = create<CartState>()(
             ? current.items.filter((item) => item.id !== itemId)
             : current.items.map((item) =>
                 item.id === itemId
-                  ? { ...item, quantity: input.quantity, updatedAt: new Date().toISOString() }
+                  ? {
+                      ...item,
+                      quantity: input.quantity,
+                      updatedAt: new Date().toISOString(),
+                    }
                   : item,
               );
-        const guestCart = { ...current, items, updatedAt: new Date().toISOString() };
+        const guestCart = {
+          ...current,
+          items,
+          updatedAt: new Date().toISOString(),
+        };
         set({ guestCart });
         return guestCart;
       },

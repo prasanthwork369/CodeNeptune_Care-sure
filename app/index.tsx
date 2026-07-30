@@ -5,5 +5,7 @@ export default function Index() {
   const { isAuthenticated, isGuest, isLoaded } = useAuthStore();
 
   if (!isLoaded) return null;
-  return <Redirect href={isAuthenticated || isGuest ? "/(tabs)" : "/(auth)/login"} />;
+  return (
+    <Redirect href={isAuthenticated || isGuest ? "/(tabs)" : "/(auth)/login"} />
+  );
 }

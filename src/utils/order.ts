@@ -1,7 +1,11 @@
-import { Address } from '@/src/api/address.api';
-import { BillBreakdown } from '@/src/store/checkoutStore';
-import { CartItem } from '@/src/types/cart';
-import { CreateOrderRequest, OrderItem, OrderMetadata } from '@/src/types/order';
+import { Address } from "@/src/api/address.api";
+import { BillBreakdown } from "@/src/store/checkoutStore";
+import { CartItem } from "@/src/types/cart";
+import {
+  CreateOrderRequest,
+  OrderItem,
+  OrderMetadata,
+} from "@/src/types/order";
 
 export interface BuildOrderPayloadParams {
   cartItems: CartItem[];
@@ -34,17 +38,17 @@ export function buildOrderPayload({
   symptoms,
   patientPhone,
 }: BuildOrderPayloadParams): CreateOrderRequest {
-  const billBreakdown: NonNullable<OrderMetadata['billBreakdown']> = {
-    itemTotal:       bill?.subtotal        ?? 0,
+  const billBreakdown: NonNullable<OrderMetadata["billBreakdown"]> = {
+    itemTotal: bill?.subtotal ?? 0,
     productDiscount: bill?.productDiscount ?? 0,
-    couponDiscount:  bill?.couponDiscount  ?? 0,
-    walletDiscount:  bill?.walletDiscount  ?? 0,
-    coinsDiscount:   bill?.coinsDiscount   ?? 0,
+    couponDiscount: bill?.couponDiscount ?? 0,
+    walletDiscount: bill?.walletDiscount ?? 0,
+    coinsDiscount: bill?.coinsDiscount ?? 0,
     creditsDiscount: bill?.corporateCreditsDiscount ?? 0,
-    deliveryFee:     bill?.deliveryFee     ?? 0,
-    handlingCharge:  bill?.handlingCharge  ?? 0,
-    totalSaved:      bill?.totalSaved      ?? 0,
-    toPay:           bill?.toPay          ?? parseFloat(toPay),
+    deliveryFee: bill?.deliveryFee ?? 0,
+    handlingCharge: bill?.handlingCharge ?? 0,
+    totalSaved: bill?.totalSaved ?? 0,
+    toPay: bill?.toPay ?? parseFloat(toPay),
   };
   const totalDiscount =
     billBreakdown.productDiscount +
@@ -88,9 +92,17 @@ export function buildOrderPayload({
       pincode: address.pincode,
       country: address.country ?? "IN",
     },
-    subtotal: String(Number(bill?.subtotal ?? cartItems.reduce((s, i) => s + parseFloat(String(i.unitPrice)) * i.quantity, 0)).toFixed(2)),
+    subtotal: String(
+      Number(
+        bill?.subtotal ??
+          cartItems.reduce(
+            (s, i) => s + parseFloat(String(i.unitPrice)) * i.quantity,
+            0,
+          ),
+      ).toFixed(2),
+    ),
     deliveryCharge: String(billBreakdown.deliveryFee),
-    taxAmount: '0',
+    taxAmount: "0",
     discountAmount: String(totalDiscount.toFixed(2)),
     total: toPay,
     deliveryType: "HOME_DELIVERY" as const,
@@ -107,7 +119,7 @@ export function buildOrderPayload({
         creditsUsed: corporateCreditsUsed,
         livePriceSyncUsed: false,
       },
-      couponCode: couponCode ?? '',
+      couponCode: couponCode ?? "",
       patientDetails: {
         phone: patientPhone || undefined,
         problem: problem || undefined,

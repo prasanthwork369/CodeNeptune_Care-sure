@@ -14,15 +14,15 @@ import { ScrollView, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
-    PatientContactInfo,
-    PatientEmptyState,
-    PatientHealthProblem,
-    PatientPrescriptionPreview,
-    PatientSelectionChips,
-    PatientSelectionFooter,
-    PatientSymptomsInput,
-    PatientVitalInfo,
-    SelectPatientSkeleton,
+  PatientContactInfo,
+  PatientEmptyState,
+  PatientHealthProblem,
+  PatientPrescriptionPreview,
+  PatientSelectionChips,
+  PatientSelectionFooter,
+  PatientSymptomsInput,
+  PatientVitalInfo,
+  SelectPatientSkeleton,
 } from "./sections";
 
 export const SelectPatientLayout: React.FC = () => {
@@ -77,7 +77,7 @@ export const SelectPatientLayout: React.FC = () => {
   );
 
   const showEmptyState = !loading && members.length === 0;
-  const showSkeleton   = loading && members.length === 0;
+  const showSkeleton = loading && members.length === 0;
 
   const handleProceed = () => {
     if (!selectedPatient) {
@@ -110,7 +110,10 @@ export const SelectPatientLayout: React.FC = () => {
               }}
               activeOpacity={0.8}
             >
-              <Text className="font-inter-bold text-[#0F7635]" style={{ fontSize: moderateScale(13) }}>
+              <Text
+                className="font-inter-bold text-[#0F7635]"
+                style={{ fontSize: moderateScale(13) }}
+              >
                 ADD PATIENT
               </Text>
             </Touchable>
@@ -167,7 +170,9 @@ export const SelectPatientLayout: React.FC = () => {
               onSave={async (val) => {
                 if (selectedPatient && val.trim()) {
                   setSavingPhone(true);
-                  await updateMember(selectedPatient.id, { phone: `+91${val.trim()}` });
+                  await updateMember(selectedPatient.id, {
+                    phone: `+91${val.trim()}`,
+                  });
                   setSavingPhone(false);
                 }
                 setEditingPhone(false);

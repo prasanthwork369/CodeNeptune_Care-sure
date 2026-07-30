@@ -1,5 +1,8 @@
 import { Touchable } from "@/src/components/ui/Touchable";
-import { SignupBonusData, SignupBonusPopupContent } from "@/src/types/signupBonus";
+import {
+  SignupBonusData,
+  SignupBonusPopupContent,
+} from "@/src/types/signupBonus";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";

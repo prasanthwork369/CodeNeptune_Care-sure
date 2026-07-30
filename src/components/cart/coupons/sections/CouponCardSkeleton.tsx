@@ -7,6 +7,10 @@ import { View } from "react-native";
 // so cards never appear active and then flip to faded.
 export const CouponCardSkeleton: React.FC = () => (
   <View style={{ marginBottom: exactScale(12) }}>
-    <Skeleton width="100%" height={exactScale(115)} borderRadius={exactScale(13)} />
+    <Skeleton
+      width="100%"
+      height={exactScale(115)}
+      borderRadius={exactScale(13)}
+    />
   </View>
 );

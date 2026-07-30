@@ -59,7 +59,10 @@ export const SaltCompositionBanner: React.FC<SaltCompositionBannerProps> = ({
           />
         </View>
         <View style={{ flex: 1, marginRight: isTruncatable ? 8 : 0 }}>
-          <Text className="font-inter-semibold text-white uppercase tracking-[1px] mb-0.5" style={{ fontSize: moderateScale(10) }}>
+          <Text
+            className="font-inter-semibold text-white uppercase tracking-[1px] mb-0.5"
+            style={{ fontSize: moderateScale(10) }}
+          >
             SALT COMPOSITION IN BOTH
           </Text>
           {/* Hidden measurement text — detects if composition overflows one

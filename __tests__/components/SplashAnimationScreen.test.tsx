@@ -23,9 +23,7 @@ describe("SplashAnimationScreen", () => {
     );
 
     expect(screen.getByText("CareSure")).toBeTruthy();
-    expect(
-      screen.getByText("Healthcare, delivered with care."),
-    ).toBeTruthy();
+    expect(screen.getByText("Healthcare, delivered with care.")).toBeTruthy();
 
     await act(async () => Promise.resolve());
     act(() => jest.advanceTimersByTime(1_450));

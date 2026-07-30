@@ -1,7 +1,20 @@
 // Shared refill-reminder date formatting. Hermes lacks full Intl, so format
 // manually. Two presentations: the profile badge (short, uppercase) and the
 // comparison card (full date + time).
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 // "21 Jul 2026, 10:30 AM"
 export const formatReminderDateTime = (d: Date): string => {

@@ -1,13 +1,11 @@
 import React, { memo } from "react";
-import {
-  DimensionValue,
-  StyleProp,
-  View,
-  ViewStyle,
-} from "react-native";
+import { DimensionValue, StyleProp, View, ViewStyle } from "react-native";
 import { ShimmerOverlay, ShimmerOverlayProps } from "./ShimmerOverlay";
 
-export interface ShimmerBlockProps extends Pick<ShimmerOverlayProps, "duration" | "enabled"> {
+export interface ShimmerBlockProps extends Pick<
+  ShimmerOverlayProps,
+  "duration" | "enabled"
+> {
   width?: DimensionValue;
   height?: DimensionValue;
   borderRadius?: number;
@@ -29,11 +27,21 @@ export const ShimmerBlock = memo(function ShimmerBlock({
   return (
     <View
       style={[
-        { width, height, borderRadius, overflow: "hidden", backgroundColor: "#E8EAED" },
+        {
+          width,
+          height,
+          borderRadius,
+          overflow: "hidden",
+          backgroundColor: "#E8EAED",
+        },
         style,
       ]}
     >
-      <ShimmerOverlay borderRadius={borderRadius} duration={duration} enabled={enabled} />
+      <ShimmerOverlay
+        borderRadius={borderRadius}
+        duration={duration}
+        enabled={enabled}
+      />
     </View>
   );
 });

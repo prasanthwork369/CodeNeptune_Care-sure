@@ -189,8 +189,6 @@ export interface CartFooterProps {
   canProceed?: boolean;
 }
 
-
-
 export interface Coupon {
   id: string;
   code: string;

@@ -20,15 +20,14 @@ export interface FamilyMemberInput {
 }
 
 export const RELATIONSHIPS = [
-  'Self',
-  'Father',
-  'Mother',
-  'Husband',
-  'Wife',
-  'Son',
-  'Daughter',
-  'Brother',
-  'Sister',
-  'Other'
+  "Self",
+  "Father",
+  "Mother",
+  "Husband",
+  "Wife",
+  "Son",
+  "Daughter",
+  "Brother",
+  "Sister",
+  "Other",
 ];
-

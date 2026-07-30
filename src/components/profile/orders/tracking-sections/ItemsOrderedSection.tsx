@@ -62,7 +62,10 @@ export function ItemsOrderedSection({
                 } as any)
               }
             >
-              <icons.return_pack width={exactScale(14)} height={exactScale(14)} />
+              <icons.return_pack
+                width={exactScale(14)}
+                height={exactScale(14)}
+              />
               <Text
                 style={[s.labelSm, { marginLeft: exactScale(6) }]}
                 className="font-inter-semibold text-brand-text"
@@ -87,7 +90,12 @@ export function ItemsOrderedSection({
                 shadowRadius: exactScale(32),
               }}
               activeOpacity={0.7}
-              onPress={() => router.push({ pathname: "/profile/orders/cancel", params: { orderId } } as any)}
+              onPress={() =>
+                router.push({
+                  pathname: "/profile/orders/cancel",
+                  params: { orderId },
+                } as any)
+              }
               disabled={isCancelling}
             >
               <Text
@@ -108,76 +116,82 @@ export function ItemsOrderedSection({
         );
         const hasDiscount = discountPercent > 0;
         return (
-        <View key={item.id}>
-          <Touchable
-            activeOpacity={0.7}
-            onPress={() => {
-              const productId =
-                item.productId ||
-                item.medicineSnapshot?.productId ||
-                item.medicineSnapshot?.slug ||
-                item.medicineId;
-              if (productId)
-                router.push({
-                  pathname: "/product/[id]",
-                  params: { id: productId },
-                } as any);
-            }}
-            className="flex-row"
-            style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(12) }}
-          >
-            <View
-              className="border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center overflow-hidden"
+          <View key={item.id}>
+            <Touchable
+              activeOpacity={0.7}
+              onPress={() => {
+                const productId =
+                  item.productId ||
+                  item.medicineSnapshot?.productId ||
+                  item.medicineSnapshot?.slug ||
+                  item.medicineId;
+                if (productId)
+                  router.push({
+                    pathname: "/product/[id]",
+                    params: { id: productId },
+                  } as any);
+              }}
+              className="flex-row"
               style={{
-                width: exactScale(72),
-                height: exactScale(72),
-                borderRadius: exactScale(8),
-                marginRight: exactScale(12),
+                paddingHorizontal: exactScale(16),
+                paddingVertical: exactScale(12),
               }}
             >
-              {item.medicineSnapshot?.image ? (
-                <Image
-                  source={{ uri: item.medicineSnapshot.image }}
-                  style={s.productImg50}
-                  contentFit="contain"
-                />
-              ) : (
-                <icons.placeholder width={exactScale(50)} height={exactScale(50)} />
-              )}
-            </View>
-            <View className="flex-1">
-              <View className="flex-row justify-between items-start">
-                <Text
-                  style={[s.labelSm, { paddingRight: exactScale(8) }]}
-                  className="font-inter-semibold text-brand-text flex-1"
-                  numberOfLines={2}
-                >
-                  {item.medicineSnapshot?.name ?? item.medicineId}
-                </Text>
-                <View className="items-end">
+              <View
+                className="border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center overflow-hidden"
+                style={{
+                  width: exactScale(72),
+                  height: exactScale(72),
+                  borderRadius: exactScale(8),
+                  marginRight: exactScale(12),
+                }}
+              >
+                {item.medicineSnapshot?.image ? (
+                  <Image
+                    source={{ uri: item.medicineSnapshot.image }}
+                    style={s.productImg50}
+                    contentFit="contain"
+                  />
+                ) : (
+                  <icons.placeholder
+                    width={exactScale(50)}
+                    height={exactScale(50)}
+                  />
+                )}
+              </View>
+              <View className="flex-1">
+                <View className="flex-row justify-between items-start">
                   <Text
-                    style={s.labelSm}
-                    className="font-inter-bold text-brand-text"
+                    style={[s.labelSm, { paddingRight: exactScale(8) }]}
+                    className="font-inter-semibold text-brand-text flex-1"
+                    numberOfLines={2}
                   >
-                    {sellingPrice
-                      ? `₹${parseFloat((sellingPrice * item.quantity).toFixed(2))}`
-                      : "—"}
+                    {item.medicineSnapshot?.name ?? item.medicineId}
                   </Text>
-                  {/* Only show the struck-through MRP when there's an actual
+                  <View className="items-end">
+                    <Text
+                      style={s.labelSm}
+                      className="font-inter-bold text-brand-text"
+                    >
+                      {sellingPrice
+                        ? `₹${parseFloat((sellingPrice * item.quantity).toFixed(2))}`
+                        : "—"}
+                    </Text>
+                    {/* Only show the struck-through MRP when there's an actual
                       discount (mrp > selling price) — otherwise it renders a
                       strikethrough over the same price on non-discounted items. */}
-                  {hasDiscount && (
-                    <Text
-                      style={[s.statusBadge, { marginTop: exactScale(2) }]}
-                      className="font-inter text-brand-subtext line-through"
-                    >
-                      ₹{parseFloat((mrp * item.quantity).toFixed(2))}
-                    </Text>
-                  )}
+                    {hasDiscount && (
+                      <Text
+                        style={[s.statusBadge, { marginTop: exactScale(2) }]}
+                        className="font-inter text-brand-subtext line-through"
+                      >
+                        ₹{parseFloat((mrp * item.quantity).toFixed(2))}
+                      </Text>
+                    )}
+                  </View>
                 </View>
-              </View>
-              {(item.medicineSnapshot?.brand ||
-                item.medicineSnapshot?.pack) && (
+                {(item.medicineSnapshot?.brand ||
+                  item.medicineSnapshot?.pack) && (
                   <Text
                     style={[s.labelSm, { marginTop: exactScale(2) }]}
                     className="font-inter-medium text-brand-subtext"
@@ -187,53 +201,53 @@ export function ItemsOrderedSection({
                       .join(" • ")}
                   </Text>
                 )}
-              <View
-                className="flex-row items-center justify-between"
-                style={{ marginTop: exactScale(8) }}
-              >
                 <View
-                  style={{
-                    borderWidth: exactScale(1),
-                    borderColor: "#E2E8F0",
-                    backgroundColor: "#F3F4F6",
-                    borderRadius: exactScale(4),
-                    paddingHorizontal: exactScale(10),
-                    paddingVertical: exactScale(2),
-                  }}
+                  className="flex-row items-center justify-between"
+                  style={{ marginTop: exactScale(8) }}
                 >
-                  <Text
-                    style={s.statusBadge}
-                    className="font-inter-semibold text-brand-text"
+                  <View
+                    style={{
+                      borderWidth: exactScale(1),
+                      borderColor: "#E2E8F0",
+                      backgroundColor: "#F3F4F6",
+                      borderRadius: exactScale(4),
+                      paddingHorizontal: exactScale(10),
+                      paddingVertical: exactScale(2),
+                    }}
                   >
-                    Qty: {item.quantity}
-                  </Text>
-                </View>
+                    <Text
+                      style={s.statusBadge}
+                      className="font-inter-semibold text-brand-text"
+                    >
+                      Qty: {item.quantity}
+                    </Text>
+                  </View>
 
-                {/* Discount % on the right — show the stored discount directly
+                  {/* Discount % on the right — show the stored discount directly
                     (like the web) so it matches the product page exactly, rather
                     than re-deriving it from the rounded paid price. */}
-                {hasDiscount && (
-                  <Text
-                    style={s.labelSm}
-                    className="font-inter-bold text-brand-primary"
-                  >
-                    {parseFloat(discountPercent.toFixed(2))}% off
-                  </Text>
-                )}
+                  {hasDiscount && (
+                    <Text
+                      style={s.labelSm}
+                      className="font-inter-bold text-brand-primary"
+                    >
+                      {parseFloat(discountPercent.toFixed(2))}% off
+                    </Text>
+                  )}
+                </View>
               </View>
-            </View>
-          </Touchable>
-          {index < arr.length - 1 && (
-            <View
-              style={{
-                borderTopWidth: 1,
-                borderColor: "#E5E7EB",
-                marginHorizontal: exactScale(20),
-                borderStyle: "dashed",
-              }}
-            />
-          )}
-        </View>
+            </Touchable>
+            {index < arr.length - 1 && (
+              <View
+                style={{
+                  borderTopWidth: 1,
+                  borderColor: "#E5E7EB",
+                  marginHorizontal: exactScale(20),
+                  borderStyle: "dashed",
+                }}
+              />
+            )}
+          </View>
         );
       })}
     </SectionCard>

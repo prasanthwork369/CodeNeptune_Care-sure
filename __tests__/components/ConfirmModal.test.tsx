@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { ConfirmModal } from "@/src/components/ui/ConfirmModal";
 
 describe("ConfirmModal Component", () => {
@@ -20,11 +23,13 @@ describe("ConfirmModal Component", () => {
         message="Are you sure you want to delete this delivery address?"
         confirmLabel="Yes, Delete"
         cancelLabel="Cancel"
-      />
+      />,
     );
 
     expect(getByText("Delete Address")).toBeTruthy();
-    expect(getByText("Are you sure you want to delete this delivery address?")).toBeTruthy();
+    expect(
+      getByText("Are you sure you want to delete this delivery address?"),
+    ).toBeTruthy();
     expect(getByText("Yes, Delete")).toBeTruthy();
     expect(getByText("Cancel")).toBeTruthy();
   });
@@ -39,7 +44,7 @@ describe("ConfirmModal Component", () => {
         message="Are you sure you want to log out?"
         confirmLabel="Confirm Logout"
         cancelLabel="Stay Logged In"
-      />
+      />,
     );
 
     fireEvent.press(getByText("Confirm Logout"));
@@ -57,7 +62,7 @@ describe("ConfirmModal Component", () => {
         message="Your unsaved changes will be lost."
         confirmLabel="Discard"
         cancelLabel="Keep Editing"
-      />
+      />,
     );
 
     fireEvent.press(getByText("Keep Editing"));
@@ -75,7 +80,7 @@ describe("ConfirmModal Component", () => {
         message="This should not be rendered"
         confirmLabel="Confirm"
         cancelLabel="Cancel"
-      />
+      />,
     );
 
     expect(queryByText("Hidden Dialog")).toBeNull();

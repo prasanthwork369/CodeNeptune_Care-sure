@@ -2,7 +2,12 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
-import { analyticsService, PERF_TRACES, reportError, usePerformanceTrace } from "@/src/services/firebase";
+import {
+  analyticsService,
+  PERF_TRACES,
+  reportError,
+  usePerformanceTrace,
+} from "@/src/services/firebase";
 import { orderErrorMessage } from "@/src/utils/orderError";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -104,11 +109,12 @@ export function usePaymentCalculations() {
   // the deferred prescription upload that runs before createOrder — so the
   // button reacts instantly on press instead of after that first call.
   const [placingOrder, setPlacingOrder] = useState(false);
-  const { start: startCheckoutTrace, stop: stopCheckoutTrace } = usePerformanceTrace({
-    traceName: PERF_TRACES.CHECKOUT_FLOW,
-    manualStart: true,
-    maxDurationMs: 30_000,
-  });
+  const { start: startCheckoutTrace, stop: stopCheckoutTrace } =
+    usePerformanceTrace({
+      traceName: PERF_TRACES.CHECKOUT_FLOW,
+      manualStart: true,
+      maxDurationMs: 30_000,
+    });
 
   // The address the user has selected — the same one the location sheet
   // highlights. Display and payload both read it, so what the screen shows is
@@ -163,43 +169,43 @@ export function usePaymentCalculations() {
     let payload: CreateOrderRequest | undefined;
     let traceStatus = "failed";
     try {
-    if (!effectivePrescriptionId && parsedImageUrls.length > 0) {
-      const rx = await prescriptionService.upload({
-        imageUrls: parsedImageUrls,
-        category: parsedCategory,
-      });
-      if (!rx.success) {
-        traceStatus = "rx_upload_failed";
-        Alert.alert(
-          "Upload Failed",
-          rx.error ?? "Could not save prescription. Please try again.",
-        );
-        return;
+      if (!effectivePrescriptionId && parsedImageUrls.length > 0) {
+        const rx = await prescriptionService.upload({
+          imageUrls: parsedImageUrls,
+          category: parsedCategory,
+        });
+        if (!rx.success) {
+          traceStatus = "rx_upload_failed";
+          Alert.alert(
+            "Upload Failed",
+            rx.error ?? "Could not save prescription. Please try again.",
+          );
+          return;
+        }
+        effectivePrescriptionId = rx.data?.id ?? "";
+        createdRxIdRef.current = effectivePrescriptionId;
       }
-      effectivePrescriptionId = rx.data?.id ?? "";
-      createdRxIdRef.current = effectivePrescriptionId;
-    }
 
-    orderItems = isPrescriptionFlow
-      ? buildPrescriptionOrderItems(prescriptionOrderItems)
-      : buildCartOrderItems(cartItems);
+      orderItems = isPrescriptionFlow
+        ? buildPrescriptionOrderItems(prescriptionOrderItems)
+        : buildCartOrderItems(cartItems);
 
-    payload = buildOrderPayload({
-      items: orderItems,
-      address: defaultAddress,
-      bill: billBreakdown,
-      subtotal: bill?.subtotal,
-      idempotencyKey: idempotencyKeyRef.current,
-      couponCode,
-      walletUsed,
-      coinsUsed,
-      creditsUsed: corporateCreditsUsed,
-      prescriptionId: effectivePrescriptionId,
-      patientMemberId,
-      patientPhone,
-      problem,
-      symptoms,
-    });
+      payload = buildOrderPayload({
+        items: orderItems,
+        address: defaultAddress,
+        bill: billBreakdown,
+        subtotal: bill?.subtotal,
+        idempotencyKey: idempotencyKeyRef.current,
+        couponCode,
+        walletUsed,
+        coinsUsed,
+        creditsUsed: corporateCreditsUsed,
+        prescriptionId: effectivePrescriptionId,
+        patientMemberId,
+        patientPhone,
+        problem,
+        symptoms,
+      });
 
       const order: any = await createOrder(payload, idempotencyKeyRef.current);
       traceStatus = "success";
@@ -242,7 +248,10 @@ export function usePaymentCalculations() {
           total: payload?.total,
           hasPrescription: !!payload?.prescriptionId,
         });
-        console.log("[PlaceOrder] error:", err?.data ?? err?.response?.data ?? err?.message);
+        console.log(
+          "[PlaceOrder] error:",
+          err?.data ?? err?.response?.data ?? err?.message,
+        );
       }
       reportError(err, "placeOrder:cart");
       Alert.alert("Order Failed", orderErrorMessage(err));

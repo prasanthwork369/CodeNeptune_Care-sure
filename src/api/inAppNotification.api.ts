@@ -1,5 +1,5 @@
-import { API_ENDPOINTS } from '../utils/urls';
-import { apiClient } from './client';
+import { API_ENDPOINTS } from "../utils/urls";
+import { apiClient } from "./client";
 
 export interface NotificationLog {
   id: string;
@@ -8,11 +8,11 @@ export interface NotificationLog {
   recipientType: string;
   recipientEmail: string | null;
   recipientPhone: string | null;
-  channel: 'EMAIL' | 'SMS' | 'PUSH' | 'IN_APP';
+  channel: "EMAIL" | "SMS" | "PUSH" | "IN_APP";
   event: string;
   subject: string | null;
   body: string;
-  status: 'SENT' | 'FAILED' | 'DELIVERED';
+  status: "SENT" | "FAILED" | "DELIVERED";
   triggeredBy: string | null;
   orderId: string | null;
   metadata: Record<string, any>;
@@ -31,8 +31,13 @@ export interface PaginatedNotifications {
 }
 
 export const inAppNotificationApi = {
-  list: async (params?: { page?: number; limit?: number }): Promise<PaginatedNotifications> => {
-    const { data } = await apiClient.get(API_ENDPOINTS.NOTIFICATIONS, { params });
+  list: async (params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedNotifications> => {
+    const { data } = await apiClient.get(API_ENDPOINTS.NOTIFICATIONS, {
+      params,
+    });
     return data.data;
   },
   markRead: async (id: string): Promise<void> => {

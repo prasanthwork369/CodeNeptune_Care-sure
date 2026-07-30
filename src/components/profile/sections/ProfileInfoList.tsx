@@ -42,7 +42,7 @@ export const ProfileInfoList: React.FC<ProfileInfoListProps> = ({
                     justifyContent: "center",
                   }}
                 >
-                  <Icon  />
+                  <Icon />
                 </View>
                 <Text
                   style={s.infoLabel}

@@ -32,7 +32,10 @@ export const applyDigitsOnlyFilter = (ref: any, maxLength = 0) => {
     }
   } catch (err) {
     if (__DEV__) {
-      console.warn("[TextInputFilter] Failed to apply digits-only filter:", err);
+      console.warn(
+        "[TextInputFilter] Failed to apply digits-only filter:",
+        err,
+      );
     }
   }
 };

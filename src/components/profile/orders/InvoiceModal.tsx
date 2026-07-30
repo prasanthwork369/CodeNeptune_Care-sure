@@ -45,10 +45,7 @@ function formatDate(iso?: string | null) {
   });
 }
 
-function injectHtmlStyles(
-  templateBody: string,
-  style: string,
-): string {
+function injectHtmlStyles(templateBody: string, style: string): string {
   const viewport =
     '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
   if (templateBody.includes("<head>")) {
@@ -125,14 +122,10 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         }
       </style>
     `;
-    const metaTag =
-      `<meta name="viewport" content="width=794, initial-scale=${initialScale.toFixed(4)}, minimum-scale=${initialScale.toFixed(4)}, maximum-scale=3.0, user-scalable=yes">`;
+    const metaTag = `<meta name="viewport" content="width=794, initial-scale=${initialScale.toFixed(4)}, minimum-scale=${initialScale.toFixed(4)}, maximum-scale=3.0, user-scalable=yes">`;
 
     if (/<meta[^>]+name=["']viewport["'][^>]*>/i.test(body)) {
-      body = body.replace(
-        /<meta[^>]+name=["']viewport["'][^>]*>/i,
-        metaTag,
-      );
+      body = body.replace(/<meta[^>]+name=["']viewport["'][^>]*>/i, metaTag);
       if (body.includes("<head>")) {
         body = body.replace("<head>", `<head>${previewStyle}`);
       } else {
@@ -281,7 +274,10 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             onPress={handleDownload}
             disabled={downloading || !printHtml}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            style={{ marginLeft: exactScale(12), opacity: printHtml ? 1 : 0.45 }}
+            style={{
+              marginLeft: exactScale(12),
+              opacity: printHtml ? 1 : 0.45,
+            }}
           >
             {downloading ? (
               <ActivityIndicator size="small" color="#0F7635" />

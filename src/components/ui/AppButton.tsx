@@ -1,10 +1,23 @@
 import React from "react";
-import { ActivityIndicator, Text, View, ViewStyle, TextStyle, StyleSheet, TouchableOpacityProps } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  View,
+  ViewStyle,
+  TextStyle,
+  StyleSheet,
+  TouchableOpacityProps,
+} from "react-native";
 import { Touchable } from "./Touchable";
 import { colors } from "@/src/theme/colors";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 interface AppButtonProps {
@@ -27,9 +40,9 @@ interface AppButtonProps {
   testID?: string;
   accessibilityLabel?: string;
   accessibilityHint?: string;
-  accessibilityRole?: TouchableOpacityProps['accessibilityRole'];
-  accessibilityState?: TouchableOpacityProps['accessibilityState'];
-  hitSlop?: TouchableOpacityProps['hitSlop'];
+  accessibilityRole?: TouchableOpacityProps["accessibilityRole"];
+  accessibilityState?: TouchableOpacityProps["accessibilityState"];
+  hitSlop?: TouchableOpacityProps["hitSlop"];
 }
 
 export const AppButton: React.FC<AppButtonProps> = ({
@@ -137,7 +150,10 @@ export const AppButton: React.FC<AppButtonProps> = ({
   };
 
   const combinedButtonStyle = StyleSheet.flatten([sizeStyles[size], style]);
-  const combinedTextStyle = StyleSheet.flatten([textSizeStyles[size], textStyle]);
+  const combinedTextStyle = StyleSheet.flatten([
+    textSizeStyles[size],
+    textStyle,
+  ]);
 
   return (
     <Touchable
@@ -148,7 +164,7 @@ export const AppButton: React.FC<AppButtonProps> = ({
       testID={testID}
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
-      accessibilityRole={accessibilityRole ?? 'button'}
+      accessibilityRole={accessibilityRole ?? "button"}
       accessibilityState={accessibilityState ?? { disabled: isBtnDisabled }}
       hitSlop={hitSlop}
       className={`flex-row items-center justify-center ${getVariantContainerClass()} ${

@@ -8,7 +8,11 @@ export const cartCounterStyles = StyleSheet.create({
   wrap: { width: COUNTER_WIDTH },
   // Match addBtn's fixed height so swapping Add ↔ stepper (count 0 ↔ 1) never
   // changes the row/card height.
-  wrapActive: { width: COUNTER_WIDTH, height: exactScale(35), backgroundColor: "#0F7635" },
+  wrapActive: {
+    width: COUNTER_WIDTH,
+    height: exactScale(35),
+    backgroundColor: "#0F7635",
+  },
   btn: {
     width: COUNTER_BTN_W,
     paddingVertical: exactScale(6),
@@ -51,7 +55,12 @@ export const searchCardStyles = StyleSheet.create({
   label: { fontSize: moderateScale(14) },
   sameComp: { fontSize: moderateScale(14) },
   checkIcon: { width: exactScale(18), height: exactScale(18) },
-  sellIcon: { width: exactScale(15), height: exactScale(15), top: exactScale(1.5), left: exactScale(1.5) },
+  sellIcon: {
+    width: exactScale(15),
+    height: exactScale(15),
+    top: exactScale(1.5),
+    left: exactScale(1.5),
+  },
   imgBox: { width: exactScale(80), height: exactScale(80) },
   imgInner: { width: exactScale(64), height: exactScale(64) },
   recImgBox: {

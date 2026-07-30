@@ -414,7 +414,10 @@ export const PrescriptionCard = ({
                 }
               }}
             >
-              <Text style={s.labelSm} className="font-inter-semibold text-white">
+              <Text
+                style={s.labelSm}
+                className="font-inter-semibold text-white"
+              >
                 Reorder
               </Text>
             </Touchable>

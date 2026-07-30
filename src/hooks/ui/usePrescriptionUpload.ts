@@ -3,7 +3,10 @@ import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
-import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
+import {
+  usePrescriptionUploadService,
+  CapturedAsset,
+} from "@/src/features/prescription-scanner";
 import { useRef } from "react";
 
 export function usePrescriptionUpload(

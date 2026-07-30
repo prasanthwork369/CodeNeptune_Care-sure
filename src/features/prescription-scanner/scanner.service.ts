@@ -9,8 +9,8 @@
  * know about expo-image-picker or react-native-document-scanner-plugin.
  */
 
-import * as ImagePicker from 'expo-image-picker';
-import { RawScanOutput } from './types';
+import * as ImagePicker from "expo-image-picker";
+import { RawScanOutput } from "./types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ import { RawScanOutput } from './types';
 function loadDocumentScanner(): any | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require('react-native-document-scanner-plugin').default;
+    return require("react-native-document-scanner-plugin").default;
   } catch {
     return null;
   }
@@ -74,7 +74,7 @@ export const ScannerService = {
       } catch (e) {
         if (__DEV__) {
           console.warn(
-            '[ScannerService] Document scanner failed, falling back to camera:',
+            "[ScannerService] Document scanner failed, falling back to camera:",
             e,
           );
         }
@@ -88,7 +88,7 @@ export const ScannerService = {
       if (!uri) return { imageUri: null, cancelled: true };
       return { imageUri: uri, cancelled: false };
     } catch (e) {
-      if (__DEV__) console.error('[ScannerService] Camera fallback failed:', e);
+      if (__DEV__) console.error("[ScannerService] Camera fallback failed:", e);
       return { imageUri: null, cancelled: false };
     }
   },

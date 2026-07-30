@@ -12,8 +12,15 @@ export const notificationApi = {
       token,
       ...deviceInfo,
     };
-    if (__DEV__) console.log('[RegisterDevice] payload:', JSON.stringify(payload, null, 2));
-    const response = await apiClient.post(API_ENDPOINTS.PUSH_DEVICE_REGISTER, payload);
+    if (__DEV__)
+      console.log(
+        "[RegisterDevice] payload:",
+        JSON.stringify(payload, null, 2),
+      );
+    const response = await apiClient.post(
+      API_ENDPOINTS.PUSH_DEVICE_REGISTER,
+      payload,
+    );
     return response.data;
   },
   removeToken: async (token: string) => {

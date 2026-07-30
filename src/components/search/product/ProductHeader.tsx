@@ -37,9 +37,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
       <View className="flex-row items-stretch justify-between">
         <Touchable
           activeOpacity={onQueryChange ? 1 : 0.5}
-          onPress={
-            onQueryChange ? undefined : () => router.push("/search")
-          }
+          onPress={onQueryChange ? undefined : () => router.push("/search")}
           style={[hs.box, { flex: 1, marginRight: 12 }]}
           className="flex-row items-center bg-white"
         >
@@ -113,7 +111,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             <icons.Add_Cart width={30} height={30} />
             {cartCount > 0 && (
               <View className="absolute -top-1 -right-1 w-[20px] h-[20px] rounded-full bg-[#C22923] items-center justify-center">
-                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(12) }}>
+                <Text
+                  className="font-inter-bold text-white leading-none"
+                  style={{ fontSize: moderateScale(12) }}
+                >
                   {cartCount}
                 </Text>
               </View>

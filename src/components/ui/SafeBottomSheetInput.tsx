@@ -39,4 +39,3 @@ export const SafeBottomSheetInput = React.forwardRef<
 });
 
 SafeBottomSheetInput.displayName = "SafeBottomSheetInput";
-

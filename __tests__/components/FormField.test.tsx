@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { FormField } from "@/src/components/ui/FormField";
 import { Text } from "react-native";
 
@@ -17,7 +20,7 @@ describe("FormField Component", () => {
         value=""
         placeholder="Enter your full name"
         onChangeText={onChangeTextMock}
-      />
+      />,
     );
 
     expect(getByText("Full Name")).toBeTruthy();
@@ -31,7 +34,7 @@ describe("FormField Component", () => {
         value=""
         placeholder="Enter your email"
         onChangeText={onChangeTextMock}
-      />
+      />,
     );
 
     const input = getByPlaceholderText("Enter your email");
@@ -47,7 +50,7 @@ describe("FormField Component", () => {
         value="123"
         error="Pincode must be 6 digits"
         onChangeText={onChangeTextMock}
-      />
+      />,
     );
 
     expect(getByText("Pincode must be 6 digits")).toBeTruthy();
@@ -60,7 +63,7 @@ describe("FormField Component", () => {
         value=""
         required={true}
         onChangeText={onChangeTextMock}
-      />
+      />,
     );
 
     expect(getByText("*")).toBeTruthy();
@@ -75,7 +78,7 @@ describe("FormField Component", () => {
         placeholder="Enter code"
         rightSlot={<Text>VERIFIED</Text>}
         onChangeText={onChangeTextMock}
-      />
+      />,
     );
 
     expect(getByText("Coupon Code")).toBeTruthy();

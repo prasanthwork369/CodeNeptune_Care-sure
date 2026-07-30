@@ -5,13 +5,13 @@ import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { sidebarStyles as s } from '../categories.styles';
+import { sidebarStyles as s } from "../categories.styles";
 import { exactScale } from "@/src/utils/exactScale";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 interface CategoriesSidebarProps {
@@ -53,9 +53,13 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
     }
 
     if (viewportHeight.current > 0) {
-      const targetScrollY = layout.y - (viewportHeight.current - layout.height) / 2;
+      const targetScrollY =
+        layout.y - (viewportHeight.current - layout.height) / 2;
       setTimeout(() => {
-        scrollViewRef.current?.scrollTo({ y: Math.max(0, targetScrollY), animated: true });
+        scrollViewRef.current?.scrollTo({
+          y: Math.max(0, targetScrollY),
+          animated: true,
+        });
       }, 50);
     }
   };
@@ -140,7 +144,10 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                 }
               }}
             >
-              <View style={s.iconWrap} className="items-center justify-center mb-1">
+              <View
+                style={s.iconWrap}
+                className="items-center justify-center mb-1"
+              >
                 <Image
                   source={isActive ? tab.imageActive : tab.imageInactive}
                   style={s.icon}

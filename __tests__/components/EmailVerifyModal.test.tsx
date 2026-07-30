@@ -1,5 +1,9 @@
 import React from "react";
-import { renderWithProviders, fireEvent, waitFor } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+  waitFor,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { EmailVerifyModal } from "@/src/components/profile/common/EmailVerifyModal";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useOtpInput } from "@/src/hooks/ui/useOtpInput";
@@ -52,7 +56,7 @@ describe("EmailVerifyModal Component", () => {
         email="testuser@caresure.com"
         onClose={onCloseMock}
         onVerified={onVerifiedMock}
-      />
+      />,
     );
 
     expect(getByText("Verify Email")).toBeTruthy();
@@ -68,7 +72,7 @@ describe("EmailVerifyModal Component", () => {
         email="testuser@caresure.com"
         onClose={onCloseMock}
         onVerified={onVerifiedMock}
-      />
+      />,
     );
 
     const cancelBtn = getByText("Cancel");
@@ -84,7 +88,7 @@ describe("EmailVerifyModal Component", () => {
         email="testuser@caresure.com"
         onClose={onCloseMock}
         onVerified={onVerifiedMock}
-      />
+      />,
     );
 
     const verifyBtn = getByText("Verify");
@@ -112,7 +116,7 @@ describe("EmailVerifyModal Component", () => {
         email="testuser@caresure.com"
         onClose={onCloseMock}
         onVerified={onVerifiedMock}
-      />
+      />,
     );
 
     expect(getByText("Incorrect verification code")).toBeTruthy();

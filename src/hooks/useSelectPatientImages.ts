@@ -5,7 +5,11 @@ import {
 } from "@/src/api/storage.api";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES, validatePrescriptionFile, capturePrescriptionImage } from "@/src/utils/prescription";
+import {
+  MAX_FILES,
+  validatePrescriptionFile,
+  capturePrescriptionImage,
+} from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -32,7 +36,7 @@ export function useSelectPatientImages(
 ) {
   const { maxSizeBytes } = useUploadConfig();
 
-  const parse = <T,>(raw: string, fallback: T): T => {
+  const parse = <T>(raw: string, fallback: T): T => {
     try {
       return raw ? (JSON.parse(raw) as T) : fallback;
     } catch {
@@ -107,7 +111,8 @@ export function useSelectPatientImages(
 
   const addFromLibrary = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permission Required",
@@ -141,7 +146,8 @@ export function useSelectPatientImages(
       }
       const scannedUri = await capturePrescriptionImage();
       if (scannedUri) {
-        const filename = scannedUri.split("/").pop() || "scanned_prescription.jpg";
+        const filename =
+          scannedUri.split("/").pop() || "scanned_prescription.jpg";
         const asset = {
           uri: scannedUri,
           name: filename,

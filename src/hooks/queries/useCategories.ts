@@ -18,7 +18,9 @@ const CARD_BG_COLORS = [
 ];
 
 export const useCategories = () => {
-  const cachedFamilies = apiCache.getWithMeta<ApiCategoryFamily[]>('category_family_map');
+  const cachedFamilies = apiCache.getWithMeta<ApiCategoryFamily[]>(
+    "category_family_map",
+  );
 
   const {
     data: families = [],
@@ -27,7 +29,10 @@ export const useCategories = () => {
     refetch,
   } = useQuery({
     queryKey: QUERY_KEYS.CATALOG.CATEGORY_MAP,
-    queryFn: withSqliteCache('category_family_map', categoryApi.getCategoryFamilyMap),
+    queryFn: withSqliteCache(
+      "category_family_map",
+      categoryApi.getCategoryFamilyMap,
+    ),
     initialData: () => cachedFamilies?.data,
     initialDataUpdatedAt: () => cachedFamilies?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
@@ -93,7 +98,8 @@ export const useCategoryProducts = (params: {
   });
 
   const items = (data?.items ?? []).filter(
-    (item, index, all) => all.findIndex((other) => other.id === item.id) === index,
+    (item, index, all) =>
+      all.findIndex((other) => other.id === item.id) === index,
   );
 
   const products: CategoryProduct[] = items.map((item) => ({
@@ -119,9 +125,11 @@ export const useCategoryProducts = (params: {
         ? `${parseFloat(String(item.discountPercentage))}% OFF`
         : undefined,
     discountPercent: parseFloat(String(item.discountPercentage)) || 0,
-    image: item.thumbnailUrl ? { uri: resolveAssetUrl(item.thumbnailUrl) } : null,
-    packSize: String(item.packSize ?? ''),
-    unit: item.unit ?? '',
+    image: item.thumbnailUrl
+      ? { uri: resolveAssetUrl(item.thumbnailUrl) }
+      : null,
+    packSize: String(item.packSize ?? ""),
+    unit: item.unit ?? "",
   }));
 
   return { products, total: data?.total ?? 0, isLoading, error, refetch };

@@ -77,10 +77,7 @@ const AddressCard = ({
         )}
       </View>
       <Text
-        style={[
-          s.addrAction,
-          { paddingHorizontal: 10, paddingBottom: 14 },
-        ]}
+        style={[s.addrAction, { paddingHorizontal: 10, paddingBottom: 14 }]}
         className="font-inter-regular text-[#6A6A6A] leading-[22px]"
         numberOfLines={3}
         ellipsizeMode="tail"

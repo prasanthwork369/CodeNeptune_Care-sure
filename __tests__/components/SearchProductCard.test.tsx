@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { SearchProductCard } from "@/src/components/search/SearchProductCard";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { Animated } from "react-native";
@@ -12,7 +15,9 @@ jest.mock("@/src/hooks/useNav", () => ({
 }));
 
 jest.mock("@/src/hooks/useCartActions");
-const mockUseCartActions = useCartActions as jest.MockedFunction<typeof useCartActions>;
+const mockUseCartActions = useCartActions as jest.MockedFunction<
+  typeof useCartActions
+>;
 
 describe("SearchProductCard Component", () => {
   const mockIncrement = jest.fn();
@@ -58,7 +63,7 @@ describe("SearchProductCard Component", () => {
 
   it("renders searched and recommended product details with prices and savings", () => {
     const { getByText, getAllByText } = renderWithProviders(
-      <SearchProductCard data={mockData} />
+      <SearchProductCard data={mockData} />,
     );
 
     expect(getByText("Crocin 500mg Tablet")).toBeTruthy();
@@ -72,7 +77,7 @@ describe("SearchProductCard Component", () => {
 
   it("triggers increment when Add button is pressed", () => {
     const { getByText } = renderWithProviders(
-      <SearchProductCard data={mockData} />
+      <SearchProductCard data={mockData} />,
     );
 
     const addBtn = getByText("Add");
@@ -94,7 +99,7 @@ describe("SearchProductCard Component", () => {
     } as any);
 
     const { getByText } = renderWithProviders(
-      <SearchProductCard data={mockData} />
+      <SearchProductCard data={mockData} />,
     );
 
     expect(getByText("3")).toBeTruthy();
@@ -111,7 +116,7 @@ describe("SearchProductCard Component", () => {
 
   it("triggers navigation callback when card is pressed", () => {
     const { getByTestId } = renderWithProviders(
-      <SearchProductCard data={mockData} />
+      <SearchProductCard data={mockData} />,
     );
 
     const card = getByTestId("search-result-item");

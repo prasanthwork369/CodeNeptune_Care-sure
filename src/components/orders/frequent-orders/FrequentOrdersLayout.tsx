@@ -7,12 +7,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import React, { useMemo, useState } from "react";
-import {
-    ScrollView,
-    Text,
-    TextInput,
-    View,
-} from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
 import { ProductCard } from "./sections";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
@@ -131,7 +126,11 @@ export const FrequentOrdersLayout: React.FC = () => {
               paddingHorizontal: exactScale(12),
             }}
           >
-            <icons.search width={18} height={18} style={{ marginRight: exactScale(8) }} />
+            <icons.search
+              width={18}
+              height={18}
+              style={{ marginRight: exactScale(8) }}
+            />
             <TextInput
               value={search}
               onChangeText={setSearch}
@@ -162,7 +161,9 @@ export const FrequentOrdersLayout: React.FC = () => {
 
       {/* Category filter chips */}
       {categories.length > 1 && (
-        <View style={{ backgroundColor: "#fff", paddingBottom: exactScale(10) }}>
+        <View
+          style={{ backgroundColor: "#fff", paddingBottom: exactScale(10) }}
+        >
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -225,7 +226,13 @@ export const FrequentOrdersLayout: React.FC = () => {
         keyboardShouldPersistTaps="handled"
       >
         {isLoading ? (
-          <View style={{ paddingHorizontal: exactScale(16), paddingTop: exactScale(14), gap: exactScale(12) }}>
+          <View
+            style={{
+              paddingHorizontal: exactScale(16),
+              paddingTop: exactScale(14),
+              gap: exactScale(12),
+            }}
+          >
             <ShimmerBlock height={exactScale(96)} borderRadius={12} />
             <ShimmerBlock height={exactScale(96)} borderRadius={12} />
             <ShimmerBlock height={exactScale(96)} borderRadius={12} />

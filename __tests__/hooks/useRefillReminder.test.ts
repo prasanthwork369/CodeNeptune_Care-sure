@@ -13,7 +13,12 @@ jest.mock("@/src/services/prescription.service", () => ({
 
 const mockPush = jest.fn();
 jest.mock("@/src/hooks/useNav", () => ({
-  useNav: () => ({ push: mockPush, replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn() }),
+  useNav: () => ({
+    push: mockPush,
+    replace: jest.fn(),
+    back: jest.fn(),
+    canGoBack: jest.fn(),
+  }),
 }));
 
 const mockInvalidateQueries = jest.fn().mockResolvedValue(undefined);
@@ -47,12 +52,17 @@ describe("useRefillReminder", () => {
 
     await waitFor(() => expect(result.current.isActive).toBe(true));
     expect(result.current.frequencyDays).toBe(14);
-    expect(result.current.nextRemindDate?.toISOString()).toBe(activeReminder.nextRemindAt);
+    expect(result.current.nextRemindDate?.toISOString()).toBe(
+      activeReminder.nextRemindAt,
+    );
   });
 
   it("uses initialReminder without refetching (list rows)", () => {
     const { result } = renderHook(() =>
-      useRefillReminder({ prescriptionId: "rx-1", initialReminder: activeReminder }),
+      useRefillReminder({
+        prescriptionId: "rx-1",
+        initialReminder: activeReminder,
+      }),
     );
 
     expect(service.getById).not.toHaveBeenCalled();
@@ -60,17 +70,24 @@ describe("useRefillReminder", () => {
   });
 
   it("activates after a successful setReminder call", async () => {
-    service.setReminder.mockResolvedValue({ success: true, data: activeReminder });
+    service.setReminder.mockResolvedValue({
+      success: true,
+      data: activeReminder,
+    });
 
     const { result } = renderHook(() =>
       useRefillReminder({ prescriptionId: "rx-1", initialReminder: null }),
     );
 
     await act(async () => {
-      expect(await result.current.setReminder({ frequencyDays: 14 })).toBe(true);
+      expect(await result.current.setReminder({ frequencyDays: 14 })).toBe(
+        true,
+      );
     });
 
-    expect(service.setReminder).toHaveBeenCalledWith("rx-1", { frequencyDays: 14 });
+    expect(service.setReminder).toHaveBeenCalledWith("rx-1", {
+      frequencyDays: 14,
+    });
     expect(result.current.isActive).toBe(true);
     // Stale cached lists must refetch so reopened screens show the new state.
     expect(mockInvalidateQueries).toHaveBeenCalledWith({
@@ -82,7 +99,10 @@ describe("useRefillReminder", () => {
     service.cancelReminder.mockResolvedValue({ success: true, data: null });
 
     const { result } = renderHook(() =>
-      useRefillReminder({ prescriptionId: "rx-1", initialReminder: activeReminder }),
+      useRefillReminder({
+        prescriptionId: "rx-1",
+        initialReminder: activeReminder,
+      }),
     );
 
     await act(async () => {
@@ -105,7 +125,9 @@ describe("useRefillReminder", () => {
     );
 
     await act(async () => {
-      expect(await result.current.setReminder({ frequencyDays: 7 })).toBe(false);
+      expect(await result.current.setReminder({ frequencyDays: 7 })).toBe(
+        false,
+      );
     });
 
     expect(result.current.isActive).toBe(false);
@@ -121,7 +143,12 @@ describe("useRefillReminder", () => {
     const serverNextRemindAt = "2026-09-01T03:30:00.000Z";
     service.setReminder.mockResolvedValue({
       success: true,
-      data: { status: "active", type: "once", frequencyDays: null, nextRemindAt: serverNextRemindAt },
+      data: {
+        status: "active",
+        type: "once",
+        frequencyDays: null,
+        nextRemindAt: serverNextRemindAt,
+      },
     });
 
     const { result } = renderHook(() =>
@@ -134,14 +161,18 @@ describe("useRefillReminder", () => {
 
     expect(service.setReminder).toHaveBeenCalledWith("rx-1", { remindAt });
     expect(result.current.isActive).toBe(true);
-    expect(result.current.nextRemindDate?.toISOString()).toBe(serverNextRemindAt);
+    expect(result.current.nextRemindDate?.toISOString()).toBe(
+      serverNextRemindAt,
+    );
   });
 
   it("does nothing without a prescriptionId", async () => {
     const { result } = renderHook(() => useRefillReminder({}));
 
     await act(async () => {
-      expect(await result.current.setReminder({ frequencyDays: 7 })).toBe(false);
+      expect(await result.current.setReminder({ frequencyDays: 7 })).toBe(
+        false,
+      );
     });
 
     expect(service.setReminder).not.toHaveBeenCalled();

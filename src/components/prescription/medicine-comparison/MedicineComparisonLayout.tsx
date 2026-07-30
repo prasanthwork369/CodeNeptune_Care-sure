@@ -8,7 +8,10 @@ import { CartDeliveringTo } from "@/src/components/cart/sections/CartDeliveringT
 import { CartFooter } from "@/src/components/cart/sections/CartFooter";
 import { CartSavingsBreakdown } from "@/src/components/cart/sections/CartSavingsBreakdown";
 import { CartTerms } from "@/src/components/cart/sections/CartTerms";
-import { CartWalletSection, CartCorporateCreditsSection } from "@/src/components/cart/sections";
+import {
+  CartWalletSection,
+  CartCorporateCreditsSection,
+} from "@/src/components/cart/sections";
 import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useRefillReminder } from "@/src/hooks/useRefillReminder";

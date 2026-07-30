@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text as RNText, TextProps as RNTextProps } from 'react-native';
+import React from "react";
+import { Text as RNText, TextProps as RNTextProps } from "react-native";
 
 export interface TextProps extends RNTextProps {}
 
@@ -12,6 +12,4 @@ export const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
   return <RNText ref={ref} {...props} />;
 });
 
-Text.displayName = 'Text';
-
-
+Text.displayName = "Text";

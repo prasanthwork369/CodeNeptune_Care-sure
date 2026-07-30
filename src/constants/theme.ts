@@ -9,17 +9,17 @@ export { colors, spacing };
 export const CART_BUTTON_HEIGHT = moderateScale(14) * 2.8;
 
 export const components = {
-    tabBar: {
-        height: spacing[18],
-        horizontalInset: spacing[5],
-        radius: spacing[8],
-        iconFrame: spacing[12],
-        itemPaddingVertical: spacing[2],
-    },
+  tabBar: {
+    height: spacing[18],
+    horizontalInset: spacing[5],
+    radius: spacing[8],
+    iconFrame: spacing[12],
+    itemPaddingVertical: spacing[2],
+  },
 } as const;
 
 export const theme = {
-    colors,
-    spacing,
-    components,
+  colors,
+  spacing,
+  components,
 } as const;

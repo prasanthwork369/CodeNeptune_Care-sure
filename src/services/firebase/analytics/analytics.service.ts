@@ -54,7 +54,9 @@ export const analyticsService = {
     log("search_completed", { result_count: resultCount }),
 
   logProductView: (sourceType?: number | string) =>
-    log("product_view", { source_type: sourceType == null ? undefined : String(sourceType) }),
+    log("product_view", {
+      source_type: sourceType == null ? undefined : String(sourceType),
+    }),
 
   logAddToCart: () => log("add_to_cart"),
 

@@ -2,7 +2,10 @@ import {
   FlyToCartOverlay,
   FlyToCartProvider,
 } from "@/src/components/animations/flyToCart";
-import { CategoryCartBanner, CategoryProductCard } from "@/src/components/categories/products/sections";
+import {
+  CategoryCartBanner,
+  CategoryProductCard,
+} from "@/src/components/categories/products/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { useCart } from "@/src/hooks/queries/useCart";
@@ -50,7 +53,8 @@ const FeaturedProductsContent: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
-  const { products, isLoading, refetch } = useAllFeaturedMedicines(FEATURED_LIMIT);
+  const { products, isLoading, refetch } =
+    useAllFeaturedMedicines(FEATURED_LIMIT);
 
   const cardWidth = (width - GRID_PADDING * 2 - GRID_GAP) / 2;
 
@@ -84,9 +88,21 @@ const FeaturedProductsContent: React.FC = () => {
                   borderRadius={14}
                 />
                 <View className="mt-2 gap-y-2">
-                  <Skeleton width={cardWidth * 0.4} height={28} borderRadius={6} />
-                  <Skeleton width={cardWidth * 0.9} height={14} borderRadius={4} />
-                  <Skeleton width={cardWidth * 0.6} height={12} borderRadius={4} />
+                  <Skeleton
+                    width={cardWidth * 0.4}
+                    height={28}
+                    borderRadius={6}
+                  />
+                  <Skeleton
+                    width={cardWidth * 0.9}
+                    height={14}
+                    borderRadius={4}
+                  />
+                  <Skeleton
+                    width={cardWidth * 0.6}
+                    height={12}
+                    borderRadius={4}
+                  />
                 </View>
               </View>
             ))}

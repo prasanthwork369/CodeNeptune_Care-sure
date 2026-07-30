@@ -80,14 +80,31 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
 
   it("logout purges all user-specific Zustand stores, React Query, SQLite, and storage atomically", async () => {
     // Populate dummy state in ancillary stores
-    usePrescriptionDraftStore.setState({ items: [{ medicineId: "m1", quantity: 1 } as any] });
-    useCouponStore.setState({ applied: { code: "SAVE20", discount: 20 } as any });
-    useNotificationStore.setState({ notifications: [{ id: "n1" } as any], unreadCount: 1 });
+    usePrescriptionDraftStore.setState({
+      items: [{ medicineId: "m1", quantity: 1 } as any],
+    });
+    useCouponStore.setState({
+      applied: { code: "SAVE20", discount: 20 } as any,
+    });
+    useNotificationStore.setState({
+      notifications: [{ id: "n1" } as any],
+      unreadCount: 1,
+    });
     useLocationStore.setState({ location: { label: "Home" } as any });
-    useCheckoutStore.setState({ bill: { toPay: 500 } as any, couponCode: "SAVE20" });
-    useReturnDraftStore.setState({ orderId: "o1", items: [{ orderItemId: "i1" } as any] });
-    usePrescriptionOrderStore.setState({ items: [{ medicineId: "m1" } as any] });
-    useCartPendingStore.setState({ guestCart: { items: [{ id: "g1" } as any] } as any });
+    useCheckoutStore.setState({
+      bill: { toPay: 500 } as any,
+      couponCode: "SAVE20",
+    });
+    useReturnDraftStore.setState({
+      orderId: "o1",
+      items: [{ orderItemId: "i1" } as any],
+    });
+    usePrescriptionOrderStore.setState({
+      items: [{ medicineId: "m1" } as any],
+    });
+    useCartPendingStore.setState({
+      guestCart: { items: [{ id: "g1" } as any] } as any,
+    });
 
     const queryClearSpy = jest.spyOn(queryClient, "clear");
 
@@ -124,16 +141,28 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
 
   it("initialize loads cached profile instantly and refreshes in background", async () => {
     (tokenStorage.get as jest.Mock).mockResolvedValueOnce("stored-token-123");
-    (apiCache.get as jest.Mock).mockReturnValueOnce({ id: "u1", firstName: "CachedUser" });
-    (profileApi.getProfile as jest.Mock).mockResolvedValueOnce({ id: "u1", firstName: "RefreshedUser" });
+    (apiCache.get as jest.Mock).mockReturnValueOnce({
+      id: "u1",
+      firstName: "CachedUser",
+    });
+    (profileApi.getProfile as jest.Mock).mockResolvedValueOnce({
+      id: "u1",
+      firstName: "RefreshedUser",
+    });
 
     await useAuthStore.getState().initialize();
     await Promise.resolve(); // Flush microtask queue for background getProfile.then()
 
     expect(getAccessToken()).toBe("stored-token-123");
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(useAuthStore.getState().user).toEqual({ id: "u1", firstName: "RefreshedUser" });
-    expect(apiCache.set).toHaveBeenCalledWith("customer_profile", { id: "u1", firstName: "RefreshedUser" });
+    expect(useAuthStore.getState().user).toEqual({
+      id: "u1",
+      firstName: "RefreshedUser",
+    });
+    expect(apiCache.set).toHaveBeenCalledWith("customer_profile", {
+      id: "u1",
+      firstName: "RefreshedUser",
+    });
   });
 
   it("initialize logs out silently on a confirmed auth failure (401 expired token)", async () => {
@@ -154,7 +183,10 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
 
   it("initialize preserves the session when the profile fetch fails on a network error", async () => {
     (tokenStorage.get as jest.Mock).mockResolvedValueOnce("valid-token");
-    (apiCache.get as jest.Mock).mockReturnValueOnce({ id: "u1", firstName: "CachedUser" });
+    (apiCache.get as jest.Mock).mockReturnValueOnce({
+      id: "u1",
+      firstName: "CachedUser",
+    });
     (profileApi.getProfile as jest.Mock).mockRejectedValueOnce(
       new AppError("network", "No Internet Connection."),
     );

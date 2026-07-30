@@ -8,7 +8,11 @@ describe("RequestQueue — Offline Mutation Queue", () => {
   });
 
   it("enqueues request and persists queue to AsyncStorage", async () => {
-    const mockConfig = { url: "/api/v1/orders", method: "POST", data: { item: "rx" } };
+    const mockConfig = {
+      url: "/api/v1/orders",
+      method: "POST",
+      data: { item: "rx" },
+    };
     const resolve = jest.fn();
     const reject = jest.fn();
 
@@ -26,7 +30,11 @@ describe("RequestQueue — Offline Mutation Queue", () => {
 
     // Fill queue to MAX_SIZE (50)
     for (let i = 0; i < 50; i++) {
-      await requestQueue.add(dummyConfig, () => {}, () => {});
+      await requestQueue.add(
+        dummyConfig,
+        () => {},
+        () => {},
+      );
     }
     expect(requestQueue.length).toBe(50);
 
@@ -34,7 +42,9 @@ describe("RequestQueue — Offline Mutation Queue", () => {
     const rejectSpy = jest.fn();
     await requestQueue.add(dummyConfig, () => {}, rejectSpy);
 
-    expect(rejectSpy).toHaveBeenCalledWith(new Error("Offline queue full — request dropped"));
+    expect(rejectSpy).toHaveBeenCalledWith(
+      new Error("Offline queue full — request dropped"),
+    );
     expect(requestQueue.length).toBe(50);
   });
 
@@ -63,12 +73,18 @@ describe("RequestQueue — Offline Mutation Queue", () => {
   });
 
   it("clears queue in memory and removes from storage", async () => {
-    await requestQueue.add({ url: "/api/test" }, () => {}, () => {});
+    await requestQueue.add(
+      { url: "/api/test" },
+      () => {},
+      () => {},
+    );
     expect(requestQueue.length).toBe(1);
 
     await requestQueue.clear();
 
     expect(requestQueue.length).toBe(0);
-    expect(AsyncStorage.removeItem).toHaveBeenCalledWith("offline_request_queue");
+    expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
+      "offline_request_queue",
+    );
   });
 });

@@ -172,13 +172,7 @@ export const SplashAnimationScreen: React.FC<Props> = ({
         if (finished) runOnJS(finish)();
       },
     );
-  }, [
-    isAppReady,
-    minimumTimeElapsed,
-    onComplete,
-    reduceMotion,
-    screenOpacity,
-  ]);
+  }, [isAppReady, minimumTimeElapsed, onComplete, reduceMotion, screenOpacity]);
 
   useEffect(
     () => () => {

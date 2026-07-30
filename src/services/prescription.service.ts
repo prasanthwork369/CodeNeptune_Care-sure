@@ -1,7 +1,15 @@
-import { prescriptionApi, PrescriptionListParams, PrescriptionUploadInput } from '@/src/api/prescription.api';
-import { PRESCRIPTION_CATEGORY } from '@/src/constants/prescription-category';
-import { ApiPrescription, PrescriptionReminder, ReminderInput } from '@/src/types/prescription';
-import { AppError } from '@/src/api/errors';
+import {
+  prescriptionApi,
+  PrescriptionListParams,
+  PrescriptionUploadInput,
+} from "@/src/api/prescription.api";
+import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import {
+  ApiPrescription,
+  PrescriptionReminder,
+  ReminderInput,
+} from "@/src/types/prescription";
+import { AppError } from "@/src/api/errors";
 
 type SuccessResult<T> = { success: true; data: T };
 // `code` lets callers distinguish e.g. "Health Updates disabled" from a generic failure.
@@ -14,11 +22,13 @@ function toFailure(err: unknown): FailureResult {
     return { success: false, error: err.message, code };
   }
   if (err instanceof Error) return { success: false, error: err.message };
-  return { success: false, error: 'Something went wrong' };
+  return { success: false, error: "Something went wrong" };
 }
 
 export const prescriptionService = {
-  upload: async (input: PrescriptionUploadInput): Promise<ServiceResult<ApiPrescription>> => {
+  upload: async (
+    input: PrescriptionUploadInput,
+  ): Promise<ServiceResult<ApiPrescription>> => {
     try {
       const data = await prescriptionApi.upload({
         ...input,
@@ -39,7 +49,9 @@ export const prescriptionService = {
     }
   },
 
-  getByOrderNumber: async (orderId: string): Promise<ServiceResult<ApiPrescription>> => {
+  getByOrderNumber: async (
+    orderId: string,
+  ): Promise<ServiceResult<ApiPrescription>> => {
     try {
       const data = await prescriptionApi.getByOrderNumber(orderId);
       return { success: true, data };
@@ -48,7 +60,9 @@ export const prescriptionService = {
     }
   },
 
-  list: async (params?: PrescriptionListParams): Promise<ServiceResult<ApiPrescription[]>> => {
+  list: async (
+    params?: PrescriptionListParams,
+  ): Promise<ServiceResult<ApiPrescription[]>> => {
     try {
       const data = await prescriptionApi.list(params);
       return { success: true, data };
@@ -67,7 +81,10 @@ export const prescriptionService = {
   },
 
   // Sets or updates the "Never Miss a Refill" reminder — every 7/14/21/30 days or a custom date.
-  setReminder: async (id: string, input: ReminderInput): Promise<ServiceResult<PrescriptionReminder>> => {
+  setReminder: async (
+    id: string,
+    input: ReminderInput,
+  ): Promise<ServiceResult<PrescriptionReminder>> => {
     try {
       const data = await prescriptionApi.setReminder(id, input);
       return { success: true, data };

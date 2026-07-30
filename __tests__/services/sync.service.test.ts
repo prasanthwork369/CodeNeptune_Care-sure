@@ -44,12 +44,17 @@ describe("syncService — Offline Sync & Cache Invalidation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockQueryClient = new QueryClient();
-    jest.spyOn(mockQueryClient, "invalidateQueries").mockResolvedValue(undefined as any);
+    jest
+      .spyOn(mockQueryClient, "invalidateQueries")
+      .mockResolvedValue(undefined as any);
   });
 
   it("reads local sync timestamps from sync_metadata SQLite table", async () => {
     (db.getAllSync as jest.Mock).mockReturnValueOnce([
-      { component_name: "appContents", last_sync_time: "2026-01-01T10:00:00.000Z" },
+      {
+        component_name: "appContents",
+        last_sync_time: "2026-01-01T10:00:00.000Z",
+      },
     ]);
 
     const timestamps = await syncService.getSyncTimestamps();
@@ -58,7 +63,10 @@ describe("syncService — Offline Sync & Cache Invalidation", () => {
   });
 
   it("updates individual sync timestamp in SQLite database", async () => {
-    await syncService.updateSyncTimestamp("appContents", "2026-07-21T12:00:00.000Z");
+    await syncService.updateSyncTimestamp(
+      "appContents",
+      "2026-07-21T12:00:00.000Z",
+    );
     expect(db.runSync).toHaveBeenCalledWith(
       "INSERT OR REPLACE INTO sync_metadata (component_name, last_sync_time) VALUES (?, ?)",
       ["appContents", "2026-07-21T12:00:00.000Z"],
@@ -71,7 +79,10 @@ describe("syncService — Offline Sync & Cache Invalidation", () => {
       data: {
         success: true,
         components: {
-          appContents: { needsSync: true, latestServerTimestamp: "2026-07-21T15:00:00.000Z" },
+          appContents: {
+            needsSync: true,
+            latestServerTimestamp: "2026-07-21T15:00:00.000Z",
+          },
           categoryFamilyMap: { needsSync: false },
         },
       },

@@ -30,7 +30,10 @@ if (instance) {
 export function reportError(error: unknown, context?: string) {
   if (!instance) return;
   if (context) crashlytics().log(instance, context);
-  crashlytics().recordError(instance, error instanceof Error ? error : new Error(String(error)));
+  crashlytics().recordError(
+    instance,
+    error instanceof Error ? error : new Error(String(error)),
+  );
 }
 
 /**

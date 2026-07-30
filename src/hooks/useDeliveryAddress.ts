@@ -1,7 +1,10 @@
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useLocationStore } from "@/src/store/locationStore";
 import type { DeliveryLocation } from "@/src/types/home";
-import { addressToLocation, pickDeliveryAddress } from "@/src/utils/addressLocation";
+import {
+  addressToLocation,
+  pickDeliveryAddress,
+} from "@/src/utils/addressLocation";
 import { useMemo } from "react";
 
 /**

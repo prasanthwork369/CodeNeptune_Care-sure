@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { REFUND_METHOD, RefundMethodValue } from '@/src/constants/return';
-import { ConfirmedReturnItem } from '@/src/types/return';
+import { create } from "zustand";
+import { REFUND_METHOD, RefundMethodValue } from "@/src/constants/return";
+import { ConfirmedReturnItem } from "@/src/types/return";
 
 interface ReturnDraftState {
   orderId: string | null;
@@ -29,7 +29,9 @@ export const useReturnDraftStore = create<ReturnDraftState>((set, get) => ({
 
   addConfirmedItem: (item) => {
     set((state) => {
-      const existingIndex = state.items.findIndex((i) => i.orderItemId === item.orderItemId);
+      const existingIndex = state.items.findIndex(
+        (i) => i.orderItemId === item.orderItemId,
+      );
       if (existingIndex !== -1) {
         const items = [...state.items];
         items[existingIndex] = item;
@@ -47,5 +49,6 @@ export const useReturnDraftStore = create<ReturnDraftState>((set, get) => ({
 
   setRefundMethod: (method) => set({ refundMethod: method }),
 
-  clearReturnDraft: () => set({ orderId: null, items: [], refundMethod: REFUND_METHOD.WALLET }),
+  clearReturnDraft: () =>
+    set({ orderId: null, items: [], refundMethod: REFUND_METHOD.WALLET }),
 }));

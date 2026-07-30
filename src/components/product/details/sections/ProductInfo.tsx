@@ -6,11 +6,11 @@ import React, { useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
 import { CarouselDot } from "@/src/components/animations/carousel";
 import {
-    Image,
-    ScrollView,
-    Text,
-    useWindowDimensions,
-    View,
+  Image,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
@@ -110,44 +110,77 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       </View>
 
       <View className="px-5">
-        <Text className="font-inter-semibold text-[#009989] mb-1" style={{ fontSize: moderateScale(13) }}>
+        <Text
+          className="font-inter-semibold text-[#009989] mb-1"
+          style={{ fontSize: moderateScale(13) }}
+        >
           {product.manufacturer}
         </Text>
-        <Text className="font-inter-bold text-[#111827] mb-3" style={[{ fontSize: moderateScale(20) }, { lineHeight: moderateScale(28) }]}>
+        <Text
+          className="font-inter-bold text-[#111827] mb-3"
+          style={[
+            { fontSize: moderateScale(20) },
+            { lineHeight: moderateScale(28) },
+          ]}
+        >
           {product.name}
         </Text>
 
-        <View style={{ borderTopWidth: 1, borderColor: '#E5E7EB', borderStyle: 'dashed', marginBottom: 12 }} />
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderColor: "#E5E7EB",
+            borderStyle: "dashed",
+            marginBottom: 12,
+          }}
+        />
 
         <View className="flex-row items-baseline gap-x-1.5 mb-1">
-          <Text className="font-inter-extrabold text-[#111827]" style={{ fontSize: moderateScale(24) }}>
+          <Text
+            className="font-inter-extrabold text-[#111827]"
+            style={{ fontSize: moderateScale(24) }}
+          >
             ₹{Number(product.price).toFixed(2)}
           </Text>
           {!!product.originalPrice && product.originalPrice > product.price && (
             <>
-              <Text className="font-inter-medium text-brand-subtext ml-1" style={{ fontSize: moderateScale(13) }}>
+              <Text
+                className="font-inter-medium text-brand-subtext ml-1"
+                style={{ fontSize: moderateScale(13) }}
+              >
                 MRP
               </Text>
-              <Text className="font-inter-medium text-brand-subtext line-through" style={{ fontSize: moderateScale(13) }}>
+              <Text
+                className="font-inter-medium text-brand-subtext line-through"
+                style={{ fontSize: moderateScale(13) }}
+              >
                 ₹{Number(product.originalPrice).toFixed(2)}
               </Text>
             </>
           )}
           {!!product.savingsPercent && (
-            <Text className="font-inter-bold text-[#0F7635] ml-2" style={{ fontSize: moderateScale(14) }}>
+            <Text
+              className="font-inter-bold text-[#0F7635] ml-2"
+              style={{ fontSize: moderateScale(14) }}
+            >
               {product.savingsPercent}% off
             </Text>
           )}
         </View>
 
-        <Text className="font-inter-medium text-brand-subtext uppercase tracking-wider" style={{ fontSize: moderateScale(12) }}>
+        <Text
+          className="font-inter-medium text-brand-subtext uppercase tracking-wider"
+          style={{ fontSize: moderateScale(12) }}
+        >
           {product.packLabel ??
             `${product.packSize ?? ""} ${product.dosageForm ?? ""}`.trim()}
           {product.packSize
-            ? ` | ₹${(
+            ? ` | ₹${
                 // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
-                Math.floor((product.price / product.packSize) * 100) / 100
-              ).toFixed(2)} / UNIT`
+                (
+                  Math.floor((product.price / product.packSize) * 100) / 100
+                ).toFixed(2)
+              } / UNIT`
             : ""}{" "}
           <Text className="normal-case tracking-normal text-brand-subtext">
             (Inclusive of all Taxes)
@@ -160,13 +193,19 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             products showed no selector on mobile. */}
         {variants.length >= 1 && (
           <View style={{ marginTop: exactScale(16) }}>
-            <Text className="font-inter-semibold text-[#6B7280] mb-3 uppercase tracking-wider" style={{ fontSize: moderateScale(12) }}>
+            <Text
+              className="font-inter-semibold text-[#6B7280] mb-3 uppercase tracking-wider"
+              style={{ fontSize: moderateScale(12) }}
+            >
               Select Pack Size
             </Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: exactScale(10), paddingRight: exactScale(4) }}
+              contentContainerStyle={{
+                gap: exactScale(10),
+                paddingRight: exactScale(4),
+              }}
             >
               {variants.map((v) => {
                 const isSelected = v.id === selectedVariantId;
@@ -176,8 +215,8 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 const packNum = parseFloat(v.packSize);
                 const unitPrice =
                   packNum > 0
-                    ? (
-                        // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+                    ? // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+                      (
                         Math.floor((sellingPrice / packNum) * 100) / 100
                       ).toFixed(2)
                     : null;

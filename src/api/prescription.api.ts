@@ -1,6 +1,10 @@
-import { ApiPrescription, PrescriptionReminder, ReminderInput } from '@/src/types/prescription';
-import { API_ENDPOINTS } from '@/src/utils/urls';
-import { apiClient } from './client';
+import {
+  ApiPrescription,
+  PrescriptionReminder,
+  ReminderInput,
+} from "@/src/types/prescription";
+import { API_ENDPOINTS } from "@/src/utils/urls";
+import { apiClient } from "./client";
 
 export interface PrescriptionListParams {
   page?: number;
@@ -9,7 +13,7 @@ export interface PrescriptionListParams {
   excludeStatus?: number;
   orderId?: string;
   category?: number;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PrescriptionUploadInput {
@@ -34,23 +38,35 @@ export const prescriptionApi = {
 
   // Richer payload than getById — includes `reminder` (same endpoint the web uses).
   getByOrderNumber: async (orderId: string): Promise<ApiPrescription> => {
-    const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTION_BY_ORDER(orderId));
+    const response = await apiClient.get(
+      API_ENDPOINTS.PRESCRIPTION_BY_ORDER(orderId),
+    );
     return response.data.data;
   },
 
   list: async (params?: PrescriptionListParams): Promise<ApiPrescription[]> => {
-    const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTIONS, { params });
+    const response = await apiClient.get(API_ENDPOINTS.PRESCRIPTIONS, {
+      params,
+    });
     return response.data.data;
   },
 
   dismiss: async (id: string): Promise<ApiPrescription> => {
-    const response = await apiClient.patch(API_ENDPOINTS.PRESCRIPTION_DISMISS(id));
+    const response = await apiClient.patch(
+      API_ENDPOINTS.PRESCRIPTION_DISMISS(id),
+    );
     return response.data.data;
   },
 
   // Sets or updates the "Never Miss a Refill" reminder — recurring frequency or custom date.
-  setReminder: async (id: string, input: ReminderInput): Promise<PrescriptionReminder> => {
-    const response = await apiClient.put(API_ENDPOINTS.PRESCRIPTION_REMINDER(id), input);
+  setReminder: async (
+    id: string,
+    input: ReminderInput,
+  ): Promise<PrescriptionReminder> => {
+    const response = await apiClient.put(
+      API_ENDPOINTS.PRESCRIPTION_REMINDER(id),
+      input,
+    );
     return response.data.data;
   },
 

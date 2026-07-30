@@ -1,10 +1,10 @@
-import { db } from './db';
+import { db } from "./db";
 
 export const apiCache = {
   get<T>(key: string): T | null {
     try {
       const row = db.getFirstSync<{ data: string }>(
-        'SELECT data FROM api_cache WHERE key = ?',
+        "SELECT data FROM api_cache WHERE key = ?",
         [key],
       );
       return row ? (JSON.parse(row.data) as T) : null;
@@ -17,10 +17,12 @@ export const apiCache = {
   getWithMeta<T>(key: string): { data: T; updatedAt: number } | null {
     try {
       const row = db.getFirstSync<{ data: string; updated_at: number }>(
-        'SELECT data, updated_at FROM api_cache WHERE key = ?',
+        "SELECT data, updated_at FROM api_cache WHERE key = ?",
         [key],
       );
-      return row ? { data: JSON.parse(row.data) as T, updatedAt: row.updated_at } : null;
+      return row
+        ? { data: JSON.parse(row.data) as T, updatedAt: row.updated_at }
+        : null;
     } catch {
       return null;
     }
@@ -29,7 +31,7 @@ export const apiCache = {
   set(key: string, data: unknown): void {
     try {
       db.runSync(
-        'INSERT OR REPLACE INTO api_cache (key, data, updated_at) VALUES (?, ?, ?)',
+        "INSERT OR REPLACE INTO api_cache (key, data, updated_at) VALUES (?, ?, ?)",
         [key, JSON.stringify(data), Date.now()],
       );
     } catch {
@@ -39,7 +41,7 @@ export const apiCache = {
 
   remove(key: string): void {
     try {
-      db.runSync('DELETE FROM api_cache WHERE key = ?', [key]);
+      db.runSync("DELETE FROM api_cache WHERE key = ?", [key]);
     } catch {
       // ignore
     }
@@ -49,7 +51,7 @@ export const apiCache = {
    * served to the next user via the offline fallback. */
   clear(): void {
     try {
-      db.runSync('DELETE FROM api_cache');
+      db.runSync("DELETE FROM api_cache");
     } catch {
       // ignore
     }

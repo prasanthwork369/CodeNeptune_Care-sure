@@ -1,4 +1,8 @@
-export { FlyToCartProvider, useFlyToCart, useFlyToCartSafe } from "./FlyToCartContext";
+export {
+  FlyToCartProvider,
+  useFlyToCart,
+  useFlyToCartSafe,
+} from "./FlyToCartContext";
 export { FlyToCartOverlay } from "./FlyToCartOverlay";
 export { SmokeParticle, PARTICLE_CONFIGS } from "./SmokeParticle";
 export { ThumbnailItem } from "./ThumbnailItem";

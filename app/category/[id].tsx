@@ -1,2 +1,2 @@
-import { CategoryProductsLayout } from '@/src/components/categories/products/CategoryProductsLayout';
+import { CategoryProductsLayout } from "@/src/components/categories/products/CategoryProductsLayout";
 export default CategoryProductsLayout;

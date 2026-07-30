@@ -34,9 +34,7 @@ export function redirectSystemPath({
     // /{productType}/{slug}/{id}  ->  /product/{id}
     // Segments are matched loosely but the id is required and passed through
     // encoded, so a crafted slug can't inject extra path segments.
-    const m = pathname.match(
-      /^\/([^/]+)\/([^/]+)\/([^/?#]+)(?:[/?#].*)?$/,
-    );
+    const m = pathname.match(/^\/([^/]+)\/([^/]+)\/([^/?#]+)(?:[/?#].*)?$/);
     if (m && PRODUCT_TYPE_SLUGS.includes(m[1].toLowerCase())) {
       const id = decodeURIComponent(m[3]);
       return `/product/${encodeURIComponent(id)}`;

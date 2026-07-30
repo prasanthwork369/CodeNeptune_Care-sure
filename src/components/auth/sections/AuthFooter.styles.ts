@@ -1,4 +1,9 @@
-import { exactScale, moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
+import {
+  exactScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "@/src/utils/exactScale";
 import { StyleSheet } from "react-native";
 
 // Single knob for the space between link text and its underline.

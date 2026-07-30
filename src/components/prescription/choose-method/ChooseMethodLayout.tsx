@@ -11,10 +11,10 @@ import React, { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
-    CallMethodCard,
-    ChooseMethodFooter,
-    RequiresPrescriptionWarning,
-    UploadMethodCard,
+  CallMethodCard,
+  ChooseMethodFooter,
+  RequiresPrescriptionWarning,
+  UploadMethodCard,
 } from "./sections";
 
 export const ChooseMethodLayout: React.FC = () => {

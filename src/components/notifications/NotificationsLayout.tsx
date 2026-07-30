@@ -278,11 +278,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   };
 
   return (
-    <Touchable
-      activeOpacity={0.7}
-      onPress={onPress}
-      style={s.notifRow}
-    >
+    <Touchable activeOpacity={0.7} onPress={onPress} style={s.notifRow}>
       <View style={s.notifLeading}>
         {!notification.isRead && <View style={s.unreadDot} />}
         <View
@@ -447,10 +443,7 @@ export const NotificationsLayout: React.FC = () => {
   const showError =
     !isLoading && !isEntryLoading && isError && notifications.length === 0;
   const showEmpty =
-    !isLoading &&
-    !isEntryLoading &&
-    !isError &&
-    notifications.length === 0;
+    !isLoading && !isEntryLoading && !isError && notifications.length === 0;
   const shouldShowInitialShimmer =
     (isLoading || isEntryLoading) && notifications.length === 0;
 
@@ -560,7 +553,8 @@ export const NotificationsLayout: React.FC = () => {
                 Clear All
               </Text>
             </Touchable>
-          ) : null}
+          ) : null
+        }
       />
 
       {shouldShowInitialShimmer ? (
@@ -652,9 +646,7 @@ export const NotificationsLayout: React.FC = () => {
               key={section.key}
               style={[s.section, sectionIndex === 0 && s.firstSection]}
             >
-              <Text style={s.sectionHeader}>
-                {section.key}
-              </Text>
+              <Text style={s.sectionHeader}>{section.key}</Text>
               {section.items.map((notification, idx) => (
                 <SwipeableNotificationRow
                   key={notification.id}

@@ -4,8 +4,18 @@ import { Transaction, WalletLog } from "@/src/types/wallet";
 // whole rupees, its own titles, and amber coins. Merging them would change the UI.
 
 const MONTH = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 function formatDate(iso: string): string {
@@ -25,7 +35,8 @@ export function logToTransactions(log: WalletLog): Transaction[] {
   const isCredit = log.type === "credit";
   const walletAmt = Number(log.walletAmount);
   const coinsAmt = Number(log.coinsAmount);
-  const title = log.description ?? TITLE_MAP[log.referenceType] ?? "Transaction";
+  const title =
+    log.description ?? TITLE_MAP[log.referenceType] ?? "Transaction";
   const date = formatDate(log.createdAt);
   const results: Transaction[] = [];
 
@@ -33,7 +44,11 @@ export function logToTransactions(log: WalletLog): Transaction[] {
     results.push({
       id: `${log.id}_wallet`,
       iconType:
-        log.referenceType === "wallet_topup" ? "cash" : isCredit ? "plus" : "bag",
+        log.referenceType === "wallet_topup"
+          ? "cash"
+          : isCredit
+            ? "plus"
+            : "bag",
       title,
       date,
       amount: `${isCredit ? "+" : "-"}₹${walletAmt.toFixed(0)}`,
@@ -53,7 +68,9 @@ export function logToTransactions(log: WalletLog): Transaction[] {
       date,
       amount: `${isCredit || log.referenceType === "signup_bonus" ? "+" : "-"}${coinsAmt}`,
       amountColor:
-        isCredit || log.referenceType === "signup_bonus" ? "#F59E0B" : "#222222",
+        isCredit || log.referenceType === "signup_bonus"
+          ? "#F59E0B"
+          : "#222222",
       isCoin: true,
     });
   }

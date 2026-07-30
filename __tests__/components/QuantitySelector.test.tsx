@@ -1,5 +1,9 @@
 import React from "react";
-import { renderWithProviders, fireEvent, waitFor } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+  waitFor,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { CartItemCounter } from "@/src/components/cart/CartItemCounter";
 
 describe("CartItemCounter Component", () => {

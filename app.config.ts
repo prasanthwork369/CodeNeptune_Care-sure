@@ -3,8 +3,9 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 const appEnv = process.env.EXPO_PUBLIC_APP_ENV ?? "development";
 const rawWebUrl =
   appEnv === "production"
-    ? process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD ?? "https://caresure.com"
-    : process.env.EXPO_PUBLIC_WEB_BASE_URL_QA ?? "https://qa-caresure.codeneptune.com";
+    ? (process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD ?? "https://caresure.com")
+    : (process.env.EXPO_PUBLIC_WEB_BASE_URL_QA ??
+      "https://qa-caresure.codeneptune.com");
 
 let webHost = "qa-caresure.codeneptune.com";
 try {
@@ -49,10 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     // Only what the app actually needs. CAMERA covers capture, the prescription
     // scanner, and avatars; location powers nearby pharmacies + delivery.
-    permissions: [
-      "android.permission.INTERNET",
-      "android.permission.CAMERA",
-    ],
+    permissions: ["android.permission.INTERNET", "android.permission.CAMERA"],
     // Strip broad permissions that libraries (e.g. expo-image-picker) inject but
     // we don't need: the photo/PDF pickers use the system Photo Picker / Storage
     // Access Framework (no media-read permission), and SYSTEM_ALERT_WINDOW is unused.

@@ -7,5 +7,5 @@ export const MEDICINES = [
   "Azithromycin",
   "Amoxicillin",
   "Cetirizine",
-  "Pantoprazole", 
+  "Pantoprazole",
 ];

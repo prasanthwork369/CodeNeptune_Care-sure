@@ -6,11 +6,11 @@ import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import {
-    PaymentAddressCard,
-    PaymentFooter,
-    PaymentHeader,
-    PaymentMethodsList,
-    PaymentTotalBanner,
+  PaymentAddressCard,
+  PaymentFooter,
+  PaymentHeader,
+  PaymentMethodsList,
+  PaymentTotalBanner,
 } from "./sections";
 
 const PAYMENT_METHODS = [

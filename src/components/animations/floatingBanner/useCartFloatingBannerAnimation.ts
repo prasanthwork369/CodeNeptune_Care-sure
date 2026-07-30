@@ -53,7 +53,8 @@ export const useCartFloatingBannerAnimation = ({
   }, [isUploadButtonCollapsed]);
 
   useEffect(() => {
-    const isBannerVisible = visible !== undefined ? (visible && totalItems > 0) : (totalItems > 0);
+    const isBannerVisible =
+      visible !== undefined ? visible && totalItems > 0 : totalItems > 0;
     if (isBannerVisible) {
       opacity.value = withTiming(1, { duration: 220, easing: EASE_IN_OUT });
       translateX.value = 0;
@@ -70,7 +71,10 @@ export const useCartFloatingBannerAnimation = ({
         stiffness: 110,
         mass: 0.6,
       });
-      opacity.value = withTiming(0, { duration: DURATION, easing: EASE_IN_OUT });
+      opacity.value = withTiming(0, {
+        duration: DURATION,
+        easing: EASE_IN_OUT,
+      });
     }
   }, [totalItems, visible, onInteractionChange]);
 
@@ -104,14 +108,14 @@ export const useCartFloatingBannerAnimation = ({
     const collapsedPaddingRight = interpolate(
       uploadCollapsedAnim.value,
       [0, 1],
-      [exact127, exact77]
+      [exact127, exact77],
     );
     return {
       paddingLeft: exact12,
       paddingRight: interpolate(
         tabBarAnim.value,
         [0, 1],
-        [collapsedPaddingRight, exact12]
+        [collapsedPaddingRight, exact12],
       ),
       transform: [{ translateY: slideY.value }],
       opacity: opacity.value,

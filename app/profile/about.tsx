@@ -25,9 +25,12 @@ export default function AboutAppScreen() {
         </Text>
 
         <View className="items-center mt-4 gap-y-1">
-          <Text className="font-inter-bold text-[#637381] text-xs">App Version</Text>
+          <Text className="font-inter-bold text-[#637381] text-xs">
+            App Version
+          </Text>
           <Text className="font-inter-semibold text-[#212B36] text-sm">
-            v{Application.nativeApplicationVersion ?? "—"} ({Application.nativeBuildVersion ?? "—"})
+            v{Application.nativeApplicationVersion ?? "—"} (
+            {Application.nativeBuildVersion ?? "—"})
           </Text>
         </View>
 

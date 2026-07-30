@@ -21,42 +21,43 @@ const RemoteIcon: React.FC<{ uri: string }> = ({ uri }) => {
   return <Image source={{ uri }} style={s.icon} contentFit="contain" />;
 };
 
-export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = React.memo(({
-  promise,
-  isLoading,
-  showTitle = true,
-}) => {
-  if (isLoading || !promise) return null;
+export const WhyFamiliesTrustUs: React.FC<WhyFamiliesTrustUsProps> = React.memo(
+  ({ promise, isLoading, showTitle = true }) => {
+    if (isLoading || !promise) return null;
 
-  return (
-    <View>
-      {showTitle && (
-        <View className="flex-row items-center px-5 mb-4 mt-2">
-          <Text style={s.title} className="ml-1 mr-4 ">
-            {promise.title}
-          </Text>
-          <LinearGradient
-            colors={["#B2E8FF", "#FFFFFF"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ height: exactScale(5), width: exactScale(170), marginTop: exactScale(4),borderRadius: exactScale(2) }}
-
-          />
-        </View>
-      )}
-
-
-      <View className="flex-row justify-around px-4 mt-1">
-        {promise.items.map((item, idx) => (
-          <View key={idx} className="items-center">
-            <View className="mb-3" style={s.iconContainer}>
-              <RemoteIcon uri={item.iconUrl} />
-            </View>
-            <Text style={s.itemLabel}>{item.label}</Text>
+    return (
+      <View>
+        {showTitle && (
+          <View className="flex-row items-center px-5 mb-4 mt-2">
+            <Text style={s.title} className="ml-1 mr-4 ">
+              {promise.title}
+            </Text>
+            <LinearGradient
+              colors={["#B2E8FF", "#FFFFFF"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                height: exactScale(5),
+                width: exactScale(170),
+                marginTop: exactScale(4),
+                borderRadius: exactScale(2),
+              }}
+            />
           </View>
-        ))}
+        )}
+
+        <View className="flex-row justify-around px-4 mt-1">
+          {promise.items.map((item, idx) => (
+            <View key={idx} className="items-center">
+              <View className="mb-3" style={s.iconContainer}>
+                <RemoteIcon uri={item.iconUrl} />
+              </View>
+              <Text style={s.itemLabel}>{item.label}</Text>
+            </View>
+          ))}
+        </View>
       </View>
-    </View>
-  );
-});
-WhyFamiliesTrustUs.displayName = 'WhyFamiliesTrustUs';
+    );
+  },
+);
+WhyFamiliesTrustUs.displayName = "WhyFamiliesTrustUs";

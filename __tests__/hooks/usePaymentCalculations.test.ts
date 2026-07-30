@@ -156,7 +156,10 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
   });
 
   it("places order successfully and clears checkout, coupon, and rx stores", async () => {
-    mockCreateOrder.mockResolvedValueOnce({ id: "ord-100", estimatedDelivery: "Tomorrow" });
+    mockCreateOrder.mockResolvedValueOnce({
+      id: "ord-100",
+      estimatedDelivery: "Tomorrow",
+    });
 
     const { result } = renderHook(() => usePaymentCalculations());
 
@@ -176,7 +179,9 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     expect(mockCreateOrder).toHaveBeenCalledWith(
       expect.objectContaining({
         total: "200.00",
-        metadata: expect.objectContaining({ idempotencyKey: expect.any(String) }),
+        metadata: expect.objectContaining({
+          idempotencyKey: expect.any(String),
+        }),
       }),
       expect.any(String),
     );
@@ -258,7 +263,9 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
   });
 
   it("retains checkout state and does not navigate when createOrder fails with 500 error", async () => {
-    mockCreateOrder.mockRejectedValueOnce(new Error("Internal Server Error 500"));
+    mockCreateOrder.mockRejectedValueOnce(
+      new Error("Internal Server Error 500"),
+    );
     const spyAlert = jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
     const { result } = renderHook(() => usePaymentCalculations());
@@ -274,4 +281,3 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     spyAlert.mockRestore();
   });
 });
-

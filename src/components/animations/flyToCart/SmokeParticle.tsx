@@ -12,12 +12,12 @@ import Animated, {
 export const PARTICLE_CONFIGS = [
   { dx: -22, dy: -10, size: 10, delay: 0 },
   { dx: -12, dy: -22, size: 13, delay: 40 },
-  { dx: 10,  dy: -24, size: 9,  delay: 20 },
-  { dx: 22,  dy: -12, size: 14, delay: 60 },
-  { dx: 20,  dy: 10,  size: 10, delay: 10 },
-  { dx: 8,   dy: 22,  size: 12, delay: 50 },
-  { dx: -10, dy: 20,  size: 8,  delay: 30 },
-  { dx: -24, dy: 8,   size: 13, delay: 70 },
+  { dx: 10, dy: -24, size: 9, delay: 20 },
+  { dx: 22, dy: -12, size: 14, delay: 60 },
+  { dx: 20, dy: 10, size: 10, delay: 10 },
+  { dx: 8, dy: 22, size: 12, delay: 50 },
+  { dx: -10, dy: 20, size: 8, delay: 30 },
+  { dx: -24, dy: 8, size: 13, delay: 70 },
 ];
 
 interface SmokeParticleProps {
@@ -49,7 +49,7 @@ export const SmokeParticle: React.FC<SmokeParticleProps> = ({
     if (startTrigger) {
       progress.value = withDelay(
         delay,
-        withTiming(1, { duration, easing: Easing.out(Easing.quad) })
+        withTiming(1, { duration, easing: Easing.out(Easing.quad) }),
       );
     } else {
       progress.value = 0;
@@ -59,8 +59,18 @@ export const SmokeParticle: React.FC<SmokeParticleProps> = ({
   const style = useAnimatedStyle(() => {
     const translateX = progress.value * dx;
     const translateY = progress.value * dy - progress.value * upwardDrift;
-    const scale = interpolate(progress.value, [0, 0.3, 1], [0.2, 1.2, 0.4], Extrapolation.CLAMP);
-    const opacity = interpolate(progress.value, [0, 0.7, 1], [0, 0.9, 0], Extrapolation.CLAMP);
+    const scale = interpolate(
+      progress.value,
+      [0, 0.3, 1],
+      [0.2, 1.2, 0.4],
+      Extrapolation.CLAMP,
+    );
+    const opacity = interpolate(
+      progress.value,
+      [0, 0.7, 1],
+      [0, 0.9, 0],
+      Extrapolation.CLAMP,
+    );
 
     return {
       position: "absolute",
@@ -70,11 +80,7 @@ export const SmokeParticle: React.FC<SmokeParticleProps> = ({
       backgroundColor: color,
       top: 18 - size / 2,
       left: 18 - size / 2,
-      transform: [
-        { translateX },
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateX }, { translateY }, { scale }],
       opacity,
       zIndex,
     };

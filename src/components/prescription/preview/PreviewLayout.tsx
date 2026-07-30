@@ -12,24 +12,24 @@ import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { PrescriptionItem } from "@/src/types/prescription";
+import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
 import {
-    MAX_FILES,
-    validatePrescriptionFile,
-} from "@/src/utils/prescription";
-import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
+  usePrescriptionUploadService,
+  CapturedAsset,
+} from "@/src/features/prescription-scanner";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, Alert, View, useWindowDimensions } from "react-native";
 import {
-    DuplicateFileModal,
-    FileTooLargeModal,
-    InfoModal,
-    PendingPrescriptionModal,
-    PreviewDisplay,
-    PreviewSuccessModal,
-    PreviewThumbnails,
-    RemoveConfirmModal,
+  DuplicateFileModal,
+  FileTooLargeModal,
+  InfoModal,
+  PendingPrescriptionModal,
+  PreviewDisplay,
+  PreviewSuccessModal,
+  PreviewThumbnails,
+  RemoveConfirmModal,
 } from "./sections";
 
 const FOLDER = "customers/prescriptions";

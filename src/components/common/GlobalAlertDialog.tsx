@@ -1,6 +1,6 @@
-import React from 'react';
-import { useUIStore } from '@/src/store/uiStore';
-import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
+import React from "react";
+import { useUIStore } from "@/src/store/uiStore";
+import { ConfirmModal } from "@/src/components/ui/ConfirmModal";
 
 export const GlobalAlertDialog = () => {
   const globalAlert = useUIStore((s) => s.globalAlert);

@@ -1,4 +1,4 @@
 export const PRESCRIPTION_CATEGORY = {
-    PRESCRIPTION_ORDER: 1,
-    ORDER: 2,
+  PRESCRIPTION_ORDER: 1,
+  ORDER: 2,
 } as const;

@@ -14,7 +14,9 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   onAddItem,
 }) => {
   const router = useNav();
-  const [addingProductId, setAddingProductId] = React.useState<string | null>(null);
+  const [addingProductId, setAddingProductId] = React.useState<string | null>(
+    null,
+  );
 
   const handleAdd = async (product: any) => {
     setAddingProductId(product.id);

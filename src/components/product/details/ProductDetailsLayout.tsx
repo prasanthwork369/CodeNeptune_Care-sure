@@ -237,7 +237,7 @@ export const ProductDetailsLayout: React.FC = () => {
 
               <MoreAboutSection
                 medicineName={medicineName}
-                mobileAdditionalData={raw?.mobileAdditionalData}
+                additionalData={raw?.additionalData}
               />
             </ScrollView>
           )}

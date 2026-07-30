@@ -6,8 +6,7 @@ export default function StackLayout() {
   const segments = useSegments() as string[];
   const currentRoute = segments[1];
 
-  const isGuestAllowed =
-    currentRoute === "cart" || currentRoute === "coupons";
+  const isGuestAllowed = currentRoute === "cart" || currentRoute === "coupons";
 
   if (!isAuthenticated && !isGuestAllowed) {
     return <Redirect href="/(auth)/login" />;

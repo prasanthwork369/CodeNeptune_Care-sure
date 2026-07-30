@@ -3,7 +3,10 @@ import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { validatePrescriptionFile } from "@/src/utils/prescription";
-import { usePrescriptionUploadService, CapturedAsset } from "@/src/features/prescription-scanner";
+import {
+  usePrescriptionUploadService,
+  CapturedAsset,
+} from "@/src/features/prescription-scanner";
 
 export function usePrescriptionPicker(
   onClose: () => void,

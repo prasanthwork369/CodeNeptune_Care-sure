@@ -101,13 +101,22 @@ export const ValidPrescriptionInfo: React.FC = () => {
         <>
           {/* Values come from the backend. The centralized hook supplies the
               safe offline fallback only when that request has actually failed. */}
-          <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+          <Text
+            style={s.footerNote}
+            className="font-inter text-brand-subtext mb-1"
+          >
             File size should be less than {maxSizeLabel}
           </Text>
-          <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+          <Text
+            style={s.footerNote}
+            className="font-inter text-brand-subtext mb-1"
+          >
             Supported formats: PDF, JPG, JPEG, PNG
           </Text>
-          <Text style={s.footerNote} className="font-inter text-brand-subtext mb-1">
+          <Text
+            style={s.footerNote}
+            className="font-inter text-brand-subtext mb-1"
+          >
             Prescription should be less than {validityLabel} old
           </Text>
         </>

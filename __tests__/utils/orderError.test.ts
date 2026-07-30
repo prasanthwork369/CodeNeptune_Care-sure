@@ -20,8 +20,12 @@ describe("orderErrorMessage — Checkout Error Sanitization", () => {
     const err401 = new AppError("unauthorized", "Unauthorized");
     const err403 = new AppError("forbidden", "Forbidden");
 
-    expect(orderErrorMessage(err401)).toBe("Your session has expired. Please log in and try again.");
-    expect(orderErrorMessage(err403)).toBe("Your session has expired. Please log in and try again.");
+    expect(orderErrorMessage(err401)).toBe(
+      "Your session has expired. Please log in and try again.",
+    );
+    expect(orderErrorMessage(err403)).toBe(
+      "Your session has expired. Please log in and try again.",
+    );
   });
 
   it("returns cart item availability warning for validation or not_found errors", () => {

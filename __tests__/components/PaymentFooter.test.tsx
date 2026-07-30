@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { PaymentFooter } from "@/src/components/payment/sections/PaymentFooter";
 
 jest.mock("@/assets/icons/arrow_forward_ios_white.svg", () => () => null);
@@ -18,7 +21,7 @@ describe("PaymentFooter Component", () => {
         loading={false}
         hasAddress={true}
         safeAreaBottom={20}
-      />
+      />,
     );
 
     expect(getByText("Confirm Order")).toBeTruthy();
@@ -31,7 +34,7 @@ describe("PaymentFooter Component", () => {
         loading={false}
         hasAddress={false}
         safeAreaBottom={0}
-      />
+      />,
     );
 
     expect(getByText("Set Delivery Address")).toBeTruthy();
@@ -44,7 +47,7 @@ describe("PaymentFooter Component", () => {
         loading={false}
         hasAddress={true}
         safeAreaBottom={0}
-      />
+      />,
     );
 
     fireEvent.press(getByText("Confirm Order"));
@@ -58,7 +61,7 @@ describe("PaymentFooter Component", () => {
         loading={true}
         hasAddress={true}
         safeAreaBottom={0}
-      />
+      />,
     );
 
     expect(queryByText("Confirm Order")).toBeNull();

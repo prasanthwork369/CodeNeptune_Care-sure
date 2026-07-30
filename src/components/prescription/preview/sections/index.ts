@@ -1,8 +1,8 @@
-export { PreviewDisplay } from './PreviewDisplay';
-export { PreviewThumbnails } from './PreviewThumbnails';
-export { PreviewSuccessModal } from './PreviewSuccessModal';
-export { InfoModal } from './InfoModal';
-export { RemoveConfirmModal } from './RemoveConfirmModal';
-export { DuplicateFileModal } from './DuplicateFileModal';
-export { FileTooLargeModal } from './FileTooLargeModal';
-export { PendingPrescriptionModal } from './PendingPrescriptionModal';
+export { PreviewDisplay } from "./PreviewDisplay";
+export { PreviewThumbnails } from "./PreviewThumbnails";
+export { PreviewSuccessModal } from "./PreviewSuccessModal";
+export { InfoModal } from "./InfoModal";
+export { RemoveConfirmModal } from "./RemoveConfirmModal";
+export { DuplicateFileModal } from "./DuplicateFileModal";
+export { FileTooLargeModal } from "./FileTooLargeModal";
+export { PendingPrescriptionModal } from "./PendingPrescriptionModal";

@@ -1,2 +1,2 @@
-import { NotificationSettingsLayout } from '@/src/components/profile/support/NotificationSettingsLayout';
+import { NotificationSettingsLayout } from "@/src/components/profile/support/NotificationSettingsLayout";
 export default NotificationSettingsLayout;

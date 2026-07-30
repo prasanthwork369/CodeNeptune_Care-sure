@@ -9,10 +9,13 @@
  *     └─> ScanResult
  */
 
-export type { ScanResult } from './types';
-export { ScannerService } from './scanner.service';
+export type { ScanResult } from "./types";
+export { ScannerService } from "./scanner.service";
 
 // ─── Unified upload service hook ──────────────────────────────────────────────
 
-export { usePrescriptionUploadService } from './usePrescriptionUploadService';
-export type { UsePrescriptionUploadServiceOptions, CapturedAsset } from './usePrescriptionUploadService';
+export { usePrescriptionUploadService } from "./usePrescriptionUploadService";
+export type {
+  UsePrescriptionUploadServiceOptions,
+  CapturedAsset,
+} from "./usePrescriptionUploadService";

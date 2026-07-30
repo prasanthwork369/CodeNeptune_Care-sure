@@ -17,7 +17,12 @@ export const OfferBadge = memo(function OfferBadge({
   style,
 }: OfferBadgeProps) {
   return (
-    <View style={[{ position: "relative", overflow: "hidden", borderRadius }, style]}>
+    <View
+      style={[
+        { position: "relative", overflow: "hidden", borderRadius },
+        style,
+      ]}
+    >
       {children}
       <OfferShine borderRadius={borderRadius} enabled={enabled} />
     </View>

@@ -114,7 +114,10 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
                   paddingHorizontal: 3,
                 }}
               >
-                <Text className="font-inter-bold text-white leading-none" style={{ fontSize: moderateScale(10) }}>
+                <Text
+                  className="font-inter-bold text-white leading-none"
+                  style={{ fontSize: moderateScale(10) }}
+                >
                   {cartCount}
                 </Text>
               </View>

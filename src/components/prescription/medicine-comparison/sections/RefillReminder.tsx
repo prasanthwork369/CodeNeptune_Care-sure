@@ -37,7 +37,11 @@ export const RefillReminder: React.FC<RefillReminderProps> = ({
       />
       <View style={{ flex: 1, marginLeft: 12 }}>
         <Text
-          style={{ fontSize: moderateScale(14), fontWeight: "700", color: "#111827" }}
+          style={{
+            fontSize: moderateScale(14),
+            fontWeight: "700",
+            color: "#111827",
+          }}
         >
           Refill Reminder
         </Text>

@@ -1,6 +1,6 @@
-import * as SQLite from 'expo-sqlite';
+import * as SQLite from "expo-sqlite";
 
-export const db = SQLite.openDatabaseSync('caresure.db');
+export const db = SQLite.openDatabaseSync("caresure.db");
 
 export const initDb = () => {
   db.execSync(`

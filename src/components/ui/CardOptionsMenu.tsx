@@ -39,7 +39,10 @@ const defaultBackdropStyle: ViewStyle = {
 };
 
 const MenuContent: React.FC<
-  Pick<CardOptionsMenuProps, "items" | "onClose" | "popoverStyle" | "backdropStyle">
+  Pick<
+    CardOptionsMenuProps,
+    "items" | "onClose" | "popoverStyle" | "backdropStyle"
+  >
 > = ({ items, onClose, popoverStyle, backdropStyle }) => (
   <>
     <Touchable

@@ -24,7 +24,7 @@ export function useNav() {
       if (!navigation.isFocused()) return;
       router.push(...args);
     },
-    [router, navigation]
+    [router, navigation],
   );
 
   const replace = useCallback(
@@ -32,7 +32,7 @@ export function useNav() {
       if (!navigation.isFocused()) return;
       router.replace(...args);
     },
-    [router, navigation]
+    [router, navigation],
   );
 
   const canGoBack = useCallback(() => router.canGoBack(), [router]);

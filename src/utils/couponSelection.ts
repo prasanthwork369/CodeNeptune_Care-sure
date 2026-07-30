@@ -41,7 +41,9 @@ export const selectCartCoupon = (
   // Codes the backend already rejected (usage limit reached, expired) must never be recommended.
   unavailableCodes?: ReadonlySet<string>,
 ): CartCouponPick | null => {
-  const usable = coupons.filter((c) => !isRejected(c, subtotal, unavailableCodes));
+  const usable = coupons.filter(
+    (c) => !isRejected(c, subtotal, unavailableCodes),
+  );
 
   if (usable.length === 0) return null;
 

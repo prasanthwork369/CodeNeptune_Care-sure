@@ -26,7 +26,14 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
 }) => {
   if (loading) {
     return (
-      <View style={{ width, paddingHorizontal: exactScale(16), paddingTop: exactScale(16), gap: exactScale(12) }}>
+      <View
+        style={{
+          width,
+          paddingHorizontal: exactScale(16),
+          paddingTop: exactScale(16),
+          gap: exactScale(12),
+        }}
+      >
         <ShimmerBlock height={exactScale(74)} borderRadius={8} />
         <ShimmerBlock height={exactScale(74)} borderRadius={8} />
         <ShimmerBlock height={exactScale(74)} borderRadius={8} />
@@ -69,11 +76,7 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
         scrollEventThrottle={200}
       >
         {transactions.map((tx, idx) => (
-          <TxRow
-            key={tx.id}
-            tx={tx}
-            isLast={idx === transactions.length - 1}
-          />
+          <TxRow key={tx.id} tx={tx} isLast={idx === transactions.length - 1} />
         ))}
         {isFetchingNextPage && (
           <ActivityIndicator

@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import { perfService } from "./perfService";
-import { TraceAttributes, TraceMetrics, UsePerformanceTraceOptions } from "./types";
+import {
+  TraceAttributes,
+  TraceMetrics,
+  UsePerformanceTraceOptions,
+} from "./types";
 
 // Screen loads should finish in seconds; anything longer is a missed stop, not
 // a slow load. The cap keeps such samples from inflating the Firebase average.
@@ -28,26 +32,36 @@ export function usePerformanceTrace({
 }: UsePerformanceTraceOptions) {
   const hasStartedRef = useRef(false);
 
-  const start = useCallback((startAttributes?: TraceAttributes, startMetrics?: TraceMetrics) => {
-    if (!hasStartedRef.current) {
-      hasStartedRef.current = true;
-      perfService.startTrace(
-        traceName,
-        startAttributes ?? attributes,
-        startMetrics ?? metrics,
-        maxDurationMs,
-      );
-    }
-  }, [traceName, attributes, metrics, maxDurationMs]);
+  const start = useCallback(
+    (startAttributes?: TraceAttributes, startMetrics?: TraceMetrics) => {
+      if (!hasStartedRef.current) {
+        hasStartedRef.current = true;
+        perfService.startTrace(
+          traceName,
+          startAttributes ?? attributes,
+          startMetrics ?? metrics,
+          maxDurationMs,
+        );
+      }
+    },
+    [traceName, attributes, metrics, maxDurationMs],
+  );
 
   const stop = useCallback(
-    (additionalAttributes?: typeof attributes, additionalMetrics?: typeof metrics) => {
+    (
+      additionalAttributes?: typeof attributes,
+      additionalMetrics?: typeof metrics,
+    ) => {
       if (hasStartedRef.current || perfService.isTraceActive(traceName)) {
-        perfService.stopTrace(traceName, additionalAttributes, additionalMetrics);
+        perfService.stopTrace(
+          traceName,
+          additionalAttributes,
+          additionalMetrics,
+        );
         hasStartedRef.current = false;
       }
     },
-    [traceName]
+    [traceName],
   );
 
   // Auto-start on mount unless manualStart is requested. Skip when the screen is
@@ -68,7 +82,10 @@ export function usePerformanceTrace({
 
   // Auto-stop when isLoading transitions to false
   useEffect(() => {
-    if (isLoading === false && (hasStartedRef.current || perfService.isTraceActive(traceName))) {
+    if (
+      isLoading === false &&
+      (hasStartedRef.current || perfService.isTraceActive(traceName))
+    ) {
       stop();
     }
   }, [isLoading, stop, traceName]);
@@ -77,7 +94,10 @@ export function usePerformanceTrace({
   // can be filtered out) when the app leaves the foreground.
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
-      if (state !== "active" && (hasStartedRef.current || perfService.isTraceActive(traceName))) {
+      if (
+        state !== "active" &&
+        (hasStartedRef.current || perfService.isTraceActive(traceName))
+      ) {
         stop({ backgrounded: "true" });
       }
     });

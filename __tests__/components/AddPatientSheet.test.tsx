@@ -9,9 +9,7 @@ jest.mock("@/src/components/ui/GorhomBottomSheet", () => {
   const ReactModule = jest.requireActual("react");
   const { View: NativeView } = jest.requireActual("react-native");
   const MockGorhomBottomSheet = ({ isVisible, children }: any) =>
-    isVisible
-      ? ReactModule.createElement(NativeView, null, children)
-      : null;
+    isVisible ? ReactModule.createElement(NativeView, null, children) : null;
 
   MockGorhomBottomSheet.displayName = "MockGorhomBottomSheet";
 
@@ -20,10 +18,8 @@ jest.mock("@/src/components/ui/GorhomBottomSheet", () => {
 
 jest.mock("@gorhom/bottom-sheet", () => {
   const ReactModule = jest.requireActual("react");
-  const {
-    ScrollView: NativeScrollView,
-    TextInput: NativeTextInput,
-  } = jest.requireActual("react-native");
+  const { ScrollView: NativeScrollView, TextInput: NativeTextInput } =
+    jest.requireActual("react-native");
 
   const MockBottomSheetScrollView = ReactModule.forwardRef(
     (props: Record<string, unknown>, ref: React.Ref<unknown>) =>

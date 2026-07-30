@@ -3,7 +3,7 @@ module.exports = {
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
     "./src/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}"
+    "./components/**/*.{js,jsx,ts,tsx}",
   ],
   presets: [require("nativewind/preset")],
   theme: {
@@ -63,8 +63,8 @@ module.exports = {
         "body-lg": ["17px", { lineHeight: "24px" }],
         body: ["15px", { lineHeight: "22px" }],
         "body-sm": ["13px", { lineHeight: "20px" }],
-      // Removed custom fontFamily configurations. 
-      // The app now uses the default system fonts (SF Pro on iOS, Roboto on Android).
+        // Removed custom fontFamily configurations.
+        // The app now uses the default system fonts (SF Pro on iOS, Roboto on Android).
       },
       fontWeight: {
         "inter-thin": "100",

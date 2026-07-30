@@ -1,4 +1,7 @@
-const { withAndroidColors, withAndroidColorsNight } = require("@expo/config-plugins");
+const {
+  withAndroidColors,
+  withAndroidColorsNight,
+} = require("@expo/config-plugins");
 
 /**
  * expo-image-picker's crop screen renders its "CROP" action invisible in light

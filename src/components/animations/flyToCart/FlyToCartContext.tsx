@@ -1,5 +1,11 @@
 import { useCart } from "@/src/hooks/queries/useCart";
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import { Dimensions } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import Animated, {
@@ -32,7 +38,12 @@ interface FlyToCartContextType {
   destinationCoords: { x: number; y: number };
   setDestinationCoords: (coords: { x: number; y: number }) => void;
   activeAnimations: ActiveAnimation[];
-  flyToCart: (sourceX: number, sourceY: number, imageUrl: any, productId: string) => void;
+  flyToCart: (
+    sourceX: number,
+    sourceY: number,
+    imageUrl: any,
+    productId: string,
+  ) => void;
   handleComplete: (id: string, imageUrl: any, productId: string) => void;
   bounceSharedValue: SharedValue<number>;
   widthExpansion: SharedValue<number>;
@@ -61,11 +72,15 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     x: number;
     y: number;
   }>(defaultCoords);
-  
-  const [activeAnimations, setActiveAnimations] = useState<ActiveAnimation[]>([]);
+
+  const [activeAnimations, setActiveAnimations] = useState<ActiveAnimation[]>(
+    [],
+  );
   const [visualCartCount, setVisualCartCount] = useState(0);
-  const [visualCartImages, setVisualCartImages] = useState<VisualCartImage[]>([]);
-  
+  const [visualCartImages, setVisualCartImages] = useState<VisualCartImage[]>(
+    [],
+  );
+
   const bounceSharedValue = useSharedValue(1);
   const widthExpansion = useSharedValue(0);
 
@@ -85,7 +100,9 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     const removedIds = prevIds.filter((id) => !currentIds.includes(id));
 
     if (removedIds.length > 0) {
-      const removedVisualIndex = visualCartImages.findIndex((img) => removedIds.includes(img.id));
+      const removedVisualIndex = visualCartImages.findIndex((img) =>
+        removedIds.includes(img.id),
+      );
       let targetIdToAnimate = "";
       let animateBehind = false;
 
@@ -107,11 +124,12 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           isCollapsingRef.current = true;
           if (timeoutRef.current) clearTimeout(timeoutRef.current);
           timeoutRef.current = setTimeout(() => {
-            setVisualCartCount((prev) => prev === 0 ? prev : 0);
+            setVisualCartCount((prev) => (prev === 0 ? prev : 0));
 
-            if (imageClearTimeoutRef.current) clearTimeout(imageClearTimeoutRef.current);
+            if (imageClearTimeoutRef.current)
+              clearTimeout(imageClearTimeoutRef.current);
             imageClearTimeoutRef.current = setTimeout(() => {
-              setVisualCartImages((prev) => prev.length === 0 ? prev : []);
+              setVisualCartImages((prev) => (prev.length === 0 ? prev : []));
               isCollapsingRef.current = false; // unlock after images cleared
               imageClearTimeoutRef.current = null;
             }, 720); // matches banner collapse duration
@@ -121,27 +139,36 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           prevItemsRef.current = items;
           return;
         } else {
-        // Mark the target item in state to play removal animation
-        setVisualCartImages((prev) => {
-          const next = prev.map((img) =>
-            img.id === targetIdToAnimate
-              ? { ...img, isRemoving: !animateBehind, isBehindRemoving: animateBehind }
-              : img
+          // Mark the target item in state to play removal animation
+          setVisualCartImages((prev) => {
+            const next = prev.map((img) =>
+              img.id === targetIdToAnimate
+                ? {
+                    ...img,
+                    isRemoving: !animateBehind,
+                    isBehindRemoving: animateBehind,
+                  }
+                : img,
+            );
+            const isChanged = next.some(
+              (img, idx) =>
+                img.isRemoving !== prev[idx].isRemoving ||
+                img.isBehindRemoving !== prev[idx].isBehindRemoving,
+            );
+            return isChanged ? next : prev;
+          });
+          setVisualCartCount((prev) =>
+            prev === totalItems ? prev : totalItems,
           );
-          const isChanged = next.some((img, idx) =>
-            img.isRemoving !== prev[idx].isRemoving ||
-            img.isBehindRemoving !== prev[idx].isBehindRemoving
-          );
-          return isChanged ? next : prev;
-        });
-          setVisualCartCount((prev) => prev === totalItems ? prev : totalItems);
           if (timeoutRef.current) clearTimeout(timeoutRef.current);
           timeoutRef.current = setTimeout(() => {
             setVisualCartImages((prev) => {
               const next = prev
                 .filter((img) => img.id !== targetIdToAnimate || animateBehind)
                 .map((img) =>
-                  img.id === targetIdToAnimate ? { ...img, isBehindRemoving: false } : img
+                  img.id === targetIdToAnimate
+                    ? { ...img, isBehindRemoving: false }
+                    : img,
                 );
               return next;
             });
@@ -154,7 +181,9 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // 2. Skip normal sync if any item is currently in the middle of being removed/animated
-    const isCurrentlyRemoving = visualCartImages.some((img) => img.isRemoving || img.isBehindRemoving);
+    const isCurrentlyRemoving = visualCartImages.some(
+      (img) => img.isRemoving || img.isBehindRemoving,
+    );
     if (isCurrentlyRemoving) {
       prevItemsRef.current = items;
       return;
@@ -163,45 +192,62 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     // 3. Normal sync logic (when no active animations are running)
     if (activeAnimations.length === 0) {
       if (totalItems > 0) {
-        const isWithinLockout = (Date.now() - lastAddTimestamp.current) < 2000;
-        const shouldSync = (totalItems >= visualCartCount) || (!hasJustAdded.current && !isWithinLockout);
+        const isWithinLockout = Date.now() - lastAddTimestamp.current < 2000;
+        const shouldSync =
+          totalItems >= visualCartCount ||
+          (!hasJustAdded.current && !isWithinLockout);
 
         if (shouldSync) {
           hasJustAdded.current = false;
-          setVisualCartCount((prev) => prev === totalItems ? prev : totalItems);
-          const cartItemsWithImage = items.filter((item) => item.image ?? item.metadata?.image);
-          const newImages: VisualCartImage[] = cartItemsWithImage.map((i) => ({
-            id: i.medicineId,
-            image: i.image ?? i.metadata?.image,
-            isPending: false,
-          })).slice(-3);
+          setVisualCartCount((prev) =>
+            prev === totalItems ? prev : totalItems,
+          );
+          const cartItemsWithImage = items.filter(
+            (item) => item.image ?? item.metadata?.image,
+          );
+          const newImages: VisualCartImage[] = cartItemsWithImage
+            .map((i) => ({
+              id: i.medicineId,
+              image: i.image ?? i.metadata?.image,
+              isPending: false,
+            }))
+            .slice(-3);
 
           setVisualCartImages((prev) => {
-            const isIdentical = prev.length === newImages.length &&
-              prev.every((img, idx) => 
-                img.id === newImages[idx].id && 
-                img.image === newImages[idx].image && 
-                img.isPending === newImages[idx].isPending &&
-                img.isRemoving === newImages[idx].isRemoving
+            const isIdentical =
+              prev.length === newImages.length &&
+              prev.every(
+                (img, idx) =>
+                  img.id === newImages[idx].id &&
+                  img.image === newImages[idx].image &&
+                  img.isPending === newImages[idx].isPending &&
+                  img.isRemoving === newImages[idx].isRemoving,
               );
             return isIdentical ? prev : newImages;
           });
         }
       } else if (!hasJustAdded.current && !isCollapsingRef.current) {
         // Guard: don't wipe images while the banner collapse animation is running
-        setVisualCartCount((prev) => prev === 0 ? prev : 0);
-        setVisualCartImages((prev) => prev.length === 0 ? prev : []);
+        setVisualCartCount((prev) => (prev === 0 ? prev : 0));
+        setVisualCartImages((prev) => (prev.length === 0 ? prev : []));
       }
     }
 
     prevItemsRef.current = items;
-  }, [totalItems, items, activeAnimations.length, visualCartImages, visualCartCount]);
+  }, [
+    totalItems,
+    items,
+    activeAnimations.length,
+    visualCartImages,
+    visualCartCount,
+  ]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (imageClearTimeoutRef.current) clearTimeout(imageClearTimeoutRef.current);
+      if (imageClearTimeoutRef.current)
+        clearTimeout(imageClearTimeoutRef.current);
     };
   }, []);
 
@@ -245,7 +291,10 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
         const visualId = productId;
         setVisualCartImages((prev) => {
           const filtered = prev.filter((item) => item.id !== visualId);
-          return [...filtered, { id: visualId, image: imageUrl, isPending: !isFirstItem }].slice(-3);
+          return [
+            ...filtered,
+            { id: visualId, image: imageUrl, isPending: !isFirstItem },
+          ].slice(-3);
         });
       }
     },
@@ -259,26 +308,29 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   const triggerWidthExpansion = useCallback(() => {
     widthExpansion.value = withSequence(
       withTiming(18, { duration: 160 }),
-      withSpring(0,  { damping: 14, stiffness: 220 }),
+      withSpring(0, { damping: 14, stiffness: 220 }),
     );
   }, [widthExpansion]);
 
-  const handleComplete = useCallback((id: string, imageUrl: any, productId: string) => {
-    setActiveAnimations((prev) => prev.filter((anim) => anim.id !== id));
-    
-    // Once the flying image lands, transition isPending to false so the thumbnail animates in.
-    if (imageUrl && productId) {
-      const visualId = productId;
-      setVisualCartImages((prev) =>
-        prev.map((item) =>
-          item.id === visualId ? { ...item, isPending: false } : item
-        )
-      );
-    }
+  const handleComplete = useCallback(
+    (id: string, imageUrl: any, productId: string) => {
+      setActiveAnimations((prev) => prev.filter((anim) => anim.id !== id));
 
-    triggerBounce();
-    triggerWidthExpansion();
-  }, [triggerBounce, triggerWidthExpansion, items]);
+      // Once the flying image lands, transition isPending to false so the thumbnail animates in.
+      if (imageUrl && productId) {
+        const visualId = productId;
+        setVisualCartImages((prev) =>
+          prev.map((item) =>
+            item.id === visualId ? { ...item, isPending: false } : item,
+          ),
+        );
+      }
+
+      triggerBounce();
+      triggerWidthExpansion();
+    },
+    [triggerBounce, triggerWidthExpansion, items],
+  );
 
   return (
     <FlyToCartContext.Provider

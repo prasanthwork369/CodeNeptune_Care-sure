@@ -5,7 +5,10 @@ import { useHome } from "@/src/hooks/queries/useHome";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
-import { addressToLocation, pickDefaultAddress } from "@/src/utils/addressLocation";
+import {
+  addressToLocation,
+  pickDefaultAddress,
+} from "@/src/utils/addressLocation";
 import { useCallback, useEffect, useState } from "react";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { syncService } from "@/src/services/sync.service";

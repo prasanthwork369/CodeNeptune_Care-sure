@@ -1,7 +1,7 @@
-import { Alert } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
-import { ScannerService } from './scanner.service';
+import { Alert } from "react-native";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
+import { ScannerService } from "./scanner.service";
 
 export interface CapturedAsset {
   uri: string;
@@ -33,11 +33,11 @@ export function usePrescriptionUploadService({
       const { status, canAskAgain } =
         await ImagePicker.requestCameraPermissionsAsync();
 
-      if (status !== 'granted') {
+      if (status !== "granted") {
         if (!canAskAgain) {
           showErr(
-            'Permission Required',
-            'Please allow camera access in Settings to continue.'
+            "Permission Required",
+            "Please allow camera access in Settings to continue.",
           );
         }
         return;
@@ -46,33 +46,34 @@ export function usePrescriptionUploadService({
       const { imageUri, cancelled } = await ScannerService.scan();
       if (cancelled || !imageUri) return;
 
-      const filename = imageUri.split('/').pop() || 'scanned_prescription.jpg';
+      const filename = imageUri.split("/").pop() || "scanned_prescription.jpg";
       const asset: CapturedAsset = {
         uri: imageUri,
         name: filename,
         fileName: filename,
-        mimeType: 'image/jpeg',
+        mimeType: "image/jpeg",
       };
 
       await onAssetsReady([asset]);
     } catch {
-      showErr('Error', 'Failed to take photo. Please try again.');
+      showErr("Error", "Failed to take photo. Please try again.");
     }
   };
 
   // ── 2. Gallery Flow ──────────────────────────────────────────────────────
   const chooseFromGallery = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
         showErr(
-          'Permission Required',
-          'Please allow photo library access in Settings to continue.'
+          "Permission Required",
+          "Please allow photo library access in Settings to continue.",
         );
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         quality: 0.9,
         allowsMultipleSelection: true,
       });
@@ -80,30 +81,31 @@ export function usePrescriptionUploadService({
 
       const assets: CapturedAsset[] = result.assets.map((a) => ({
         uri: a.uri,
-        name: a.fileName || a.uri.split('/').pop() || 'gallery_image.jpg',
-        fileName: a.fileName || a.uri.split('/').pop() || 'gallery_image.jpg',
-        mimeType: 'image/jpeg',
+        name: a.fileName || a.uri.split("/").pop() || "gallery_image.jpg",
+        fileName: a.fileName || a.uri.split("/").pop() || "gallery_image.jpg",
+        mimeType: "image/jpeg",
       }));
 
       await onAssetsReady(assets);
     } catch {
-      showErr('Error', 'Failed to pick images. Please try again.');
+      showErr("Error", "Failed to pick images. Please try again.");
     }
   };
 
   // ── 3. PDF Flow ──────────────────────────────────────────────────────────
   const pickPdf = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
         showErr(
-          'Permission Required',
-          'Please allow photo library access in Settings to continue.'
+          "Permission Required",
+          "Please allow photo library access in Settings to continue.",
         );
         return;
       }
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf'],
+        type: ["application/pdf"],
         copyToCacheDirectory: true,
         multiple: true,
       });
@@ -113,27 +115,28 @@ export function usePrescriptionUploadService({
         uri: a.uri,
         name: a.name,
         fileName: a.name,
-        mimeType: 'application/pdf',
+        mimeType: "application/pdf",
       }));
       await onAssetsReady(assets);
     } catch {
-      showErr('Error', 'Failed to pick PDF. Please try again.');
+      showErr("Error", "Failed to pick PDF. Please try again.");
     }
   };
 
   // ── 4. Mixed Document Flow (Images + PDFs) ───────────────────────────────
   const pickDocument = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
         showErr(
-          'Permission Required',
-          'Please allow photo library access in Settings to continue.'
+          "Permission Required",
+          "Please allow photo library access in Settings to continue.",
         );
         return;
       }
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
+        type: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
         copyToCacheDirectory: true,
         multiple: true,
       });
@@ -143,11 +146,13 @@ export function usePrescriptionUploadService({
         uri: a.uri,
         name: a.name,
         fileName: a.name,
-        mimeType: a.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
+        mimeType: a.name.toLowerCase().endsWith(".pdf")
+          ? "application/pdf"
+          : "image/jpeg",
       }));
       await onAssetsReady(assets);
     } catch {
-      showErr('Error', 'Failed to pick document. Please try again.');
+      showErr("Error", "Failed to pick document. Please try again.");
     }
   };
 

@@ -1,6 +1,10 @@
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useOrders } from "@/src/hooks/queries/useOrders";
-import { AddToCartInput, CartItem, UpdateCartItemInput } from "@/src/types/cart";
+import {
+  AddToCartInput,
+  CartItem,
+  UpdateCartItemInput,
+} from "@/src/types/cart";
 import { Order, OrderTabKey } from "@/src/types/order";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";

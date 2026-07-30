@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform } from "react-native";
 
 const { PhoneNumberHint } = NativeModules;
 
@@ -13,13 +13,13 @@ const { PhoneNumberHint } = NativeModules;
  * iOS always returns null (no equivalent API).
  */
 export async function getPhoneNumberHint(): Promise<string | null> {
-    if (Platform.OS !== 'android') return null;
-    if (!PhoneNumberHint?.getPhoneNumberHint) return null;
-    try {
-        return await PhoneNumberHint.getPhoneNumberHint();
-    } catch {
-        return null;
-    }
+  if (Platform.OS !== "android") return null;
+  if (!PhoneNumberHint?.getPhoneNumberHint) return null;
+  try {
+    return await PhoneNumberHint.getPhoneNumberHint();
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -27,7 +27,7 @@ export async function getPhoneNumberHint(): Promise<string | null> {
  * e.g. "+919876543210" → "9876543210"
  */
 export function normalizeIndianPhone(raw: string): string {
-    const digits = raw.replace(/\D/g, '');
-    // Take last 10 digits — handles +91xxxxxxxxxx and 91xxxxxxxxxx
-    return digits.slice(-10);
+  const digits = raw.replace(/\D/g, "");
+  // Take last 10 digits — handles +91xxxxxxxxxx and 91xxxxxxxxxx
+  return digits.slice(-10);
 }

@@ -38,13 +38,20 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
       }}
       className="px-4 pb-2"
     >
-      <View style={{ height: exactScale(48) }} className="flex-row items-center">
+      <View
+        style={{ height: exactScale(48) }}
+        className="flex-row items-center"
+      >
         <Touchable
           onPress={handleBack}
           className="mr-3 bg-white rounded-full border border-[#919EAB33] items-center justify-center"
           style={{ width: exactScale(44), height: exactScale(44) }}
         >
-          <icons.arrow_back width={exactScale(18)} height={exactScale(18)} fill={colors.text} />
+          <icons.arrow_back
+            width={exactScale(18)}
+            height={exactScale(18)}
+            fill={colors.text}
+          />
         </Touchable>
         <Text
           className="font-inter-bold flex-1"

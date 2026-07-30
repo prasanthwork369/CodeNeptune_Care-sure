@@ -1,2 +1,2 @@
-export { CategoryProductCard } from './CategoryProductCard';
-export { CategoryCartBanner } from './CategoryCartBanner';
+export { CategoryProductCard } from "./CategoryProductCard";
+export { CategoryCartBanner } from "./CategoryCartBanner";

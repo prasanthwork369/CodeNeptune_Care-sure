@@ -35,13 +35,29 @@ export const MedicineComparisonSkeleton: React.FC = () => {
           <View style={{ flexDirection: "row", gap: exactScale(12) }}>
             <View style={{ flex: 1, gap: exactScale(8) }}>
               <ShimmerBlock height={exactScale(80)} borderRadius={8} />
-              <ShimmerBlock height={exactScale(16)} width="80%" borderRadius={4} />
-              <ShimmerBlock height={exactScale(20)} width="60%" borderRadius={4} />
+              <ShimmerBlock
+                height={exactScale(16)}
+                width="80%"
+                borderRadius={4}
+              />
+              <ShimmerBlock
+                height={exactScale(20)}
+                width="60%"
+                borderRadius={4}
+              />
             </View>
             <View style={{ flex: 1, gap: exactScale(8) }}>
               <ShimmerBlock height={exactScale(80)} borderRadius={8} />
-              <ShimmerBlock height={exactScale(16)} width="80%" borderRadius={4} />
-              <ShimmerBlock height={exactScale(20)} width="60%" borderRadius={4} />
+              <ShimmerBlock
+                height={exactScale(16)}
+                width="80%"
+                borderRadius={4}
+              />
+              <ShimmerBlock
+                height={exactScale(20)}
+                width="60%"
+                borderRadius={4}
+              />
             </View>
           </View>
         </View>
@@ -61,13 +77,29 @@ export const MedicineComparisonSkeleton: React.FC = () => {
           <View style={{ flexDirection: "row", gap: exactScale(12) }}>
             <View style={{ flex: 1, gap: exactScale(8) }}>
               <ShimmerBlock height={exactScale(80)} borderRadius={8} />
-              <ShimmerBlock height={exactScale(16)} width="80%" borderRadius={4} />
-              <ShimmerBlock height={exactScale(20)} width="60%" borderRadius={4} />
+              <ShimmerBlock
+                height={exactScale(16)}
+                width="80%"
+                borderRadius={4}
+              />
+              <ShimmerBlock
+                height={exactScale(20)}
+                width="60%"
+                borderRadius={4}
+              />
             </View>
             <View style={{ flex: 1, gap: exactScale(8) }}>
               <ShimmerBlock height={exactScale(80)} borderRadius={8} />
-              <ShimmerBlock height={exactScale(16)} width="80%" borderRadius={4} />
-              <ShimmerBlock height={exactScale(20)} width="60%" borderRadius={4} />
+              <ShimmerBlock
+                height={exactScale(16)}
+                width="80%"
+                borderRadius={4}
+              />
+              <ShimmerBlock
+                height={exactScale(20)}
+                width="60%"
+                borderRadius={4}
+              />
             </View>
           </View>
         </View>

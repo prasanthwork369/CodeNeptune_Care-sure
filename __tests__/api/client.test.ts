@@ -1,4 +1,9 @@
-import { apiClient, setAccessToken, getAccessToken, setUnauthorizedHandler } from "@/src/api/client";
+import {
+  apiClient,
+  setAccessToken,
+  getAccessToken,
+  setUnauthorizedHandler,
+} from "@/src/api/client";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { tokenStorage } from "@/src/lib/storage";
 import axios from "axios";
@@ -47,7 +52,9 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
       const interceptor = getRequestInterceptor();
       const config = { headers: {} as any };
       const updatedConfig = await interceptor(config);
-      expect(updatedConfig.headers.Authorization).toBe("Bearer secret-access-token");
+      expect(updatedConfig.headers.Authorization).toBe(
+        "Bearer secret-access-token",
+      );
     });
 
     it("does not attach Authorization header when token is null", async () => {

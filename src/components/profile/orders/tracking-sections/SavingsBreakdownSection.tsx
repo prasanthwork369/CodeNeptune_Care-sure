@@ -36,14 +36,21 @@ export function SavingsBreakdownSection({
       >
         <View
           className="flex-row items-center justify-between"
-          style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(12) }}
+          style={{
+            paddingHorizontal: exactScale(16),
+            paddingVertical: exactScale(12),
+          }}
         >
-          <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
-            <icons.percent_discount width={exactScale(18)} height={exactScale(18)} fill="#0F7635" />
-            <Text
-              style={s.labelMd}
-              className="font-inter-bold text-brand-text"
-            >
+          <View
+            className="flex-row items-center"
+            style={{ gap: exactScale(8) }}
+          >
+            <icons.percent_discount
+              width={exactScale(18)}
+              height={exactScale(18)}
+              fill="#0F7635"
+            />
+            <Text style={s.labelMd} className="font-inter-bold text-brand-text">
               Saving this order
             </Text>
           </View>
@@ -53,11 +60,13 @@ export function SavingsBreakdownSection({
             end={{ x: 0.5, y: 1 }}
             style={{ borderRadius: exactScale(6), overflow: "hidden" }}
           >
-            <View style={{ paddingHorizontal: exactScale(10), paddingVertical: exactScale(4) }}>
-              <Text
-                style={s.labelSm}
-                className="font-inter-bold text-white"
-              >
+            <View
+              style={{
+                paddingHorizontal: exactScale(10),
+                paddingVertical: exactScale(4),
+              }}
+            >
+              <Text style={s.labelSm} className="font-inter-bold text-white">
                 ₹{totalSaved.toFixed(2)}
               </Text>
             </View>
@@ -65,9 +74,17 @@ export function SavingsBreakdownSection({
           </LinearGradient>
         </View>
       </LinearGradient>
-      <View style={{ paddingHorizontal: exactScale(16), paddingVertical: exactScale(8) }}>
+      <View
+        style={{
+          paddingHorizontal: exactScale(16),
+          paddingVertical: exactScale(8),
+        }}
+      >
         {productDiscount > 0 && (
-          <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
+          <View
+            className="flex-row justify-between items-center"
+            style={{ paddingVertical: exactScale(8) }}
+          >
             <Text
               style={s.labelSm}
               className="font-inter-medium text-[#6A6A6A]"
@@ -83,7 +100,10 @@ export function SavingsBreakdownSection({
           </View>
         )}
         {couponDiscount > 0 && (
-          <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
+          <View
+            className="flex-row justify-between items-center"
+            style={{ paddingVertical: exactScale(8) }}
+          >
             <Text
               style={s.labelSm}
               className="font-inter-medium text-[#6A6A6A]"
@@ -99,7 +119,10 @@ export function SavingsBreakdownSection({
           </View>
         )}
         {walletDiscount > 0 && (
-          <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
+          <View
+            className="flex-row justify-between items-center"
+            style={{ paddingVertical: exactScale(8) }}
+          >
             <Text
               style={s.labelSm}
               className="font-inter-medium text-[#6A6A6A]"
@@ -115,7 +138,10 @@ export function SavingsBreakdownSection({
           </View>
         )}
         {coinsDiscount > 0 && (
-          <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
+          <View
+            className="flex-row justify-between items-center"
+            style={{ paddingVertical: exactScale(8) }}
+          >
             <Text
               style={s.labelSm}
               className="font-inter-medium text-[#6A6A6A]"
@@ -131,7 +157,10 @@ export function SavingsBreakdownSection({
           </View>
         )}
         {hasNoDiscounts && (
-          <View className="flex-row justify-between items-center" style={{ paddingVertical: exactScale(8) }}>
+          <View
+            className="flex-row justify-between items-center"
+            style={{ paddingVertical: exactScale(8) }}
+          >
             <Text
               style={s.labelSm}
               className="font-inter-medium text-[#6A6A6A]"

@@ -123,7 +123,10 @@ try {
     RN.Text = PatchedText;
   } catch (err) {
     if (__DEV__)
-      console.error("Failed to globally patch react-native Text component:", err);
+      console.error(
+        "Failed to globally patch react-native Text component:",
+        err,
+      );
   }
 }
 

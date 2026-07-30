@@ -18,7 +18,7 @@ Read `CLAUDE.md` first — it has the project rules (NativeWind, Zustand, Expo R
 
 These came from the user directly. Breaking them wastes their time.
 
-1. **Comments are ONE line.** Never a multi-line block, never a JSDoc paragraph. State *why*, not *what*. The user has corrected this repeatedly.
+1. **Comments are ONE line.** Never a multi-line block, never a JSDoc paragraph. State _why_, not _what_. The user has corrected this repeatedly.
 2. **Never run builds.** No `expo run:android`, `expo start`, `expo prebuild`, `npm run android`. Hand the command over and let the user run it. Diagnostics (`adb`, `tsc`, `eslint`, `jest`, `curl`) are fine.
 3. **Commit directly to `main`.** No feature branches, no PRs unless asked.
 4. **Single-line commit messages.** No body paragraphs.
@@ -58,16 +58,16 @@ For each screen: read every related file, check the bug patterns below, fix only
 
 Look for these first — each was found multiple times.
 
-| Pattern | What to grep |
-|---|---|
-| **Whole-store Zustand subscription** | `useXStore()` with no selector. All 15 fixed, but new ones appear. |
-| **RN Modal mounted while hidden** | Fixed at source in `CardOptionsMenu`, `AlertDialog`, `AlreadyHaveItemsModal`. Any *other* component rendering `<Modal visible={false}>` has the same bug. Gorhom `BottomSheetModal` is portal-based and fine. |
-| **Inline `ref={(el) => …}` with a side effect** | Re-invoked every render. Found in `LoginForm` and `OtpForm`. |
-| **Component declared inside render** | Creates a new type each pass → React remounts the subtree. Found in `ReturnProductLayout`. |
-| **`React.memo` defeated by unstable props** | `useCart()` returns fresh arrows each render. Found in `OrderCard`. |
-| **Timer with no cleanup** | Found in `useCartCalculations`, `AddMoneyLayout`, `SplashAnimationScreen`, `OrderTrackingLayout`. |
-| **Unnecessary `as any` on routes** | ~79 remain. `tsc` usually proves they're removable — one was hiding a real type hole. |
-| **Raw pixel values instead of `exactScale`** | `OrderCard` is the worst offender. Needs device check before changing. |
+| Pattern                                         | What to grep                                                                                                                                                                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Whole-store Zustand subscription**            | `useXStore()` with no selector. All 15 fixed, but new ones appear.                                                                                                                                            |
+| **RN Modal mounted while hidden**               | Fixed at source in `CardOptionsMenu`, `AlertDialog`, `AlreadyHaveItemsModal`. Any _other_ component rendering `<Modal visible={false}>` has the same bug. Gorhom `BottomSheetModal` is portal-based and fine. |
+| **Inline `ref={(el) => …}` with a side effect** | Re-invoked every render. Found in `LoginForm` and `OtpForm`.                                                                                                                                                  |
+| **Component declared inside render**            | Creates a new type each pass → React remounts the subtree. Found in `ReturnProductLayout`.                                                                                                                    |
+| **`React.memo` defeated by unstable props**     | `useCart()` returns fresh arrows each render. Found in `OrderCard`.                                                                                                                                           |
+| **Timer with no cleanup**                       | Found in `useCartCalculations`, `AddMoneyLayout`, `SplashAnimationScreen`, `OrderTrackingLayout`.                                                                                                             |
+| **Unnecessary `as any` on routes**              | ~79 remain. `tsc` usually proves they're removable — one was hiding a real type hole.                                                                                                                         |
+| **Raw pixel values instead of `exactScale`**    | `OrderCard` is the worst offender. Needs device check before changing.                                                                                                                                        |
 
 ---
 
@@ -118,7 +118,7 @@ Ask the user to chase these. Nothing in the app can fix them.
 - **`OrderCard`** uses raw pixels, and its status badge sits behind a fixed `paddingRight: 110` — a long status like `OUT FOR DELIVERY` may overlap the order ID on a narrow screen.
 - **Cart footer total** may clip at <360 dp with the largest system font.
 - **8 files over 500 lines:** `LocationBottomSheet` 809, `ReturnProductLayout` 816, `ComparisonBoard` 748, `OrderTrackingLayout` 699, `NotificationsLayout` 692, `AddPatientSheet` 653, `HomeLayout` 600, `SelectPatientLayout` 596.
-- **158 lint warnings** project-wide (mostly unused vars and `exhaustive-deps`). The 3 lint *errors* are `react/display-name` in test mocks only — harmless.
+- **158 lint warnings** project-wide (mostly unused vars and `exhaustive-deps`). The 3 lint _errors_ are `react/display-name` in test mocks only — harmless.
 
 ---
 

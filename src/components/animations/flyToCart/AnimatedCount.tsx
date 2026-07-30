@@ -22,10 +22,13 @@ export const AnimatedCount: React.FC<AnimatedCountProps> = ({ count }) => {
     if (prev.current === count) return;
     const dir = count > prev.current ? -1 : 1;
     prev.current = count;
-    opacity.value = withSequence(withTiming(0, { duration: 90 }), withTiming(1, { duration: 110 }));
+    opacity.value = withSequence(
+      withTiming(0, { duration: 90 }),
+      withTiming(1, { duration: 110 }),
+    );
     translateY.value = withSequence(
       withTiming(dir * 7, { duration: 90, easing: Easing.in(Easing.quad) }),
-      withTiming(0, { duration: 120, easing: Easing.out(Easing.back(1.2)) })
+      withTiming(0, { duration: 120, easing: Easing.out(Easing.back(1.2)) }),
     );
   }, [count]);
 

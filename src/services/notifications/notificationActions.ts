@@ -1,15 +1,15 @@
-import { contactService } from '../contact.service';
+import { contactService } from "../contact.service";
 
 /**
  * Action ids used on notification buttons. The value is what comes back in the
  * notifee event, so keep these in sync with whatever sets `pressAction.id`.
  */
 export const NOTIFICATION_ACTIONS = {
-  CALL: 'call',
-  LATER: 'later',
+  CALL: "call",
+  LATER: "later",
 } as const;
 
-const getNotifee = () => require('@notifee/react-native');
+const getNotifee = () => require("@notifee/react-native");
 
 /**
  * Runs a notification button press. Shared by the foreground and background

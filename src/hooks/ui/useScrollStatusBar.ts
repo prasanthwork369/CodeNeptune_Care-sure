@@ -24,7 +24,7 @@ export const useScrollStatusBar = (
     const threshold = revealAfter ? revealAfter.value : 0;
     const shouldShow = revealAfter
       ? scrollY.value >= threshold
-      : (scrollY.value >= 0 || scrollY.value < 0);
+      : scrollY.value >= 0 || scrollY.value < 0;
     return {
       opacity: shouldShow ? 1 : 0,
       position: "absolute",

@@ -62,12 +62,18 @@ describe("authService — Authentication Lifecycle Integration", () => {
       firstName: "Jane",
     });
 
-    const loginSpy = jest.spyOn(useAuthStore.getState(), "login").mockResolvedValueOnce(undefined);
+    const loginSpy = jest
+      .spyOn(useAuthStore.getState(), "login")
+      .mockResolvedValueOnce(undefined);
     const setUserSpy = jest.spyOn(useAuthStore.getState(), "setUser");
 
     await authService.verifyOtp("9876543210", "123456");
 
-    expect(authApi.verifyOtp).toHaveBeenCalledWith("9876543210", "123456", "device-uuid-123");
+    expect(authApi.verifyOtp).toHaveBeenCalledWith(
+      "9876543210",
+      "123456",
+      "device-uuid-123",
+    );
     expect(loginSpy).toHaveBeenCalledWith("access-123", 3600);
     expect(tokenStorage.setRefreshToken).toHaveBeenCalledWith("refresh-456");
     expect(profileApi.getProfile).toHaveBeenCalled();
@@ -75,7 +81,9 @@ describe("authService — Authentication Lifecycle Integration", () => {
   });
 
   it("logout calls authApi.logout and notificationService.unregister before clearing local auth state", async () => {
-    const logoutStoreSpy = jest.spyOn(useAuthStore.getState(), "logout").mockResolvedValueOnce(undefined);
+    const logoutStoreSpy = jest
+      .spyOn(useAuthStore.getState(), "logout")
+      .mockResolvedValueOnce(undefined);
 
     await authService.logout();
 
@@ -85,8 +93,12 @@ describe("authService — Authentication Lifecycle Integration", () => {
   });
 
   it("deleteAccount clears auth state only when server deletion succeeds", async () => {
-    (profileApi.deleteAccount as jest.Mock).mockResolvedValueOnce({ success: true });
-    const logoutStoreSpy = jest.spyOn(useAuthStore.getState(), "logout").mockResolvedValueOnce(undefined);
+    (profileApi.deleteAccount as jest.Mock).mockResolvedValueOnce({
+      success: true,
+    });
+    const logoutStoreSpy = jest
+      .spyOn(useAuthStore.getState(), "logout")
+      .mockResolvedValueOnce(undefined);
 
     const res = await authService.deleteAccount("No longer needed");
 

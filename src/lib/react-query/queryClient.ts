@@ -1,6 +1,10 @@
-import { MutationCache, QueryClient, onlineManager } from '@tanstack/react-query';
-import NetInfo from '@react-native-community/netinfo';
-import { AppError } from '@/src/api/errors';
+import {
+  MutationCache,
+  QueryClient,
+  onlineManager,
+} from "@tanstack/react-query";
+import NetInfo from "@react-native-community/netinfo";
+import { AppError } from "@/src/api/errors";
 
 onlineManager.setEventListener((setOnline) => {
   return NetInfo.addEventListener((state) => {
@@ -20,11 +24,11 @@ export const queryClient = new QueryClient({
       retry: (failureCount, error) => {
         if (error instanceof AppError) {
           if (
-            error.kind === 'unauthorized' ||
-            error.kind === 'forbidden' ||
-            error.kind === 'not_found' ||
-            error.kind === 'validation' ||
-            error.kind === 'network'
+            error.kind === "unauthorized" ||
+            error.kind === "forbidden" ||
+            error.kind === "not_found" ||
+            error.kind === "validation" ||
+            error.kind === "network"
           ) {
             return false;
           }

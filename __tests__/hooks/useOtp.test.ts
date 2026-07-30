@@ -52,7 +52,9 @@ describe("useOtp — OTP Flow & Guest Cart Merge", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useNav as jest.Mock).mockReturnValue(mockRouter);
-    (useLocalSearchParams as jest.Mock).mockReturnValue({ phone: "9876543210" });
+    (useLocalSearchParams as jest.Mock).mockReturnValue({
+      phone: "9876543210",
+    });
     (useAuth as jest.Mock).mockReturnValue({
       verifyOtp: mockVerifyOtp,
       requestOtp: mockRequestOtp,
@@ -133,7 +135,10 @@ describe("useOtp — OTP Flow & Guest Cart Merge", () => {
   it("executes pending notification navigation upon verification if notification exists", async () => {
     mockVerifyOtp.mockResolvedValueOnce({ success: true });
     useNotificationNavigationStore.setState({
-      pendingNotification: { id: "notif-1", route: "/(stack)/order-details" } as any,
+      pendingNotification: {
+        id: "notif-1",
+        route: "/(stack)/order-details",
+      } as any,
     });
 
     const { result } = renderHook(() => useOtp(), {
@@ -144,6 +149,8 @@ describe("useOtp — OTP Flow & Guest Cart Merge", () => {
       await result.current.handleVerify("654321");
     });
 
-    expect(useNotificationNavigationStore.getState().pendingNotification).toBeNull();
+    expect(
+      useNotificationNavigationStore.getState().pendingNotification,
+    ).toBeNull();
   });
 });

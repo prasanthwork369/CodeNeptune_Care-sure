@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { CartFooter } from "@/src/components/cart/sections/CartFooter";
 
 describe("CartFooter Component", () => {
@@ -16,7 +19,7 @@ describe("CartFooter Component", () => {
         safeAreaBottom={20}
         onProceed={onProceedMock}
         canProceed={true}
-      />
+      />,
     );
 
     expect(getByText("To Pay")).toBeTruthy();
@@ -31,7 +34,7 @@ describe("CartFooter Component", () => {
         safeAreaBottom={0}
         onProceed={onProceedMock}
         canProceed={true}
-      />
+      />,
     );
 
     fireEvent.press(getByText("Proceed to pay"));
@@ -45,7 +48,7 @@ describe("CartFooter Component", () => {
         safeAreaBottom={0}
         onProceed={onProceedMock}
         canProceed={false}
-      />
+      />,
     );
 
     fireEvent.press(getByText("Proceed to pay"));

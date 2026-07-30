@@ -1,2 +1,2 @@
-import { CategoriesLayout } from '@/src/components/categories/CategoriesLayout';
+import { CategoriesLayout } from "@/src/components/categories/CategoriesLayout";
 export default CategoriesLayout;

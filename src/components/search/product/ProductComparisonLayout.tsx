@@ -1,13 +1,13 @@
 import {
-    LocationBottomSheet,
-    WhyFamiliesTrustUs,
+  LocationBottomSheet,
+  WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import {
-    KnowYourMedicine,
-    LogisticsBar,
-    ProductDetailsFooter,
-    SaltCompositionBanner,
-    TrustBadge,
+  KnowYourMedicine,
+  LogisticsBar,
+  ProductDetailsFooter,
+  SaltCompositionBanner,
+  TrustBadge,
 } from "@/src/components/product/details/sections";
 import { ProductHeader } from "@/src/components/search/product/ProductHeader";
 import { useProductHeroAnimation } from "@/src/hooks/animations/useProductHeroAnimation";
@@ -24,9 +24,9 @@ import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
-    ComparisonBoard,
-    MoreAboutSection,
-    ProductDetailsSkeleton,
+  ComparisonBoard,
+  MoreAboutSection,
+  ProductDetailsSkeleton,
 } from "./sections";
 
 interface ProductComparisonLayoutProps {
@@ -109,9 +109,10 @@ export const ProductComparisonLayout: React.FC<
     : 1;
 
   const recUnitPrice = recommendation
-    ? (
-        // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
-        Math.floor((recommendation.price / Math.max(recPackSize, 1)) * 100) / 100
+    ? // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
+      (
+        Math.floor((recommendation.price / Math.max(recPackSize, 1)) * 100) /
+        100
       ).toFixed(2)
     : undefined;
 
@@ -225,7 +226,7 @@ export const ProductComparisonLayout: React.FC<
 
                 <MoreAboutSection
                   medicineName={medicineName}
-                  mobileAdditionalData={raw?.mobileAdditionalData}
+                  additionalData={raw?.additionalData}
                 />
               </ScrollView>
             )}

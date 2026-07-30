@@ -1,10 +1,10 @@
-import * as SecureStore from 'expo-secure-store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const AUTH_TOKEN_KEY = 'caresure.auth.token';
-const AUTH_REFRESH_TOKEN_KEY = 'caresure.auth.refreshToken';
-const AUTH_EXPIRES_AT_KEY = 'caresure.auth.expiresAt';
-const AVATAR_URI_KEY = 'caresure.profile.avatarUri';
+const AUTH_TOKEN_KEY = "caresure.auth.token";
+const AUTH_REFRESH_TOKEN_KEY = "caresure.auth.refreshToken";
+const AUTH_EXPIRES_AT_KEY = "caresure.auth.expiresAt";
+const AVATAR_URI_KEY = "caresure.profile.avatarUri";
 
 export const tokenStorage = {
   async get(): Promise<string | null> {
@@ -60,19 +60,19 @@ export const tokenStorage = {
   },
 };
 
-const GUEST_MODE_KEY = 'caresure.auth.isGuest';
+const GUEST_MODE_KEY = "caresure.auth.isGuest";
 
 export const guestStorage = {
   async get(): Promise<boolean> {
     try {
-      return (await AsyncStorage.getItem(GUEST_MODE_KEY)) === 'true';
+      return (await AsyncStorage.getItem(GUEST_MODE_KEY)) === "true";
     } catch {
       return false;
     }
   },
   async set(value: boolean): Promise<void> {
     try {
-      await AsyncStorage.setItem(GUEST_MODE_KEY, value ? 'true' : 'false');
+      await AsyncStorage.setItem(GUEST_MODE_KEY, value ? "true" : "false");
     } catch {}
   },
   async clear(): Promise<void> {

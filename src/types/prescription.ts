@@ -1,18 +1,18 @@
 import { PrescriptionStatusValue } from "@/src/constants/prescription-status";
 
 export interface PrescriptionItem {
-    localUri: string;
-    name: string;
-    type: string;
-    size?: number;
+  localUri: string;
+  name: string;
+  type: string;
+  size?: number;
 }
 
 export interface Prescription {
-    id: string;
-    rxId: string;
-    date: string;
-    patient: string;
-    doctor: string;
+  id: string;
+  rxId: string;
+  date: string;
+  patient: string;
+  doctor: string;
 }
 
 /** Backend-accepted "Never Miss a Refill" frequencies. */
@@ -20,16 +20,16 @@ export type ReminderFrequencyDays = 7 | 14 | 21 | 30;
 
 /** Set-reminder payload: recurring every N days, or a one-time custom date ("YYYY-MM-DD"). */
 export type ReminderInput =
-    | { frequencyDays: ReminderFrequencyDays }
-    | { remindAt: string };
+  | { frequencyDays: ReminderFrequencyDays }
+  | { remindAt: string };
 
 /** Refill reminder attached to a prescription; null/absent when never set. */
 export interface PrescriptionReminder {
-    status: 'active' | 'cancelled' | 'completed' | string;
-    /** "once" for custom-date reminders; null frequencyDays goes with it. */
-    type?: 'recurring' | 'once';
-    frequencyDays: ReminderFrequencyDays | null;
-    nextRemindAt: string | null;
+  status: "active" | "cancelled" | "completed" | string;
+  /** "once" for custom-date reminders; null frequencyDays goes with it. */
+  type?: "recurring" | "once";
+  frequencyDays: ReminderFrequencyDays | null;
+  nextRemindAt: string | null;
 }
 
 /**
@@ -39,95 +39,95 @@ export interface PrescriptionReminder {
  * fields directly, never from local/AsyncStorage state.
  */
 export interface ApiPrescription {
-    id: string;
-    rxId?: string;
-    status: PrescriptionStatusValue;
-    category?: number;
-    isDismissed: boolean;
-    isPurchased: boolean;
-    prescriptionOrderId?: string | null;
-    imageUrls?: string[];
-    doctorName?: string | null;
-    ocrData?: {
-        patientName?: string;
-        /** One reason per uploaded file when automated verification fails. */
-        rejectionReasons?: string[];
-    } | null;
-    /** Why a prescription was rejected — set by automated OCR or a pharmacist. */
-    reviewNotes?: string | null;
-    reminder?: PrescriptionReminder | null;
-    createdAt: string;
-    updatedAt?: string;
+  id: string;
+  rxId?: string;
+  status: PrescriptionStatusValue;
+  category?: number;
+  isDismissed: boolean;
+  isPurchased: boolean;
+  prescriptionOrderId?: string | null;
+  imageUrls?: string[];
+  doctorName?: string | null;
+  ocrData?: {
+    patientName?: string;
+    /** One reason per uploaded file when automated verification fails. */
+    rejectionReasons?: string[];
+  } | null;
+  /** Why a prescription was rejected — set by automated OCR or a pharmacist. */
+  reviewNotes?: string | null;
+  reminder?: PrescriptionReminder | null;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface RequiresPrescriptionWarningProps {
-    itemCount: number;
-    items: any[];
+  itemCount: number;
+  items: any[];
 }
 
 export interface UploadMethodCardProps {
-    isSelected: boolean;
-    onSelect: () => void;
+  isSelected: boolean;
+  onSelect: () => void;
 }
 
 export interface CallMethodCardProps {
-    isSelected: boolean;
-    onSelect: () => void;
+  isSelected: boolean;
+  onSelect: () => void;
 }
 
 export interface ChooseMethodFooterProps {
-    toPay: string;
-    safeAreaBottom: number;
-    canProceed: boolean;
-    onProceed: () => void;
-    buttonLabel: string;
+  toPay: string;
+  safeAreaBottom: number;
+  canProceed: boolean;
+  onProceed: () => void;
+  buttonLabel: string;
 }
 
 export interface PrescriptionHistoryItemData {
-    id: string;
-    rawId: string;
-    status: string;
-    patientName: string;
-    doctorName: string;
-    uploadedDate: string;
-    image: any;
-    source?: string;
-    toPay?: string;
-    prescriptionOrderId?: string | null;
-    reviewNotes?: string | null;
-    rejectionReasons?: string[];
+  id: string;
+  rawId: string;
+  status: string;
+  patientName: string;
+  doctorName: string;
+  uploadedDate: string;
+  image: any;
+  source?: string;
+  toPay?: string;
+  prescriptionOrderId?: string | null;
+  reviewNotes?: string | null;
+  rejectionReasons?: string[];
 }
 
 export interface PrescriptionHistoryItemProps {
-    item: PrescriptionHistoryItemData;
+  item: PrescriptionHistoryItemData;
 }
 
 export interface PreviewDisplayProps {
-    activeItem: PrescriptionItem | null;
-    screenWidth: number;
-    previewHeight: number;
-    onLayout: (height: number) => void;
-    onPrev?: () => void;
-    showPrev: boolean;
-    onNext?: () => void;
-    showNext: boolean;
+  activeItem: PrescriptionItem | null;
+  screenWidth: number;
+  previewHeight: number;
+  onLayout: (height: number) => void;
+  onPrev?: () => void;
+  showPrev: boolean;
+  onNext?: () => void;
+  showNext: boolean;
 }
 
 export interface PreviewThumbnailsProps {
-    items: PrescriptionItem[];
-    activeIndex: number;
-    maxFiles: number;
-    onAdd: () => void;
-    onSelect: (index: number) => void;
-    onRemove: (index: number) => void;
-    onSubmit: () => void;
-    submitting: boolean;
-    safeAreaBottom: number;
+  items: PrescriptionItem[];
+  activeIndex: number;
+  maxFiles: number;
+  onAdd: () => void;
+  onSelect: (index: number) => void;
+  onRemove: (index: number) => void;
+  onSubmit: () => void;
+  submitting: boolean;
+  safeAreaBottom: number;
 }
 
 export interface PreviewSuccessModalProps {
-    visible: boolean;
-    onClose: () => void;
-    onContinue: () => void;
-    safeAreaBottom: number;
+  visible: boolean;
+  onClose: () => void;
+  onContinue: () => void;
+  safeAreaBottom: number;
 }

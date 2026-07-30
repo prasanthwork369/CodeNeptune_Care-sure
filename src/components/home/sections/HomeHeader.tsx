@@ -22,147 +22,152 @@ interface HomeHeaderProps {
   onPressLocation?: () => void;
 }
 
-export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(({
-  location,
-  onPressLocation,
-}) => {
-  const router = useNav();
-  const insets = useSafeAreaInsets();
-  const { balance } = useWalletBalance();
-  const { latestPrescription, hasPendingPrescription } =
-    usePrescriptionBanner();
+export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
+  ({ location, onPressLocation }) => {
+    const router = useNav();
+    const insets = useSafeAreaInsets();
+    const { balance } = useWalletBalance();
+    const { latestPrescription, hasPendingPrescription } =
+      usePrescriptionBanner();
 
-  // Field selectors, or unrelated notification writes re-render this header.
-  const lastSeenRxId = useNotificationStore((s) => s.lastSeenRxId);
-  const lastSeenRxStatus = useNotificationStore((s) => s.lastSeenRxStatus);
-  const setLastSeenRx = useNotificationStore((s) => s.setLastSeenRx);
-  const { unreadCount: apiUnreadCount } = useNotifications();
-  const isRxUnread =
-    hasPendingPrescription &&
-    latestPrescription &&
-    (latestPrescription.id !== lastSeenRxId ||
-      String(latestPrescription.status) !== lastSeenRxStatus);
-  const unreadCount = apiUnreadCount + (isRxUnread ? 1 : 0);
+    // Field selectors, or unrelated notification writes re-render this header.
+    const lastSeenRxId = useNotificationStore((s) => s.lastSeenRxId);
+    const lastSeenRxStatus = useNotificationStore((s) => s.lastSeenRxStatus);
+    const setLastSeenRx = useNotificationStore((s) => s.setLastSeenRx);
+    const { unreadCount: apiUnreadCount } = useNotifications();
+    const isRxUnread =
+      hasPendingPrescription &&
+      latestPrescription &&
+      (latestPrescription.id !== lastSeenRxId ||
+        String(latestPrescription.status) !== lastSeenRxStatus);
+    const unreadCount = apiUnreadCount + (isRxUnread ? 1 : 0);
 
-  const walletDisplay =
-    balance != null
-      ? `₹${Number(balance.walletBalance) % 1 === 0 ? Number(balance.walletBalance).toFixed(0) : Number(balance.walletBalance).toFixed(2)}`
-      : "₹0";
+    const walletDisplay =
+      balance != null
+        ? `₹${Number(balance.walletBalance) % 1 === 0 ? Number(balance.walletBalance).toFixed(0) : Number(balance.walletBalance).toFixed(2)}`
+        : "₹0";
 
-  return (
-    <View
-      className="flex-row justify-between items-center px-5 pb-2"
-      style={{ paddingTop: insets.top + exactScale(10) }}
-    >
-      {/* Left: Delivery Location */}
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={s.deliverLabel} className="font-inter-semibold uppercase">
-          DELIVER TO
-        </Text>
-        <Touchable
-          activeOpacity={0.1}
-          onPress={onPressLocation}
-          accessibilityRole="button"
-          accessibilityLabel={`Change delivery location, current ${location.label || location.city}`}
-          className="flex-row items-center mt-1.5"
-          style={{ minWidth: 0 }}
-        >
-          {location.shortCity && location.pincode ? (
-            <View
-              className="flex-row items-center"
-              style={{ flexShrink: 1, minWidth: 0 }}
-            >
+    return (
+      <View
+        className="flex-row justify-between items-center px-5 pb-2"
+        style={{ paddingTop: insets.top + exactScale(10) }}
+      >
+        {/* Left: Delivery Location */}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text
+            style={s.deliverLabel}
+            className="font-inter-semibold uppercase"
+          >
+            DELIVER TO
+          </Text>
+          <Touchable
+            activeOpacity={0.1}
+            onPress={onPressLocation}
+            accessibilityRole="button"
+            accessibilityLabel={`Change delivery location, current ${location.label || location.city}`}
+            className="flex-row items-center mt-1.5"
+            style={{ minWidth: 0 }}
+          >
+            {location.shortCity && location.pincode ? (
+              <View
+                className="flex-row items-center"
+                style={{ flexShrink: 1, minWidth: 0 }}
+              >
+                <Text
+                  style={[s.locationText, { flexShrink: 1 }]}
+                  className="font-inter-bold capitalize"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {location.shortCity}
+                </Text>
+                <Text
+                  style={[s.locationText, { flexShrink: 0 }]}
+                  className="font-inter-bold"
+                  numberOfLines={1}
+                >
+                  {` - ${location.pincode}`}
+                </Text>
+              </View>
+            ) : (
               <Text
                 style={[s.locationText, { flexShrink: 1 }]}
                 className="font-inter-bold capitalize"
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {location.shortCity}
+                {location.label &&
+                location.label !== "DELIVER TO" &&
+                location.label !== location.city
+                  ? `${location.label} - ${location.city}`
+                  : location.city}
               </Text>
-              <Text
-                style={[s.locationText, { flexShrink: 0 }]}
-                className="font-inter-bold"
-                numberOfLines={1}
-              >
-                {` - ${location.pincode}`}
-              </Text>
-            </View>
-          ) : (
-            <Text
-              style={[s.locationText, { flexShrink: 1 }]}
-              className="font-inter-bold capitalize"
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {location.label &&
-              location.label !== "DELIVER TO" &&
-              location.label !== location.city
-                ? `${location.label} - ${location.city}`
-                : location.city}
-            </Text>
-          )}
-          <icons.arrow_drop_down
-            fill="#1C1B1F"
-            style={[s.dropDownIcon, { flexShrink: 0 }]}
-          />
-        </Touchable>
-      </View>
-
-      {/* Right: Wallet + Notification */}
-      <View className="flex-row items-start gap-3" style={{ flexShrink: 0 }}>
-        <Touchable
-          onPress={() => router.push("/profile/wallet")}
-          className="items-center"
-          accessibilityRole="button"
-          accessibilityLabel={`Wallet, balance ${walletDisplay}`}
-        >
-          <View
-            style={s.iconBtn}
-            className="rounded-full justify-center items-center bg-white"
-          >
-            <Image
-              source={HOME_IMAGES.wallet}
-              style={s.walletIcon}
-              contentFit="contain"
+            )}
+            <icons.arrow_drop_down
+              fill="#1C1B1F"
+              style={[s.dropDownIcon, { flexShrink: 0 }]}
             />
-          </View>
-          <View style={[s.walletBadgeWrap, { marginTop: -exactScale(14) }]}>
-            <Text style={s.walletBadgeText} className="font-inter-bold">
-              {walletDisplay}
-            </Text>
-          </View>
-        </Touchable>
+          </Touchable>
+        </View>
 
-        <Touchable
-          onPress={() => {
-            if (isRxUnread && latestPrescription) {
-              setLastSeenRx(latestPrescription.id, String(latestPrescription.status));
-            }
-            router.push("/notifications");
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={`Notifications, ${unreadCount} unread`}
-          style={s.notificationBtn}
-          className="justify-center items-center bg-white relative"
-        >
-          <NotificationIcon color={colors.text} style={s.notificationIcon} />
-          {unreadCount > 0 && (
+        {/* Right: Wallet + Notification */}
+        <View className="flex-row items-start gap-3" style={{ flexShrink: 0 }}>
+          <Touchable
+            onPress={() => router.push("/profile/wallet")}
+            className="items-center"
+            accessibilityRole="button"
+            accessibilityLabel={`Wallet, balance ${walletDisplay}`}
+          >
             <View
-              style={s.badge}
-              className="absolute -top-1 -right-1 bg-[#C22923] rounded-full items-center justify-center px-1 border border-white"
+              style={s.iconBtn}
+              className="rounded-full justify-center items-center bg-white"
             >
-              <Text
-                style={s.badgeText}
-                className="font-inter-bold text-white leading-none"
-              >
-                {unreadCount}
+              <Image
+                source={HOME_IMAGES.wallet}
+                style={s.walletIcon}
+                contentFit="contain"
+              />
+            </View>
+            <View style={[s.walletBadgeWrap, { marginTop: -exactScale(14) }]}>
+              <Text style={s.walletBadgeText} className="font-inter-bold">
+                {walletDisplay}
               </Text>
             </View>
-          )}
-        </Touchable>
+          </Touchable>
+
+          <Touchable
+            onPress={() => {
+              if (isRxUnread && latestPrescription) {
+                setLastSeenRx(
+                  latestPrescription.id,
+                  String(latestPrescription.status),
+                );
+              }
+              router.push("/notifications");
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Notifications, ${unreadCount} unread`}
+            style={s.notificationBtn}
+            className="justify-center items-center bg-white relative"
+          >
+            <NotificationIcon color={colors.text} style={s.notificationIcon} />
+            {unreadCount > 0 && (
+              <View
+                style={s.badge}
+                className="absolute -top-1 -right-1 bg-[#C22923] rounded-full items-center justify-center px-1 border border-white"
+              >
+                <Text
+                  style={s.badgeText}
+                  className="font-inter-bold text-white leading-none"
+                >
+                  {unreadCount}
+                </Text>
+              </View>
+            )}
+          </Touchable>
+        </View>
       </View>
-    </View>
-  );
-});
+    );
+  },
+);
 HomeHeader.displayName = "HomeHeader";

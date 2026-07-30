@@ -39,9 +39,7 @@ const registrationKey = (token: string): string => token;
  * Shared by initial registration and token-refresh so the de-dup/cache logic
  * lives in one place. Assumes permission/Expo-Go gating already passed.
  */
-const syncToken = async (
-  token: string,
-): Promise<void> => {
+const syncToken = async (token: string): Promise<void> => {
   const key = registrationKey(token);
 
   // Already handled this key this session (or a call is mid-flight) — skip.
@@ -78,7 +76,7 @@ const syncToken = async (
     if (__DEV__) {
       __devApiCallCount += 1;
       console.log(
-        `[PushToken] POST /push-notifications/devices — call #${__devApiCallCount} this session`
+        `[PushToken] POST /push-notifications/devices — call #${__devApiCallCount} this session`,
       );
     }
     await notificationApi.registerDevice(token, deviceInfo);
@@ -179,9 +177,7 @@ export const notificationService = {
     await syncToken(token);
   },
 
-  updateToken: async (
-    newToken: string,
-  ): Promise<void> => {
+  updateToken: async (newToken: string): Promise<void> => {
     if (__DEV__) console.log("[PushToken:refreshed]", newToken);
     await syncToken(newToken);
   },

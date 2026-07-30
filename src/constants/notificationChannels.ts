@@ -6,9 +6,9 @@
  * sync with the backend; changing a value here means updating the backend too.
  */
 export const NOTIFICATION_CHANNELS = {
-  ORDERS: 'orders',
-  REMINDERS: 'reminders',
-  OFFERS: 'offers',
+  ORDERS: "orders",
+  REMINDERS: "reminders",
+  OFFERS: "offers",
 } as const;
 
 export type NotificationChannelId =

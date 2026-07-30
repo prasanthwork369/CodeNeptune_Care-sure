@@ -62,7 +62,9 @@ export async function getDeviceInfo(): Promise<DeviceInfo> {
     device_os: Platform.OS as DeviceInfo["device_os"],
     device_os_name: Device.osName,
     device_os_version: Device.osVersion,
-    device_type: DEVICE_TYPE_MAP[Device.deviceType ?? Device.DeviceType.UNKNOWN] ?? "UNKNOWN",
+    device_type:
+      DEVICE_TYPE_MAP[Device.deviceType ?? Device.DeviceType.UNKNOWN] ??
+      "UNKNOWN",
     platform_api_level: Device.platformApiLevel,
     is_device: Device.isDevice,
 

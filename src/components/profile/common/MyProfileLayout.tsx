@@ -226,7 +226,8 @@ export const MyProfileLayout: React.FC = () => {
 
   // Opens the dedicated Delete Account confirmation screen, which handles the
   // actual deletion (and the "lose access to" details from the design).
-  const handleDeleteAccount = () => router.push("/profile/delete-account" as any);
+  const handleDeleteAccount = () =>
+    router.push("/profile/delete-account" as any);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>

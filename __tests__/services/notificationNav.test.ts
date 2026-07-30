@@ -41,7 +41,9 @@ describe("NotificationNavigation — Route Resolution & Tap Deduplication", () =
 
     NotificationNavigation.handleTap(payload, "tap-uuid-999");
 
-    expect(useNotificationNavigationStore.getState().pendingNotification).toEqual(payload);
+    expect(
+      useNotificationNavigationStore.getState().pendingNotification,
+    ).toEqual(payload);
     expect(router.push).toHaveBeenCalledWith("/(auth)/login");
   });
 

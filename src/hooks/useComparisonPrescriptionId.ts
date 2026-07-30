@@ -13,5 +13,7 @@ export function useComparisonPrescriptionId(
   const { prescriptions } = usePrescriptions({});
   if (prescriptionId) return prescriptionId;
   if (!prescriptionOrderId) return undefined;
-  return prescriptions.find((p) => p.prescriptionOrderId === prescriptionOrderId)?.id;
+  return prescriptions.find(
+    (p) => p.prescriptionOrderId === prescriptionOrderId,
+  )?.id;
 }

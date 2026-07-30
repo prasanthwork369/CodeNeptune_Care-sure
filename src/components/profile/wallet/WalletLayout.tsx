@@ -25,7 +25,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { profileStyles as s } from '../profile.styles';
+import { profileStyles as s } from "../profile.styles";
 
 // Same near-critically-damped spring as the bottom LiquidTabBar's snap
 // animation -- fast settle, no visible overshoot/bounce.
@@ -41,10 +41,13 @@ import { ShimmerBlock } from "@/src/components/ui/shimmer";
 const TransactionIcon = ({ type }: { type: TxIconType }) => {
   const isCredit = type === "plus" || type === "coin_credit" || type === "cash";
   const src =
-    type === 'coin_credit' ? HOME_IMAGES.coinCredit :
-      type === 'coin_debit' ? HOME_IMAGES.coinDebit :
-        isCredit ? HOME_IMAGES.accountBalanceCredit :
-          HOME_IMAGES.accountBalanceDebit;
+    type === "coin_credit"
+      ? HOME_IMAGES.coinCredit
+      : type === "coin_debit"
+        ? HOME_IMAGES.coinDebit
+        : isCredit
+          ? HOME_IMAGES.accountBalanceCredit
+          : HOME_IMAGES.accountBalanceDebit;
 
   return (
     <View
@@ -67,7 +70,9 @@ export const WalletLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   const [isHistorySheetVisible, setIsHistorySheetVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState<"wallet" | "credits" | "coins">("wallet");
+  const [activeTab, setActiveTab] = useState<"wallet" | "credits" | "coins">(
+    "wallet",
+  );
 
   const { profile } = useProfile();
   const isCorporateUser = profile?.isCorporateUser ?? false;
@@ -89,7 +94,10 @@ export const WalletLayout: React.FC = () => {
 
   useEffect(() => {
     const visualIndex = visibleTabs.indexOf(activeTab as any);
-    activeTabIndex.value = withSpring(Math.max(0, visualIndex), TAB_SNAP_SPRING);
+    activeTabIndex.value = withSpring(
+      Math.max(0, visualIndex),
+      TAB_SNAP_SPRING,
+    );
   }, [activeTab, isCorporateUser]);
 
   // Guard against landing on the Credits tab if the profile loads in as
@@ -108,11 +116,19 @@ export const WalletLayout: React.FC = () => {
   });
 
   const router = useNav();
-  const { balance, loading: balanceLoading, refetch: refetchBalance } = useWalletBalance();
+  const {
+    balance,
+    loading: balanceLoading,
+    refetch: refetchBalance,
+  } = useWalletBalance();
 
   // A null balance with active loading=false still denotes a loading/pre-auth state.
   const isBalancePending = balanceLoading || balance == null;
-  const { logs, loading: logsLoading, refetch: refetchLogs } = useWalletLogs(20, 0);
+  const {
+    logs,
+    loading: logsLoading,
+    refetch: refetchLogs,
+  } = useWalletLogs(20, 0);
   const { data: settings } = useCartWalletSettings();
   const coinValue = settings?.wallet?.coinValueInRupees ?? 1;
 
@@ -144,8 +160,6 @@ export const WalletLayout: React.FC = () => {
       >
         {/* Balance Dashboard Card */}
         <View style={cardStyles.card}>
-
-
           {/* 3D Wallet & Shield absolute background artwork */}
           <Image
             source={HOME_IMAGES.rupeeMoneyBag}
@@ -229,7 +243,12 @@ export const WalletLayout: React.FC = () => {
               <View style={cardStyles.cardInfoSection}>
                 <Text style={cardStyles.cardLabel}>WALLET BALANCE</Text>
                 {isBalancePending ? (
-                  <ShimmerBlock width={120} height={28} borderRadius={6} style={{ marginVertical: 4 }} />
+                  <ShimmerBlock
+                    width={120}
+                    height={28}
+                    borderRadius={6}
+                    style={{ marginVertical: 4 }}
+                  />
                 ) : (
                   <Text style={cardStyles.cardValue}>
                     ₹{Number(balance?.walletBalance ?? 0).toLocaleString()}
@@ -260,7 +279,12 @@ export const WalletLayout: React.FC = () => {
               <View style={cardStyles.cardInfoSection}>
                 <Text style={cardStyles.cardLabel}>CORPORATE CREDITS</Text>
                 {isBalancePending ? (
-                  <ShimmerBlock width={120} height={28} borderRadius={6} style={{ marginVertical: 4 }} />
+                  <ShimmerBlock
+                    width={120}
+                    height={28}
+                    borderRadius={6}
+                    style={{ marginVertical: 4 }}
+                  />
                 ) : (
                   <Text style={cardStyles.cardValue}>
                     ₹{Number(balance?.corporateCredits ?? 0).toLocaleString()}
@@ -285,7 +309,12 @@ export const WalletLayout: React.FC = () => {
                     resizeMode="contain"
                   />
                   {isBalancePending ? (
-                    <ShimmerBlock width={80} height={28} borderRadius={6} style={{ marginVertical: 4 }} />
+                    <ShimmerBlock
+                      width={80}
+                      height={28}
+                      borderRadius={6}
+                      style={{ marginVertical: 4 }}
+                    />
                   ) : (
                     <Text style={cardStyles.cardValue}>
                       {balance?.coinsBalance ?? 0}
@@ -302,11 +331,19 @@ export const WalletLayout: React.FC = () => {
 
         {/* Transaction History Section Header */}
         <View style={cardStyles.historyHeader}>
-          <Text style={s.walletTitle} className="font-inter-extrabold text-brand-text">
+          <Text
+            style={s.walletTitle}
+            className="font-inter-extrabold text-brand-text"
+          >
             Transaction History
           </Text>
-          <Touchable onPress={() => router.push('/profile/wallet/history' as any)}>
-            <Text style={s.walletTxTitle} className="font-inter-bold text-[#FF8A00]">
+          <Touchable
+            onPress={() => router.push("/profile/wallet/history" as any)}
+          >
+            <Text
+              style={s.walletTxTitle}
+              className="font-inter-bold text-[#FF8A00]"
+            >
               View All
             </Text>
           </Touchable>
@@ -321,7 +358,10 @@ export const WalletLayout: React.FC = () => {
               <ShimmerBlock height={48} borderRadius={8} />
             </View>
           ) : previewTxs.length === 0 ? (
-            <Text style={s.walletLabel} className="font-inter text-brand-subtext text-center py-6">
+            <Text
+              style={s.walletLabel}
+              className="font-inter text-brand-subtext text-center py-6"
+            >
               No transactions yet
             </Text>
           ) : (
@@ -330,10 +370,16 @@ export const WalletLayout: React.FC = () => {
                 <View style={cardStyles.txRow}>
                   <TransactionIcon type={tx.iconType} />
                   <View style={cardStyles.txDetails}>
-                    <Text style={s.walletTxTitle} className="font-inter-medium text-brand-text">
+                    <Text
+                      style={s.walletTxTitle}
+                      className="font-inter-medium text-brand-text"
+                    >
                       {tx.title}
                     </Text>
-                    <Text style={[s.walletSub, cardStyles.txDateText]} className="font-inter text-brand-subtext mt-0.5">
+                    <Text
+                      style={[s.walletSub, cardStyles.txDateText]}
+                      className="font-inter text-brand-subtext mt-0.5"
+                    >
                       {tx.date}
                     </Text>
                   </View>
@@ -345,14 +391,21 @@ export const WalletLayout: React.FC = () => {
                         resizeMode="contain"
                       />
                       <Text
-                        style={[s.walletTxTitle, cardStyles.txAmountText, { color: tx.amountColor }]}
+                        style={[
+                          s.walletTxTitle,
+                          cardStyles.txAmountText,
+                          { color: tx.amountColor },
+                        ]}
                       >
                         {tx.amount}
                       </Text>
                     </View>
                   ) : (
                     <Text
-                      style={[cardStyles.txAmountText, { color: tx.amountColor }]}
+                      style={[
+                        cardStyles.txAmountText,
+                        { color: tx.amountColor },
+                      ]}
                     >
                       {tx.amount}
                     </Text>

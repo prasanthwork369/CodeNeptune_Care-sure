@@ -1,7 +1,10 @@
 import { locationService } from "@/src/services/location.service";
 import { messagingService as notificationService } from "@/src/services/firebase";
 import { useAuthStore } from "@/src/store/authStore";
-import { useLocationStore, waitForLocationHydration } from "@/src/store/locationStore";
+import {
+  useLocationStore,
+  waitForLocationHydration,
+} from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { isExpoGo } from "@/src/utils/environment";
 import { useIsFocused } from "@react-navigation/native";
@@ -58,7 +61,10 @@ export const useHomeOnboarding = () => {
             );
             if (saved) {
               const parsed = JSON.parse(saved);
-              if (parsed?.location && !useLocationStore.getState().selectedAddressId) {
+              if (
+                parsed?.location &&
+                !useLocationStore.getState().selectedAddressId
+              ) {
                 useLocationStore.getState().setLocation(parsed.location, {
                   coords: parsed.coords ?? undefined,
                   pincode: parsed.pincode ?? undefined,

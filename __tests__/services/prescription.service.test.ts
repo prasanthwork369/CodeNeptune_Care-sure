@@ -18,7 +18,11 @@ describe("prescriptionService — Payload & Exception Handling", () => {
   });
 
   it("upload passes payload to API and wraps success result", async () => {
-    const mockRx = { id: "rx-55", category: 1, imageUrls: ["https://img.com/1.jpg"] } as any;
+    const mockRx = {
+      id: "rx-55",
+      category: 1,
+      imageUrls: ["https://img.com/1.jpg"],
+    } as any;
     (prescriptionApi.upload as jest.Mock).mockResolvedValueOnce(mockRx);
 
     const result = await prescriptionService.upload({

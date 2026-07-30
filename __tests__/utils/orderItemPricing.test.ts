@@ -13,9 +13,7 @@ const makeItem = (overrides: Partial<OrderItem> = {}): OrderItem => ({
 
 describe("getOrderItemPricing", () => {
   it("uses the direct item discountPercent", () => {
-    expect(
-      getOrderItemPricing(makeItem({ discountPercent: 15 })),
-    ).toEqual({
+    expect(getOrderItemPricing(makeItem({ discountPercent: 15 }))).toEqual({
       mrp: 100,
       sellingPrice: 85,
       discountPercent: 15,
@@ -117,9 +115,8 @@ describe("getOrderItemPricing", () => {
     "does not derive a discount from invalid prices: %p",
     (overrides) => {
       expect(
-        getOrderItemPricing(
-          makeItem({ unitPrice: undefined, ...overrides }),
-        ).discountPercent,
+        getOrderItemPricing(makeItem({ unitPrice: undefined, ...overrides }))
+          .discountPercent,
       ).toBe(0);
     },
   );
@@ -128,9 +125,8 @@ describe("getOrderItemPricing", () => {
     "ignores invalid direct discount %p",
     (discountPercent) => {
       expect(
-        getOrderItemPricing(
-          makeItem({ discountPercent, unitPrice: "100" }),
-        ).discountPercent,
+        getOrderItemPricing(makeItem({ discountPercent, unitPrice: "100" }))
+          .discountPercent,
       ).toBe(0);
     },
   );

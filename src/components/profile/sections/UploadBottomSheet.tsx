@@ -5,10 +5,10 @@ import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -59,7 +59,11 @@ const ActionRow = ({
         style={[s.actionRow, !last && s.actionRowBorder]}
       >
         <View style={[s.actionIcon, { backgroundColor: iconBg }]}>
-          <IconComponent width={exactScale(20)} height={exactScale(20)} color={iconColor} />
+          <IconComponent
+            width={exactScale(20)}
+            height={exactScale(20)}
+            color={iconColor}
+          />
         </View>
         <View style={s.actionText}>
           <Text style={s.actionLabel}>{label}</Text>
@@ -152,7 +156,11 @@ const s = StyleSheet.create({
     marginRight: exactScale(14),
   },
   actionText: { flex: 1 },
-  actionLabel: { fontSize: moderateScale(15), fontWeight: "600", color: "#111" },
+  actionLabel: {
+    fontSize: moderateScale(15),
+    fontWeight: "600",
+    color: "#111",
+  },
   actionSublabel: {
     fontSize: moderateScale(12),
     color: "#9CA3AF",
@@ -175,7 +183,11 @@ const s = StyleSheet.create({
     borderColor: "#EBEBEB",
     marginBottom: exactScale(14),
   },
-  cancelText: { fontSize: moderateScale(15), fontWeight: "600", color: "#CF1A1A" },
+  cancelText: {
+    fontSize: moderateScale(15),
+    fontWeight: "600",
+    color: "#CF1A1A",
+  },
 });
 
 export default UploadBottomSheet;

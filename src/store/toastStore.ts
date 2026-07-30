@@ -1,6 +1,6 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-type ToastType = 'success' | 'warning' | 'error';
+type ToastType = "success" | "warning" | "error";
 
 interface ToastState {
   visible: boolean;
@@ -12,8 +12,8 @@ interface ToastState {
 
 export const useToastStore = create<ToastState>((set) => ({
   visible: false,
-  message: '',
-  type: 'success',
-  show: (message, type = 'success') => set({ visible: true, message, type }),
+  message: "",
+  type: "success",
+  show: (message, type = "success") => set({ visible: true, message, type }),
   hide: () => set({ visible: false }),
 }));

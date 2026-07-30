@@ -1,5 +1,8 @@
 import React from "react";
-import { renderWithProviders, fireEvent } from "@/__tests__/test-utils/renderWithProviders";
+import {
+  renderWithProviders,
+  fireEvent,
+} from "@/__tests__/test-utils/renderWithProviders";
 import { TextInput } from "react-native";
 import { OtpForm } from "@/src/components/auth/sections/OtpForm";
 
@@ -34,7 +37,7 @@ describe("OtpForm Component", () => {
 
   it("renders Resend OTP button when cooldown reaches 0", () => {
     const { getByText, queryByText } = renderWithProviders(
-      <OtpForm {...defaultProps} resendCooldown={0} />
+      <OtpForm {...defaultProps} resendCooldown={0} />,
     );
 
     expect(queryByText("Resend OTP in")).toBeNull();
@@ -44,7 +47,7 @@ describe("OtpForm Component", () => {
   it("triggers onResend callback when Resend OTP button is pressed", () => {
     const onResend = jest.fn();
     const { getByText } = renderWithProviders(
-      <OtpForm {...defaultProps} resendCooldown={0} onResend={onResend} />
+      <OtpForm {...defaultProps} resendCooldown={0} onResend={onResend} />,
     );
 
     fireEvent.press(getByText("Resend OTP"));
@@ -53,7 +56,10 @@ describe("OtpForm Component", () => {
 
   it("displays otpError text when provided", () => {
     const { getByText } = renderWithProviders(
-      <OtpForm {...defaultProps} otpError="Invalid OTP code. Please try again." />
+      <OtpForm
+        {...defaultProps}
+        otpError="Invalid OTP code. Please try again."
+      />,
     );
 
     expect(getByText("Invalid OTP code. Please try again.")).toBeTruthy();

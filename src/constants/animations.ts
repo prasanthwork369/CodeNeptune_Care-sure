@@ -3,8 +3,8 @@
 import { durations, springs } from "@/src/theme";
 
 export const ANIMATION_CONSTANTS = {
-    DURATIONS: durations,
-    SPRINGS: springs,
-    ENABLED: true,
-    USE_NATIVE_DRIVER: true,
+  DURATIONS: durations,
+  SPRINGS: springs,
+  ENABLED: true,
+  USE_NATIVE_DRIVER: true,
 };

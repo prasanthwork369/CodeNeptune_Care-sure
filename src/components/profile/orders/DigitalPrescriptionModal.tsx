@@ -5,7 +5,15 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState, useMemo } from "react";
-import { Alert, Image, Platform, Text, useWindowDimensions, View, ActivityIndicator } from "react-native";
+import {
+  Alert,
+  Image,
+  Platform,
+  Text,
+  useWindowDimensions,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { useSystemTemplate } from "@/src/hooks/queries/useSystemTemplates";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { WebView } from "react-native-webview";
@@ -88,7 +96,10 @@ export const DigitalPrescriptionModal: React.FC<
     setDownloading(true);
     try {
       const { uri } = await Print.printToFileAsync({ html: printHtml });
-      const sanitizedOrderId = (orderId ?? "prescription").replace(/[^a-zA-Z0-9-_]/g, "");
+      const sanitizedOrderId = (orderId ?? "prescription").replace(
+        /[^a-zA-Z0-9-_]/g,
+        "",
+      );
       await downloadLocalFile(uri, `RX-${sanitizedOrderId}.pdf`);
       // Android already copied the file into Downloads, so the temp is safe to
       // remove; iOS still references it for the preview/share, so leave it for
@@ -97,13 +108,15 @@ export const DigitalPrescriptionModal: React.FC<
         try {
           new File(uri).delete();
         } catch (cleanupError) {
-          if (__DEV__) console.log("[RxDownload] temp cleanup failed:", cleanupError);
+          if (__DEV__)
+            console.log("[RxDownload] temp cleanup failed:", cleanupError);
         }
       }
     } catch (error: any) {
       Alert.alert(
         "Download Error",
-        error?.message || "Could not download the prescription. Please try again.",
+        error?.message ||
+          "Could not download the prescription. Please try again.",
       );
     } finally {
       setDownloading(false);
@@ -124,7 +137,7 @@ export const DigitalPrescriptionModal: React.FC<
   const doctorSignature = clinicalData?.doctorSnapshot?.signatureUrl || "";
 
   const issueDate = new Date(
-    clinicalData?.approvedAt || orderCreatedAt || new Date()
+    clinicalData?.approvedAt || orderCreatedAt || new Date(),
   );
   const expiryDate = new Date(issueDate);
   // Validity is the backend's rule, not the app's — printing a longer expiry
@@ -177,7 +190,7 @@ export const DigitalPrescriptionModal: React.FC<
     "rx.generated",
     "DOCUMENT",
     variables,
-    visible && prescriptions.length > 0
+    visible && prescriptions.length > 0,
   );
 
   const htmlContent = useMemo(() => {
@@ -263,7 +276,8 @@ export const DigitalPrescriptionModal: React.FC<
         style={{
           paddingHorizontal: exactScale(20),
           paddingTop: exactScale(22),
-          paddingBottom: Math.max(adjustedBottom, exactScale(32)) + exactScale(24),
+          paddingBottom:
+            Math.max(adjustedBottom, exactScale(32)) + exactScale(24),
         }}
       >
         {/* Header Row with Title + download (icon only) on the right */}
@@ -308,7 +322,8 @@ export const DigitalPrescriptionModal: React.FC<
           >
             {prescriptions.map((p: any, idx: number) => {
               const active = activePatientIdx === idx;
-              const name = p.patientName ?? p.patient?.name ?? `Patient ${idx + 1}`;
+              const name =
+                p.patientName ?? p.patient?.name ?? `Patient ${idx + 1}`;
               return (
                 <Touchable
                   key={idx}
@@ -342,7 +357,13 @@ export const DigitalPrescriptionModal: React.FC<
 
         {/* Loading State */}
         {isLoading && (
-          <View style={{ alignItems: "center", justifyContent: "center", height: screenHeight * 0.4 }}>
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: screenHeight * 0.4,
+            }}
+          >
             <ActivityIndicator size="large" color="#0F7635" />
             <Text
               style={{
@@ -358,7 +379,13 @@ export const DigitalPrescriptionModal: React.FC<
 
         {/* Error State */}
         {isError && (
-          <View style={{ alignItems: "center", justifyContent: "center", height: screenHeight * 0.4 }}>
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: screenHeight * 0.4,
+            }}
+          >
             <Text
               style={{
                 fontSize: moderateScale(14),

@@ -245,7 +245,8 @@ export function useOtp() {
       setIsRedirecting(true);
 
       // Navigate immediately; cart merge runs in the background.
-      const pendingNotification = useNotificationNavigationStore.getState().pendingNotification;
+      const pendingNotification =
+        useNotificationNavigationStore.getState().pendingNotification;
       if (pendingNotification) {
         NotificationNavigation.executeNavigation(pendingNotification);
         useNotificationNavigationStore.getState().clearPendingNotification();
@@ -268,9 +269,7 @@ export function useOtp() {
               medicineSlug: item.medicineSlug,
               unitPrice: Number(item.unitPrice),
               mrp: Number(
-                item.metadata?.price ||
-                  item.originalPrice ||
-                  item.unitPrice,
+                item.metadata?.price || item.originalPrice || item.unitPrice,
               ),
               discountPercent: Number(item.discountPercent || 0),
               quantity: item.quantity,
@@ -283,7 +282,12 @@ export function useOtp() {
             useCartPendingStore.getState().removeGuestItem(item.id);
             anyMerged = true;
           } catch (err) {
-            if (__DEV__) console.warn("[CartMerge] Failed to merge item:", item.medicineId, err);
+            if (__DEV__)
+              console.warn(
+                "[CartMerge] Failed to merge item:",
+                item.medicineId,
+                err,
+              );
           }
         }
 

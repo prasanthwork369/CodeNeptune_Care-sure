@@ -48,7 +48,12 @@ const HelpSkeleton = () => (
           paddingVertical: 10,
         }}
       >
-        <Skeleton width={48} height={48} borderRadius={24} style={{ marginBottom: 12 }} />
+        <Skeleton
+          width={48}
+          height={48}
+          borderRadius={24}
+          style={{ marginBottom: 12 }}
+        />
         <Skeleton width="40%" height={18} style={{ marginBottom: 8 }} />
         <Skeleton width="85%" height={12} style={{ marginBottom: 6 }} />
         <Skeleton width="60%" height={12} style={{ marginBottom: 16 }} />
@@ -68,7 +73,7 @@ const HelpSkeleton = () => (
 export const HelpLayout: React.FC = () => {
   const { data: settings, isLoading } = useSettings();
   const adjustedBottom = useAdjustedBottomInset();
-  
+
   const { callSupport, whatsappOrder, emailSupport } = useContactActions({
     phone: settings?.contactPhone,
     whatsapp: settings?.whatsappNumber,
@@ -77,7 +82,8 @@ export const HelpLayout: React.FC = () => {
 
   const displayPhone = settings?.contactPhone || SUPPORT_PHONE;
   const phoneDigits = displayPhone.replace(/\D/g, "");
-  const localPhone = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phoneDigits;
+  const localPhone =
+    phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phoneDigits;
   const formattedPhone =
     localPhone.length === 10
       ? `+91 ${localPhone.slice(0, 5)} ${localPhone.slice(5)}`
@@ -102,10 +108,16 @@ export const HelpLayout: React.FC = () => {
             <IconCircle>
               <icons.whatsapp width={28} height={28} />
             </IconCircle>
-            <Text className="font-inter-bold text-brand-text mb-1" style={{ fontSize: moderateScale(15) }}>
+            <Text
+              className="font-inter-bold text-brand-text mb-1"
+              style={{ fontSize: moderateScale(15) }}
+            >
               Chat On Whatsapp
             </Text>
-            <Text className="font-inter-medium text-brand-subtext leading-[19px] mb-3" style={{ fontSize: moderateScale(13) }}>
+            <Text
+              className="font-inter-medium text-brand-subtext leading-[19px] mb-3"
+              style={{ fontSize: moderateScale(13) }}
+            >
               Real-time assistance for urgent clinical queries.{"\n"}Available
               24/7.
             </Text>
@@ -114,7 +126,10 @@ export const HelpLayout: React.FC = () => {
               activeOpacity={0.7}
               onPress={whatsappOrder}
             >
-              <Text className="font-inter-semibold text-[#0F7635] mr-2" style={{ fontSize: moderateScale(15) }}>
+              <Text
+                className="font-inter-semibold text-[#0F7635] mr-2"
+                style={{ fontSize: moderateScale(15) }}
+              >
                 Start Chat
               </Text>
               <icons.green_arrow width={15} height={15} />
@@ -126,16 +141,28 @@ export const HelpLayout: React.FC = () => {
               <IconCircle>
                 <icons.tel width={26} height={26} />
               </IconCircle>
-              <Text className="font-inter-bold text-brand-text mb-1" style={{ fontSize: moderateScale(15) }}>
+              <Text
+                className="font-inter-bold text-brand-text mb-1"
+                style={{ fontSize: moderateScale(15) }}
+              >
                 Direct Line
               </Text>
-              <Text className="font-inter-medium text-brand-subtext leading-[19px] mb-2" style={{ fontSize: moderateScale(13) }}>
+              <Text
+                className="font-inter-medium text-brand-subtext leading-[19px] mb-2"
+                style={{ fontSize: moderateScale(13) }}
+              >
                 Speak directly with a restorative{"\n"}architect specialist.
               </Text>
-              <Text className="font-inter-semibold text-brand-text mb-0.5" style={{ fontSize: moderateScale(16) }}>
+              <Text
+                className="font-inter-semibold text-brand-text mb-0.5"
+                style={{ fontSize: moderateScale(16) }}
+              >
                 {formattedPhone}
               </Text>
-              <Text className="font-inter-medium text-[#3D4A43]" style={{ fontSize: moderateScale(13) }}>
+              <Text
+                className="font-inter-medium text-[#3D4A43]"
+                style={{ fontSize: moderateScale(13) }}
+              >
                 Average wait: 2 mins
               </Text>
             </HelpCard>
@@ -145,10 +172,16 @@ export const HelpLayout: React.FC = () => {
             <IconCircle>
               <icons.mail width={26} height={26} fill="#0F7635" />
             </IconCircle>
-            <Text className="font-inter-bold text-brand-text mb-1" style={{ fontSize: moderateScale(15) }}>
+            <Text
+              className="font-inter-bold text-brand-text mb-1"
+              style={{ fontSize: moderateScale(15) }}
+            >
               Email Support
             </Text>
-            <Text className="font-inter-medium text-brand-subtext leading-[19px] mb-3" style={{ fontSize: moderateScale(13) }}>
+            <Text
+              className="font-inter-medium text-brand-subtext leading-[19px] mb-3"
+              style={{ fontSize: moderateScale(13) }}
+            >
               Detailed requests and documentation for{"\n"}non-urgent matters.
             </Text>
             <Touchable
@@ -156,7 +189,10 @@ export const HelpLayout: React.FC = () => {
               activeOpacity={0.7}
               onPress={emailSupport}
             >
-              <Text className="font-inter-semibold text-[#0F7635] mr-2" style={{ fontSize: moderateScale(15) }}>
+              <Text
+                className="font-inter-semibold text-[#0F7635] mr-2"
+                style={{ fontSize: moderateScale(15) }}
+              >
                 Open Ticket
               </Text>
               <icons.green_arrow width={15} height={15} />
