@@ -132,6 +132,16 @@ export function usePaymentCalculations() {
       return;
     }
 
+    // The calculated bill is the only trusted total. Without it the route param is the
+    // sole source, and that is spoofable and can be stale -- refuse rather than send it.
+    if (!bill) {
+      Alert.alert(
+        "Order Total Unavailable",
+        "We couldn't confirm your bill. Please go back to your cart and try again.",
+      );
+      return;
+    }
+
     // Loader on immediately, before any network call.
     setPlacingOrder(true);
 

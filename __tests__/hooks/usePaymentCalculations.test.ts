@@ -4,6 +4,7 @@ import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
+import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
@@ -89,6 +90,33 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
       },
       displayLocation: { label: "Home", city: "Mumbai" },
     });
+
+    // Both real flows compute a bill before reaching this screen; without one the hook
+    // now refuses to place the order rather than trusting the route param.
+    useCheckoutStore.getState().setBill(
+      {
+        subtotal: 200,
+        productDiscount: 0,
+        couponDiscount: 0,
+        walletDiscount: 0,
+        coinsDiscount: 0,
+        corporateCreditsDiscount: 0,
+        deliveryFee: 0,
+        handlingCharge: 0,
+        totalSaved: 0,
+        toPay: 200,
+      } as never,
+      {
+        walletUsed: false,
+        coinsUsed: false,
+        corporateCreditsUsed: false,
+        couponCode: "",
+      },
+    );
+  });
+
+  afterEach(() => {
+    useCheckoutStore.getState().clear();
   });
 
   it("shows location sheet when delivery address is missing", async () => {
@@ -106,6 +134,25 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
 
     expect(result.current.showLocationSheet).toBe(true);
     expect(mockCreateOrder).not.toHaveBeenCalled();
+  });
+
+  // The route param is spoofable, so a missing bill must block the order, not fall back to it.
+  it("refuses to place an order when no bill has been calculated", async () => {
+    useCheckoutStore.getState().clear();
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+
+    const { result } = renderHook(() => usePaymentCalculations());
+
+    await act(async () => {
+      await result.current.handlePlaceOrder();
+    });
+
+    expect(mockCreateOrder).not.toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Order Total Unavailable",
+      expect.stringContaining("couldn't confirm your bill"),
+    );
+    expect(mockRouter.replace).not.toHaveBeenCalled();
   });
 
   it("places order successfully and clears checkout, coupon, and rx stores", async () => {
