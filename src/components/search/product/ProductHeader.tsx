@@ -6,7 +6,7 @@ import React from "react";
 import { Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { searchHeaderStyles as hs } from "@/src/components/search/search.styles";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface ProductHeaderProps {
   cartCount?: number;
@@ -78,7 +78,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
 
           {!onQueryChange && (
             <Text
-              className="flex-1 font-inter text-[#222222]"
+              className="flex-1 font-inter-medium text-[#222222]"
               style={{ fontSize: moderateScale(15) }}
               numberOfLines={1}
             >
@@ -100,20 +100,31 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           <Touchable
             onPress={() => router.push("/(stack)/cart")}
             style={{
-              elevation: 3,
-              shadowColor: "#919EAB",
-              shadowOpacity: 0.04,
-              shadowRadius: 20,
-              shadowOffset: { width: 0, height: 10 },
+              height: exactScale(60),
+              width: exactScale(60),
+              borderWidth: 1.05,
+              borderColor: "#919EAB33",
+              shadowColor: "#919EAB0A",
+              shadowOffset: { width: 0, height: exactScale(6) },
+              shadowRadius: exactScale(10),
+              shadowOpacity: 0.1,
+              elevation: 4,
             }}
-            className="bg-white items-center justify-center aspect-square rounded-[12px] relative"
+            className="bg-white items-center justify-center rounded-[12px] relative"
           >
             <icons.Add_Cart width={30} height={30} />
             {cartCount > 0 && (
-              <View className="absolute -top-1 -right-1 w-[20px] h-[20px] rounded-full bg-[#C22923] items-center justify-center">
+              <View
+                style={{
+                  minWidth: 20,
+                  height: 20,
+                  paddingHorizontal: 4,
+                }}
+                className="absolute -top-1 -right-1 rounded-full bg-[#C22923] items-center justify-center"
+              >
                 <Text
                   className="font-inter-bold text-white leading-none"
-                  style={{ fontSize: moderateScale(12) }}
+                  style={{ fontSize: moderateScale(11) }}
                 >
                   {cartCount}
                 </Text>

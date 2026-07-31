@@ -13,9 +13,20 @@ interface DatePickerModalProps {
   maximumDate?: Date;
   mode?: "date" | "time" | "datetime";
   display?: "spinner" | "inline" | "default" | "compact";
+  /** Render the picker inline without a GorhomBottomSheet wrapper.
+   * Use this when the caller is already inside a <Modal> to avoid
+   * a native modal-on-modal crash on iOS. */
+  inline?: boolean;
   onClose: () => void;
   onChange: (date: Date) => void;
 }
+
+const clampDate = (date: Date, min?: Date, max?: Date): Date => {
+  let res = date;
+  if (min && res < min) res = min;
+  if (max && res > max) res = max;
+  return res;
+};
 
 export const DatePickerModal: React.FC<DatePickerModalProps> = ({
   visible,
@@ -24,6 +35,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
   maximumDate,
   mode = "date",
   display = "spinner",
+  inline = false,
   onClose,
   onChange,
 }) => {
@@ -34,16 +46,51 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
 
   React.useEffect(() => {
     if (visible) {
-      setTempDate(value);
+      setTempDate(clampDate(value, minimumDate, maximumDate));
       if (Platform.OS === "android" && mode === "datetime") {
         setAndroidStep("date");
       } else {
         setAndroidStep("none");
       }
     }
-  }, [visible, value, mode]);
+  }, [visible, value, mode, minimumDate, maximumDate]);
 
   if (Platform.OS === "ios") {
+    // inline=true: caller is inside a <Modal>; skip the GorhomBottomSheet
+    // wrapper to avoid a native modal-on-modal crash on iOS.
+    if (inline) {
+      if (!visible) return null;
+      return (
+        <View
+          style={{
+            alignItems: "center",
+            backgroundColor: "#FFFFFF",
+            borderRadius: 12,
+            overflow: "hidden",
+          }}
+        >
+          <DateTimePicker
+            value={tempDate}
+            mode={mode}
+            display="spinner"
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
+            themeVariant="light"
+            textColor="#111827"
+            accentColor="#0F7635"
+            style={{ backgroundColor: "#FFFFFF" }}
+            onChange={(_, selected) => {
+              if (selected) {
+                const validated = clampDate(selected, minimumDate, maximumDate);
+                onChange(validated);
+                onClose();
+              }
+            }}
+          />
+        </View>
+      );
+    }
+
     return (
       <GorhomBottomSheet
         isVisible={visible}
@@ -69,7 +116,8 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
             <Text style={s.title}>Select Date & Time</Text>
             <Touchable
               onPress={() => {
-                onChange(tempDate);
+                const validated = clampDate(tempDate, minimumDate, maximumDate);
+                onChange(validated);
                 onClose();
               }}
             >
@@ -83,10 +131,11 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
               display={display}
               minimumDate={minimumDate}
               maximumDate={maximumDate}
+              themeVariant="light"
               textColor="#111827"
               onChange={(_, selected) => {
                 if (selected) {
-                  setTempDate(selected);
+                  setTempDate(clampDate(selected, minimumDate, maximumDate));
                 }
               }}
             />
@@ -110,7 +159,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
           maximumDate={maximumDate}
           onChange={(_, selected) => {
             if (selected) {
-              setTempDate(selected);
+              setTempDate(clampDate(selected, minimumDate, maximumDate));
               setAndroidStep("time");
             } else {
               onClose();
@@ -130,7 +179,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
               const combined = new Date(tempDate);
               combined.setHours(selected.getHours());
               combined.setMinutes(selected.getMinutes());
-              onChange(combined);
+              onChange(clampDate(combined, minimumDate, maximumDate));
             }
           }}
         />
@@ -149,7 +198,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
       onChange={(_, selected) => {
         onClose();
         if (selected) {
-          onChange(selected);
+          onChange(clampDate(selected, minimumDate, maximumDate));
         }
       }}
     />

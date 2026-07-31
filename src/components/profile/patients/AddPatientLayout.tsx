@@ -4,7 +4,7 @@ import { icons } from "@/src/constants/icons";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { FamilyMemberInput } from "@/src/types/familyMember";
-import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
+import { formatDobDisplay, getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -77,6 +77,7 @@ export const AddPatientLayout: React.FC = () => {
   const [dobDate, setDobDate] = useState<Date>(new Date(2000, 0, 1));
   const [showDatePicker, setShowDatePicker] = useState(false);
   const maxDob = getMaxDob();
+  const minDob = getMinDob();
   const [relationship, setRelationship] = useState("");
   const [otherRelationship, setOtherRelationship] = useState("");
   const [gender, setGender] = useState("");
@@ -114,7 +115,8 @@ export const AddPatientLayout: React.FC = () => {
     if (!name.trim()) newErrors.name = "Name is required";
     if (!mobile || mobile.length !== 10)
       newErrors.mobile = "Enter a valid 10-digit number";
-    if (!dob) newErrors.dob = "Date of birth is required";
+    const dobValidation = validateDob(dob);
+    if (!dobValidation.valid) newErrors.dob = dobValidation.error;
     if (!relationship) newErrors.relationship = "Please select a relationship";
     if (relationship === "Other" && !otherRelationship.trim())
       newErrors.otherRelationship = "Please specify relationship";
@@ -335,6 +337,7 @@ export const AddPatientLayout: React.FC = () => {
           <DatePickerModal
             visible={showDatePicker}
             value={dobDate}
+            minimumDate={minDob}
             maximumDate={maxDob}
             onClose={() => setShowDatePicker(false)}
             onChange={(selected) => {

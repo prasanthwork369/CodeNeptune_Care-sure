@@ -7,7 +7,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect } from "expo-router";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { Alert, Linking, RefreshControl, ScrollView, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -49,7 +49,6 @@ export const ProfileLayout: React.FC = () => {
 
   const uploadUri = async (uri: string) => {
     setLocalAvatar(uri);
-    setShowUploadSheet(false);
     try {
       await uploadAvatar(uri);
     } catch (err) {
@@ -58,29 +57,73 @@ export const ProfileLayout: React.FC = () => {
     }
   };
 
-  const handleSelectCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) return;
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-    if (result.canceled) return;
-    await uploadUri(result.assets[0].uri);
+  const showPermissionAlert = (title: string, message: string) => {
+    Alert.alert(title, message, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Open Settings", onPress: () => void Linking.openSettings() },
+    ]);
   };
 
-  const handleSelectLibrary = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"] as any,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-    if (result.canceled) return;
-    await uploadUri(result.assets[0].uri);
+  // Close the sheet and immediately launch the picker — iOS presents
+  // UIImagePickerController on top of any open sheet without conflict.
+  const handleSelectCamera = () => {
+    setShowUploadSheet(false);
+    void (async () => {
+      try {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        if (!permission.granted) {
+          showPermissionAlert(
+            "Permission Required",
+            "Please allow camera access in Settings to continue.",
+          );
+          return;
+        }
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ["images"] as ImagePicker.MediaType[],
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.8,
+        });
+        if (!result.canceled && result.assets?.[0]?.uri) {
+          await uploadUri(result.assets[0].uri);
+        }
+      } catch (err) {
+        if (__DEV__) console.error("[Camera Pick Error]", err);
+        Alert.alert("Error", "Failed to capture photo. Please try again.");
+      }
+    })();
+  };
+
+  const handleSelectLibrary = () => {
+    setShowUploadSheet(false);
+    void (async () => {
+      try {
+        const permission =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permission.granted) {
+          showPermissionAlert(
+            "Permission Required",
+            "Please allow photo library access in Settings to continue.",
+          );
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ["images"] as ImagePicker.MediaType[],
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.8,
+        });
+        if (!result.canceled && result.assets?.[0]?.uri) {
+          await uploadUri(result.assets[0].uri);
+        }
+      } catch (err) {
+        if (__DEV__) console.error("[Library Pick Error]", err);
+        showPermissionAlert(
+          "Permission Required",
+          "Please allow photo library access in Settings to continue.",
+        );
+      }
+    })();
   };
 
   if (loading) return <ProfileSkeleton />;

@@ -12,7 +12,7 @@ export const MoreAboutContent: React.FC<MoreAboutContentProps> = ({
   section,
 }) => (
   <View className="mx-4 mb-6 overflow-hidden rounded-b-[12px] bg-white">
-    <View className="px-2 pb-5 pt-4" style={{ height: exactScale(300) }}>
+    <View className="px-2 pb-5 pt-4" style={{ height: exactScale(400) }}>
       <Text
         className="mb-3 px-2 font-inter-bold text-brand-text"
         style={{

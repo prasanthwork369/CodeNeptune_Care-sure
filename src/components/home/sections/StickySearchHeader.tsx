@@ -1,8 +1,8 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { exactScale } from "@/src/utils/exactScale";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { exactScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import Animated, {
@@ -61,7 +61,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
       >
         <BlurView
           intensity={10}
-          tint="dark"
+          tint="systemUltraThinMaterialLight"
           experimentalBlurMethod="dimezisBlurView"
           style={{ overflow: "hidden" }}
         >

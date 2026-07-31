@@ -11,6 +11,7 @@ import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { format, validate } from "@/src/utils/validation";
+import { getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -136,6 +137,7 @@ export const MyProfileLayout: React.FC = () => {
   const [showGenderSheet, setShowGenderSheet] = useState(false);
   const [showEmailVerify, setShowEmailVerify] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [dobError, setDobError] = useState("");
 
   // Hydrate the form once per profile (keyed by id). A background refetch of the
   // same profile returns a new object each time; re-syncing on every change would
@@ -181,7 +183,16 @@ export const MyProfileLayout: React.FC = () => {
       if (lastName.trim()) payload.lastName = lastName.trim();
       payload.email = email.trim();
       if (gender) payload.gender = gender;
-      if (dob) payload.dateOfBirth = dob.toISOString();
+
+      if (dob) {
+        const dobValidation = validateDob(dob.toISOString());
+        if (!dobValidation.valid) {
+          setDobError(dobValidation.error ?? "Please enter a valid date of birth.");
+          return;
+        }
+        setDobError("");
+        payload.dateOfBirth = dob.toISOString();
+      }
 
       if (Object.keys(payload).length === 0) return;
 
@@ -395,15 +406,31 @@ export const MyProfileLayout: React.FC = () => {
               </Text>
               <icons.calendar_month width={18} height={18} />
             </Touchable>
+            {dobError ? (
+              <Text
+                style={{
+                  fontSize: moderateScale(12),
+                  fontWeight: "500",
+                  color: "#EF4444",
+                  marginTop: 4,
+                }}
+              >
+                {dobError}
+              </Text>
+            ) : null}
           </View>
         </View>
 
         <DatePickerModal
           visible={showDatePicker}
           value={dob ?? new Date(2000, 0, 1)}
-          maximumDate={new Date()}
+          minimumDate={getMinDob()}
+          maximumDate={getMaxDob()}
           onClose={() => setShowDatePicker(false)}
-          onChange={(date) => setDob(date)}
+          onChange={(date) => {
+            setDob(date);
+            setDobError("");
+          }}
         />
 
         {error ? (

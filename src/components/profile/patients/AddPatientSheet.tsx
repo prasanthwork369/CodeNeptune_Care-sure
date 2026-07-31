@@ -7,7 +7,7 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
-import { formatDobDisplay, getMaxDob } from "@/src/utils/patient";
+import { formatDobDisplay, getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -121,6 +121,7 @@ export function AddPatientSheet({
     }
   };
   const maxDob = getMaxDob();
+  const minDob = getMinDob();
 
   useEffect(() => {
     if (isVisible && editPatient) {
@@ -151,7 +152,8 @@ export function AddPatientSheet({
   const handleSubmit = async () => {
     const newErrors: typeof errors = {};
     if (!name.trim()) newErrors.name = "Name is required";
-    if (!dob) newErrors.dob = "Date of birth is required";
+    const dobValidation = validateDob(dob);
+    if (!dobValidation.valid) newErrors.dob = dobValidation.error;
     if (!relationship) newErrors.relationship = "Please select a relationship";
     else if (relationship === "Other" && !otherRelationship.trim())
       newErrors.relationship = "Please specify the relationship";
@@ -530,6 +532,7 @@ export function AddPatientSheet({
           <DatePickerModal
             visible={showDatePicker}
             value={dobDate}
+            minimumDate={minDob}
             maximumDate={maxDob}
             onClose={() => setShowDatePicker(false)}
             onChange={(selected) => {

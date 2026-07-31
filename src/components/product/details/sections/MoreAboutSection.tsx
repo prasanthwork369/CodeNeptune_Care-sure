@@ -28,6 +28,15 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
 
   const cardsScrollRef = useRef<ScrollView>(null);
   const screenWidth = Dimensions.get("window").width;
+  const isTabClickScroll = useRef(false);
+
+  const onTabPressWithScroll = (tabId: string) => {
+    isTabClickScroll.current = true;
+    handleTabPress(tabId);
+    setTimeout(() => {
+      isTabClickScroll.current = false;
+    }, 350);
+  };
 
   useEffect(() => {
     if (activeSection) {
@@ -52,7 +61,7 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
         tabsScrollRef={tabsScrollRef}
         indicatorX={indicatorX}
         indicatorWidth={indicatorWidth}
-        onTabPress={handleTabPress}
+        onTabPress={onTabPressWithScroll}
         onTabLayout={handleTabLayout}
       />
       <ScrollView
@@ -62,7 +71,9 @@ export const MoreAboutSection: React.FC<MoreAboutSectionProps> = ({
         showsHorizontalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        onMomentumScrollEnd={(e) => {
+        scrollEventThrottle={16}
+        onScroll={(e) => {
+          if (isTabClickScroll.current) return;
           const index = Math.round(
             e.nativeEvent.contentOffset.x / screenWidth,
           );

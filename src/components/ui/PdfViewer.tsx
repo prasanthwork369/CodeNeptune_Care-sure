@@ -16,23 +16,36 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   style,
   onError,
 }) => {
+  const isLocalFile = uri.startsWith("file://") || uri.startsWith("/");
+
   if (isExpoGo) {
+    // On iOS, WKWebView needs explicit originWhitelist and file access props to display local file:// URIs.
+    const source =
+      Platform.OS === "android"
+        ? {
+            uri: isLocalFile
+              ? uri
+              : `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(uri)}`,
+          }
+        : { uri };
+
     return (
       <WebView
-        source={{
-          uri:
-            Platform.OS === "android"
-              ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(uri)}`
-              : uri,
-        }}
+        source={source}
         style={style}
+        originWhitelist={["*"]}
+        allowingReadAccessToURL={isLocalFile ? uri : undefined}
+        allowFileAccess={true}
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
+        onError={onError}
       />
     );
   }
 
   return (
     <Pdf
-      source={{ uri, cache: true }}
+      source={{ uri, cache: !isLocalFile }}
       style={style}
       trustAllCerts={false}
       onError={onError}

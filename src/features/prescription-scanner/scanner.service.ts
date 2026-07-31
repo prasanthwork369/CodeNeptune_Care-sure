@@ -9,20 +9,21 @@
  * know about expo-image-picker or react-native-document-scanner-plugin.
  */
 
+import { NativeModules } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { RawScanOutput } from "./types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Returns the DocumentScanner default export from
- * react-native-document-scanner-plugin when the native module is available,
- * or null when the package is not installed / the binary was not rebuilt.
- *
- * Using require() instead of import keeps the module completely optional and
- * matches the pattern already used in src/utils/prescription.ts.
+ * Returns the DocumentScanner default export when the native module is
+ * available, or null when it is not. Guards via NativeModules first so
+ * TurboModuleRegistry.getEnforcing() never throws on iOS new-arch builds
+ * where the native binary does not include the scanner module.
  */
 function loadDocumentScanner(): any | null {
+  // NativeModules check prevents TurboModuleRegistry from throwing synchronously
+  if (!NativeModules.DocumentScanner) return null;
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require("react-native-document-scanner-plugin").default;

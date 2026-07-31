@@ -2,13 +2,11 @@ import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { icons } from "@/src/constants/icons";
 import { PreviewDisplayProps } from "@/src/types/prescription";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { useZoomGesture } from "@/src/hooks/ui/useZoomGesture";
 import React, { useEffect } from "react";
 import { Alert, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 
 const isPdf = (uri: string, type?: string) =>
   type === "application/pdf" || uri.toLowerCase().endsWith(".pdf");
@@ -23,89 +21,17 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
   onNext,
   showNext,
 }) => {
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
+  const containerWidth = screenWidth - 48;
+
+  const { resetZoom, composedGesture, animatedStyle } = useZoomGesture({
+    containerWidth,
+    containerHeight: previewHeight,
+  });
 
   // Reset zoom when active item changes
   useEffect(() => {
-    scale.value = 1;
-    translateX.value = 0;
-    translateY.value = 0;
-    savedScale.value = 1;
-    savedTranslateX.value = 0;
-    savedTranslateY.value = 0;
+    resetZoom();
   }, [activeItem?.localUri]);
-
-  const resetZoom = () => {
-    "worklet";
-    scale.value = 1;
-    translateX.value = 0;
-    translateY.value = 0;
-    savedScale.value = 1;
-    savedTranslateX.value = 0;
-    savedTranslateY.value = 0;
-  };
-
-  const pinchGesture = Gesture.Pinch()
-    .onUpdate((e) => {
-      scale.value = Math.min(Math.max(savedScale.value * e.scale, 1), 6);
-    })
-    .onEnd(() => {
-      if (scale.value <= 1) {
-        resetZoom();
-      } else {
-        savedScale.value = scale.value;
-      }
-    });
-
-  const panGesture = Gesture.Pan()
-    .onUpdate((e) => {
-      if (savedScale.value > 1) {
-        const maxX = ((screenWidth - 48) * (savedScale.value - 1)) / 2;
-        const maxY = (previewHeight * (savedScale.value - 1)) / 2;
-        translateX.value = Math.min(
-          Math.max(savedTranslateX.value + e.translationX, -maxX),
-          maxX,
-        );
-        translateY.value = Math.min(
-          Math.max(savedTranslateY.value + e.translationY, -maxY),
-          maxY,
-        );
-      }
-    })
-    .onEnd(() => {
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
-    });
-
-  const doubleTap = Gesture.Tap()
-    .numberOfTaps(2)
-    .maxDuration(250)
-    .onEnd(() => {
-      if (scale.value > 1) {
-        resetZoom();
-      } else {
-        scale.value = 2.5;
-        savedScale.value = 2.5;
-      }
-    });
-
-  const composed = Gesture.Simultaneous(
-    doubleTap,
-    Gesture.Simultaneous(pinchGesture, panGesture),
-  );
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-    ],
-  }));
 
   return (
     <View style={{ flex: 1, position: "relative" }}>
@@ -128,17 +54,17 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
           <PdfViewer
             uri={activeItem.localUri}
             style={{
-              width: screenWidth - 48,
+              width: containerWidth,
               height: previewHeight,
               backgroundColor: "#F9FAFB",
             }}
             onError={() => Alert.alert("Error", "Could not load PDF.")}
           />
         ) : activeItem && previewHeight > 0 ? (
-          <GestureDetector gesture={composed}>
+          <GestureDetector gesture={composedGesture}>
             <Animated.View
               style={{
-                width: screenWidth - 48,
+                width: containerWidth,
                 height: previewHeight,
                 overflow: "hidden",
                 alignItems: "center",
@@ -149,7 +75,7 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
                 source={{ uri: activeItem.localUri }}
                 style={[
                   {
-                    width: screenWidth - 48,
+                    width: containerWidth,
                     height: previewHeight,
                   },
                   animatedStyle,

@@ -2,6 +2,7 @@ import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
+import { useZoomGesture } from "@/src/hooks/ui/useZoomGesture";
 import { useLocalSearchParams } from "expo-router";
 import { icons } from "@/src/constants/icons";
 import { PRESCRIPTION_STATUS_LABELS } from "@/src/constants/prescription-status";
@@ -13,12 +14,8 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 
@@ -28,21 +25,19 @@ const PAGE_BTN = 40;
 export const PrescriptionViewerLayout: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const [containerHeight, setContainerHeight] = useState(0);
+
   const onContainerLayout = (e: LayoutChangeEvent) =>
     setContainerHeight(e.nativeEvent.layout.height);
 
   const {
     imageUrls,
-    doctorName,
-    patientName,
-    uploadedDate,
-    toPay,
     source,
     status,
     prescriptionOrderId,
     prescriptionId,
+    toPay,
   } = useLocalSearchParams<{
     prescriptionId: string;
     imageUrls: string;
@@ -80,114 +75,30 @@ export const PrescriptionViewerLayout: React.FC = () => {
 
   const effectiveStatus = resolved?.status ?? status;
   const effectiveOrderId = resolved?.orderId ?? prescriptionOrderId;
-  // Only the notification and the upload screen offer ordering; the upload
-  // bottom sheet is picking a file for a new order, so it stays on Select.
+
   const isOrderEntry = source === "notification" || source === "upload";
   const showVerifiedCard =
     isOrderEntry && effectiveStatus === "Verified" && !!effectiveOrderId;
-  // A rejected prescription cannot be reused, so it is view-only.
   const isRejected = effectiveStatus === "Rejected" || source === "rejection";
   const showSelect = !showVerifiedCard && !isRejected && source !== "view_only";
 
   const urls: string[] = imageUrls ? JSON.parse(imageUrls) : [];
-  // A prescription can be several files, so the viewer pages through them.
   const [pageIndex, setPageIndex] = useState(0);
   const currentUrl = urls[pageIndex] ?? "";
   const isPdf = currentUrl.toLowerCase().endsWith(".pdf");
   const hasPages = urls.length > 1;
-  // Without a footer the image runs to the screen edge, so the page controls
-  // have to clear the system navigation bar themselves.
   const hasFooter = showVerifiedCard || showSelect;
 
-  // Zoom shared values
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
+  const { resetZoom, composedGesture, animatedStyle } = useZoomGesture({
+    containerWidth: width,
+    containerHeight,
+  });
 
-  // Carrying a zoom across pages would land the next file mid-zoom, off-centre.
   const goToPage = (next: number) => {
     if (next < 0 || next >= urls.length) return;
-    scale.value = 1;
-    savedScale.value = 1;
-    translateX.value = 0;
-    translateY.value = 0;
-    savedTranslateX.value = 0;
-    savedTranslateY.value = 0;
+    resetZoom();
     setPageIndex(next);
   };
-
-  const resetZoom = () => {
-    "worklet";
-    // Animate scale and translate together with the same timing so they
-    // settle in sync — independent springs drift apart and look like a jump.
-    scale.value = withTiming(1, { duration: 250 });
-    translateX.value = withTiming(0, { duration: 250 });
-    translateY.value = withTiming(0, { duration: 250 });
-    savedScale.value = 1;
-    savedTranslateX.value = 0;
-    savedTranslateY.value = 0;
-  };
-
-  const pinchGesture = Gesture.Pinch()
-    .onUpdate((e) => {
-      scale.value = Math.min(Math.max(savedScale.value * e.scale, 1), 6);
-    })
-    .onEnd(() => {
-      if (scale.value <= 1) {
-        resetZoom();
-      } else {
-        savedScale.value = scale.value;
-      }
-    });
-
-  const panGesture = Gesture.Pan()
-    .minDistance(10)
-    .onUpdate((e) => {
-      if (savedScale.value > 1) {
-        const maxX = (width * (savedScale.value - 1)) / 2;
-        const maxY = (containerHeight * (savedScale.value - 1)) / 2;
-        translateX.value = Math.min(
-          Math.max(savedTranslateX.value + e.translationX, -maxX),
-          maxX,
-        );
-        translateY.value = Math.min(
-          Math.max(savedTranslateY.value + e.translationY, -maxY),
-          maxY,
-        );
-      }
-    })
-    .onEnd(() => {
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
-    });
-
-  const doubleTap = Gesture.Tap()
-    .numberOfTaps(2)
-    .maxDuration(250)
-    .onEnd(() => {
-      if (scale.value > 1) {
-        resetZoom();
-      } else {
-        scale.value = withTiming(2.5, { duration: 250 });
-        savedScale.value = 2.5;
-      }
-    });
-
-  const composed = Gesture.Simultaneous(
-    pinchGesture,
-    Gesture.Exclusive(doubleTap, panGesture),
-  );
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
-  }));
 
   const handleSelect = () => {
     const filesPayload = urls.map((u) => ({
@@ -221,7 +132,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
               }}
             />
           ) : (
-            <GestureDetector gesture={composed}>
+            <GestureDetector gesture={composedGesture}>
               <Animated.View
                 style={{
                   width,
@@ -240,10 +151,8 @@ export const PrescriptionViewerLayout: React.FC = () => {
             </GestureDetector>
           ))}
 
-        {/* Page controls — only when the prescription has multiple files. */}
         {hasPages && (
           <>
-            {/* Arrows sit level with the middle of the image, like a carousel. */}
             <Touchable
               activeOpacity={0.8}
               disabled={pageIndex === 0}
@@ -305,7 +214,6 @@ export const PrescriptionViewerLayout: React.FC = () => {
         )}
       </View>
 
-      {/* If the prescription is verified, show a custom inline card to directly compare/order medicines */}
       {showVerifiedCard ? (
         <View
           style={{ paddingBottom: adjustedBottom + 12 }}

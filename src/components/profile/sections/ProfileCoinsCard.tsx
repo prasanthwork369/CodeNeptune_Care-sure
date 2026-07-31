@@ -51,10 +51,10 @@ export const ProfileCoinsCard: React.FC = () => {
         <Image
           source={HOME_IMAGES.moneyBag}
           style={{
-            width: 96,
+            width: 105,
             height: 96,
             position: "absolute",
-            right: 0,
+            right: -3,
             bottom: -5,
           }}
           contentFit="cover"

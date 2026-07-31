@@ -7,7 +7,6 @@ import { ReminderFrequencyDays, ReminderInput } from "@/src/types/prescription";
 import React, { useState } from "react";
 import {
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -20,7 +19,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 interface ReminderSheetProps {
   isVisible: boolean;
   onClose: () => void;
-  /** Recurring frequency (chips) or one-time custom date — matches the backend contract. */
   onConfirm?: (input: ReminderInput) => void;
 }
 
@@ -43,20 +41,29 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
 }) => {
   const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  // selectedDays null means the custom date is active.
   const [selectedDays, setSelectedDays] =
     useState<ReminderFrequencyDays | null>(14);
   const [customDate, setCustomDate] = useState<Date>(addDays(14));
   const [showPicker, setShowPicker] = useState(false);
 
   const handleConfirm = () => {
-    // Date only — the backend owns the delivery hour, same as frequencyDays.
-    onConfirm?.(
-      selectedDays !== null
-        ? { frequencyDays: selectedDays }
-        : { remindAt: toDateOnly(customDate) },
-    );
+    let input: ReminderInput;
+    if (selectedDays !== null) {
+      input = { frequencyDays: selectedDays };
+    } else {
+      // Ensure custom date is not in the past
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const validDate = customDate < today ? new Date() : customDate;
+      input = { remindAt: toDateOnly(validDate) };
+    }
+    onConfirm?.(input);
     onClose();
+  };
+
+  const handleCustomPress = () => {
+    setSelectedDays(null);
+    setShowPicker(true);
   };
 
   return (
@@ -87,7 +94,6 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
             style={{ flexShrink: 1 }}
             contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24 }}
           >
-            {/* Calendar icon */}
             <View className="items-center mb-4">
               <DotLottie
                 source={ANIMATIONS.calendar}
@@ -97,7 +103,6 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
               />
             </View>
 
-            {/* Title */}
             <Text
               className="font-inter-bold text-brand-text text-center mb-1"
               style={{ fontSize: moderateScale(18) }}
@@ -105,7 +110,6 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
               {"We'll remind you at the right time"}
             </Text>
 
-            {/* Subtitle */}
             <Text
               className="font-inter-medium text-brand-subtext text-center mb-5"
               style={{ fontSize: moderateScale(13) }}
@@ -113,14 +117,17 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
               When should we remind you
             </Text>
 
-            {/* Day chips row */}
+            {/* Day chips */}
             <View className="flex-row justify-between mb-5" style={{ gap: 5 }}>
               {DAY_OPTIONS.map((day) => {
                 const isSelected = selectedDays === day;
                 return (
                   <Touchable
                     key={day}
-                    onPress={() => setSelectedDays(day)}
+                    onPress={() => {
+                      setSelectedDays(day);
+                      setShowPicker(false);
+                    }}
                     activeOpacity={0.8}
                     className="flex-1 py-2 rounded-full items-center justify-center"
                     style={{
@@ -142,9 +149,9 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
                 );
               })}
 
-              {/* Custom chip — one-time reminder on a picked date */}
+              {/* Custom chip */}
               <Touchable
-                onPress={() => setShowPicker(true)}
+                onPress={handleCustomPress}
                 activeOpacity={0.8}
                 className="flex-1 py-2.5 px-1 rounded-full items-center justify-center"
                 style={{
@@ -165,6 +172,21 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
                 </Text>
               </Touchable>
             </View>
+
+            {/* inline=true skips GorhomBottomSheet — safe inside a <Modal> */}
+            <DatePickerModal
+              visible={showPicker}
+              value={customDate}
+              minimumDate={new Date()}
+              mode="date"
+              display="inline"
+              inline
+              onClose={() => setShowPicker(false)}
+              onChange={(date) => {
+                setCustomDate(date);
+                setShowPicker(false);
+              }}
+            />
 
             {/* Info banner */}
             <View
@@ -200,21 +222,6 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
           </View>
         </View>
       </View>
-
-      {/* Custom date picker — date only; delivery hour is the backend's call */}
-      <DatePickerModal
-        visible={showPicker}
-        value={customDate}
-        minimumDate={new Date()}
-        mode="date"
-        display={Platform.OS === "ios" ? "inline" : "default"}
-        onClose={() => setShowPicker(false)}
-        onChange={(date: Date) => {
-          setCustomDate(date);
-          setSelectedDays(null);
-          setShowPicker(false);
-        }}
-      />
     </Modal>
   );
 };
