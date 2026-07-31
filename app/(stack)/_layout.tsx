@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/src/store/authStore";
+import { screenTransitions } from "@/src/theme";
 import { Redirect, Stack, useSegments } from "expo-router";
 
 export default function StackLayout() {
@@ -13,29 +14,25 @@ export default function StackLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="cart"
-        options={{
-          presentation: "card",
-          animation: "slide_from_right",
-          animationDuration: 320,
-        }}
-      />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        ...screenTransitions.push,
+        // order-success is a transparentModal, so the screen under it stays
+        // visible while inactive — freezing it would strand a stale frame.
+        freezeOnBlur: false,
+      }}
+    >
+      <Stack.Screen name="cart" options={{ presentation: "card" }} />
 
-      <Stack.Screen
-        name="coupons"
-        options={{
-          presentation: "card",
-          animation: "slide_from_right",
-        }}
-      />
+      <Stack.Screen name="coupons" options={{ presentation: "card" }} />
 
       <Stack.Screen
         name="order-success"
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          ...screenTransitions.fade,
+          freezeOnBlur: false,
         }}
       />
     </Stack>

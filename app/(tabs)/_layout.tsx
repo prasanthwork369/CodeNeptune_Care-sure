@@ -1,9 +1,13 @@
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import LiquidTabBar from "@/src/components/navigation/LiquidTabBar";
 import { tabs as tabConfig } from "@/src/constants/data";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useAuthStore } from "@/src/store/authStore";
 import { Tabs } from "expo-router";
 import React from "react";
+
+// Hoisted so the tab bar isn't remounted by a fresh closure on every render.
+const renderTabBar = (props: BottomTabBarProps) => <LiquidTabBar {...props} />;
 
 const TabLayout = () => {
   const { isLoaded } = useAuthStore();
@@ -13,8 +17,9 @@ const TabLayout = () => {
 
   return (
     <Tabs
-      screenOptions={{ headerShown: false }}
-      tabBar={(props) => <LiquidTabBar {...props} />}
+      // Inactive tabs stop re-rendering behind the active one.
+      screenOptions={{ headerShown: false, freezeOnBlur: true }}
+      tabBar={renderTabBar}
     >
       {tabConfig.map((tab) => (
         <Tabs.Screen

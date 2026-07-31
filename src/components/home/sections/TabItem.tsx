@@ -9,7 +9,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import type { CategoryTab } from "@/src/types/home";
-import { SPRINGS } from "../../../animations/configs/springs";
+import { springs } from "@/src/theme";
 
 interface TabItemProps {
   tab: CategoryTab;
@@ -27,7 +27,7 @@ export const TabItem: React.FC<TabItemProps> = ({
   const scale = useSharedValue(1);
 
   useEffect(() => {
-    scale.value = withSpring(isActive ? 1.05 : 1, SPRINGS.tab);
+    scale.value = withSpring(isActive ? 1.05 : 1, springs.tab);
   }, [isActive, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({

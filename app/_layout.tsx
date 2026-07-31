@@ -28,6 +28,7 @@ import { analyticsService, initCrashReporting } from "@/src/services/firebase";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
+import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
@@ -148,7 +149,12 @@ export default function RootLayout() {
                     translucent
                     backgroundColor="transparent"
                   />
-                  <Stack screenOptions={{ headerShown: false }}>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      ...screenTransitions.push,
+                    }}
+                  >
                     <Stack.Screen name="index" />
                     <Stack.Screen name="(auth)" />
                     <Stack.Screen name="(tabs)" />
@@ -156,7 +162,7 @@ export default function RootLayout() {
                     <Stack.Screen name="(prescription)" />
                     <Stack.Screen
                       name="search"
-                      options={{ animation: "fade", animationDuration: 180 }}
+                      options={screenTransitions.fade}
                     />
                     <Stack.Screen name="notifications" />
                     <Stack.Screen name="profile" />

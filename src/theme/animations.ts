@@ -19,3 +19,23 @@ export const springs = {
   bouncy: { damping: 10, stiffness: 150 },
   tab: { damping: 20, stiffness: 200 },
 } as const;
+
+/**
+ * Screen transition presets — spread into a Stack's `screenOptions` so every
+ * navigator pushes at the same speed instead of each picking its own.
+ * `freezeOnBlur` stops off-screen screens re-rendering behind the active one.
+ */
+export const screenTransitions = {
+  /** Default push: horizontal slide, matching the platform back gesture. */
+  push: {
+    animation: "slide_from_right",
+    animationDuration: 300,
+    freezeOnBlur: true,
+  },
+  /** Overlays and tab-level swaps, where a slide would read as navigation. */
+  fade: {
+    animation: "fade",
+    animationDuration: 180,
+    freezeOnBlur: true,
+  },
+} as const;
