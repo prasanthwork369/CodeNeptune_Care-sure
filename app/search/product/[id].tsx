@@ -7,12 +7,6 @@ export default function ProductDetailsScreen() {
   return (
     <>
       <Stack.Screen
-        options={{
-          presentation: "transparentModal",
-          animation: "none",
-          gestureEnabled: false,
-          contentStyle: { backgroundColor: "transparent" },
-        }}
       />
       <ProductComparisonLayout id={id} />
     </>

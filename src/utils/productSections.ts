@@ -96,6 +96,27 @@ const toAdviceItems = (data: unknown): SafetyAdviceItem[] =>
     .filter((entry) => !!entry?.title || !!entry?.description);
 
 // Returns null when the section carries no usable content, so empty ones never render.
+// Tab labels only. An unlisted key still renders — it just falls back to its humanised key,
+// so a section the backend adds later needs no app change.
+const SECTION_LABELS: Record<string, string> = {
+  shortDescription: "Quick Summary",
+  longDescription: "Description",
+  safetyGuidance: "Safety Advice",
+  howToUse: "How to Use",
+  directionsForUse: "Directions",
+  sideEffects: "Side Effects",
+  forgottenDose: "Missed Dose",
+  dailyDose: "Daily Dose",
+  quickTips: "Quick Tips",
+  drugFoodInteraction: "Food Interaction",
+  drugDiseaseInteractions: "Disease Interaction",
+  productHighlights: "Highlights",
+  keyIngredients: "Ingredients",
+  safetyInstructions: "Safety Info",
+  faqs: "FAQs",
+  factBox: "Fact Box",
+};
+
 const buildSection = (
   id: string,
   raw: ApiProductSection,
@@ -106,6 +127,7 @@ const buildSection = (
   const base = {
     id,
     title: raw.title?.trim() || humanizeKey(id),
+    label: SECTION_LABELS[id] ?? humanizeKey(id),
     sortOrder: raw.sort_order ?? Number.MAX_SAFE_INTEGER,
   };
 

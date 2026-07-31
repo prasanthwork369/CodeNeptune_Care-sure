@@ -7,6 +7,8 @@ import Animated, { Easing, LinearTransition } from "react-native-reanimated";
 
 const CARD_WIDTH_COLLAPSED = exactScale(175);
 const CARD_WIDTH_EXPANDED = exactScale(280);
+// Collapsed cards show this many lines, which is what bounds their height.
+const COLLAPSED_LINES = 4;
 const PREVIEW_LENGTH = 80;
 
 const badgeColors = (label: string) => {
@@ -67,10 +69,6 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
           const description = item.description ?? "";
           const isExpanded = expandedCardId === id;
           const expandable = description.length > PREVIEW_LENGTH;
-          const visibleDescription =
-            expandable && !isExpanded
-              ? `${description.slice(0, PREVIEW_LENGTH)}...`
-              : description;
           const colors = item.label ? badgeColors(item.label) : null;
 
           return (
@@ -87,17 +85,15 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
                 cardXOffsets.current[id] = event.nativeEvent.layout.x;
               }}
             >
-              <View
-                className="mb-3 items-center justify-center rounded-[8px] bg-[#F1EDFD]"
-                style={{
-                  width: exactScale(48),
-                  height: exactScale(48),
-                }}
-              >
-                {item.image ? (
-                  <RemoteIcon uri={item.image} size={exactScale(24)} />
-                ) : null}
-              </View>
+              {/* The exported SVG already carries its own rounded background and brand
+                  colour, so it is drawn as-is: no wrapper fill, no tint. */}
+              {item.image ? (
+                <RemoteIcon
+                  uri={item.image}
+                  size={exactScale(48)}
+                  style={{ marginBottom: exactScale(16) }}
+                />
+              ) : null}
 
               {item.title ? (
                 <Text
@@ -128,24 +124,32 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
               ) : null}
 
               {description ? (
-                <Text
-                  className="font-inter-medium text-brand-subtext"
-                  style={{
-                    fontSize: moderateScale(12),
-                    lineHeight: moderateScale(18),
-                  }}
-                >
-                  {visibleDescription}
+                <>
+                  {/* Clamped by lines, not characters: 80 characters still wrap to any
+                      height in a 175px card, which is what let the cards grow unbounded. */}
+                  <Text
+                    numberOfLines={isExpanded ? undefined : COLLAPSED_LINES}
+                    className="font-inter-medium text-brand-subtext"
+                    style={{
+                      fontSize: moderateScale(12),
+                      lineHeight: moderateScale(18),
+                    }}
+                  >
+                    {description}
+                  </Text>
                   {expandable ? (
                     <Text
                       onPress={() => toggleExpand(id)}
                       className="font-inter-bold text-[#0F7635]"
-                      style={{ fontSize: moderateScale(14) }}
+                      style={{
+                        fontSize: moderateScale(12),
+                        marginTop: exactScale(6),
+                      }}
                     >
-                      {isExpanded ? " Show less" : " Read More"}
+                      {isExpanded ? "Show less" : "Read More"}
                     </Text>
                   ) : null}
-                </Text>
+                </>
               ) : null}
             </Animated.View>
           );

@@ -13,7 +13,9 @@
       "Bash(echo \"TSC_EXIT=$?\")",
       "Bash(awk -F: '{print $1}')",
       "Bash(git commit -q -m 'fix: apply admin delivery and handling charges to the prescription flow *)",
-      "PowerShell(npx jest --silent 2>&1)"
+      "PowerShell(npx jest --silent 2>&1)",
+      "Bash(cd \"C:/Code Neptune/Caresure_Project/Customer_app/Caresure\" && grep -n \"minHeight\\\\|contentMinHeight\\\\|onLayout\\\\|LinearTransition\\\\|withTiming\\\\|scrollTo\\\\|opacity\" src/components/product/details/sections/MoreAboutSection.tsx | head -25)",
+      "Read(//c/Code Neptune/Caresure_Project/Customer_app/Caresure/**)"
     ]
   }
 }

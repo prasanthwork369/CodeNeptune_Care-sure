@@ -40,6 +40,7 @@ export const ProductComparisonLayout: React.FC<
   const adjustedBottom = useAdjustedBottomInset();
   const [locationSheetVisible, setLocationSheetVisible] = useState(false);
 
+  const mainScrollRef = React.useRef<ScrollView>(null);
   const goBack = useCallback(() => router.back(), [router]);
   const {
     containerStyle,
@@ -176,6 +177,7 @@ export const ProductComparisonLayout: React.FC<
               </View>
             ) : (
               <ScrollView
+                ref={mainScrollRef}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
                   paddingBottom: isRecommendedInCart

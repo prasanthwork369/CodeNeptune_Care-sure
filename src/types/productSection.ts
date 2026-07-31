@@ -30,7 +30,10 @@ export interface KeyValueRow {
 interface SectionBase {
   /** The additionalData key, e.g. "shortDescription" — stable across renders. */
   id: string;
+  /** Full heading from the API, e.g. "Possible Side Effects of Zonegran Tablet". */
   title: string;
+  /** Short tab label, e.g. "Side Effects" — the title is far too long for a tab strip. */
+  label: string;
   sortOrder: number;
 }
 

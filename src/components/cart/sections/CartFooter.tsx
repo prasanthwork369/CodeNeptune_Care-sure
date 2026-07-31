@@ -15,13 +15,19 @@ export const CartFooter: React.FC<CartFooterProps> = ({
 
   return (
     <View
-      className="bg-white border-t border-[#919EAB33] px-4 flex-row items-center"
+      className="bg-white border-t border-[#F3F4F6] flex-row items-center justify-between"
       style={{
-        paddingTop: exactScale(8),
-        paddingBottom: safeAreaBottom + exactScale(8),
+        paddingTop: exactScale(12),
+        paddingBottom: safeAreaBottom + exactScale(12),
+        paddingHorizontal: exactScale(16),
+        shadowColor: "#919EAB33",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 12,
       }}
     >
-      <View style={{ minWidth: exactScale(96) }}>
+      <View style={{ marginRight: exactScale(12), minWidth: 0 }}>
         <Text
           style={s.footerLabel}
           className="font-inter-medium text-brand-text"
@@ -37,16 +43,17 @@ export const CartFooter: React.FC<CartFooterProps> = ({
         </Text>
       </View>
 
-      <AppButton
-        title="Proceed to pay"
-        onPress={onProceed}
-        disabled={!canProceed}
-        size="md"
-        className="flex-1"
-        style={{ marginLeft: exactScale(24) }}
-        accessibilityLabel={`Proceed to pay ₹${formattedTotal}`}
-        accessibilityHint="Continues to delivery and payment"
-      />
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <AppButton
+          title="Proceed to pay"
+          onPress={onProceed}
+          disabled={!canProceed}
+          size="md"
+          style={{ width: "100%", paddingHorizontal: exactScale(8) }}
+          accessibilityLabel={`Proceed to pay ₹${formattedTotal}`}
+          accessibilityHint="Continues to delivery and payment"
+        />
+      </View>
     </View>
   );
 };

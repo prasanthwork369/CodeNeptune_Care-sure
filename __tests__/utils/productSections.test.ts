@@ -52,8 +52,31 @@ describe("parseProductSections", () => {
 
     expect(sections).toHaveLength(1);
     expect(sections[0].id).toBe("brandNewSection");
-    // No title from the backend, so the key becomes the heading.
+    // No title from the backend, so the key becomes both heading and tab label.
     expect(sections[0].title).toBe("Brand New Section");
+    expect(sections[0].label).toBe("Brand New Section");
+  });
+
+  // Tabs need a short label; API titles are full headings and far too long for a tab strip.
+  it("gives known sections a short tab label but keeps the API title", () => {
+    const sections = parseProductSections({
+      sideEffects: {
+        design_type: SECTION_DESIGN_TYPE.BULLET_LIST,
+        title: "Possible Side Effects of Zonegran Tablet",
+        sort_order: 7,
+        data: '["Dizziness"]',
+      },
+      faqs: {
+        design_type: SECTION_DESIGN_TYPE.FAQ_ACCORDION,
+        title: "Frequently Asked Questions",
+        sort_order: 18,
+        data: [{ question: "Q", answer: "A" }],
+      },
+    });
+
+    expect(sections[0].label).toBe("Side Effects");
+    expect(sections[0].title).toBe("Possible Side Effects of Zonegran Tablet");
+    expect(sections[1].label).toBe("FAQs");
   });
 
   it("drops a section whose design_type the app does not support", () => {

@@ -59,6 +59,7 @@ export const ProductDetailsLayout: React.FC = () => {
     if (product) void analyticsService.logProductView(raw?.sourceType);
   }, [product, raw?.sourceType]);
 
+  const mainScrollRef = React.useRef<ScrollView>(null);
   const [locationSheetVisible, setLocationSheetVisible] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
     null,
@@ -193,6 +194,7 @@ export const ProductDetailsLayout: React.FC = () => {
             </View>
           ) : (
             <ScrollView
+              ref={mainScrollRef}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
               style={{ flex: 1 }}
