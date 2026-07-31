@@ -16,7 +16,7 @@ import {
   categoryCardStyles as s,
 } from "../../categories.styles";
 
-export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
+const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
   product,
   cardWidth,
   onPress,
@@ -42,6 +42,8 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
   );
 
   const { slideAnim, opacityAnim } = animations;
+
+  const handlePress = () => onPress(product);
 
   const handleIncrement = () => {
     increment();
@@ -89,7 +91,7 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
         {/* Image container */}
         <Touchable
           activeOpacity={0.7}
-          onPress={onPress}
+          onPress={handlePress}
           style={{
             height: cardWidth * 1.05,
             backgroundColor: "#FFFFFF",
@@ -286,3 +288,6 @@ export const CategoryProductCard: React.FC<CategoryProductCardProps> = ({
     </View>
   );
 };
+
+// Memoized so a grid re-render (cart tick, refresh) only re-renders changed cards.
+export const CategoryProductCard = React.memo(CategoryProductCardBase);

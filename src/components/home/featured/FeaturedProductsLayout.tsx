@@ -4,28 +4,17 @@ import {
 } from "@/src/components/animations/flyToCart";
 import {
   CategoryCartBanner,
-  CategoryProductCard,
+  ProductGrid,
 } from "@/src/components/categories/products/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { Skeleton } from "@/src/components/ui/Skeleton";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useAllFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryProduct } from "@/src/types/category";
 import type { Product } from "@/src/types/home";
-import { moderateScale } from "@/src/utils/exactScale";
-import React from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-  useWindowDimensions,
-} from "react-native";
-
-const GRID_PADDING = 16;
-const GRID_GAP = 10;
+import React, { useCallback, useMemo } from "react";
+import { View } from "react-native";
 
 // The featured endpoint has no paging, so the page asks for a larger limit and
 // shows everything it returns.
@@ -51,89 +40,41 @@ const toCategoryProduct = (p: Product): CategoryProduct => ({
 const FeaturedProductsContent: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { width } = useWindowDimensions();
   const { totalItems } = useCart();
   const { products, isLoading, refetch } =
     useAllFeaturedMedicines(FEATURED_LIMIT);
 
-  const cardWidth = (width - GRID_PADDING * 2 - GRID_GAP) / 2;
+  const gridProducts = useMemo(
+    () => products.map(toCategoryProduct),
+    [products],
+  );
+
+  // Stable, so the memoized cards don't re-render on every grid render.
+  const handleProductPress = useCallback(
+    (product: CategoryProduct) => {
+      router.push({
+        pathname: "/product/[id]",
+        params: { id: product.productId },
+      });
+    },
+    [router],
+  );
+
+  const handleRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="More Affordable Choices" />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: GRID_PADDING,
-          paddingTop: 16,
-          paddingBottom: adjustedBottom + 100,
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={refetch}
-            tintColor="#36B37E"
-            colors={["#36B37E"]}
-          />
-        }
-      >
-        {isLoading ? (
-          <View className="flex-row flex-wrap justify-between">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <View key={i} style={{ width: cardWidth }} className="mb-6">
-                <Skeleton
-                  width={cardWidth}
-                  height={cardWidth * 1.05}
-                  borderRadius={14}
-                />
-                <View className="mt-2 gap-y-2">
-                  <Skeleton
-                    width={cardWidth * 0.4}
-                    height={28}
-                    borderRadius={6}
-                  />
-                  <Skeleton
-                    width={cardWidth * 0.9}
-                    height={14}
-                    borderRadius={4}
-                  />
-                  <Skeleton
-                    width={cardWidth * 0.6}
-                    height={12}
-                    borderRadius={4}
-                  />
-                </View>
-              </View>
-            ))}
-          </View>
-        ) : products.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-20">
-            <Text
-              className="font-inter-medium text-brand-subtext"
-              style={{ fontSize: moderateScale(15) }}
-            >
-              No products found
-            </Text>
-          </View>
-        ) : (
-          <View className="flex-row flex-wrap justify-between">
-            {products.map((item) => (
-              <CategoryProductCard
-                key={item.id}
-                product={toCategoryProduct(item)}
-                cardWidth={cardWidth}
-                onPress={() =>
-                  router.push({
-                    pathname: "/product/[id]",
-                    params: { id: item.productId ?? item.id },
-                  })
-                }
-              />
-            ))}
-          </View>
-        )}
-      </ScrollView>
+      <ProductGrid
+        products={gridProducts}
+        isLoading={isLoading}
+        onRefresh={handleRefresh}
+        onProductPress={handleProductPress}
+        paddingBottom={adjustedBottom + 100}
+      />
 
       <View
         pointerEvents={totalItems > 0 ? "box-none" : "none"}

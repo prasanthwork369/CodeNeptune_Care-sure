@@ -16,5 +16,6 @@ export interface CategoryProduct {
 export interface CategoryProductCardProps {
   product: CategoryProduct;
   cardWidth: number;
-  onPress: () => void;
+  // Takes the product so callers can pass one stable callback per list.
+  onPress: (product: CategoryProduct) => void;
 }

@@ -6,7 +6,8 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import React, { useMemo, useState } from "react";
+import { FlashList } from "@shopify/flash-list";
+import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { ProductCard } from "./sections";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -51,6 +52,18 @@ export const FrequentOrdersLayout: React.FC = () => {
       return matchSearch && matchFilter;
     });
   }, [displayProducts, search, activeFilter]);
+
+  const renderProduct = useCallback(
+    ({ item, index }: { item: any; index: number }) => (
+      <ProductCard item={item} index={index} />
+    ),
+    [],
+  );
+
+  const keyExtractor = useCallback(
+    (item: any, index: number) => `${item.productId ?? item.id}-${index}`,
+    [],
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
@@ -207,74 +220,67 @@ export const FrequentOrdersLayout: React.FC = () => {
 
       <View style={{ height: 1, backgroundColor: "#F0F1F3" }} />
 
-      <ScrollView
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={
-          filtered.length === 0
-            ? {
-                flexGrow: 1,
-                justifyContent: "center",
-                paddingHorizontal: exactScale(32),
-                paddingBottom: adjustedBottom + exactScale(80),
-              }
-            : {
-                paddingTop: exactScale(14),
-                paddingBottom: adjustedBottom + exactScale(32),
-              }
-        }
-        keyboardShouldPersistTaps="handled"
-      >
-        {isLoading ? (
-          <View
+      {isLoading ? (
+        <View
+          style={{
+            paddingHorizontal: exactScale(16),
+            paddingTop: exactScale(14),
+            gap: exactScale(12),
+          }}
+        >
+          <ShimmerBlock height={exactScale(96)} borderRadius={12} />
+          <ShimmerBlock height={exactScale(96)} borderRadius={12} />
+          <ShimmerBlock height={exactScale(96)} borderRadius={12} />
+        </View>
+      ) : filtered.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingHorizontal: exactScale(32),
+            paddingBottom: adjustedBottom + exactScale(80),
+          }}
+        >
+          <Text
             style={{
-              paddingHorizontal: exactScale(16),
-              paddingTop: exactScale(14),
-              gap: exactScale(12),
+              fontSize: moderateScale(16),
+              fontWeight: "600",
+              color: "#637381",
+              textAlign: "center",
             }}
           >
-            <ShimmerBlock height={exactScale(96)} borderRadius={12} />
-            <ShimmerBlock height={exactScale(96)} borderRadius={12} />
-            <ShimmerBlock height={exactScale(96)} borderRadius={12} />
-          </View>
-        ) : filtered.length === 0 ? (
-          <View style={{ alignItems: "center", justifyContent: "center" }}>
-            <Text
-              style={{
-                fontSize: moderateScale(16),
-                fontWeight: "600",
-                color: "#637381",
-                textAlign: "center",
-              }}
-            >
-              {search || activeFilter !== "All"
-                ? "No products found"
-                : "No frequently ordered products yet"}
-            </Text>
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                fontWeight: "400",
-                color: "#919EAB",
-                marginTop: exactScale(6),
-                textAlign: "center",
-              }}
-            >
-              {search || activeFilter !== "All"
-                ? "Try a different name or filter"
-                : "Your frequently ordered products will appear here"}
-            </Text>
-          </View>
-        ) : (
-          filtered.map((item: any, index: number) => (
-            <ProductCard
-              key={`${item.productId ?? item.id}-${index}`}
-              item={item}
-              index={index}
-            />
-          ))
-        )}
-      </ScrollView>
+            {search || activeFilter !== "All"
+              ? "No products found"
+              : "No frequently ordered products yet"}
+          </Text>
+          <Text
+            style={{
+              fontSize: moderateScale(13),
+              fontWeight: "400",
+              color: "#919EAB",
+              marginTop: exactScale(6),
+              textAlign: "center",
+            }}
+          >
+            {search || activeFilter !== "All"
+              ? "Try a different name or filter"
+              : "Your frequently ordered products will appear here"}
+          </Text>
+        </View>
+      ) : (
+        <FlashList
+          data={filtered}
+          renderItem={renderProduct}
+          keyExtractor={keyExtractor}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            paddingTop: exactScale(14),
+            paddingBottom: adjustedBottom + exactScale(32),
+          }}
+        />
+      )}
     </View>
   );
 };
