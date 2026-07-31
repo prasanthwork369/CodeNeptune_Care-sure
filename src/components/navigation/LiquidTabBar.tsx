@@ -2,6 +2,7 @@ import { tabs } from "@/src/constants/data";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
+import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useUIStore } from "@/src/store/uiStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import { exactScale } from "@/src/utils/exactScale";
@@ -59,17 +60,10 @@ const INACTIVE_ICON_COLOR = "#6A6A6A";
 const SNAP_SPRING = { damping: 28, stiffness: 420, mass: 0.5 } as const;
 // Slightly trailing spring for the liquid stretch effect
 const TRAIL_SPRING = { damping: 22, stiffness: 320, mass: 0.6 } as const;
-// Material-style easing for tab bar show/hide
-const SLIDE_EASING = Easing.bezier(0.4, 0, 0.2, 1);
 // How far the bar travels down to hide — also the range the gradient fades over
 const TAB_BAR_HIDE_OFFSET = 120;
-// Snappier, tighter spring for the upload button's expand/collapse width —
-// matches SLIDE_SPRING's feel more closely so both stay in sync.
-const WIDTH_SPRING = { damping: 22, stiffness: 260, mass: 0.6 } as const;
 // Gentle spring for the upload button's icon/text slide transitions
 const SLIDE_SPRING = { damping: 18, stiffness: 130, mass: 0.6 } as const;
-// Smooth ease for the upload button's text fade
-const TRANSLATE_EASING = Easing.out(Easing.cubic);
 
 const ICON_OFF_LEFT = -100;
 const TEXT_OFF_RIGHT = 150;
@@ -90,10 +84,6 @@ const AnimatedUploadButton = React.memo(
     );
     const iconTranslate = useSharedValue(0);
     const textTranslate = useSharedValue(TEXT_OFF_RIGHT);
-    const buttonWidth = useSharedValue(
-      isUploadButtonCollapsed ? PILL_HEIGHT : FAB_WIDTH,
-    );
-    const textOpacity = useSharedValue(isUploadButtonCollapsed ? 0 : 1);
 
     const animateTo = useCallback((expand: boolean) => {
       if (expand) {
@@ -105,21 +95,11 @@ const AnimatedUploadButton = React.memo(
       }
     }, []);
 
-    // Single effect drives width, text opacity, and icon/text position
-    // together whenever the collapsed state flips, so they stay in lockstep
-    // instead of two independent effects animating related properties with
-    // different spring/timing configs (which could fall out of sync).
+    // Width and label opacity now come straight off the tab bar's shared value
+    // (see animatedButtonStyle), so they move on the same frame as the bar.
+    // This effect only drives the periodic icon/text attention cycle.
     useEffect(() => {
       let timeout: ReturnType<typeof setTimeout>;
-
-      buttonWidth.value = withSpring(
-        isUploadButtonCollapsed ? PILL_HEIGHT : FAB_WIDTH,
-        WIDTH_SPRING,
-      );
-      textOpacity.value = withTiming(isUploadButtonCollapsed ? 0 : 1, {
-        duration: 220,
-        easing: TRANSLATE_EASING,
-      });
 
       const tick = (expand: boolean) => {
         if (isUploadButtonCollapsed) return;
@@ -140,7 +120,12 @@ const AnimatedUploadButton = React.memo(
     }, [isUploadButtonCollapsed]);
 
     const animatedButtonStyle = useAnimatedStyle(() => ({
-      width: buttonWidth.value,
+      width: interpolate(
+        tabBarVisible.value,
+        [0, 1],
+        [PILL_HEIGHT, FAB_WIDTH],
+        Extrapolation.CLAMP,
+      ),
       height: PILL_HEIGHT,
       borderTopLeftRadius: PILL_HEIGHT,
       borderBottomLeftRadius: PILL_HEIGHT,
@@ -184,7 +169,14 @@ const AnimatedUploadButton = React.memo(
                 { position: "absolute" },
                 useAnimatedStyle(() => ({
                   transform: [{ translateX: textTranslate.value }],
-                  opacity: textOpacity.value,
+                  // Fades over the back half of the bar's travel, so the label
+                  // is gone before the button finishes narrowing to a circle.
+                  opacity: interpolate(
+                    tabBarVisible.value,
+                    [0.5, 1],
+                    [0, 1],
+                    Extrapolation.CLAMP,
+                  ),
                 })),
               ]}
             >
@@ -355,7 +347,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const adjustedBottom = useAdjustedBottomInset();
   const extraGap = exactScale(6);
   const router = useNav();
-  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
   const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
   const [barWidth, setBarWidth] = useState(0);
 
@@ -379,16 +370,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const leaderX = useSharedValue(lastValidIndex.current);
   const followerX = useSharedValue(lastValidIndex.current);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
-  const tabBarTranslateY = useSharedValue(
-    isTabBarVisible ? 0 : TAB_BAR_HIDE_OFFSET,
-  );
-
-  useEffect(() => {
-    tabBarTranslateY.value = withTiming(
-      isTabBarVisible ? 0 : TAB_BAR_HIDE_OFFSET,
-      { duration: 240, easing: SLIDE_EASING },
-    );
-  }, [isTabBarVisible]);
 
   // Android: the active tab label's custom Inter typeface (set via useAnimatedStyle in
   // TabItem) can fail to resolve on the very first paint -- the native Text view is
@@ -541,20 +522,26 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     };
   });
 
+  // Read straight off the shared value the scroll worklet writes, so the bar
+  // moves on the same frame as the scroll — no store subscription, no re-render.
   const animatedTabBarContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: tabBarTranslateY.value }],
+    transform: [
+      {
+        translateY: interpolate(
+          tabBarVisible.value,
+          [0, 1],
+          [TAB_BAR_HIDE_OFFSET, 0],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
   }));
 
   // The fade gradient is anchored to the screen bottom, so sliding it would
   // push its solid end off-screen and collapse the fade band into a hard edge.
   // It dissolves in place instead, finishing exactly as the pill lands.
   const animatedGradientStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      tabBarTranslateY.value,
-      [0, TAB_BAR_HIDE_OFFSET],
-      [1, 0],
-      Extrapolation.CLAMP,
-    ),
+    opacity: tabBarVisible.value,
   }));
 
   const tabItems = useMemo(

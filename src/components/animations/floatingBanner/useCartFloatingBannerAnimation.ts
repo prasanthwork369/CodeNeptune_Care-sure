@@ -8,20 +8,17 @@ import {
   interpolate,
 } from "react-native-reanimated";
 import { exactScale } from "@/src/utils/exactScale";
+import { tabBarVisible } from "@/src/store/tabBarVisibility";
 
 interface UseCartFloatingBannerAnimationProps {
   visible?: boolean;
   totalItems: number;
-  isTabBarVisible: boolean;
-  isUploadButtonCollapsed: boolean;
   onInteractionChange?: (isInteracting: boolean) => void;
 }
 
 export const useCartFloatingBannerAnimation = ({
   visible,
   totalItems,
-  isTabBarVisible,
-  isUploadButtonCollapsed,
   onInteractionChange,
 }: UseCartFloatingBannerAnimationProps) => {
   // Scaled to match the Remove button's width/position (exactScale(90)) so the
@@ -35,22 +32,9 @@ export const useCartFloatingBannerAnimation = ({
   const translateX = useSharedValue(0);
   const opacity = useSharedValue(totalItems > 0 ? 1 : 0);
   const slideY = useSharedValue(totalItems > 0 ? 0 : 150);
-  const tabBarAnim = useSharedValue(isTabBarVisible ? 1 : 0);
-  const uploadCollapsedAnim = useSharedValue(isUploadButtonCollapsed ? 1 : 0);
-
-  useEffect(() => {
-    tabBarAnim.value = withTiming(isTabBarVisible ? 1 : 0, {
-      duration: DURATION,
-      easing: EASE_IN_OUT,
-    });
-  }, [isTabBarVisible]);
-
-  useEffect(() => {
-    uploadCollapsedAnim.value = withTiming(isUploadButtonCollapsed ? 1 : 0, {
-      duration: DURATION,
-      easing: EASE_IN_OUT,
-    });
-  }, [isUploadButtonCollapsed]);
+  // The tab bar's own shared value — read directly so the banner reshapes on
+  // the same frame as the bar rather than trailing it through a store update.
+  const tabBarAnim = tabBarVisible;
 
   useEffect(() => {
     const isBannerVisible =
@@ -100,27 +84,19 @@ export const useCartFloatingBannerAnimation = ({
     transform: [{ translateX: translateX.value }],
   }));
 
-  const exact127 = exactScale(127);
   const exact77 = exactScale(77);
   const exact12 = exactScale(12);
 
-  const containerStyle = useAnimatedStyle(() => {
-    const collapsedPaddingRight = interpolate(
-      uploadCollapsedAnim.value,
-      [0, 1],
-      [exact127, exact77],
-    );
-    return {
-      paddingLeft: exact12,
-      paddingRight: interpolate(
-        tabBarAnim.value,
-        [0, 1],
-        [collapsedPaddingRight, exact12],
-      ),
-      transform: [{ translateY: slideY.value }],
-      opacity: opacity.value,
-    };
-  });
+  // The upload button is always collapsed exactly when the bar is hidden, so
+  // one value drives the whole reshape. Deriving it from a second, JS-driven
+  // value would run the shrink on two clocks and read as a broken two-stage
+  // animation.
+  const containerStyle = useAnimatedStyle(() => ({
+    paddingLeft: exact12,
+    paddingRight: interpolate(tabBarAnim.value, [0, 1], [exact77, exact12]),
+    transform: [{ translateY: slideY.value }],
+    opacity: opacity.value,
+  }));
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
     paddingHorizontal: interpolate(tabBarAnim.value, [0, 1], [10, 14]),

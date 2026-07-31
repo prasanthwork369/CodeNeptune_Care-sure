@@ -1,5 +1,8 @@
 import { create } from "zustand";
+import { withTiming } from "react-native-reanimated";
 import { AlertButton, AlertDialogProps } from "@/src/components/ui/AlertDialog";
+import { tabBarVisible } from "@/src/store/tabBarVisibility";
+import { durations, easings } from "@/src/theme";
 
 export interface GlobalAlertConfig {
   title: string;
@@ -43,7 +46,16 @@ export const useUIStore = create<UIState>((set) => ({
   isRxFromCartFlow: false,
   isFeedScrolling: false,
   permissionFlowComplete: false,
-  setTabBarVisible: (visible) => set({ isTabBarVisible: visible }),
+  // Also drives the shared value, since that — not this flag — is what the bar
+  // animates from. The scroll worklet writes the shared value itself and calls
+  // setState directly, so it never round-trips through here.
+  setTabBarVisible: (visible) => {
+    tabBarVisible.value = withTiming(visible ? 1 : 0, {
+      duration: durations.tabBar,
+      easing: easings.standard,
+    });
+    set({ isTabBarVisible: visible });
+  },
   setUploadButtonCollapsed: (collapsed) =>
     set({ isUploadButtonCollapsed: collapsed }),
   setHasJustUploadedPrescription: (uploaded) =>

@@ -5,6 +5,9 @@ export const durations = {
   normal: 200,
   slow: 300,
   fade: 150,
+  // Tab bar and everything that rides with it (floating banners, dots) — one
+  // value so they can't drift out of lockstep.
+  tabBar: 200,
 } as const;
 
 export const easings = {

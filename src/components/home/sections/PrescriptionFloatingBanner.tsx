@@ -3,7 +3,7 @@ import {
   PRESCRIPTION_STATUS,
   PrescriptionStatusValue,
 } from "@/src/constants/prescription-status";
-import { useUIStore } from "@/src/store/uiStore";
+import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
@@ -63,13 +63,11 @@ export const PrescriptionFloatingBanner = ({
   onPress,
   onClose,
 }: PrescriptionFloatingBannerProps) => {
-  const isUploadButtonCollapsed = useUIStore((s) => s.isUploadButtonCollapsed);
-  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
-
   const slideY = useSharedValue(visible ? 0 : 150);
   const opacity = useSharedValue(visible ? 1 : 0);
-  const tabBarAnim = useSharedValue(isTabBarVisible ? 1 : 0);
-  const uploadCollapsedAnim = useSharedValue(isUploadButtonCollapsed ? 1 : 0);
+  // The tab bar's own shared value — read directly so the banner reshapes on
+  // the same frame as the bar rather than trailing it through a store update.
+  const tabBarAnim = tabBarVisible;
   const progressAnim = useSharedValue(0);
 
   const config = STATUS_CONFIG[status];
@@ -95,20 +93,6 @@ export const PrescriptionFloatingBanner = ({
   }, [isUnderReview, progressAnim]);
 
   useEffect(() => {
-    tabBarAnim.value = withTiming(isTabBarVisible ? 1 : 0, {
-      duration: DURATION,
-      easing: EASE_IN_OUT,
-    });
-  }, [isTabBarVisible, tabBarAnim]);
-
-  useEffect(() => {
-    uploadCollapsedAnim.value = withTiming(isUploadButtonCollapsed ? 1 : 0, {
-      duration: DURATION,
-      easing: EASE_IN_OUT,
-    });
-  }, [isUploadButtonCollapsed, uploadCollapsedAnim]);
-
-  useEffect(() => {
     if (visible) {
       opacity.value = withTiming(1, { duration: 220, easing: EASE_IN_OUT });
       slideY.value = withSpring(0, { damping: 17, stiffness: 110, mass: 0.6 });
@@ -125,27 +109,19 @@ export const PrescriptionFloatingBanner = ({
     }
   }, [visible, status, opacity, slideY]);
 
-  const exact127 = exactScale(127);
   const exact77 = exactScale(77);
   const exact12 = exactScale(12);
 
-  const containerStyle = useAnimatedStyle(() => {
-    const collapsedPaddingRight = interpolate(
-      uploadCollapsedAnim.value,
-      [0, 1],
-      [exact127, exact77],
-    );
-    return {
-      paddingLeft: exact12,
-      paddingRight: interpolate(
-        tabBarAnim.value,
-        [0, 1],
-        [collapsedPaddingRight, exact12],
-      ),
-      transform: [{ translateY: slideY.value }],
-      opacity: opacity.value,
-    };
-  });
+  // The upload button is always collapsed exactly when the bar is hidden, so
+  // one value drives the whole reshape. Deriving it from a second, JS-driven
+  // value would run the shrink on two clocks and read as a broken two-stage
+  // animation.
+  const containerStyle = useAnimatedStyle(() => ({
+    paddingLeft: exact12,
+    paddingRight: interpolate(tabBarAnim.value, [0, 1], [exact77, exact12]),
+    transform: [{ translateY: slideY.value }],
+    opacity: opacity.value,
+  }));
 
   // Inline progress pill: fills a dynamic track width based on expansion state
   const trackWidthStyle = useAnimatedStyle(() => {
@@ -168,7 +144,8 @@ export const PrescriptionFloatingBanner = ({
     <Animated.View style={containerStyle}>
       <View
         style={{
-          boxShadow: "0px 0px 20px 0px #00000026",
+          // Lighter than the tab bar pill's 15% — the banner sits over content.
+          boxShadow: "0px 0px 20px 0px #00000017",
           borderRadius: exactScale(999),
           backgroundColor: "white",
         }}

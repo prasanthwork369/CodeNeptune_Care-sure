@@ -37,8 +37,6 @@ export const CartFloatingBanner = ({
 }: CartFloatingBannerProps) => {
   const [isClearing, setIsClearing] = useState(false);
   const { totalItems, items, clearCart } = useCart();
-  const isUploadButtonCollapsed = useUIStore((s) => s.isUploadButtonCollapsed);
-  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
   const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
   const setUploadButtonCollapsed = useUIStore(
     (s) => s.setUploadButtonCollapsed,
@@ -61,8 +59,6 @@ export const CartFloatingBanner = ({
   } = useCartFloatingBannerAnimation({
     visible,
     totalItems,
-    isTabBarVisible,
-    isUploadButtonCollapsed,
     onInteractionChange,
   });
 
@@ -136,7 +132,8 @@ export const CartFloatingBanner = ({
     <Animated.View style={containerStyle}>
       <View
         style={{
-          boxShadow: "0px 0px 20px 0px #00000026",
+          // Lighter than the tab bar pill's 15% — the banner sits over content.
+          boxShadow: "0px 0px 20px 0px #00000017",
           borderRadius: exactScale(999),
           backgroundColor: "white",
         }}

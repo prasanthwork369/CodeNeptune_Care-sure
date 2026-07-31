@@ -11,14 +11,15 @@ import {
 } from "@/src/components/navigation/LiquidTabBar.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
-  Easing,
+  Extrapolation,
+  interpolate,
   interpolateColor,
   SharedValue,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
+import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
@@ -33,6 +34,9 @@ interface DotProps {
 // Room reserved below the banner for its 20px boxShadow. The carousel clips its
 // slides (overflow + ScrollView), so without this the shadow is sliced off flat.
 const SHADOW_ROOM = exactScale(24);
+
+// How far the banners drop when the tab bar hides.
+const BANNER_HIDE_OFFSET = exactScale(73);
 
 // `extraBottom` lets a caller that shifted its own container back down cancel
 // that shift here, so the fade lands on the same pixels either way.
@@ -98,7 +102,6 @@ export const FloatingBannersCarousel = ({
   const extraGap = exactScale(6);
   const { width } = useWindowDimensions();
   const { totalItems } = useCart();
-  const isTabBarVisible = useUIStore((s) => s.isTabBarVisible);
   const { latestPrescription, hasPendingPrescription, dismissBanner } =
     usePrescriptionBanner();
   const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
@@ -121,8 +124,6 @@ export const FloatingBannersCarousel = ({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const currentScrollX = useRef(bothActive ? width : 0);
 
-  // Tab bar vertical transition anim
-  const translateY = useSharedValue(0);
   // Horizontal transition progress for the carousel
   const progress = useSharedValue(0);
 
@@ -177,13 +178,6 @@ export const FloatingBannersCarousel = ({
     return () => stopAutoplay();
   }, [isCartInteracting, startAutoplay, stopAutoplay]);
 
-  useEffect(() => {
-    translateY.value = withTiming(isTabBarVisible ? 0 : exactScale(73), {
-      duration: 300,
-      easing: Easing.inOut(Easing.ease),
-    });
-  }, [isTabBarVisible, translateY]);
-
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       progress.value = event.contentOffset.x / width;
@@ -206,21 +200,31 @@ export const FloatingBannersCarousel = ({
     }
   }, [activeBannerIndex, bothActive, width, progress]);
 
+  // Both ride the same shared value as the tab bar, so the banners travel on
+  // the identical frame instead of chasing it through a store update.
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [
+      {
+        translateY: interpolate(
+          tabBarVisible.value,
+          [0, 1],
+          [BANNER_HIDE_OFFSET, 0],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
   }));
 
   const dotsAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(isTabBarVisible ? 1 : 0, {
-      duration: 250,
-      easing: Easing.inOut(Easing.ease),
-    }),
+    opacity: tabBarVisible.value,
     transform: [
       {
-        translateY: withTiming(isTabBarVisible ? 0 : 10, {
-          duration: 250,
-          easing: Easing.inOut(Easing.ease),
-        }),
+        translateY: interpolate(
+          tabBarVisible.value,
+          [0, 1],
+          [10, 0],
+          Extrapolation.CLAMP,
+        ),
       },
     ],
   }));
@@ -437,8 +441,9 @@ export const FloatingBannersCarousel = ({
                   alignItems: "center",
                   justifyContent: "center",
                   gap: exactScale(4),
+                  // zIndex alone handles stacking; elevation would also cast a
+                  // dark Android drop shadow under the badge.
                   zIndex: 20,
-                  elevation: 7,
                 },
                 dotsAnimatedStyle,
               ]}
