@@ -222,7 +222,12 @@ export const CartFloatingBanner = ({
                   </View>
                 </View>
 
-                <View className="flex-1 justify-center">
+                {/* minWidth 0 lets the flex child actually shrink — without it a
+                    long medicine name pushes into the View Cart button. */}
+                <View
+                  className="flex-1 justify-center"
+                  style={{ minWidth: 0, marginRight: exactScale(8) }}
+                >
                   <Text
                     className="font-inter-bold text-[#1A1C1E]"
                     numberOfLines={1}
@@ -235,6 +240,7 @@ export const CartFloatingBanner = ({
                   </Text>
                   <Text
                     className="font-inter-bold text-[#1A1C1E]"
+                    numberOfLines={1}
                     style={{
                       fontSize: moderateScale(14),
                       lineHeight: moderateScale(18),
@@ -246,7 +252,7 @@ export const CartFloatingBanner = ({
 
                 <View
                   className="flex-row items-center"
-                  style={{ columnGap: exactScale(8) }}
+                  style={{ columnGap: exactScale(8), flexShrink: 0 }}
                 >
                   <Touchable activeOpacity={0.9} onPress={onViewCart}>
                     <Animated.View style={[BUTTON_STATIC, buttonAnimatedStyle]}>

@@ -61,6 +61,8 @@ const SNAP_SPRING = { damping: 28, stiffness: 420, mass: 0.5 } as const;
 const TRAIL_SPRING = { damping: 22, stiffness: 320, mass: 0.6 } as const;
 // Material-style easing for tab bar show/hide
 const SLIDE_EASING = Easing.bezier(0.4, 0, 0.2, 1);
+// How far the bar travels down to hide — also the range the gradient fades over
+const TAB_BAR_HIDE_OFFSET = 120;
 // Snappier, tighter spring for the upload button's expand/collapse width —
 // matches SLIDE_SPRING's feel more closely so both stay in sync.
 const WIDTH_SPRING = { damping: 22, stiffness: 260, mass: 0.6 } as const;
@@ -377,13 +379,15 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const leaderX = useSharedValue(lastValidIndex.current);
   const followerX = useSharedValue(lastValidIndex.current);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
-  const tabBarTranslateY = useSharedValue(isTabBarVisible ? 0 : 120);
+  const tabBarTranslateY = useSharedValue(
+    isTabBarVisible ? 0 : TAB_BAR_HIDE_OFFSET,
+  );
 
   useEffect(() => {
-    tabBarTranslateY.value = withTiming(isTabBarVisible ? 0 : 120, {
-      duration: 240,
-      easing: SLIDE_EASING,
-    });
+    tabBarTranslateY.value = withTiming(
+      isTabBarVisible ? 0 : TAB_BAR_HIDE_OFFSET,
+      { duration: 240, easing: SLIDE_EASING },
+    );
   }, [isTabBarVisible]);
 
   // Android: the active tab label's custom Inter typeface (set via useAnimatedStyle in
@@ -541,6 +545,18 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     transform: [{ translateY: tabBarTranslateY.value }],
   }));
 
+  // The fade gradient is anchored to the screen bottom, so sliding it would
+  // push its solid end off-screen and collapse the fade band into a hard edge.
+  // It dissolves in place instead, finishing exactly as the pill lands.
+  const animatedGradientStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      tabBarTranslateY.value,
+      [0, TAB_BAR_HIDE_OFFSET],
+      [1, 0],
+      Extrapolation.CLAMP,
+    ),
+  }));
+
   const tabItems = useMemo(
     () =>
       pillRoutes
@@ -574,7 +590,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       onLayout={handleLayout}
     >
       <Animated.View
-        style={[StyleSheet.absoluteFill, animatedTabBarContainerStyle]}
+        style={[StyleSheet.absoluteFill, animatedGradientStyle]}
         pointerEvents="none"
       >
         <TabBarFadeGradient />

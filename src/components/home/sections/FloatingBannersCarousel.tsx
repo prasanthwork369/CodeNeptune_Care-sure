@@ -30,14 +30,20 @@ interface DotProps {
   total: number;
 }
 
-const BannerFadeGradient = () => (
+// Room reserved below the banner for its 20px boxShadow. The carousel clips its
+// slides (overflow + ScrollView), so without this the shadow is sliced off flat.
+const SHADOW_ROOM = exactScale(24);
+
+// `extraBottom` lets a caller that shifted its own container back down cancel
+// that shift here, so the fade lands on the same pixels either way.
+const BannerFadeGradient = ({ extraBottom = 0 }: { extraBottom?: number }) => (
   <LinearGradient
     colors={["rgba(255,255,255,0)", "rgba(255,255,255,0.95)", "#FFFFFF"]}
     locations={[0.05, 0.3, 1]}
     pointerEvents="none"
     style={{
       position: "absolute",
-      bottom: -exactScale(100),
+      bottom: -exactScale(100) + extraBottom,
       left: 0,
       right: 0,
       height: exactScale(150),
@@ -295,23 +301,25 @@ export const FloatingBannersCarousel = ({
           style={[
             {
               position: "absolute",
-              bottom: TAB_BAR_HEIGHT + exactScale(8),
+              // Dropped by SHADOW_ROOM and grown by the same amount; each slide
+              // adds it back as padding, so the banner lands where it always did.
+              bottom: TAB_BAR_HEIGHT + exactScale(8) - SHADOW_ROOM,
               left: 0,
               width: width,
-              height: exactScale(90),
+              height: exactScale(90) + SHADOW_ROOM,
               justifyContent: "flex-end",
               zIndex: 100,
             },
             animatedContainerStyle,
           ]}
         >
-          <BannerFadeGradient />
+          <BannerFadeGradient extraBottom={SHADOW_ROOM} />
           {/* Slides Container */}
           <View
             pointerEvents="box-none"
             style={{
               width: "100%",
-              height: exactScale(82),
+              height: exactScale(82) + SHADOW_ROOM,
               overflow: "hidden",
             }}
           >
@@ -343,7 +351,7 @@ export const FloatingBannersCarousel = ({
                   width: width,
                   height: "100%",
                   justifyContent: "flex-end",
-                  paddingBottom: 1,
+                  paddingBottom: 1 + SHADOW_ROOM,
                 }}
               >
                 <PrescriptionFloatingBanner
@@ -364,7 +372,7 @@ export const FloatingBannersCarousel = ({
                   width: width,
                   height: "100%",
                   justifyContent: "flex-end",
-                  paddingBottom: 1,
+                  paddingBottom: 1 + SHADOW_ROOM,
                 }}
               >
                 <CartFloatingBanner
@@ -380,7 +388,7 @@ export const FloatingBannersCarousel = ({
                   width: width,
                   height: "100%",
                   justifyContent: "flex-end",
-                  paddingBottom: 1,
+                  paddingBottom: 1 + SHADOW_ROOM,
                 }}
               >
                 <PrescriptionFloatingBanner
@@ -401,7 +409,7 @@ export const FloatingBannersCarousel = ({
                   width: width,
                   height: "100%",
                   justifyContent: "flex-end",
-                  paddingBottom: 1,
+                  paddingBottom: 1 + SHADOW_ROOM,
                 }}
               >
                 <CartFloatingBanner
@@ -417,7 +425,9 @@ export const FloatingBannersCarousel = ({
               style={[
                 {
                   position: "absolute",
-                  bottom: exactScale(3),
+                  // Offset by the same room the slides gained, so the badge
+                  // stays pinned to the banner instead of dropping with it.
+                  bottom: exactScale(3) + SHADOW_ROOM,
                   alignSelf: "center",
                   height: exactScale(12),
                   paddingHorizontal: exactScale(6),
