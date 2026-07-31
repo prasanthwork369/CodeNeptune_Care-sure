@@ -17,6 +17,7 @@ import {
   NotificationPayload,
   NotificationType,
 } from "../../types/notification";
+import { logger } from "@/src/utils/logger";
 
 // Firebase Messaging is a native module unavailable in Expo Go — a static
 // top-level `import` would crash the JS bundle on load there before the
@@ -128,7 +129,7 @@ export const usePushNotifications = () => {
 
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       if (__DEV__)
-        console.log(
+        logger.debug(
           "[PushNotificationHook] Foreground FCM message:",
           JSON.stringify(remoteMessage, null, 2),
         );
@@ -187,7 +188,7 @@ export const usePushNotifications = () => {
   useEffect(() => {
     if (isExpoGo) return;
     if (__DEV__)
-      console.log(
+      logger.debug(
         `[PushNotificationHook] Cold-start gate — isLoaded:${isLoaded} navReady:${navReady}`,
       );
     if (!isLoaded || !navReady) return;
@@ -195,7 +196,7 @@ export const usePushNotifications = () => {
       .getInitialNotification()
       .then((remoteMessage) => {
         if (__DEV__)
-          console.log(
+          logger.debug(
             "[PushNotificationHook] Cold start (FCM) getInitialNotification:",
             remoteMessage ? JSON.stringify(remoteMessage, null, 2) : "null",
           );
@@ -205,7 +206,7 @@ export const usePushNotifications = () => {
       })
       .catch((e) => {
         if (__DEV__)
-          console.log(
+          logger.debug(
             "[PushNotificationHook] getInitialNotification error:",
             e,
           );
@@ -247,7 +248,7 @@ export const usePushNotifications = () => {
     const unsubscribe = messaging().onNotificationOpenedApp((remoteMessage) => {
       if (!remoteMessage) return;
       if (__DEV__)
-        console.log(
+        logger.debug(
           "[PushNotificationHook] Notification opened app (FCM):",
           JSON.stringify(remoteMessage, null, 2),
         );
@@ -265,7 +266,7 @@ export const usePushNotifications = () => {
     foregroundListener.current = Notifications.addNotificationReceivedListener(
       (notification) => {
         if (__DEV__)
-          console.log(
+          logger.debug(
             "[PushNotificationHook] Foreground notification received:",
             JSON.stringify(notification, null, 2),
           );
@@ -282,7 +283,7 @@ export const usePushNotifications = () => {
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         if (__DEV__)
-          console.log(
+          logger.debug(
             "[PushNotificationHook] Notification tapped (response listener):",
             JSON.stringify(response, null, 2),
           );

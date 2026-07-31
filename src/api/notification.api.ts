@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "../utils/urls";
 import { DeviceInfo } from "../lib/deviceInfo";
 import { apiClient } from "./client";
+import { logger } from "@/src/utils/logger";
 
 export const notificationApi = {
   /**
@@ -13,7 +14,7 @@ export const notificationApi = {
       ...deviceInfo,
     };
     if (__DEV__)
-      console.log(
+      logger.debug(
         "[RegisterDevice] payload:",
         JSON.stringify(payload, null, 2),
       );

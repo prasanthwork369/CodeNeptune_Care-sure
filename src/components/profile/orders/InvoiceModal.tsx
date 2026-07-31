@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { WebView } from "react-native-webview";
+import { logger } from "@/src/utils/logger";
 
 interface InvoiceModalProps {
   visible: boolean;
@@ -215,7 +216,10 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           new File(temporaryPdfUri).delete();
         } catch (cleanupError) {
           if (__DEV__) {
-            console.log("[InvoiceDownload] temp cleanup failed:", cleanupError);
+            logger.debug(
+              "[InvoiceDownload] temp cleanup failed:",
+              cleanupError,
+            );
           }
         }
       }

@@ -5,6 +5,7 @@ import { tokenStorage } from "../lib/storage";
 import { useAuthStore } from "../store/authStore";
 import { messagingService as notificationService } from "./firebase";
 import { getDeviceInfo } from "../lib/deviceInfo";
+import { logger } from "@/src/utils/logger";
 
 export const authService = {
   requestOtp: async (phone: string) => {
@@ -13,7 +14,7 @@ export const authService = {
   verifyOtp: async (phone: string, otp: string) => {
     // Retrieve the unique hardware deviceId (always mandatory for backend verify-otp schema validation)
     const { deviceId } = await getDeviceInfo();
-    if (__DEV__) console.log("[VerifyOtp] deviceId:", deviceId);
+    if (__DEV__) logger.debug("[VerifyOtp] deviceId:", deviceId);
 
     const data = await authApi.verifyOtp(phone, otp, deviceId);
     const { accessToken, refreshToken, expiresIn } = data.data;

@@ -9,6 +9,7 @@ import {
   cartCounterStyles as cc,
   searchCardStyles as s,
 } from "./search.styles";
+import { logger } from "@/src/utils/logger";
 
 interface SearchNoSubstituteCardProps {
   data: {
@@ -39,7 +40,7 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
   const handleRequest = () => {
     // Keep this local until the backend exposes a substitute-request endpoint.
     if (__DEV__) {
-      console.log("[SearchNoSubstituteCard] request substitute for", {
+      logger.debug("[SearchNoSubstituteCard] request substitute for", {
         productId: data.productId ?? data.id,
       });
     }

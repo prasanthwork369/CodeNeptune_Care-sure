@@ -3,6 +3,7 @@ import { PrescriptionItem } from "../types/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { CapturedAsset } from "../features/prescription-scanner";
+import { logger } from "@/src/utils/logger";
 
 /**
  * Last-resort fallbacks, NOT the real limits.
@@ -156,7 +157,7 @@ export async function validatePrescriptionFile(
     ) {
       size = info.size;
       if (__DEV__)
-        console.log(
+        logger.debug(
           `[Prescription] FS-verified size for "${name}": ${size} bytes`,
         );
     } else {
@@ -171,7 +172,7 @@ export async function validatePrescriptionFile(
   }
 
   if (__DEV__)
-    console.log(
+    logger.debug(
       `[Prescription] Final size for "${name}": ${size} bytes (limit: ${maxSizeBytes})`,
     );
 

@@ -6,6 +6,7 @@ import {
 } from "../../types/notification";
 import { useAuthStore } from "../../store/authStore";
 import { useNotificationNavigationStore } from "../../store/notificationNavigationStore";
+import { logger } from "@/src/utils/logger";
 
 const ANDROID_PACKAGE = "com.codeneptune.caresure";
 
@@ -38,7 +39,7 @@ export const NotificationNavigation = {
   /** Central entrypoint for handling notification tap navigation */
   handleTap: (payload: NotificationPayload, tapId?: string) => {
     if (__DEV__)
-      console.log(
+      logger.debug(
         "[NotificationNavigation] handleTap called with payload:",
         JSON.stringify(payload, null, 2),
       );
@@ -56,7 +57,7 @@ export const NotificationNavigation = {
     if (tapId) {
       if (store.lastHandledTapId === tapId) {
         if (__DEV__)
-          console.log(
+          logger.debug(
             "[NotificationNavigation] Skipping duplicate tap event for tapId:",
             tapId,
           );
@@ -67,14 +68,14 @@ export const NotificationNavigation = {
 
     const { isAuthenticated } = useAuthStore.getState();
     if (__DEV__)
-      console.log(
+      logger.debug(
         `[NotificationNavigation] User isAuthenticated status: ${isAuthenticated}`,
       );
 
     // Authentication Guard
     if (AUTH_REQUIRED_TYPES.has(payload.type) && !isAuthenticated) {
       if (__DEV__)
-        console.log(
+        logger.debug(
           `[NotificationNavigation] Route for type "${payload.type}" requires authentication. Caching and pushing to login.`,
         );
       store.setPendingNotification(payload);
@@ -89,7 +90,7 @@ export const NotificationNavigation = {
   executeNavigation: (payload: NotificationPayload) => {
     const { type, data = {} } = payload;
     if (__DEV__)
-      console.log(
+      logger.debug(
         `[NotificationNavigation] Routing to destination for type: ${type} with data:`,
         JSON.stringify(data, null, 2),
       );

@@ -7,6 +7,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
+import { logger } from "@/src/utils/logger";
 
 const RECENT_PRESCRIPTIONS_LIMIT = 1;
 
@@ -109,7 +110,7 @@ export const usePrescriptionBanner = () => {
   const dismissBanner = () => {
     if (latestPrescription) {
       if (__DEV__)
-        console.log(
+        logger.debug(
           "Dismissing prescription banner for",
           latestPrescription.id,
         );

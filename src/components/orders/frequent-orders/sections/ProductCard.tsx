@@ -7,6 +7,7 @@ import { resolveUUID } from "@/src/utils/resolveUUID";
 import React, { useState } from "react";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
+import { logger } from "@/src/utils/logger";
 
 function formatDate(dateStr?: string | null) {
   if (!dateStr) return "";
@@ -104,7 +105,7 @@ export function ProductCard({
           (typeof item.image === "string" ? item.image : undefined);
         const medicineId = await resolveUUID(itemId, slug, item.productId);
         if (!isStepperVariant && __DEV__)
-          console.log("[FrequentOrders] resolved:", {
+          logger.debug("[FrequentOrders] resolved:", {
             itemId,
             slug,
             medicineId,
@@ -129,7 +130,7 @@ export function ProductCard({
       }
     } catch (err: any) {
       if (isStepperVariant) {
-        if (__DEV__) console.log("[FrequentlyOrdered AddToCart] error:", err);
+        if (__DEV__) logger.debug("[FrequentlyOrdered AddToCart] error:", err);
       } else {
         if (__DEV__)
           console.error(

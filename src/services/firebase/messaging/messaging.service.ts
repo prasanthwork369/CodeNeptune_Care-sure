@@ -7,6 +7,7 @@ import { notificationApi } from "../../../api/notification.api";
 import { NOTIFICATION_CHANNELS } from "../../../constants/notificationChannels";
 import { getDeviceInfo } from "../../../lib/deviceInfo";
 import { isExpoGo } from "../../../utils/environment";
+import { logger } from "@/src/utils/logger";
 
 // Single composite cache key holding `${token}:${isAuthenticated}`. Storing one
 // value (instead of token + auth separately) makes the write atomic — the app
@@ -45,7 +46,7 @@ const syncToken = async (token: string): Promise<void> => {
   // Already handled this key this session (or a call is mid-flight) — skip.
   if (lastRegisteredKey === key || inProgressKey === key) {
     if (__DEV__)
-      console.log(
+      logger.debug(
         "[PushToken] Already registered/registering this session. Skipping.",
       );
     return;
@@ -61,7 +62,7 @@ const syncToken = async (token: string): Promise<void> => {
       if ((await AsyncStorage.getItem(CACHE_KEY)) === key) {
         lastRegisteredKey = key; // sync in-memory guard
         if (__DEV__)
-          console.log(
+          logger.debug(
             "[PushToken] Match found in cache. Skipping registration.",
           );
         return;
@@ -72,10 +73,10 @@ const syncToken = async (token: string): Promise<void> => {
     // registration — not on the startup calls that skip via the cache guard.
     const deviceInfo = await getDeviceInfo();
     if (__DEV__)
-      console.log("[DeviceInfo]", JSON.stringify(deviceInfo, null, 2));
+      logger.debug("[DeviceInfo]", JSON.stringify(deviceInfo, null, 2));
     if (__DEV__) {
       __devApiCallCount += 1;
-      console.log(
+      logger.debug(
         `[PushToken] POST /push-notifications/devices — call #${__devApiCallCount} this session`,
       );
     }
@@ -171,14 +172,14 @@ export const notificationService = {
     if (!granted) return;
 
     const token = await notificationService.getFcmToken();
-    if (__DEV__) console.log("[PushToken]", token);
+    if (__DEV__) logger.debug("[PushToken]", token);
     if (!token) return;
 
     await syncToken(token);
   },
 
   updateToken: async (newToken: string): Promise<void> => {
-    if (__DEV__) console.log("[PushToken:refreshed]", newToken);
+    if (__DEV__) logger.debug("[PushToken:refreshed]", newToken);
     await syncToken(newToken);
   },
 

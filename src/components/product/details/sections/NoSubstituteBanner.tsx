@@ -4,6 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { logger } from "@/src/utils/logger";
 
 interface NoSubstituteBannerProps {
   productId: string;
@@ -25,7 +26,7 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
     // productName are threaded through so the real API call can be wired
     // in here directly once one exists, without touching the caller.
     if (__DEV__) {
-      console.log("[NoSubstituteBanner] request substitute for", {
+      logger.debug("[NoSubstituteBanner] request substitute for", {
         productId,
         medicineUuid,
         productName,

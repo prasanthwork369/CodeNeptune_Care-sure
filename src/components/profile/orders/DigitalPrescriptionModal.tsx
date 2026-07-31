@@ -20,6 +20,7 @@ import { WebView } from "react-native-webview";
 import * as Print from "expo-print";
 import { File } from "expo-file-system";
 import { downloadLocalFile } from "@/src/utils/fileDownload";
+import { logger } from "@/src/utils/logger";
 
 interface MedicineItem {
   name: string;
@@ -109,7 +110,7 @@ export const DigitalPrescriptionModal: React.FC<
           new File(uri).delete();
         } catch (cleanupError) {
           if (__DEV__)
-            console.log("[RxDownload] temp cleanup failed:", cleanupError);
+            logger.debug("[RxDownload] temp cleanup failed:", cleanupError);
         }
       }
     } catch (error: any) {

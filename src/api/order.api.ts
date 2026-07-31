@@ -1,6 +1,7 @@
 import { CreateOrderRequest, Order } from "../types/order";
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
+import { logger } from "@/src/utils/logger";
 
 export const orderApi = {
   createOrder: async (
@@ -23,13 +24,13 @@ export const orderApi = {
     const response = await apiClient.get(API_ENDPOINTS.ORDER_BY_ID(id));
     const data = response.data.data;
     if (__DEV__)
-      console.log("[getOrderById] raw:", JSON.stringify(data, null, 2));
+      logger.debug("[getOrderById] raw:", JSON.stringify(data, null, 2));
     // Normalize items — API may return orderItems or lineItems instead of items
     if (!data.items?.length) {
       data.items = data.orderItems ?? data.lineItems ?? data.items ?? [];
     }
     if (__DEV__) {
-      console.log(
+      logger.debug(
         "[getOrderById] item pricing:",
         data.items?.map((item: any) => ({
           name: item.medicineSnapshot?.name,
@@ -50,7 +51,7 @@ export const orderApi = {
   listOrders: async (params?: Record<string, any>): Promise<Order[]> => {
     const response = await apiClient.get(API_ENDPOINTS.ORDERS, { params });
     if (__DEV__)
-      console.log(
+      logger.debug(
         "[listOrders] first order items:",
         JSON.stringify(response.data.data?.[0]?.items, null, 2),
       );

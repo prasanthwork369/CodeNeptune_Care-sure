@@ -1,4 +1,5 @@
 import { isExpoGo } from "../../../utils/environment";
+import { logger } from "@/src/utils/logger";
 
 /**
  * Registers the Firebase background/quit-state message handler.
@@ -20,7 +21,7 @@ if (!isExpoGo) {
   const messaging = require("@react-native-firebase/messaging").default;
   messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
     if (__DEV__)
-      console.log("[BackgroundMessage]", JSON.stringify(remoteMessage));
+      logger.debug("[BackgroundMessage]", JSON.stringify(remoteMessage));
     if (!remoteMessage?.notification) {
       // Marketing product offers get the custom RemoteViews layout; anything
       // else (or a native failure) falls through to the branded notification.

@@ -6,7 +6,7 @@ import {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { DURATIONS } from "../../animations/configs/durations";
+import { durations } from "@/src/theme";
 
 interface TabMeasuredLayout {
   x: number;
@@ -37,7 +37,7 @@ export const useTabIndicator = (activeId: string) => {
         duration: 220,
         easing: Easing.out(Easing.quad),
       });
-      opacity.value = withTiming(1, { duration: DURATIONS.fade });
+      opacity.value = withTiming(1, { duration: durations.fade });
 
       const screenWidth = Dimensions.get("window").width;
       const targetScrollX = x - (screenWidth - width) / 2;

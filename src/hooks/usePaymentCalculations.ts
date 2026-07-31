@@ -28,6 +28,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { logger } from "@/src/utils/logger";
 
 export function usePaymentCalculations() {
   const router = useNav();
@@ -230,7 +231,7 @@ export function usePaymentCalculations() {
             itemCount: orderItems.length,
           })
           .catch((e) => {
-            if (__DEV__) console.log("[OrderNotification] failed:", e);
+            if (__DEV__) logger.debug("[OrderNotification] failed:", e);
           });
       }
       router.replace({
@@ -243,12 +244,12 @@ export function usePaymentCalculations() {
     } catch (err: any) {
       // Redacted on purpose: the payload carries the delivery address and patient phone.
       if (__DEV__) {
-        console.log("[PlaceOrder] failed", {
+        logger.debug("[PlaceOrder] failed", {
           itemCount: payload?.items.length ?? 0,
           total: payload?.total,
           hasPrescription: !!payload?.prescriptionId,
         });
-        console.log(
+        logger.debug(
           "[PlaceOrder] error:",
           err?.data ?? err?.response?.data ?? err?.message,
         );

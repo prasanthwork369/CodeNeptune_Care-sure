@@ -14,6 +14,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Keyboard, Platform, TextInput } from "react-native";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { logger } from "@/src/utils/logger";
 
 // SMS retriever verification module (Android native module, unavailable in Expo Go mock environment)
 const useOtpVerify =
@@ -83,7 +84,7 @@ export function useOtp() {
   const { otp: smsOtp, hash } = useOtpVerify({ numberOfDigits: 6 });
 
   useEffect(() => {
-    if (__DEV__ && hash?.length) console.log("[OTP SMS Hash]", hash);
+    if (__DEV__ && hash?.length) logger.debug("[OTP SMS Hash]", hash);
   }, [hash]);
 
   // Auto-fill from incoming SMS messages on Android

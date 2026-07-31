@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { useNav } from "./useNav";
+import { logger } from "@/src/utils/logger";
 
 interface UseRefillReminderOptions {
   prescriptionId?: string;
@@ -48,7 +49,7 @@ export function useRefillReminder({
       : prescriptionService.getById(prescriptionId);
     fetchDetail.then((res) => {
       if (__DEV__)
-        console.log(
+        logger.debug(
           "[RefillReminder] hydrate:",
           res.success
             ? JSON.stringify(res.data.reminder ?? "NO reminder field")
@@ -96,7 +97,7 @@ export function useRefillReminder({
     }
     // Surface the real backend error while debugging integration.
     if (__DEV__)
-      console.log("[RefillReminder] setReminder failed:", JSON.stringify(res));
+      logger.debug("[RefillReminder] setReminder failed:", JSON.stringify(res));
     if (res.code === "HEALTH_UPDATES_DISABLED") showHealthUpdatesAlert();
     else Alert.alert("Reminder", "Failed to set reminder. Please try again.");
     return false;

@@ -1,5 +1,6 @@
 import * as Device from "expo-device";
 import { Dimensions, PixelRatio } from "react-native";
+import { logger } from "@/src/utils/logger";
 
 const BASE_WIDTH = 390;
 
@@ -38,7 +39,7 @@ export const moderateScale = (size: number, _factor = 0.5): number => {
 };
 
 if (__DEV__) {
-  console.log("[Scalings]", {
+  logger.debug("[Scalings]", {
     manufacturer: Device.manufacturer,
     model: Device.modelName,
     deviceName: Device.deviceName,

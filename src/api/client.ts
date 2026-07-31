@@ -3,6 +3,7 @@ import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
 import axios, { AxiosInstance } from "axios";
 import { toAppError } from "./errors";
+import { logger } from "@/src/utils/logger";
 
 const MUTATION_METHODS = new Set(["post", "put", "patch", "delete"]);
 
@@ -54,9 +55,9 @@ export const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use((config) => {
   // if (__DEV__) {
   //   if (config.data !== undefined) {
-  //     console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
+  //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
   //   } else {
-  //     console.log(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
+  //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
   //   }
   // }
   const { isConnected } = useNetworkStore.getState();
@@ -104,7 +105,7 @@ apiClient.interceptors.response.use(
       }
 
       if (__DEV__)
-        console.log(
+        logger.debug(
           "[apiClient] 401 detected. Attempting background refresh...",
         );
 
@@ -135,7 +136,7 @@ apiClient.interceptors.response.use(
         const newToken = data.data.accessToken;
         const expiresIn = data.data.expiresIn;
 
-        if (__DEV__) console.log("[apiClient] Background refresh SUCCESS");
+        if (__DEV__) logger.debug("[apiClient] Background refresh SUCCESS");
         refreshCooldownUntil = 0;
 
         // Update in-memory token + persist to SecureStore

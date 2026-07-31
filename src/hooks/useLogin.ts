@@ -11,6 +11,7 @@ import { useRef, useState } from "react";
 import { Keyboard, Platform, TextInput } from "react-native";
 
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
+import { logger } from "@/src/utils/logger";
 
 /**
  * Custom hook managing the business logic for the Login screen.
@@ -92,7 +93,7 @@ export function useLogin() {
       const res = await requestOtp(formattedPhone);
       succeeded = true;
       // DEV-only: the QA response contains the OTP — never log it in release.
-      if (__DEV__) console.log("[Login] requestOtp response:", res);
+      if (__DEV__) logger.debug("[Login] requestOtp response:", res);
       // Never auto-fill against the live API — a leaked `otp` there would hand any number's account over.
       const prefillOtp = IS_LIVE_API ? "" : (res?.data?.otp ?? "");
       router.push({

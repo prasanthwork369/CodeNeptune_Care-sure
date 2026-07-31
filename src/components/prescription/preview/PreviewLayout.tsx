@@ -31,6 +31,7 @@ import {
   PreviewThumbnails,
   RemoveConfirmModal,
 } from "./sections";
+import { logger } from "@/src/utils/logger";
 
 const FOLDER = "customers/prescriptions";
 
@@ -150,7 +151,7 @@ export const PreviewLayout: React.FC = () => {
   );
 
   const processAndAdd = async (assets: CapturedAsset[]) => {
-    if (__DEV__) console.log("Processing and validating new assets...");
+    if (__DEV__) logger.debug("Processing and validating new assets...");
     const newItems: PrescriptionItem[] = [];
     const currentItems = usePrescriptionDraftStore.getState().items;
     for (const asset of assets) {
@@ -203,7 +204,7 @@ export const PreviewLayout: React.FC = () => {
       return;
     }
     if (__DEV__)
-      console.log(
+      logger.debug(
         "[Prescription] Proceed pressed! Starting upload flow for items:",
         items,
       );

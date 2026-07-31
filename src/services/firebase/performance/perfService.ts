@@ -1,5 +1,6 @@
 import { isExpoGo } from "../../../utils/environment";
 import { PerfTraceName, TraceAttributes, TraceMetrics } from "./types";
+import { logger } from "@/src/utils/logger";
 
 /**
  * Disable Performance Monitoring in Expo Go, Metro, and Development / Debug builds (__DEV__).
@@ -183,7 +184,9 @@ class PerformanceService {
         const attrs = additionalAttributes
           ? ` ${JSON.stringify(additionalAttributes)}`
           : "";
-        console.log(`[Perf] ${traceName}: ${Date.now() - startedAt}ms${attrs}`);
+        logger.debug(
+          `[Perf] ${traceName}: ${Date.now() - startedAt}ms${attrs}`,
+        );
         this.devTimers.delete(traceName);
       }
     }

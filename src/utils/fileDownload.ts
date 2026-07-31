@@ -2,6 +2,7 @@ import { Platform, Alert } from "react-native";
 import { Asset } from "expo-asset";
 import * as Notifications from "expo-notifications";
 import { isExpoGo } from "./environment";
+import { logger } from "@/src/utils/logger";
 
 // react-native-blob-util is a native module unavailable in Expo Go
 const getBlobUtil = ():
@@ -132,7 +133,7 @@ const persistLocalFile = async (
         { path: destPath, mime: mimeType },
       ]);
     } catch (scanError) {
-      if (__DEV__) console.log("Error scanning file:", scanError);
+      if (__DEV__) logger.debug("Error scanning file:", scanError);
     }
 
     // Show notification in Android notification tray using expo-notifications
@@ -153,14 +154,14 @@ const persistLocalFile = async (
         });
       }
     } catch (notifError) {
-      if (__DEV__) console.log("Error scheduling notification:", notifError);
+      if (__DEV__) logger.debug("Error scheduling notification:", notifError);
     }
 
     // Open the file immediately on Android using actionViewIntent
     try {
       await ReactNativeBlobUtil.android.actionViewIntent(destPath, mimeType);
     } catch (openError) {
-      if (__DEV__) console.log("Error opening file:", openError);
+      if (__DEV__) logger.debug("Error opening file:", openError);
       Alert.alert(
         "Success",
         `${itemTypeLabel} saved to Downloads folder: ${finalFileName}`,

@@ -14,6 +14,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
+import { logger } from "@/src/utils/logger";
 
 // Must match the storage folder Preview uploads to, so all prescription
 // images for an order land in the same place.
@@ -184,13 +185,13 @@ export function useSelectPatientImages(
     setRemovingIndex(index);
     try {
       if (__DEV__)
-        console.log("[removeImage] DELETE /storage/delete key:", target.path);
+        logger.debug("[removeImage] DELETE /storage/delete key:", target.path);
       await storageApi.delete(target.path);
       setHosted((prev) => prev.filter((_, i) => i !== index));
       setItems((prev) => prev.filter((_, i) => i !== index));
     } catch (err: any) {
       if (__DEV__)
-        console.log("[removeImage] delete FAILED", {
+        logger.debug("[removeImage] delete FAILED", {
           key: target.path,
           kind: err?.kind,
           status: err?.status,

@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
+import { logger } from "@/src/utils/logger";
 
 export interface UploadFile {
   uri: string;
@@ -47,7 +48,7 @@ export const storageApi = {
     // TEMP: confirm the exact field the backend returns for the delete key
     // (doc calls it the "path returned in upload response metadata").
     if (__DEV__)
-      console.log(
+      logger.debug(
         "[storageApi.upload] raw response.data:",
         JSON.stringify(response.data),
       );

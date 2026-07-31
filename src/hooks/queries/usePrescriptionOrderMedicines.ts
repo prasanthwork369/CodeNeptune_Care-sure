@@ -4,6 +4,7 @@ import {
   ApiPrescriptionOrderItem,
 } from "../../api/prescriptionOrder.api";
 import { ComparisonMedicine } from "../../components/prescription/medicine-comparison/types";
+import { logger } from "@/src/utils/logger";
 
 const buildSaltComposition = (item: ApiPrescriptionOrderItem): string => {
   const salts = item.original?.salts || item.recommended?.salts || [];
@@ -20,7 +21,7 @@ const toComparisonMedicines = (
   items: ApiPrescriptionOrderItem[],
 ): ComparisonMedicine[] => {
   if (__DEV__)
-    console.log(
+    logger.debug(
       "[usePrescriptionOrderMedicines] Raw items from API:",
       JSON.stringify(items, null, 2),
     );
