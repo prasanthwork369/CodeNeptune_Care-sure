@@ -1,14 +1,9 @@
 import { Image } from "expo-image";
-import React, { useEffect } from "react";
+import React from "react";
 import { View } from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withTiming,
-} from "react-native-reanimated";
-import { PARTICLE_CONFIGS, SmokeParticle } from "./SmokeParticle";
+import Animated from "react-native-reanimated";
+import { SmokePuff } from "./SmokePuff";
+import { useThumbnailRemoval } from "./useThumbnailRemoval";
 
 interface ThumbnailItemProps {
   imgUrl: string;
@@ -25,55 +20,8 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
   isRemoving,
   isBehindRemoving,
 }) => {
-  const scale = useSharedValue(0);
-  const opacity = useSharedValue(0);
-  const maskScale = useSharedValue(0);
-  const imageScale = useSharedValue(1);
-
-  useEffect(() => {
-    if (isRemoving) {
-      maskScale.value = withTiming(1, {
-        duration: 250,
-        easing: Easing.out(Easing.quad),
-      });
-      imageScale.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.quad),
-      });
-      scale.value = withDelay(200, withTiming(0, { duration: 200 }));
-      opacity.value = withDelay(200, withTiming(0, { duration: 200 }));
-    } else if (isBehindRemoving) {
-      scale.value = 1;
-      opacity.value = 1;
-      maskScale.value = 0;
-      imageScale.value = 1;
-    } else if (!isPending) {
-      scale.value = withTiming(1, { duration: 180 });
-      opacity.value = withTiming(1, { duration: 180 });
-      maskScale.value = 0;
-      imageScale.value = 1;
-    } else {
-      scale.value = 0;
-      opacity.value = 0;
-      maskScale.value = 0;
-      imageScale.value = 1;
-    }
-  }, [isPending, isRemoving, isBehindRemoving]);
-
-  const style = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
-
-  const maskStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: maskScale.value }],
-  }));
-
-  const imageAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: imageScale.value }],
-  }));
-
-  const shouldPlaySmoke = isRemoving || isBehindRemoving;
+  const { containerStyle, maskStyle, imageStyle, shouldPlaySmoke } =
+    useThumbnailRemoval({ isPending, isRemoving, isBehindRemoving });
 
   return (
     <View
@@ -85,43 +33,12 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
         position: "relative",
       }}
     >
-      {/* Green puff — renders above the thumbnail circle (zIndex: 5) */}
-      {shouldPlaySmoke &&
-        PARTICLE_CONFIGS.map((p, idx) => (
-          <SmokeParticle
-            key={`green-${idx}`}
-            dx={p.dx}
-            dy={p.dy}
-            size={p.size}
-            color="#22C55E"
-            delay={p.delay}
-            duration={320}
-            startTrigger={true}
-            upwardDrift={12}
-            zIndex={5}
-          />
-        ))}
-
-      {/* White puff — second wave, also above thumbnail */}
-      {shouldPlaySmoke &&
-        PARTICLE_CONFIGS.map((p, idx) => (
-          <SmokeParticle
-            key={`white-${idx}`}
-            dx={p.dx}
-            dy={p.dy}
-            size={p.size * 0.9}
-            color="#F1F5F9"
-            delay={p.delay + 220}
-            duration={300}
-            startTrigger={true}
-            upwardDrift={55}
-            zIndex={5}
-          />
-        ))}
+      {/* Renders above the thumbnail circle (zIndex: 5) */}
+      <SmokePuff active={shouldPlaySmoke} />
 
       <Animated.View
         style={[
-          style,
+          containerStyle,
           {
             width: 36,
             height: 36,
@@ -152,7 +69,7 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
               alignItems: "center",
               justifyContent: "center",
             },
-            imageAnimatedStyle,
+            imageStyle,
           ]}
         >
           <Image

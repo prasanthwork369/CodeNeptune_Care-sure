@@ -1,3 +1,4 @@
+import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import type { Product } from "@/src/types/home";
@@ -59,6 +60,7 @@ const ProductCard = React.memo(
     // the same variant here or on the PDP lands in one cart row. Falls back to
     // the base medicine when no variant is present.
     const v = product.defaultVariant;
+    const cartMedicineId = v ? v.id : product.id;
     const { count, increment, decrement, animations, isPending } =
       useCartActions(
         v
@@ -94,6 +96,16 @@ const ProductCard = React.memo(
       );
     const { slideAnim, opacityAnim } = animations;
 
+    const { imageRef, triggerFly } = useFlyToCartTrigger(
+      product.image,
+      cartMedicineId,
+    );
+
+    const handleAdd = useCallback(() => {
+      increment();
+      triggerFly();
+    }, [increment, triggerFly]);
+
     return (
       <View
         className="bg-white rounded-[12px] overflow-hidden"
@@ -124,11 +136,17 @@ const ProductCard = React.memo(
               justifyContent: "center",
             }}
           >
-            <Image
-              source={product.image}
+            <View
+              ref={imageRef}
+              collapsable={false}
               style={{ width: imageSize, height: imageSize }}
-              contentFit="contain"
-            />
+            >
+              <Image
+                source={product.image}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="contain"
+              />
+            </View>
           </View>
           {!!product.discount && (
             <View style={[s.badgeContainer, { backgroundColor: DISCOUNT_BG }]}>
@@ -186,7 +204,7 @@ const ProductCard = React.memo(
           >
             {count === 0 ? (
               <Touchable
-                onPress={increment}
+                onPress={handleAdd}
                 disabled={isPending}
                 activeOpacity={0.85}
                 style={s.cartBtn}
@@ -236,7 +254,7 @@ const ProductCard = React.memo(
                   )}
                 </View>
                 <Touchable
-                  onPress={increment}
+                  onPress={handleAdd}
                   disabled={isPending}
                   activeOpacity={0.7}
                   className="w-9 h-9 items-center justify-center"

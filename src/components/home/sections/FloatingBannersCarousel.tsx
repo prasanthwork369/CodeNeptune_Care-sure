@@ -19,6 +19,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { useFlyToCartSafe } from "@/src/components/animations/flyToCart";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { CartFloatingBanner } from "./CartFloatingBanner";
@@ -111,10 +112,15 @@ export const FloatingBannersCarousel = ({
   const focused = isFocused && !isFeedScrolling;
 
   const [isCartInteracting, setIsCartInteracting] = useState(false);
+  // The cart mutation has no onMutate, so totalItems trails the server by a
+  // round-trip. visualCartCount is bumped the moment the fly launches — without
+  // it the banner would appear only after the flying image had already landed.
+  const visualCartCount = useFlyToCartSafe()?.visualCartCount ?? 0;
   // Keep the banner mounted through a Remove tap (totalItems hits 0 before
   // the close animation finishes) so it can hide smoothly instead of
   // snapping out instantly.
-  const isCartActive = totalItems > 0 || isCartInteracting;
+  const isCartActive =
+    totalItems > 0 || visualCartCount > 0 || isCartInteracting;
   const isRxActive = hasPendingPrescription;
   const bothActive = isCartActive && isRxActive;
   const [activeBannerIndex, setActiveBannerIndex] = useState(

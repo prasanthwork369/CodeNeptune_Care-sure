@@ -1,4 +1,4 @@
-import { useFlyToCartSafe } from "@/src/components/animations/flyToCart";
+import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
@@ -21,9 +21,10 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
   cardWidth,
   onPress,
 }) => {
-  const flyToCartContext = useFlyToCartSafe();
-
-  const imageContainerRef = React.useRef<View>(null);
+  const { imageRef, triggerFly } = useFlyToCartTrigger(
+    product.image,
+    product.id,
+  );
 
   const { count, increment, decrement, animations, isPending } = useCartActions(
     {
@@ -47,42 +48,8 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
 
   const handleIncrement = () => {
     increment();
-    if (flyToCartContext && product.image && Number(product.price) > 0) {
-      imageContainerRef.current?.measure(
-        (x, y, width, height, pageX, pageY) => {
-          if (
-            pageX !== undefined &&
-            pageY !== undefined &&
-            pageX !== 0 &&
-            pageY !== 0
-          ) {
-            const centerX = pageX + width / 2;
-            const centerY = pageY + height / 2;
-            flyToCartContext.flyToCart(
-              centerX,
-              centerY,
-              product.image,
-              product.id,
-            );
-          } else {
-            imageContainerRef.current?.measureInWindow(
-              (winX, winY, winW, winH) => {
-                if (winX !== undefined && winY !== undefined) {
-                  const centerX = winX + winW / 2;
-                  const centerY = winY + winH / 2;
-                  flyToCartContext.flyToCart(
-                    centerX,
-                    centerY,
-                    product.image,
-                    product.id,
-                  );
-                }
-              },
-            );
-          }
-        },
-      );
-    }
+    // Priceless rows are placeholders from the API — nothing to fly.
+    if (Number(product.price) > 0) triggerFly();
   };
 
   return (
@@ -104,7 +71,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
           }}
         >
           <View
-            ref={imageContainerRef}
+            ref={imageRef}
             style={{
               width: "78%",
               height: "68%",

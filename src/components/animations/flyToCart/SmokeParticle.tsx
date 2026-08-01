@@ -30,6 +30,8 @@ interface SmokeParticleProps {
   startTrigger: boolean;
   upwardDrift?: number;
   zIndex?: number;
+  /** Half the host circle's size — particles emit from its middle. */
+  center?: number;
 }
 
 export const SmokeParticle: React.FC<SmokeParticleProps> = ({
@@ -42,6 +44,7 @@ export const SmokeParticle: React.FC<SmokeParticleProps> = ({
   startTrigger,
   upwardDrift = 0,
   zIndex = 50,
+  center = 18,
 }) => {
   const progress = useSharedValue(0);
 

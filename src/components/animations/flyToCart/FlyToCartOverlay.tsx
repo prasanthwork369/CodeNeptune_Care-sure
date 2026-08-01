@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet, Image } from "react-native";
 import Animated, {
+  SharedValue,
   useSharedValue,
   useAnimatedStyle,
   withTiming,
@@ -13,14 +14,23 @@ import { useFlyToCart, ActiveAnimation } from "./FlyToCartContext";
 
 const IMAGE_SIZE = 64;
 
+// Must beat the cart banners' own zIndex (50, and 100 in the Home carousel),
+// or the flying image passes behind them instead of landing on top.
+const OVERLAY_Z_INDEX = 200;
+
 interface FloatingItemProps {
   item: ActiveAnimation;
+  destination: SharedValue<{ x: number; y: number }>;
   onComplete: () => void;
 }
 
-const FloatingItem: React.FC<FloatingItemProps> = ({ item, onComplete }) => {
+const FloatingItem: React.FC<FloatingItemProps> = ({
+  item,
+  destination,
+  onComplete,
+}) => {
   const progress = useSharedValue(0);
-  const { startX, startY, endX, endY } = item;
+  const { startX, startY } = item;
 
   useEffect(() => {
     progress.value = withTiming(
@@ -37,6 +47,10 @@ const FloatingItem: React.FC<FloatingItemProps> = ({ item, onComplete }) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     const t = progress.value;
+
+    // Read live: on the first add the banner isn't mounted yet, so it reports
+    // its real position a frame or two after launch and the path re-aims.
+    const { x: endX, y: endY } = destination.value;
 
     // Straight line: top to bottom
     const x = startX + t * (endX - startX);
@@ -74,16 +88,21 @@ const FloatingItem: React.FC<FloatingItemProps> = ({ item, onComplete }) => {
 };
 
 export const FlyToCartOverlay: React.FC = () => {
-  const { activeAnimations, handleComplete } = useFlyToCart();
+  const { activeAnimations, handleComplete, destinationShared } =
+    useFlyToCart();
 
   if (activeAnimations.length === 0) return null;
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View
+      style={[StyleSheet.absoluteFill, { zIndex: OVERLAY_Z_INDEX }]}
+      pointerEvents="none"
+    >
       {activeAnimations.map((anim) => (
         <FloatingItem
           key={anim.id}
           item={anim}
+          destination={destinationShared}
           onComplete={() =>
             handleComplete(anim.id, anim.imageUrl, anim.productId)
           }

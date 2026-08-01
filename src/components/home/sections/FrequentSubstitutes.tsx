@@ -1,9 +1,10 @@
+import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import type { SubstituteProduct } from "@/src/types/home";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { styles as s } from "./FrequentSubstitutes.styles";
 import { exactScale } from "@/src/utils/exactScale";
@@ -48,6 +49,14 @@ const FrequentItem = React.memo(
 
     const { slideAnim, opacityAnim } = animations;
 
+    const { imageRef, triggerFly } = useFlyToCartTrigger(item.image, item.id);
+
+    const handleAdd = useCallback(() => {
+      if (disableCart) return;
+      increment();
+      triggerFly();
+    }, [disableCart, increment, triggerFly]);
+
     return (
       <View className="flex-row items-center  pb-4">
         {/* Tappable area → product detail */}
@@ -69,6 +78,8 @@ const FrequentItem = React.memo(
             ]}
           >
             <View
+              ref={imageRef}
+              collapsable={false}
               style={{
                 flex: 1,
                 alignItems: "center",
@@ -149,7 +160,7 @@ const FrequentItem = React.memo(
         {/* Cart button */}
         {count === 0 ? (
           <Touchable
-            onPress={disableCart ? undefined : increment}
+            onPress={disableCart ? undefined : handleAdd}
             disabled={isPending || disableCart}
             activeOpacity={0.85}
             className="rounded-[8px] bg-white ml-3"
@@ -222,7 +233,7 @@ const FrequentItem = React.memo(
               )}
             </View>
             <Touchable
-              onPress={disableCart ? undefined : increment}
+              onPress={disableCart ? undefined : handleAdd}
               disabled={isPending || disableCart}
               activeOpacity={0.7}
               style={{

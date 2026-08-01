@@ -5,10 +5,11 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useMemo,
 } from "react";
 import { Dimensions } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import Animated, {
+import {
   SharedValue,
   useSharedValue,
   withSequence,
@@ -47,6 +48,9 @@ interface FlyToCartContextType {
   handleComplete: (id: string, imageUrl: any, productId: string) => void;
   bounceSharedValue: SharedValue<number>;
   widthExpansion: SharedValue<number>;
+  /** Live target, so a flight already in the air re-aims when the banner
+   * mounts and reports its position (matters on the very first add). */
+  destinationShared: SharedValue<{ x: number; y: number }>;
   triggerBounce: () => void;
   triggerWidthExpansion: () => void;
   visualCartCount: number;
@@ -54,6 +58,23 @@ interface FlyToCartContextType {
 }
 
 const FlyToCartContext = createContext<FlyToCartContextType | null>(null);
+
+/**
+ * Just the two actions, split out and held stable forever. Product cards
+ * subscribe to this instead of the full context so the visual state churning
+ * during a fly (activeAnimations, visualCartImages…) can't re-render the grid.
+ */
+interface FlyToCartActions {
+  flyToCart: (
+    sourceX: number,
+    sourceY: number,
+    imageUrl: any,
+    productId: string,
+  ) => void;
+  setDestinationCoords: (coords: { x: number; y: number }) => void;
+}
+
+const FlyToCartActionsContext = createContext<FlyToCartActions | null>(null);
 
 export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -83,6 +104,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const bounceSharedValue = useSharedValue(1);
   const widthExpansion = useSharedValue(0);
+  const destinationShared = useSharedValue(defaultCoords);
 
   const hasJustAdded = React.useRef(false);
   const lastAddTimestamp = React.useRef(0);
@@ -251,15 +273,25 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
+  // Mirrored into refs so flyToCart can stay referentially stable — otherwise
+  // every card consuming it re-renders whenever the destination or cart moves.
+  const destinationRef = React.useRef(defaultCoords);
+  const totalItemsRef = React.useRef(totalItems);
+  totalItemsRef.current = totalItems;
+
   const setDestinationCoords = useCallback(
     (coords: { x: number; y: number }) => {
+      destinationRef.current = coords;
+      destinationShared.value = coords;
       setDestinationCoordsState(coords);
     },
-    [],
+    [destinationShared],
   );
 
   const flyToCart = useCallback(
     (sourceX: number, sourceY: number, imageUrl: any, productId: string) => {
+      const destination = destinationRef.current;
+      const currentTotal = totalItemsRef.current;
       const id = Math.random().toString(36).substring(2, 9);
       hasJustAdded.current = true;
       lastAddTimestamp.current = Date.now();
@@ -269,21 +301,21 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           id,
           startX: sourceX,
           startY: sourceY,
-          endX: destinationCoords.x,
-          endY: destinationCoords.y,
+          endX: destination.x,
+          endY: destination.y,
           imageUrl,
           productId,
         },
       ]);
 
       // Optimistically increment the visual cart count immediately
-      setVisualCartCount((prev) => Math.max(prev + 1, totalItems + 1));
+      setVisualCartCount((prev) => Math.max(prev + 1, currentTotal + 1));
 
       // First item: show image immediately in the circle (no pending)
       // so user sees image in circle before expansion starts.
       // Subsequent items: keep isPending so thumbnail only pops in when fly lands.
       if (imageUrl && productId) {
-        const isFirstItem = totalItems === 0;
+        const isFirstItem = currentTotal === 0;
         // Use the real cart row id when the item already exists in the cart
         // (e.g. incrementing quantity) so this optimistic entry shares the
         // same id the sync effect below will use — preventing two entries
@@ -298,7 +330,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       }
     },
-    [destinationCoords, totalItems, visualCartCount, items],
+    [],
   );
 
   const triggerBounce = useCallback(() => {
@@ -329,27 +361,52 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
       triggerBounce();
       triggerWidthExpansion();
     },
-    [triggerBounce, triggerWidthExpansion, items],
+    [triggerBounce, triggerWidthExpansion],
+  );
+
+  // Both callbacks are stable, so this object is created once and never again.
+  const actions = useMemo<FlyToCartActions>(
+    () => ({ flyToCart, setDestinationCoords }),
+    [flyToCart, setDestinationCoords],
+  );
+
+  const value = useMemo<FlyToCartContextType>(
+    () => ({
+      destinationCoords,
+      setDestinationCoords,
+      activeAnimations,
+      flyToCart,
+      handleComplete,
+      bounceSharedValue,
+      widthExpansion,
+      destinationShared,
+      triggerBounce,
+      triggerWidthExpansion,
+      visualCartCount,
+      visualCartImages,
+    }),
+    [
+      destinationCoords,
+      setDestinationCoords,
+      activeAnimations,
+      flyToCart,
+      handleComplete,
+      bounceSharedValue,
+      widthExpansion,
+      destinationShared,
+      triggerBounce,
+      triggerWidthExpansion,
+      visualCartCount,
+      visualCartImages,
+    ],
   );
 
   return (
-    <FlyToCartContext.Provider
-      value={{
-        destinationCoords,
-        setDestinationCoords,
-        activeAnimations,
-        flyToCart,
-        handleComplete,
-        bounceSharedValue,
-        widthExpansion,
-        triggerBounce,
-        triggerWidthExpansion,
-        visualCartCount,
-        visualCartImages,
-      }}
-    >
-      {children}
-    </FlyToCartContext.Provider>
+    <FlyToCartActionsContext.Provider value={actions}>
+      <FlyToCartContext.Provider value={value}>
+        {children}
+      </FlyToCartContext.Provider>
+    </FlyToCartActionsContext.Provider>
   );
 };
 
@@ -364,4 +421,9 @@ export const useFlyToCart = () => {
 // Safe version — returns null when used outside provider (no throw)
 export const useFlyToCartSafe = (): FlyToCartContextType | null => {
   return useContext(FlyToCartContext);
+};
+
+// Actions only — subscribing to this never re-renders on visual state changes.
+export const useFlyToCartActionsSafe = (): FlyToCartActions | null => {
+  return useContext(FlyToCartActionsContext);
 };

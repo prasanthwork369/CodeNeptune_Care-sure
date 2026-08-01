@@ -2,6 +2,7 @@ import {
   ApiFeaturedSubcategory,
   ApiFeaturedSubcategoryMetadata,
 } from "@/src/api/category.api";
+import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { resolveAssetUrl } from "@/src/utils/urls";
@@ -9,7 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -94,6 +95,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     const imageAreaHeight = cardWidth * 0.875;
     const imageSize = imageAreaHeight * 0.65;
 
+    // One source object for the card, the cart row and the fly animation.
+    const imageSource = useMemo(
+      () => (thumbnailUrl ? { uri: resolveAssetUrl(thumbnailUrl) } : undefined),
+      [thumbnailUrl],
+    );
+
     const { count, increment, decrement, animations, isPending } =
       useCartActions({
         medicineId: id,
@@ -104,13 +111,18 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
         price,
         originalPrice: mrp,
         discountPercent: discountPercentage,
-        image: thumbnailUrl
-          ? { uri: resolveAssetUrl(thumbnailUrl) }
-          : undefined,
+        image: imageSource,
         packSize,
         unit,
       });
     const { slideAnim, opacityAnim } = animations;
+
+    const { imageRef, triggerFly } = useFlyToCartTrigger(imageSource, id);
+
+    const handleAdd = useCallback(() => {
+      increment();
+      triggerFly();
+    }, [increment, triggerFly]);
 
     const discountLabel =
       discountPercentage > 0 ? `${Math.round(discountPercentage)}% OFF` : "";
@@ -147,15 +159,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
               justifyContent: "center",
             }}
           >
-            <Image
-              source={
-                thumbnailUrl
-                  ? { uri: resolveAssetUrl(thumbnailUrl) }
-                  : undefined
-              }
+            <View
+              ref={imageRef}
+              collapsable={false}
               style={{ width: imageSize, height: imageSize }}
-              contentFit="contain"
-            />
+            >
+              <Image
+                source={imageSource}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="contain"
+              />
+            </View>
           </View>
           {!!discountLabel && (
             <View
@@ -219,7 +233,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
           >
             {count === 0 ? (
               <Touchable
-                onPress={increment}
+                onPress={handleAdd}
                 disabled={isPending}
                 activeOpacity={0.85}
                 style={[s.cartBtn, { borderColor: accentColor }]}
@@ -269,7 +283,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                   )}
                 </View>
                 <Touchable
-                  onPress={increment}
+                  onPress={handleAdd}
                   disabled={isPending}
                   activeOpacity={0.7}
                   className="w-9 h-9 items-center justify-center"

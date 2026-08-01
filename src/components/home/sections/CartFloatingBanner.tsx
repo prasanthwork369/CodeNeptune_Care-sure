@@ -1,14 +1,28 @@
 import { useCartFloatingBannerAnimation } from "@/src/components/animations/floatingBanner";
+import {
+  SmokePuff,
+  useFlyToCartSafe,
+  type VisualCartImage,
+} from "@/src/components/animations/flyToCart";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
+import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useUIStore } from "@/src/store/uiStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
-import { Image } from "expo-image";
-import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import Animated, {
+  runOnJS,
+  useAnimatedReaction,
+} from "react-native-reanimated";
+import { CART_THUMB_SIZE, CartBannerThumbnail } from "./CartBannerThumbnail";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -36,7 +50,13 @@ export const CartFloatingBanner = ({
   onInteractionChange,
 }: CartFloatingBannerProps) => {
   const [isClearing, setIsClearing] = useState(false);
-  const { totalItems, items, clearCart } = useCart();
+  const { totalItems: cartItems, items, clearCart } = useCart();
+  const flyCtx = useFlyToCartSafe();
+
+  // The cart mutation has no onMutate, so cartItems trails the server by a
+  // round-trip. The provider's count is bumped the instant the fly launches —
+  // without it the banner would stay hidden until the request came back.
+  const totalItems = Math.max(cartItems, flyCtx?.visualCartCount ?? 0);
   const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
   const setUploadButtonCollapsed = useUIStore(
     (s) => s.setUploadButtonCollapsed,
@@ -73,26 +93,56 @@ export const CartFloatingBanner = ({
     [productForm, lastAddedItem?.dosageForm],
   );
 
-  const displayImageUri =
-    lastAddedItem?.image ?? lastAddedItem?.metadata?.image ?? null;
-  const displayImage = useMemo(
-    () => (displayImageUri ? { uri: displayImageUri } : null),
-    [displayImageUri],
+  // ── Fly-to-cart destination ─────────────────────────────────────────────────
+  const imageStackRef = useRef<View>(null);
+  const { width: screenWidth } = useWindowDimensions();
+
+  // The carousel also mounts duplicate banners off-screen; only report the visible one.
+  const reportDestination = useCallback(() => {
+    if (!flyCtx) return;
+    imageStackRef.current?.measureInWindow((x, y, w, h) => {
+      if (x >= 0 && x < screenWidth && y > 0) {
+        flyCtx.setDestinationCoords({ x: x + w / 2, y: y + h / 2 });
+      }
+    });
+  }, [flyCtx, screenWidth]);
+
+  // The banner rides the tab bar's translate, so re-measure once that slide settles.
+  useAnimatedReaction(
+    () => tabBarVisible.value,
+    (current, previous) => {
+      const settled = current === 0 || current === 1;
+      if (previous !== null && current !== previous && settled) {
+        runOnJS(reportDestination)();
+      }
+    },
+    [reportDestination],
   );
 
-  const secondItem =
-    items.length >= 2
-      ? ([...items]
-          .reverse()
-          .find((i) => (i.image ?? i.metadata?.image) && i !== lastAddedItem) ??
-        items[items.length - 2])
+  // Sourced from the provider (not the cart) so the circles carry the
+  // isRemoving/isPending flags that drive the puff and the fly landing.
+  const visualCartImages = flyCtx?.visualCartImages ?? [];
+  const backThumb =
+    visualCartImages.length > 1
+      ? visualCartImages[visualCartImages.length - 2]
       : null;
-  const secondImageUri =
-    secondItem?.image ?? secondItem?.metadata?.image ?? null;
-  const secondImage = useMemo(
-    () => (secondImageUri ? { uri: secondImageUri } : null),
-    [secondImageUri],
-  );
+  const frontThumb = visualCartImages[visualCartImages.length - 1] ?? null;
+
+  // Quantity says two circles but only one product has a thumbnail (e.g. the
+  // same item bumped to qty 2) — repeat its image so the back slot reads as a
+  // stack instead of sitting empty.
+  const backImage = backThumb?.image ?? frontThumb?.image;
+
+  // The pill clips its children, so the puff is drawn over it instead. Only one
+  // thumbnail animates out at a time — find which slot it sits in.
+  const isExiting = (t: VisualCartImage | null) =>
+    !!t && (t.isRemoving || t.isBehindRemoving);
+  const frontOffset = totalItems > 1 ? exactScale(8) : 0;
+  const puffOffsetLeft = isExiting(frontThumb)
+    ? frontOffset
+    : isExiting(backThumb)
+      ? 0
+      : null;
 
   const handleBannerPress = useCallback(() => {
     if (isSlid.value) {
@@ -163,6 +213,9 @@ export const CartFloatingBanner = ({
                 }}
               >
                 <View
+                  ref={imageStackRef}
+                  collapsable={false}
+                  onLayout={reportDestination}
                   className="justify-center"
                   style={{
                     width: totalItems > 1 ? exactScale(52) : exactScale(44),
@@ -170,53 +223,27 @@ export const CartFloatingBanner = ({
                     marginRight: exactScale(12),
                   }}
                 >
+                  {/* Mirrors the category banner's ThumbnailItem: a thumbnail
+                      in flight stays hidden and reveals itself on landing. */}
                   {totalItems > 1 && (
-                    <View
-                      className="absolute left-0 bg-white rounded-full border border-[#919EAB33] items-center justify-center"
-                      style={{ width: exactScale(44), height: exactScale(44) }}
-                    >
-                      {secondImage ? (
-                        <Image
-                          source={secondImage}
-                          style={{
-                            width: exactScale(30),
-                            height: exactScale(30),
-                          }}
-                          contentFit="contain"
-                        />
-                      ) : (
-                        <icons.placeholder
-                          width={exactScale(30)}
-                          height={exactScale(30)}
-                        />
-                      )}
-                    </View>
+                    <CartBannerThumbnail
+                      key={backThumb?.id ?? "back-stacked"}
+                      image={backImage}
+                      isPending={backThumb?.isPending}
+                      isRemoving={backThumb?.isRemoving}
+                      isBehindRemoving={backThumb?.isBehindRemoving}
+                      absolute
+                    />
                   )}
-                  <View
-                    className="bg-white rounded-full border border-[#919EAB33] items-center justify-center"
-                    style={{
-                      width: exactScale(44),
-                      height: exactScale(44),
-                      position: totalItems > 1 ? "absolute" : "relative",
-                      left: totalItems > 1 ? exactScale(8) : 0,
-                    }}
-                  >
-                    {displayImage ? (
-                      <Image
-                        source={displayImage}
-                        style={{
-                          width: exactScale(30),
-                          height: exactScale(30),
-                        }}
-                        contentFit="contain"
-                      />
-                    ) : (
-                      <icons.placeholder
-                        width={exactScale(30)}
-                        height={exactScale(30)}
-                      />
-                    )}
-                  </View>
+                  <CartBannerThumbnail
+                    key={frontThumb?.id ?? "front-stacked"}
+                    image={frontThumb?.image}
+                    isPending={frontThumb?.isPending}
+                    isRemoving={frontThumb?.isRemoving}
+                    isBehindRemoving={frontThumb?.isBehindRemoving}
+                    absolute={totalItems > 1}
+                    offsetLeft={frontOffset}
+                  />
                 </View>
 
                 {/* minWidth 0 lets the flex child actually shrink — without it a
@@ -317,6 +344,27 @@ export const CartFloatingBanner = ({
           </Animated.View>
         </View>
       </View>
+
+      {/* Outside the pill's overflow:hidden, so the burst isn't clipped away.
+          Offsets mirror the thumbnail's: 1px border + the row's 12px padding. */}
+      {puffOffsetLeft !== null && (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: 1 + exactScale(12) + puffOffsetLeft,
+            top: 1 + PILL_HEIGHT / 2 - CART_THUMB_SIZE / 2,
+            width: CART_THUMB_SIZE,
+            height: CART_THUMB_SIZE,
+          }}
+        >
+          <SmokePuff
+            active
+            center={CART_THUMB_SIZE / 2}
+            secondColor="#94A3B8"
+          />
+        </View>
+      )}
     </Animated.View>
   );
 };

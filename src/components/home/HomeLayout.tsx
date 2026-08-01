@@ -1,5 +1,9 @@
 import { ApiFeaturedSubcategory } from "@/src/api/category.api";
 import {
+  FlyToCartOverlay,
+  FlyToCartProvider,
+} from "@/src/components/animations/flyToCart";
+import {
   BannerCarousel,
   FloatingBannersCarousel,
   FrequentSubstitutes,
@@ -75,7 +79,7 @@ type HomeSection =
       themeIndex: number;
     };
 
-export const HomeLayout: React.FC = () => {
+const HomeContent: React.FC = () => {
   const router = useNav();
   const insets = useSafeAreaInsets();
   const adjustedBottom = useAdjustedBottomInset();
@@ -588,6 +592,16 @@ export const HomeLayout: React.FC = () => {
       />
 
       <FloatingBannersCarousel isFocused={isScreenFocused} />
+
+      <FlyToCartOverlay />
     </View>
   );
 };
+
+// The provider sits outside HomeContent so its state changes re-render only the
+// fly-to-cart consumers, not the whole feed.
+export const HomeLayout: React.FC = () => (
+  <FlyToCartProvider>
+    <HomeContent />
+  </FlyToCartProvider>
+);
