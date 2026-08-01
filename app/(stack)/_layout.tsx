@@ -18,9 +18,6 @@ export default function StackLayout() {
       screenOptions={{
         headerShown: false,
         ...screenTransitions.push,
-        // order-success is a transparentModal, so the screen under it stays
-        // visible while inactive — freezing it would strand a stale frame.
-        freezeOnBlur: false,
       }}
     >
       <Stack.Screen name="cart" options={{ presentation: "card" }} />

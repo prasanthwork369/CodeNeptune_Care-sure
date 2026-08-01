@@ -156,7 +156,11 @@ export default function RootLayout() {
                     }}
                   >
                     <Stack.Screen name="index" />
-                    <Stack.Screen name="(auth)" />
+                    {/* Every auth guard redirects here, so entering it must not read as a push */}
+                    <Stack.Screen
+                      name="(auth)"
+                      options={screenTransitions.none}
+                    />
                     <Stack.Screen name="(tabs)" />
                     <Stack.Screen name="(stack)" />
                     <Stack.Screen name="(prescription)" />

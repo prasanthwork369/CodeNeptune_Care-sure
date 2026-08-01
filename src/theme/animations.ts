@@ -41,4 +41,9 @@ export const screenTransitions = {
     animationDuration: 180,
     freezeOnBlur: true,
   },
+  /** Guard redirects — an auth bounce is not a navigation the user made, so it shouldn't animate like one. */
+  none: {
+    animation: "none",
+    freezeOnBlur: true,
+  },
 } as const;

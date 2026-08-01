@@ -306,7 +306,7 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({
             Spend Less on What You Need
           </Text>
           <View className="mt-1">
-            <Text style={s.sectionSubtitle}>More Affordable Choices</Text>
+            <Text style={s.sectionSubtitle}>More Affordable. Choices</Text>
             <LinearGradient
               colors={["#12975E", "rgba(255,255,255,0)"]}
               start={{ x: 0, y: 0 }}
