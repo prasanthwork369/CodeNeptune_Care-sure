@@ -19,7 +19,9 @@ export const useStickySearchBar = (
     // pulls the container up to overlap the hero, so its real top
     // offset in content coordinates.
     const threshold = heroHeight - insets.top - 8 - 30;
-    const fadeRange = 15; // pixels over which to fade from 0 to 1
+    // Scroll distance the fade is spread over. Short ranges finish inside a
+    // frame or two of a fling, which reads as a pop rather than a fade.
+    const fadeRange = 80;
 
     if (scrollY.value < threshold) {
       return 0;

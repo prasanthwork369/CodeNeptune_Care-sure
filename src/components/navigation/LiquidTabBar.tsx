@@ -9,13 +9,7 @@ import { exactScale } from "@/src/utils/exactScale";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   DeviceEventEmitter,
   Image,
@@ -24,17 +18,18 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
-  Easing,
   Extrapolation,
   interpolate,
   interpolateColor,
   runOnJS,
   SharedValue,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withSequence,
   withSpring,
@@ -51,8 +46,15 @@ import {
   UPLOAD_ICON,
 } from "./LiquidTabBar.styles";
 import { TabBarFadeGradient } from "./TabBarFadeGradient";
+import {
+  ActivePillGlass,
+  GLASS_TINT,
+  TabBarGlass,
+  UploadButtonGlass,
+} from "./TabBarGlass";
 
-const ACTIVE_BG = "#ECFDF5";
+// Translucent so the glass backdrop reads through the active tab too
+const ACTIVE_BG = "rgba(236,253,245,0.82)";
 const ACTIVE_ICON_COLOR = "#0F7635";
 const INACTIVE_ICON_COLOR = "#6A6A6A";
 
@@ -65,11 +67,17 @@ const TAB_BAR_HIDE_OFFSET = 120;
 // Gentle spring for the upload button's icon/text slide transitions
 const SLIDE_SPRING = { damping: 18, stiffness: 130, mass: 0.6 } as const;
 
+// Row chrome flanking the pill container — lets tab width be derived instead of measured
+const BAR_PADDING_LEFT = exactScale(12);
+const BAR_MARGIN_RIGHT = exactScale(12);
+
 const ICON_OFF_LEFT = -100;
 const TEXT_OFF_RIGHT = 150;
 const AUTO_EXPAND_DELAY = 500;
 const HOLD_EXPANDED_MS = 2200;
 const HOLD_COLLAPSED_MS = 1400;
+// Attention cycles per reveal — looping forever kept the UI thread animating on every tab screen
+const MAX_ATTENTION_CYCLES = 3;
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -100,10 +108,13 @@ const AnimatedUploadButton = React.memo(
     // This effect only drives the periodic icon/text attention cycle.
     useEffect(() => {
       let timeout: ReturnType<typeof setTimeout>;
+      let cycles = 0;
 
       const tick = (expand: boolean) => {
         if (isUploadButtonCollapsed) return;
         animateTo(expand);
+        // Settle on the collapsed icon once the cycles are spent, so an idle screen animates nothing
+        if (!expand && ++cycles >= MAX_ATTENTION_CYCLES) return;
         timeout = setTimeout(
           () => tick(!expand),
           expand ? HOLD_EXPANDED_MS : HOLD_COLLAPSED_MS,
@@ -133,6 +144,21 @@ const AnimatedUploadButton = React.memo(
       backgroundColor: "transparent",
     }));
 
+    const iconStyle = useAnimatedStyle(() => ({
+      transform: [{ translateX: iconTranslate.value }],
+    }));
+
+    // Fades over the back half of the bar's travel, so the label clears before the button narrows to a circle
+    const labelStyle = useAnimatedStyle(() => ({
+      transform: [{ translateX: textTranslate.value }],
+      opacity: interpolate(
+        tabBarVisible.value,
+        [0.5, 1],
+        [0, 1],
+        Extrapolation.CLAMP,
+      ),
+    }));
+
     return (
       <Pressable onPress={onPress} style={{ height: PILL_HEIGHT }}>
         <Animated.View style={animatedButtonStyle}>
@@ -150,36 +176,15 @@ const AnimatedUploadButton = React.memo(
               overflow: "hidden",
             }}
           >
-            <Animated.View
-              style={[
-                { position: "absolute" },
-                useAnimatedStyle(() => ({
-                  transform: [{ translateX: iconTranslate.value }],
-                })),
-              ]}
-            >
+            <UploadButtonGlass radius={PILL_HEIGHT} />
+            <Animated.View style={[{ position: "absolute" }, iconStyle]}>
               <Image
                 source={HOME_IMAGES.upload_png}
                 style={{ width: UPLOAD_ICON, height: UPLOAD_ICON }}
                 resizeMode="contain"
               />
             </Animated.View>
-            <Animated.View
-              style={[
-                { position: "absolute" },
-                useAnimatedStyle(() => ({
-                  transform: [{ translateX: textTranslate.value }],
-                  // Fades over the back half of the bar's travel, so the label
-                  // is gone before the button finishes narrowing to a circle.
-                  opacity: interpolate(
-                    tabBarVisible.value,
-                    [0.5, 1],
-                    [0, 1],
-                    Extrapolation.CLAMP,
-                  ),
-                })),
-              ]}
-            >
+            <Animated.View style={[{ position: "absolute" }, labelStyle]}>
               <Text style={tabStyles.uploadText}>Upload{"\n"}Prescription</Text>
             </Animated.View>
           </LinearGradient>
@@ -348,7 +353,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const extraGap = exactScale(6);
   const router = useNav();
   const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
-  const [barWidth, setBarWidth] = useState(0);
+  const { width: screenWidth } = useWindowDimensions();
 
   const pillRoutes = useMemo(
     () =>
@@ -366,7 +371,19 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const lastValidIndex = useRef(activePillIndex === -1 ? 0 : activePillIndex);
   if (activePillIndex !== -1) lastValidIndex.current = activePillIndex;
 
-  const tabWidthShared = useSharedValue(0);
+  // Derived, not measured — onLayout would fire a setState on every frame of the collapse
+  const tabWidthShared = useDerivedValue(() => {
+    const uploadWidth = interpolate(
+      tabBarVisible.value,
+      [0, 1],
+      [PILL_HEIGHT, FAB_WIDTH],
+      Extrapolation.CLAMP,
+    );
+    const inner =
+      screenWidth - BAR_PADDING_LEFT - BAR_MARGIN_RIGHT - uploadWidth;
+    return inner / Math.max(1, pillRoutes.length);
+  }, [screenWidth, pillRoutes.length]);
+
   const leaderX = useSharedValue(lastValidIndex.current);
   const followerX = useSharedValue(lastValidIndex.current);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
@@ -415,20 +432,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       }
     },
     [pillRoutes, navigation, activePillIndex],
-  );
-
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      const { width } = e.nativeEvent.layout;
-      const tw = width / pillRoutes.length;
-      setBarWidth(width);
-      tabWidthShared.value = tw;
-      if (barWidth === 0) {
-        leaderX.value = activePillIndex === -1 ? 0 : activePillIndex;
-        followerX.value = activePillIndex === -1 ? 0 : activePillIndex;
-      }
-    },
-    [barWidth, pillRoutes.length, activePillIndex],
   );
 
   const panGesture = useMemo(
@@ -561,7 +564,8 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     router.push("/upload");
   }, [router]);
   const handleLayout = useCallback(
-    (e: any) => setTabBarHeight(e.nativeEvent.layout.height + 16 + 12),
+    (e: LayoutChangeEvent) =>
+      setTabBarHeight(e.nativeEvent.layout.height + 16 + 12),
     [setTabBarHeight],
   );
 
@@ -571,7 +575,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       style={{
         height: BAR_HEIGHT + adjustedBottom + extraGap,
         paddingBottom: adjustedBottom + extraGap,
-        paddingLeft: exactScale(12),
+        paddingLeft: BAR_PADDING_LEFT,
       }}
       pointerEvents="box-none"
       onLayout={handleLayout}
@@ -594,16 +598,15 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
         <View
           style={{
             flex: 1,
-            marginRight: exactScale(12),
+            marginRight: BAR_MARGIN_RIGHT,
             height: PILL_HEIGHT,
             borderRadius: PILL_HEIGHT / 2,
-            backgroundColor: "#fff",
+            backgroundColor: GLASS_TINT,
             boxShadow: "0px 0px 20px 0px #00000026",
           }}
         >
           <GestureDetector gesture={gesture}>
             <View
-              onLayout={onLayout}
               style={{
                 height: PILL_HEIGHT,
                 borderRadius: PILL_HEIGHT / 2,
@@ -611,32 +614,34 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
               }}
               className="flex-1 flex-row items-center"
             >
-              {barWidth > 0 && (
-                <View
-                  pointerEvents="none"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    borderRadius: PILL_HEIGHT / 2,
-                    overflow: "hidden",
-                  }}
+              <TabBarGlass radius={PILL_HEIGHT / 2} />
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: PILL_HEIGHT / 2,
+                  overflow: "hidden",
+                }}
+              >
+                <Animated.View
+                  style={[
+                    animatedPillStyle,
+                    {
+                      position: "absolute",
+                      height: ACTIVE_HEIGHT,
+                      borderRadius: ACTIVE_RADIUS,
+                      top: (PILL_HEIGHT - ACTIVE_HEIGHT) / 2,
+                      overflow: "hidden",
+                    },
+                  ]}
                 >
-                  <Animated.View
-                    style={[
-                      animatedPillStyle,
-                      {
-                        position: "absolute",
-                        height: ACTIVE_HEIGHT,
-                        borderRadius: ACTIVE_RADIUS,
-                        top: (PILL_HEIGHT - ACTIVE_HEIGHT) / 2,
-                      },
-                    ]}
-                  />
-                </View>
-              )}
+                  <ActivePillGlass radius={ACTIVE_RADIUS} />
+                </Animated.View>
+              </View>
               {tabItems.map(({ route, index, tab }) => (
                 <TabItem
                   key={route.key}

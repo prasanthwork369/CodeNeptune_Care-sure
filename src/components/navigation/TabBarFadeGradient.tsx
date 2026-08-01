@@ -2,20 +2,12 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Platform } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const TabBarFadeGradient: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
-  const { bottom: rawBottom } = useSafeAreaInsets();
 
-  // On gesture nav, adjustedBottom is small (~16) so a large fixed offset
-  // pushes the gradient top above the banner when the tab bar hides.
-  // Use a tight offset for gesture nav, larger for 3-button nav.
-  const is3Button = Platform.OS === "android" && rawBottom > 24;
-  const extraHeight = exactScale(
-    Platform.OS === "android" ? (is3Button ? 30 : 25) : 24,
-  );
+  // Tops out just under the pill so the glass keeps live content behind its full height
+  const extraHeight = exactScale(4);
 
   // Solid white overhang below the screen edge, matching BannerFadeGradient.
   // Without it the gradient's opaque end is the first thing to leave the

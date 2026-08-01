@@ -29,6 +29,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
   ({ visible, onPressSearch, onPressUpload }) => {
     const insets = useSafeAreaInsets();
     const [interactive, setInteractive] = useState(false);
+    const [rendered, setRendered] = useState(false);
 
     useAnimatedReaction(
       () => visible.value > 0.5,
@@ -37,27 +38,43 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
       },
     );
 
+    // Opacity 0 still keeps the blur attached, so track "fully hidden" separately
+    useAnimatedReaction(
+      () => visible.value > 0.01,
+      (current, previous) => {
+        if (current !== previous) runOnJS(setRendered)(current);
+      },
+    );
+
     const animatedStyle = useAnimatedStyle(() => ({
       opacity: visible.value,
       transform: [{ translateY: (1 - visible.value) * -12 }],
     }));
 
+    const searchBarBottom = insets.top + exactScale(65);
+
+    const containerStyle = {
+      position: "absolute" as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 110,
+    };
+
+    // dimezisBlurView re-blurs the feed behind it every frame while attached
+    if (!rendered) {
+      return (
+        <Animated.View
+          pointerEvents="none"
+          style={[animatedStyle, containerStyle]}
+        />
+      );
+    }
+
     return (
       <Animated.View
         pointerEvents={interactive ? "auto" : "none"}
-        style={[
-          animatedStyle,
-          {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            // Above useScrollStatusBar's solid white safe-area mask (zIndex
-            // 101) -- otherwise that mask paints over this header's blur once
-            // scrolled past its reveal threshold.
-            zIndex: 110,
-          },
-        ]}
+        style={[animatedStyle, containerStyle]}
       >
         <BlurView
           intensity={10}
@@ -65,19 +82,6 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
           experimentalBlurMethod="dimezisBlurView"
           style={{ overflow: "hidden" }}
         >
-          {/* Softens the blur's bottom edge into the white page content below
-            instead of cutting off sharply */}
-          <LinearGradient
-            colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: exactScale(32),
-            }}
-            pointerEvents="none"
-          />
           <View
             style={{
               flexDirection: "row",
@@ -86,13 +90,11 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
               paddingTop: insets.top + exactScale(5),
               paddingBottom: exactScale(14),
               paddingHorizontal: exactScale(16),
-              // No fill here -- the Figma spec is backdrop-filter: blur() only,
-              // so the BlurView itself is the entire background treatment.
             }}
           >
             <View
               style={{
-                width: exactScale(55),
+                width: exactScale(60),
                 height: exactScale(60),
                 borderRadius: exactScale(10),
                 borderWidth: 1.05,
@@ -156,6 +158,29 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
             </Touchable>
           </View>
         </BlurView>
+
+        {/* Smoothstep alpha ramp — a linear ramp with few stops bands visibly on Android */}
+        <LinearGradient
+          colors={[
+            "rgba(255,255,255,1)",
+            "rgba(255,255,255,1)",
+            "rgba(255,255,255,0.92)",
+            "rgba(255,255,255,0.75)",
+            "rgba(255,255,255,0.5)",
+            "rgba(255,255,255,0.25)",
+            "rgba(255,255,255,0.08)",
+            "rgba(255,255,255,0)",
+          ]}
+          locations={[0, 0.47, 0.55, 0.64, 0.73, 0.82, 0.91, 1]}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: searchBarBottom,
+            height: exactScale(30),
+          }}
+          pointerEvents="none"
+        />
       </Animated.View>
     );
   },
