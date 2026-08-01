@@ -13,6 +13,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { formatOrderId } from "@/src/utils/order";
 import { PrescriptionHistoryItem } from "./sections";
 
 // Status options for the filter sheet. `null` = show all.
@@ -46,7 +47,8 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
   const mapItem = (item: any) => ({
-    id: item.prescriptionOrderId ?? item.id.slice(0, 8).toUpperCase(),
+    // Same CS-XXXXXX shape My Orders renders, so one reference reads alike everywhere
+    id: formatOrderId(item.prescriptionOrderId ?? item.id),
     rawId: item.id,
     status:
       PRESCRIPTION_STATUS_LABELS[
@@ -94,7 +96,10 @@ export const PrescriptionHistoryLayout: React.FC = () => {
       <ScreenHeader title="My Prescriptions" />
 
       <View className="px-5 pt-6">
-        <SearchBar placeholder="Search Prescription" onSearch={setSearch} />
+        <SearchBar
+          placeholder="Search by ID, patient or doctor"
+          onSearch={setSearch}
+        />
       </View>
 
       {/* Status filter chips — always visible, "All" selected by default */}
@@ -140,7 +145,8 @@ export const PrescriptionHistoryLayout: React.FC = () => {
       ) : (
         <FlashList
           data={items}
-          keyExtractor={(item) => item.id}
+          // rawId, not the display id — formatOrderId keeps only 6 chars and two can collide
+          keyExtractor={(item) => item.rawId}
           renderItem={renderItem}
           contentContainerStyle={{
             padding: 20,

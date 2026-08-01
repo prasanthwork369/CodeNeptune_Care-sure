@@ -123,7 +123,7 @@ export const PrescriptionHistoryItem: React.FC<
               style={{ fontSize: moderateScale(15) }}
               numberOfLines={1}
             >
-              #{item.id}
+              {item.id}
             </Text>
             <Text
               className="font-inter-medium text-[#6A6A6A] mt-0.5"
