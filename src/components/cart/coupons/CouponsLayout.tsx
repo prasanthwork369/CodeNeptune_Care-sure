@@ -8,11 +8,16 @@ import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
 
 const EMPTY_COUPONS: any[] = [];
+
+// One skeleton card: 115 body + 12 bottom margin
+const SKELETON_CARD_HEIGHT = 127;
+// Header, search input and section title sitting above the list
+const SKELETON_LIST_OFFSET = 260;
 
 export const CouponsLayout: React.FC = () => {
   const [couponCode, setCouponCode] = useState("");
@@ -21,12 +26,31 @@ export const CouponsLayout: React.FC = () => {
   const applied = useCouponStore((s) => s.applied);
   const showToast = useToastStore((s) => s.show);
   const router = useNav();
+  const { height: screenHeight } = useWindowDimensions();
   const { totalPrice: subtotal } = useCart();
   const { data: rawCoupons, isLoading } = useCoupons();
   const coupons = rawCoupons ?? EMPTY_COUPONS;
-  const { unavailable } = useCouponAvailability(coupons, subtotal);
+  const { unavailable, checking } = useCouponAvailability(coupons, subtotal);
   const visibleCoupons = useCouponSearch(coupons, couponCode);
-  const shouldShowInitialShimmer = isLoading && coupons.length === 0;
+  const [validatedOnce, setValidatedOnce] = useState(false);
+
+  // Only the first check blocks the list; later re-checks keep the current states so a changing subtotal never flashes skeletons back in
+  useEffect(() => {
+    if (!checking) setValidatedOnce(true);
+  }, [checking]);
+
+  // Covers the validation round-trip too, or every coupon paints as an active APPLY before the unavailable ones grey out
+  const shouldShowInitialShimmer =
+    (isLoading && coupons.length === 0) || (checking && !validatedOnce);
+
+  // Fills the viewport so the placeholder reads as a full list rather than a short stub
+  const skeletonCount = Math.max(
+    3,
+    Math.ceil(
+      (screenHeight - exactScale(SKELETON_LIST_OFFSET)) /
+        exactScale(SKELETON_CARD_HEIGHT),
+    ),
+  );
 
   const applyCode = async (code: string) => {
     const trimmed = code.trim().toUpperCase();
@@ -101,11 +125,9 @@ export const CouponsLayout: React.FC = () => {
         </Text>
 
         {shouldShowInitialShimmer ? (
-          <>
-            <CouponCardSkeleton />
-            <CouponCardSkeleton />
-            <CouponCardSkeleton />
-          </>
+          Array.from({ length: skeletonCount }, (_, i) => (
+            <CouponCardSkeleton key={i} />
+          ))
         ) : visibleCoupons.length === 0 ? (
           <Text
             className="font-inter-medium text-brand-subtext text-center mt-4"
