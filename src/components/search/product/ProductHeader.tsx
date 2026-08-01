@@ -2,7 +2,8 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
-import React from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useRef } from "react";
 import { Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { searchHeaderStyles as hs } from "@/src/components/search/search.styles";
@@ -28,6 +29,18 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   const router = useNav();
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
+  const inputRef = useRef<TextInput>(null);
+
+  // autoFocus only fires on mount, and returning from the product page doesn't
+  // remount this screen — refocus so the keyboard comes back with it.
+  useFocusEffect(
+    useCallback(() => {
+      if (!onQueryChange) return;
+      // Android drops a focus() issued mid-transition, so wait a frame or two.
+      const t = setTimeout(() => inputRef.current?.focus(), 80);
+      return () => clearTimeout(t);
+    }, [onQueryChange]),
+  );
 
   return (
     <View
@@ -52,6 +65,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           {onQueryChange ? (
             <View style={{ flex: 1, justifyContent: "center" }}>
               <TextInput
+                ref={inputRef}
                 value={query}
                 onChangeText={onQueryChange}
                 onSubmitEditing={onSubmit}

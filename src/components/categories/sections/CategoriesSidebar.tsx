@@ -25,6 +25,10 @@ interface CategoriesSidebarProps {
 
 const INDICATOR_HEIGHT = 64;
 
+// Android splits "Anti-Pollution" mid-word; a zero-width space lets it break after the hyphen.
+const ZERO_WIDTH_SPACE = String.fromCharCode(0x200b);
+const breakableLabel = (l: string) => l.split("-").join("-" + ZERO_WIDTH_SPACE);
+
 export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
   tabs,
   activeTabId,
@@ -154,12 +158,14 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                   contentFit="contain"
                 />
               </View>
+              {/* Fixed 86px column, so the OS font setting must not widen this. */}
               <Text
                 style={s.label}
                 className={`text-center px-1 text-brand-text ${isActive ? "font-inter-semibold" : "font-inter-medium"}`}
                 numberOfLines={2}
+                allowFontScaling={false}
               >
-                {tab.label}
+                {breakableLabel(tab.label)}
               </Text>
             </Touchable>
           );

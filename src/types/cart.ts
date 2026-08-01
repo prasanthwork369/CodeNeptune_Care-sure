@@ -203,6 +203,8 @@ export interface Coupon {
   status: number;
   createdAt: string;
   updatedAt: string;
+  /** Server flag: this customer has hit their per-customer usage limit. */
+  isUsedUp?: boolean;
 }
 
 export interface CouponValidationResult {

@@ -8,7 +8,7 @@ import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
 
@@ -27,21 +27,16 @@ export const CouponsLayout: React.FC = () => {
   const showToast = useToastStore((s) => s.show);
   const router = useNav();
   const { height: screenHeight } = useWindowDimensions();
-  const { totalPrice: subtotal } = useCart();
+  const { totalPrice: subtotal, isLoading: isCartLoading } = useCart();
   const { data: rawCoupons, isLoading } = useCoupons();
   const coupons = rawCoupons ?? EMPTY_COUPONS;
-  const { unavailable, checking } = useCouponAvailability(coupons, subtotal);
+  const unavailable = useCouponAvailability(coupons);
   const visibleCoupons = useCouponSearch(coupons, couponCode);
-  const [validatedOnce, setValidatedOnce] = useState(false);
 
-  // Only the first check blocks the list; later re-checks keep the current states so a changing subtotal never flashes skeletons back in
-  useEffect(() => {
-    if (!checking) setValidatedOnce(true);
-  }, [checking]);
-
-  // Covers the validation round-trip too, or every coupon paints as an active APPLY before the unavailable ones grey out
+  // Subtotal drives every min-order state, so painting before the cart lands
+  // would show each coupon as eligible and then grey it out.
   const shouldShowInitialShimmer =
-    (isLoading && coupons.length === 0) || (checking && !validatedOnce);
+    (isLoading && coupons.length === 0) || isCartLoading;
 
   // Fills the viewport so the placeholder reads as a full list rather than a short stub
   const skeletonCount = Math.max(

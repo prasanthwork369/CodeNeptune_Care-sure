@@ -16,7 +16,7 @@ import {
   selectNextCouponUpsell,
 } from "@/src/utils/couponSelection";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 
@@ -32,14 +32,9 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   const coupons = rawCoupons ?? EMPTY_COUPONS;
   const apply = useCouponStore((s) => s.apply);
   const [applying, setApplying] = useState(false);
-  const [validatedOnce, setValidatedOnce] = useState(false);
 
-  // Same pre-validation the coupons screen uses, so a limit-reached coupon is never recommended.
-  const { unavailable, checking } = useCouponAvailability(coupons, subtotal);
-
-  useEffect(() => {
-    if (!checking) setValidatedOnce(true);
-  }, [checking]);
+  // Same source the coupons screen uses, so a used-up coupon is never recommended.
+  const unavailable = useCouponAvailability(coupons);
 
   // Recomputed as the subtotal moves, so the card tracks what this cart can actually use.
   const pick = useMemo(
@@ -133,9 +128,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   // skeleton instead of the small "Apply Coupon" fallback. Otherwise the small
   // row shows first and then jumps to the big "Coupons & offers" card once the
   // query resolves — the flicker/jerk on first load.
-  // Only the first validation blocks the card; later re-checks keep the last good pick so
-  // editing quantities never flashes the skeleton back in.
-  if (isLoading || (checking && !validatedOnce)) {
+  if (isLoading) {
     return (
       <View className="mx-4 mt-3">
         <Skeleton width="100%" height={exactScale(132)} borderRadius={16} />

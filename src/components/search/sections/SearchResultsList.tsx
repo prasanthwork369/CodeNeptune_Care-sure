@@ -74,6 +74,9 @@ export const SearchResultsList = React.memo(
         data={results}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
+        // Without this the keyboard swallows the first tap on a card, so the
+        // user has to press twice to open the product.
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={contentStyle}
         className="flex-1"
         ListHeaderComponent={listHeader}

@@ -59,7 +59,9 @@ export const TabItem: React.FC<TabItemProps> = ({
             )}
           </View>
         ) : null}
+        {/* Active swaps to wider semibold; wrapping would hide the growth. */}
         <Text
+          numberOfLines={1}
           style={s.label}
           className={`text-brand-text ${isActive ? "font-inter-semibold" : "font-inter-medium"}`}
         >

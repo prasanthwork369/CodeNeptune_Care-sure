@@ -46,7 +46,6 @@ describe("CartCouponSection Component", () => {
       error: null,
       refetch: jest.fn(),
     } as any);
-    // The card pre-validates every coupon before recommending one, so this covers that probe too.
     mockValidate.mockResolvedValue({
       valid: true,
       discount: 50,
@@ -118,12 +117,14 @@ describe("CartCouponSection Component", () => {
   });
 
   // The reported bug: a used-up coupon was recommended and only failed once Apply was tapped.
-  it("does not recommend a coupon the backend has already rejected", async () => {
-    mockValidate.mockResolvedValue({
-      valid: false,
-      discount: 0,
-      message: "Coupon usage limit reached",
-    });
+  // Availability now rides on the coupons payload rather than a validate probe.
+  it("does not recommend a coupon the backend has marked used up", async () => {
+    mockUseCoupons.mockReturnValue({
+      data: [{ ...mockCouponList[0], isUsedUp: true }],
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    } as any);
 
     const { findByText, queryByText } = renderWithProviders(
       <CartCouponSection

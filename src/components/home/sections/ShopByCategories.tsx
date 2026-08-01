@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { CategoryTabs } from "./CategoryTabs";
@@ -14,14 +14,17 @@ interface ShopByCategoriesProps {
 
 export const ShopByCategories: React.FC<ShopByCategoriesProps> = React.memo(
   ({ tabs, cards, onCardPress, isLoading }) => {
-    const [activeId, setActiveId] = useState("");
+    const [selectedId, setSelectedId] = useState("");
 
-    useEffect(() => {
-      if (tabs.length > 0 && !activeId) {
-        setActiveId(tabs[0].id);
-      }
-      // Guarded by !activeId, so the extra runs this dep causes are no-ops.
-    }, [tabs, activeId]);
+    // Derived rather than set in an effect. Defaulting after the first commit
+    // meant the first tab laid out inactive (medium), then switched to active
+    // (semibold, wider) — reflowing the label inside a box measured for the
+    // narrower font, so it wrapped mid-word and the indicator sat off-centre.
+    // Falls back to the first tab whenever the selection isn't in the current
+    // set, which also covers the tabs list changing underneath us.
+    const activeId = tabs.some((t) => t.id === selectedId)
+      ? selectedId
+      : (tabs[0]?.id ?? "");
 
     const filteredCards = cards.filter((card) => card.tabId === activeId);
 
@@ -30,7 +33,7 @@ export const ShopByCategories: React.FC<ShopByCategoriesProps> = React.memo(
         <CategoryTabs
           tabs={tabs}
           activeId={activeId}
-          onTabChange={setActiveId}
+          onTabChange={setSelectedId}
           isLoading={isLoading}
         />
         <Animated.View key={activeId} entering={FadeIn.duration(200)}>
