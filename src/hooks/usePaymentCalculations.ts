@@ -209,7 +209,7 @@ export function usePaymentCalculations() {
         symptoms,
       });
 
-      const order: any = await createOrder(payload, idempotencyKeyRef.current);
+      const order = await createOrder(payload, idempotencyKeyRef.current);
       traceStatus = "success";
       if (order?.id) {
         void analyticsService.logPurchase(

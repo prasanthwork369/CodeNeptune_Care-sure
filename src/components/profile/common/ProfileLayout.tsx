@@ -1,3 +1,4 @@
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { components } from "@/src/constants/theme";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { useProfile } from "@/src/hooks/queries/useProfile";
@@ -43,7 +44,7 @@ export const ProfileLayout: React.FC = () => {
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
-  const handleScroll = (event: any) => {
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     scrollY.value = event.nativeEvent.contentOffset.y;
   };
 

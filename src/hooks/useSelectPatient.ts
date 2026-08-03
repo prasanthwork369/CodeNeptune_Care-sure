@@ -1,7 +1,7 @@
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useSelectPatientImages } from "@/src/hooks/useSelectPatientImages";
-import { FamilyMember } from "@/src/types/familyMember";
+import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { HealthProblem } from "@/src/api/health-problem.api";
 import { sanitize, stripIndianCode, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
@@ -93,13 +93,16 @@ export function useSelectPatient() {
     }
   };
 
-  const handleAddPatient = async (patient: any) => {
+  const handleAddPatient = async (patient: FamilyMemberInput) => {
     const created = await addMember(patient);
     if (created?.id) setSelectedPatientId(created.id);
     setIsAddPatientSheetVisible(false);
   };
 
-  const handleEditPatient = async (id: string, patient: any) => {
+  const handleEditPatient = async (
+    id: string,
+    patient: Partial<FamilyMemberInput>,
+  ) => {
     await updateMember(id, patient);
     setIsAddPatientSheetVisible(false);
     setEditingPatient(null);

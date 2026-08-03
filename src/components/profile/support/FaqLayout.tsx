@@ -7,6 +7,15 @@ import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
 
+type Faq = { question: string; answer: string };
+
+// The CMS returns FAQs under three different shapes; each candidate row is
+// validated through this guard rather than trusted.
+const isFaq = (item: unknown): item is Faq =>
+  !!item &&
+  typeof (item as Faq).question === "string" &&
+  typeof (item as Faq).answer === "string";
+
 const FaqSkeleton = () => (
   <ScrollView
     showsVerticalScrollIndicator={false}
@@ -43,17 +52,12 @@ export const FaqLayout: React.FC = () => {
   const { data: cmsFaqs, isLoading } = useWebsiteContent("faqs");
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const faqs: { question: string; answer: string }[] = useMemo(() => {
+  const faqs: Faq[] = useMemo(() => {
     if (!cmsFaqs) return [];
 
     // Try direct array
     if (Array.isArray(cmsFaqs)) {
-      const valid = cmsFaqs.filter(
-        (item: any) =>
-          item &&
-          typeof item.question === "string" &&
-          typeof item.answer === "string",
-      );
+      const valid = cmsFaqs.filter(isFaq);
       if (valid.length > 0) return valid;
     }
 
@@ -68,24 +72,14 @@ export const FaqLayout: React.FC = () => {
         }
       }
       if (Array.isArray(val)) {
-        const valid = val.filter(
-          (item: any) =>
-            item &&
-            typeof item.question === "string" &&
-            typeof item.answer === "string",
-        );
+        const valid = val.filter(isFaq);
         if (valid.length > 0) return valid;
       }
     }
 
     // Try faqs field
     if (Array.isArray(cmsFaqs.faqs)) {
-      const valid = cmsFaqs.faqs.filter(
-        (item: any) =>
-          item &&
-          typeof item.question === "string" &&
-          typeof item.answer === "string",
-      );
+      const valid = cmsFaqs.faqs.filter(isFaq);
       if (valid.length > 0) return valid;
     }
 

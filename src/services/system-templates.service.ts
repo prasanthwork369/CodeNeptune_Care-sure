@@ -35,7 +35,7 @@ export const systemTemplatesService = {
   getPublicTemplate: async (
     event: string,
     channel = "DOCUMENT",
-    variables?: Record<string, any>,
+    variables?: Record<string, unknown>,
   ): Promise<SystemTemplate> => {
     const { data } = await apiClient.get<SystemTemplateResponse>(
       "/api/v1/system-templates/public",

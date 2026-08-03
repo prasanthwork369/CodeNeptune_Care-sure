@@ -1,3 +1,4 @@
+import type { StyleProp, ViewStyle } from "react-native";
 import React from "react";
 import { View } from "react-native";
 
@@ -8,7 +9,7 @@ export function SectionCard({
 }: {
   children: React.ReactNode;
   className?: string;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }) {
   return (
     <View

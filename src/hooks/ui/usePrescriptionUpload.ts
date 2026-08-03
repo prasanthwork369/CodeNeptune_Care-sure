@@ -143,7 +143,7 @@ export function usePrescriptionUpload(
     pickDocument,
   } = usePrescriptionUploadService({
     onAssetsReady: async (assets) => {
-      const { validated, hadTooLarge } = await processAssets(assets as any);
+      const { validated, hadTooLarge } = await processAssets(assets);
       handlePicked(validated, hadTooLarge);
     },
     onError: (msg) => showErr("Error", msg),

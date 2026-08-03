@@ -1,3 +1,4 @@
+import type { ApiPrescription, PrescriptionHistoryItemData } from "@/src/types/prescription";
 import { SearchBar } from "@/src/components/home/sections/SearchBar";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
@@ -46,7 +47,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
-  const mapItem = (item: any) => ({
+  const mapItem = (item: ApiPrescription) => ({
     // Same CS-XXXXXX shape My Orders renders, so one reference reads alike everywhere
     id: formatOrderId(item.prescriptionOrderId ?? item.id),
     rawId: item.id,
@@ -74,7 +75,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
 
   const items = useMemo(() => {
     return prescriptions
-      .filter((p: any) => statusFilter === null || p.status === statusFilter)
+      .filter((p) => statusFilter === null || p.status === statusFilter)
       .map(mapItem)
       .filter((item: ReturnType<typeof mapItem>) => {
         if (!query) return true;
@@ -87,7 +88,9 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   }, [prescriptions, query, source, toPay, statusFilter]);
 
   const renderItem = useCallback(
-    ({ item }: { item: any }) => <PrescriptionHistoryItem item={item} />,
+    ({ item }: { item: PrescriptionHistoryItemData }) => (
+      <PrescriptionHistoryItem item={item} />
+    ),
     [],
   );
 

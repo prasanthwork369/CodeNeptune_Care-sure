@@ -10,7 +10,7 @@ import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { formatDobDisplay, getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, TextInput, View } from "react-native";
 // This app's reanimated keyboard reporting is inert (see AuthScreenShell), so
 // gorhom's keyboardBehavior can't move the sheet. KeyboardEvents is the only
 // keyboard pipeline that fires here — we drive a manual scroll from it.
@@ -113,8 +113,8 @@ export function AddPatientSheet({
   }, [isVisible]);
 
   const isEditMode = !!editPatient;
-  const mobileRef = useRef<any>(null);
-  const setMobileRef = (ref: any) => {
+  const mobileRef = useRef<TextInput | null | undefined>(null);
+  const setMobileRef = (ref?: TextInput | null) => {
     mobileRef.current = ref;
     if (ref) {
       applyDigitsOnlyFilter(ref);
@@ -581,7 +581,7 @@ export function AddPatientSheet({
                     gap: exactScale(4),
                   }}
                 >
-                  {React.cloneElement(icon as React.ReactElement<any>, {
+                  {React.cloneElement(icon as React.ReactElement<{ color?: string }>, {
                     color: sel ? "#0F7635" : "#919EAB",
                   })}
                   <Text

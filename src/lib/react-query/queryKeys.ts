@@ -87,7 +87,7 @@ export const QUERY_KEYS = {
     BY_EVENT: (
       event: string,
       channel: string,
-      variables?: Record<string, any>,
+      variables?: Record<string, unknown>,
     ) => ["system-templates", "by-event", event, channel, variables] as const,
   },
 } as const;

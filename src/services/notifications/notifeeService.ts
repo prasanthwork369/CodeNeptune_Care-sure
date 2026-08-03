@@ -1,3 +1,4 @@
+import type { EventDetail } from "@notifee/react-native";
 import { NOTIFICATION_CHANNELS } from "../../constants/notificationChannels";
 import { NotificationData } from "../../types/notification";
 import { isExpoGo } from "../../utils/environment";
@@ -128,7 +129,7 @@ export const notifeeService = {
         detail,
       }: {
         type: number;
-        detail: { notification?: any; pressAction?: { id: string } };
+        detail: EventDetail;
       }) => {
         const n = detail.notification;
         if (!n) return;

@@ -59,7 +59,7 @@ export const PreviewLayout: React.FC = () => {
     pickPdf: pickPdfs,
   } = usePrescriptionUploadService({
     onAssetsReady: async (assets) => {
-      await processAndAdd(assets as any);
+      await processAndAdd(assets);
     },
     onError: (msg) => showInfo("Error", msg),
   });

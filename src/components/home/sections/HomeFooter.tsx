@@ -1,3 +1,4 @@
+import type { ImageStyle } from "react-native";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, View, useWindowDimensions } from "react-native";
@@ -18,16 +19,16 @@ interface HomeFooterProps {
 
 const isSvg = (url: string) => url?.toLowerCase().endsWith(".svg");
 
-const RemoteIcon: React.FC<{ uri: string; style?: any }> = ({ uri, style }) => {
+// A plain style object, not StyleProp — width/height are read off it below.
+const RemoteIcon: React.FC<{ uri: string; style?: ImageStyle }> = ({
+  uri,
+  style,
+}) => {
   if (isSvg(uri)) {
-    return (
-      <SvgUri
-        uri={uri}
-        width={style?.width}
-        height={style?.height}
-        style={style}
-      />
-    );
+    // SvgUri only accepts concrete sizes — percentage/animated values are dropped.
+    const width = typeof style?.width === "number" ? style.width : undefined;
+    const height = typeof style?.height === "number" ? style.height : undefined;
+    return <SvgUri uri={uri} width={width} height={height} style={style} />;
   }
   return <Image source={{ uri }} style={style} contentFit="contain" />;
 };

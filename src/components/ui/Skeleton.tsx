@@ -1,10 +1,10 @@
 import React from "react";
-import { ViewStyle } from "react-native";
+import { DimensionValue, ViewStyle } from "react-native";
 import { ShimmerBlock } from "./shimmer";
 
 interface SkeletonProps {
-  width?: number | string;
-  height?: number | string;
+  width?: DimensionValue;
+  height?: DimensionValue;
   borderRadius?: number;
   style?: ViewStyle;
 }
@@ -17,8 +17,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 }) => {
   return (
     <ShimmerBlock
-      width={width as any}
-      height={height as any}
+      width={width}
+      height={height}
       borderRadius={borderRadius}
       style={style}
     />

@@ -1,3 +1,4 @@
+import type { ImageSource } from "expo-image";
 import { create } from "zustand";
 import { withTiming } from "react-native-reanimated";
 import { AlertButton, AlertDialogProps } from "@/src/components/ui/AlertDialog";
@@ -7,7 +8,7 @@ import { durations, easings } from "@/src/theme";
 export interface GlobalAlertConfig {
   title: string;
   message: string;
-  icon: any; // ImageSource
+  icon: ImageSource;
   iconBg?: string;
   confirmBg?: string;
   cancelLabel: string;

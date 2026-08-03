@@ -23,7 +23,7 @@ export type ReturnReason = {
 interface ReturnReasonModalProps {
   isVisible: boolean;
   onClose: () => void;
-  item: { name: string; image: any; pack: string } | null;
+  item: { name: string; image?: { uri: string }; pack: string } | null;
   quantity: number;
   initialData: ReturnReason | null;
   onSave: (data: ReturnReason) => void;

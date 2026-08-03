@@ -1,3 +1,4 @@
+import type { Cart, Coupon } from "@/src/types/cart";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { tokenStorage } from "@/src/lib/storage";
 import { useAuthStore } from "@/src/store/authStore";
@@ -42,7 +43,7 @@ export const useCartSocketSync = () => {
         if (__DEV__) console.warn("[Socket] Error:", err.message);
       });
 
-      socket.on("cart_update", (data: { action: string; cart: any }) => {
+      socket.on("cart_update", (data: { action: string; cart: Cart }) => {
         if (data?.cart) {
           // 1. Instantly sync Zustand state (sub-100ms UI updates!)
           setCart(data.cart);
@@ -56,7 +57,7 @@ export const useCartSocketSync = () => {
         }
       });
 
-      socket.on("coupon_update", (data: { action: string; coupon: any }) => {
+      socket.on("coupon_update", (data: { action: string; coupon: Coupon }) => {
         if (__DEV__) logger.debug("[Socket] Coupon update:", data);
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.CUSTOMER.COUPONS,
@@ -80,7 +81,8 @@ export const useCartSocketSync = () => {
         });
       });
 
-      socket.on("notification", (data: any) => {
+      // Payload is only logged — the handler just invalidates the query.
+      socket.on("notification", (data: unknown) => {
         if (__DEV__) logger.debug("[Socket] Notification:", data);
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.CUSTOMER.NOTIFICATIONS,
@@ -89,7 +91,7 @@ export const useCartSocketSync = () => {
 
       socket.on(
         "settings_update",
-        (data: { action: string; settings: any }) => {
+        (data: { action: string; settings: unknown }) => {
           if (__DEV__) logger.debug("[Socket] Settings update:", data);
           queryClient.invalidateQueries({ queryKey: ["platform-settings"] });
           queryClient.invalidateQueries({ queryKey: ["cart-wallet-settings"] });

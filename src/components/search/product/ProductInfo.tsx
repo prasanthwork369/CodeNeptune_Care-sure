@@ -32,8 +32,8 @@ interface ProductInfoProps {
     packSize?: number;
     packLabel?: string;
     brandName?: string;
-    image: any;
-    images?: any[];
+    image?: { uri: string };
+    images?: { uri: string }[];
   };
 }
 

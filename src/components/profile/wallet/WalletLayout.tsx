@@ -93,7 +93,7 @@ export const WalletLayout: React.FC = () => {
   };
 
   useEffect(() => {
-    const visualIndex = visibleTabs.indexOf(activeTab as any);
+    const visualIndex = visibleTabs.findIndex((t) => t === activeTab);
     activeTabIndex.value = withSpring(
       Math.max(0, visualIndex),
       TAB_SNAP_SPRING,

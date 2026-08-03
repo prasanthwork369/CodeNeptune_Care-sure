@@ -1,3 +1,4 @@
+import type { StyleProp, ViewStyle } from "react-native";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -10,7 +11,7 @@ function SkeletonCard({
   style,
 }: {
   children: React.ReactNode;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }) {
   return (
     <View

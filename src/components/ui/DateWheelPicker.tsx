@@ -1,3 +1,4 @@
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
@@ -53,7 +54,7 @@ const WheelCol: React.FC<ColProps> = ({
   }, [index]);
 
   const onEnd = useCallback(
-    (e: any) => {
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const i = Math.round(
         Math.max(
           0,

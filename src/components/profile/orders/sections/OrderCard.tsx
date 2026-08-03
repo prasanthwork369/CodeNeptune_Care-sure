@@ -18,9 +18,9 @@ import { orderStyles as s } from "../orders.styles";
 export interface OrderCardProps {
   order: Order;
   cartItemsRef: React.RefObject<CartItem[]>;
-  addItem: (input: AddToCartInput) => Promise<any>;
-  updateItem: (itemId: string, input: UpdateCartItemInput) => Promise<any>;
-  clearCart: () => Promise<any>;
+  addItem: (input: AddToCartInput) => Promise<unknown>;
+  updateItem: (itemId: string, input: UpdateCartItemInput) => Promise<unknown>;
+  clearCart: () => Promise<unknown>;
 }
 
 const labelStyle = { letterSpacing: 0.6 };

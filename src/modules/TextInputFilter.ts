@@ -1,4 +1,10 @@
-import { findNodeHandle, NativeModules, Platform } from "react-native";
+import React from "react";
+import {
+  findNodeHandle,
+  NativeModules,
+  Platform,
+  TextInput,
+} from "react-native";
 
 /**
  * Applies a native Android InputFilter to a React Native TextInput reference
@@ -9,7 +15,7 @@ import { findNodeHandle, NativeModules, Platform } from "react-native";
  * when the stripped text equals the previous value React sends no native update, so the
  * rejected character stays in the native buffer and the field stops responding.
  */
-export const applyAsciiOnlyFilter = (ref: any) => {
+export const applyAsciiOnlyFilter = (ref: React.ComponentRef<typeof TextInput> | null) => {
   if (Platform.OS !== "android" || !ref) return;
   try {
     const tag = findNodeHandle(ref);
@@ -23,7 +29,10 @@ export const applyAsciiOnlyFilter = (ref: any) => {
   }
 };
 
-export const applyDigitsOnlyFilter = (ref: any, maxLength = 0) => {
+export const applyDigitsOnlyFilter = (
+  ref: React.ComponentRef<typeof TextInput> | null,
+  maxLength = 0,
+) => {
   if (Platform.OS !== "android" || !ref) return;
   try {
     const tag = findNodeHandle(ref);

@@ -1,3 +1,4 @@
+import type { Coupon } from "@/src/types/cart";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -20,7 +21,7 @@ import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 
-const EMPTY_COUPONS: any[] = [];
+const EMPTY_COUPONS: Coupon[] = [];
 
 export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   appliedCoupon,

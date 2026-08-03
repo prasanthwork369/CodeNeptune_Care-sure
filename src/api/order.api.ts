@@ -3,6 +3,11 @@ import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
 import { logger } from "@/src/utils/logger";
 
+/** One mapped row from getFrequentlyOrdered — the shape the UI consumes. */
+export type FrequentOrderItem = Awaited<
+  ReturnType<typeof orderApi.getFrequentlyOrdered>
+>[number];
+
 export interface OrderListParams {
   page?: number;
   limit?: number;

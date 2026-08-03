@@ -49,7 +49,7 @@ export const useAddress = () => {
     if (isAuthenticated) {
       return refetch();
     }
-    return Promise.resolve(null) as any;
+    return Promise.resolve(null);
   };
 
   return {

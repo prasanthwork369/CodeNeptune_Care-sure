@@ -1,3 +1,4 @@
+import type { Href } from "expo-router";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   AppState,
@@ -24,7 +25,7 @@ interface BannerCarouselProps {
   isVisible?: boolean;
 }
 
-const BANNER_ROUTE_MAP: Record<string, string> = {
+const BANNER_ROUTE_MAP: Record<string, Href> = {
   "/cart": "/(stack)/cart",
   "/category": "/categories",
   "/categories": "/categories",
@@ -114,7 +115,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
               familySlug: card.familySlug,
               name: card.label.replace("\n", " "),
             },
-          } as any);
+          });
           return;
         }
         if (__DEV__ && categories?.length) {
@@ -126,9 +127,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
         // Unknown slug (typo, renamed, or a category missing from the family
         // map): land on the category list rather than pushing an unmatched path,
         // which would drop the user on the router's raw "Unmatched Route" screen.
-        router.push(
-          (BANNER_ROUTE_MAP[link.toLowerCase()] ?? "/categories") as any,
-        );
+        router.push(BANNER_ROUTE_MAP[link.toLowerCase()] ?? "/categories");
       },
       [router, categories],
     );

@@ -49,6 +49,7 @@ export interface ApiPrescription {
   prescriptionOrderId?: string | null;
   imageUrls?: string[];
   doctorName?: string | null;
+  customer?: { firstName?: string; lastName?: string } | null;
   ocrData?: {
     patientName?: string;
     /** One reason per uploaded file when automated verification fails. */

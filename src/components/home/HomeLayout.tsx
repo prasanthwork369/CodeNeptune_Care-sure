@@ -554,7 +554,7 @@ const HomeContent: React.FC = () => {
         style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]}
       />
       <Animated.FlatList
-        ref={listRef as any}
+        ref={listRef as React.Ref<Animated.FlatList<HomeSection>>}
         data={sections}
         keyExtractor={(item) => item.id}
         renderItem={renderSection}

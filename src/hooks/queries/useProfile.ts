@@ -51,7 +51,7 @@ export const useProfile = () => {
 
     // Step 1 — upload file, get back a URL
     const form = new FormData();
-    form.append("file", { uri, name: filename, type } as any);
+    form.append("file", { uri, name: filename, type } as unknown as Blob);
 
     const uploadRes = await apiClient.post(API_ENDPOINTS.STORAGE_UPLOAD, form, {
       headers: { "Content-Type": "multipart/form-data" },

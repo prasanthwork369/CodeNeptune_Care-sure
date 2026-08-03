@@ -12,8 +12,8 @@ export const ProfileCoinsCard: React.FC = () => {
   const { profile } = useProfile();
 
   const coins = balance != null ? balance.coinsBalance : "—";
-  const memberYear = (profile as any)?.createdAt
-    ? new Date((profile as any).createdAt).getFullYear()
+  const memberYear = profile?.createdAt
+    ? new Date(profile.createdAt).getFullYear()
     : "—";
 
   return (

@@ -113,7 +113,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                   router.push({
                     pathname: "/product/[id]",
                     params: { id: product.productId ?? product.id },
-                  } as any)
+                  })
                 }
                 style={{ width: exactScale(167), marginRight: exactScale(10) }}
               >

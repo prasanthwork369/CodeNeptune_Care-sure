@@ -329,7 +329,7 @@ export const FloatingBannersCarousel = ({
             }}
           >
             <Animated.ScrollView
-              ref={scrollViewRef as any}
+              ref={scrollViewRef as React.Ref<Animated.ScrollView>}
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}

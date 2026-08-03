@@ -1,13 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const STORAGE_KEY = "offline_request_queue";
 const MAX_SIZE = 50;
 
 interface QueuedRequest {
   config: AxiosRequestConfig;
-  resolve: (value: any) => void;
-  reject: (reason?: any) => void;
+  resolve: (value: AxiosResponse) => void;
+  reject: (reason?: unknown) => void;
 }
 
 class RequestQueue {
@@ -30,8 +30,8 @@ class RequestQueue {
 
   async add(
     config: AxiosRequestConfig,
-    resolve: any,
-    reject: any,
+    resolve: QueuedRequest["resolve"],
+    reject: QueuedRequest["reject"],
   ): Promise<void> {
     if (this.queue.length >= MAX_SIZE) {
       reject(new Error("Offline queue full — request dropped"));
@@ -41,7 +41,10 @@ class RequestQueue {
     await this._persist();
   }
 
-  async process(axiosInstance: any): Promise<void> {
+  // Takes just the callable shape it uses, so an AxiosInstance fits and so does a stub.
+  async process(
+    axiosInstance: (config: AxiosRequestConfig) => Promise<AxiosResponse>,
+  ): Promise<void> {
     if (this.queue.length === 0) return;
 
     const batch = [...this.queue];

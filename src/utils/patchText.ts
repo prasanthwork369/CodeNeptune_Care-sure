@@ -45,7 +45,9 @@ const getAndroidInterFamily = (weight: unknown): string => {
 };
 
 /** Normalizes shared Text and TextInput styles for the current platform. */
-export function sanitizeStyle(styleProp: any): any {
+export function sanitizeStyle(
+  styleProp: RN.StyleProp<RN.TextStyle>,
+): RN.TextStyle {
   // Never bail out early: Android must get an Inter family even with no style prop.
   const cleanStyle = { ...(RN.StyleSheet.flatten(styleProp) ?? {}) };
 
@@ -101,11 +103,11 @@ const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
 PatchedText.displayName = "Text";
 
 // Preserve original statics for React Native and library compatibility.
+const patchedStatics = PatchedText as unknown as Record<string, unknown>;
+const originalStatics = OriginalText as unknown as Record<string, unknown>;
 for (const key of Object.keys(OriginalText)) {
-  // @ts-ignore
-  if ((PatchedText as any)[key] === undefined) {
-    // @ts-ignore
-    (PatchedText as any)[key] = (OriginalText as any)[key];
+  if (patchedStatics[key] === undefined) {
+    patchedStatics[key] = originalStatics[key];
   }
 }
 

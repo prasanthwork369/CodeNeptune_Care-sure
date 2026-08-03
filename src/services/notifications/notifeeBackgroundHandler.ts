@@ -1,3 +1,4 @@
+import type { EventDetail } from "@notifee/react-native";
 import { isExpoGo } from "../../utils/environment";
 import { handleNotificationAction } from "./notificationActions";
 
@@ -23,7 +24,7 @@ if (!isExpoGo) {
       detail,
     }: {
       type: number;
-      detail: { notification?: any; pressAction?: { id: string } };
+      detail: EventDetail;
     }) => {
       if (type !== EventType.ACTION_PRESS) return;
       const actionId = detail.pressAction?.id;

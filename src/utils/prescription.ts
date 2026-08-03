@@ -108,11 +108,14 @@ export async function validatePrescriptionFile(
 ): Promise<PrescriptionItem | null> {
   const limitLabel = `${Math.round(maxSizeBytes / (1024 * 1024))} MB`;
   const uri = asset.uri;
-  const name =
-    (asset as any).name ??
-    (asset as any).fileName ??
-    uri.split("/").pop() ??
-    "file";
+  // The three asset unions spell the name/size fields differently; read both.
+  const raw = asset as {
+    name?: string;
+    fileName?: string | null;
+    size?: number | string | null;
+    fileSize?: number | string | null;
+  };
+  const name = raw.name ?? raw.fileName ?? uri.split("/").pop() ?? "file";
   const type =
     asset.mimeType ??
     (name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg");
@@ -123,7 +126,7 @@ export async function validatePrescriptionFile(
   }
 
   // Step 1: Fast reject via picker-reported size
-  let size = parseSize((asset as any).size ?? (asset as any).fileSize);
+  let size = parseSize(raw.size ?? raw.fileSize);
 
   // Performance optimization: If picker already says it's too big, reject immediately
   // to avoid the expensive copy/resolve operation.
@@ -212,7 +215,10 @@ export async function validatePrescriptionFile(
 }
 
 export async function capturePrescriptionImage(): Promise<string | null> {
-  let DocumentScanner: any = null;
+  // Optional native module — absent from some binaries, so it stays lazy-required.
+  let DocumentScanner: {
+    scanDocument: () => Promise<{ scannedImages?: string[] }>;
+  } | null = null;
   try {
     DocumentScanner = require("react-native-document-scanner-plugin").default;
   } catch {

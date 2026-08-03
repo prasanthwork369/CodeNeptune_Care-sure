@@ -1,3 +1,4 @@
+import type { ImageSource } from "expo-image";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { View, Text } from "react-native";
@@ -10,7 +11,7 @@ interface NotificationCardProps {
   date: string;
   amount: string;
   iconType: "plus" | "coin_group";
-  amountImage?: any;
+  amountImage?: ImageSource;
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({

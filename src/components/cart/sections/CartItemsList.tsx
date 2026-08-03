@@ -54,7 +54,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = React.memo(
                   router.push({
                     pathname: "/product/[id]",
                     params: { id: line.productId },
-                  } as any)
+                  })
                 }
               >
                 <View

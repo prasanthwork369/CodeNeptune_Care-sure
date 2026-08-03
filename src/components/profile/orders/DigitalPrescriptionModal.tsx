@@ -167,7 +167,7 @@ export const DigitalPrescriptionModal: React.FC<
       patientName: patientNameVal,
       diagnosis: "",
       doctorSignature: doctorSignature,
-      medicines: medicines.map((med: any) => ({
+      medicines: medicines.map((med) => ({
         name: med.name || "Unknown Medicine",
         description: med.instructions || "",
         quantity: String(med.quantity ?? 1),
@@ -322,7 +322,7 @@ export const DigitalPrescriptionModal: React.FC<
               flexWrap: "wrap",
             }}
           >
-            {prescriptions.map((p: any, idx: number) => {
+            {prescriptions.map((p, idx) => {
               const active = activePatientIdx === idx;
               const name =
                 p.patientName ?? p.patient?.name ?? `Patient ${idx + 1}`;

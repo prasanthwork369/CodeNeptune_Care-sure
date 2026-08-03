@@ -1,3 +1,4 @@
+import type { ImageSource } from "expo-image";
 import React, { useCallback } from "react";
 import { ActivityIndicator, View, Text, Animated } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -33,7 +34,7 @@ interface SearchRowProps {
       originalPrice: number;
       savings: number;
       description?: string;
-      image?: any;
+      image?: ImageSource | null;
       packSize?: string;
       unit?: string;
     };

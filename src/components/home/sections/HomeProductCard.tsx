@@ -97,7 +97,7 @@ export const HomeProductCard: React.FC<Props> = React.memo(
             )}
             {item.image ? (
               <Image
-                source={item.image as any}
+                source={item.image}
                 style={{ width: imageSize, height: imageSize }}
                 contentFit="contain"
               />

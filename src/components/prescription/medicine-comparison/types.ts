@@ -1,3 +1,4 @@
+import type { ImageSource } from "expo-image";
 export interface ComparisonMedicine {
   id: string;
   saltComposition: string;
@@ -5,7 +6,7 @@ export interface ComparisonMedicine {
     name: string;
     manufacturer: string;
     packSize: string;
-    image: any;
+    image: ImageSource | null;
     mrp: number;
   };
   recommended: {
@@ -15,7 +16,7 @@ export interface ComparisonMedicine {
     name: string;
     manufacturer: string;
     packSize: string;
-    image: any;
+    image: ImageSource | null;
     price: number;
     mrp: number;
     discountPercent: number;

@@ -1,3 +1,4 @@
+import type { CapturedAsset } from "@/src/features/prescription-scanner";
 import { asError } from "@/src/api/errors";
 import {
   deriveKeyFromUrl,
@@ -65,10 +66,13 @@ export function useSelectPatientImages(
   // Validates each picked asset, uploads it to storage, and appends the
   // resulting URL + a display item. Uses the uploaded URL as the item's
   // localUri so the thumbnail renders the hosted image.
+  // CapturedAsset covers the scanner's own minimal shape, which carries no
+  // picker metadata — validatePrescriptionFile already accepts all three.
   const addAssets = async (
     assets: (
       | DocumentPicker.DocumentPickerAsset
       | ImagePicker.ImagePickerAsset
+      | CapturedAsset
     )[],
   ) => {
     setIsAddingImage(true);
@@ -156,7 +160,7 @@ export function useSelectPatientImages(
           fileName: filename,
           mimeType: "image/jpeg",
         };
-        await addAssets([asset as any]);
+        await addAssets([asset]);
       }
     } catch {
       Alert.alert("Error", "Failed to take photo. Please try again.");

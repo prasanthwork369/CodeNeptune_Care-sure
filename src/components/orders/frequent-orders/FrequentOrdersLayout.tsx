@@ -1,3 +1,4 @@
+import type { FrequentOrderItem } from "@/src/api/order.api";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -23,45 +24,34 @@ export const FrequentOrdersLayout: React.FC = () => {
   const displayProducts = frequentlyOrdered;
 
   const categories: string[] = useMemo(() => {
-    const cats = displayProducts
-      .map((p: any) => {
-        if (!p.category) return "";
-        if (typeof p.category === "object") {
-          return p.category.name ?? p.category.title ?? "";
-        }
-        return String(p.category).trim();
-      })
-      .filter(Boolean);
+    const cats = displayProducts.map((p) => p.category.trim()).filter(Boolean);
     const unique = Array.from(new Set<string>(cats));
     return unique.length > 0 ? ["All", ...unique] : [];
   }, [displayProducts]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return displayProducts.filter((p: any) => {
+    return displayProducts.filter((p) => {
       const matchSearch =
         !q ||
         p.name?.toLowerCase().includes(q) ||
         p.brand?.toLowerCase().includes(q);
-      const pCat = !p.category
-        ? ""
-        : typeof p.category === "object"
-          ? (p.category.name ?? p.category.title ?? "")
-          : String(p.category).trim();
+      const pCat = p.category.trim();
       const matchFilter = activeFilter === "All" || pCat === activeFilter;
       return matchSearch && matchFilter;
     });
   }, [displayProducts, search, activeFilter]);
 
   const renderProduct = useCallback(
-    ({ item, index }: { item: any; index: number }) => (
+    ({ item, index }: { item: FrequentOrderItem; index: number }) => (
       <ProductCard item={item} index={index} />
     ),
     [],
   );
 
   const keyExtractor = useCallback(
-    (item: any, index: number) => `${item.productId ?? item.id}-${index}`,
+    (item: FrequentOrderItem, index: number) =>
+      `${item.productId ?? item.id}-${index}`,
     [],
   );
 

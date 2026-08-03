@@ -1,3 +1,4 @@
+import type { Coupon } from "@/src/types/cart";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
@@ -12,7 +13,7 @@ import React, { useState } from "react";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
 
-const EMPTY_COUPONS: any[] = [];
+const EMPTY_COUPONS: Coupon[] = [];
 
 // One skeleton card: 115 body + 12 bottom margin
 const SKELETON_CARD_HEIGHT = 127;

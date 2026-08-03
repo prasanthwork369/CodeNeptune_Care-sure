@@ -80,7 +80,7 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
     return (
       <View
         className="bg-white border-r border-[#919EAB33]"
-        style={{ width } as any}
+        style={{ width }}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}

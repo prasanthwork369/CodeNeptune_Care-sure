@@ -1,10 +1,15 @@
-import { categoryApi } from "@/src/api/category.api";
+import {
+  categoryApi,
+  type ApiFeaturedSubcategory,
+} from "@/src/api/category.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 export const useFeaturedSubcategories = () => {
-  const cachedSub = apiCache.getWithMeta<any[]>("featured_subcategories");
+  const cachedSub = apiCache.getWithMeta<ApiFeaturedSubcategory[]>(
+    "featured_subcategories",
+  );
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CATALOG.FEATURED_SUBCATEGORIES,

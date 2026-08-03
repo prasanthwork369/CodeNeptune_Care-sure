@@ -1,15 +1,11 @@
+import type { OrderListParams } from "@/src/api/order.api";
 import { useQuery } from "@tanstack/react-query";
 import { orderService } from "../../services/order.service";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
 import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 
-interface UseOrdersParams {
-  page?: number;
-  limit?: number;
-  status?: string;
-  [key: string]: any;
-}
+type UseOrdersParams = OrderListParams;
 
 export const useOrders = (params: UseOrdersParams = {}) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -40,7 +36,10 @@ export function useFrequentlyOrdered(
   params: { page?: number; limit?: number } = {},
 ) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const cachedFreq = apiCache.getWithMeta<any[]>("frequently_ordered");
+  const cachedFreq =
+    apiCache.getWithMeta<
+      Awaited<ReturnType<typeof orderService.getFrequentlyOrdered>>
+    >("frequently_ordered");
 
   return useQuery({
     queryKey: ["frequently-ordered", params],

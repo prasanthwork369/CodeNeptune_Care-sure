@@ -14,6 +14,8 @@ export interface CustomerProfile {
   isCorporateUser?: boolean;
   isEmailVerified?: boolean;
   isPhoneVerified?: boolean;
+  createdAt?: string; // drives the "member since" year on the profile card
+  updatedAt?: string;
 }
 
 export interface UpdateProfilePayload {

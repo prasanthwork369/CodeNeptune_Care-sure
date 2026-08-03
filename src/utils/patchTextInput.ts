@@ -47,20 +47,17 @@ const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
 PatchedTextInput.displayName = "TextInput";
 
 // Preserve original statics for React Native and library compatibility.
+const patchedStatics = PatchedTextInput as unknown as Record<string, unknown>;
+const originalStatics = OriginalTextInput as unknown as Record<string, unknown>;
 for (const key of Object.keys(OriginalTextInput)) {
-  // @ts-ignore
-  if ((PatchedTextInput as any)[key] === undefined) {
-    // @ts-ignore
-    (PatchedTextInput as any)[key] = (OriginalTextInput as any)[key];
+  if (patchedStatics[key] === undefined) {
+    patchedStatics[key] = originalStatics[key];
   }
 }
 
 // State may be non-enumerable, so preserve it explicitly.
-// @ts-ignore
-if ((PatchedTextInput as any).State === undefined) {
-  // @ts-ignore
-  (PatchedTextInput as any).State =
-    (OriginalTextInput as any).State ?? TextInputState;
+if (patchedStatics.State === undefined) {
+  patchedStatics.State = originalStatics.State ?? TextInputState;
 }
 
 try {

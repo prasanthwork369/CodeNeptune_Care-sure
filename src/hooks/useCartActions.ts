@@ -1,3 +1,4 @@
+import type { ImageSource } from "expo-image";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
@@ -23,7 +24,7 @@ export interface CartActionProduct {
   price: number;
   originalPrice?: number;
   discountPercent?: number;
-  image?: any;
+  image?: ImageSource | string | null;
   packSize?: string; // e.g. "50 ml" — stored in metadata for web cart display
   unit?: string; // e.g. "ml"
   manufacturer?: string;

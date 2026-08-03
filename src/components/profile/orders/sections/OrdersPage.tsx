@@ -19,9 +19,9 @@ interface OrdersPageProps {
   width: number;
   // Cart comes from the parent so all pages share one subscription.
   cartItemsRef: React.RefObject<CartItem[]>;
-  addItem: (input: AddToCartInput) => Promise<any>;
-  updateItem: (itemId: string, input: UpdateCartItemInput) => Promise<any>;
-  clearCart: () => Promise<any>;
+  addItem: (input: AddToCartInput) => Promise<unknown>;
+  updateItem: (itemId: string, input: UpdateCartItemInput) => Promise<unknown>;
+  clearCart: () => Promise<unknown>;
 }
 
 // One pager page. Each holds its own query, which react-query already caches

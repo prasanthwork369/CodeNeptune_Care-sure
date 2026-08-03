@@ -1,3 +1,4 @@
+import type { ApiPrescription } from "@/src/types/prescription";
 import { RxOrdersSkeleton } from "@/src/components/profile/orders/PrescriptionSkeleton";
 import {
   Prescription,
@@ -29,7 +30,7 @@ export const RxOrdersLayout: React.FC = () => {
     });
   };
 
-  const mapItem = (item: any): Prescription => ({
+  const mapItem = (item: ApiPrescription): Prescription => ({
     id: item.id,
     rxId: item.prescriptionOrderId ?? `#${item.id}`,
     prescriptionOrderId: item.prescriptionOrderId ?? null,

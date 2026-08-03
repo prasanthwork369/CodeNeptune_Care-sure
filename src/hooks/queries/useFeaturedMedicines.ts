@@ -1,3 +1,4 @@
+import type { ApiFeaturedMedicine } from "@/src/api/medicine.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { medicineApi } from "../../api/medicine.api";
@@ -7,7 +8,7 @@ import { resolveAssetUrl } from "../../utils/urls";
 import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 // Shared by the home row and the full listing so both show identical pricing.
-export const mapFeaturedMedicine = (med: any): Product => {
+export const mapFeaturedMedicine = (med: ApiFeaturedMedicine): Product => {
   const price = parseFloat(med.price);
   const discountPct = parseFloat(med.discountPercentage);
   const originalPrice =
@@ -66,7 +67,8 @@ export const mapFeaturedMedicine = (med: any): Product => {
 };
 
 export const useFeaturedMedicines = () => {
-  const cachedMed = apiCache.getWithMeta<any[]>("featured_medicines");
+  const cachedMed =
+    apiCache.getWithMeta<ApiFeaturedMedicine[]>("featured_medicines");
 
   const {
     data: medicines = [],

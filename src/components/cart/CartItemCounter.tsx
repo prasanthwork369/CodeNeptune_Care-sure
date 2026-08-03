@@ -6,8 +6,8 @@ import { COUNTER_BTN, COUNTER_W, cartStyles as s } from "./cart.styles";
 
 interface CartItemCounterProps {
   item: { id: string; qty: number };
-  updateItem: (itemId: string, input: { quantity: number }) => Promise<any>;
-  removeItem: (itemId: string) => Promise<any>;
+  updateItem: (itemId: string, input: { quantity: number }) => Promise<unknown>;
+  removeItem: (itemId: string) => Promise<unknown>;
 }
 
 export const CartItemCounter: React.FC<CartItemCounterProps> = ({

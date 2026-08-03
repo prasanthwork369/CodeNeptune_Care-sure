@@ -21,7 +21,9 @@ import { RawScanOutput } from "./types";
  * TurboModuleRegistry.getEnforcing() never throws on iOS new-arch builds
  * where the native binary does not include the scanner module.
  */
-function loadDocumentScanner(): any | null {
+function loadDocumentScanner(): {
+  scanDocument: (opts?: object) => Promise<{ scannedImages?: string[] }>;
+} | null {
   // NativeModules check prevents TurboModuleRegistry from throwing synchronously
   if (!NativeModules.DocumentScanner) return null;
   try {

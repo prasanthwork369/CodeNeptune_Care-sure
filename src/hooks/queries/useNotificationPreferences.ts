@@ -1,3 +1,4 @@
+import type { CustomerNotificationPreferences } from "@/src/api/notification-preferences.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   notificationPreferencesApi,
@@ -22,16 +23,16 @@ export const useNotificationPreferences = () => {
     mutationFn: (payload: UpdateNotificationPreferencesInput) =>
       notificationPreferencesApi.updatePreferences(payload),
     onMutate: async (payload) => {
-      const previous = queryClient.getQueryData(
+      const previous = queryClient.getQueryData<CustomerNotificationPreferences>(
         QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,
       );
       queryClient.setQueryData(
         QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,
-        (old: any) => ({ ...old, ...payload }),
+        (old?: CustomerNotificationPreferences) => ({ ...old, ...payload }),
       );
       return { previous };
     },
-    onError: (_err, _payload, context: any) => {
+    onError: (_err, _payload, context) => {
       if (context?.previous)
         queryClient.setQueryData(
           QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,

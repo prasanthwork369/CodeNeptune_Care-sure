@@ -1,3 +1,4 @@
+import type { ImageSource } from "expo-image";
 import React from "react";
 import { ConfirmModal } from "@/src/components/ui/ConfirmModal";
 
@@ -10,7 +11,7 @@ interface RemoveConfirmModalProps {
   message?: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  icon?: any;
+  icon?: ImageSource;
   iconBg?: string;
   confirmBg?: string;
 }

@@ -1,5 +1,7 @@
 import { isExpoGo } from "../../../utils/environment";
 import { PerfTraceName, TraceAttributes, TraceMetrics } from "./types";
+// Type-only, so the native module is still lazy-required below.
+import type { PerformanceTrace } from "@react-native-firebase/perf";
 import { logger } from "@/src/utils/logger";
 
 /**
@@ -51,12 +53,14 @@ class PerformanceService {
   ) {
     if (session.stopping || !session.trace) return;
     session.stopping = true;
+    // Captured once, so the callbacks below close over a stable non-null trace.
+    const trace = session.trace;
 
     try {
       if (additionalAttributes) {
         Object.entries(additionalAttributes).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
-            session.trace.putAttribute(key, String(value));
+            trace.putAttribute(key, String(value));
           }
         });
       }
@@ -64,12 +68,12 @@ class PerformanceService {
       if (additionalMetrics) {
         Object.entries(additionalMetrics).forEach(([key, value]) => {
           if (typeof value === "number" && !Number.isNaN(value)) {
-            session.trace.putMetric(key, value);
+            trace.putMetric(key, value);
           }
         });
       }
 
-      await session.trace.stop();
+      await trace.stop();
     } catch (err) {
       if (__DEV__)
         console.warn(`[PerfService] Stop trace error (${traceName}):`, err);
@@ -239,7 +243,7 @@ class PerformanceService {
 }
 
 type TraceSession = {
-  trace: any | null;
+  trace: PerformanceTrace | null;
   stopping: boolean;
   stopRequested: boolean;
   stopAttributes?: TraceAttributes;

@@ -23,7 +23,7 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 export function useSystemTemplate(
   event: string,
   channel = "DOCUMENT",
-  variables?: Record<string, any>,
+  variables?: Record<string, unknown>,
   enabled = true,
 ) {
   return useQuery({

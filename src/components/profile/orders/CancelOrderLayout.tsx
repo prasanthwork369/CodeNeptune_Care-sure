@@ -1,3 +1,4 @@
+import type { CancellationReason } from "@/src/services/cancellation-reason.service";
 import { orderApi } from "@/src/api/order.api";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
@@ -29,13 +30,24 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const OTHER_OPTION = "__other__";
 
+// A backend reason, or the synthetic "Other" row — which carries a string id
+// instead of the numeric ones the backend returns.
+type DisplayReason =
+  | CancellationReason
+  | {
+      id: typeof OTHER_OPTION;
+      label: string;
+      description: string;
+      image_url?: null;
+    };
+
 export function CancelOrderLayout() {
   const router = useNav();
   const queryClient = useQueryClient();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const bottomInset = useAdjustedBottomInset();
   const insets = useSafeAreaInsets();
-  const scrollRef = useRef<any>(null);
+  const scrollRef = useRef<React.ComponentRef<typeof KeyboardAwareScrollView>>(null);
 
   const { order, loading: orderLoading } = useOrderById(orderId);
   const { data: reasons = [], isLoading: reasonsLoading } =
@@ -240,18 +252,16 @@ export function CancelOrderLayout() {
             ) : (
               <View style={{ width: "100%" }}>
                 {(() => {
-                  const hasOther = reasons.some(
-                    (r) =>
-                      r.label.toLowerCase().includes("other") ||
-                      (r.id as any) === OTHER_OPTION,
+                  const hasOther = reasons.some((r) =>
+                    r.label.toLowerCase().includes("other"),
                   );
-                  const displayReasons = [...reasons];
+                  const displayReasons: DisplayReason[] = [...reasons];
                   if (!hasOther) {
                     displayReasons.push({
                       id: OTHER_OPTION,
                       label: "Other Reason",
                       description: "Something else",
-                    } as any);
+                    });
                   }
 
                   return (

@@ -59,7 +59,7 @@ export function ItemsOrderedSection({
                 router.push({
                   pathname: "/profile/orders/return",
                   params: { orderId },
-                } as any)
+                })
               }
             >
               <icons.return_pack
@@ -94,7 +94,7 @@ export function ItemsOrderedSection({
                 router.push({
                   pathname: "/profile/orders/cancel",
                   params: { orderId },
-                } as any)
+                })
               }
               disabled={isCancelling}
             >
@@ -129,7 +129,7 @@ export function ItemsOrderedSection({
                   router.push({
                     pathname: "/product/[id]",
                     params: { id: productId },
-                  } as any);
+                  });
               }}
               className="flex-row"
               style={{

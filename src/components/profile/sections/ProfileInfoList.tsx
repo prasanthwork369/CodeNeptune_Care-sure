@@ -26,11 +26,11 @@ export const ProfileInfoList: React.FC<ProfileInfoListProps> = ({
       </Text>
       <View className="bg-white rounded-xl overflow-hidden border border-[#919EAB33]">
         {INFO_ITEMS.map((item, index) => {
-          const Icon = (icons as any)[item.icon];
+          const Icon = icons[item.icon];
           return (
             <View key={item.label}>
               <Touchable
-                onPress={() => router.push(item.route as any)}
+                onPress={() => router.push(item.route)}
                 activeOpacity={0.6}
                 className="flex-row items-center px-4 py-[15px]"
               >

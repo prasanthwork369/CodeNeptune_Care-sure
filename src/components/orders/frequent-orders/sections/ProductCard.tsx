@@ -1,3 +1,4 @@
+import type { FrequentOrderItem } from "@/src/api/order.api";
 import { asError } from "@/src/api/errors";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -34,7 +35,7 @@ export function ProductCard({
   index,
   variant = "cartCounter",
 }: {
-  item: any;
+  item: FrequentOrderItem;
   index: number;
   variant?: ProductCardVariant;
 }) {
@@ -45,10 +46,10 @@ export function ProductCard({
   const [manualQty, setManualQty] = useState(1);
 
   const productId = item.productId || item.id;
-  const historyQty = item.lastQty ?? item.qty ?? 1;
+  const historyQty = item.lastQty ?? 1;
   const qty = isStepperVariant ? manualQty : historyQty;
   const cartItem = cartItems.find(
-    (c: any) =>
+    (c) =>
       c.medicineId === productId ||
       c.metadata?.productId === productId ||
       c.medicineId === item.id ||
@@ -71,7 +72,7 @@ export function ProductCard({
     setIsAdding(true);
     try {
       const existing = cartItems.find(
-        (c: any) =>
+        (c) =>
           c.medicineId === productId || c.metadata?.productId === productId,
       );
       if (existing) {
@@ -96,11 +97,11 @@ export function ProductCard({
           : String(item.name ?? item.productId ?? item.id ?? "").trim() ||
             itemId;
         const price =
-          Number(item.price ?? item.originalPrice ?? item.mrp ?? 0) ||
-          Number(item.originalPrice ?? item.price ?? item.mrp ?? 0) ||
+          Number(item.price ?? item.originalPrice ?? 0) ||
+          Number(item.originalPrice ?? item.price ?? 0) ||
           1;
 
-        const mrp = Number(item.originalPrice ?? item.mrp ?? price);
+        const mrp = Number(item.originalPrice ?? price);
         const imageUri =
           item.image?.uri ??
           (typeof item.image === "string" ? item.image : undefined);
@@ -149,7 +150,7 @@ export function ProductCard({
     }
   };
 
-  const brandLine = [item.brand, item.description || item.form]
+  const brandLine = [item.brand, item.description]
     .filter(Boolean)
     .join(" • ");
 
@@ -330,7 +331,7 @@ export function ProductCard({
                   {item.brand}
                 </Text>
               )}
-              {!!(item.description || item.form) && (
+              {!!item.description && (
                 <Text
                   style={{
                     fontSize: smallFontSize,
@@ -341,7 +342,7 @@ export function ProductCard({
                   }}
                   numberOfLines={1}
                 >
-                  {item.description || item.form}
+                  {item.description}
                 </Text>
               )}
             </>

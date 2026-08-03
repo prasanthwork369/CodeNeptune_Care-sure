@@ -1,10 +1,11 @@
 import React, { useCallback, useRef } from "react";
-// eslint-disable-next-line no-restricted-imports
+/* eslint-disable no-restricted-imports -- this file IS the wrapper the rule points at */
 import {
   GestureResponderEvent,
   TouchableOpacity,
   TouchableOpacityProps,
 } from "react-native";
+/* eslint-enable no-restricted-imports */
 
 interface TouchableProps extends TouchableOpacityProps {
   throttleMs?: number;

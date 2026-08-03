@@ -382,7 +382,7 @@ export const AddPatientLayout: React.FC = () => {
                     gap: 5,
                   }}
                 >
-                  {React.cloneElement(icon as React.ReactElement<any>, {
+                  {React.cloneElement(icon as React.ReactElement<{ color?: string }>, {
                     color: sel ? "#0F7635" : "#919EAB",
                   })}
                   <Text

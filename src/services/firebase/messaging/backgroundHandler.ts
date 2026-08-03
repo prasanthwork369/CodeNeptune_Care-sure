@@ -1,5 +1,7 @@
 import { isExpoGo } from "../../../utils/environment";
 import { logger } from "@/src/utils/logger";
+// Type-only, so it never pulls the native module into the Expo Go bundle.
+import type { FirebaseMessagingTypes } from "@react-native-firebase/messaging";
 
 /**
  * Registers the Firebase background/quit-state message handler.
@@ -19,21 +21,25 @@ import { logger } from "@/src/utils/logger";
  */
 if (!isExpoGo) {
   const messaging = require("@react-native-firebase/messaging").default;
-  messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
-    if (__DEV__)
-      logger.debug("[BackgroundMessage]", JSON.stringify(remoteMessage));
-    if (!remoteMessage?.notification) {
-      // Marketing product offers get the custom RemoteViews layout; anything
-      // else (or a native failure) falls through to the branded notification.
-      const {
-        showProductOffer,
-      } = require("../../notifications/productOfferNotification");
-      const shown = await showProductOffer(remoteMessage?.data).catch(
-        () => false,
-      );
-      if (shown) return;
-      const { notifeeService } = require("../../notifications/notifeeService");
-      await notifeeService.displayBranded(remoteMessage).catch(() => {});
-    }
-  });
+  messaging().setBackgroundMessageHandler(
+    async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+      if (__DEV__)
+        logger.debug("[BackgroundMessage]", JSON.stringify(remoteMessage));
+      if (!remoteMessage?.notification) {
+        // Marketing product offers get the custom RemoteViews layout; anything
+        // else (or a native failure) falls through to the branded notification.
+        const {
+          showProductOffer,
+        } = require("../../notifications/productOfferNotification");
+        const shown = await showProductOffer(remoteMessage?.data).catch(
+          () => false,
+        );
+        if (shown) return;
+        const {
+          notifeeService,
+        } = require("../../notifications/notifeeService");
+        await notifeeService.displayBranded(remoteMessage).catch(() => {});
+      }
+    },
+  );
 }

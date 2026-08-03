@@ -1,8 +1,9 @@
 import NetInfo from "@react-native-community/netinfo";
+import type { AxiosInstance } from "axios";
 import { useNetworkStore } from "../store/useNetworkStore";
 import { requestQueue } from "./requestQueue";
 
-export const initNetworkListener = (axiosInstance: any) => {
+export const initNetworkListener = (axiosInstance: AxiosInstance) => {
   requestQueue.loadFromStorage();
 
   return NetInfo.addEventListener((state) => {

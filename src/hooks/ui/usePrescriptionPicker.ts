@@ -105,7 +105,7 @@ export function usePrescriptionPicker(
     pickPdf: _pickPdf,
   } = usePrescriptionUploadService({
     onAssetsReady: async (assets) => {
-      const validated = await processAssets(assets as any);
+      const validated = await processAssets(assets);
       if (validated.length > 0) navigate(validated);
     },
     onError: (msg) => showErr("Error", msg),

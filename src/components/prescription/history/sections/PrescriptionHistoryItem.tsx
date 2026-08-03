@@ -8,24 +8,21 @@ import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { PrescriptionRejectedModal } from "./PrescriptionRejectedModal";
 
-const resolveImageSource = (image: any) => {
-  if (typeof image === "string") return { uri: image };
-  if (Array.isArray(image) && image.length > 0) return { uri: image[0] };
-  return image;
+// Normally the page-URL array, but older records can carry a bare string.
+type HistoryImage = string[] | string | null | undefined;
+
+const firstUrl = (image: HistoryImage): string | undefined =>
+  (typeof image === "string" ? image : image?.[0]) || undefined;
+
+const resolveImageSource = (image: HistoryImage) => {
+  const uri = firstUrl(image);
+  return uri ? { uri } : undefined;
 };
 
-const isPdf = (image: any): boolean => {
-  if (typeof image === "string") return image.toLowerCase().endsWith(".pdf");
-  if (Array.isArray(image) && image.length > 0)
-    return image[0].toLowerCase().endsWith(".pdf");
-  return false;
-};
+const isPdf = (image: HistoryImage): boolean =>
+  firstUrl(image)?.toLowerCase().endsWith(".pdf") ?? false;
 
-const hasImage = (image: any): boolean => {
-  if (typeof image === "string") return image.length > 0;
-  if (Array.isArray(image)) return image.length > 0;
-  return false;
-};
+const hasImage = (image: HistoryImage): boolean => !!firstUrl(image);
 
 const STATUS_CONFIG = {
   Verified: {

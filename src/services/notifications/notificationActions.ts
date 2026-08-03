@@ -18,7 +18,7 @@ const getNotifee = () => require("@notifee/react-native");
 export async function handleNotificationAction(
   actionId: string,
   notificationId?: string,
-  data?: Record<string, any>,
+  data?: { phone?: string } & Record<string, unknown>,
 ): Promise<void> {
   switch (actionId) {
     case NOTIFICATION_ACTIONS.CALL:
