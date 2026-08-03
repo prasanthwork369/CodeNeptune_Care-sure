@@ -60,6 +60,7 @@ export const CategoriesLayout: React.FC = () => {
         />
 
         <CategoriesGrid
+          key={activeTabId}
           cards={activeCards}
           cardWidth={cardWidth}
           cardHeight={cardHeight}

@@ -6,6 +6,7 @@ import { ProductSkeleton } from "@/src/components/product/ProductSkeleton";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
+import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import {
@@ -22,12 +23,13 @@ import { ScrollView, Text, View } from "react-native";
 import {
   KnowYourMedicine,
   LogisticsBar,
-  MoreAboutSection,
   NoSubstituteBanner,
   ProductDetailsFooter,
   ProductDetailsHeader,
   ProductInfo,
   SaltCompositionBanner,
+  ScrollableMoreAboutContent,
+  StickyMoreAboutTabs,
   TrustBadge,
 } from "./sections";
 
@@ -129,6 +131,10 @@ export const ProductDetailsLayout: React.FC = () => {
 
   const manufacturer = raw?.manufacturer?.name ?? raw?.brand?.name ?? "";
   const medicineName = raw?.name ?? "";
+  const moreAboutNavigation = useMoreAboutScrollNavigation(
+    raw?.additionalData,
+    mainScrollRef,
+  );
 
   const recPackSize = raw?.recommendation?.packSize
     ? parseInt(String(raw.recommendation.packSize).match(/\d+/)?.[0] ?? "1")
@@ -193,55 +199,64 @@ export const ProductDetailsLayout: React.FC = () => {
               </Text>
             </View>
           ) : (
-            <ScrollView
-              ref={mainScrollRef}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
-              style={{ flex: 1 }}
-              bounces={false}
-              overScrollMode="never"
-            >
-              {saltComposition && (
-                <SaltCompositionBanner composition={saltComposition} />
-              )}
+            <View style={{ flex: 1 }}>
+              <ScrollView
+                ref={mainScrollRef}
+                nestedScrollEnabled
+                onScroll={moreAboutNavigation.handleScroll}
+                onScrollBeginDrag={moreAboutNavigation.handleScrollBeginDrag}
+                scrollEventThrottle={16}
+                removeClippedSubviews={false}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
+                style={{ flex: 1 }}
+                bounces={false}
+                overScrollMode="never"
+              >
+                <View>
+                  {saltComposition && (
+                    <SaltCompositionBanner composition={saltComposition} />
+                  )}
 
-              <ProductInfo
-                productId={id}
-                medicineUuid={medicineId}
-                product={activeProduct!}
-                variants={variants}
-                selectedVariantId={selectedVariantId}
-                onVariantSelect={setSelectedVariantId}
-              />
+                  <ProductInfo
+                    productId={id}
+                    medicineUuid={medicineId}
+                    product={activeProduct!}
+                    variants={variants}
+                    selectedVariantId={selectedVariantId}
+                    onVariantSelect={setSelectedVariantId}
+                  />
 
-              <LogisticsBar
-                onChangeLocation={() => setLocationSheetVisible(true)}
-              />
+                  <LogisticsBar
+                    onChangeLocation={() => setLocationSheetVisible(true)}
+                  />
 
-              {recommendation && (
-                <TrustBadge
-                  searchedName={product.name}
-                  recommendedName={recommendation?.name}
-                  searchedManufacturer={product.manufacturer}
-                  recommendedManufacturer={recommendation?.manufacturer}
-                  searchedUnitPrice={product.unitPriceDisplay}
-                  recommendedUnitPrice={recUnitPrice}
+                  {recommendation && (
+                    <TrustBadge
+                      searchedName={product.name}
+                      recommendedName={recommendation?.name}
+                      searchedManufacturer={product.manufacturer}
+                      recommendedManufacturer={recommendation?.manufacturer}
+                      searchedUnitPrice={product.unitPriceDisplay}
+                      recommendedUnitPrice={recUnitPrice}
+                    />
+                  )}
+
+                  <KnowYourMedicine manufacturer={manufacturer} />
+
+                  <WhyFamiliesTrustUs
+                    promise={appContent?.promise}
+                    isLoading={isHomeLoading}
+                    showTitle={false}
+                  />
+                </View>
+                <ScrollableMoreAboutContent
+                  medicineName={medicineName}
+                  navigation={moreAboutNavigation}
                 />
-              )}
-
-              <KnowYourMedicine manufacturer={manufacturer} />
-
-              <WhyFamiliesTrustUs
-                promise={appContent?.promise}
-                isLoading={isHomeLoading}
-                showTitle={false}
-              />
-
-              <MoreAboutSection
-                medicineName={medicineName}
-                additionalData={raw?.additionalData}
-              />
-            </ScrollView>
+              </ScrollView>
+              <StickyMoreAboutTabs navigation={moreAboutNavigation} />
+            </View>
           )}
 
           {activeProduct &&

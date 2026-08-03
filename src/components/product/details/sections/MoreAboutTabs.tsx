@@ -36,10 +36,18 @@ export const MoreAboutTabs: React.FC<MoreAboutTabsProps> = ({
   }));
 
   return (
-    <View className="mx-4 overflow-hidden rounded-t-[12px] bg-white">
+    <View
+      className="mx-4 overflow-hidden rounded-t-[12px] bg-white"
+      style={{ zIndex: 21 }}
+    >
       <ScrollView
         ref={tabsScrollRef}
         horizontal
+        nestedScrollEnabled
+        directionalLockEnabled
+        scrollEnabled
+        canCancelContentTouches={false}
+        keyboardShouldPersistTaps="always"
         showsHorizontalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
@@ -57,6 +65,7 @@ export const MoreAboutTabs: React.FC<MoreAboutTabsProps> = ({
                 <Touchable
                   key={section.id}
                   onPress={() => onTabPress(section.id)}
+                  throttleMs={0}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: isActive }}
                   activeOpacity={0.8}

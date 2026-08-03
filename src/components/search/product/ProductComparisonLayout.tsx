@@ -7,6 +7,8 @@ import {
   LogisticsBar,
   ProductDetailsFooter,
   SaltCompositionBanner,
+  ScrollableMoreAboutContent,
+  StickyMoreAboutTabs,
   TrustBadge,
 } from "@/src/components/product/details/sections";
 import { ProductHeader } from "@/src/components/search/product/ProductHeader";
@@ -14,6 +16,7 @@ import { useProductHeroAnimation } from "@/src/hooks/animations/useProductHeroAn
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
+import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
@@ -23,11 +26,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
-import {
-  ComparisonBoard,
-  MoreAboutSection,
-  ProductDetailsSkeleton,
-} from "./sections";
+import { ComparisonBoard, ProductDetailsSkeleton } from "./sections";
 
 interface ProductComparisonLayoutProps {
   id: string;
@@ -104,6 +103,10 @@ export const ProductComparisonLayout: React.FC<
 
   const manufacturer = raw?.manufacturer?.name ?? product?.manufacturer ?? "";
   const medicineName = raw?.name ?? "";
+  const moreAboutNavigation = useMoreAboutScrollNavigation(
+    raw?.additionalData,
+    mainScrollRef,
+  );
 
   const recPackSize = raw?.recommendation?.packSize
     ? parseInt(String(raw.recommendation.packSize).match(/\d+/)?.[0] ?? "1")
@@ -176,61 +179,69 @@ export const ProductComparisonLayout: React.FC<
                 </Text>
               </View>
             ) : (
-              <ScrollView
-                ref={mainScrollRef}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingBottom: isRecommendedInCart
-                    ? adjustedBottom + 100
-                    : adjustedBottom + 24,
-                }}
-                style={{ flex: 1 }}
-                bounces={false}
-                overScrollMode="never"
-              >
-                {saltComposition && (
-                  <SaltCompositionBanner composition={saltComposition} />
-                )}
+              <View style={{ flex: 1 }}>
+                <ScrollView
+                  ref={mainScrollRef}
+                  nestedScrollEnabled
+                  onScroll={moreAboutNavigation.handleScroll}
+                  onScrollBeginDrag={moreAboutNavigation.handleScrollBeginDrag}
+                  scrollEventThrottle={16}
+                  removeClippedSubviews={false}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingBottom: isRecommendedInCart
+                      ? adjustedBottom + 100
+                      : adjustedBottom + 24,
+                  }}
+                  style={{ flex: 1 }}
+                  bounces={false}
+                  overScrollMode="never"
+                >
+                  {saltComposition && (
+                    <SaltCompositionBanner composition={saltComposition} />
+                  )}
 
-                <ComparisonBoard
-                  searched={searched}
-                  recommended={recommended}
-                  productId={recommendation?.productId ?? id}
-                  medicineUuid={recommendation?.id ?? raw?.id}
-                  slug={recommendation?.slug ?? raw?.slug}
-                  requiresPrescription={raw?.requiresPrescription}
-                />
-
-                <LogisticsBar
-                  pincode={storePincode ?? undefined}
-                  onChangeLocation={() => setLocationSheetVisible(true)}
-                />
-
-                {recommendation && (
-                  <TrustBadge
-                    searchedName={searched.name}
-                    recommendedName={recommended.name}
-                    searchedManufacturer={searched.manufacturer}
-                    recommendedManufacturer={recommended.manufacturer}
-                    searchedUnitPrice={searched.unitPriceDisplay}
-                    recommendedUnitPrice={recUnitPrice}
+                  <ComparisonBoard
+                    searched={searched}
+                    recommended={recommended}
+                    productId={recommendation?.productId ?? id}
+                    medicineUuid={recommendation?.id ?? raw?.id}
+                    slug={recommendation?.slug ?? raw?.slug}
+                    requiresPrescription={raw?.requiresPrescription}
                   />
-                )}
 
-                <KnowYourMedicine manufacturer={manufacturer} />
-                <View style={{ backgroundColor: "#FFFFFF" }}>
-                  <WhyFamiliesTrustUs
-                    promise={appContent?.promise}
-                    isLoading={isHomeLoading}
-                    showTitle={false}
+                  <LogisticsBar
+                    pincode={storePincode ?? undefined}
+                    onChangeLocation={() => setLocationSheetVisible(true)}
                   />
-                </View>
 
-                <MoreAboutSection
-                  medicineName={medicineName}
-                  additionalData={raw?.additionalData}
-                />
-              </ScrollView>
+                  {recommendation && (
+                    <TrustBadge
+                      searchedName={searched.name}
+                      recommendedName={recommended.name}
+                      searchedManufacturer={searched.manufacturer}
+                      recommendedManufacturer={recommended.manufacturer}
+                      searchedUnitPrice={searched.unitPriceDisplay}
+                      recommendedUnitPrice={recUnitPrice}
+                    />
+                  )}
+
+                  <KnowYourMedicine manufacturer={manufacturer} />
+                  <View style={{ backgroundColor: "#FFFFFF" }}>
+                    <WhyFamiliesTrustUs
+                      promise={appContent?.promise}
+                      isLoading={isHomeLoading}
+                      showTitle={false}
+                    />
+                  </View>
+
+                  <ScrollableMoreAboutContent
+                    medicineName={medicineName}
+                    navigation={moreAboutNavigation}
+                  />
+                </ScrollView>
+                <StickyMoreAboutTabs navigation={moreAboutNavigation} />
+              </View>
             )}
 
             {recommended && (

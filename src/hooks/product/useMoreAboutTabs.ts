@@ -48,22 +48,37 @@ export const useMoreAboutTabs = (
     }, delay);
   };
 
-  const handleTabPress = (tabId: string) => {
+  const activateTab = (
+    tabId: string,
+    indicatorDuration: number,
+    centreDelay: number,
+  ) => {
     const layout = tabLayouts.current[tabId];
     if (layout) {
-      indicatorX.value = withTiming(layout.x, {
-        duration: 250,
-        easing: Easing.out(Easing.quad),
-      });
-      indicatorWidth.value = withTiming(layout.width, {
-        duration: 250,
-        easing: Easing.out(Easing.quad),
-      });
-      centreTab(layout.x, layout.width, 50);
+      if (indicatorDuration === 0) {
+        indicatorX.value = layout.x;
+        indicatorWidth.value = layout.width;
+      } else {
+        indicatorX.value = withTiming(layout.x, {
+          duration: indicatorDuration,
+          easing: Easing.out(Easing.quad),
+        });
+        indicatorWidth.value = withTiming(layout.width, {
+          duration: indicatorDuration,
+          easing: Easing.out(Easing.quad),
+        });
+      }
+      centreTab(layout.x, layout.width, centreDelay);
     }
 
     setSelectedTabId(tabId);
   };
+
+  const handleTabPress = (tabId: string) => activateTab(tabId, 250, 50);
+  // During a fast vertical fling several sections can be crossed in quick
+  // succession. Update the underline promptly, but debounce horizontal tab
+  // centering so competing ScrollView animations do not produce a jerk.
+  const syncActiveSectionId = (tabId: string) => activateTab(tabId, 60, 100);
 
   const handleTabLayout = (
     tabId: string,
@@ -87,5 +102,7 @@ export const useMoreAboutTabs = (
     indicatorWidth,
     handleTabPress,
     handleTabLayout,
+    setActiveSectionId: handleTabPress,
+    syncActiveSectionId,
   };
 };

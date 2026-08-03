@@ -57,6 +57,10 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
     <ScrollView
       ref={cardsScrollRef}
       horizontal
+      nestedScrollEnabled
+      canCancelContentTouches={false}
+      directionalLockEnabled
+      scrollEnabled
       showsHorizontalScrollIndicator={false}
       className="mt-4 pb-2"
       contentContainerStyle={{ paddingRight: exactScale(16) }}
