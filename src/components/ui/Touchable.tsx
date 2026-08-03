@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from "react";
-/* eslint-disable no-restricted-imports -- this file IS the wrapper the rule points at */
+/* eslint-disable no-restricted-imports */
 import {
   GestureResponderEvent,
   TouchableOpacity,
