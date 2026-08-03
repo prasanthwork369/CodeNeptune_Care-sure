@@ -10,8 +10,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { exactScale } from "@/src/utils/exactScale";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 const CONFIG = {
   success: {

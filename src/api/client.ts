@@ -25,10 +25,10 @@ export function setUnauthorizedHandler(handler: () => void) {
 }
 
 let isRefreshing = false;
-let failedQueue: Array<{
+let failedQueue: {
   resolve: (v: string) => void;
   reject: (e: unknown) => void;
-}> = [];
+}[] = [];
 
 // After a non-auth refresh failure (5xx/network), back off for a short
 // window instead of re-attempting refresh on every subsequent 401 — avoids

@@ -27,13 +27,14 @@ import Animated, {
 } from "react-native-reanimated";
 import { profileStyles as s } from "../profile.styles";
 
-// Same near-critically-damped spring as the bottom LiquidTabBar's snap
-// animation -- fast settle, no visible overshoot/bounce.
-const TAB_SNAP_SPRING = { damping: 28, stiffness: 420, mass: 0.5 } as const;
 import { styles as cardStyles } from "./WalletLayout.styles";
 import { TransactionHistorySheet } from "./TransactionHistorySheet";
 import { WalletInfoModal } from "./WalletInfoModal";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
+
+// Same near-critically-damped spring as the bottom LiquidTabBar's snap
+// animation -- fast settle, no visible overshoot/bounce.
+const TAB_SNAP_SPRING = { damping: 28, stiffness: 420, mass: 0.5 } as const;
 
 /**
  * Renders a stylized circular status badge containing a context icon for transaction rows.

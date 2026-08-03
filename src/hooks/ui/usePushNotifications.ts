@@ -97,7 +97,6 @@ export const usePushNotifications = () => {
 
   // Registers the push token once on app launch (anonymous).
   // The backend links the token to the user account via deviceId at OTP verify.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!isLoaded) return;
     notificationService.registerWithBackend().catch(() => {});
@@ -152,7 +151,6 @@ export const usePushNotifications = () => {
     });
 
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addNotification]);
 
   // Foreground tap on a notifee-displayed notification → route it. (Background/
@@ -211,7 +209,6 @@ export const usePushNotifications = () => {
             e,
           );
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, navReady]);
 
   // Secondary cold-start source: notifications presented locally by
@@ -224,7 +221,6 @@ export const usePushNotifications = () => {
       const { payload, tapId } = buildTapPayload(response);
       runColdStart(payload, tapId);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, navReady]);
 
   // Cold-start tap on a notifee-displayed (data-only) notification. Shares the
@@ -237,7 +233,6 @@ export const usePushNotifications = () => {
       const { payload } = buildPayloadFromData(res.data, res.tapId);
       runColdStart(payload, res.tapId);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, navReady]);
 
   // Background → foreground tap: app was alive in the background, the FCM

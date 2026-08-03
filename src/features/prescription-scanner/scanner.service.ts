@@ -27,7 +27,6 @@ function loadDocumentScanner(): {
   // NativeModules check prevents TurboModuleRegistry from throwing synchronously
   if (!NativeModules.DocumentScanner) return null;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require("react-native-document-scanner-plugin").default;
   } catch {
     return null;
