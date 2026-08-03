@@ -9,7 +9,6 @@ export { HomeFooter } from "./HomeFooter";
 export { HomeHeader } from "./HomeHeader";
 export { LocationBottomSheet } from "./LocationBottomSheet";
 export { PopularSubstitutes } from "./PopularSubstitutes";
-export { ProductSection } from "./ProductSection";
 export { QuickActions } from "./QuickActions";
 export { SearchBar } from "./SearchBar";
 export { TabItem } from "./TabItem";

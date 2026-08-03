@@ -1,6 +1,5 @@
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
-import type { ApiProductDetail } from "./medicine.api";
 
 export interface ApiSearchRecommendation {
   id: string;
@@ -85,13 +84,6 @@ export const searchApi = {
       params: { query, limit },
     });
     return response.data?.data ?? [];
-  },
-
-  getProductDetail: async (productId: string): Promise<ApiProductDetail> => {
-    const response = await apiClient.get(
-      API_ENDPOINTS.PRODUCT_BY_ID(productId),
-    );
-    return response.data?.data ?? response.data;
   },
 
   getHistory: async (

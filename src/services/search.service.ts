@@ -5,8 +5,6 @@ export const searchService = {
     searchApi.searchMedicines(query, page, limit),
   getSuggestions: (query: string, limit?: number) =>
     searchApi.getSuggestions(query, limit),
-  getProductDetail: (productId: string) =>
-    searchApi.getProductDetail(productId),
   getHistory: (limit?: number, offset?: number) =>
     searchApi.getHistory(limit, offset),
   recordHistory: (query: string, productId?: string) =>
