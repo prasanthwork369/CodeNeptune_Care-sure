@@ -13,9 +13,15 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePrescriptionPicker } from "@/src/hooks/ui/usePrescriptionPicker";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Text, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -38,6 +44,11 @@ const VALID_ITEMS = [
   "Patient's details",
   "Medicine details",
 ];
+
+// Fixed design content heights keep the native sheet surface opaque while it
+// animates, without leaving percentage-based whitespace on taller devices.
+const COLLAPSED_CONTENT_HEIGHT = 316;
+const EXPANDED_CONTENT_HEIGHT = 590;
 
 export const UploadPrescriptionSheet: React.FC<
   UploadPrescriptionSheetProps
@@ -78,10 +89,12 @@ export const UploadPrescriptionSheet: React.FC<
   const handleTakePhoto = onTakePhoto ?? takePhoto;
   const handleUploadPdf = onUploadPdf ?? pickPdf;
   const [showBeforeUpload, setShowBeforeUpload] = useState(false);
+  const sheetRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (isVisible) {
       setShowBeforeUpload(false);
+      sheetRef.current?.snapToIndex(0);
     }
   }, [isVisible]);
 
@@ -94,10 +107,47 @@ export const UploadPrescriptionSheet: React.FC<
   // and can show "Before You Upload" outright instead of falling back to a
   // scroll. The sheet only grows this far when the content actually needs it.
   const maxSheetHeight = screenHeight - insets.top - exactScale(12);
+  const snapPoints = useMemo(
+    () => [
+      Math.min(
+        maxSheetHeight,
+        exactScale(COLLAPSED_CONTENT_HEIGHT) + adjustedBottom,
+      ),
+      Math.min(
+        maxSheetHeight,
+        exactScale(EXPANDED_CONTENT_HEIGHT) + adjustedBottom,
+      ),
+    ],
+    [adjustedBottom, maxSheetHeight],
+  );
 
   // Toggling the section changes the content height, and the sheet resizes to
   // match — so there is no snap point to drive here any more.
-  const handleToggleBeforeUpload = () => setShowBeforeUpload((v) => !v);
+  const handleToggleBeforeUpload = () => {
+    if (showBeforeUpload) {
+      // Hide content after the sheet collapses.
+      sheetRef.current?.snapToIndex(0);
+      return;
+    }
+
+    // Show content before expanding to avoid an empty area.
+    setShowBeforeUpload(true);
+    requestAnimationFrame(() => sheetRef.current?.snapToIndex(1));
+  };
+
+  const handleSheetChange = useCallback((index: number) => {
+    // Gorhom reports the settled snap index. Reveal the content only after the
+    // expanded surface is ready; hide it whenever the sheet returns down.
+    setShowBeforeUpload(index === 1);
+  }, []);
+
+  const handleSheetAnimate = useCallback(
+    (_fromIndex: number, toIndex: number) => {
+      // Show content as soon as manual expansion starts.
+      if (toIndex === 1) setShowBeforeUpload(true);
+    },
+    [],
+  );
 
   return (
     <>
@@ -145,9 +195,14 @@ export const UploadPrescriptionSheet: React.FC<
           Sizing to the content instead fits every screen, and the sheet grows
           on its own when the section expands. */}
       <GorhomBottomSheet
+        ref={sheetRef}
         isVisible={isVisible}
         onClose={onClose}
+        snapPoints={snapPoints}
+        closeButtonOffset={0}
         maxDynamicContentSize={maxSheetHeight}
+        onChange={handleSheetChange}
+        onAnimate={handleSheetAnimate}
         backgroundStyle={{
           backgroundColor: "#fff",
           borderTopLeftRadius: exactScale(12),
@@ -157,7 +212,10 @@ export const UploadPrescriptionSheet: React.FC<
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
           bounces={false}
+          overScrollMode="never"
+          style={{ backgroundColor: "#FFFFFF" }}
           contentContainerStyle={{
+            backgroundColor: "#FFFFFF",
             paddingHorizontal: exactScale(16),
             paddingTop: exactScale(20),
             paddingBottom: adjustedBottom + exactScale(16),
@@ -393,7 +451,8 @@ export const UploadPrescriptionSheet: React.FC<
 
           {showBeforeUpload && (
             <Animated.View
-              entering={FadeIn.duration(200)}
+              // Fade with the sheet expansion.
+              entering={FadeIn.duration(180)}
               style={{
                 borderColor: "#0F763522",
                 borderRadius: exactScale(16),

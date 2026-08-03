@@ -249,8 +249,14 @@ export function useOtp() {
       const pendingNotification =
         useNotificationNavigationStore.getState().pendingNotification;
       if (pendingNotification) {
-        NotificationNavigation.executeNavigation(pendingNotification);
         useNotificationNavigationStore.getState().clearPendingNotification();
+        // Remove OTP from history before opening the pending destination.
+        // One animation frame lets Expo Router commit the replacement before
+        // the destination push, matching the cold-start notification flow.
+        router.replace("/(tabs)");
+        requestAnimationFrame(() => {
+          NotificationNavigation.executeNavigation(pendingNotification);
+        });
       } else {
         router.replace("/(tabs)");
       }

@@ -18,7 +18,12 @@ const TabLayout = () => {
   return (
     <Tabs
       // Inactive tabs stop re-rendering behind the active one.
-      screenOptions={{ headerShown: false, freezeOnBlur: true }}
+      screenOptions={{
+        headerShown: false,
+        animation: "none",
+        freezeOnBlur: true,
+        lazy: true,
+      }}
       tabBar={renderTabBar}
     >
       {tabConfig.map((tab) => (

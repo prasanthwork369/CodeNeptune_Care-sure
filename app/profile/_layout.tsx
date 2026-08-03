@@ -7,11 +7,13 @@ export default function ProfileLayout() {
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
   return (
-    <Stack screenOptions={{ headerShown: false, ...screenTransitions.push }}>
+    <Stack
+      screenOptions={{ headerShown: false, ...screenTransitions.nativePush }}
+    >
       {/* Matches order-success, so both terminal confirmations arrive the same way */}
       <Stack.Screen
         name="orders/return-success"
-        options={screenTransitions.fade}
+        options={screenTransitions.result}
       />
     </Stack>
   );

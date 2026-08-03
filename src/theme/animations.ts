@@ -29,17 +29,41 @@ export const springs = {
  * `freezeOnBlur` stops off-screen screens re-rendering behind the active one.
  */
 export const screenTransitions = {
-  /** Default push: horizontal slide, matching the platform back gesture. */
-  push: {
-    animation: "slide_from_right",
-    animationDuration: 300,
+  /** Details, settings and edit flows use platform-native push/pop motion. */
+  nativePush: {
+    animation: "fade",
+    animationDuration: 250,
+    gestureEnabled: true,
+    contentStyle: { backgroundColor: "#FFFFFF" },
     freezeOnBlur: true,
   },
-  /** Overlays and tab-level swaps, where a slide would read as navigation. */
+  /** Splash and neutral context replacements. */
   fade: {
     animation: "fade",
-    animationDuration: 180,
+    animationDuration: 120,
     freezeOnBlur: true,
+  },
+  /** Auth completion uses native fade with subtle depth. */
+  authComplete: {
+    animation: "fade_from_bottom",
+    animationDuration: 250,
+    freezeOnBlur: true,
+  },
+  /** Navigation-owned modal screens slide up and support native dismissal. */
+  modal: {
+    presentation: "modal",
+    animation: "slide_from_bottom",
+    animationDuration: 250,
+    gestureEnabled: true,
+    freezeOnBlur: true,
+  },
+  /** Terminal success/error screens do not imply deeper hierarchy. */
+  result: {
+    animation: "fade",
+    animationDuration: 220,
+    gestureEnabled: false,
+    contentStyle: { backgroundColor: "#FFFFFF" },
+    freezeOnBlur: false,
   },
   /** Guard redirects — an auth bounce is not a navigation the user made, so it shouldn't animate like one. */
   none: {

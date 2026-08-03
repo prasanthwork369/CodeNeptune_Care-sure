@@ -3,11 +3,10 @@ import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
-import { useHeroTransitionStore } from "@/src/store/heroTransitionStore";
 import { Product } from "@/src/types/home";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { styles as s } from "./HomeProductCard.styles";
 
@@ -37,18 +36,10 @@ export const HomeProductCard: React.FC<Props> = React.memo(
     onPress,
     disableCart = false,
   }) => {
-    const cardRef = useRef<View>(null);
-    // Selector, not the whole store: writing originRect on press would otherwise
-    // re-render every mounted card in the frame that starts the navigation.
-    const setOriginRect = useHeroTransitionStore((s) => s.setOriginRect);
-
     const handleCardPress = useCallback(() => {
       if (!onPress) return;
-      cardRef.current?.measureInWindow((x, y, width, height) => {
-        setOriginRect({ x, y, width, height });
-        onPress(item.id);
-      });
-    }, [onPress, item.id, setOriginRect]);
+      onPress(item.id);
+    }, [onPress, item.id]);
 
     const { count, increment, decrement, isPending, animations } =
       useCartActions({
@@ -71,7 +62,6 @@ export const HomeProductCard: React.FC<Props> = React.memo(
 
     return (
       <View
-        ref={cardRef}
         className="rounded-[12px] overflow-hidden bg-transparent"
         style={{
           width: cardWidth,

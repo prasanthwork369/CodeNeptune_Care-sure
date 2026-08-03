@@ -17,7 +17,7 @@ export default function StackLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        ...screenTransitions.push,
+        ...screenTransitions.nativePush,
       }}
     >
       <Stack.Screen name="cart" options={{ presentation: "card" }} />
@@ -28,8 +28,7 @@ export default function StackLayout() {
         name="order-success"
         options={{
           presentation: "transparentModal",
-          ...screenTransitions.fade,
-          freezeOnBlur: false,
+          ...screenTransitions.result,
         }}
       />
     </Stack>

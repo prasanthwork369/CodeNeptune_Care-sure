@@ -5,10 +5,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
-import {
-  BAR_HEIGHT,
-  PILL_HEIGHT,
-} from "@/src/components/navigation/LiquidTabBar.styles";
+import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   Extrapolation,
@@ -298,10 +295,8 @@ export const FloatingBannersCarousel = ({
 
   // Distance from screen bottom to the top of the LiquidTabBar pill:
   // paddingBottom (adjustedBottom + extraGap) + vertical centering offset
-  // within BAR_HEIGHT = (BAR_HEIGHT + PILL_HEIGHT) / 2.
-  // Derived from actual style constants so it stays in sync automatically.
-  const TAB_BAR_HEIGHT =
-    (BAR_HEIGHT + PILL_HEIGHT) / 2 + adjustedBottom + extraGap;
+  // Match the tab pill's bottom-aligned position.
+  const TAB_BAR_HEIGHT = PILL_HEIGHT + adjustedBottom + extraGap;
 
   return (
     <>

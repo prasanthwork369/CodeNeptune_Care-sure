@@ -3,7 +3,13 @@ import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 
-export const TabBarFadeGradient: React.FC = () => {
+interface TabBarFadeGradientProps {
+  visibleHeight?: number;
+}
+
+export const TabBarFadeGradient: React.FC<TabBarFadeGradientProps> = ({
+  visibleHeight: customVisibleHeight,
+}) => {
   const adjustedBottom = useAdjustedBottomInset();
 
   // Tops out just under the pill so the glass keeps live content behind its full height
@@ -15,7 +21,7 @@ export const TabBarFadeGradient: React.FC = () => {
   // Added to the offset and the height equally, so the visible top edge —
   // and therefore the resting appearance — is unchanged.
   const OVERHANG = exactScale(100);
-  const visibleHeight = adjustedBottom + extraHeight;
+  const visibleHeight = customVisibleHeight ?? adjustedBottom + extraHeight;
   const totalHeight = visibleHeight + OVERHANG;
   // Fraction of the gradient that sits on screen; the rest hangs below.
   const edge = visibleHeight / totalHeight;

@@ -3,7 +3,9 @@ import { Stack } from "expo-router";
 
 export default function ProductLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false, ...screenTransitions.push }}>
+    <Stack
+      screenOptions={{ headerShown: false, ...screenTransitions.nativePush }}
+    >
       <Stack.Screen name="[id]" />
     </Stack>
   );

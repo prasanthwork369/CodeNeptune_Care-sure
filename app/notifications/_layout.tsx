@@ -7,6 +7,8 @@ export default function NotificationsLayout() {
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
   return (
-    <Stack screenOptions={{ headerShown: false, ...screenTransitions.push }} />
+    <Stack
+      screenOptions={{ headerShown: false, ...screenTransitions.nativePush }}
+    />
   );
 }

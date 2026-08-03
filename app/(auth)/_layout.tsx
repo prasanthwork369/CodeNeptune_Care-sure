@@ -3,9 +3,11 @@ import { Stack } from "expo-router";
 
 export default function AuthLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false, ...screenTransitions.push }}>
-      <Stack.Screen name="login" />
-      <Stack.Screen name="otp" />
+    <Stack
+      screenOptions={{ headerShown: false, ...screenTransitions.nativePush }}
+    >
+      <Stack.Screen name="login" options={screenTransitions.fade} />
+      <Stack.Screen name="otp" options={screenTransitions.authComplete} />
     </Stack>
   );
 }

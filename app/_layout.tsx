@@ -152,25 +152,32 @@ export default function RootLayout() {
                   <Stack
                     screenOptions={{
                       headerShown: false,
-                      ...screenTransitions.push,
+                      ...screenTransitions.nativePush,
                     }}
                   >
-                    <Stack.Screen name="index" />
+                    <Stack.Screen
+                      name="index"
+                      options={screenTransitions.fade}
+                    />
                     {/* Every auth guard redirects here, so entering it must not read as a push */}
                     <Stack.Screen
                       name="(auth)"
                       options={screenTransitions.none}
                     />
-                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={screenTransitions.authComplete}
+                    />
                     <Stack.Screen name="(stack)" />
                     <Stack.Screen name="(prescription)" />
-                    <Stack.Screen
-                      name="search"
-                      options={screenTransitions.fade}
-                    />
+                    <Stack.Screen name="search" />
                     <Stack.Screen name="notifications" />
                     <Stack.Screen name="profile" />
                     <Stack.Screen name="product" />
+                    <Stack.Screen
+                      name="+not-found"
+                      options={screenTransitions.result}
+                    />
                   </Stack>
                   <CartSyncProvider />
                   <PushNotificationProvider />

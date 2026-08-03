@@ -28,6 +28,7 @@ interface GorhomBottomSheetProps extends Pick<
   | "maxDynamicContentSize"
   | "bottomInset"
   | "onChange"
+  | "onAnimate"
   | "stackBehavior"
 > {
   isVisible: boolean;
@@ -79,6 +80,7 @@ export const GorhomBottomSheet = forwardRef<
       style,
       children,
       onChange,
+      onAnimate,
       stackBehavior,
     },
     ref,
@@ -177,6 +179,7 @@ export const GorhomBottomSheet = forwardRef<
         enablePanDownToClose
         stackBehavior={stackBehavior}
         onChange={onChange}
+        onAnimate={onAnimate}
         onDismiss={handleDismiss}
         backdropComponent={renderBackdrop}
         keyboardBehavior={keyboardBehavior}
