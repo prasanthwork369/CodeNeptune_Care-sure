@@ -37,7 +37,7 @@ export interface Settings {
 export interface PaymentSettings {
   active_payment_methods?: number[];
   active_return_methods?: number[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /** Backend-owned prescription upload rules. */

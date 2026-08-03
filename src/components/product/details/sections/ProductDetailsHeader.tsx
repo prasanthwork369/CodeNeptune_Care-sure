@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { productWebUrl } from "@/src/constants/urls";
@@ -52,8 +53,8 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
       await Share.share({
         message,
       });
-    } catch (error: any) {
-      Alert.alert("Error", error.message);
+    } catch (e) {
+      Alert.alert("Error", asError(e).message);
     }
   };
 

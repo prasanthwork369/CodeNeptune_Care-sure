@@ -1,9 +1,6 @@
-import type { ImageSource } from "expo-image";
 import { useCallback, useRef } from "react";
 import { View } from "react-native";
-import { useFlyToCartActionsSafe } from "./FlyToCartContext";
-
-type FlyImage = ImageSource | string | null | undefined;
+import { useFlyToCartActionsSafe, type FlyImage } from "./FlyToCartContext";
 
 // Attach `imageRef` (with collapsable={false}) to a card's image and call
 // `triggerFly` from its add/increment handler. No-op outside a provider.

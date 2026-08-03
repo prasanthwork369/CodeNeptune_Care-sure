@@ -121,7 +121,7 @@ export const PatientDetailsLayout: React.FC = () => {
       <View className="px-4 pt-4 pb-3 bg-[#F5F6FB]">
         <Touchable
           activeOpacity={0.85}
-          onPress={() => router.push("/profile/add-patient" as any)}
+          onPress={() => router.push("/profile/patients/add")}
           className="bg-[#0F7635] rounded-xl py-4 flex-row items-center justify-center"
           style={{
             shadowColor: "#0F172A",
@@ -179,7 +179,7 @@ export const PatientDetailsLayout: React.FC = () => {
               item={item}
               onEdit={(p) =>
                 router.push({
-                  pathname: "/profile/add-patient" as any,
+                  pathname: "/profile/patients/add",
                   params: { id: p.id },
                 })
               }

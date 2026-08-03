@@ -1,4 +1,5 @@
 import { PrescriptionStatusValue } from "@/src/constants/prescription-status";
+import type { CartItem } from "./cart";
 
 export interface PrescriptionItem {
   localUri: string;
@@ -62,7 +63,8 @@ export interface ApiPrescription {
 
 export interface RequiresPrescriptionWarningProps {
   itemCount: number;
-  items: any[];
+  // Only the label is rendered, so this takes any cart-item-shaped row.
+  items: Pick<CartItem, "id" | "medicineName">[];
 }
 
 export interface UploadMethodCardProps {
@@ -90,7 +92,7 @@ export interface PrescriptionHistoryItemData {
   patientName: string;
   doctorName: string;
   uploadedDate: string;
-  image: any;
+  image: string[]; // prescription page URLs, in order
   source?: string;
   toPay?: string;
   prescriptionOrderId?: string | null;

@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -204,7 +205,8 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       const safeOrderReference =
         orderReference.replace(/[^a-zA-Z0-9-_]/g, "") || order.id;
       await downloadLocalFile(uri, `Invoice-${safeOrderReference}.pdf`);
-    } catch (error: any) {
+    } catch (e) {
+      const error = asError(e);
       if (__DEV__) console.error("[InvoiceDownload]", error);
       Alert.alert(
         "Invoice Download Failed",

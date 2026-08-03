@@ -259,7 +259,7 @@ export const WalletLayout: React.FC = () => {
                 </Text>
               </View>
               <Touchable
-                onPress={() => router.push("/profile/wallet/add-money" as any)}
+                onPress={() => router.push("/profile/wallet/add-money")}
                 activeOpacity={0.85}
                 style={cardStyles.addMoneyBtn}
               >
@@ -338,7 +338,7 @@ export const WalletLayout: React.FC = () => {
             Transaction History
           </Text>
           <Touchable
-            onPress={() => router.push("/profile/wallet/history" as any)}
+            onPress={() => router.push("/profile/wallet/history")}
           >
             <Text
               style={s.walletTxTitle}

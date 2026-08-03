@@ -6,6 +6,6 @@ export const returnService = {
     returnApi.createReturn(data),
   getReturnById: (id: string): Promise<ReturnRecord> =>
     returnApi.getReturnById(id),
-  listReturns: (params?: Record<string, any>): Promise<ReturnRecord[]> =>
+  listReturns: (params?: Record<string, unknown>): Promise<ReturnRecord[]> =>
     returnApi.listReturns(params),
 };

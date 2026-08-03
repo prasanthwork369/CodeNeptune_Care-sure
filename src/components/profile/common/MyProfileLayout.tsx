@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { UpdateProfilePayload } from "@/src/api/profile.api";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
@@ -198,7 +199,8 @@ export const MyProfileLayout: React.FC = () => {
 
       await updateProfile(payload);
       router.back();
-    } catch (err: any) {
+    } catch (e) {
+      const err = asError(e);
       if (__DEV__) {
         console.error("[Profile Update Error]", err);
         // Log full API validation details to identify which field is failing
@@ -223,8 +225,10 @@ export const MyProfileLayout: React.FC = () => {
     try {
       await requestVerify(email.trim());
       setShowEmailVerify(true);
-    } catch (err: any) {
-      setEmailError(err?.message ?? "Could not send code. Please try again.");
+    } catch (e) {
+      setEmailError(
+        asError(e).message ?? "Could not send code. Please try again.",
+      );
     }
   };
 
@@ -238,7 +242,7 @@ export const MyProfileLayout: React.FC = () => {
   // Opens the dedicated Delete Account confirmation screen, which handles the
   // actual deletion (and the "lose access to" details from the design).
   const handleDeleteAccount = () =>
-    router.push("/profile/delete-account" as any);
+    router.push("/profile/delete-account");
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>

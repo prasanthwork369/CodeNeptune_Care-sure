@@ -48,8 +48,8 @@ describe("buildCartOrderItems", () => {
     expect(items).toHaveLength(1);
     expect(items[0].unitPrice).toBe("49.5");
     expect(items[0].quantity).toBe(2);
-    expect(items[0].medicineSnapshot.name).toBe("Paracetamol");
-    expect(items[0].medicineSnapshot.requiresPrescription).toBe(false);
+    expect(items[0].medicineSnapshot?.name).toBe("Paracetamol");
+    expect(items[0].medicineSnapshot?.requiresPrescription).toBe(false);
   });
 
   // The backend does not always promote these out of metadata.
@@ -72,11 +72,11 @@ describe("buildCartOrderItems", () => {
       },
     ]);
 
-    expect(items[0].medicineSnapshot.productId).toBe("CS-META");
-    expect(items[0].medicineSnapshot.image).toBe("https://img/meta.png");
-    expect(items[0].medicineSnapshot.mrp).toBe(25);
-    expect(items[0].medicineSnapshot.brand).toBe("Acme");
-    expect(items[0].medicineSnapshot.pack).toBe("10 tablets");
+    expect(items[0].medicineSnapshot?.productId).toBe("CS-META");
+    expect(items[0].medicineSnapshot?.image).toBe("https://img/meta.png");
+    expect(items[0].medicineSnapshot?.mrp).toBe(25);
+    expect(items[0].medicineSnapshot?.brand).toBe("Acme");
+    expect(items[0].medicineSnapshot?.pack).toBe("10 tablets");
   });
 
   it("prefers the top-level value over metadata", () => {
@@ -91,7 +91,7 @@ describe("buildCartOrderItems", () => {
       },
     ]);
 
-    expect(items[0].medicineSnapshot.productId).toBe("CS-TOP");
+    expect(items[0].medicineSnapshot?.productId).toBe("CS-TOP");
   });
 });
 
@@ -108,8 +108,8 @@ describe("buildPrescriptionOrderItems", () => {
     ]);
 
     expect(items[0].unitPrice).toBe("120");
-    expect(items[0].medicineSnapshot.requiresPrescription).toBe(true);
-    expect(items[0].medicineSnapshot.mrp).toBe(150);
+    expect(items[0].medicineSnapshot?.requiresPrescription).toBe(true);
+    expect(items[0].medicineSnapshot?.mrp).toBe(150);
   });
 });
 

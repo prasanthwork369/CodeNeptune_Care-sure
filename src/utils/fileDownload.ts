@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { Platform, Alert } from "react-native";
 import { Asset } from "expo-asset";
 import * as Notifications from "expo-notifications";
@@ -84,10 +85,10 @@ export const downloadFile = async (
         throw new Error("Failed to save file to local cache.");
       }
     }
-  } catch (error: any) {
+  } catch (e) {
     Alert.alert(
       "Download Error",
-      error.message || "Failed to download prescription. Please try again.",
+      asError(e).message || "Failed to download prescription. Please try again.",
     );
   }
 };
@@ -211,10 +212,10 @@ export const downloadLocalAsset = async (
     }
 
     await persistLocalFile(ReactNativeBlobUtil, fileUri, fileName);
-  } catch (error: any) {
+  } catch (e) {
     Alert.alert(
       "Download Error",
-      error.message || "Failed to save file. Please try again.",
+      asError(e).message || "Failed to save file. Please try again.",
     );
   }
 };
@@ -247,10 +248,10 @@ export const downloadLocalFile = async (
     }
 
     await persistLocalFile(ReactNativeBlobUtil, uri, fileName);
-  } catch (error: any) {
+  } catch (e) {
     Alert.alert(
       "Download Error",
-      error.message || "Failed to save file. Please try again.",
+      asError(e).message || "Failed to save file. Please try again.",
     );
   }
 };

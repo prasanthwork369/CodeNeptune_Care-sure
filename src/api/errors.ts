@@ -29,13 +29,31 @@ export class AppError extends Error {
   }
 }
 
+/** The fields catch blocks actually read off a thrown value. */
+export type CaughtError = {
+  message?: string;
+  name?: string;
+  code?: string;
+  kind?: string; // AppError
+  status?: number; // AppError
+  data?: unknown;
+  response?: {
+    status?: number;
+    data?: { message?: string; data?: unknown } & Record<string, unknown>;
+  };
+};
+
+/** Views an `unknown` catch variable through CaughtError — every field stays optional. */
+export const asError = (err: unknown): CaughtError =>
+  (err ?? {}) as CaughtError;
+
 export function toAppError(err: unknown): AppError {
   if (err instanceof AppError) return err;
 
   if (
     err &&
     typeof err === "object" &&
-    (err as any).code === "NETWORK_OFFLINE"
+    (err as { code?: unknown }).code === "NETWORK_OFFLINE"
   ) {
     return new AppError(
       "network",

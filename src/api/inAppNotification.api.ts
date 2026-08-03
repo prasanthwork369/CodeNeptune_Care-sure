@@ -1,6 +1,17 @@
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
 
+/** Event-specific payload; the listed keys are the ones the UI reads. */
+export interface NotificationMetadata {
+  type?: string;
+  coinsAmount?: number | string;
+  walletAmount?: number | string;
+  orderId?: string;
+  prescriptionId?: string;
+  prescriptionOrderId?: string;
+  [key: string]: unknown;
+}
+
 export interface NotificationLog {
   id: string;
   templateId: string | null;
@@ -15,7 +26,7 @@ export interface NotificationLog {
   status: "SENT" | "FAILED" | "DELIVERED";
   triggeredBy: string | null;
   orderId: string | null;
-  metadata: Record<string, any>;
+  metadata: NotificationMetadata;
   isRead: boolean;
   readAt: string | null;
   isDismissed: boolean;

@@ -1,12 +1,5 @@
-import { orderApi } from "../api/order.api";
+import { orderApi, type OrderListParams } from "../api/order.api";
 import { CreateOrderRequest, Order } from "../types/order";
-
-interface OrderListParams {
-  page?: number;
-  limit?: number;
-  status?: string;
-  sortOrder?: "asc" | "desc";
-}
 
 export const orderService = {
   createOrder: (

@@ -51,7 +51,7 @@ export const TransactionHistorySheet: React.FC<
 
   const handleSeeAll = () => {
     onClose();
-    setTimeout(() => router.push("/profile/wallet/history" as any), 300);
+    setTimeout(() => router.push("/profile/wallet/history"), 300);
   };
 
   const snapPoints = useMemo(() => ["50%"], []);

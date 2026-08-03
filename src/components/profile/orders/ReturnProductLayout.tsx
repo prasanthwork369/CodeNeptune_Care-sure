@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { storageApi } from "@/src/api/storage.api";
 import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
 import { RemoveConfirmModal } from "@/src/components/prescription/preview/sections/RemoveConfirmModal";
@@ -256,8 +257,11 @@ export const ReturnProductLayout: React.FC = () => {
     try {
       await updateAddress({ id: addrId, isDefault: true });
       setIsAddressSheetVisible(false);
-    } catch (err: any) {
-      Alert.alert("Error", err?.message ?? "Could not update default address.");
+    } catch (e) {
+      Alert.alert(
+        "Error",
+        asError(e).message ?? "Could not update default address.",
+      );
     }
   };
 
@@ -334,7 +338,8 @@ export const ReturnProductLayout: React.FC = () => {
       await createReturn(payload);
       clearReturnDraft();
       setIsSuccessModalVisible(true);
-    } catch (err: any) {
+    } catch (e) {
+      const err = asError(e);
       setUploadingImages(false);
       Alert.alert(
         "Return Failed",
@@ -705,7 +710,7 @@ export const ReturnProductLayout: React.FC = () => {
             <Touchable
               onPress={() => {
                 if (addresses.length === 0) {
-                  router.push("/profile/addresses" as any);
+                  router.push("/profile/addresses");
                 } else {
                   setIsAddressSheetVisible(true);
                 }

@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { storageApi } from "@/src/api/storage.api";
 import { PrescriptionReviewSheet } from "@/src/components/prescription/PrescriptionReviewSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
@@ -250,7 +251,8 @@ export const PreviewLayout: React.FC = () => {
       }
       clearItems();
       setShowReviewSheet(true);
-    } catch (error: any) {
+    } catch (e) {
+      const error = asError(e);
       showInfo(
         "Upload Failed",
         error?.response?.data?.message ??

@@ -14,7 +14,7 @@ export const returnApi = {
   },
 
   listReturns: async (
-    params?: Record<string, any>,
+    params?: Record<string, unknown>,
   ): Promise<ReturnRecord[]> => {
     const response = await apiClient.get(API_ENDPOINTS.RETURNS, { params });
     return response.data.data;

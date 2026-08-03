@@ -1,7 +1,7 @@
 export interface CreateOrderRequest {
   items: {
     medicineId: string;
-    medicineSnapshot?: any;
+    medicineSnapshot?: MedicineSnapshot;
     quantity: number;
     unitPrice: string;
   }[];
@@ -51,7 +51,16 @@ export interface OrderMetadata {
     creditsUsed: boolean;
     livePriceSyncUsed: boolean;
   };
-  [key: string]: any;
+  patientDetails?: {
+    phone?: string;
+    problem?: string;
+    symptoms?: string;
+    /** No prescription attached means the customer chose to skip it. */
+    skipPrescription: boolean;
+  };
+  idempotencyKey?: string;
+  couponCode?: string;
+  [key: string]: unknown;
 }
 
 export interface MedicineSnapshot {
@@ -61,7 +70,7 @@ export interface MedicineSnapshot {
   image?: string;
   brand?: string;
   pack?: string;
-  mrp?: number;
+  mrp?: number | null; // prescription lines can carry an explicit null
   // Persisted at order creation so tracking can derive the discounted price the
   // customer paid — unitPrice is stored as the MRP (see buildOrderPayload).
   discountPercent?: number;

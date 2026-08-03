@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type FirebaseMessaging from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
@@ -85,7 +86,8 @@ const syncToken = async (token: string): Promise<void> => {
     // Cache only on success so a failed call never poisons the guard.
     await AsyncStorage.setItem(CACHE_KEY, key);
     lastRegisteredKey = key;
-  } catch (error: any) {
+  } catch (e) {
+    const error = asError(e);
     if (__DEV__) {
       const status = error?.response?.status || error?.status;
       if (status === 429) {

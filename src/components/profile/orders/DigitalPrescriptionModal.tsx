@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -113,10 +114,10 @@ export const DigitalPrescriptionModal: React.FC<
             logger.debug("[RxDownload] temp cleanup failed:", cleanupError);
         }
       }
-    } catch (error: any) {
+    } catch (e) {
       Alert.alert(
         "Download Error",
-        error?.message ||
+        asError(e).message ||
           "Could not download the prescription. Please try again.",
       );
     } finally {

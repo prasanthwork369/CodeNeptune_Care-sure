@@ -3,10 +3,11 @@ import React from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SmokePuff } from "./SmokePuff";
+import type { FlyImage } from "./FlyToCartContext";
 import { useThumbnailRemoval } from "./useThumbnailRemoval";
 
 interface ThumbnailItemProps {
-  imgUrl: string;
+  imgUrl: FlyImage;
   index: number;
   isPending?: boolean;
   isRemoving?: boolean;

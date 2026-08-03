@@ -1,4 +1,6 @@
 import { useCart } from "@/src/hooks/queries/useCart";
+import type { CartItem } from "@/src/types/cart";
+import type { ImageSource } from "expo-image";
 import React, {
   createContext,
   useContext,
@@ -17,19 +19,22 @@ import {
   withSpring,
 } from "react-native-reanimated";
 
+/** What a card can hand to the fly animation: a remote URI or a bundled asset. */
+export type FlyImage = ImageSource | string | null | undefined;
+
 export interface ActiveAnimation {
   id: string;
   startX: number;
   startY: number;
   endX: number;
   endY: number;
-  imageUrl: any;
+  imageUrl: FlyImage;
   productId: string;
 }
 
 export interface VisualCartImage {
   id: string;
-  image: any;
+  image: FlyImage;
   isPending?: boolean;
   isRemoving?: boolean;
   isBehindRemoving?: boolean;
@@ -42,10 +47,10 @@ interface FlyToCartContextType {
   flyToCart: (
     sourceX: number,
     sourceY: number,
-    imageUrl: any,
+    imageUrl: FlyImage,
     productId: string,
   ) => void;
-  handleComplete: (id: string, imageUrl: any, productId: string) => void;
+  handleComplete: (id: string, imageUrl: FlyImage, productId: string) => void;
   bounceSharedValue: SharedValue<number>;
   widthExpansion: SharedValue<number>;
   /** Live target, so a flight already in the air re-aims when the banner
@@ -68,7 +73,7 @@ interface FlyToCartActions {
   flyToCart: (
     sourceX: number,
     sourceY: number,
-    imageUrl: any,
+    imageUrl: FlyImage,
     productId: string,
   ) => void;
   setDestinationCoords: (coords: { x: number; y: number }) => void;
@@ -108,17 +113,19 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const hasJustAdded = React.useRef(false);
   const lastAddTimestamp = React.useRef(0);
-  const prevItemsRef = React.useRef<any[]>(items);
-  const timeoutRef = React.useRef<any>(null);
-  const imageClearTimeoutRef = React.useRef<any>(null);
+  const prevItemsRef = React.useRef<CartItem[]>(items);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const imageClearTimeoutRef = React.useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   // Prevents normal sync from clearing images while banner collapse animation is running
   const isCollapsingRef = React.useRef(false);
 
   // Sync visual cart with real cart, checking for item removals to trigger exit animations
   useEffect(() => {
     // 1. Detect if any items were removed from the cart
-    const prevIds = prevItemsRef.current.map((item: any) => item.medicineId);
-    const currentIds = items.map((item: any) => item.medicineId);
+    const prevIds = prevItemsRef.current.map((item) => item.medicineId);
+    const currentIds = items.map((item) => item.medicineId);
     const removedIds = prevIds.filter((id) => !currentIds.includes(id));
 
     if (removedIds.length > 0) {
@@ -289,7 +296,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const flyToCart = useCallback(
-    (sourceX: number, sourceY: number, imageUrl: any, productId: string) => {
+    (sourceX: number, sourceY: number, imageUrl: FlyImage, productId: string) => {
       const destination = destinationRef.current;
       const currentTotal = totalItemsRef.current;
       const id = Math.random().toString(36).substring(2, 9);
@@ -345,7 +352,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [widthExpansion]);
 
   const handleComplete = useCallback(
-    (id: string, imageUrl: any, productId: string) => {
+    (id: string, imageUrl: FlyImage, productId: string) => {
       setActiveAnimations((prev) => prev.filter((anim) => anim.id !== id));
 
       // Once the flying image lands, transition isPending to false so the thumbnail animates in.

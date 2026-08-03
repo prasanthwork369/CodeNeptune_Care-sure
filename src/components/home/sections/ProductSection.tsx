@@ -1,5 +1,5 @@
 import { HomeProductCard } from "./HomeProductCard";
-import { Image } from "expo-image";
+import { Image, type ImageSource } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
@@ -16,9 +16,10 @@ interface ProductSectionProps {
   badgeTextColor: string;
   detailsBgColor: string;
   bgColor?: string;
-  bgGradient?: string[];
-  bgLocations?: number[];
-  headerImages: any[];
+  // LinearGradient needs at least two stops, so these are tuples, not arrays.
+  bgGradient?: readonly [string, string, ...string[]];
+  bgLocations?: readonly [number, number, ...number[]];
+  headerImages: ImageSource[];
   products: Product[];
   onProductPress?: (id: string) => void;
   disableCart?: boolean;
@@ -77,8 +78,8 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
     <View className="mb-6">
       {bgGradient ? (
         <LinearGradient
-          colors={bgGradient as any}
-          locations={bgLocations as any}
+          colors={bgGradient}
+          locations={bgLocations}
           start={{ x: 0, y: 1 }}
           end={{ x: 0, y: 0 }}
           style={StyleSheet.absoluteFillObject}
@@ -112,7 +113,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 {subtitle}
               </Text>
               <LinearGradient
-                colors={[subtitleColor, "rgba(255,255,255,0)"] as any}
+                colors={[subtitleColor, "rgba(255,255,255,0)"] as const}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={{
@@ -129,7 +130,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
             {headerImages.map((img, idx) => (
               <Image
                 key={idx}
-                source={img as any}
+                source={img}
                 style={{ width: exactScale(55), height: exactScale(55) }}
                 contentFit="contain"
               />

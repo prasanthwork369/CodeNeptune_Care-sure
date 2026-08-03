@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import {
   deriveKeyFromUrl,
   storageApi,
@@ -189,7 +190,8 @@ export function useSelectPatientImages(
       await storageApi.delete(target.path);
       setHosted((prev) => prev.filter((_, i) => i !== index));
       setItems((prev) => prev.filter((_, i) => i !== index));
-    } catch (err: any) {
+    } catch (e) {
+      const err = asError(e);
       if (__DEV__)
         logger.debug("[removeImage] delete FAILED", {
           key: target.path,

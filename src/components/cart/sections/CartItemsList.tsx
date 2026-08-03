@@ -73,7 +73,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = React.memo(
                 >
                   {line.image ? (
                     <Image
-                      source={line.image as any}
+                      source={line.image}
                       style={s.itemImg}
                       contentFit="contain"
                     />

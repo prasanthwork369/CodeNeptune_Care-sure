@@ -40,7 +40,8 @@ export const cartApi = {
     await apiClient.delete(API_ENDPOINTS.CART);
   },
 
-  checkout: async (input: CheckoutInput): Promise<any> => {
+  // Response shape is not modelled yet — callers must narrow before using it.
+  checkout: async (input: CheckoutInput): Promise<unknown> => {
     const response = await apiClient.post(API_ENDPOINTS.CART_CHECKOUT, input);
     return response.data.data;
   },

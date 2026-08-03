@@ -1,3 +1,23 @@
+import type { Product } from "./home";
+
+/** Free-form bag the backend round-trips; the listed keys are the ones we read. */
+export interface CartItemMetadata {
+  productId?: string;
+  selectedVariantId?: string; // variant UUID — present when item is a pack-size variant
+  variants?: unknown[]; // full variants array enriched by backend
+  selectedSize?: number;
+  packSize?: string;
+  pack?: string;
+  unit?: string;
+  price?: number;
+  mrp?: number;
+  discountPercent?: number;
+  brand?: string;
+  image?: string;
+  manufacturer?: string | null;
+  [key: string]: unknown;
+}
+
 export interface CartItem {
   id: string;
   cartId: string;
@@ -10,18 +30,7 @@ export interface CartItem {
   quantity: number;
   requiresPrescription: boolean;
   prescriptionId?: string | null;
-  metadata?: {
-    productId?: string;
-    selectedVariantId?: string; // variant UUID — present when item is a pack-size variant
-    variants?: any[]; // full variants array enriched by backend
-    selectedSize?: number;
-    packSize?: string;
-    unit?: string;
-    price?: number;
-    image?: string;
-    manufacturer?: string | null;
-    [key: string]: any;
-  };
+  metadata?: CartItemMetadata;
   createdAt: string;
   updatedAt: string;
 
@@ -68,7 +77,7 @@ export interface AddToCartInput {
   requiresPrescription: boolean;
   image?: string;
   prescriptionId?: string;
-  metadata?: Record<string, any>;
+  metadata?: CartItemMetadata;
 }
 
 export interface UpdateCartItemInput {
@@ -104,13 +113,13 @@ export interface CartLine {
   mrp: number;
   price: number;
   qty: number;
-  image: any;
+  image: { uri: string } | null;
   rx: boolean;
 }
 
 export interface CartEmptyStateProps {
-  featuredProducts: any[];
-  onAddItem: (product: any) => Promise<any> | any;
+  featuredProducts: Product[];
+  onAddItem: (product: Product) => Promise<unknown>;
 }
 
 export interface CartDeliveringToProps {
@@ -132,12 +141,22 @@ export interface CartFreeDeliveryProgressProps {
 
 export interface CartItemsListProps {
   lines: CartLine[];
-  onUpdateItem: (itemId: string, input: { quantity: number }) => Promise<any>;
-  onRemoveItem: (itemId: string) => Promise<any>;
+  onUpdateItem: (
+    itemId: string,
+    input: { quantity: number },
+  ) => Promise<unknown>;
+  onRemoveItem: (itemId: string) => Promise<unknown>;
+}
+
+/** The coupon currently held in couponStore, not the full catalog Coupon. */
+export interface AppliedCoupon {
+  code: string;
+  discount: number;
+  description: string;
 }
 
 export interface CartCouponSectionProps {
-  appliedCoupon: any;
+  appliedCoupon: AppliedCoupon | null;
   onRemove: () => void;
   subtotal: number;
 }

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import type { ImageSource } from "expo-image";
 
 export interface ProductDetailsHeaderProps {
   title?: string;
@@ -27,7 +28,7 @@ export interface ProductDetailsFooterProps {
     originalPrice?: number;
     savingsPercent?: number;
     requiresPrescription?: boolean;
-    image?: any;
+    image?: ImageSource | null;
     packSize?: string; // formatted e.g. "50 ml"
     unit?: string; // e.g. "ml"
   };

@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
@@ -128,7 +129,8 @@ export function ProductCard({
           },
         });
       }
-    } catch (err: any) {
+    } catch (e) {
+      const err = asError(e);
       if (isStepperVariant) {
         if (__DEV__) logger.debug("[FrequentlyOrdered AddToCart] error:", err);
       } else {

@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
@@ -67,10 +68,10 @@ export const AddMoneyLayout: React.FC = () => {
         backTimer.current = null;
         router.back();
       }, 2000);
-    } catch (err: any) {
+    } catch (e) {
       Alert.alert(
         "Failed",
-        err?.message ?? "Could not add money. Please try again.",
+        asError(e).message ?? "Could not add money. Please try again.",
       );
     }
   };

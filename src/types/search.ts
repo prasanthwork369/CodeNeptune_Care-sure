@@ -1,5 +1,7 @@
+// Thumbnails on this screen are always remote URLs rendered with RN's Image,
+// so they are plain {uri} objects — not expo-image's ImageSource.
 export interface SearchedProduct {
-  image: any;
+  image?: { uri: string };
   name: string;
   manufacturer: string;
   description: string;
@@ -11,7 +13,7 @@ export interface SearchedProduct {
 }
 
 export interface RecommendedProduct {
-  image: any;
+  image?: { uri: string };
   name: string;
   manufacturer: string;
   description: string;

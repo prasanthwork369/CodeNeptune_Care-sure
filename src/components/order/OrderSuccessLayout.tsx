@@ -384,7 +384,7 @@ export const OrderSuccessLayout: React.FC = () => {
           >
             <Touchable
               activeOpacity={0.88}
-              onPress={() => router.replace("/profile/orders" as any)}
+              onPress={() => router.replace("/profile/orders")}
               style={{
                 backgroundColor: "#0F7635",
                 borderRadius: exactScale(14),

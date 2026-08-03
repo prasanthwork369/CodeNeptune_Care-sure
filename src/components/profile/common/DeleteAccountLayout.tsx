@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -49,10 +50,10 @@ export const DeleteAccountLayout: React.FC = () => {
     try {
       await deleteAccount();
       // On success the auth state is cleared → root layout redirects to login.
-    } catch (err: any) {
+    } catch (e) {
       Alert.alert(
         "Delete Account",
-        err?.message ?? "Could not delete your account. Please try again.",
+        asError(e).message ?? "Could not delete your account. Please try again.",
       );
     }
   };

@@ -2,7 +2,7 @@ import { tokenStorage } from "@/src/lib/storage";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
 import axios, { AxiosInstance } from "axios";
-import { toAppError } from "./errors";
+import { asError, toAppError } from "./errors";
 import { logger } from "@/src/utils/logger";
 
 const MUTATION_METHODS = new Set(["post", "put", "patch", "delete"]);
@@ -149,12 +149,12 @@ apiClient.interceptors.response.use(
         processQueue(null, newToken);
         original.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(original);
-      } catch (e: any) {
+      } catch (e) {
         if (__DEV__) console.error("[apiClient] Background refresh FAILED:", e);
         processQueue(e, null);
         // Only force logout if the refresh itself returned 401/403 (invalid/expired refresh token)
         // A 5xx server error should not log the user out
-        const refreshStatus = e?.response?.status;
+        const refreshStatus = asError(e).response?.status;
         if (refreshStatus === 401 || refreshStatus === 403) {
           _accessToken = null;
           onUnauthorized?.();

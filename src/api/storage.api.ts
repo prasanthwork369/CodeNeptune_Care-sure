@@ -36,7 +36,8 @@ export const storageApi = {
       uri: file.uri,
       name: sanitizeFileName(file.name),
       type: file.type,
-    } as any);
+      // RN's FormData takes a file descriptor object; the DOM typings only allow Blob.
+    } as unknown as Blob);
     form.append("folder", folder);
     const response = await apiClient.post<{
       success: boolean;
@@ -75,7 +76,8 @@ export const storageApi = {
         uri: file.uri,
         name: sanitizeFileName(file.name),
         type: file.type,
-      } as any);
+        // RN's FormData takes a file descriptor object; the DOM typings only allow Blob.
+      } as unknown as Blob);
     });
     form.append("folder", folder);
     const response = await apiClient.post<{

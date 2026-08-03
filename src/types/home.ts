@@ -5,7 +5,7 @@ import type { ImageSource } from "expo-image";
 export interface QuickAction {
   id: string;
   label: string;
-  icon: any; // Can be SVG component or ImageSource
+  icon: ImageSource | number; // remote source, or a bundled asset's module id
   bgColor: string;
   iconColor: string;
 }
@@ -85,7 +85,7 @@ export interface SubstituteProduct extends Product {
 export interface TrustBadge {
   id: string;
   label: string;
-  image: any;
+  image: ImageSource | number;
 }
 
 // ─── API Response Types ────────────────────────────────────────────────────────

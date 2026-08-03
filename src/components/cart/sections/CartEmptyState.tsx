@@ -1,6 +1,7 @@
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
 import { CartEmptyStateProps } from "@/src/types/cart";
+import { Product } from "@/src/types/home";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { useNav } from "@/src/hooks/useNav";
@@ -18,7 +19,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
     null,
   );
 
-  const handleAdd = async (product: any) => {
+  const handleAdd = async (product: Product) => {
     setAddingProductId(product.id);
     try {
       const apiPromise = Promise.resolve(onAddItem(product));
@@ -132,7 +133,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                 >
                   {product.image?.uri ? (
                     <Image
-                      source={product.image as any}
+                      source={{ uri: product.image.uri }}
                       style={{ width: "82%", height: "82%" }}
                       resizeMode="contain"
                     />

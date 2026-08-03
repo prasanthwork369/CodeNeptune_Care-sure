@@ -1,3 +1,5 @@
+import type { ImageSource } from "expo-image";
+
 export interface CategoryProduct {
   id: string;
   productId: string;
@@ -6,7 +8,7 @@ export interface CategoryProduct {
   price: number;
   originalPrice?: number;
   description: string;
-  image: any;
+  image: ImageSource | null;
   discount?: string;
   discountPercent?: number;
   packSize?: string;

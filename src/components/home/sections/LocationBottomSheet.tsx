@@ -41,6 +41,20 @@ interface GooglePrediction {
   secondaryText: string;
 }
 
+/** Raw Places Autocomplete row, before it is flattened into a GooglePrediction. */
+interface ApiPlacePrediction {
+  description: string;
+  place_id: string;
+  structured_formatting?: { main_text?: string; secondary_text?: string };
+}
+
+/** Raw Place Details address component. */
+interface ApiAddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
+
 const labelToIcon = (label: string) => {
   const l = label.toUpperCase();
   if (l === "HOME")
@@ -92,7 +106,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
       settings?.mapsApiKey ?? process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 
     const bottomSheetRef = useRef<BottomSheetModal>(null);
-    const inputRef = useRef<any>(null);
+    const inputRef = useRef<React.ComponentRef<
+      typeof BottomSheetTextInput
+    > | null>(null);
     const snapPoints = useMemo(() => ["70%"], []);
 
     // Debounce input value
@@ -121,7 +137,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           const json = await res.json();
           if (json.status === "OK") {
             setPredictions(
-              (json.predictions ?? []).map((p: any) => ({
+              (json.predictions ?? []).map((p: ApiPlacePrediction) => ({
                 description: p.description,
                 place_id: p.place_id,
                 mainText: p.structured_formatting?.main_text ?? p.description,
@@ -131,8 +147,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           } else {
             setPredictions([]);
           }
-        } catch (err: any) {
-          if (err?.name === "AbortError") return;
+        } catch (err) {
+          if (err instanceof Error && err.name === "AbortError") return;
           setPredictions([]);
         } finally {
           if (!controller.signal.aborted) setIsSearching(false);
@@ -173,9 +189,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           return;
         }
 
-        const components: any[] = json.result.address_components ?? [];
+        const components: ApiAddressComponent[] =
+          json.result.address_components ?? [];
         const get = (type: string) =>
-          components.find((c: any) => c.types.includes(type))?.long_name ?? "";
+          components.find((c) => c.types.includes(type))?.long_name ?? "";
 
         const streetNumber = get("street_number");
         const route = get("route");
@@ -218,7 +235,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
 
         handleClose();
         setTimeout(() => {
-          router.push({ pathname: "/profile/addresses/add" as any, params });
+          router.push({ pathname: "/profile/addresses/add", params });
         }, 500);
       } catch {
         showToast("Failed to get location details. Please try again.", "error");
@@ -230,7 +247,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     const handleAddNewAddress = () => {
       handleClose();
       router.push({
-        pathname: "/profile/addresses/add" as any,
+        pathname: "/profile/addresses/add",
         params: { from_location_sheet: "1" },
       });
     };
@@ -239,10 +256,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     // device's location services are disabled.
     const openLocationSettings = async () => {
       try {
-        if (Platform.OS === "android" && (Linking as any).sendIntent) {
+        if (Platform.OS === "android" && Linking.sendIntent) {
           // Open the Android Location source settings directly.
           try {
-            await (Linking as any).sendIntent(
+            await Linking.sendIntent(
               "android.settings.LOCATION_SOURCE_SETTINGS",
             );
             return;
@@ -381,7 +398,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
 
         handleClose();
         setTimeout(() => {
-          router.push({ pathname: "/profile/addresses/add" as any, params });
+          router.push({ pathname: "/profile/addresses/add", params });
         }, 500);
       } catch {
         Alert.alert(

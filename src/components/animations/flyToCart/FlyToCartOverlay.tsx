@@ -77,8 +77,11 @@ const FloatingItem: React.FC<FloatingItemProps> = ({
     };
   });
 
-  const imageSource =
-    typeof item.imageUrl === "string" ? { uri: item.imageUrl } : item.imageUrl;
+  // Normalised to a plain {uri} because this is RN's Image, not expo-image's.
+  // Undefined when absent — flyToCart never fires without an image anyway.
+  const uri =
+    typeof item.imageUrl === "string" ? item.imageUrl : item.imageUrl?.uri;
+  const imageSource = uri ? { uri } : undefined;
 
   return (
     <Animated.View style={[animatedStyle, styles.shadow]} pointerEvents="none">

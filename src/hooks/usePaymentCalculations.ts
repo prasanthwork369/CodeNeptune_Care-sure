@@ -1,3 +1,4 @@
+import { asError } from "@/src/api/errors";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
@@ -241,7 +242,8 @@ export function usePaymentCalculations() {
           total: String(Number(billBreakdown.toPay).toFixed(2)),
         },
       });
-    } catch (err: any) {
+    } catch (e) {
+      const err = asError(e);
       // Redacted on purpose: the payload carries the delivery address and patient phone.
       if (__DEV__) {
         logger.debug("[PlaceOrder] failed", {

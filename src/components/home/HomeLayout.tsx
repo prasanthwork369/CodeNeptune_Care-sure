@@ -227,11 +227,11 @@ const HomeContent: React.FC = () => {
   );
 
   const handleViewAllFrequent = useCallback(() => {
-    router.push("/profile/orders/frequent" as any);
+    router.push("/profile/orders/frequent");
   }, [router]);
 
   const handleViewAllSubstitutes = useCallback(() => {
-    router.push("/(stack)/featured" as any);
+    router.push("/(stack)/featured");
   }, [router]);
 
   // Each Health Essentials row is one subcategory. The featured API returns no

@@ -350,7 +350,7 @@ export function ReturnSuccessLayout() {
         }}
       >
         <Touchable
-          onPress={() => router.replace("/(tabs)" as any)}
+          onPress={() => router.replace("/(tabs)")}
           style={{
             backgroundColor: colors.primary,
             paddingVertical: verticalScale(14),

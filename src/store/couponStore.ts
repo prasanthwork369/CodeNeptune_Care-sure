@@ -1,10 +1,5 @@
 import { create } from "zustand";
-
-interface AppliedCoupon {
-  code: string;
-  discount: number;
-  description: string;
-}
+import type { AppliedCoupon } from "@/src/types/cart";
 
 interface CouponState {
   applied: AppliedCoupon | null;
