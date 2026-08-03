@@ -355,9 +355,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
   const { width: screenWidth } = useWindowDimensions();
   const activeRouteName = state.routes[state.index]?.name;
-  const keepBottomGradient = ["categories", "profile"].includes(
-    activeRouteName,
-  );
+  const keepBottomGradient = activeRouteName !== "index";
 
   const pillRoutes = useMemo(
     () =>
