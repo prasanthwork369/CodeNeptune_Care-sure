@@ -24,14 +24,14 @@ interface SearchRowProps {
       name: string;
       brandName: string;
       description?: string;
-      price: number;
+      price: number | null; // absent when the backend omits a price
       status: string;
     };
     recommended: {
       name: string;
       manufacturer: string;
-      price: number;
-      originalPrice: number;
+      price: number | null; // absent when the backend omits a price
+      originalPrice: number | null;
       savings: number;
       description?: string;
       image?: ImageSource | null;
@@ -58,8 +58,9 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
       productId: data.recProductId || data.productId,
       name: data.recommended.name,
       slug: data.recSlug || data.slug,
-      price: data.recommended.price,
-      originalPrice: data.recommended.originalPrice,
+      // 0 when the backend sent no price — useCartActions blocks the add.
+      price: data.recommended.price ?? 0,
+      originalPrice: data.recommended.originalPrice ?? undefined,
       image: data.recommended.image,
       requiresPrescription: data.requiresPrescription,
       packSize: data.recommended.packSize,
@@ -160,6 +161,7 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
                 </Text>
               )}
               {data.recommended.originalPrice != null &&
+                data.recommended.price != null &&
                 data.recommended.originalPrice > data.recommended.price && (
                   <Text
                     style={[s.mrp, { lineHeight: moderateScale(16) }]}

@@ -9,6 +9,9 @@ module.exports = defineConfig([
   },
   {
     rules: {
+      // CLAUDE.md rule: no `any`. tsconfig's `strict` only bans implicit ones,
+      // so this catches the explicit ones it lets through.
+      "@typescript-eslint/no-explicit-any": "warn",
       "no-restricted-imports": [
         "error",
         {

@@ -32,9 +32,16 @@ export const SearchResultsList = React.memo(
     results: ApiSearchMedicine[];
     colWidth: number;
     bottomPad: number;
-    toComparisonData: (item: ApiSearchMedicine) => any;
-    toSearchedOnlyData: (item: ApiSearchMedicine) => any;
-    toRecommendData: (item: ApiSearchMedicine) => any;
+    // Each mapper must produce exactly what the card it feeds expects.
+    toComparisonData: (
+      item: ApiSearchMedicine,
+    ) => React.ComponentProps<typeof SearchProductCard>["data"];
+    toSearchedOnlyData: (
+      item: ApiSearchMedicine,
+    ) => React.ComponentProps<typeof SearchNoSubstituteCard>["data"];
+    toRecommendData: (
+      item: ApiSearchMedicine,
+    ) => React.ComponentProps<typeof SearchRecommendCard>["data"];
     onRecommendPress: (productId: string) => void;
     onEndReached: () => void;
     isFetchingNextPage: boolean;

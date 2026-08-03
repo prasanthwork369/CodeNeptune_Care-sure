@@ -18,7 +18,7 @@ interface SearchNoSubstituteCardProps {
     searched: {
       name: string;
       manufacturer?: string;
-      price: number;
+      price: number | null; // absent when the backend omits a price
       status: string;
     };
   };
