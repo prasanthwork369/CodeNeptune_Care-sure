@@ -14,7 +14,6 @@ interface ItemsOrderedSectionProps {
   items: OrderItem[];
   orderId: string | undefined;
   orderStatus?: number;
-  isCancelling: boolean;
   // paid itemTotal / MRP total; used only to estimate a missing selling price.
   // It must never be displayed as an individual item's discount percentage.
   priceEstimateRatio?: number;
@@ -24,7 +23,6 @@ export function ItemsOrderedSection({
   items,
   orderId,
   orderStatus,
-  isCancelling,
   priceEstimateRatio,
 }: ItemsOrderedSectionProps) {
   const router = useNav();
@@ -96,13 +94,12 @@ export function ItemsOrderedSection({
                   params: { orderId },
                 })
               }
-              disabled={isCancelling}
             >
               <Text
                 style={[s.labelSm, { marginLeft: exactScale(6) }]}
                 className="font-inter-semibold text-brand-text"
               >
-                {isCancelling ? "Cancelling..." : "Cancel Order"}
+                Cancel Order
               </Text>
             </Touchable>
           )}

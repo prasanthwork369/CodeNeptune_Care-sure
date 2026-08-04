@@ -67,7 +67,7 @@ export const FaqLayout: React.FC = () => {
       if (typeof val === "string") {
         try {
           val = JSON.parse(val);
-        } catch (e) {
+        } catch {
           // ignore
         }
       }

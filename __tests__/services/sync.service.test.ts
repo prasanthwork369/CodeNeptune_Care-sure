@@ -3,8 +3,6 @@ import { apiClient } from "@/src/api/client";
 import { db } from "@/src/lib/sqlite/db";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { homeApi } from "@/src/api/home.api";
-import { categoryApi } from "@/src/api/category.api";
-import { medicineApi } from "@/src/api/medicine.api";
 import { QueryClient } from "@tanstack/react-query";
 
 jest.mock("@/src/api/client", () => ({

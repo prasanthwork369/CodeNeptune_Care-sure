@@ -40,9 +40,8 @@ export function usePrescriptionPicker(
     for (const f of files) {
       const key = `${f.name}-${f.size}-${f.type}`;
       if (seenKeys.has(key)) {
-        existingKeys.has(key)
-          ? skippedCount.existing++
-          : skippedCount.internal++;
+        if (existingKeys.has(key)) skippedCount.existing++;
+        else skippedCount.internal++;
         if (!firstDuplicate) firstDuplicate = f;
       } else {
         uniqueInSelection.push(f);

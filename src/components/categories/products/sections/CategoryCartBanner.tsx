@@ -6,7 +6,7 @@ import {
   AnimatedCount,
 } from "@/src/components/animations/flyToCart";
 import React, { useEffect, useRef } from "react";
-import { Text, View, useWindowDimensions } from "react-native";
+import { Text, View } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import Animated, {
   useAnimatedStyle,
@@ -29,7 +29,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
   onPress,
 }) => {
   const ctx = useFlyToCartSafe();
-  const { width: screenWidth } = useWindowDimensions();
 
   // Expand to the original designed pill width (centered)
   const PILL_W = 250;

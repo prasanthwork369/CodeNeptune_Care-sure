@@ -6,7 +6,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
-import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -24,14 +23,18 @@ import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationSc
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
-import { analyticsService, initCrashReporting } from "@/src/services/firebase";
+import {
+  analyticsService,
+  initCrashReporting,
+  PERF_TRACES,
+  usePerformanceTrace,
+} from "@/src/services/firebase";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
 import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
-import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import "../global.css";
 
 /**

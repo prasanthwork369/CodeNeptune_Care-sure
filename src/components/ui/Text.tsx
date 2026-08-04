@@ -1,7 +1,7 @@
 import React from "react";
 import { Text as RNText, TextProps as RNTextProps } from "react-native";
 
-export interface TextProps extends RNTextProps {}
+export type TextProps = RNTextProps;
 
 /**
  * A reusable Text component that wraps the globally-patched React Native Text.

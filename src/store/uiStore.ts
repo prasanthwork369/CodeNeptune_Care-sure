@@ -1,7 +1,6 @@
 import type { ImageSource } from "expo-image";
 import { create } from "zustand";
 import { withTiming } from "react-native-reanimated";
-import { AlertButton, AlertDialogProps } from "@/src/components/ui/AlertDialog";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { durations, easings } from "@/src/theme";
 

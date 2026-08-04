@@ -10,7 +10,7 @@ import {
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState, useMemo, useCallback } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";

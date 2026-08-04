@@ -26,7 +26,6 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const OTHER_OPTION = "__other__";
 
@@ -46,7 +45,6 @@ export function CancelOrderLayout() {
   const queryClient = useQueryClient();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const bottomInset = useAdjustedBottomInset();
-  const insets = useSafeAreaInsets();
   const scrollRef = useRef<React.ComponentRef<typeof KeyboardAwareScrollView>>(null);
 
   const { order, loading: orderLoading } = useOrderById(orderId);
@@ -58,7 +56,6 @@ export function CancelOrderLayout() {
   >(null);
   const [otherReason, setOtherReason] = useState("");
   const [error, setError] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [alertState, setAlertState] = useState<{
     visible: boolean;
@@ -73,7 +70,6 @@ export function CancelOrderLayout() {
 
   const isOtherSelected = selectedReasonId === OTHER_OPTION;
   const selectedReason = reasons.find((r) => r.id === selectedReasonId);
-  const selectedLabel = isOtherSelected ? "Other" : selectedReason?.label;
 
   const orderNumber = formatOrderId(order?.orderId || orderId);
   const itemsCount = order?.items?.length ?? 0;
@@ -81,7 +77,6 @@ export function CancelOrderLayout() {
 
   const selectReason = (id: number | typeof OTHER_OPTION) => {
     setSelectedReasonId(id);
-    setIsDropdownOpen(false);
     if (error) setError("");
     if (id !== OTHER_OPTION) {
       Keyboard.dismiss();

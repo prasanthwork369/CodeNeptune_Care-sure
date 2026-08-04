@@ -1,5 +1,4 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { profileStyles as s } from "../profile.styles";
 import { icons } from "@/src/constants/icons";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";

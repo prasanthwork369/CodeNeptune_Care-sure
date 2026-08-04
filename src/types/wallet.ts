@@ -36,7 +36,7 @@ export interface AddMoneyPayload {
   amount: number;
 }
 
-export interface WalletBalanceResponse extends WalletBalance {}
+export type WalletBalanceResponse = WalletBalance;
 
 export type Transaction = {
   id: string;

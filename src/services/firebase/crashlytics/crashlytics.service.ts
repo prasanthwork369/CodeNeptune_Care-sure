@@ -22,7 +22,7 @@ if (instance) {
     if (devInstance) {
       crashlytics().setCrashlyticsCollectionEnabled(devInstance, false);
     }
-  } catch (_) {
+  } catch {
     // Ignore errors in dev environment
   }
 }

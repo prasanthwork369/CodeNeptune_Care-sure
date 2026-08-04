@@ -1,11 +1,10 @@
 import { useCartActions } from "@/src/hooks/useCartActions";
-import { useCart } from "@/src/hooks/queries/useCart";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import Carousel from "react-native-reanimated-carousel";
 import { useSharedValue } from "react-native-reanimated";
 import { CarouselDot } from "@/src/components/animations/carousel";
 import { Touchable } from "@/src/components/ui/Touchable";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -43,7 +42,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   product,
 }) => {
   const { width } = useWindowDimensions();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [, setActiveIndex] = useState(0);
   const progress = useSharedValue(0);
   const imgSize = exactScale(215);
 

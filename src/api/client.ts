@@ -5,8 +5,6 @@ import axios, { AxiosInstance } from "axios";
 import { asError, toAppError } from "./errors";
 import { logger } from "@/src/utils/logger";
 
-const MUTATION_METHODS = new Set(["post", "put", "patch", "delete"]);
-
 // In-memory token — mirrors window.__ACCESS_TOKEN__ from web client
 // Synchronous access avoids async race conditions in the request interceptor
 let _accessToken: string | null = null;

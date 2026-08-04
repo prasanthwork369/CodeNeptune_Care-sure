@@ -1,19 +1,16 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { ANIMATIONS, HOME_IMAGES } from "@/src/constants/images";
-import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
+import { HOME_IMAGES } from "@/src/constants/images";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType } from "@/src/types/wallet";
 import { logToTransactions } from "@/src/utils/walletTransactions";
-import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   LayoutChangeEvent,
   ScrollView,
@@ -130,8 +127,6 @@ export const WalletLayout: React.FC = () => {
     loading: logsLoading,
     refetch: refetchLogs,
   } = useWalletLogs(20, 0);
-  const { data: settings } = useCartWalletSettings();
-  const coinValue = settings?.wallet?.coinValueInRupees ?? 1;
 
   // Refetch on every screen focus so balance/transactions don't show stale
   // cached data when the user navigates back to this tab repeatedly.

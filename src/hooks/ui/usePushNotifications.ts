@@ -74,7 +74,6 @@ const buildFcmTapPayload = (remoteMessage: {
 // Remote push notifications are unsupported in Expo Go (SDK 53+).
 // Remove the `isExpoGo` check below once running via a development build.
 export const usePushNotifications = () => {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoaded = useAuthStore((s) => s.isLoaded);
   // Root navigator readiness — `key` is set only once the navigation tree is
   // mounted. Cold-start navigation must wait for this so it lands AFTER index's

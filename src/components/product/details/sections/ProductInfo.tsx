@@ -47,7 +47,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   onVariantSelect,
 }) => {
   const { width } = useWindowDimensions();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [, setActiveIndex] = useState(0);
   const progress = useSharedValue(0);
   // 0.55 * Figma's 390px baseline, scaled the same way as the rest of the
   // app (capped at 1.15x) so this doesn't grow unbounded on large screens.

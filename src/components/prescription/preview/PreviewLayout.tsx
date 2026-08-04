@@ -21,7 +21,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { BackHandler, Alert, View, useWindowDimensions } from "react-native";
+import { BackHandler, View, useWindowDimensions } from "react-native";
 import {
   DuplicateFileModal,
   FileTooLargeModal,
@@ -35,16 +35,6 @@ import {
 import { logger } from "@/src/utils/logger";
 
 const FOLDER = "customers/prescriptions";
-
-const showPermissionAlert = (
-  feature: "photo library" | "camera",
-  showInfo: (t: string, m: string) => void,
-) => {
-  showInfo(
-    "Permission Required",
-    `Please allow ${feature} access in Settings to continue.`,
-  );
-};
 
 export const PreviewLayout: React.FC = () => {
   const router = useNav();

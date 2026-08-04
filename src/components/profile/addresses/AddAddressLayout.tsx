@@ -4,7 +4,6 @@ import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { profileStyles as s } from "../profile.styles";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
-import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { icons } from "@/src/constants/icons";
 import { LABELS, LabelType } from "@/src/types/address";
@@ -47,7 +46,6 @@ export const AddAddressLayout: React.FC = () => {
     prefill_pincode?: string;
   }>();
   const isEdit = !!id;
-  const user = useAuthStore((s) => s.user);
   const setLocation = useLocationStore((s) => s.setLocation);
   const {
     addresses,

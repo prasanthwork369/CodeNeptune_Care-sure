@@ -8,10 +8,27 @@ module.exports = defineConfig([
     ignores: ["dist/*"],
   },
   {
+    // TS-only: the @typescript-eslint plugin is registered for these files only,
+    // so applying its rules globally crashes ESLint on plain .js files.
+    files: ["**/*.ts", "**/*.tsx"],
     rules: {
       // CLAUDE.md rule: no `any`. tsconfig's `strict` only bans implicit ones,
       // so this catches the explicit ones it lets through.
       "@typescript-eslint/no-explicit-any": "warn",
+      // require() is the deliberate pattern for lazy native-module loads (kept
+      // out of Expo Go) and for static asset refs, so the ESM rule doesn't fit.
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    // Mock components in tests are throwaway stand-ins, not real components.
+    files: ["__tests__/**", "jest.setup.ts"],
+    rules: {
+      "react/display-name": "off",
+    },
+  },
+  {
+    rules: {
       "no-restricted-imports": [
         "error",
         {

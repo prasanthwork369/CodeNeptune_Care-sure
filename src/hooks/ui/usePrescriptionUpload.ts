@@ -68,9 +68,8 @@ export function usePrescriptionUpload(
     for (const f of files) {
       const key = `${f.name}_${f.size ?? 0}_${f.type}`;
       if (seenKeys.has(key)) {
-        existingKeys.has(key)
-          ? skippedCount.existing++
-          : skippedCount.internal++;
+        if (existingKeys.has(key)) skippedCount.existing++;
+        else skippedCount.internal++;
         if (!firstDuplicate) firstDuplicate = f;
       } else {
         uniqueInSelection.push(f);

@@ -13,7 +13,6 @@ import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
@@ -241,7 +240,6 @@ function formatDate(iso?: string | null) {
 
 export const OrderTrackLayout: React.FC = () => {
   const router = useNav();
-  const queryClient = useQueryClient();
   const adjustedBottom = useAdjustedBottomInset();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const { order, loading } = useOrderById(orderId);
@@ -251,7 +249,6 @@ export const OrderTrackLayout: React.FC = () => {
   const [animTriggered, setAnimTriggered] = useState(false);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
   const [isProceeding, setIsProceeding] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
   const [invoiceModalVisible, setInvoiceModalVisible] = useState(false);
 
   const [alertState, setAlertState] = useState<{
@@ -505,7 +502,6 @@ export const OrderTrackLayout: React.FC = () => {
           items={items}
           orderId={orderId}
           orderStatus={order?.status}
-          isCancelling={isCancelling}
           priceEstimateRatio={mrpTotal > 0 ? subtotal / mrpTotal : 1}
         />
 
