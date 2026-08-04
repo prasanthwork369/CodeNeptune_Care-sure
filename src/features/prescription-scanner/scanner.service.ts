@@ -48,8 +48,8 @@ async function captureWithCamera(): Promise<string | null> {
 
 export const ScannerService = {
   /**
-   * Opens the document scanner (or camera fallback) and returns the URI of
-   * the captured image.
+   * Opens the document scanner (or camera fallback) and returns the URIs of
+   * every captured page — the scanner's "+" button can add several.
    *
    * Requires camera permission — call this AFTER the caller has already
    * obtained permission (usePrescriptionUpload / usePrescriptionPicker both
@@ -64,14 +64,14 @@ export const ScannerService = {
       try {
         const result = await DocumentScanner.scanDocument();
 
-        // scannedImages present → success
+        // scannedImages present → success, keep every page the user captured
         if (result?.scannedImages?.length) {
-          return { imageUri: result.scannedImages[0], cancelled: false };
+          return { imageUris: [...result.scannedImages], cancelled: false };
         }
 
         // result truthy but no images → user cancelled inside the scanner
         if (result) {
-          return { imageUri: null, cancelled: true };
+          return { imageUris: [], cancelled: true };
         }
       } catch (e) {
         if (__DEV__) {
@@ -84,14 +84,14 @@ export const ScannerService = {
       }
     }
 
-    // 2. Camera fallback
+    // 2. Camera fallback — single shot, so always a one-page result
     try {
       const uri = await captureWithCamera();
-      if (!uri) return { imageUri: null, cancelled: true };
-      return { imageUri: uri, cancelled: false };
+      if (!uri) return { imageUris: [], cancelled: true };
+      return { imageUris: [uri], cancelled: false };
     } catch (e) {
       if (__DEV__) console.error("[ScannerService] Camera fallback failed:", e);
-      return { imageUri: null, cancelled: false };
+      return { imageUris: [], cancelled: false };
     }
   },
 };

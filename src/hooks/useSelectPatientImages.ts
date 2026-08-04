@@ -10,7 +10,7 @@ import { PrescriptionItem } from "@/src/types/prescription";
 import {
   MAX_FILES,
   validatePrescriptionFile,
-  capturePrescriptionImage,
+  capturePrescriptionImages,
 } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
@@ -150,17 +150,20 @@ export function useSelectPatientImages(
           );
         return;
       }
-      const scannedUri = await capturePrescriptionImage();
-      if (scannedUri) {
-        const filename =
-          scannedUri.split("/").pop() || "scanned_prescription.jpg";
-        const asset = {
-          uri: scannedUri,
-          name: filename,
-          fileName: filename,
-          mimeType: "image/jpeg",
-        };
-        await addAssets([asset]);
+      const scannedUris = await capturePrescriptionImages();
+      if (scannedUris.length > 0) {
+        // One asset per scanned page, so multi-page scans are all kept.
+        const assets = scannedUris.map((uri, index) => {
+          const filename =
+            uri.split("/").pop() || `scanned_prescription_${index + 1}.jpg`;
+          return {
+            uri,
+            name: filename,
+            fileName: filename,
+            mimeType: "image/jpeg",
+          };
+        });
+        await addAssets(assets);
       }
     } catch {
       Alert.alert("Error", "Failed to take photo. Please try again.");

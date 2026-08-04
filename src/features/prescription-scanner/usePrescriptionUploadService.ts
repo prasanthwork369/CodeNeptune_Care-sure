@@ -43,18 +43,22 @@ export function usePrescriptionUploadService({
         return;
       }
 
-      const { imageUri, cancelled } = await ScannerService.scan();
-      if (cancelled || !imageUri) return;
+      const { imageUris, cancelled } = await ScannerService.scan();
+      if (cancelled || imageUris.length === 0) return;
 
-      const filename = imageUri.split("/").pop() || "scanned_prescription.jpg";
-      const asset: CapturedAsset = {
-        uri: imageUri,
-        name: filename,
-        fileName: filename,
-        mimeType: "image/jpeg",
-      };
+      // One asset per scanned page — the scanner's "+" can return several.
+      const assets: CapturedAsset[] = imageUris.map((uri, index) => {
+        const filename =
+          uri.split("/").pop() || `scanned_prescription_${index + 1}.jpg`;
+        return {
+          uri,
+          name: filename,
+          fileName: filename,
+          mimeType: "image/jpeg",
+        };
+      });
 
-      await onAssetsReady([asset]);
+      await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to take photo. Please try again.");
     }

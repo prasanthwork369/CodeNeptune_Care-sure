@@ -206,7 +206,8 @@ export async function validatePrescriptionFile(
   return { localUri: resolvedUri, name, type, size };
 }
 
-export async function capturePrescriptionImage(): Promise<string | null> {
+/** Returns every scanned page — the scanner's "+" button can capture several. */
+export async function capturePrescriptionImages(): Promise<string[]> {
   // Optional native module — absent from some binaries, so it stays lazy-required.
   let DocumentScanner: {
     scanDocument: () => Promise<{ scannedImages?: string[] }>;
@@ -221,11 +222,11 @@ export async function capturePrescriptionImage(): Promise<string | null> {
     try {
       const result = await DocumentScanner.scanDocument();
       if (result && result.scannedImages && result.scannedImages.length > 0) {
-        return result.scannedImages[0];
+        return [...result.scannedImages];
       }
-      // If the user cancelled, return null without showing the camera fallback
+      // If the user cancelled, return empty without showing the camera fallback
       if (result) {
-        return null;
+        return [];
       }
     } catch (e) {
       if (__DEV__) {
@@ -243,7 +244,7 @@ export async function capturePrescriptionImage(): Promise<string | null> {
     cameraType: ImagePicker.CameraType.back,
   });
   if (!result.canceled && result.assets && result.assets.length > 0) {
-    return result.assets[0].uri;
+    return [result.assets[0].uri];
   }
-  return null;
+  return [];
 }

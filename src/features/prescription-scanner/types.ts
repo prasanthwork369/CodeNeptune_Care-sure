@@ -4,13 +4,13 @@
  */
 
 export interface ScanResult {
-  /** Local file URI of the scanned image, or null if no image was captured. */
-  imageUri: string | null;
+  /** Local file URIs of every scanned page, in capture order; empty if none. */
+  imageUris: string[];
   /** True when the user cancelled the scanner without capturing an image. */
   cancelled: boolean;
 }
 
 export interface RawScanOutput {
-  imageUri: string | null;
+  imageUris: string[];
   cancelled: boolean;
 }
