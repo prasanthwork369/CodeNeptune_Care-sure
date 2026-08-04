@@ -19,6 +19,6 @@ describe("AdviceCardsSection", () => {
     expect(scrollView.props.horizontal).toBe(true);
     expect(scrollView.props.scrollEnabled).toBe(true);
     expect(scrollView.props.nestedScrollEnabled).toBe(true);
-    expect(scrollView.props.canCancelContentTouches).toBe(false);
+    expect(scrollView.props.canCancelContentTouches).toBe(true);
   });
 });

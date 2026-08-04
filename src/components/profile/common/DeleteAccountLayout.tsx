@@ -9,7 +9,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 import { ConfirmActionModal } from "./ConfirmActionModal";
 
 // The three things the user loses on deletion — icon + copy, matching the design.
@@ -66,16 +66,13 @@ export const DeleteAccountLayout: React.FC = () => {
         showBorder
       />
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
+      <View
+        style={{
+          flex: 1,
           paddingHorizontal: exactScale(20),
-          paddingTop: exactScale(28),
+          paddingTop: exactScale(16),
           paddingBottom: exactScale(24),
-          flexGrow: 1,
         }}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
       >
         {/* Hero illustration */}
         <View style={{ alignItems: "center" }}>
@@ -94,7 +91,7 @@ export const DeleteAccountLayout: React.FC = () => {
             color: "#1A1C1E",
             textAlign: "center",
             lineHeight: moderateScale(29),
-            marginTop: exactScale(16),
+            marginTop: exactScale(12),
           }}
         >
           Are you sure you want{"\n"}to delete your account
@@ -121,7 +118,7 @@ export const DeleteAccountLayout: React.FC = () => {
             fontSize: moderateScale(16),
             fontWeight: "700",
             color: "#1A1C1E",
-            marginTop: exactScale(28),
+            marginTop: exactScale(24),
             marginBottom: exactScale(12),
           }}
         >
@@ -187,7 +184,7 @@ export const DeleteAccountLayout: React.FC = () => {
             </View>
           ))}
         </View>
-      </ScrollView>
+      </View>
 
       {/* Footer — destructive action */}
       <View

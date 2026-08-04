@@ -58,7 +58,9 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
       ref={cardsScrollRef}
       horizontal
       nestedScrollEnabled
-      canCancelContentTouches={false}
+      // iOS must be able to take over touches that start on card text so a
+      // horizontal drag scrolls the carousel instead of staying with the child.
+      canCancelContentTouches
       directionalLockEnabled
       scrollEnabled
       showsHorizontalScrollIndicator={false}
