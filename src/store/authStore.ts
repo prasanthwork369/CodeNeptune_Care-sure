@@ -3,6 +3,7 @@ import { tokenStorage, guestStorage } from "@/src/lib/storage";
 import { profileApi, CustomerProfile } from "../api/profile.api";
 import { setAccessToken } from "../api/client";
 import { queryClient } from "@/src/lib/react-query/queryClient";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { usePrescriptionDraftStore } from "./prescriptionDraftStore";
 import { useCouponStore } from "./couponStore";
@@ -54,6 +55,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .then((profile) => {
             set({ user: profile });
             apiCache.set("customer_profile", profile);
+            // Seed React Query too, or useProfile (mounted by the tabs layout)
+            // fires a second identical request on every cold start.
+            queryClient.setQueryData(QUERY_KEYS.CUSTOMER.PROFILE, profile);
           })
           .catch(async (err) => {
             // Only drop the session on a confirmed auth failure (401/403).

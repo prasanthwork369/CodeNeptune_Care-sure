@@ -10,7 +10,7 @@ import React from "react";
 const renderTabBar = (props: BottomTabBarProps) => <LiquidTabBar {...props} />;
 
 const TabLayout = () => {
-  const { isLoaded } = useAuthStore();
+  const isLoaded = useAuthStore((s) => s.isLoaded);
   useProfile();
 
   if (!isLoaded) return null;

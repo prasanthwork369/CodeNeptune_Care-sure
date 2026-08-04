@@ -3,7 +3,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import { screenTransitions } from "@/src/theme";
 
 export default function PrescriptionLayout() {
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
   return (

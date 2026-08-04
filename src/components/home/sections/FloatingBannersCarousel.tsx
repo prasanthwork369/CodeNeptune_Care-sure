@@ -90,11 +90,7 @@ const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
 });
 Dot.displayName = "Dot";
 
-export const FloatingBannersCarousel = ({
-  isFocused = true,
-}: {
-  isFocused?: boolean;
-}) => {
+export const FloatingBannersCarousel = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const extraGap = exactScale(6);
@@ -103,10 +99,12 @@ export const FloatingBannersCarousel = ({
   const { latestPrescription, hasPendingPrescription, dismissBanner } =
     usePrescriptionBanner();
   const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
-  // Pause autoplay while the home feed is scrolling. Read from the store here
-  // (rather than via a prop) so scroll toggles don't re-render the whole feed.
+  // Pause autoplay while the home feed is scrolling or Home is blurred. Read
+  // from the store here (rather than via props) so neither toggle re-renders
+  // the whole feed.
   const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
-  const focused = isFocused && !isFeedScrolling;
+  const isHomeFocused = useUIStore((s) => s.isHomeFocused);
+  const focused = isHomeFocused && !isFeedScrolling;
 
   const [isCartInteracting, setIsCartInteracting] = useState(false);
   // The cart mutation has no onMutate, so totalItems trails the server by a

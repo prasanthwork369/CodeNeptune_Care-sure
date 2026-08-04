@@ -19,7 +19,9 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60_000,
-      gcTime: 24 * 60 * 60_000,
+      // An hour, not a day: product/order/search payloads were the largest
+      // heap contributor across a long session. SQLite still backs offline.
+      gcTime: 60 * 60_000,
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
         if (error instanceof AppError) {

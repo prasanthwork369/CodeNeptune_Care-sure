@@ -1,0 +1,57 @@
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { cartService } from "@/src/services/cart.service";
+import { useAuthStore } from "@/src/store/authStore";
+import { useCartPendingStore } from "@/src/store/cartStore";
+import type { CartItem } from "@/src/types/cart";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+
+// Shared identity, or an empty cart would hand useMemo a new array each render.
+const EMPTY_ITEMS: CartItem[] = [];
+
+/**
+ * Read-only view of the cart, for components that never mutate it.
+ *
+ * useCart builds five useMutation instances per call, which product cards pay
+ * for on mount and on every cart write. This hook holds only the query
+ * subscription, so a card costs one subscriber instead of six.
+ */
+export const useCartRead = () => {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const guestCart = useCartPendingStore((s) => s.guestCart);
+
+  const { data: cart, isLoading } = useQuery({
+    queryKey: QUERY_KEYS.CUSTOMER.CART,
+    queryFn: cartService.getCart,
+    enabled: isAuthenticated,
+    // Mutations keep this cache fresh via setQueryData, so a short staleTime
+    // just avoids redundant refetches on every screen focus/tab switch.
+    staleTime: 10_000,
+  });
+
+  const activeCart = isAuthenticated ? cart : guestCart;
+  const items: CartItem[] = activeCart?.items ?? EMPTY_ITEMS;
+
+  // One pass over the items instead of two reduces per subscribed card.
+  const { totalItems, totalPrice } = useMemo(() => {
+    let count = 0;
+    let price = 0;
+    for (const item of items) {
+      count += item.quantity;
+      const mrp = parseFloat(String(item.unitPrice));
+      const discountPct =
+        item.discountPercent ?? item.metadata?.discountPercent ?? 0;
+      price +=
+        (discountPct > 0 ? mrp * (1 - discountPct / 100) : mrp) * item.quantity;
+    }
+    return { totalItems: count, totalPrice: price };
+  }, [items]);
+
+  return {
+    cart: activeCart,
+    items,
+    totalItems,
+    totalPrice,
+    isLoading: isAuthenticated ? isLoading : false,
+  };
+};

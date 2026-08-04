@@ -2,7 +2,8 @@ import type { ImageSource } from "expo-image";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
-import { useCart } from "./queries/useCart";
+import { useCartRead } from "./queries/useCartRead";
+import { cartMutations } from "@/src/services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { analyticsService } from "@/src/services/firebase";
@@ -32,7 +33,9 @@ export interface CartActionProduct {
 }
 
 export const useCartActions = (product: CartActionProduct) => {
-  const { items, addItem, updateItem, removeItem } = useCart();
+  // Read-only: writes go through cartMutations, so a card never allocates the
+  // five useMutation instances useCart builds.
+  const { items } = useCartRead();
 
   // Primary match: medicineId = variant UUID (new items).
   // Fallback: metadata.selectedVariantId match for items added with old code (medicineId = parent UUID).
@@ -108,7 +111,7 @@ export const useCartActions = (product: CartActionProduct) => {
     if (isAuthenticated) setPending(pendingKey, true);
     try {
       if (cartItem) {
-        await updateItem(cartItem.id, { quantity: count + 1 });
+        await cartMutations.updateItem(cartItem.id, { quantity: count + 1 });
         void analyticsService.logAddToCart();
       } else {
         const medicineName =
@@ -145,7 +148,7 @@ export const useCartActions = (product: CartActionProduct) => {
             : String(product.packSize)
           : undefined;
 
-        await addItem({
+        await cartMutations.addItem({
           medicineId: product.medicineId,
           variantId: product.variantId ?? null,
           medicineName,
@@ -186,9 +189,9 @@ export const useCartActions = (product: CartActionProduct) => {
     if (isAuthenticated) setPending(pendingKey, true);
     try {
       if (count === 1) {
-        await removeItem(cartItem!.id);
+        await cartMutations.removeItem(cartItem!.id);
       } else {
-        await updateItem(cartItem!.id, { quantity: count - 1 });
+        await cartMutations.updateItem(cartItem!.id, { quantity: count - 1 });
       }
     } finally {
       if (isAuthenticated) setPending(pendingKey, false);

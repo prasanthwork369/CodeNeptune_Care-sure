@@ -6,7 +6,7 @@ import { ApiPrescription } from "@/src/types/prescription";
 import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { logger } from "@/src/utils/logger";
 
 const RECENT_PRESCRIPTIONS_LIMIT = 1;
@@ -27,9 +27,17 @@ const isActionable = (p: ApiPrescription): boolean => {
   return false;
 };
 
-export const usePrescriptionBanner = () => {
+interface PrescriptionBannerOptions {
+  /** Only the owner of the screen should refetch. Home mounts this hook three
+   * times (layout, header, floating banner) — leaving every instance to refetch
+   * on focus meant three refetch calls and three isFocusRefetching renders. */
+  refetchOnFocus?: boolean;
+}
+
+export const usePrescriptionBanner = ({
+  refetchOnFocus = false,
+}: PrescriptionBannerOptions = {}) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [isFocusRefetching, setIsFocusRefetching] = useState(false);
   // Per-field selectors: a whole-store subscription here would re-render every
   // Home consumer on each scroll-start/stop isFeedScrolling toggle.
   const hasJustUploadedPrescription = useUIStore(
@@ -46,7 +54,9 @@ export const usePrescriptionBanner = () => {
 
   const { mutate: dismissPrescription } = useDismissPrescription();
 
-  const { prescriptions, loading, refetch } = usePrescriptions(
+  // `refreshing` comes off the shared query, so all three Home instances see
+  // the same in-flight state even though only one of them triggers the refetch.
+  const { prescriptions, loading, refreshing, refetch } = usePrescriptions(
     isAuthenticated
       ? {
           limit: RECENT_PRESCRIPTIONS_LIMIT,
@@ -64,16 +74,14 @@ export const usePrescriptionBanner = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (isAuthenticated) {
-        setIsFocusRefetching(true);
+      if (isAuthenticated && refetchOnFocus) {
         refetch().finally(() => {
-          setIsFocusRefetching(false);
           if (hasJustUploadedRef.current) {
             setHasJustUploadedPrescription(false);
           }
         });
       }
-    }, [isAuthenticated]),
+    }, [isAuthenticated, refetchOnFocus]),
   );
 
   const isRejected = status === PRESCRIPTION_STATUS.CANCELLED;
@@ -83,7 +91,7 @@ export const usePrescriptionBanner = () => {
   const baseVisible =
     isAuthenticated &&
     !!latestPrescription &&
-    !isFocusRefetching &&
+    !refreshing &&
     !hasJustUploadedPrescription &&
     !isRxFromCartFlow;
 
@@ -126,6 +134,6 @@ export const usePrescriptionBanner = () => {
     showUnderReviewBanner,
     dismissBanner,
     isLoading: isAuthenticated && loading,
-    isRefetching: isAuthenticated && isFocusRefetching,
+    isRefetching: isAuthenticated && refreshing,
   };
 };

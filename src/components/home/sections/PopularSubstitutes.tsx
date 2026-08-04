@@ -33,6 +33,11 @@ interface PopularSubstitutesProps {
 const ACCENT = "#0F7635";
 const CONTENT_BG = "#F7FDF9";
 const DISCOUNT_BG = "#E8F5E9";
+const ROW_GAP = exactScale(14);
+
+// Hoisted: an inline arrow is a new component type every render, which remounts
+// every separator in the row instead of reusing them.
+const ProductSeparator = () => <View style={{ width: ROW_GAP }} />;
 
 const ProductCard = React.memo(
   ({
@@ -285,7 +290,6 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({
 }) => {
   const { width } = useWindowDimensions();
   const cardWidth = (width - 20 - 14 - 36) / 2;
-  const gap = exactScale(14);
   // Product cards size to their own content (see ProductCard), so there is no
   // fixed height to copy — measure a real one and match it.
   const [rowHeight, setRowHeight] = useState(0);
@@ -378,13 +382,13 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({
             paddingLeft: exactScale(20),
             paddingRight: exactScale(40),
           }}
-          ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+          ItemSeparatorComponent={ProductSeparator}
           // Sits after the last product so scrolling to the end leads
           // into the full catalogue.
           // View All only earns its card once the row is deep (10+ products).
           ListFooterComponent={
             onViewAll && products.length >= 10 ? (
-              <View style={{ marginLeft: gap }}>
+              <View style={{ marginLeft: ROW_GAP }}>
                 <ViewAllCard
                   width={cardWidth}
                   height={rowHeight}

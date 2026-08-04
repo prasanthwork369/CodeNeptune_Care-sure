@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { homeApi } from "../../api/home.api";
 import type { ApiAppContent } from "../../types/home";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
@@ -14,7 +15,11 @@ export const useHome = () => {
     refetch: refetchCategories,
   } = useCategories();
 
-  const cachedContent = apiCache.getWithMeta<ApiAppContent>("app_contents");
+  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
+  // React Query only consumes it to seed initialData.
+  const [cachedContent] = useState(() =>
+    apiCache.getWithMeta<ApiAppContent>("app_contents"),
+  );
 
   const {
     data: appContent,

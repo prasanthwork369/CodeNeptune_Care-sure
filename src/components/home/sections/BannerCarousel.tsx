@@ -22,7 +22,6 @@ interface BannerCarouselProps {
   banners: ApiBanner[];
   categories?: CategoryCard[];
   isLoading?: boolean;
-  isVisible?: boolean;
 }
 
 const BANNER_ROUTE_MAP: Record<string, Href> = {
@@ -67,17 +66,19 @@ const findCardBySlug = (
 };
 
 export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
-  ({ banners, categories, isLoading, isVisible = true }) => {
+  ({ banners, categories, isLoading }) => {
     const { width } = useWindowDimensions();
     const bannerHeight = Math.round(exactScale(176));
     const router = useNav();
     const carouselRef = useRef<ICarouselInstance>(null);
     const progressShared = useSharedValue(0);
     const appActiveRef = useRef(true);
-    // Subscribed here (not passed as a prop) so the home feed doesn't re-render
-    // on every scroll start/stop — only this carousel reacts to pause autoplay.
+    // Both subscribed here (not passed as props) so the home feed doesn't
+    // re-render on scroll start/stop or on focus changes — only this carousel
+    // reacts, to pause autoplay.
     const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
-    const autoplayActive = isVisible && !isFeedScrolling;
+    const isHomeFocused = useUIStore((s) => s.isHomeFocused);
+    const autoplayActive = isHomeFocused && !isFeedScrolling;
 
     // Manual autoplay — bypasses the unreliable autoPlay prop in v4
     useEffect(() => {

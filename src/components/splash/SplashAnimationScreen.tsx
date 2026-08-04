@@ -25,7 +25,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const MIN_DISPLAY_MS = 1_450;
+const MIN_DISPLAY_MS = 600;
 const REDUCED_MOTION_DISPLAY_MS = 450;
 const SLOW_LOAD_MESSAGE_MS = 1_800;
 

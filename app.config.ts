@@ -127,6 +127,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Copies native/android/ custom sources into the generated android/ project
     // and registers their ReactPackages — survives `expo prebuild --clean`.
     "./plugins/withCustomNativeFiles",
+    // Lets Android Studio Profiler attach to release builds without debuggable=true.
+    "./plugins/withProfileable",
     [
       "react-native-document-scanner-plugin",
       {

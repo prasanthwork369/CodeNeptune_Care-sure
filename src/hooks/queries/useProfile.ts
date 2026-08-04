@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   profileApi,
   UpdateProfilePayload,
@@ -14,8 +15,11 @@ export const useProfile = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const cachedProfile =
-    apiCache.getWithMeta<CustomerProfile>("customer_profile");
+  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
+  // React Query only consumes it to seed initialData.
+  const [cachedProfile] = useState(() =>
+    apiCache.getWithMeta<CustomerProfile>("customer_profile"),
+  );
 
   const {
     data: profile,

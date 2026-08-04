@@ -96,7 +96,11 @@ export const syncService = {
       }
 
       const { components } = response.data;
-      const invalidations: Promise<void>[] = [];
+
+      // Each block seeds the query cache with the payload it just fetched.
+      // Invalidating instead would refetch the same data over the network and
+      // re-write it to SQLite through withSqliteCache — two round trips and two
+      // blocking writes for data already in hand.
 
       // 1. appContents
       if (components.appContents?.needsSync) {
@@ -107,11 +111,7 @@ export const syncService = {
             "appContents",
             components.appContents.latestServerTimestamp,
           );
-          invalidations.push(
-            queryClient.invalidateQueries({
-              queryKey: QUERY_KEYS.APP.CONTENTS,
-            }),
-          );
+          queryClient.setQueryData(QUERY_KEYS.APP.CONTENTS, data);
         } catch (e) {
           if (__DEV__)
             console.error("[SyncService] Failed to sync appContents:", e);
@@ -127,11 +127,7 @@ export const syncService = {
             "categoryFamilyMap",
             components.categoryFamilyMap.latestServerTimestamp,
           );
-          invalidations.push(
-            queryClient.invalidateQueries({
-              queryKey: QUERY_KEYS.CATALOG.CATEGORY_MAP,
-            }),
-          );
+          queryClient.setQueryData(QUERY_KEYS.CATALOG.CATEGORY_MAP, data);
         } catch (e) {
           if (__DEV__)
             console.error("[SyncService] Failed to sync categoryFamilyMap:", e);
@@ -147,10 +143,9 @@ export const syncService = {
             "featuredSubcategories",
             components.featuredSubcategories.latestServerTimestamp,
           );
-          invalidations.push(
-            queryClient.invalidateQueries({
-              queryKey: QUERY_KEYS.CATALOG.FEATURED_SUBCATEGORIES,
-            }),
+          queryClient.setQueryData(
+            QUERY_KEYS.CATALOG.FEATURED_SUBCATEGORIES,
+            data,
           );
         } catch (e) {
           if (__DEV__)
@@ -170,11 +165,7 @@ export const syncService = {
             "featuredMedicines",
             components.featuredMedicines.latestServerTimestamp,
           );
-          invalidations.push(
-            queryClient.invalidateQueries({
-              queryKey: QUERY_KEYS.CATALOG.FEATURED_MEDICINES,
-            }),
-          );
+          queryClient.setQueryData(QUERY_KEYS.CATALOG.FEATURED_MEDICINES, data);
         } catch (e) {
           if (__DEV__)
             console.error("[SyncService] Failed to sync featuredMedicines:", e);
@@ -190,18 +181,15 @@ export const syncService = {
             "frequentlyOrdered",
             components.frequentlyOrdered.latestServerTimestamp,
           );
-          invalidations.push(
-            queryClient.invalidateQueries({ queryKey: ["frequently-ordered"] }),
-          );
+          // setQueriesData, not setQueryData: this key carries the caller's
+          // params object, so match on the prefix instead of guessing it.
+          queryClient.setQueriesData({ queryKey: ["frequently-ordered"] }, data);
         } catch (e) {
           if (__DEV__)
             console.error("[SyncService] Failed to sync frequentlyOrdered:", e);
         }
       }
 
-      if (invalidations.length > 0) {
-        await Promise.all(invalidations);
-      }
     } catch (error) {
       if (__DEV__)
         console.error("[SyncService] Sync check execution error:", error);

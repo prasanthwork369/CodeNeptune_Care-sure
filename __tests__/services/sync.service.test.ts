@@ -3,6 +3,7 @@ import { apiClient } from "@/src/api/client";
 import { db } from "@/src/lib/sqlite/db";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { homeApi } from "@/src/api/home.api";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { QueryClient } from "@tanstack/react-query";
 
 jest.mock("@/src/api/client", () => ({
@@ -45,6 +46,7 @@ describe("syncService — Offline Sync & Cache Invalidation", () => {
     jest
       .spyOn(mockQueryClient, "invalidateQueries")
       .mockResolvedValue(undefined as any);
+    jest.spyOn(mockQueryClient, "setQueryData");
   });
 
   it("reads local sync timestamps from sync_metadata SQLite table", async () => {
@@ -71,7 +73,7 @@ describe("syncService — Offline Sync & Cache Invalidation", () => {
     );
   });
 
-  it("fetches updated components and invalidates query keys when needsSync is true", async () => {
+  it("fetches updated components and seeds the query cache when needsSync is true", async () => {
     (db.getAllSync as jest.Mock).mockReturnValue([]);
     (apiClient.post as jest.Mock).mockResolvedValueOnce({
       data: {
@@ -97,6 +99,12 @@ describe("syncService — Offline Sync & Cache Invalidation", () => {
       "INSERT OR REPLACE INTO sync_metadata (component_name, last_sync_time) VALUES (?, ?)",
       ["appContents", "2026-07-21T15:00:00.000Z"],
     );
-    expect(mockQueryClient.invalidateQueries).toHaveBeenCalled();
+    // Seeded directly rather than invalidated: the payload is already in hand,
+    // so invalidating would refetch it and re-write it to SQLite a second time.
+    expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
+      QUERY_KEYS.APP.CONTENTS,
+      mockContents,
+    );
+    expect(mockQueryClient.invalidateQueries).not.toHaveBeenCalled();
   });
 });

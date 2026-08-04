@@ -1,7 +1,7 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { categoryApi, type ApiCategoryFamily } from "../../api/category.api";
 import { resolveAssetUrl } from "../../utils/urls";
 import type { CategoryProduct } from "../../types/category";
@@ -18,8 +18,10 @@ const CARD_BG_COLORS = [
 ];
 
 export const useCategories = () => {
-  const cachedFamilies = apiCache.getWithMeta<ApiCategoryFamily[]>(
-    "category_family_map",
+  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
+  // React Query only consumes it to seed initialData.
+  const [cachedFamilies] = useState(() =>
+    apiCache.getWithMeta<ApiCategoryFamily[]>("category_family_map"),
   );
 
   const {
@@ -97,40 +99,41 @@ export const useCategoryProducts = (params: {
     staleTime: 60_000,
   });
 
-  const items = (data?.items ?? []).filter(
-    (item, index, all) =>
-      all.findIndex((other) => other.id === item.id) === index,
-  );
-
-  const products: CategoryProduct[] = items.map((item) => ({
-    id: item.id,
-    productId: item.productId,
-    slug: item.slug,
-    name: item.name,
-    description:
-      item.unit && item.packSize && item.dosageForm
-        ? `${item.unit.charAt(0).toUpperCase() + item.unit.slice(1)} of ${item.packSize} ${item.dosageForm}s`
-        : item.packSize || item.brandName,
-    price: (() => {
-      const mrp = parseFloat(String(item.price));
-      const disc = parseFloat(String(item.discountPercentage));
-      return disc > 0 ? parseFloat((mrp * (1 - disc / 100)).toFixed(2)) : mrp;
-    })(),
-    originalPrice: (() => {
-      const disc = parseFloat(String(item.discountPercentage));
-      return disc > 0 ? parseFloat(String(item.price)) : undefined;
-    })(),
-    discount:
-      parseFloat(String(item.discountPercentage)) > 0
-        ? `${parseFloat(String(item.discountPercentage))}% OFF`
-        : undefined,
-    discountPercent: parseFloat(String(item.discountPercentage)) || 0,
-    image: item.thumbnailUrl
-      ? { uri: resolveAssetUrl(item.thumbnailUrl) }
-      : null,
-    packSize: String(item.packSize ?? ""),
-    unit: item.unit ?? "",
-  }));
+  // Memoized: this ran on every render, and the dedup was O(n²) over a 40-item
+  // page. A Set keeps it linear and holds the array identity stable for the grid.
+  const products: CategoryProduct[] = useMemo(() => {
+    const seenIds = new Set<string>();
+    return (data?.items ?? [])
+      .filter((item) => {
+        if (seenIds.has(item.id)) return false;
+        seenIds.add(item.id);
+        return true;
+      })
+      .map((item) => {
+        const disc = parseFloat(String(item.discountPercentage));
+        const mrp = parseFloat(String(item.price));
+        return {
+          id: item.id,
+          productId: item.productId,
+          slug: item.slug,
+          name: item.name,
+          description:
+            item.unit && item.packSize && item.dosageForm
+              ? `${item.unit.charAt(0).toUpperCase() + item.unit.slice(1)} of ${item.packSize} ${item.dosageForm}s`
+              : item.packSize || item.brandName,
+          price:
+            disc > 0 ? parseFloat((mrp * (1 - disc / 100)).toFixed(2)) : mrp,
+          originalPrice: disc > 0 ? mrp : undefined,
+          discount: disc > 0 ? `${disc}% OFF` : undefined,
+          discountPercent: disc || 0,
+          image: item.thumbnailUrl
+            ? { uri: resolveAssetUrl(item.thumbnailUrl) }
+            : null,
+          packSize: String(item.packSize ?? ""),
+          unit: item.unit ?? "",
+        };
+      });
+  }, [data?.items]);
 
   return { products, total: data?.total ?? 0, isLoading, error, refetch };
 };

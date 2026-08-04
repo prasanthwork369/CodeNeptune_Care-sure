@@ -2,6 +2,7 @@ import * as WebBrowser from "expo-web-browser";
 import { Linking, Alert, Platform } from "react-native";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { MobileAppLinks } from "@/src/api/settings.api";
+import { logger } from "@/src/utils/logger";
 
 /**
  * Resolves the given URL. If it's a placeholder (contains caresure.app), it attempts to
@@ -78,7 +79,7 @@ export async function openLegalLink(url: string): Promise<void> {
 
     await WebBrowser.openBrowserAsync(url);
   } catch (error) {
-    console.warn("[LegalLink] Failed to open URL", error);
+    logger.warn("[LegalLink] Failed to open URL", error);
   }
 }
 

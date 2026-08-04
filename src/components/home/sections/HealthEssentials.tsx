@@ -26,6 +26,12 @@ import { ViewAllCard } from "./ViewAllCard";
 import { styles as s } from "./HealthEssentials.styles";
 import { exactScale } from "@/src/utils/exactScale";
 
+const ROW_GAP = exactScale(14);
+
+// Hoisted: an inline arrow is a new component type every render, which remounts
+// every separator in the row instead of reusing them.
+const ProductSeparator = () => <View style={{ width: ROW_GAP }} />;
+
 const FALLBACK_THEMES = [
   {
     gradientStart: "#F2FAF7",
@@ -321,7 +327,6 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
       subcategory.featuredMetadata;
     const fallback = FALLBACK_THEMES[themeIndex % FALLBACK_THEMES.length];
     const cardWidth = (width - 20 - 14 - 36) / 2;
-    const gap = exactScale(14);
     // Cards size to their own content, so measure a real one to match it.
     const [rowHeight, setRowHeight] = useState(0);
 
@@ -441,12 +446,12 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
                 paddingLeft: exactScale(20),
                 paddingRight: exactScale(40),
               }}
-              ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+              ItemSeparatorComponent={ProductSeparator}
               // Sits after the last product so scrolling to the end
               // leads into this subcategory.
               ListFooterComponent={
                 onViewAll && subcategory.products.length > 0 ? (
-                  <View style={{ marginLeft: gap }}>
+                  <View style={{ marginLeft: ROW_GAP }}>
                     <ViewAllCard
                       width={cardWidth}
                       height={rowHeight}

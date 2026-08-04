@@ -1,5 +1,6 @@
 import type { OrderListParams } from "@/src/api/order.api";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { orderService } from "../../services/order.service";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
@@ -36,10 +37,13 @@ export function useFrequentlyOrdered(
   params: { page?: number; limit?: number } = {},
 ) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const cachedFreq =
+  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
+  // React Query only consumes it to seed initialData.
+  const [cachedFreq] = useState(() =>
     apiCache.getWithMeta<
       Awaited<ReturnType<typeof orderService.getFrequentlyOrdered>>
-    >("frequently_ordered");
+    >("frequently_ordered"),
+  );
 
   return useQuery({
     queryKey: ["frequently-ordered", params],

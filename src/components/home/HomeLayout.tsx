@@ -101,8 +101,13 @@ const HomeContent: React.FC = () => {
     (s) => s.setUploadButtonCollapsed,
   );
   const setFeedScrolling = useUIStore((s) => s.setFeedScrolling);
+  const setHomeFocused = useUIStore((s) => s.setHomeFocused);
   const { totalItems } = useCart();
-  const { hasPendingPrescription } = usePrescriptionBanner();
+  // Owns the focus refetch for Home; the header and floating banner read the
+  // same shared query without triggering their own.
+  const { hasPendingPrescription } = usePrescriptionBanner({
+    refetchOnFocus: true,
+  });
   const hasFloatingBanner = totalItems > 0 || hasPendingPrescription;
   const {
     tabs,
@@ -142,7 +147,6 @@ const HomeContent: React.FC = () => {
     PERF_TRACES.HOME_SCROLL,
   );
 
-  const [isScreenFocused, setIsScreenFocused] = useState(true);
   // Settles the "scrolling" flag back to false shortly after the last scroll
   // event so a single drag→fling doesn't flip it true/false/true/false.
   const feedScrollSettleRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -151,7 +155,7 @@ const HomeContent: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setIsScreenFocused(true);
+      setHomeFocused(true);
       const t = setTimeout(() => {
         setTabBarVisible(true);
         setUploadButtonCollapsed(false);
@@ -161,7 +165,7 @@ const HomeContent: React.FC = () => {
         setReopenLocationSheet(false);
       }
       return () => {
-        setIsScreenFocused(false);
+        setHomeFocused(false);
         clearTimeout(t);
         // Leaving Home while a scroll flag is set would strand it as `true`
         // in the shared store; reset it so banner autoplays resume elsewhere.
@@ -178,6 +182,7 @@ const HomeContent: React.FC = () => {
       setTabBarVisible,
       setUploadButtonCollapsed,
       setFeedScrolling,
+      setHomeFocused,
       stopScrollJank,
     ]),
   );
@@ -436,7 +441,6 @@ const HomeContent: React.FC = () => {
                 banners={appContent?.banners ?? EMPTY_BANNERS}
                 categories={cards}
                 isLoading={isHomeLoading}
-                isVisible={isScreenFocused}
               />
             </View>
           );
@@ -515,7 +519,6 @@ const HomeContent: React.FC = () => {
       insets.top,
       isFeaturedLoading,
       isHomeLoading,
-      isScreenFocused,
       isSubcategoriesLoading,
       openLocationSheet,
       quickActionsAnim,
@@ -596,7 +599,7 @@ const HomeContent: React.FC = () => {
         onClose={closeLocationSheet}
       />
 
-      <FloatingBannersCarousel isFocused={isScreenFocused} />
+      <FloatingBannersCarousel />
 
       <FlyToCartOverlay />
     </View>

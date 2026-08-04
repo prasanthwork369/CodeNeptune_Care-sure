@@ -1,6 +1,7 @@
 import type { ApiFeaturedMedicine } from "@/src/api/medicine.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { medicineApi } from "../../api/medicine.api";
 import type { Product } from "../../types/home";
 import { formatPackLabel } from "../../utils/packLabel";
@@ -67,8 +68,11 @@ export const mapFeaturedMedicine = (med: ApiFeaturedMedicine): Product => {
 };
 
 export const useFeaturedMedicines = () => {
-  const cachedMed =
-    apiCache.getWithMeta<ApiFeaturedMedicine[]>("featured_medicines");
+  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
+  // React Query only consumes it to seed initialData.
+  const [cachedMed] = useState(() =>
+    apiCache.getWithMeta<ApiFeaturedMedicine[]>("featured_medicines"),
+  );
 
   const {
     data: medicines = [],
@@ -83,10 +87,13 @@ export const useFeaturedMedicines = () => {
     initialData: () => cachedMed?.data,
     initialDataUpdatedAt: () => cachedMed?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
-    refetchInterval: 2 * 60 * 1000,
   });
 
-  const products: Product[] = medicines.map(mapFeaturedMedicine);
+  // Memoized, or a fresh array each render defeats React.memo on the row.
+  const products: Product[] = useMemo(
+    () => medicines.map(mapFeaturedMedicine),
+    [medicines],
+  );
 
   return { products, isLoading, error, refetch };
 };
