@@ -1,3 +1,4 @@
+import { AnimatedImage } from "@/src/components/ui/AnimatedImage";
 import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { icons } from "@/src/constants/icons";
 import { PreviewDisplayProps } from "@/src/types/prescription";
@@ -71,7 +72,7 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
                 justifyContent: "center",
               }}
             >
-              <Animated.Image
+              <AnimatedImage
                 source={{ uri: activeItem.localUri }}
                 style={[
                   {
@@ -80,7 +81,7 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
                   },
                   animatedStyle,
                 ]}
-                resizeMode="contain"
+                contentFit="contain"
               />
             </Animated.View>
           </GestureDetector>

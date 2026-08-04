@@ -1,3 +1,4 @@
+import { AnimatedImage } from "@/src/components/ui/AnimatedImage";
 import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -7,7 +8,7 @@ import { useLocalSearchParams } from "expo-router";
 import { icons } from "@/src/constants/icons";
 import { PRESCRIPTION_STATUS_LABELS } from "@/src/constants/prescription-status";
 import { prescriptionService } from "@/src/services/prescription.service";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   LayoutChangeEvent,
   Text,
@@ -82,7 +83,12 @@ export const PrescriptionViewerLayout: React.FC = () => {
   const isRejected = effectiveStatus === "Rejected" || source === "rejection";
   const showSelect = !showVerifiedCard && !isRejected && source !== "view_only";
 
-  const urls: string[] = imageUrls ? JSON.parse(imageUrls) : [];
+  // Memoized: this param is a JSON string, so it was re-parsed on every page
+  // change and every zoom-driven render.
+  const urls: string[] = useMemo(
+    () => (imageUrls ? JSON.parse(imageUrls) : []),
+    [imageUrls],
+  );
   const [pageIndex, setPageIndex] = useState(0);
   const currentUrl = urls[pageIndex] ?? "";
   const isPdf = currentUrl.toLowerCase().endsWith(".pdf");
@@ -142,10 +148,10 @@ export const PrescriptionViewerLayout: React.FC = () => {
                   overflow: "hidden",
                 }}
               >
-                <Animated.Image
+                <AnimatedImage
                   source={{ uri: currentUrl }}
                   style={[{ width, height: containerHeight }, animatedStyle]}
-                  resizeMode="contain"
+                  contentFit="contain"
                 />
               </Animated.View>
             </GestureDetector>

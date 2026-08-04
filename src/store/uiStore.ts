@@ -1,6 +1,7 @@
 import type { ImageSource } from "expo-image";
 import { create } from "zustand";
 import { withTiming } from "react-native-reanimated";
+import { feedScrolling } from "@/src/store/feedScrolling";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { durations, easings } from "@/src/theme";
 
@@ -67,7 +68,12 @@ export const useUIStore = create<UIState>((set) => ({
   setHasJustUploadedPrescription: (uploaded) =>
     set({ hasJustUploadedPrescription: uploaded }),
   setIsRxFromCartFlow: (value) => set({ isRxFromCartFlow: value }),
-  setFeedScrolling: (value) => set({ isFeedScrolling: value }),
+  // Drives the shared value too — that, not this flag, is what the decorative
+  // shimmers read, so pausing them costs no re-render.
+  setFeedScrolling: (value) => {
+    feedScrolling.value = value;
+    set({ isFeedScrolling: value });
+  },
   setHomeFocused: (value) => set({ isHomeFocused: value }),
   setPermissionFlowComplete: (value) => set({ permissionFlowComplete: value }),
   globalAlert: null,

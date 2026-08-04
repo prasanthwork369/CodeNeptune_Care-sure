@@ -1,5 +1,4 @@
 import { ShimmerOverlay } from "@/src/components/ui/shimmer";
-import { useUIStore } from "@/src/store/uiStore";
 import React, { memo, useEffect, useState } from "react";
 import { AccessibilityInfo, StyleProp, ViewStyle } from "react-native";
 import { Easing } from "react-native-reanimated";
@@ -18,10 +17,6 @@ export const OfferShine = memo(function OfferShine({
   style,
 }: OfferShineProps) {
   const [reduceMotion, setReduceMotion] = useState(false);
-  // Every discounted card renders one of these, so a scrolling feed was running
-  // 20+ looping gradient overlays at once. Subscribing here rather than in the
-  // cards keeps the scroll toggle re-rendering only these leaves.
-  const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
 
   useEffect(() => {
     let mounted = true;
@@ -48,7 +43,9 @@ export const OfferShine = memo(function OfferShine({
       bandWidthRatio={0.4}
       softEdges
       easing={Easing.linear}
-      enabled={enabled && !reduceMotion && !isFeedScrolling}
+      enabled={enabled && !reduceMotion}
+      // Pauses on the UI thread while the home feed scrolls; no re-render here.
+      pauseOnFeedScroll
       style={style}
     />
   );

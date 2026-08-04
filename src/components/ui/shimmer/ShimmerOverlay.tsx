@@ -8,7 +8,9 @@ import {
   useWindowDimensions,
 } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -16,6 +18,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { feedScrolling } from "@/src/store/feedScrolling";
 import type {
   EasingFunction,
   EasingFunctionFactory,
@@ -38,6 +41,8 @@ export interface ShimmerOverlayProps {
   easing?: EasingFunction | EasingFunctionFactory;
   /** Set false when an off-screen list cell should not animate. */
   enabled?: boolean;
+  /** Decorative consumers opt in to pausing while the home feed scrolls. */
+  pauseOnFeedScroll?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -58,6 +63,7 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
   softEdges = false,
   easing = Easing.linear,
   enabled = true,
+  pauseOnFeedScroll = false,
   style,
 }: ShimmerOverlayProps) {
   const { width: windowWidth } = useWindowDimensions();
@@ -75,12 +81,10 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
   const startX = angle ? -(travelDistance + stripWidth) : -travelDistance;
   const endX = angle ? travelDistance + stripWidth : travelDistance;
 
-  useEffect(() => {
-    if (!enabled) {
-      progress.value = 0;
-      return;
-    }
-
+  // A worklet so the scroll reaction below can restart the loop on the UI
+  // thread, without a React render.
+  const startLoop = useCallback(() => {
+    "worklet";
     const pass = withTiming(1, {
       duration,
       easing,
@@ -96,11 +100,35 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
             false,
           )
         : withRepeat(pass, -1, false);
+  }, [duration, easing, pause, progress]);
+
+  useEffect(() => {
+    if (!enabled) {
+      progress.value = 0;
+      return;
+    }
+
+    startLoop();
 
     return () => {
       progress.value = 0;
     };
-  }, [duration, easing, enabled, pause, progress]);
+  }, [enabled, progress, startLoop]);
+
+  // Pauses/resumes entirely on the UI thread — reading the scroll flag from the
+  // store here would re-render every badge on screen at touch-down.
+  useAnimatedReaction(
+    () => (pauseOnFeedScroll ? feedScrolling.value : false),
+    (scrolling, previous) => {
+      if (previous === null || scrolling === previous || !enabled) return;
+      if (scrolling) {
+        cancelAnimation(progress);
+        progress.value = 0;
+      } else {
+        startLoop();
+      }
+    },
+  );
 
   const handleLayout = useCallback(
     (event: { nativeEvent: { layout: { width: number } } }) => {
