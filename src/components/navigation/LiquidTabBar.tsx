@@ -355,7 +355,9 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
   const { width: screenWidth } = useWindowDimensions();
   const activeRouteName = state.routes[state.index]?.name;
-  const keepBottomGradient = activeRouteName !== "index";
+  const keepBottomGradient = ["categories", "profile"].includes(
+    activeRouteName,
+  );
 
   const pillRoutes = useMemo(
     () =>
@@ -546,8 +548,8 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   // push its solid end off-screen and collapse the fade band into a hard edge.
   // It dissolves in place instead, finishing exactly as the pill lands.
   const animatedGradientStyle = useAnimatedStyle(() => ({
-    opacity: keepBottomGradient ? 1 : tabBarVisible.value,
-  }), [keepBottomGradient]);
+    opacity: tabBarVisible.value,
+  }));
 
   const tabItems = useMemo(
     () =>
@@ -584,11 +586,18 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       onLayout={handleLayout}
     >
       <Animated.View
-        style={[StyleSheet.absoluteFill, animatedGradientStyle]}
+        style={[
+          StyleSheet.absoluteFill,
+          keepBottomGradient ? undefined : animatedGradientStyle,
+        ]}
         pointerEvents="none"
       >
         <TabBarFadeGradient
-          visibleHeight={keepBottomGradient ? exactScale(50) : undefined}
+          visibleHeight={
+            keepBottomGradient
+              ? BAR_HEIGHT + adjustedBottom + extraGap
+              : undefined
+          }
         />
       </Animated.View>
       <Animated.View
