@@ -7,8 +7,6 @@ export const APP_TITLE = {
 };
 
 export const DEFAULT_CITY = "Delhi";
-export const SUPPORT_PHONE = "9790274711";
-export const SUPPORT_EMAIL = "support@caresure.app";
 
 // ─── Tab Navigation ────────────────────────────────────────────────────────────
 

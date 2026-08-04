@@ -1,5 +1,4 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { SUPPORT_PHONE } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -76,11 +75,11 @@ export const HelpLayout: React.FC = () => {
 
   const { callSupport, whatsappOrder, emailSupport } = useContactActions({
     phone: settings?.contactPhone,
-    whatsapp: settings?.whatsappNumber,
+    whatsapp: settings?.whatsappNumber || settings?.contactPhone,
     email: settings?.contactEmail,
   });
 
-  const displayPhone = settings?.contactPhone || SUPPORT_PHONE;
+  const displayPhone = settings?.contactPhone ?? "";
   const phoneDigits = displayPhone.replace(/\D/g, "");
   const localPhone =
     phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phoneDigits;
@@ -153,12 +152,15 @@ export const HelpLayout: React.FC = () => {
               >
                 Speak directly with a restorative{"\n"}architect specialist.
               </Text>
-              <Text
-                className="font-inter-semibold text-brand-text mb-0.5"
-                style={{ fontSize: moderateScale(16) }}
-              >
-                {formattedPhone}
-              </Text>
+              {/* Hidden rather than showing a stale constant when settings omit the number. */}
+              {formattedPhone ? (
+                <Text
+                  className="font-inter-semibold text-brand-text mb-0.5"
+                  style={{ fontSize: moderateScale(16) }}
+                >
+                  {formattedPhone}
+                </Text>
+              ) : null}
               <Text
                 className="font-inter-medium text-[#3D4A43]"
                 style={{ fontSize: moderateScale(13) }}

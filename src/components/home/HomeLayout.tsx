@@ -31,6 +31,7 @@ import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
+import { useSettings } from "@/src/hooks/queries/useSettings";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
@@ -117,7 +118,11 @@ const HomeContent: React.FC = () => {
     onRefresh,
   } = useHomeData();
 
-  const { callSupport, whatsappOrder } = useContactActions();
+  const { data: settings } = useSettings();
+  const { callSupport, whatsappOrder } = useContactActions({
+    phone: settings?.contactPhone,
+    whatsapp: settings?.whatsappNumber || settings?.contactPhone,
+  });
   const { displayLocation } = useDeliveryAddress();
   const reopenLocationSheet = useLocationStore((s) => s.reopenLocationSheet);
   const setReopenLocationSheet = useLocationStore(
