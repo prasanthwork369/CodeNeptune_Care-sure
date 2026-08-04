@@ -71,6 +71,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Resolves the manifest-merger clash between expo-notifications and
     // @react-native-firebase/messaging over default_notification_color.
     "./plugins/withFirebaseNotificationColorFix",
+    [
+      "expo-build-properties",
+      {
+        android: {
+          // Release DEX was 50 MB unminified; R8 plus resource shrinking cuts it.
+          enableMinifyInReleaseBuilds: true,
+          enableShrinkResourcesInReleaseBuilds: true,
+          // buildArchs left default: the AAB splits per device and limiting it breaks emulators.
+        },
+      },
+    ],
     "expo-router",
     "expo-secure-store",
     "expo-sqlite",
