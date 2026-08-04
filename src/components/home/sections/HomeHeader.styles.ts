@@ -14,6 +14,8 @@ export const styles = StyleSheet.create({
     lineHeight: moderateScale(18),
     letterSpacing: 0,
     color: colors.text,
+    // Caps the city so it ellipsizes at a fixed point, not just on icon collision.
+    maxWidth: exactScale(150),
   },
   dropDownIcon: {
     marginLeft: exactScale(10),
