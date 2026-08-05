@@ -12,6 +12,19 @@ export interface ParsedPlace {
   pincode: string;
 }
 
+/** Just the device coordinates, for callers that resolve the address server side. */
+export interface DeviceCoords {
+  latitude: number;
+  longitude: number;
+}
+
+/** Why a location read failed, so callers can pick the right recovery UX. */
+export interface LocationFailure {
+  code: string;
+  message: string;
+  raw?: unknown;
+}
+
 /** Legacy expo-location probes missing from the current typings. */
 type LegacyLocationApi = {
   getProviderStatusAsync?: () => Promise<unknown>;
@@ -40,6 +53,134 @@ const requestAndRecord = async () => {
     } catch {}
   }
   return req;
+};
+
+/**
+ * Whether the provider status *definitively* says location services are off.
+ *
+ * We deliberately trust `locationServicesEnabled === true` when it's present:
+ * right after the user toggles GPS on, `gpsAvailable` and `networkAvailable`
+ * can both still read false for a moment (providers haven't initialised a fix
+ * yet). The old check treated that as "disabled" and fired a false "Enable GPS"
+ * prompt even though GPS was on. The gps/network both-off heuristic is only
+ * used as a fallback when the explicit flag isn't reporting "on".
+ */
+const isServicesDisabled = (status: unknown): boolean => {
+  // `hasServicesEnabledAsync()` fallback returns a plain boolean.
+  if (typeof status === "boolean") return status === false;
+  if (!status || typeof status !== "object") return false;
+  const s = status as {
+    locationServicesEnabled?: boolean;
+    gpsAvailable?: boolean;
+    networkAvailable?: boolean;
+  };
+  if (s.locationServicesEnabled === false) return true;
+  if (s.locationServicesEnabled === true) return false;
+  return s.gpsAvailable === false && s.networkAvailable === false;
+};
+
+/** Probes provider state, falling back to the boolean API when the rich one is missing. */
+const readProviderStatus = async (): Promise<unknown> => {
+  const legacyLocation = Location as unknown as LegacyLocationApi;
+  try {
+    return await legacyLocation.getProviderStatusAsync?.();
+  } catch (e) {
+    if (__DEV__)
+      console.debug("locationService: getProviderStatusAsync failed", e);
+    try {
+      return await legacyLocation.hasServicesEnabledAsync?.();
+    } catch (ee) {
+      if (__DEV__)
+        console.debug("locationService: hasServicesEnabledAsync failed", ee);
+      return null;
+    }
+  }
+};
+
+/**
+ * Maps a thrown location error to SERVICES_DISABLED or a generic failure.
+ *
+ * Only errors that clearly say the provider/services are off count as
+ * SERVICES_DISABLED — generic timeouts and "denied" messages previously
+ * produced false "Enable GPS" prompts even when GPS was on.
+ */
+const classifyFailure = (
+  err: unknown,
+  providerStatus: unknown,
+): LocationFailure => {
+  const msg = errorMessage(err).toLowerCase();
+  const servicesDisabled =
+    isServicesDisabled(providerStatus) ||
+    /location.*(disabled|not enabled|turned off)|services?.*(disabled|off|not enabled)|no location provider|provider.*(disabled|not available)/.test(
+      msg,
+    );
+  return {
+    code: servicesDisabled ? "SERVICES_DISABLED" : "LOCATION_ERROR",
+    message: errorMessage(err),
+    raw: err,
+  };
+};
+
+/** With GPS on but no fix (indoors / weak signal) the read can hang forever. */
+const POSITION_TIMEOUT_MS = 12000;
+
+/**
+ * Reads a device position, or explains why it couldn't.
+ *
+ * When the provider explicitly reports services off we skip
+ * `getCurrentPositionAsync` — on some Android OEMs that call triggers a system
+ * 'Enable location' dialog, which would duplicate the app's own prompt.
+ */
+const getPosition = async (): Promise<{
+  position: Location.LocationObject | null;
+  providerStatus: unknown;
+  error?: LocationFailure;
+}> => {
+  const providerStatus = await readProviderStatus();
+
+  if (isServicesDisabled(providerStatus)) {
+    return {
+      position: null,
+      providerStatus,
+      error: {
+        code: "SERVICES_DISABLED",
+        message: "Provider reports location services disabled",
+        raw: providerStatus,
+      },
+    };
+  }
+
+  try {
+    let position: Location.LocationObject;
+    try {
+      position = await Promise.race([
+        Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("LOCATION_TIMEOUT")),
+            POSITION_TIMEOUT_MS,
+          ),
+        ),
+      ]);
+    } catch (raceErr) {
+      // On timeout fall back to the last known fix so the user isn't left spinning.
+      if (errorMessage(raceErr) !== "LOCATION_TIMEOUT") throw raceErr;
+      const last = await Location.getLastKnownPositionAsync();
+      if (!last) throw raceErr;
+      position = last;
+    }
+    return { position, providerStatus };
+  } catch (err) {
+    if (__DEV__)
+      console.debug("locationService: getCurrentPositionAsync failed", err);
+    return {
+      position: null,
+      providerStatus,
+      error: classifyFailure(err, providerStatus),
+    };
+  }
 };
 
 /**
@@ -117,97 +258,13 @@ export const locationService = {
    */
   getCurrentPlace: async (): Promise<{
     place: ParsedPlace | null;
-    error?: { code: string; message: string; raw?: unknown };
+    error?: LocationFailure;
     providerStatus?: unknown;
   }> => {
-    const legacyLocation = Location as unknown as LegacyLocationApi;
-    let providerStatus: unknown = null;
+    const { position, providerStatus, error } = await getPosition();
+    if (!position) return { place: null, providerStatus, error };
+
     try {
-      providerStatus = await legacyLocation.getProviderStatusAsync?.();
-    } catch (e) {
-      if (__DEV__)
-        console.debug("locationService: getProviderStatusAsync failed", e);
-      try {
-        providerStatus = await legacyLocation.hasServicesEnabledAsync?.();
-      } catch (ee) {
-        if (__DEV__)
-          console.debug("locationService: hasServicesEnabledAsync failed", ee);
-      }
-    }
-
-    // Whether the provider status *definitively* says location services are
-    // off. We deliberately trust `locationServicesEnabled === true` when it's
-    // present: right after the user toggles GPS on, `gpsAvailable` and
-    // `networkAvailable` can both still read false for a moment (providers
-    // haven't initialised a fix yet). The old check treated that as
-    // "disabled" and fired a false "Enable GPS" prompt even though GPS was on.
-    // The gps/network both-off heuristic is only used as a fallback when the
-    // explicit flag isn't reporting "on".
-    const isServicesDisabled = (status: unknown): boolean => {
-      // `hasServicesEnabledAsync()` fallback returns a plain boolean.
-      if (typeof status === "boolean") return status === false;
-      if (!status || typeof status !== "object") return false;
-      const s = status as {
-        locationServicesEnabled?: boolean;
-        gpsAvailable?: boolean;
-        networkAvailable?: boolean;
-      };
-      if (s.locationServicesEnabled === false) return true;
-      if (s.locationServicesEnabled === true) return false;
-      return s.gpsAvailable === false && s.networkAvailable === false;
-    };
-
-    // If providerStatus explicitly reports services are disabled, avoid
-    // calling `getCurrentPositionAsync` — on some Android OEMs that call
-    // triggers a system 'Enable location' dialog. In that case return a
-    // SERVICES_DISABLED error so callers can show a single, controlled
-    // in-app message instead of producing duplicate system+app prompts.
-    const servicesDisabledFromProvider = isServicesDisabled(providerStatus);
-
-    if (servicesDisabledFromProvider) {
-      return {
-        place: null,
-        providerStatus,
-        error: {
-          code: "SERVICES_DISABLED",
-          message: "Provider reports location services disabled",
-          raw: providerStatus,
-        },
-      };
-    }
-
-    // Provider didn't explicitly indicate disabled; attempt to read a
-    // position. This may trigger OS dialogs on some devices only when the
-    // provider is actually disabled — we handled that above.
-    try {
-      // Race the read against a timeout: with GPS on but no fix (indoors /
-      // weak signal) getCurrentPositionAsync can hang indefinitely, leaving
-      // the "Fetching" spinner stuck. On timeout, fall back to the last known
-      // position so the user still gets a usable location instead of a freeze.
-      const POSITION_TIMEOUT_MS = 12000;
-      let position: Location.LocationObject;
-      try {
-        position = await Promise.race([
-          Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-          }),
-          new Promise<never>((_, reject) =>
-            setTimeout(
-              () => reject(new Error("LOCATION_TIMEOUT")),
-              POSITION_TIMEOUT_MS,
-            ),
-          ),
-        ]);
-      } catch (raceErr) {
-        if (errorMessage(raceErr) === "LOCATION_TIMEOUT") {
-          const last = await Location.getLastKnownPositionAsync();
-          if (!last) throw raceErr;
-          position = last;
-        } else {
-          throw raceErr;
-        }
-      }
-
       const [place] = await Location.reverseGeocodeAsync({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -245,52 +302,32 @@ export const locationService = {
         providerStatus,
       };
     } catch (err) {
-      // Log the raw error for debugging.
-      if (__DEV__)
-        console.debug("locationService: getCurrentPositionAsync failed", err);
-
-      // Heuristic: treat as services-disabled when providerStatus indicates
-      // services are off, or when the thrown error message mentions
-      // 'disabled', 'services', 'provider', or 'gps'. This covers several
-      // Android OEM/Play-services error messages.
-      const msg = errorMessage(err).toLowerCase();
-      // Reuse the same conservative check as the pre-read path so a momentary
-      // gps/network "unavailable" right after enabling GPS isn't mistaken for
-      // "services off" when locationServicesEnabled is already true.
-      const servicesDisabledFromProvider = isServicesDisabled(providerStatus);
-      // Only treat the thrown error as "services disabled" when it clearly
-      // says the location provider/services are off — not for generic
-      // timeouts or "denied" messages, which previously produced false
-      // "Enable GPS" prompts even when GPS was on.
-      const servicesDisabledFromError =
-        /location.*(disabled|not enabled|turned off)|services?.*(disabled|off|not enabled)|no location provider|provider.*(disabled|not available)/.test(
-          msg,
-        );
-
-      if (servicesDisabledFromProvider || servicesDisabledFromError) {
-        return {
-          place: null,
-          providerStatus,
-          error: {
-            code: "SERVICES_DISABLED",
-            message: errorMessage(err),
-            raw: err,
-          },
-        };
-      }
-
-      // Otherwise return a general failure detail so callers may decide how
-      // to present errors (e.g. generic "Could not fetch location").
+      if (__DEV__) console.debug("locationService: reverseGeocode failed", err);
       return {
         place: null,
         providerStatus,
-        error: {
-          code: "LOCATION_ERROR",
-          message: errorMessage(err),
-          raw: err,
-        },
+        error: classifyFailure(err, providerStatus),
       };
     }
+  },
+
+  /**
+   * Coordinates only, for callers that resolve the address on the backend
+   * (`locationApi.resolveCoords`) instead of reverse-geocoding on device.
+   * Inspect `error.code === 'SERVICES_DISABLED'` to show an "Enable GPS" flow.
+   */
+  getCurrentCoords: async (): Promise<{
+    coords: DeviceCoords | null;
+    error?: LocationFailure;
+  }> => {
+    const { position, error } = await getPosition();
+    if (!position) return { coords: null, error };
+    return {
+      coords: {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      },
+    };
   },
 
   /** Opens device location settings (tries Android Location settings first). */

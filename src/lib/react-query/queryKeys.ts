@@ -79,6 +79,10 @@ export const QUERY_KEYS = {
       ["search", "history", params] as const,
     TRENDING: (limit?: number) => ["search", "trending", limit] as const,
   },
+  LOCATION: {
+    AUTOCOMPLETE: (query: string) =>
+      ["location", "autocomplete", query] as const,
+  },
   CANCELLATION_REASONS: {
     LIST: (params?: CancellationReasonParams) =>
       ["cancellation-reasons", "list", params] as const,

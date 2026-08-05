@@ -1,11 +1,15 @@
 import { Address } from "@/src/api/address.api";
+import { locationApi } from "@/src/api/location.api";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { typography } from "@/src/constants/typography";
 import { usePincode } from "@/src/hooks/mutations/usePincode";
 import { useAddress } from "@/src/hooks/queries/useAddress";
-import { useSettings } from "@/src/hooks/queries/useSettings";
+import {
+  LocationSuggestion,
+  useLocationSearch,
+} from "@/src/hooks/queries/useLocationSearch";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
@@ -14,10 +18,11 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { addressToLocation } from "@/src/utils/addressLocation";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { toPrefillParams } from "@/src/utils/locationPrefill";
 import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -32,27 +37,6 @@ interface LocationBottomSheetProps {
   isVisible: boolean;
   onClose: () => void;
   onSelect?: (label: string, city: string, address?: Address) => void;
-}
-
-interface GooglePrediction {
-  description: string;
-  place_id: string;
-  mainText: string;
-  secondaryText: string;
-}
-
-/** Raw Places Autocomplete row, before it is flattened into a GooglePrediction. */
-interface ApiPlacePrediction {
-  description: string;
-  place_id: string;
-  structured_formatting?: { main_text?: string; secondary_text?: string };
-}
-
-/** Raw Place Details address component. */
-interface ApiAddressComponent {
-  long_name: string;
-  short_name: string;
-  types: string[];
 }
 
 const labelToIcon = (label: string) => {
@@ -95,15 +79,12 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     const showToast = useToastStore((s) => s.show);
     const [isLocating, setIsLocating] = useState(false);
     const [inputValue, setInputValue] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [predictions, setPredictions] = useState<GooglePrediction[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
+    // Resolving a tapped suggestion — separate from the search spinner.
+    const [isResolving, setIsResolving] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const { addresses, loading: addressesLoading, refetch } = useAddress();
-    const { checkServiceability, isChecking } = usePincode();
-    const { data: settings } = useSettings();
-    const mapsApiKey =
-      settings?.mapsApiKey ?? process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
+    const { checkServiceability } = usePincode();
+    const { predictions, isSearching } = useLocationSearch(inputValue);
 
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const inputRef = useRef<React.ComponentRef<
@@ -111,136 +92,47 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     > | null>(null);
     const snapPoints = useMemo(() => ["70%"], []);
 
-    // Debounce input value
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setSearchQuery(inputValue);
-      }, 400); // 400ms is a snappy debounce for typing
-      return () => clearTimeout(timer);
-    }, [inputValue]);
-
-    // Fetch Places Autocomplete when debounced query changes
-    useEffect(() => {
-      if (!searchQuery.trim() || !mapsApiKey) {
-        setPredictions([]);
-        setIsSearching(false);
-        return;
-      }
-
-      setIsSearching(true);
-      const controller = new AbortController();
-
-      const fetchPlaces = async () => {
-        try {
-          const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${mapsApiKey}&components=country:in&types=geocode|establishment`;
-          const res = await fetch(url, { signal: controller.signal });
-          const json = await res.json();
-          if (json.status === "OK") {
-            setPredictions(
-              (json.predictions ?? []).map((p: ApiPlacePrediction) => ({
-                description: p.description,
-                place_id: p.place_id,
-                mainText: p.structured_formatting?.main_text ?? p.description,
-                secondaryText: p.structured_formatting?.secondary_text ?? "",
-              })),
-            );
-          } else {
-            setPredictions([]);
-          }
-        } catch (err) {
-          if (err instanceof Error && err.name === "AbortError") return;
-          setPredictions([]);
-        } finally {
-          if (!controller.signal.aborted) setIsSearching(false);
-        }
-      };
-
-      fetchPlaces();
-
-      return () => controller.abort();
-    }, [searchQuery, mapsApiKey]);
-
     const handleClose = () => {
       Keyboard.dismiss();
       bottomSheetRef.current?.dismiss();
       inputRef.current?.clear();
       setInputValue("");
-      setSearchQuery("");
-      setPredictions([]);
       setIsSearchFocused(false);
     };
 
-    const handlePredictionSelect = async (prediction: GooglePrediction) => {
-      if (!mapsApiKey) {
-        showToast("Location search is not configured.", "error");
-        return;
-      }
-      setIsSearching(true);
+    // The sheet has to dismiss before navigating, or the push lands under it.
+    const goToAddAddress = (params: Record<string, string>) => {
+      handleClose();
+      setTimeout(() => {
+        router.push({ pathname: "/profile/addresses/add", params });
+      }, 500);
+    };
+
+    const handlePredictionSelect = async (prediction: LocationSuggestion) => {
+      setIsResolving(true);
       try {
-        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${prediction.place_id}&fields=address_components&key=${mapsApiKey}`;
-        const res = await fetch(url);
-        const json = await res.json();
+        const resolved = await locationApi.resolvePlace(prediction.placeId);
 
-        if (json.status !== "OK" || !json.result) {
-          showToast(
-            "Could not fetch location details. Please try again.",
-            "error",
-          );
-          return;
-        }
-
-        const components: ApiAddressComponent[] =
-          json.result.address_components ?? [];
-        const get = (type: string) =>
-          components.find((c) => c.types.includes(type))?.long_name ?? "";
-
-        const streetNumber = get("street_number");
-        const route = get("route");
-        const sublocality =
-          get("sublocality_level_1") ||
-          get("sublocality") ||
-          get("neighborhood");
-        const city =
-          get("locality") || get("administrative_area_level_2") || sublocality;
-        const state = get("administrative_area_level_1");
-        const pincode = get("postal_code").replace(/\D/g, "").slice(0, 6);
-
-        if (!pincode || !/^\d{6}$/.test(pincode)) {
+        if (!resolved.pincode || !/^\d{6}$/.test(resolved.pincode)) {
           showToast(
             "Could not find a valid pincode for this location.",
             "warning",
           );
           return;
         }
-
-        const serviceability = await checkServiceability(pincode);
-        if (!serviceability.serviceable) {
-          showToast(`Sorry, we don't deliver to ${pincode} yet.`, "error");
+        if (!resolved.serviceable) {
+          showToast(
+            `Sorry, we don't deliver to ${resolved.pincode} yet.`,
+            "error",
+          );
           return;
         }
 
-        const line2Parts = [
-          prediction.description.split(",")[0],
-          route,
-          sublocality,
-        ].filter(Boolean);
-        const line2 = [...new Set(line2Parts)].join(", ");
-
-        const params: Record<string, string> = {};
-        if (streetNumber) params.prefill_line1 = streetNumber;
-        if (line2) params.prefill_line2 = line2;
-        if (city) params.prefill_city = city;
-        if (state) params.prefill_state = state;
-        if (pincode) params.prefill_pincode = pincode;
-
-        handleClose();
-        setTimeout(() => {
-          router.push({ pathname: "/profile/addresses/add", params });
-        }, 500);
+        goToAddAddress(toPrefillParams(resolved, prediction.mainText));
       } catch {
         showToast("Failed to get location details. Please try again.", "error");
       } finally {
-        setIsSearching(false);
+        setIsResolving(false);
       }
     };
 
@@ -347,12 +239,11 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           );
           return;
         }
-        const result = await locationService.getCurrentPlace();
-        const place = result.place;
-        if (!place) {
+        const { coords, error } = await locationService.getCurrentCoords();
+        if (!coords) {
           // If the underlying failure indicates services are disabled,
           // show the Enable GPS alert. Otherwise show a generic failure.
-          if (result.error?.code === "SERVICES_DISABLED") {
+          if (error?.code === "SERVICES_DISABLED") {
             Alert.alert(
               "Location services are off",
               "Please enable location services (GPS) to auto-detect your address.",
@@ -365,30 +256,47 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           }
           Alert.alert(
             "Could not fetch location",
-            result.error?.message ||
+            error?.message ||
               "Please check that location services are enabled and try again.",
           );
           return;
         }
-        const params: Record<string, string> = {};
-        if (place.line1) params.prefill_line1 = place.line1;
-        if (place.line2) params.prefill_line2 = place.line2;
-        if (place.city) params.prefill_city = place.city;
-        if (place.state) params.prefill_state = place.state;
-        if (place.pincode) params.prefill_pincode = place.pincode;
+
+        // The backend turns raw coordinates into a pincode and tells us whether
+        // we deliver there, so the address form never opens on a dead pincode.
+        const resolved = await locationApi.resolveCoords(
+          coords.latitude,
+          coords.longitude,
+        );
+        if (!resolved.pincode) {
+          showToast(
+            "Could not find a valid pincode for your location.",
+            "warning",
+          );
+          return;
+        }
+        if (!resolved.serviceable) {
+          showToast(
+            `Sorry, we don't deliver to ${resolved.pincode} yet.`,
+            "error",
+          );
+          return;
+        }
+
+        const city = resolved.area?.city ?? "";
         // Persist last-known location for fast startup and header rendering.
         try {
           await AsyncStorage.setItem(
             "@caresure:last_known_location",
             JSON.stringify({
               location: {
-                label: place.city,
-                city: place.city,
-                shortCity: place.city,
-                pincode: place.pincode,
+                label: city,
+                city,
+                shortCity: city,
+                pincode: resolved.pincode,
               },
-              coords: place.coords,
-              pincode: place.pincode,
+              coords,
+              pincode: resolved.pincode,
             }),
           );
           try {
@@ -396,10 +304,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           } catch {}
         } catch {}
 
-        handleClose();
-        setTimeout(() => {
-          router.push({ pathname: "/profile/addresses/add", params });
-        }, 500);
+        goToAddAddress(toPrefillParams(resolved));
       } catch {
         Alert.alert(
           "Could not fetch location",
@@ -466,7 +371,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
               }}
               className="flex-row items-center bg-white"
             >
-              {isSearching ? (
+              {isSearching || isResolving ? (
                 <ActivityIndicator size="small" color="#0F7635" />
               ) : (
                 <icons.search_grey
@@ -503,8 +408,6 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
                   onPress={() => {
                     inputRef.current?.clear();
                     setInputValue("");
-                    setSearchQuery("");
-                    setPredictions([]);
                   }}
                   hitSlop={{
                     top: exactScale(8),
@@ -655,9 +558,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
               >
                 {predictions.map((p, index) => (
                   <Touchable
-                    key={p.place_id}
+                    key={p.placeId}
                     onPress={() => handlePredictionSelect(p)}
-                    disabled={isSearching || isChecking}
+                    disabled={isResolving}
                     activeOpacity={0.75}
                     style={
                       index < predictions.length - 1

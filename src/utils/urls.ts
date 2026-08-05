@@ -149,6 +149,11 @@ export const API_ENDPOINTS = {
   // ── Pincodes ─────────────────────────────────────────────────────────────
   PINCODE_CHECK: (pincode: string) => `/api/v1/pincodes/check/${pincode}`,
 
+  // ── Locations ────────────────────────────────────────────────────────────
+  LOCATION_AUTOCOMPLETE: "/api/v1/locations/autocomplete",
+  LOCATION_RESOLVE_PLACE: "/api/v1/locations/resolve-place",
+  LOCATION_RESOLVE_COORDS: "/api/v1/locations/resolve-coords",
+
   // ── Settings ─────────────────────────────────────────────────────────────
   SETTINGS_MOBILE_APP_LINKS: "/api/v1/settings/mobile-app-links",
   SETTINGS_CART_WALLET: "/api/v1/settings/public/customer/cart-wallet",
