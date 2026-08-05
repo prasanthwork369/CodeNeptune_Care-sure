@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { Text, View } from "react-native";
 
 interface TrustBadgeProps {
   searchedName: string;
@@ -67,7 +67,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
               <Text
                 className="font-inter-semibold text-brand-text"
                 style={{ flex: 1, marginRight: 8, fontSize: moderateScale(14) }}
-                numberOfLines={1}
+                numberOfLines={2}
               >
                 {searchedName}
               </Text>
@@ -78,7 +78,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
                   textAlign: "right",
                   fontSize: moderateScale(14),
                 }}
-                numberOfLines={1}
+                numberOfLines={2}
               >
                 {recName}
               </Text>

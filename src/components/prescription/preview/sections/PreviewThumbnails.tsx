@@ -105,7 +105,7 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
           className="font-inter-medium text-[#000000]"
           style={{ fontSize: moderateScale(14) }}
         >
-          {items.length} / {maxFiles} Prescription
+          {items.length} Prescription
           {items.length !== 1 ? "s" : ""} Uploaded
         </Text>
         <Touchable

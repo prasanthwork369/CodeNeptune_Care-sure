@@ -1,5 +1,6 @@
 import { Address } from "@/src/api/address.api";
 import { locationApi } from "@/src/api/location.api";
+import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -10,8 +11,8 @@ import {
   LocationSuggestion,
   useLocationSearch,
 } from "@/src/hooks/queries/useLocationSearch";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
 import { locationService } from "@/src/services/location.service";
 import { useLocationStore } from "@/src/store/locationStore";
@@ -19,7 +20,6 @@ import { useToastStore } from "@/src/store/toastStore";
 import { addressToLocation } from "@/src/utils/addressLocation";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { toPrefillParams } from "@/src/utils/locationPrefill";
-import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useMemo, useRef, useState } from "react";
@@ -37,6 +37,7 @@ interface LocationBottomSheetProps {
   isVisible: boolean;
   onClose: () => void;
   onSelect?: (label: string, city: string, address?: Address) => void;
+  title?: string;
 }
 
 const labelToIcon = (label: string) => {
@@ -68,7 +69,7 @@ const labelToIcon = (label: string) => {
 
 // Memoised: always mounted under the Home feed, which re-renders often.
 export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
-  React.memo(({ isVisible, onClose, onSelect }) => {
+  React.memo(({ isVisible, onClose, onSelect, title }) => {
     const router = useNav();
     const adjustedBottom = useAdjustedBottomInset();
     const setLocation = useLocationStore((s) => s.setLocation);
@@ -82,7 +83,12 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     // Resolving a tapped suggestion — separate from the search spinner.
     const [isResolving, setIsResolving] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const { addresses, loading: addressesLoading, refetch } = useAddress();
+    const {
+      addresses,
+      loading: addressesLoading,
+      loaded: addressesLoaded,
+      refetch,
+    } = useAddress();
     const { checkServiceability } = usePincode();
     const { predictions, isSearching } = useLocationSearch(inputValue);
 
@@ -345,7 +351,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
               marginBottom: exactScale(20),
             }}
           >
-            Change Location
+            {title ??
+              (addressesLoaded && addresses.length > 0
+                ? "Change Address"
+                : "Add Address")}
           </Text>
 
           {/* Search Box */}

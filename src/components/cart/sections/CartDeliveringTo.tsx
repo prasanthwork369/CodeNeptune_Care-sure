@@ -1,14 +1,15 @@
-import React from "react";
-import { View, Text } from "react-native";
-import { cartStyles as s } from "../cart.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { CartDeliveringToProps } from "@/src/types/cart";
+import React from "react";
+import { Text, View } from "react-native";
+import { cartStyles as s } from "../cart.styles";
 
 export const CartDeliveringTo: React.FC<CartDeliveringToProps> = ({
   label,
   description,
   onChange,
+  actionLabel = "Change",
   flat,
 }) => {
   return (
@@ -50,13 +51,13 @@ export const CartDeliveringTo: React.FC<CartDeliveringToProps> = ({
         onPress={onChange}
         className="flex-row items-center"
         accessibilityRole="button"
-        accessibilityLabel="Change delivery address"
+        accessibilityLabel={actionLabel}
       >
         <Text
           style={s.deliverChange}
           className="font-inter-bold text-[#E16D09]"
         >
-          Change
+          {actionLabel}
         </Text>
       </Touchable>
     </View>

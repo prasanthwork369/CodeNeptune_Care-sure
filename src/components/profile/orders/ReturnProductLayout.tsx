@@ -799,7 +799,7 @@ export const ReturnProductLayout: React.FC = () => {
         icon={HOME_IMAGES.leaveWarning}
         iconBg="#FFF1F1"
         confirmBg="#E02D5B"
-        cancelLabel="Great"
+        cancelLabel="Continue"
         confirmLabel="Leave"
         onConfirm={() => {
           setShowLeaveConfirm(false);

@@ -1,7 +1,6 @@
 import { PrescriptionItem } from "@/src/types/prescription";
+import { MAX_FILES } from "@/src/utils/prescription";
 import { create } from "zustand";
-
-const MAX_FILES = 10;
 
 interface PrescriptionDraftState {
   items: PrescriptionItem[];

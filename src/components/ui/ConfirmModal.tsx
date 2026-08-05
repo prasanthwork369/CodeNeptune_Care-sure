@@ -98,7 +98,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               onPress={onConfirm}
             >
               {!icon && (
-                <icons.delete_red width={16} height={16} fill="#FFFFFF" />
+                <icons.delete_white width={16} height={16} fill="#FFFFFF" />
               )}
               <Text
                 className="font-inter-semibold text-white"

@@ -46,31 +46,54 @@ export const SearchResultsList = React.memo(
     onEndReached: () => void;
     isFetchingNextPage: boolean;
   }) => {
-    const renderItem = useCallback(
-      ({ item }: { item: ApiSearchMedicine }) => (
-        <View className="px-4">
-          {item.sourceType === 2 ? (
-            item.recommendation ? (
-              <SearchProductCard data={toComparisonData(item)} />
-            ) : (
-              <SearchNoSubstituteCard data={toSearchedOnlyData(item)} />
-            )
-          ) : (
-            <SearchRecommendCard
-              data={toRecommendData(item)}
-              onPress={onRecommendPress}
-            />
-          )}
-        </View>
-      ),
-      [toComparisonData, toSearchedOnlyData, toRecommendData, onRecommendPress],
+    type SearchDataItem = { type: "comparison-header" } | ApiSearchMedicine;
+
+    const hasComparisonRows = useMemo(
+      () =>
+        results.some((item) => item.sourceType === 2 && item.recommendation),
+      [results],
     );
 
-    // Hoisted out of the render pass so typing does not rebuild the gradient-SVG header on every keystroke.
-    const listHeader = useMemo(
-      () => <SearchColumnHeaders colWidth={colWidth} />,
-      [colWidth],
+    const data = useMemo<SearchDataItem[]>(
+      () =>
+        hasComparisonRows
+          ? [{ type: "comparison-header" }, ...results]
+          : results,
+      [hasComparisonRows, results],
     );
+
+    const renderItem = useCallback(
+      ({ item }: { item: SearchDataItem }) => {
+        if ("type" in item) {
+          return <SearchColumnHeaders colWidth={colWidth} />;
+        }
+
+        return (
+          <View className="px-4">
+            {item.sourceType === 2 ? (
+              item.recommendation ? (
+                <SearchProductCard data={toComparisonData(item)} />
+              ) : (
+                <SearchNoSubstituteCard data={toSearchedOnlyData(item)} />
+              )
+            ) : (
+              <SearchRecommendCard
+                data={toRecommendData(item)}
+                onPress={onRecommendPress}
+              />
+            )}
+          </View>
+        );
+      },
+      [
+        colWidth,
+        toComparisonData,
+        toSearchedOnlyData,
+        toRecommendData,
+        onRecommendPress,
+      ],
+    );
+
     const contentStyle = useMemo(
       () => ({ paddingBottom: bottomPad }),
       [bottomPad],
@@ -78,15 +101,17 @@ export const SearchResultsList = React.memo(
 
     return (
       <FlashList
-        data={results}
-        keyExtractor={keyExtractor}
+        data={data}
+        keyExtractor={(item) =>
+          "type" in item ? "comparison-header" : keyExtractor(item)
+        }
         showsVerticalScrollIndicator={false}
         // Without this the keyboard swallows the first tap on a card, so the
         // user has to press twice to open the product.
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={contentStyle}
         className="flex-1"
-        ListHeaderComponent={listHeader}
+        stickyHeaderIndices={hasComparisonRows ? [0] : undefined}
         renderItem={renderItem}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.4}

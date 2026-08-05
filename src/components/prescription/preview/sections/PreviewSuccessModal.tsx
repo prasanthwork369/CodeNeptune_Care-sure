@@ -68,7 +68,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                   letterSpacing: 0.5,
                 }}
               >
-                Great
+Yes, unwork. Continuous now the intern uploaded clean seat of simultaneous bank approved multiple times. Stack navigation. No stack navigation is three clear. Is the broad delight numbers priority comment. s the music broke an upper dealers on the time law next time no                Continue
               </Text>
             </Touchable>
           </View>

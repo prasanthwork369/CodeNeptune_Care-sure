@@ -1,5 +1,6 @@
 import React from "react"; // Re-saved to trigger Metro resolver
 
+import { moderateScale } from "@/src/utils/exactScale";
 import { Text, View } from "react-native";
 import Svg, {
   Defs,
@@ -7,14 +8,13 @@ import Svg, {
   LinearGradient as SvgLinearGradient,
   Text as SvgText,
 } from "react-native-svg";
-import { moderateScale } from "@/src/utils/exactScale";
 
 export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
   // Safety check for colWidth to prevent native crashes on Android
   const safeColWidth = Math.max(0, colWidth || 0);
 
   return (
-    <View className="flex-row mx-4 mt-2">
+    <View style={{ backgroundColor: "#fff" }} className="flex-row mx-4">
       <View className="flex-1 items-center justify-center pb-3">
         <Text
           style={{ letterSpacing: 0.5, fontSize: moderateScale(11) }}

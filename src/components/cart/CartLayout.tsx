@@ -2,10 +2,11 @@ import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
 import { LocationBottomSheet } from "@/src/components/home/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";
-import { exactScale } from "@/src/utils/exactScale";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
+import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import Animated, {
@@ -18,18 +19,18 @@ import {
   CartBillSummary,
   CartCoinsSection,
   CartConfetti,
+  CartCorporateCreditsSection,
   CartCouponSection,
   CartDeliveringTo,
   CartEmptyState,
   CartFooter,
   CartFreeDeliveryProgress,
-  CartItemsList,
   CartInitialSkeleton,
+  CartItemsList,
   CartSavingsBanner,
   CartSavingsBreakdown,
   CartTerms,
   CartWalletSection,
-  CartCorporateCreditsSection,
 } from "./sections";
 
 const SAVINGS_BANNER_ENTERING = FadeInDown.duration(220).reduceMotion(
@@ -93,6 +94,10 @@ export const CartLayout: React.FC = () => {
     firstName,
     isCartLoading,
   } = useCartCalculations();
+
+  const { addresses, loaded: addressLoaded } = useAddress();
+  const hasAddress = addressLoaded && addresses.length > 0;
+  const addressActionLabel = hasAddress ? "Change Address" : "Add Address";
 
   const shouldShowSavingsBanner = totalSavings > 0;
 
@@ -166,6 +171,7 @@ export const CartLayout: React.FC = () => {
                 : "No address saved")
             }
             onChange={() => setShowLocationSheet(true)}
+            actionLabel={addressActionLabel}
             flat
           />
 
@@ -260,6 +266,7 @@ export const CartLayout: React.FC = () => {
       <LocationBottomSheet
         isVisible={showLocationSheet}
         onClose={() => setShowLocationSheet(false)}
+        title={addressActionLabel}
       />
 
       <CartConfetti trigger={confettiTrigger} />

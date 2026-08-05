@@ -126,6 +126,7 @@ export interface CartDeliveringToProps {
   label: string;
   description: string;
   onChange: () => void;
+  actionLabel?: string;
   flat?: boolean;
 }
 
