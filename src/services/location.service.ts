@@ -22,6 +22,26 @@ type LegacyLocationApi = {
 const errorMessage = (err: unknown): string =>
   err instanceof Error ? err.message : String(err ?? "");
 
+/** Below this, the OS resolved without a human ever seeing the dialog. */
+const DIALOG_MIN_MS = 250;
+
+// Key bumped so installs whose flag was set without a dialog get one clean prompt.
+const ASKED_KEY = "@caresure:location_permission_asked_v2";
+
+// Records "asked" only when a dialog really showed; some ROMs auto-deny instantly.
+const requestAndRecord = async () => {
+  const startedAt = Date.now();
+  const req = await Location.requestForegroundPermissionsAsync();
+  const answered =
+    req.status === "granted" || Date.now() - startedAt >= DIALOG_MIN_MS;
+  if (answered) {
+    try {
+      await AsyncStorage.setItem(ASKED_KEY, "1");
+    } catch {}
+  }
+  return req;
+};
+
 /**
  * Shared device-location helpers, reused by both the auto-detect on home load
  * (useHomeOnboarding) and the "Use Current Location" button (LocationBottomSheet).
@@ -56,10 +76,7 @@ export const locationService = {
     if (!opts?.interactive) {
       let askedBefore = false;
       try {
-        askedBefore =
-          (await AsyncStorage.getItem(
-            "@caresure:location_permission_asked",
-          )) === "1";
+        askedBefore = (await AsyncStorage.getItem(ASKED_KEY)) === "1";
       } catch {}
       if (!existing.canAskAgain || askedBefore) {
         return {
@@ -68,10 +85,7 @@ export const locationService = {
           askedBefore,
         };
       }
-      const req = await Location.requestForegroundPermissionsAsync();
-      try {
-        await AsyncStorage.setItem("@caresure:location_permission_asked", "1");
-      } catch {}
+      const req = await requestAndRecord();
       return {
         granted: req.status === "granted",
         canAskAgain: req.canAskAgain,
@@ -86,10 +100,7 @@ export const locationService = {
     // Let the OS decide: it shows the dialog when allowed, or resolves denied
     // immediately when permanently denied. We then react to THIS fresh result,
     // which is how mainstream apps re-prompt instead of jumping to Settings.
-    const req = await Location.requestForegroundPermissionsAsync();
-    try {
-      await AsyncStorage.setItem("@caresure:location_permission_asked", "1");
-    } catch {}
+    const req = await requestAndRecord();
     return {
       granted: req.status === "granted",
       canAskAgain: req.canAskAgain,

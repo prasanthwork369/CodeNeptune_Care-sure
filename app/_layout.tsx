@@ -32,6 +32,7 @@ import {
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
+import { useUIStore } from "@/src/store/uiStore";
 import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
@@ -138,6 +139,11 @@ export default function RootLayout() {
     traceName: PERF_TRACES.APP_LAUNCH,
     isLoading: showSplash,
   });
+
+  // Prompting under the curtain gets auto-denied with no dialog on some ROMs.
+  useEffect(() => {
+    if (!showSplash) useUIStore.getState().setAppRevealed(true);
+  }, [showSplash]);
 
   return (
     <ErrorBoundary>

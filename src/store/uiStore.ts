@@ -30,6 +30,8 @@ interface UIState {
    * state) so focus changes don't invalidate the feed's renderItem and
    * re-render every mounted cell — only the carousels that pause on blur. */
   isHomeFocused: boolean;
+  /** True once the splash curtain lifts; permission prompts wait for it. */
+  isAppRevealed: boolean;
   /** True once the home onboarding permission flow (location → notification)
    * has finished. The SignupBonusPopup waits for this so it never overlaps a
    * permission dialog. */
@@ -40,6 +42,7 @@ interface UIState {
   setIsRxFromCartFlow: (value: boolean) => void;
   setFeedScrolling: (value: boolean) => void;
   setHomeFocused: (value: boolean) => void;
+  setAppRevealed: (value: boolean) => void;
   setPermissionFlowComplete: (value: boolean) => void;
   globalAlert: GlobalAlertConfig | null;
   setGlobalAlert: (alert: GlobalAlertConfig | null) => void;
@@ -52,6 +55,7 @@ export const useUIStore = create<UIState>((set) => ({
   isRxFromCartFlow: false,
   isFeedScrolling: false,
   isHomeFocused: true,
+  isAppRevealed: false,
   permissionFlowComplete: false,
   // Also drives the shared value, since that — not this flag — is what the bar
   // animates from. The scroll worklet writes the shared value itself and calls
@@ -75,6 +79,7 @@ export const useUIStore = create<UIState>((set) => ({
     set({ isFeedScrolling: value });
   },
   setHomeFocused: (value) => set({ isHomeFocused: value }),
+  setAppRevealed: (value) => set({ isAppRevealed: value }),
   setPermissionFlowComplete: (value) => set({ permissionFlowComplete: value }),
   globalAlert: null,
   setGlobalAlert: (alert) => set({ globalAlert: alert }),

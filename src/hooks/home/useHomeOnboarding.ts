@@ -31,10 +31,18 @@ export const useHomeOnboarding = () => {
   const isFocused = useIsFocused();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isGuest = useAuthStore((s) => s.isGuest);
+  // Home mounts under the splash curtain, so focus alone is too early to prompt.
+  const isAppRevealed = useUIStore((s) => s.isAppRevealed);
 
   useEffect(() => {
     // Home also mounts under the login screen (root anchor route).
-    if (hasRun.current || !isFocused || !(isAuthenticated || isGuest)) return;
+    if (
+      hasRun.current ||
+      !isFocused ||
+      !isAppRevealed ||
+      !(isAuthenticated || isGuest)
+    )
+      return;
     hasRun.current = true;
 
     // Close the gate up front so a stale `true` from a previous session
@@ -196,7 +204,7 @@ export const useHomeOnboarding = () => {
         useUIStore.getState().setPermissionFlowComplete(true);
       }
     })();
-  }, [isFocused, isAuthenticated, isGuest]);
+  }, [isFocused, isAppRevealed, isAuthenticated, isGuest]);
 
   // Silent refresh on resume; never prompts, so it stays out of the gated flow.
   useEffect(() => {
