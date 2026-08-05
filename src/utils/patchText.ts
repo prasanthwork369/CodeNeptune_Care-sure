@@ -89,13 +89,64 @@ export function sanitizeStyle(
   return cleanStyle;
 }
 
+// Hoisted so every Text shares one identity instead of allocating a fresh object per render.
+const NO_FONT_PADDING = RN.StyleSheet.create({
+  base: { includeFontPadding: false },
+}).base;
+
+// Style props are usually stable references, so keying on the reference skips
+// flatten + the family scan on nearly every re-render.
+const objectStyleCache = new WeakMap<object, RN.StyleProp<RN.TextStyle>>();
+const idStyleCache = new Map<number, RN.StyleProp<RN.TextStyle>>();
+const UNSTYLED: RN.StyleProp<RN.TextStyle> = [
+  NO_FONT_PADDING,
+  sanitizeStyle(undefined),
+];
+
+/**
+ * Returns the final, cached style array for Text and TextInput.
+ *
+ * The old code rebuilt `[{ includeFontPadding: false }, sanitize(style)]` on every
+ * render of every Text in the app, so the style identity always changed and React
+ * Native could never skip the native style diff. Caching on the incoming reference
+ * makes a re-render with an unchanged style allocation-free.
+ *
+ * Caveat: a style object mutated in place (rather than replaced) keeps its cached
+ * result. That is already an anti-pattern in this codebase and nothing relies on it.
+ */
+export function resolveTextStyle(
+  styleProp: RN.StyleProp<RN.TextStyle>,
+): RN.StyleProp<RN.TextStyle> {
+  // Registered StyleSheet IDs are a bounded set, so a plain Map is safe here.
+  if (typeof styleProp === "number") {
+    let cached = idStyleCache.get(styleProp);
+    if (!cached) {
+      cached = [NO_FONT_PADDING, sanitizeStyle(styleProp)];
+      idStyleCache.set(styleProp, cached);
+    }
+    return cached;
+  }
+
+  // Objects and arrays: WeakMap lets inline arrays be collected instead of leaking.
+  if (styleProp !== null && typeof styleProp === "object") {
+    let cached = objectStyleCache.get(styleProp);
+    if (!cached) {
+      cached = [NO_FONT_PADDING, sanitizeStyle(styleProp)];
+      objectStyleCache.set(styleProp, cached);
+    }
+    return cached;
+  }
+
+  // undefined/null/false all sanitize to the same constant result.
+  return UNSTYLED;
+}
+
 const PatchedText = React.forwardRef<RN.Text, RN.TextProps>((props, ref) => {
-  const sanitizedStyle = sanitizeStyle(props.style);
   return React.createElement(OriginalText, {
     ...props,
     ref,
     allowFontScaling: props.allowFontScaling ?? false,
-    style: [{ includeFontPadding: false }, sanitizedStyle],
+    style: resolveTextStyle(props.style),
   });
 });
 
@@ -137,6 +188,9 @@ PatchedText.default = PatchedText;
 // Keep sanitizeStyle available after CommonJS export replacement.
 // @ts-ignore
 PatchedText.sanitizeStyle = sanitizeStyle;
+// Same treatment, or patchTextInput's import resolves to undefined at runtime.
+// @ts-ignore
+PatchedText.resolveTextStyle = resolveTextStyle;
 // @ts-ignore
 module.exports = PatchedText;
 export default PatchedText;

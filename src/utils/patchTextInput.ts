@@ -9,15 +9,13 @@ import OriginalTextInputImport from "react-native/Libraries/Components/TextInput
 import TextInputState from "react-native/Libraries/Components/TextInput/TextInputState";
 
 import { applyAsciiOnlyFilter } from "../modules/TextInputFilter";
-import { sanitizeStyle } from "./patchText";
+import { resolveTextStyle } from "./patchText";
 
 const OriginalTextInput =
   OriginalTextInputImport as unknown as typeof RN.TextInput;
 
 const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
   (props, ref) => {
-    const sanitizedStyle = sanitizeStyle(props.style);
-
     // English-only input, applied natively so the keyboard cannot defeat it. Numeric fields
     // add their own digits-only filter afterwards, which supersedes this one.
     const setRef = React.useCallback(
@@ -38,7 +36,7 @@ const PatchedTextInput = React.forwardRef<RN.TextInput, RN.TextInputProps>(
       // spellCheck is an iOS-only prop; React Native ignores it on Android.
       autoCorrect: props.autoCorrect ?? false,
       spellCheck: props.spellCheck ?? false,
-      style: [{ includeFontPadding: false }, sanitizedStyle],
+      style: resolveTextStyle(props.style),
     });
   },
 );

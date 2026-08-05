@@ -71,6 +71,48 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Resolves the manifest-merger clash between expo-notifications and
     // @react-native-firebase/messaging over default_notification_color.
     "./plugins/withFirebaseNotificationColorFix",
+    // R8 is off by default in the React Native template, which left ~50MB of
+    // unshrunk dex — and ART roughly doubles that again on disk at install.
+    [
+      "expo-build-properties",
+      {
+        android: {
+          enableMinifyInReleaseBuilds: true,
+          enableShrinkResourcesInReleaseBuilds: true,
+          // Intercepts every request in dev builds; we use Flipper-free debugging.
+          networkInspector: false,
+          extraProguardRules: [
+            "# Custom native modules are constructed reflectively via their ReactPackage.",
+            "-keep class com.codeneptune.caresure.** { *; }",
+            "",
+            "# React Native resolves TurboModules, view managers and JNI targets by name.",
+            "-keep class com.facebook.react.** { *; }",
+            "-keep class com.facebook.jni.** { *; }",
+            "-keep class com.facebook.hermes.** { *; }",
+            "-keep @com.facebook.proguard.annotations.DoNotStrip class *",
+            "-keepclassmembers class * { @com.facebook.proguard.annotations.DoNotStrip *; }",
+            "-keepclassmembers class * { @com.facebook.react.bridge.ReactMethod <methods>; }",
+            "",
+            "# Expo's module registry looks modules up by class name at runtime.",
+            "-keep class expo.modules.** { *; }",
+            "",
+            "# Firebase/GMS reflect over model classes; Crashlytics needs these for readable traces.",
+            "-keep class com.google.firebase.** { *; }",
+            "-keep class com.google.android.gms.** { *; }",
+            "-keepattributes SourceFile,LineNumberTable,Signature,*Annotation*",
+            "",
+            "# notifee, reanimated worklets, PDF and ML Kit scanner natives.",
+            "-keep class app.notifee.** { *; }",
+            "-keep class com.swmansion.** { *; }",
+            "-keep class com.shockwave.** { *; }",
+            "-keep class com.google.mlkit.** { *; }",
+            "",
+            "-dontwarn okhttp3.**",
+            "-dontwarn okio.**",
+          ].join("\n"),
+        },
+      },
+    ],
     "expo-router",
     "expo-secure-store",
     "expo-sqlite",
