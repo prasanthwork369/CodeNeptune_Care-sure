@@ -133,6 +133,8 @@ import shopping_cart from "../../assets/icons/shopping_cart.svg";
 import plus from "../../assets/icons/plus.svg";
 import plus_light from "../../assets/icons/plus_light.svg";
 import cancel_white from "../../assets/icons/cancel_white.svg";
+import arrow_back_white from "../../assets/icons/arrow_back_white.svg";
+import edit_white from "../../assets/icons/edit_white.svg";
 import fire from "../../assets/icons/fire.svg";
 import prescription_green from "../../assets/icons/prescription_green.svg";
 import prescriptions from "../../assets/icons/prescriptions.svg";
@@ -203,6 +205,7 @@ export const icons = {
   sell,
   arrow_back,
   arrow_back_ios,
+  arrow_back_white,
   arrow_down,
   arrow_down_green,
   arrow_drop_down,
@@ -221,6 +224,7 @@ export const icons = {
   outline_gallery,
   add_circle,
   edit_icon,
+  edit_white,
   credit_card,
   camera_gray,
   cancel_order_bag,

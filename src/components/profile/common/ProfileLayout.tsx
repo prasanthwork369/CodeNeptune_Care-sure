@@ -168,6 +168,8 @@ export const ProfileLayout: React.FC = () => {
             localAvatar={localAvatar}
             avatarUploading={avatarUploading}
             onPickAvatar={() => setShowUploadSheet(true)}
+            onSelectCamera={handleSelectCamera}
+            onSelectLibrary={handleSelectLibrary}
             safeAreaTop={insets.top}
           />
         </View>

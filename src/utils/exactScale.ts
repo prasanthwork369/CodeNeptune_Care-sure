@@ -15,8 +15,12 @@ const layoutRatio = Math.min(Math.max(widthRatio, 0.92), 1);
 // Typography: 360dp → ~92%, 390dp+ → 100%
 const typographyRatio = Math.min(Math.max(widthRatio, 0.9), 1);
 
-const snap = (value: number): number =>
-  Math.round(value * pixelRatio) / pixelRatio;
+// Must be a worklet too, else the scale helpers below throw "snap is not a
+// function" when they run on the UI thread.
+const snap = (value: number): number => {
+  "worklet";
+  return Math.round(value * pixelRatio) / pixelRatio;
+};
 
 export const scale = (size: number): number => {
   "worklet";
