@@ -1,7 +1,6 @@
-import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
 
+/** Shorthand for the common render check — useNetworkStatus owns the derivation. */
 export function useIsOffline(): boolean {
-  const isConnected = useNetworkStore((s) => s.isConnected);
-  const isInternetReachable = useNetworkStore((s) => s.isInternetReachable);
-  return isConnected === false || isInternetReachable === false;
+  return useNetworkStatus().isOffline;
 }

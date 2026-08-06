@@ -1,4 +1,5 @@
 import { AppError } from "@/src/api/errors";
+import { OFFLINE_MESSAGE } from "@/src/utils/offline/messages";
 
 /**
  * User-facing copy for a failed order. Raw backend messages must never reach
@@ -8,8 +9,9 @@ export const orderErrorMessage = (err: unknown): string => {
   const kind = err instanceof AppError ? err.kind : "unknown";
 
   switch (kind) {
+    case "offline":
     case "network":
-      return "No internet connection. Check your connection and try again.";
+      return OFFLINE_MESSAGE;
     // Never tell the user to simply retry: the order may have been created
     // before the request timed out, and a blind retry duplicates it.
     case "timeout":

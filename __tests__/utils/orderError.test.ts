@@ -1,11 +1,14 @@
 import { orderErrorMessage } from "@/src/utils/orderError";
 import { AppError } from "@/src/api/errors";
+import { OFFLINE_MESSAGE } from "@/src/utils/offline";
 
 describe("orderErrorMessage — Checkout Error Sanitization", () => {
-  it("returns network warning when AppError kind is network", () => {
-    const err = new AppError("network", "Failed to connect");
-    expect(orderErrorMessage(err)).toBe(
-      "No internet connection. Check your connection and try again.",
+  it("uses the one shared offline sentence for offline and network kinds", () => {
+    expect(orderErrorMessage(new AppError("network", "Failed to connect"))).toBe(
+      OFFLINE_MESSAGE,
+    );
+    expect(orderErrorMessage(new AppError("offline", "never sent"))).toBe(
+      OFFLINE_MESSAGE,
     );
   });
 

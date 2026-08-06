@@ -1,6 +1,6 @@
 import { AppError } from "@/src/api/errors";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
-import { useToastStore } from "@/src/store/toastStore";
+import { OFFLINE_MESSAGE } from "@/src/utils/offline/messages";
+import { reportActionError } from "@/src/utils/offline/networkFeedback";
 
 /**
  * User-facing copy for a failed cart write. Raw backend messages must never reach
@@ -10,8 +10,9 @@ export const cartErrorMessage = (err: unknown): string => {
   const kind = err instanceof AppError ? err.kind : "unknown";
 
   switch (kind) {
+    case "offline":
     case "network":
-      return "No internet connection. Check your connection and try again.";
+      return OFFLINE_MESSAGE;
     case "timeout":
       return "That took too long. Please try again.";
     case "unauthorized":
@@ -28,8 +29,7 @@ export const cartErrorMessage = (err: unknown): string => {
   }
 };
 
-/** Reports a failed cart write, unless the offline dialog is already saying it. */
+/** Reports a failed cart write through the shared feedback layer, with cart copy. */
 export const notifyCartError = (err: unknown): void => {
-  if (useNetworkStore.getState().offlineAlertVisible) return;
-  useToastStore.getState().show(cartErrorMessage(err), "error");
+  reportActionError(err, { message: cartErrorMessage(err) });
 };

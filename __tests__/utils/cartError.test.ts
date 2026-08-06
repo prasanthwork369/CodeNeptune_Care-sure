@@ -2,12 +2,19 @@ import { AppError } from "@/src/api/errors";
 import { cartErrorMessage, notifyCartError } from "@/src/utils/cartError";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useToastStore } from "@/src/store/toastStore";
-import { ensureOnline } from "@/src/utils/network";
+import {
+  OFFLINE_MESSAGE,
+  requireInternet,
+  resetNetworkFeedback,
+} from "@/src/utils/offline";
 
 describe("cartErrorMessage — cart write error sanitization", () => {
-  it("returns network warning when AppError kind is network", () => {
+  it("uses the shared offline copy for offline and network kinds", () => {
     expect(cartErrorMessage(new AppError("network", "socket hang up"))).toBe(
-      "No internet connection. Check your connection and try again.",
+      OFFLINE_MESSAGE,
+    );
+    expect(cartErrorMessage(new AppError("offline", "never sent"))).toBe(
+      OFFLINE_MESSAGE,
     );
   });
 
@@ -47,6 +54,7 @@ describe("notifyCartError", () => {
   beforeEach(() => {
     useToastStore.setState({ visible: false, message: "", type: "success" });
     useNetworkStore.setState({ offlineAlertVisible: false });
+    resetNetworkFeedback();
   });
 
   it("shows an error toast", () => {
@@ -68,38 +76,38 @@ describe("notifyCartError", () => {
   });
 });
 
-describe("ensureOnline", () => {
+describe("requireInternet — the cart's pre-flight gate", () => {
   beforeEach(() => {
     useNetworkStore.setState({
       isConnected: true,
       isInternetReachable: true,
       offlineAlertVisible: false,
     });
+    useToastStore.setState({ visible: false, message: "", type: "success" });
+    resetNetworkFeedback();
   });
 
   it("allows the action when the connection is usable", () => {
-    expect(ensureOnline()).toBe(true);
-    expect(useNetworkStore.getState().offlineAlertVisible).toBe(false);
+    expect(requireInternet()).toBe(true);
+    expect(useToastStore.getState().visible).toBe(false);
   });
 
-  it("blocks and raises the offline dialog when disconnected", () => {
+  it("blocks the write when disconnected, leaving the banner to explain", () => {
     useNetworkStore.setState({ isConnected: false });
 
-    expect(ensureOnline()).toBe(false);
-    expect(useNetworkStore.getState().offlineAlertVisible).toBe(true);
+    expect(requireInternet()).toBe(false);
+    expect(useToastStore.getState().visible).toBe(false);
   });
 
   it("treats connected-but-unreachable as offline", () => {
     useNetworkStore.setState({ isConnected: true, isInternetReachable: false });
 
-    expect(ensureOnline()).toBe(false);
-    expect(useNetworkStore.getState().offlineAlertVisible).toBe(true);
+    expect(requireInternet()).toBe(false);
   });
 
   it("allows the action while reachability is still unknown", () => {
     useNetworkStore.setState({ isConnected: true, isInternetReachable: null });
 
-    expect(ensureOnline()).toBe(true);
-    expect(useNetworkStore.getState().offlineAlertVisible).toBe(false);
+    expect(requireInternet()).toBe(true);
   });
 });

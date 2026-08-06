@@ -1,8 +1,16 @@
 import { AxiosError } from "axios";
+// messages.ts imports only the AppErrorKind *type* back, so this stays a
+// type-only cycle and never becomes a runtime one.
+import { OFFLINE_MESSAGE } from "@/src/utils/offline/messages";
 
 export type AppErrorKind =
+  // Device has no usable connection — the request never left.
+  | "offline"
+  // The request left but the connection failed (DNS, reset, unreachable host).
   | "network"
   | "timeout"
+  // Aborted by us (debounce, unmount, replaced request) — never user-facing.
+  | "cancelled"
   | "unauthorized"
   | "forbidden"
   | "not_found"
@@ -50,24 +58,25 @@ export const asError = (err: unknown): CaughtError =>
 export function toAppError(err: unknown): AppError {
   if (err instanceof AppError) return err;
 
-  if (
-    err &&
-    typeof err === "object" &&
-    (err as { code?: unknown }).code === "NETWORK_OFFLINE"
-  ) {
-    return new AppError(
-      "network",
-      "No Internet Connection. Please check your connection.",
-    );
+  const code = (err as { code?: unknown } | null)?.code;
+
+  if (code === "NETWORK_OFFLINE") {
+    return new AppError("offline", OFFLINE_MESSAGE);
+  }
+
+  // Axios aborts (ERR_CANCELED) and manual AbortController signals both land here.
+  if (code === "ERR_CANCELED" || (err as { name?: string } | null)?.name === "CanceledError") {
+    return new AppError("cancelled", "Request cancelled");
   }
 
   if (isAxiosError(err)) {
-    if (err.code === "ECONNABORTED") {
+    if (err.code === "ECONNABORTED" || err.code === "ETIMEDOUT") {
       return new AppError(
         "timeout",
         "Request timed out. Please check your connection.",
       );
     }
+    // No response covers DNS failure, connection reset and unreachable host.
     if (!err.response) {
       return new AppError(
         "network",

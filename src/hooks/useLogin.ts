@@ -4,7 +4,7 @@ import {
   getPhoneNumberHint,
   normalizeIndianPhone,
 } from "@/src/modules/PhoneNumberHint";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { requireInternet } from "@/src/utils/offline";
 import { IS_LIVE_API } from "@/src/utils/urls";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
@@ -75,11 +75,7 @@ export function useLogin() {
    * Submits the sanitized phone number to the API, then routes to the OTP verification screen.
    */
   const handleGetOtp = async () => {
-    const { isConnected } = useNetworkStore.getState();
-    if (isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
-      return;
-    }
+    if (!requireInternet()) return;
     const result = validate.phone(phoneNumber);
     if (!result.valid) {
       setPhoneError(result.message);

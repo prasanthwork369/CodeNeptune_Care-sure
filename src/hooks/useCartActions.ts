@@ -5,7 +5,7 @@ import { Animated } from "react-native";
 import { useCartRead } from "./queries/useCartRead";
 import { cartMutations } from "@/src/services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
-import { ensureOnline } from "@/src/utils/network";
+import { requireInternet } from "@/src/utils/offline";
 import { notifyCartError } from "@/src/utils/cartError";
 import { analyticsService } from "@/src/services/firebase";
 
@@ -104,7 +104,7 @@ export const useCartActions = (product: CartActionProduct) => {
 
   const increment = async () => {
     // Guest edits are local, so only a signed-in write needs the connection.
-    if (isAuthenticated && !ensureOnline()) return;
+    if (isAuthenticated && !requireInternet()) return;
     if (isPending) return;
     if (isAuthenticated) setPending(pendingKey, true);
     try {
@@ -181,7 +181,7 @@ export const useCartActions = (product: CartActionProduct) => {
 
   const decrement = async () => {
     // Guest edits are local, so only a signed-in write needs the connection.
-    if (isAuthenticated && !ensureOnline()) return;
+    if (isAuthenticated && !requireInternet()) return;
     if (isPending || count <= 0) return;
     if (isAuthenticated) setPending(pendingKey, true);
     try {

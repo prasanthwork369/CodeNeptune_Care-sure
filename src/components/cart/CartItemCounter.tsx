@@ -1,7 +1,7 @@
 import { exactScale } from "@/src/utils/exactScale";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { notifyCartError } from "@/src/utils/cartError";
-import { ensureOnline } from "@/src/utils/network";
+import { requireInternet } from "@/src/utils/offline";
 import { useAuthStore } from "@/src/store/authStore";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -24,7 +24,7 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
   const handleChange = async (newQty: number) => {
     if (isPending) return;
     // Guest edits are local, so only a signed-in write needs the connection.
-    if (isAuthenticated && !ensureOnline()) return;
+    if (isAuthenticated && !requireInternet()) return;
     setIsPending(true);
     try {
       if (newQty <= 0) await removeItem(item.id);

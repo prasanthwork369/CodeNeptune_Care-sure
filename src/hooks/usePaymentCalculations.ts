@@ -13,7 +13,7 @@ import { orderErrorMessage } from "@/src/utils/orderError";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { requireInternet } from "@/src/utils/offline";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
@@ -130,11 +130,9 @@ export function usePaymentCalculations() {
   const hasAddress = !!deliveryCity && !!defaultAddress;
 
   const handlePlaceOrder = async () => {
-    const { isConnected } = useNetworkStore.getState();
-    if (isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
-      return;
-    }
+    // The one flow that keeps the blocking modal: placing an order must be
+    // acknowledged as not-happening, not just implied by the banner.
+    if (!requireInternet({ critical: true })) return;
     if (!hasAddress || !defaultAddress) {
       setShowLocationSheet(true);
       return;

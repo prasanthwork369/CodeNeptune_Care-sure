@@ -1,5 +1,7 @@
 import { tokenStorage } from "@/src/lib/storage";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { isOffline } from "@/src/utils/offline/networkState";
+import { reportOffline } from "@/src/utils/offline/networkFeedback";
+import { markReachable, markUnreachable } from "@/src/utils/offline/reachability";
 import { logger } from "@/src/utils/logger";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
 import axios, { AxiosInstance } from "axios";
@@ -58,9 +60,11 @@ apiClient.interceptors.request.use((config) => {
   //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
   //   }
   // }
-  const { isConnected } = useNetworkStore.getState();
-  if (isConnected === false) {
-    useNetworkStore.getState().showOfflineAlert();
+  // Reject fast so nothing hangs, and report through the feedback layer as a
+  // backstop — a call site that forgets requireInternet still can't fail
+  // silently. Repeats collapse, so this never doubles a screen's own message.
+  if (isOffline()) {
+    reportOffline();
     return Promise.reject(
       Object.assign(new Error("Network offline"), {
         code: "NETWORK_OFFLINE",
@@ -75,15 +79,21 @@ apiClient.interceptors.request.use((config) => {
 
 // 401 response interceptor — refresh and retry
 apiClient.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // Proof the app can reach the network, whatever NetInfo currently believes.
+    markReachable();
+    return res;
+  },
   async (err) => {
+    // A request that left before the drop was noticed still reads as offline.
     const isNetworkError =
       !err.response &&
       err.code !== "ECONNABORTED" &&
       err.code !== "NETWORK_OFFLINE";
-    const { isConnected } = useNetworkStore.getState();
-    if (isNetworkError && isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
+    // Equally, a connection-level failure proves it cannot — this is what catches
+    // an OS-level per-app network block, where NetInfo still reports connected.
+    if (isNetworkError) markUnreachable();
+    if (isNetworkError && isOffline()) {
       return Promise.reject(
         Object.assign(new Error("Network offline"), {
           code: "NETWORK_OFFLINE",
