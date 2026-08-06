@@ -3,6 +3,20 @@ import type { AxiosInstance } from "axios";
 import { useNetworkStore } from "../store/useNetworkStore";
 import { requestQueue } from "./requestQueue";
 
+/**
+ * Gate a network action on a usable connection, showing the offline dialog when
+ * there isn't one. Connected-but-unreachable counts as offline: such a request
+ * only hangs until the axios timeout and then fails anyway.
+ */
+export const ensureOnline = (): boolean => {
+  const { isConnected, isInternetReachable } = useNetworkStore.getState();
+  if (isConnected === false || isInternetReachable === false) {
+    useNetworkStore.getState().showOfflineAlert();
+    return false;
+  }
+  return true;
+};
+
 export const initNetworkListener = (axiosInstance: AxiosInstance) => {
   requestQueue.loadFromStorage();
 

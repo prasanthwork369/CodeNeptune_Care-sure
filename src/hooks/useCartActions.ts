@@ -5,7 +5,8 @@ import { Animated } from "react-native";
 import { useCartRead } from "./queries/useCartRead";
 import { cartMutations } from "@/src/services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { ensureOnline } from "@/src/utils/network";
+import { notifyCartError } from "@/src/utils/cartError";
 import { analyticsService } from "@/src/services/firebase";
 
 /**
@@ -102,11 +103,8 @@ export const useCartActions = (product: CartActionProduct) => {
   });
 
   const increment = async () => {
-    const { isConnected } = useNetworkStore.getState();
-    if (isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
-      return;
-    }
+    // Guest edits are local, so only a signed-in write needs the connection.
+    if (isAuthenticated && !ensureOnline()) return;
     if (isPending) return;
     if (isAuthenticated) setPending(pendingKey, true);
     try {
@@ -174,17 +172,16 @@ export const useCartActions = (product: CartActionProduct) => {
         });
         void analyticsService.logAddToCart();
       }
+    } catch (err) {
+      notifyCartError(err);
     } finally {
       if (isAuthenticated) setPending(pendingKey, false);
     }
   };
 
   const decrement = async () => {
-    const { isConnected } = useNetworkStore.getState();
-    if (isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
-      return;
-    }
+    // Guest edits are local, so only a signed-in write needs the connection.
+    if (isAuthenticated && !ensureOnline()) return;
     if (isPending || count <= 0) return;
     if (isAuthenticated) setPending(pendingKey, true);
     try {
@@ -193,6 +190,8 @@ export const useCartActions = (product: CartActionProduct) => {
       } else {
         await cartMutations.updateItem(cartItem!.id, { quantity: count - 1 });
       }
+    } catch (err) {
+      notifyCartError(err);
     } finally {
       if (isAuthenticated) setPending(pendingKey, false);
     }

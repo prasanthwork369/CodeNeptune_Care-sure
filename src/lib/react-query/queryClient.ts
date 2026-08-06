@@ -40,6 +40,10 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: false,
+      // "online" pauses a mutation while offline, so mutateAsync never settles and
+      // the caller's spinner hangs forever. Let it run: the axios interceptor
+      // rejects offline requests immediately and raises the offline dialog.
+      networkMode: "always",
     },
   },
 });
