@@ -349,7 +349,7 @@ export const UploadPrescriptionSheet: React.FC<
             onPress={() => {
               onClose();
               if (onSelectExisting) onSelectExisting();
-              router.push({
+              router.replace({
                 pathname: "/prescription-history",
                 params: toPay ? { toPay, source: "cart" } : {},
               });

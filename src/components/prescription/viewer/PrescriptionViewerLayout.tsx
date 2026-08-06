@@ -112,7 +112,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
       name: u.split("/").pop() ?? "prescription",
       type: u.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg",
     }));
-    router.push({
+    router.replace({
       pathname: "/(prescription)/preview",
       params: {
         files: JSON.stringify(filesPayload),

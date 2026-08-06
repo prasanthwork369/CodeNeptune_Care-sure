@@ -251,4 +251,5 @@ export interface CouponCardProps {
   // Failed pre-validation (e.g. usage limit reached) — faded but still pressable
   // so tapping Apply surfaces the reason toast.
   isUnavailable?: boolean;
+  loading?: boolean;
 }

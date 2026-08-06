@@ -22,7 +22,7 @@ const SKELETON_LIST_OFFSET = 260;
 
 export const CouponsLayout: React.FC = () => {
   const [couponCode, setCouponCode] = useState("");
-  const [validating, setValidating] = useState(false);
+  const [validatingCode, setValidatingCode] = useState<string | null>(null);
   const apply = useCouponStore((s) => s.apply);
   const applied = useCouponStore((s) => s.applied);
   const showToast = useToastStore((s) => s.show);
@@ -51,7 +51,7 @@ export const CouponsLayout: React.FC = () => {
   const applyCode = async (code: string) => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
-    setValidating(true);
+    setValidatingCode(trimmed);
     try {
       const result = await couponService.validateCoupon(trimmed, subtotal);
       if (result.valid) {
@@ -77,7 +77,7 @@ export const CouponsLayout: React.FC = () => {
         "error",
       );
     } finally {
-      setValidating(false);
+      setValidatingCode(null);
     }
   };
 
@@ -96,7 +96,7 @@ export const CouponsLayout: React.FC = () => {
           value={couponCode}
           onChangeText={setCouponCode}
           onApply={() => applyCode(couponCode)}
-          loading={validating}
+          loading={validatingCode !== null}
         />
       </View>
 
@@ -144,6 +144,9 @@ export const CouponsLayout: React.FC = () => {
               !isApplied &&
               subtotal >= coupon.minOrderValue &&
               unavailable.has(coupon.code);
+            const isCardValidating =
+              validatingCode !== null &&
+              validatingCode === coupon.code.toUpperCase();
             return (
               <CouponCard
                 key={coupon.id}
@@ -152,6 +155,7 @@ export const CouponsLayout: React.FC = () => {
                 disabled={subtotal < coupon.minOrderValue}
                 isApplied={isApplied}
                 isUnavailable={isUnavailable}
+                loading={isCardValidating}
               />
             );
           })

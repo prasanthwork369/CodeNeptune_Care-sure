@@ -5,6 +5,10 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import {
+  CapturedAsset,
+  usePrescriptionUploadService,
+} from "@/src/features/prescription-scanner";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
@@ -13,11 +17,8 @@ import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { PrescriptionItem } from "@/src/types/prescription";
+import { logger } from "@/src/utils/logger";
 import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
-import {
-  usePrescriptionUploadService,
-  CapturedAsset,
-} from "@/src/features/prescription-scanner";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -32,7 +33,6 @@ import {
   PreviewThumbnails,
   RemoveConfirmModal,
 } from "./sections";
-import { logger } from "@/src/utils/logger";
 
 const FOLDER = "customers/prescriptions";
 
@@ -121,10 +121,22 @@ export const PreviewLayout: React.FC = () => {
   const deferredImageUrls = useRef<string[]>([]);
   const activeItem = items[activeIndex] ?? items[0];
 
+  const exitFlow = useCallback(() => {
+    clearItems();
+    const isFromCart =
+      source === "cart" || useUIStore.getState().isRxFromCartFlow;
+    useUIStore.getState().setIsRxFromCartFlow(false);
+    if (isFromCart) {
+      router.replace("/choose-method");
+    } else {
+      router.replace("/(tabs)/upload");
+    }
+  }, [clearItems, router, source]);
+
   const handleBackPress = useCallback(() => {
     if (items.length > 0) setShowLeaveConfirm(true);
-    else router.back();
-  }, [items.length, router]);
+    else exitFlow();
+  }, [items.length, exitFlow]);
 
   // Intercepts the Android hardware back button too, so it shows the same
   // warning instead of leaving (and silently dropping the draft) unprompted.
@@ -340,8 +352,7 @@ export const PreviewLayout: React.FC = () => {
         confirmLabel="Leave"
         onConfirm={() => {
           setShowLeaveConfirm(false);
-          clearItems();
-          router.back();
+          exitFlow();
         }}
         onCancel={() => setShowLeaveConfirm(false)}
       />

@@ -9,7 +9,7 @@ import {
 } from "@/src/utils/couponFormat";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export const CouponCard: React.FC<CouponCardProps> = ({
   coupon,
@@ -17,6 +17,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
   disabled = false,
   isApplied = false,
   isUnavailable = false,
+  loading = false,
 }) => {
   // Both applied and limit-reached coupons read as inactive (faded).
   const inactive = isApplied || isUnavailable;
@@ -37,6 +38,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
     >
       <Touchable
         activeOpacity={0.85}
+        disabled={disabled || inactive || loading}
         onPress={() => onApply(coupon.code)}
         style={{
           backgroundColor: "#FFFFFF",
@@ -137,9 +139,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             {coupon.code}
           </Text>
           <Touchable
-            // Keep applied coupons pressable so the "already applied" toast still fires;
-            // only the min-order case is truly disabled.
-            disabled={disabled}
+            disabled={disabled || inactive || loading}
             onPress={() => onApply(coupon.code)}
             style={{
               backgroundColor:
@@ -155,17 +155,24 @@ export const CouponCard: React.FC<CouponCardProps> = ({
               justifyContent: "center",
             }}
           >
-            <Text
-              numberOfLines={1}
-              style={{
-                color: disabled || inactive ? "#9CA3AF" : "#FFFFFF",
-                fontSize: moderateScale(13),
-                lineHeight: moderateScale(17),
-                fontWeight: "700",
-              }}
-            >
-              {isApplied ? "APPLIED" : "APPLY"}
-            </Text>
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={disabled || inactive ? colors.primary : "#FFFFFF"}
+              />
+            ) : (
+              <Text
+                numberOfLines={1}
+                style={{
+                  color: disabled || inactive ? "#9CA3AF" : "#FFFFFF",
+                  fontSize: moderateScale(13),
+                  lineHeight: moderateScale(17),
+                  fontWeight: "700",
+                }}
+              >
+                {isApplied ? "APPLIED" : "APPLY"}
+              </Text>
+            )}
           </Touchable>
         </View>
       </Touchable>

@@ -55,7 +55,7 @@ export function usePrescriptionPicker(
     const goToPreview = () => {
       if (uniqueInSelection.length === 0) return;
       addItems(uniqueInSelection);
-      router.push({
+      router.replace({
         pathname: "/(prescription)/preview",
         params: {
           toPay: toPay ?? "0",

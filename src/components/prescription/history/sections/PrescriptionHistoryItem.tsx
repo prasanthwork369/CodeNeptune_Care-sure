@@ -72,7 +72,7 @@ export const PrescriptionHistoryItem: React.FC<
   const canViewMore = isRejected && reasons.length > 0;
 
   const handleView = () => {
-    router.push({
+    router.replace({
       pathname: "/(prescription)/prescription-viewer",
       params: {
         prescriptionId: item.rawId,
