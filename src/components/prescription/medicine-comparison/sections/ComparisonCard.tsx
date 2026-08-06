@@ -25,10 +25,16 @@ const nameStyle = {
   lineHeight: moderateScale(20),
 } as const;
 
-const manufacturerStyle = {
+const prescribedManufacturerStyle = {
   fontSize: moderateScale(12),
   fontWeight: "500",
   color: "#6B7280",
+} as const;
+
+const recommendedManufacturerStyle = {
+  fontSize: moderateScale(12),
+  fontWeight: "500",
+  color: "#009989",
 } as const;
 
 const packSizeStyle = {
@@ -199,12 +205,12 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           <Row
             marginBottom={2}
             left={
-              <Text style={manufacturerStyle} numberOfLines={1}>
+              <Text style={prescribedManufacturerStyle} numberOfLines={1}>
                 {item.prescribed.manufacturer}
               </Text>
             }
             right={
-              <Text style={manufacturerStyle} numberOfLines={1}>
+              <Text style={recommendedManufacturerStyle} numberOfLines={1}>
                 {item.recommended.manufacturer}
               </Text>
             }

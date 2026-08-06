@@ -1,17 +1,17 @@
-import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { FormField } from "@/src/components/ui/FormField";
-import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
-import { profileStyles as s } from "../profile.styles";
+import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
+import { useNav } from "@/src/hooks/useNav";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { useLocationStore } from "@/src/store/locationStore";
-import { icons } from "@/src/constants/icons";
 import { LABELS, LabelType } from "@/src/types/address";
 import { addressToLocation } from "@/src/utils/addressLocation";
+import { moderateScale } from "@/src/utils/exactScale";
 import { sanitize, validate } from "@/src/utils/validation";
-import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
-import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -24,7 +24,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { moderateScale } from "@/src/utils/exactScale";
+import { profileStyles as s } from "../profile.styles";
 
 export const AddAddressLayout: React.FC = () => {
   const router = useNav();
@@ -130,7 +130,13 @@ export const AddAddressLayout: React.FC = () => {
         setPincodeError(pr.valid ? "" : pr.message);
       }
     }
-  }, []);
+  }, [
+    prefill_line1,
+    prefill_line2,
+    prefill_city,
+    prefill_state,
+    prefill_pincode,
+  ]);
 
   useEffect(() => {
     if (!existing) return;

@@ -2,6 +2,7 @@ import { ApiSearchMedicine } from "@/src/api/search.api";
 import { SearchSkeleton } from "@/src/components/search/SearchSkeleton";
 import { ProductHeader } from "@/src/components/search/product/ProductHeader";
 import { SearchEmptyState } from "@/src/components/search/sections/SearchEmptyState";
+import { SearchOfflineState } from "@/src/components/search/sections/SearchOfflineState";
 import { SearchRecentSection } from "@/src/components/search/sections/SearchRecentSection";
 import { SearchResultsList } from "@/src/components/search/sections/SearchResultsList";
 import { useCart } from "@/src/hooks/queries/useCart";
@@ -11,18 +12,17 @@ import {
   useSearchSuggestions,
   useTrendingSearches,
 } from "@/src/hooks/queries/useSearch";
-import { LinearGradient } from "expo-linear-gradient";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
 import {
   analyticsService,
   PERF_TRACES,
   usePerformanceTrace,
 } from "@/src/services/firebase";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { View, useWindowDimensions } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
-import { SearchOfflineState } from "@/src/components/search/sections/SearchOfflineState";
+import { useWindowDimensions, View } from "react-native";
 
 const toComparisonData = (item: ApiSearchMedicine) => {
   const rec = item.recommendation!;
@@ -42,16 +42,28 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     packSize?: string,
     unit?: string,
     dosageForm?: string,
+    packagingDetail?: string | null,
   ) => {
-    const base = [packSize?.trim(), unit].filter(Boolean).join(" ");
-    return dosageForm ? `${base} in ${dosageForm}` : base;
+    if (packagingDetail) return packagingDetail;
+    const parts = [
+      packSize?.trim(),
+      unit,
+      dosageForm ? `in ${dosageForm}` : "",
+    ].filter(Boolean);
+    return parts.join(" ");
   };
   const searchedPackLabel = buildPackLabel(
     item.packSize,
     item.unit,
     item.dosageForm,
+    item.packagingDetail,
   );
-  const recPackLabel = buildPackLabel(rec.packSize, rec.unit, rec.dosageForm);
+  const recPackLabel = buildPackLabel(
+    rec.packSize,
+    rec.unit,
+    rec.dosageForm,
+    rec.packagingDetail,
+  );
   return {
     id: item.id,
     productId: item.productId,
@@ -70,7 +82,7 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     },
     recommended: {
       name: rec.name,
-      manufacturer: "",
+      manufacturer: rec.manufacturer || "",
       price: recPrice,
       originalPrice: recMrp,
       savings: savings > 0 ? savings : 0,
@@ -81,6 +93,21 @@ const toComparisonData = (item: ApiSearchMedicine) => {
       unit: rec.unit,
     },
   };
+};
+
+const buildPackLabel = (
+  packSize?: string,
+  unit?: string,
+  dosageForm?: string,
+  packagingDetail?: string | null,
+) => {
+  if (packagingDetail) return packagingDetail;
+  const parts = [
+    packSize?.trim(),
+    unit,
+    dosageForm ? `in ${dosageForm}` : "",
+  ].filter(Boolean);
+  return parts.join(" ");
 };
 
 // This path cannot dereference recommendation because sourceType 2 can omit it.
@@ -95,6 +122,12 @@ const toSearchedOnlyData = (item: ApiSearchMedicine) => {
       manufacturer: item.brand?.name ?? "",
       price: searchedMrp,
       status: "Not for Purchase",
+      description: buildPackLabel(
+        item.packSize,
+        item.unit,
+        item.dosageForm,
+        item.packagingDetail,
+      ),
     },
   };
 };
@@ -110,6 +143,7 @@ const toRecommendData = (item: ApiSearchMedicine) => ({
   packSize: item.packSize ?? "",
   unit: item.unit ?? "",
   dosageForm: item.dosageForm ?? "",
+  packagingDetail: item.packagingDetail ?? null,
   price:
     item.price != null && item.price !== "" ? parseFloat(item.price) : null,
   mrp:

@@ -6,12 +6,20 @@ import { resolveAssetUrl } from "../../utils/urls";
 
 export type { MedicineVariant };
 
-const parsePackSize = (
+export const getPackDivisor = (
   packSize: string | number | null | undefined,
+  unit?: string,
 ): number => {
-  if (packSize == null) return 1;
-  const match = String(packSize).match(/\d+/);
-  return match ? parseInt(match[0]) : 1;
+  if (!packSize) return 1;
+  const containerUnits = [
+    "bottle", "tube", "vial", "pack", "box",
+    "inhaler", "syringe", "ampoule", "spray", "strip"
+  ];
+  if (unit && containerUnits.includes(unit.toLowerCase())) {
+    return 1;
+  }
+  const parsed = parseFloat(String(packSize));
+  return isNaN(parsed) || parsed <= 0 ? 1 : parsed;
 };
 
 export const useProduct = (productId: string) => {
@@ -25,7 +33,7 @@ export const useProduct = (productId: string) => {
   // Numbers for arithmetic only
   const price = data ? parseFloat(String(data.price)) : 0;
   const discountPct = data ? parseFloat(String(data.discountPercentage)) : 0;
-  const packSizeNum = data ? parsePackSize(data.packSize) : 1;
+  const packSizeNum = data ? getPackDivisor(data.packSize, data.unit) : 1;
   // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
   const unitPrice =
     packSizeNum > 0 ? Math.floor((price / packSizeNum) * 100) / 100 : 0;
@@ -84,7 +92,12 @@ export const useProduct = (productId: string) => {
         id: data.recommendation.id,
         name: data.recommendation.name,
         slug: data.recommendation.slug,
-        manufacturer: data.recommendation.manufacturer,
+        manufacturer:
+          typeof data.recommendation.manufacturer === "string"
+            ? data.recommendation.manufacturer
+            : data.recommendation.manufacturer?.name ??
+              data.recommendation.brand?.name ??
+              "",
         packSize: data.recommendation.packSize,
         unit: data.recommendation.unit,
         description: [

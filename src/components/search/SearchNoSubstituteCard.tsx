@@ -1,15 +1,15 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { useToastStore } from "@/src/store/toastStore";
+import { useSubstituteRequest } from "@/src/hooks/queries/useSubstituteRequest";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   cartCounterStyles as cc,
   searchCardStyles as s,
 } from "./search.styles";
-import { logger } from "@/src/utils/logger";
+
 
 interface SearchNoSubstituteCardProps {
   data: {
@@ -18,6 +18,7 @@ interface SearchNoSubstituteCardProps {
     searched: {
       name: string;
       manufacturer?: string;
+      description?: string;
       price: number | null; // absent when the backend omits a price
       status: string;
     };
@@ -28,7 +29,7 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
   data,
 }) => {
   const router = useNav();
-  const showToast = useToastStore((store) => store.show);
+  const { requestSubstitute, isPending, isSuccess } = useSubstituteRequest();
 
   const handleCardPress = () => {
     router.push({
@@ -38,13 +39,7 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
   };
 
   const handleRequest = () => {
-    // Keep this local until the backend exposes a substitute-request endpoint.
-    if (__DEV__) {
-      logger.debug("[SearchNoSubstituteCard] request substitute for", {
-        productId: data.productId ?? data.id,
-      });
-    }
-    showToast("Your substitute request has been sent", "success");
+    requestSubstitute(data.id ?? data.productId);
   };
 
   return (
@@ -65,6 +60,15 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
             >
               {data.searched.name}
             </Text>
+            {data.searched.description ? (
+              <Text
+                style={s.desc}
+                className="font-inter-medium text-brand-subtext mt-0.5"
+                numberOfLines={1}
+              >
+                {data.searched.description}
+              </Text>
+            ) : null}
             {data.searched.manufacturer ? (
               <Text
                 style={s.desc}
@@ -125,15 +129,27 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
 
         <Touchable
           onPress={handleRequest}
+          disabled={isPending || isSuccess}
           activeOpacity={0.85}
-          style={[cc.addBtn, { borderColor: "#FF383C", flexShrink: 0 }]}
+          style={[
+            cc.addBtn,
+            {
+              borderColor: isSuccess ? "#10B981" : "#FF383C",
+              backgroundColor: isSuccess ? "#ECFDF5" : "transparent",
+              flexShrink: 0,
+            },
+          ]}
         >
-          <Text
-            style={[s.label, { color: "#FF383C" }]}
-            className="font-inter-bold"
-          >
-            Request
-          </Text>
+          {isPending ? (
+            <ActivityIndicator size="small" color="#FF383C" />
+          ) : (
+            <Text
+              style={[s.label, { color: isSuccess ? "#10B981" : "#FF383C" }]}
+              className="font-inter-bold"
+            >
+              {isSuccess ? "Requested" : "Request"}
+            </Text>
+          )}
         </Touchable>
       </View>
     </Touchable>

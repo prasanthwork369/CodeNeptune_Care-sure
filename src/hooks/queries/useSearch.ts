@@ -1,14 +1,14 @@
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { useAuthStore } from "@/src/store/authStore";
 import {
   useInfiniteQuery,
-  useQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { searchApi, ApiSearchMedicine } from "../../api/search.api";
+import { ApiSearchMedicine, searchApi } from "../../api/search.api";
 import { searchService } from "../../services/search.service";
-import { useAuthStore } from "@/src/store/authStore";
-import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 export const useSearch = () => {
   const [query, setQuery] = useState("");

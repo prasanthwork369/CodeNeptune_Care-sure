@@ -107,7 +107,8 @@ export interface ApiProductDetail {
     price: string;
     mrp?: string;
     discountPercentage: number;
-    manufacturer: string;
+    manufacturer: string | { name: string; [key: string]: any } | null;
+    brand?: { name: string; [key: string]: any } | null;
     thumbnailUrl: string;
   } | null;
 }

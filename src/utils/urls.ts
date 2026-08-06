@@ -90,6 +90,7 @@ export const API_ENDPOINTS = {
   SEARCH_HISTORY: "/api/v1/customers/search-history",
   SEARCH_HISTORY_ITEM: (id: string) => `/api/v1/customers/search-history/${id}`,
   SEARCH_TRENDING: "/api/v1/customers/search-history/trending",
+  SUBSTITUTE_REQUESTS: "/api/v1/substitute-requests",
 
   // ── Family Members ───────────────────────────────────────────────────────
   FAMILY_MEMBERS: "/api/v1/family-members",

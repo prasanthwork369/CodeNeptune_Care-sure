@@ -50,16 +50,7 @@ interface HeroBannerProps {
   isLoading?: boolean;
 }
 
-// Trims title to "Stop overpaying" (removes "for your" and cycling words)
-const getCleanTitlePart1 = (rawTitle?: string): string => {
-  if (!rawTitle) return "Stop overpaying";
-  const lowercaseTitle = rawTitle.toLowerCase();
-  const forYourIndex = lowercaseTitle.indexOf("for your");
-  if (forYourIndex !== -1) {
-    return rawTitle.substring(0, forYourIndex).trim();
-  }
-  return "Stop overpaying";
-};
+
 
 export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
   ({ content, isLoading }) => {
@@ -158,35 +149,24 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
             className="flex-[1.2] justify-start"
           >
             <View>
-              {/* First line (e.g. 'Stop overpaying') */}
-              <Text
-                style={[styles.titleText, dStyles.titleText]}
-                className="text-brand-text"
-              >
-                {getCleanTitlePart1(title)}
-              </Text>
-
-              {/* Second line (inline 'for your' prefix and cycling word cycler) */}
-              <View className="flex-row items-center" style={{ minWidth: 0 }}>
+              <View className="flex-row flex-wrap items-center" style={{ minWidth: 0 }}>
                 <Text
-                  style={[
-                    styles.titleText,
-                    dStyles.titleText,
-                    { flexShrink: 0 },
-                  ]}
+                  style={[styles.titleText, dStyles.titleText]}
                   className="text-brand-text"
                 >
-                  for your{" "}
+                  {title}{title ? " " : ""}
                 </Text>
-                <TextCycler
-                  words={highlights}
-                  lineHeight={dStyles.titleText.lineHeight}
-                  style={StyleSheet.flatten([
-                    styles.titleText,
-                    dStyles.titleText,
-                  ])}
-                  className="text-brand-primary"
-                />
+                {highlights.length > 0 && (
+                  <TextCycler
+                    words={highlights}
+                    lineHeight={dStyles.titleText.lineHeight}
+                    style={StyleSheet.flatten([
+                      styles.titleText,
+                      dStyles.titleText,
+                    ])}
+                    className="text-brand-primary"
+                  />
+                )}
               </View>
             </View>
 

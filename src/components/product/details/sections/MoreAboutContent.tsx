@@ -31,10 +31,10 @@ export const MoreAboutContent: React.FC<MoreAboutContentProps> = ({
       descriptionCharacters > DESCRIPTION_PREVIEW_CHARACTERS);
 
   return (
-    <View className="mx-4 mb-4 overflow-hidden rounded-[12px] bg-white">
+    <View className="mx-2 mb-4 overflow-hidden rounded-[12px] bg-white">
       <View className="px-2 pb-5 pt-4">
         <Text
-          className="mb-3 px-2 font-inter-bold text-brand-text"
+          className="mb-3 font-inter-bold text-brand-text"
           style={{
             fontSize: moderateScale(15),
             lineHeight: moderateScale(20),

@@ -97,7 +97,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
             <View className="flex-row items-center justify-between">
               <Text
                 className="font-inter-semibold text-brand-text"
-                style={{ flex: 1, marginRight: 8, fontSize: moderateScale(13) }}
+                style={{ flex: 1, marginRight: 8, fontSize: moderateScale(14) }}
                 numberOfLines={2}
               >
                 {searchedManufacturer || "—"}
@@ -107,7 +107,7 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
                 style={{
                   flex: 1,
                   textAlign: "right",
-                  fontSize: moderateScale(13),
+                  fontSize: moderateScale(14),
                 }}
                 numberOfLines={2}
               >

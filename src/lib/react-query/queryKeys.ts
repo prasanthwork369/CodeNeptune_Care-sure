@@ -32,6 +32,7 @@ export const QUERY_KEYS = {
     MEMBERS: ["customer", "members"] as const,
     CART: ["customer", "cart"] as const,
     COUPONS: ["customer", "coupons", "active"] as const,
+    SUBSTITUTE_REQUESTS: ["customer", "substitute-requests"] as const,
     PRESCRIPTIONS: {
       LIST: (params?: PrescriptionListParams) =>
         ["customer", "prescriptions", "list", params] as const,

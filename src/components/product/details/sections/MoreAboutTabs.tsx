@@ -3,8 +3,8 @@ import { ProductSection } from "@/src/types/productSection";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import type { SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 interface MoreAboutTabsProps {
   sections: ProductSection[];
@@ -53,7 +53,6 @@ export const MoreAboutTabs: React.FC<MoreAboutTabsProps> = ({
         overScrollMode="never"
         style={{ backgroundColor: "#F4F7FC" }}
         contentContainerStyle={{
-          paddingHorizontal: exactScale(16),
           paddingTop: exactScale(14),
         }}
       >

@@ -66,10 +66,9 @@ export const styles = StyleSheet.create({
     // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
     fontWeight: "600",
     fontSize: moderateScale(12),
-    lineHeight: moderateScale(12),
+    lineHeight: moderateScale(16),
     letterSpacing: 0,
     color: "#0F7635",
-    verticalAlign: "middle",
   },
   badgeIcon: {
     width: exactScale(16.6),
@@ -142,7 +141,7 @@ export const getDynamicStyles = (scale: number) => {
     },
     badgeText: {
       fontSize: Math.round(moderateScale(12) * scale),
-      lineHeight: Math.round(moderateScale(12) * scale),
+      lineHeight: Math.round(moderateScale(16) * scale),
     },
     avatar: {
       width: personWidth,

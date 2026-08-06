@@ -146,6 +146,15 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
                 {data.recommended.description}
               </Text>
             ) : null}
+            {data.recommended.manufacturer ? (
+              <Text
+                style={s.desc}
+                className="font-inter-medium text-[#009989] mt-0.5"
+                numberOfLines={1}
+              >
+                {data.recommended.manufacturer}
+              </Text>
+            ) : null}
           </View>
           <View className="mt-auto">
             <View

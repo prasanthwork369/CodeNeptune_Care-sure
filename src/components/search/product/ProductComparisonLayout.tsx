@@ -12,18 +12,17 @@ import {
   TrustBadge,
 } from "@/src/components/product/details/sections";
 import { ProductHeader } from "@/src/components/search/product/ProductHeader";
+import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
-import { useProduct } from "@/src/hooks/queries/useProduct";
-import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
+import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
-import { LinearGradient } from "expo-linear-gradient";
+import { moderateScale } from "@/src/utils/exactScale";
 import React, { useCallback, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
 import { ComparisonBoard, ProductDetailsSkeleton } from "./sections";
 
 interface ProductComparisonLayoutProps {
@@ -99,8 +98,8 @@ export const ProductComparisonLayout: React.FC<
     mainScrollRef,
   );
 
-  const recPackSize = raw?.recommendation?.packSize
-    ? parseInt(String(raw.recommendation.packSize).match(/\d+/)?.[0] ?? "1")
+  const recPackSize = raw?.recommendation
+    ? getPackDivisor(raw.recommendation.packSize, raw.recommendation.unit)
     : 1;
 
   const recUnitPrice = recommendation
@@ -114,18 +113,7 @@ export const ProductComparisonLayout: React.FC<
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-        <LinearGradient
-          colors={["#EAF7D6", "rgba(234, 247, 214, 0)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 180,
-          }}
-        />
+        {/* Header gradient removed to match ProductDetailsLayout */}
 
         <ProductHeader
           query={raw?.name ?? ""}

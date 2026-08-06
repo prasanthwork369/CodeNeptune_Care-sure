@@ -1,13 +1,28 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
 import { trustBadgeStyles as s } from "../../search.styles";
 import { LinearGradient } from "expo-linear-gradient";
-import { HOME_IMAGES } from "@/src/constants/images";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { moderateScale } from "@/src/utils/exactScale";
 
-export const TrustBadge = () => {
+interface TrustBadgeProps {
+  searchedName: string;
+  recommendedName: string;
+  searchedManufacturer: string;
+  recommendedManufacturer: string;
+  searchedUnitPrice?: string;
+  recommendedUnitPrice?: string;
+}
+
+export const TrustBadge = ({
+  searchedName,
+  recommendedName,
+  searchedManufacturer,
+  recommendedManufacturer,
+  searchedUnitPrice,
+  recommendedUnitPrice,
+}: TrustBadgeProps) => {
   return (
     <LinearGradient
       colors={["#F0F8FF", "#FFFFFF"]}
@@ -32,18 +47,20 @@ export const TrustBadge = () => {
             >
               MEDICINE
             </Text>
-            <View className="flex-row items-center justify-between">
+            <View className="flex-row items-start justify-between gap-x-3">
               <Text
                 style={s.value}
-                className="font-inter-semibold text-brand-text"
+                className="font-inter-semibold text-brand-text flex-1"
+                numberOfLines={2}
               >
-                Paracetamol 650mg
+                {searchedName}
               </Text>
               <Text
                 style={s.value}
-                className="font-inter-semibold text-brand-primary"
+                className="font-inter-semibold text-brand-primary flex-1 text-right"
+                numberOfLines={2}
               >
-                Paracip 650mg
+                {recommendedName}
               </Text>
             </View>
           </View>
@@ -56,17 +73,21 @@ export const TrustBadge = () => {
             >
               MANUFACTURER
             </Text>
-            <View className="flex-row items-center justify-between h-[30px]">
-              <Image
-                source={HOME_IMAGES.modiLogo}
-                style={s.modiLogo}
-                resizeMode="contain"
-              />
-              <Image
-                source={HOME_IMAGES.ciplaLogo}
-                style={s.ciplaLogo}
-                resizeMode="contain"
-              />
+            <View className="flex-row items-start justify-between gap-x-3">
+              <Text
+                style={s.value}
+                className="font-inter-semibold text-brand-text flex-1"
+                numberOfLines={2}
+              >
+                {searchedManufacturer}
+              </Text>
+              <Text
+                style={s.value}
+                className="font-inter-semibold text-[#009989] flex-1 text-right"
+                numberOfLines={2}
+              >
+                {recommendedManufacturer}
+              </Text>
             </View>
           </View>
 
@@ -127,15 +148,15 @@ export const TrustBadge = () => {
             <View className="flex-row items-center justify-between">
               <Text
                 className="font-inter-semibold text-[#111827]"
-                style={{ fontSize: moderateScale(14) }}
+                style={s.value}
               >
-                ₹1.5
+                {searchedUnitPrice ? `₹${searchedUnitPrice}` : "—"}
               </Text>
               <Text
                 style={s.value}
                 className="font-inter-semibold text-brand-primary"
               >
-                ₹1.4
+                {recommendedUnitPrice ? `₹${recommendedUnitPrice}` : "—"}
               </Text>
             </View>
           </View>

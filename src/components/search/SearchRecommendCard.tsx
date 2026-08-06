@@ -2,9 +2,9 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { moderateScale } from "@/src/utils/exactScale";
+import { Image } from "expo-image";
 import React from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
-import { Image } from "expo-image";
 import {
   cartCounterStyles as cc,
   searchCardStyles as s,
@@ -19,6 +19,7 @@ interface SearchRecommendCardProps {
     packSize: string;
     unit: string;
     dosageForm: string;
+    packagingDetail?: string | null;
     price: number | null;
     mrp: number | null;
     discountPercentage: number;
@@ -32,8 +33,15 @@ export const SearchRecommendCard = React.memo(
     const savings =
       data.mrp != null && data.price != null ? data.mrp - data.price : 0;
     const hasSavings = savings > 0;
-    const base = [data.packSize?.trim(), data.unit].filter(Boolean).join(" ");
-    const packLabel = data.dosageForm ? `${base} in ${data.dosageForm}` : base;
+    const packLabel =
+      data.packagingDetail ||
+      [
+        data.packSize?.trim(),
+        data.unit,
+        data.dosageForm ? `in ${data.dosageForm}` : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
 
     const { count, increment, decrement, isPending, animations } =
       useCartActions({
@@ -98,7 +106,7 @@ export const SearchRecommendCard = React.memo(
             {data.manufacturer ? (
               <Text
                 style={s.desc}
-                className="font-inter-medium text-brand-subtext mt-0.5"
+                className="font-inter-medium text-[#009989] mt-0.5"
                 numberOfLines={1}
               >
                 {data.manufacturer}

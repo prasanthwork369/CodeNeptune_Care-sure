@@ -3,10 +3,10 @@ import {
   WhyFamiliesTrustUs,
 } from "@/src/components/home/sections";
 import { ProductSkeleton } from "@/src/components/product/ProductSkeleton";
+import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
-import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import {
@@ -16,7 +16,6 @@ import {
 } from "@/src/services/firebase";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
-import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -151,18 +150,7 @@ export const ProductDetailsLayout: React.FC = () => {
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <View style={{ flex: 1 }}>
-          <LinearGradient
-            colors={["#EAF7D6", "rgba(234, 247, 214, 0)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: exactScale(180),
-            }}
-          />
+          {/* Header gradient removed per design — keep solid white background */}
 
           <ProductDetailsHeader
             title={medicineName}

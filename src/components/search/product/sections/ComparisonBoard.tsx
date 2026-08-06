@@ -8,7 +8,6 @@ import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
 import { moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
-import Svg, { Line } from "react-native-svg";
 import {
   ActivityIndicator,
   Animated,
@@ -23,6 +22,7 @@ import ReAnimated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import Svg, { Line } from "react-native-svg";
 
 interface ComparisonBoardProps {
   searched: SearchedProduct;
@@ -314,9 +314,9 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 style={{
                   fontSize: moderateScale(12),
                   lineHeight: moderateScale(15),
-                  minHeight: moderateScale(15),
+                  minHeight: moderateScale(30),
                 }}
-                numberOfLines={1}
+                numberOfLines={2}
               >
                 {searched.manufacturer}
               </Text>
@@ -339,6 +339,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 setSearchedBottomHeight(event.nativeEvent.layout.height)
               }
             >
+              {/* Spacer matching the savings badge height on the recommended card */}
+              <View style={{ height: 30 }} />
               <ComparisonDivider />
               {/* Price Slot */}
               <View style={{ height: 28, justifyContent: "center" }}>
@@ -456,14 +458,14 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       {recommended.name}
                     </Text>
                     <Text
-                      className="font-inter-bold text-[#0F7635]"
+                      className="font-inter-bold text-[#009989]"
                       style={{
                         fontSize: moderateScale(12),
                         lineHeight: moderateScale(15),
-                        minHeight: moderateScale(15),
+                        minHeight: moderateScale(30),
                         marginBottom: 3,
                       }}
-                      numberOfLines={1}
+                      numberOfLines={2}
                     >
                       {recommended.manufacturer}
                     </Text>
@@ -478,6 +480,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     >
                       {recommended.description}
                     </Text>
+                  </View>
+                  <View style={{ marginTop: "auto" }}>
                     {(() => {
                       const searchedPrice = searched.price ?? 0;
                       const crossSaving =
@@ -499,33 +503,33 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                             ? ownSaving
                             : 0;
 
-                      if (effectiveSaving <= 0) return null;
+                      if (effectiveSaving <= 0)
+                        return <View style={{ height: 30 }} />;
                       return (
-                        <LinearGradient
-                          colors={["#C22923", "#FF8A00"]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={{
-                            alignSelf: "flex-start",
-                            paddingHorizontal: 8,
-                            paddingVertical: 4,
-                            borderRadius: 6,
-                            marginTop: 6,
-                            overflow: "hidden",
-                          }}
-                        >
-                          <Text
-                            className="font-inter-semibold text-white"
-                            style={{ fontSize: moderateScale(10) }}
+                        <View style={{ height: 30, justifyContent: "center" }}>
+                          <LinearGradient
+                            colors={["#C22923", "#FF8A00"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={{
+                              alignSelf: "flex-start",
+                              paddingHorizontal: 8,
+                              paddingVertical: 4,
+                              borderRadius: 6,
+                              overflow: "hidden",
+                            }}
                           >
-                            Save ₹{effectiveSaving.toFixed(2)}
-                          </Text>
-                          <OfferShine borderRadius={6} />
-                        </LinearGradient>
+                            <Text
+                              className="font-inter-semibold text-white"
+                              style={{ fontSize: moderateScale(10) }}
+                            >
+                              Save ₹{effectiveSaving.toFixed(2)}
+                            </Text>
+                            <OfferShine borderRadius={6} />
+                          </LinearGradient>
+                        </View>
                       );
                     })()}
-                  </View>
-                  <View style={{ marginTop: "auto" }}>
                     <ComparisonDivider />
                     {/* Price & Strikethrough Slot */}
                     <View style={{ height: 28, justifyContent: "center" }}>

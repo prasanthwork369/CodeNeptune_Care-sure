@@ -1,10 +1,10 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useToastStore } from "@/src/store/toastStore";
+import { useSubstituteRequest } from "@/src/hooks/queries/useSubstituteRequest";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { logger } from "@/src/utils/logger";
+
 
 interface NoSubstituteBannerProps {
   productId: string;
@@ -19,20 +19,11 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
   productName,
   safeAreaBottom,
 }) => {
-  const showToast = useToastStore((store) => store.show);
+  const { requestSubstitute, isPending, isSuccess } = useSubstituteRequest();
 
   const handleRequest = () => {
-    // No backend endpoint exists yet for this — productId/medicineUuid/
-    // productName are threaded through so the real API call can be wired
-    // in here directly once one exists, without touching the caller.
-    if (__DEV__) {
-      logger.debug("[NoSubstituteBanner] request substitute for", {
-        productId,
-        medicineUuid,
-        productName,
-      });
-    }
-    showToast("Your substitute request has been sent", "success");
+    const targetId = medicineUuid || productId;
+    requestSubstitute(targetId);
   };
 
   return (
@@ -61,9 +52,10 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
       {/* Bottom Row: Full-width Request Button */}
       <Touchable
         onPress={handleRequest}
+        disabled={isPending || isSuccess}
         activeOpacity={0.85}
         style={{
-          backgroundColor: "#FF383C",
+          backgroundColor: isSuccess ? "#10B981" : "#FF383C",
           borderRadius: exactScale(12),
           height: exactScale(48),
           alignItems: "center",
@@ -71,12 +63,16 @@ export const NoSubstituteBanner: React.FC<NoSubstituteBannerProps> = ({
           width: "100%",
         }}
       >
-        <Text
-          className="font-inter-bold text-white text-center"
-          style={{ fontSize: moderateScale(15) }}
-        >
-          Request a Substitute
-        </Text>
+        {isPending ? (
+          <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+          <Text
+            className="font-inter-bold text-white text-center"
+            style={{ fontSize: moderateScale(15) }}
+          >
+            {isSuccess ? "Substitute Requested" : "Request a Substitute"}
+          </Text>
+        )}
       </Touchable>
     </View>
   );

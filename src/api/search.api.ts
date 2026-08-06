@@ -15,6 +15,8 @@ export interface ApiSearchRecommendation {
   mrp: string;
   discountPercentage: number;
   thumbnailUrl: string;
+  packagingDetail?: string | null;
+  manufacturer?: string | null;
 }
 
 export interface ApiSearchMedicine {
@@ -32,6 +34,7 @@ export interface ApiSearchMedicine {
   discountPercentage: number;
   requiresPrescription?: boolean;
   thumbnailUrl: string;
+  packagingDetail?: string | null;
   recommendation: ApiSearchRecommendation | null;
   brand?: {
     id: string;
