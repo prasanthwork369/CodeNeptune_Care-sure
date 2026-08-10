@@ -1,4 +1,5 @@
 import { PrescriptionStatusValue } from "@/src/constants/prescription-status";
+import type { FileUploadState } from "@/src/hooks/ui/usePrescriptionUploader";
 import type { CartItem } from "./cart";
 
 export interface PrescriptionItem {
@@ -126,6 +127,9 @@ export interface PreviewThumbnailsProps {
   onSubmit: () => void;
   submitting: boolean;
   safeAreaBottom: number;
+  /** Per-file upload state, keyed by uploadKeyOf(item). */
+  uploadStates?: Record<string, FileUploadState>;
+  onRetry?: (item: PrescriptionItem) => void;
 }
 
 export interface PreviewSuccessModalProps {

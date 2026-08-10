@@ -32,6 +32,9 @@ export const API_BASE_URL = resolvedBaseUrl;
 // Exposed so auth can refuse QA-only conveniences (OTP prefill) when pointed at the live API.
 export const IS_LIVE_API = IS_PRODUCTION;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
+// File uploads stream megabytes over the user's mobile connection, so the JSON
+// timeout above is far too short for them and aborts large files mid-transfer.
+export const UPLOAD_TIMEOUT = 60_000;
 
 // Share links follow the same switch as the API, so a production build can never emit QA links.
 // The QA fallback keeps local dev zero-config; production has no fallback by design.

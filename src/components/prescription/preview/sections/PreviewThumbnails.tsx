@@ -1,12 +1,70 @@
 import { icons } from "@/src/constants/icons";
 import { PreviewThumbnailsProps } from "@/src/types/prescription";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { uploadKeyOf } from "@/src/hooks/ui/usePrescriptionUploader";
+import type { FileUploadState } from "@/src/hooks/ui/usePrescriptionUploader";
 import React from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
 
 const isPdf = (uri: string, type?: string) =>
   type === "application/pdf" || uri.toLowerCase().endsWith(".pdf");
+
+// Sits over the thumbnail so a successful file stays visible rather than being hidden.
+const StatusBadge: React.FC<{
+  state: FileUploadState;
+  onRetry?: () => void;
+}> = ({ state, onRetry }) => {
+  if (state.status === "success") {
+    return (
+      <View className="absolute bottom-1 left-1 right-1 bg-[#0F7635] rounded-md items-center py-0.5">
+        <Text
+          className="text-white font-inter-semibold"
+          style={{ fontSize: moderateScale(9) }}
+        >
+          ✓ Uploaded
+        </Text>
+      </View>
+    );
+  }
+  if (state.status === "error") {
+    return (
+      <Touchable
+        onPress={onRetry}
+        className="absolute bottom-1 left-1 right-1 bg-[#E02D5B] rounded-md items-center py-0.5"
+      >
+        <Text
+          className="text-white font-inter-semibold"
+          style={{ fontSize: moderateScale(9) }}
+        >
+          Retry
+        </Text>
+      </Touchable>
+    );
+  }
+  if (state.status === "uploading") {
+    return (
+      <View className="absolute bottom-1 left-1 right-1 bg-[#1A1C1E]/80 rounded-md items-center py-0.5">
+        <Text
+          className="text-white font-inter-semibold"
+          style={{ fontSize: moderateScale(9) }}
+        >
+          {state.progress > 0 ? `${state.progress}%` : "Uploading…"}
+        </Text>
+      </View>
+    );
+  }
+  return (
+    <View className="absolute bottom-1 left-1 right-1 bg-[#6A6A6A]/80 rounded-md items-center py-0.5">
+      <Text
+        className="text-white font-inter-semibold"
+        style={{ fontSize: moderateScale(9) }}
+      >
+        Waiting
+      </Text>
+    </View>
+  );
+};
 
 export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
   items,
@@ -18,6 +76,8 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
   onSubmit,
   submitting,
   safeAreaBottom,
+  uploadStates,
+  onRetry,
 }) => {
   return (
     <View
@@ -52,7 +112,9 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
             <icons.add_photo width={28} height={28} />
           </Touchable>
         )}
-        {items.map((item, index) => (
+        {items.map((item, index) => {
+          const state = uploadStates?.[uploadKeyOf(item)];
+          return (
           <Touchable
             key={index}
             onPress={() => onSelect(index)}
@@ -83,6 +145,9 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
                   resizeMode="contain"
                 />
               )}
+              {state && (
+                <StatusBadge state={state} onRetry={() => onRetry?.(item)} />
+              )}
             </View>
             {!submitting && (
               <Touchable
@@ -94,7 +159,8 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
               </Touchable>
             )}
           </Touchable>
-        ))}
+          );
+        })}
       </ScrollView>
 
       <View

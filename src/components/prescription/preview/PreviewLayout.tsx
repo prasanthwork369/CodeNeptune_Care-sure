@@ -1,5 +1,4 @@
 import { asError } from "@/src/api/errors";
-import { storageApi } from "@/src/api/storage.api";
 import { PrescriptionReviewSheet } from "@/src/components/prescription/PrescriptionReviewSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
@@ -11,6 +10,10 @@ import {
 } from "@/src/features/prescription-scanner";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import {
+  uploadKeyOf,
+  usePrescriptionUploader,
+} from "@/src/hooks/ui/usePrescriptionUploader";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
@@ -21,7 +24,13 @@ import { logger } from "@/src/utils/logger";
 import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
 import {
   DuplicateFileModal,
@@ -32,6 +41,7 @@ import {
   PreviewSuccessModal,
   PreviewThumbnails,
   RemoveConfirmModal,
+  UploadProgressPanel,
 } from "./sections";
 
 const FOLDER = "customers/prescriptions";
@@ -115,11 +125,44 @@ export const PreviewLayout: React.FC = () => {
   const showInfo = (title: string, message: string) =>
     setInfoModal({ title, message });
   const uploadedSnapshot = useRef<PrescriptionItem[]>([]);
+  const uploader = usePrescriptionUploader(FOLDER);
+  const submitLockRef = useRef(false);
   // Hosted image URLs produced at Preview for the order flow. The prescription
   // record itself is NOT created here anymore — it's created at the final
   // Place Order step — so we stash the URLs to carry forward to payment.
   const deferredImageUrls = useRef<string[]>([]);
   const activeItem = items[activeIndex] ?? items[0];
+
+  // Stable identities, or React.memo on PreviewDisplay can never hold.
+  const goPrev = useCallback(() => setActiveIndex((prev) => prev - 1), []);
+  const goNext = useCallback(() => setActiveIndex((prev) => prev + 1), []);
+
+  // Averaged across files so one large upload can't dominate the bar. Failed
+  // files contribute 0 rather than freezing the percentage at their last value.
+  const uploadTotals = useMemo(() => {
+    const total = items.length;
+    let done = 0;
+    let failed = 0;
+    let sum = 0;
+    for (const item of items) {
+      const state = uploader.states[uploadKeyOf(item)];
+      if (!state) continue;
+      if (state.status === "success") {
+        done += 1;
+        sum += 100;
+      } else if (state.status === "error") {
+        failed += 1;
+      } else {
+        sum += state.progress;
+      }
+    }
+    return {
+      total,
+      done,
+      failed,
+      percent: total > 0 ? Math.round(sum / total) : 0,
+    };
+  }, [items, uploader.states]);
 
   const exitFlow = useCallback(() => {
     clearItems();
@@ -206,6 +249,10 @@ export const PreviewLayout: React.FC = () => {
       useNetworkStore.getState().showOfflineAlert();
       return;
     }
+    // Ref, not the `submitting` state: two taps in the same tick both read the
+    // stale false, and the loser's finally would clear the winner's spinner.
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
     if (__DEV__)
       logger.debug(
         "[Prescription] Proceed pressed! Starting upload flow for items:",
@@ -214,25 +261,17 @@ export const PreviewLayout: React.FC = () => {
     setSubmitting(true);
     uploadedSnapshot.current = [...items];
     try {
-      const uploadedUrls: string[] = [];
-      for (const item of uploadedSnapshot.current) {
-        if (/^https?:\/\//i.test(item.localUri)) {
-          uploadedUrls.push(item.localUri);
-          continue;
-        }
-        const { url } = await storageApi.upload(
-          { uri: item.localUri, name: item.name, type: item.type },
-          FOLDER,
-        );
-        uploadedUrls.push(url);
-      }
+      // Null means at least one file failed; the thumbnails carry a per-file
+      // Retry, so stay on this screen rather than losing the user's work.
+      const uploadedUrls = await uploader.uploadAll(uploadedSnapshot.current);
+      if (!uploadedUrls) return;
+
       if (source === "cart") {
         // Order flow: DON'T create the prescription record here. The files are
         // now hosted URLs (above); the prescription is created in one POST at
         // the final Place Order step, so any images added later on Select
         // Patient are saved together. Carry the URLs forward.
         deferredImageUrls.current = uploadedUrls;
-        clearItems();
         useUIStore.getState().setIsRxFromCartFlow(true);
         setShowConfirmed(true);
         return;
@@ -251,7 +290,6 @@ export const PreviewLayout: React.FC = () => {
         );
         return;
       }
-      clearItems();
       setShowReviewSheet(true);
     } catch (e) {
       const error = asError(e);
@@ -262,6 +300,7 @@ export const PreviewLayout: React.FC = () => {
           "Upload failed. Please try again.",
       );
     } finally {
+      submitLockRef.current = false;
       setSubmitting(false);
     }
   };
@@ -283,12 +322,21 @@ export const PreviewLayout: React.FC = () => {
           screenWidth={screenWidth}
           previewHeight={previewHeight}
           onLayout={setPreviewHeight}
-          onPrev={() => setActiveIndex((prev) => prev - 1)}
+          onPrev={goPrev}
           showPrev={activeIndex > 0}
-          onNext={() => setActiveIndex((prev) => prev + 1)}
+          onNext={goNext}
           showNext={activeIndex < items.length - 1}
         />
       </View>
+
+      {submitting && (
+        <UploadProgressPanel
+          total={uploadTotals.total}
+          done={uploadTotals.done}
+          percent={uploadTotals.percent}
+          failed={uploadTotals.failed}
+        />
+      )}
 
       <PreviewThumbnails
         items={items}
@@ -300,6 +348,8 @@ export const PreviewLayout: React.FC = () => {
         onSubmit={handleSubmit}
         submitting={submitting}
         safeAreaBottom={adjustedBottom}
+        uploadStates={uploader.states}
+        onRetry={uploader.retryOne}
       />
 
       <UploadPrescriptionSheet
@@ -414,6 +464,9 @@ export const PreviewLayout: React.FC = () => {
             },
           });
           setShowConfirmed(false);
+          // Only after navigating: clearing while still mounted empties the
+          // preview and blanks the screen behind the modal.
+          clearItems();
         }}
         safeAreaBottom={adjustedBottom}
       />
@@ -425,6 +478,8 @@ export const PreviewLayout: React.FC = () => {
           useUIStore.getState().setHasJustUploadedPrescription(true);
           useUIStore.getState().setIsRxFromCartFlow(false);
           router.replace("/(tabs)");
+          // Cleared after navigation for the same reason as the order flow above.
+          clearItems();
         }}
       />
     </View>

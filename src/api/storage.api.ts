@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from "../utils/urls";
+import { API_ENDPOINTS, UPLOAD_TIMEOUT } from "../utils/urls";
 import { apiClient } from "./client";
 import { logger } from "@/src/utils/logger";
 
@@ -30,7 +30,15 @@ export const deriveKeyFromUrl = (url: string): string => {
 export const storageApi = {
   // Returns both the display URL and the bucket-relative `path`. Mirrors the
   // web ImageUpload, which stores `path` (the delete key) and previews `url`.
-  upload: async (file: UploadFile, folder: string): Promise<UploadedImage> => {
+  upload: async (
+    file: UploadFile,
+    folder: string,
+    // Optional so every existing caller keeps working untouched.
+    options?: {
+      onProgress?: (percent: number) => void;
+      signal?: AbortSignal;
+    },
+  ): Promise<UploadedImage> => {
     const form = new FormData();
     form.append("file", {
       uri: file.uri,
@@ -44,6 +52,15 @@ export const storageApi = {
       data: { url: string; path?: string; key?: string };
     }>(API_ENDPOINTS.STORAGE_UPLOAD, form, {
       headers: { "Content-Type": "multipart/form-data" },
+      // The shared JSON timeout aborts multi-megabyte files mid-transfer.
+      timeout: UPLOAD_TIMEOUT,
+      signal: options?.signal,
+      onUploadProgress: options?.onProgress
+        ? (e) => {
+            if (!e.total) return;
+            options.onProgress?.(Math.round((e.loaded / e.total) * 100));
+          }
+        : undefined,
     });
     const data = response.data.data;
     // TEMP: confirm the exact field the backend returns for the delete key

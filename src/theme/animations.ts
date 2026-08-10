@@ -41,6 +41,9 @@ export const screenTransitions = {
   fade: {
     animation: "fade",
     animationDuration: 120,
+    // Without this the screen container is transparent and the window shows
+    // through as black for the length of the fade.
+    contentStyle: { backgroundColor: "#FFFFFF" },
     freezeOnBlur: true,
   },
   /** Auth completion uses native fade with subtle depth. */

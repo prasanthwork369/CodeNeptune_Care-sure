@@ -12,7 +12,9 @@ import Animated from "react-native-reanimated";
 const isPdf = (uri: string, type?: string) =>
   type === "application/pdf" || uri.toLowerCase().endsWith(".pdf");
 
-export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
+// Memoised: upload progress ticks several times a second, and without this the
+// zoomable image and its gesture handler re-render on every tick.
+export const PreviewDisplay: React.FC<PreviewDisplayProps> = React.memo(({
   activeItem,
   screenWidth,
   previewHeight,
@@ -145,4 +147,5 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = ({
       )}
     </View>
   );
-};
+});
+PreviewDisplay.displayName = "PreviewDisplay";
