@@ -15,10 +15,14 @@ import {
   ProfileCoinsCard,
   ProfileHeader,
   ProfileInfoList,
+  ProfileUpdateCard,
   ProfileQuickTiles,
 } from "../sections";
 import UploadBottomSheet from "../sections/UploadBottomSheet";
 import { LogoutConfirmModal } from "./LogoutConfirmModal";
+import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
+import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
+import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
 import { ProfileSkeleton } from "./ProfileSkeleton";
 
 export const ProfileLayout: React.FC = () => {
@@ -36,6 +40,9 @@ export const ProfileLayout: React.FC = () => {
   } = useProfile();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showUpdateSheet, setShowUpdateSheet] = useState(false);
+  const softUpdate = useSoftUpdate();
+  const inAppUpdate = useInAppUpdate();
   const [showUploadSheet, setShowUploadSheet] = useState(false);
   const [localAvatar, setLocalAvatar] = useState<string | null>(null);
   const scrollY = useSharedValue(0);
@@ -178,8 +185,24 @@ export const ProfileLayout: React.FC = () => {
 
         <ProfileCoinsCard />
 
+        {/* Uses raw availability, not the popup's dismissal state, so declining
+            "Maybe Later" still leaves a way to update. */}
+        <ProfileUpdateCard
+          visible={softUpdate.available}
+          onPress={() => setShowUpdateSheet(true)}
+        />
+
         <ProfileInfoList onLogout={() => setShowLogoutModal(true)} />
       </ScrollView>
+
+      {/* Same prompt the app shows automatically; opening it from the row
+          reuses one component rather than a second update UI. */}
+      <SoftUpdateModal
+        visible={showUpdateSheet}
+        latestVersion={softUpdate.latestVersion}
+        onDismiss={() => setShowUpdateSheet(false)}
+        onUpdate={() => inAppUpdate.runFlexibleUpdate()}
+      />
 
       <LogoutConfirmModal
         isVisible={showLogoutModal}

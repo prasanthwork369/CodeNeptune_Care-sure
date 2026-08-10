@@ -26,6 +26,7 @@ import arrow_forward_ios_white from "../../assets/icons/arrow_forward_ios_white.
 import arrow_forward_white from "../../assets/icons/arrow_forward_white.svg";
 
 import arrow_up from "../../assets/icons/arrow_up.svg";
+import autorenew from "../../assets/icons/autorenew.svg";
 import arrow_up_white from "../../assets/icons/arrow_up_white.svg";
 import cancel_circle from "../../assets/icons/cancel_circle.svg";
 import check_circle from "../../assets/icons/check_circle.svg";
@@ -218,6 +219,7 @@ export const icons = {
 
   arrow_up,
   arrow_up_white,
+  autorenew,
   Add_Cart,
   moped_package,
   location,

@@ -45,6 +45,7 @@ export const HOME_IMAGES = {
   // UI Icons
   call: require("../../assets/images/icons/call.webp"),
   whatsapp: require("../../assets/images/icons/whatsapp.webp"),
+  updateBell: require("../../assets/images/icons/update-bell.png"),
   wallet: require("../../assets/images/icons/wallet.webp"),
   walletCredit: require("../../assets/images/wallet/wallet-credit.webp"),
   corporateCredit: require("../../assets/images/wallet/corporate-credit.webp"),

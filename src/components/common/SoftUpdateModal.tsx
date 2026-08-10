@@ -1,10 +1,13 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { HOME_IMAGES } from "@/src/constants/images";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { Image } from "expo-image";
 import React from "react";
 import { Modal, StyleSheet, Text, View } from "react-native";
 
 interface SoftUpdateModalProps {
   visible: boolean;
+  /** Kept for analytics/callers; the copy is version-agnostic by design. */
   latestVersion?: string;
   /** Later, Android back, or after Update — always closes the prompt. */
   onDismiss: () => void;
@@ -18,7 +21,6 @@ interface SoftUpdateModalProps {
  */
 export const SoftUpdateModal: React.FC<SoftUpdateModalProps> = ({
   visible,
-  latestVersion,
   onDismiss,
   onUpdate,
 }) => (
@@ -26,44 +28,54 @@ export const SoftUpdateModal: React.FC<SoftUpdateModalProps> = ({
     visible={visible}
     transparent
     animationType="fade"
+    // Without this the Android backdrop stops below the status bar and leaves a
+    // pale strip. Every other modal in the app sets it.
+    statusBarTranslucent
     // Android back dismisses, matching the Later action.
     onRequestClose={onDismiss}
   >
     <View style={styles.backdrop}>
       <View style={styles.card}>
-        <Text style={styles.title}>Update available</Text>
+        <View style={styles.iconHalo}>
+          <Image
+            source={HOME_IMAGES.updateBell}
+            style={styles.icon}
+            contentFit="contain"
+            accessibilityIgnoresInvertColors
+          />
+        </View>
+
+        <Text style={styles.title}>A new version is available</Text>
         <Text style={styles.body}>
-          {latestVersion
-            ? `Version ${latestVersion} of CareSure is ready, with the latest improvements and fixes.`
-            : "A new version of CareSure is ready, with the latest improvements and fixes."}
+          We&rsquo;ve made improvements and added new features to give a better
+          CareSure experience.
         </Text>
 
-        <View style={styles.actions}>
-          <Touchable
-            onPress={onDismiss}
-            style={[styles.button, styles.secondary]}
-            accessibilityRole="button"
-            accessibilityLabel="Dismiss update prompt"
-          >
-            <Text style={styles.secondaryLabel}>Later</Text>
-          </Touchable>
+        {/* Stacked, not side by side: Update is the primary action and gets the
+            full width, with Later readable but visually secondary. */}
+        <Touchable
+          onPress={() => {
+            // The parent decides what Update means — Play flexible update on
+            // Android, store link elsewhere. Closing either way, so returning
+            // from the store does not find the prompt still waiting.
+            onUpdate?.();
+            onDismiss();
+          }}
+          style={[styles.button, styles.primary]}
+          accessibilityRole="button"
+          accessibilityLabel="Update CareSure now"
+        >
+          <Text style={styles.primaryLabel}>Update Now</Text>
+        </Touchable>
 
-          <Touchable
-            onPress={() => {
-              // The parent decides what Update means — Play flexible update on
-              // Android, store link elsewhere. Closing either way, so returning
-              // from the store does not find the prompt still waiting.
-              onUpdate?.();
-              onDismiss();
-            }}
-            className="bg-brand-primary"
-            style={[styles.button, styles.primary]}
-            accessibilityRole="button"
-            accessibilityLabel="Update CareSure now"
-          >
-            <Text style={styles.primaryLabel}>Update</Text>
-          </Touchable>
-        </View>
+        <Touchable
+          onPress={onDismiss}
+          style={[styles.button, styles.secondary]}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss update prompt"
+        >
+          <Text style={styles.secondaryLabel}>Maybe Later</Text>
+        </Touchable>
       </View>
     </View>
   </Modal>
@@ -81,43 +93,59 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: exactScale(400),
     backgroundColor: "#FFFFFF",
-    borderRadius: exactScale(16),
-    padding: exactScale(24),
+    borderRadius: exactScale(20),
+    paddingHorizontal: exactScale(24),
+    paddingTop: exactScale(28),
+    paddingBottom: exactScale(24),
+    alignItems: "center",
   },
-  title: {
-    fontSize: moderateScale(17),
-    fontWeight: "700",
-    color: "#1A1C1E",
-  },
-  body: {
-    marginTop: exactScale(8),
-    fontSize: moderateScale(14),
-    lineHeight: moderateScale(20),
-    color: "#6A6A6A",
-  },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: exactScale(12),
-    marginTop: exactScale(24),
-  },
-  button: {
-    height: exactScale(44),
-    paddingHorizontal: exactScale(20),
-    borderRadius: exactScale(10),
+  iconHalo: {
+    width: exactScale(96),
+    height: exactScale(96),
+    borderRadius: exactScale(48),
+    backgroundColor: "#F1FBF965",
     alignItems: "center",
     justifyContent: "center",
   },
-  secondary: { backgroundColor: "#F3F4F6" },
-  primary: { minWidth: exactScale(110) },
-  secondaryLabel: {
-    color: "#6A6A6A",
+  icon: { width: exactScale(56), height: exactScale(56) },
+  title: {
+    marginTop: exactScale(18),
+    fontSize: moderateScale(20),
+    fontWeight: "700",
+    color: "#1A1C1E",
+    textAlign: "center",
+  },
+  body: {
+    marginTop: exactScale(10),
     fontSize: moderateScale(14),
-    fontWeight: "600",
+    lineHeight: moderateScale(22),
+    fontWeight: "500",
+    color: "#6A6A6A",
+    textAlign: "center",
+  },
+  // Full width and stacked, so the primary action is unmissable.
+  button: {
+    width: "100%",
+    height: exactScale(52),
+    borderRadius: exactScale(12),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  primary: { marginTop: exactScale(22), backgroundColor: "#146C3A" },
+  secondary: {
+    marginTop: exactScale(12),
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   primaryLabel: {
     color: "#FFFFFF",
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(16),
+    fontWeight: "700",
+  },
+  secondaryLabel: {
+    color: "#6A6A6A",
+    fontSize: moderateScale(16),
     fontWeight: "600",
   },
 });

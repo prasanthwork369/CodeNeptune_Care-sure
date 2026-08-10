@@ -17,7 +17,7 @@ export const ProfileInfoList: React.FC<ProfileInfoListProps> = ({
   const router = useNav();
 
   return (
-    <View className="mx-4 my-6">
+    <View className="mx-4 my-4">
       <Text
         style={s.sectionTitle}
         className="font-inter-bold text-brand-text mb-3"

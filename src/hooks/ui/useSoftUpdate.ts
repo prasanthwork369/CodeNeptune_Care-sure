@@ -50,8 +50,15 @@ export function useSoftUpdate() {
   }, [latestVersion]);
 
   return {
+    /** Drives the one-time popup — goes false once this version is dismissed. */
     shouldPrompt:
       available && dismissed !== undefined && dismissed !== latestVersion,
+    /**
+     * Raw availability, ignoring dismissal. The Profile row uses this so that
+     * declining the popup leaves a permanent way back to updating, rather than
+     * hiding the option until the next release.
+     */
+    available,
     latestVersion,
     dismiss,
   };
