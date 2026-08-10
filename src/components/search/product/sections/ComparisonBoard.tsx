@@ -3,6 +3,7 @@ import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
+import { durations } from "@/src/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
 import { moderateScale } from "@/src/utils/exactScale";
@@ -151,8 +152,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
     swapRotate.setValue(0);
     Animated.timing(swapRotate, {
+      // Was a hardcoded 380ms, which reads sluggish for a small control and
+      // bypassed the shared scale. durations.slow is the app's 300ms step.
       toValue: 1,
-      duration: 380,
+      duration: durations.slow,
       useNativeDriver: true,
     }).start();
 
@@ -233,10 +236,9 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     outputRange: [cardWidth / 2, cardWidth],
   });
 
-  const recBgColor = expandAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#FEFFF9", "#FEFFF9"],
-  });
+  // Was an interpolation between two identical colours — it drove a colour
+  // calculation every frame for no visual change. It is simply a constant.
+  const recBgColor = "#FEFFF9";
 
   // The recommended column lives inside a full-width measurement layer, but in the
   // collapsed state the visible half-card is narrower by the section's paddingLeft (4)
