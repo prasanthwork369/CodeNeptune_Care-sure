@@ -23,6 +23,10 @@ const NON_RETRYABLE: AppError["kind"][] = [
   "not_found",
   "validation",
   "network",
+  // Retrying a 429 sends three requests where the server asked for none.
+  "rate_limited",
+  // A conflict is about server state, so an identical retry conflicts again.
+  "conflict",
 ];
 
 /**

@@ -22,6 +22,9 @@ export const cartErrorMessage = (err: unknown): string => {
       return "This item is no longer available.";
     case "validation":
       return "We couldn't update this item. Please try again.";
+    // "Try again" is the wrong advice when the server asked us to slow down.
+    case "rate_limited":
+      return "Too many requests. Please wait a moment and try again.";
     case "server":
       return "We couldn't reach our servers. Please try again in a moment.";
     default:

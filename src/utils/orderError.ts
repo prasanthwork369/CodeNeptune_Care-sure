@@ -22,6 +22,11 @@ export const orderErrorMessage = (err: unknown): string => {
     case "validation":
     case "not_found":
       return "Some items in your order are no longer available. Please review your cart and try again.";
+    case "rate_limited":
+      return "Too many requests. Please wait a moment and try again.";
+    // Same caution as timeout: a conflict can mean the order already exists.
+    case "conflict":
+      return "This order may already be placed. Please check My Orders before trying again.";
     case "server":
       return "We couldn't reach our servers. Please try again in a moment.";
     default:

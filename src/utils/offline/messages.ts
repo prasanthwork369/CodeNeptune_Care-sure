@@ -26,6 +26,10 @@ export const networkErrorMessage = (kind: AppErrorKind): string => {
       return "That's no longer available.";
     case "validation":
       return "Please check the details and try again.";
+    case "rate_limited":
+      return "Too many requests. Please wait a moment and try again.";
+    case "conflict":
+      return "That's already been updated. Please refresh and try again.";
     case "server":
       return "We couldn't reach our servers. Please try again in a moment.";
     default:

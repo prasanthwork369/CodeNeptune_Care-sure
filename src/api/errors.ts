@@ -15,6 +15,10 @@ export type AppErrorKind =
   | "forbidden"
   | "not_found"
   | "validation"
+  // Server asked us to slow down. Retrying only makes it worse.
+  | "rate_limited"
+  // The request conflicts with current server state (duplicate, stale version).
+  | "conflict"
   | "server"
   | "unknown";
 
@@ -22,19 +26,49 @@ export class AppError extends Error {
   kind: AppErrorKind;
   status?: number;
   data?: unknown;
+  /** Seconds the server asked us to wait; only ever set for `rate_limited`. */
+  retryAfterSeconds?: number;
 
   constructor(
     kind: AppErrorKind,
     message: string,
     status?: number,
     data?: unknown,
+    retryAfterSeconds?: number,
   ) {
     super(message);
     this.name = "AppError";
     this.kind = kind;
     this.status = status;
     this.data = data;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
+}
+
+/**
+ * Parses a `Retry-After` header. Accepts both documented forms — delay in
+ * seconds, or an HTTP date — and returns undefined for anything unparseable,
+ * so a malformed header can never throw or produce a nonsense wait.
+ */
+export function parseRetryAfter(
+  raw: unknown,
+  now: number = Date.now(),
+): number | undefined {
+  if (typeof raw !== "string" && typeof raw !== "number") return undefined;
+  const value = String(raw).trim();
+  if (!value) return undefined;
+
+  // Delay-seconds form, e.g. "120".
+  if (/^\d+$/.test(value)) {
+    const seconds = Number(value);
+    return Number.isFinite(seconds) ? seconds : undefined;
+  }
+
+  // HTTP-date form, e.g. "Wed, 21 Oct 2015 07:28:00 GMT".
+  const at = Date.parse(value);
+  if (Number.isNaN(at)) return undefined;
+  // A date already in the past means "retry now", not a negative wait.
+  return Math.max(0, Math.round((at - now) / 1000));
 }
 
 /** The fields catch blocks actually read off a thrown value. */
@@ -100,6 +134,20 @@ export function toAppError(err: unknown): AppError {
       );
     if (status === 422)
       return new AppError("validation", message, status, data);
+    // Explicit, or an unmapped 4xx falls through to `unknown` and gets retried
+    // — which on a 429 means hammering the endpoint that just said stop.
+    if (status === 400)
+      return new AppError("validation", message, status, data);
+    if (status === 409)
+      return new AppError("conflict", message, status, data);
+    if (status === 429)
+      return new AppError(
+        "rate_limited",
+        message,
+        status,
+        data,
+        parseRetryAfter(err.response.headers?.["retry-after"]),
+      );
     if (status >= 500)
       return new AppError(
         "server",
