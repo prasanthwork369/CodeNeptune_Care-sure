@@ -10,8 +10,8 @@ describe("AppGateScreen", () => {
     it("shows the update copy and an action to reach the store", () => {
       const screen = renderWithProviders(<AppGateScreen reason="update" />);
 
-      expect(screen.getByText("Update required")).toBeTruthy();
-      expect(screen.getByText("Update now")).toBeTruthy();
+      expect(screen.getByText("New Update Available")).toBeTruthy();
+      expect(screen.getByText("Update Now")).toBeTruthy();
     });
 
     it("opens the store when the action is pressed", () => {
@@ -20,7 +20,7 @@ describe("AppGateScreen", () => {
         .mockResolvedValue(undefined as never);
       const screen = renderWithProviders(<AppGateScreen reason="update" />);
 
-      fireEvent.press(screen.getByText("Update now"));
+      fireEvent.press(screen.getByText("Update Now"));
 
       expect(openURL).toHaveBeenCalledTimes(1);
       // Tests run as iOS by default, so this also guards the bug where every
@@ -54,7 +54,7 @@ describe("AppGateScreen", () => {
     it("offers no update action", () => {
       const screen = renderWithProviders(<AppGateScreen reason="maintenance" />);
 
-      expect(screen.queryByText("Update now")).toBeNull();
+      expect(screen.queryByText("Update Now")).toBeNull();
     });
   });
 });

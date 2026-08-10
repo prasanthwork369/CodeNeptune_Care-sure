@@ -5,8 +5,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { Text, View } from "react-native";
 
+/**
+ * Flip to true to bring the preview buttons back. Kept off by default so the
+ * overlay does not sit on top of the UI during normal development — the
+ * component and its wiring stay intact, nothing to re-add.
+ */
+const VISIBLE = true;
+
 export function DevPreviewToggler() {
-  if (!__DEV__) return null;
+  if (!__DEV__ || !VISIBLE) return null;
   return (
     <View
       style={{
