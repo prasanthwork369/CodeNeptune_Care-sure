@@ -264,6 +264,23 @@ export const FloatingBannersCarousel = () => {
         },
       });
     } else if (!isRxFromCartFlow) {
+      // Under review: open the prescription itself. The notifications list says
+      // nothing about it and reads as the wrong screen entirely.
+      if (latestPrescription.status === PRESCRIPTION_STATUS.NEW) {
+        router.push({
+          pathname: "/(prescription)/prescription-viewer",
+          params: {
+            prescriptionId: latestPrescription.id,
+            imageUrls: JSON.stringify(latestPrescription.imageUrls ?? []),
+            doctorName: latestPrescription.doctorName ?? "",
+            patientName: latestPrescription.ocrData?.patientName ?? "",
+            uploadedDate: latestPrescription.createdAt ?? "",
+            // Nothing to action while it is still being reviewed.
+            source: "view_only",
+          },
+        });
+        return;
+      }
       router.push("/notifications");
     }
   };
