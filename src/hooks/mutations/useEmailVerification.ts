@@ -13,12 +13,16 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 export const useEmailVerification = () => {
   const queryClient = useQueryClient();
 
+  // silentError: EmailVerifyModal renders these errors inline, so the global
+  // toast would repeat the same message.
   const requestMutation = useMutation({
     mutationFn: (email: string) => profileApi.requestEmailVerify(email),
+    meta: { silentError: true },
   });
 
   const verifyMutation = useMutation({
     mutationFn: (otp: string) => profileApi.verifyEmail(otp),
+    meta: { silentError: true },
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.PROFILE }),
   });

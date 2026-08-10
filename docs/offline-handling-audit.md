@@ -167,17 +167,28 @@ NetInfo lifts that.
       `critical: true` on order cancel, return submit and prescription upload; the rest
       are banner-only per the single-signal policy. The viewer's `getById` is left
       ungated deliberately — it is a read that falls back to the passed params.
-- [ ] `meta: { silentError: true }` on mutations whose screens already show inline
-      errors — auth OTP, [MyProfileLayout](../src/components/profile/common/MyProfileLayout.tsx),
-      email verification — to avoid telling the user twice
-- [ ] `requiresInternet` prop on [`AppButton`](../src/components/ui/AppButton.tsx) for
-      one disabled style on critical actions, replacing the ad-hoc `useIsOffline()`
-      disables in [SearchPageLayout](../src/components/search/SearchPageLayout.tsx),
-      [AddAddressLayout](../src/components/profile/addresses/AddAddressLayout.tsx),
+- [x] `meta: { silentError: true }` — done 2026-08-10 on `requestOtp`, `verifyOtp`
+      ([useAuth](../src/hooks/mutations/useAuth.ts)) and both email-verify mutations
+      ([useEmailVerification](../src/hooks/mutations/useEmailVerification.ts)). All four
+      surface their error inline (OTP screen via `useAuth().error`, `EmailVerifyModal`
+      via `error={verifyError}`), so the global toast was repeating it. `logout` and
+      `deleteAccount` deliberately keep the toast — they render nothing inline.
+- [~] `requiresInternet` prop on [`AppButton`](../src/components/ui/AppButton.tsx) —
+      **not actionable as written.** The three screens named here
+      ([AddAddressLayout](../src/components/profile/addresses/AddAddressLayout.tsx),
       [AddPatientLayout](../src/components/profile/patients/AddPatientLayout.tsx),
-      [MyProfileLayout](../src/components/profile/common/MyProfileLayout.tsx)
-- [ ] Verify each `RefreshControl` stops promptly offline: Home, Profile, Orders,
-      Notifications, ProductGrid
+      [MyProfileLayout](../src/components/profile/common/MyProfileLayout.tsx)) do not use
+      `AppButton` — they use raw `Touchable` with their own `disabled` + opacity. Adding
+      the prop changes nothing until they are migrated, which is a visual refactor with
+      real risk. Their current `useIsOffline()` disable is already correct behaviour;
+      only the styling is ad-hoc. `SearchPageLayout` uses `isOffline` to render an
+      offline view, not to disable a button, so it is out of scope entirely.
+- [x] `RefreshControl` verification — done 2026-08-10, **all five are safe**. Home uses
+      `Promise.allSettled` + `finally` so the spinner always stops; Notifications, Orders
+      and Profile bind to React Query's `isRefetching`, which settles quickly offline now
+      that `networkMode: "always"` no longer pauses work. `ProductGrid` passes a hardcoded
+      `refreshing={false}` — it cannot hang, but pull-to-refresh there gives no feedback
+      at all. Minor UX gap, not an offline bug.
 - [ ] Empty-cache offline states: screens with no SQLite cache now show an error
       instead of an endless skeleton — decide per screen whether that needs a
       retry view

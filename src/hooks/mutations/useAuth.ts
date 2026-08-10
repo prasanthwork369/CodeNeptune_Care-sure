@@ -4,13 +4,17 @@ import { authService } from "../../services/auth.service";
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
+  // silentError: both expose `error` below and the OTP screen renders it inline,
+  // so the global toast would say the same thing a second time.
   const requestOtpMutation = useMutation({
     mutationFn: (phone: string) => authService.requestOtp(phone),
+    meta: { silentError: true },
   });
 
   const verifyOtpMutation = useMutation({
     mutationFn: ({ phone, otp }: { phone: string; otp: string }) =>
       authService.verifyOtp(phone, otp),
+    meta: { silentError: true },
   });
 
   const logoutMutation = useMutation({

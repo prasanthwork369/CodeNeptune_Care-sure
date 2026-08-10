@@ -4,6 +4,7 @@ import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { VerifiedBadge } from "@/src/components/ui/VerifiedBadge";
 import { icons } from "@/src/constants/icons";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useProfile } from "@/src/hooks/queries/useProfile";
@@ -275,6 +276,7 @@ export const MyProfileLayout: React.FC = () => {
           value={format.phone(profile?.phoneNumber)}
           editable={false}
           keyboardType="number-pad"
+          rightSlot={profile?.isPhoneVerified ? <VerifiedBadge /> : null}
         />
 
         {/* Email */}
@@ -291,22 +293,7 @@ export const MyProfileLayout: React.FC = () => {
           rightSlot={
             isCurrentEmailVerified ? (
               // Already verified — show a green badge, no action needed.
-              // Not interactive: let taps near it fall through to the input.
-              <View
-                pointerEvents="none"
-                style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-              >
-                <icons.check_circle width={16} height={16} fill="#0F7635" />
-                <Text
-                  style={{
-                    fontSize: moderateScale(12),
-                    fontWeight: "600",
-                    color: "#0F7635",
-                  }}
-                >
-                  Verified
-                </Text>
-              </View>
+              <VerifiedBadge />
             ) : email ? (
               // Not yet verified — show the Verify button
               <Touchable
