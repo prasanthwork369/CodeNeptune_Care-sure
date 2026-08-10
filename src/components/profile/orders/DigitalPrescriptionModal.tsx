@@ -421,8 +421,12 @@ export const DigitalPrescriptionModal: React.FC<
               backgroundColor: "#FFFFFF",
             }}
           >
+            {/* Static backend HTML only. "about:" covers the source={{html}}
+                document; a wildcard would let injected markup navigate anywhere,
+                and JS is disabled outright since the document never needs it. */}
             <WebView
-              originWhitelist={["*"]}
+              originWhitelist={["about:"]}
+              javaScriptEnabled={false}
               source={{ html: htmlContent }}
               style={{ flex: 1, backgroundColor: "#ffffff" }}
               containerStyle={{ backgroundColor: "#ffffff" }}
