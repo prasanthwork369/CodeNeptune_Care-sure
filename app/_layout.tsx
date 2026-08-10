@@ -63,6 +63,16 @@ const PushNotificationProvider = () => {
   return null;
 };
 
+// Its own component so the settings query runs inside QueryClientProvider —
+// RootLayout renders that provider, so a hook there would sit outside it.
+const AppGate = () => {
+  const { reason, maintenanceMessage } = useAppGate();
+  if (!reason) return null;
+  return (
+    <AppGateScreen reason={reason} maintenanceMessage={maintenanceMessage} />
+  );
+};
+
 SplashScreen.preventAutoHideAsync();
 
 const screenNameForPath = (pathname: string) => {
@@ -88,7 +98,6 @@ export default function RootLayout() {
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
   const interFontsLoaded = useAndroidInterFonts();
-  const appGate = useAppGate();
 
   // Tracks whether the JS animated splash has finished playing.
   // Auth loading and the animation run in parallel — the app only
@@ -224,12 +233,7 @@ export default function RootLayout() {
 
                 {/* Last sibling so it paints above the splash too — a blocked app
                     must never flash its content. Fail-open: an absent setting renders nothing. */}
-                {appGate.reason && (
-                  <AppGateScreen
-                    reason={appGate.reason}
-                    maintenanceMessage={appGate.maintenanceMessage}
-                  />
-                )}
+                <AppGate />
               </View>
             </SafeAreaProvider>
           </KeyboardProvider>
