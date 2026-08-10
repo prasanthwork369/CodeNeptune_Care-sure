@@ -1,5 +1,6 @@
 import { useSettings } from "@/src/hooks/queries/useSettings";
 import { isUpdateAvailable } from "@/src/utils/appVersion";
+import { getDevGatePreview } from "@/src/utils/devFlags";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 
@@ -21,6 +22,14 @@ export function useSoftUpdate() {
     undefined,
   );
 
+  const devPreview = __DEV__ ? getDevGatePreview() : null;
+  const latestVersion =
+    data?.latestVersion ?? (devPreview === "soft" ? "999.0.0" : undefined);
+  const available = isUpdateAvailable(latestVersion);
+
+  // Re-read the dismissed storage value whenever the candidate latestVersion
+  // changes. This ensures forcing the same latestVersion after clearing the
+  // dismissed key makes the prompt reappear without a reload.
   useEffect(() => {
     let active = true;
     AsyncStorage.getItem(DISMISSED_KEY)
@@ -29,10 +38,7 @@ export function useSoftUpdate() {
     return () => {
       active = false;
     };
-  }, []);
-
-  const latestVersion = data?.latestVersion;
-  const available = isUpdateAvailable(latestVersion);
+  }, [latestVersion]);
 
   const dismiss = useCallback(() => {
     // Optimistic: the prompt closes even if the write fails, so a storage

@@ -1,5 +1,6 @@
 import { useSettings } from "@/src/hooks/queries/useSettings";
 import { isUpdateRequired } from "@/src/utils/appVersion";
+import { getDevGatePreview } from "@/src/utils/devFlags";
 import { useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
 
@@ -22,6 +23,7 @@ export function useAppGate(): {
 } {
   const { data, refetch } = useSettings();
   const lastCheckedAt = useRef(Date.now());
+  const devPreview = __DEV__ ? getDevGatePreview() : null;
 
   // React Query's focusManager is not wired to AppState in this app, so
   // refetchOnWindowFocus would do nothing. Without this the gate is only
@@ -38,8 +40,22 @@ export function useAppGate(): {
     return () => sub.remove();
   }, [refetch]);
 
+  // Dev preview override: allow quickly forcing gate screens locally.
+  if (devPreview === "maintenance") {
+    return {
+      reason: "maintenance",
+      maintenanceMessage: "Dev: maintenance preview",
+    };
+  }
+  if (devPreview === "update") {
+    return { reason: "update" };
+  }
+
   if (data?.maintenanceMode === true) {
-     return { reason: "maintenance", maintenanceMessage: data.maintenanceMessage };
+    return {
+      reason: "maintenance",
+      maintenanceMessage: data.maintenanceMessage,
+    };
   }
   if (isUpdateRequired(data?.minSupportedVersion)) {
     return { reason: "update" };
