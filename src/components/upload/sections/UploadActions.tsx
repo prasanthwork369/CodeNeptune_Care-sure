@@ -83,7 +83,7 @@ export const UploadActions: React.FC<UploadActionsProps> = ({
       <Touchable
         // Marks the entry so a verified pick offers ordering, not re-upload.
         onPress={() =>
-          router.replace({
+          router.push({
             pathname: "/prescription-history",
             params: { source: "upload" },
           })

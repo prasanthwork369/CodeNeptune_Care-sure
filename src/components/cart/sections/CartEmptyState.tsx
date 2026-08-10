@@ -1,14 +1,14 @@
-import { icons } from "@/src/constants/icons";
-import { ANIMATIONS } from "@/src/constants/images";
-import { CartEmptyStateProps } from "@/src/types/cart";
-import { Product } from "@/src/types/home";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
+import { icons } from "@/src/constants/icons";
+import { ANIMATIONS } from "@/src/constants/images";
 import { useNav } from "@/src/hooks/useNav";
+import { CartEmptyStateProps } from "@/src/types/cart";
+import { Product } from "@/src/types/home";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import React from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   featuredProducts,
@@ -66,7 +66,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
           onPress={() => router.replace("/(tabs)")}
           className="bg-brand-primary items-center justify-center"
           style={{
-            width: exactScale(122),
+            width: exactScale(152),
             height: exactScale(50),
             borderRadius: exactScale(12),
             marginTop: exactScale(20),
@@ -79,7 +79,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
               lineHeight: moderateScale(20),
             }}
           >
-            Add More
+            Add Medicines
           </Text>
         </Touchable>
       </View>

@@ -143,7 +143,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <AvatarPreviewModal
         visible={preview.visible}
         uri={photoUri}
-        title={fullName}
+        title="Profile"
         originRect={preview.rect}
         onClose={() => {
           setShowEditSheet(false);
