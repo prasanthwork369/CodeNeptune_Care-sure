@@ -8,6 +8,7 @@
 // prod can't diverge. Imported for local use below and re-exported to keep the
 // existing "@/src/constants/urls" import path stable.
 import { WEB_BASE_URL } from "@/src/utils/urls";
+import { PRODUCT_TYPE } from "./product-type";
 export { WEB_BASE_URL };
 
 /** Custom deep-link scheme registered in app.config.ts */
@@ -18,9 +19,9 @@ export const APP_SCHEME = "caresure";
 // (1=Medicine, 2=OTC, 3=FMCG). Unknown/absent type falls back to "medicines"
 // like the web's own getProductUrl helper.
 const PRODUCT_TYPE_SLUG: Record<number, string> = {
-  1: "medicines",
-  2: "otc",
-  3: "fmcg",
+  [PRODUCT_TYPE.MEDICINE]: "medicines",
+  [PRODUCT_TYPE.OTC]: "otc",
+  [PRODUCT_TYPE.FMCG]: "fmcg",
 };
 
 // ─── Builders ──────────────────────────────────────────────────────────────

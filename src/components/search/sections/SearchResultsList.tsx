@@ -2,6 +2,7 @@ import { ApiSearchMedicine } from "@/src/api/search.api";
 import { SearchNoSubstituteCard } from "@/src/components/search/SearchNoSubstituteCard";
 import { SearchProductCard } from "@/src/components/search/SearchProductCard";
 import { SearchRecommendCard } from "@/src/components/search/SearchRecommendCard";
+import { SOURCE_TYPE } from "@/src/constants/source-type";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -50,7 +51,7 @@ export const SearchResultsList = React.memo(
 
     const hasComparisonRows = useMemo(
       () =>
-        results.some((item) => item.sourceType === 2 && item.recommendation),
+        results.some((item) => item.sourceType === SOURCE_TYPE.COMPARABLE && item.recommendation),
       [results],
     );
 
@@ -70,7 +71,7 @@ export const SearchResultsList = React.memo(
 
         return (
           <View className="px-4">
-            {item.sourceType === 2 ? (
+            {item.sourceType === SOURCE_TYPE.COMPARABLE ? (
               item.recommendation ? (
                 <SearchProductCard data={toComparisonData(item)} />
               ) : (

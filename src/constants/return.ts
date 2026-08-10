@@ -1,3 +1,5 @@
+import { RETURN_STATUS } from "./return-status";
+
 export const REFUND_METHOD = {
   WALLET: 1,
   ORIGINAL_PAYMENT: 2,
@@ -13,4 +15,7 @@ export const REFUND_METHOD_LABELS: Record<RefundMethodValue, string> = {
 
 // Closed/terminal return statuses -- an order with a return outside these is
 // treated as "already has an active return request".
-export const CLOSED_RETURN_STATUSES = [6, 7];
+export const CLOSED_RETURN_STATUSES: number[] = [
+  RETURN_STATUS.REJECTED,
+  RETURN_STATUS.CANCELLED,
+];
