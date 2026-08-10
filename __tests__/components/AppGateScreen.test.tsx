@@ -23,8 +23,11 @@ describe("AppGateScreen", () => {
       fireEvent.press(screen.getByText("Update now"));
 
       expect(openURL).toHaveBeenCalledTimes(1);
-      // Whichever scheme the platform takes, it must point at our listing.
-      expect(openURL.mock.calls[0][0]).toContain("com.codeneptune.caresure");
+      // Tests run as iOS by default, so this also guards the bug where every
+      // platform was sent to Play Store — an iPhone cannot install from there.
+      const url = openURL.mock.calls[0][0];
+      expect(url).not.toContain("play.google.com");
+      expect(url).toContain("apple.com");
     });
   });
 

@@ -2,8 +2,21 @@ import * as Application from "expo-application";
 import { Linking, Platform } from "react-native";
 
 const ANDROID_PACKAGE = "com.codeneptune.caresure";
-const STORE_APP_URL = `market://details?id=${ANDROID_PACKAGE}`;
-const STORE_WEB_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
+const PLAY_APP_URL = `market://details?id=${ANDROID_PACKAGE}`;
+const PLAY_WEB_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
+
+/**
+ * Numeric App Store id (the digits in apps.apple.com/app/id123456789).
+ * TODO: fill in once the iOS listing exists. Until then iOS falls back to an
+ * App Store search — never to Play Store, which an iPhone cannot install from.
+ */
+const APP_STORE_ID = "";
+const APPLE_APP_URL = APP_STORE_ID
+  ? `itms-apps://apps.apple.com/app/id${APP_STORE_ID}`
+  : "itms-apps://apps.apple.com/search?term=CareSure";
+const APPLE_WEB_URL = APP_STORE_ID
+  ? `https://apps.apple.com/app/id${APP_STORE_ID}`
+  : "https://apps.apple.com/search?term=CareSure";
 
 /**
  * Compares dotted numeric versions ("1.4.0"). Returns -1, 0 or 1.
@@ -51,17 +64,20 @@ export const isUpdateAvailable = (
   installed: string | null = currentAppVersion(),
 ): boolean => isUpdateRequired(latestVersion, installed);
 
-/** Opens the store listing, falling back to the web URL when no store app handles it. */
+/**
+ * Opens this platform's own store listing. Sending an iPhone to Play Store is
+ * a dead end, so the platform branch matters more than the fallback does.
+ */
 export const openAppStore = async (): Promise<void> => {
+  const isAndroid = Platform.OS === "android";
+  const appUrl = isAndroid ? PLAY_APP_URL : APPLE_APP_URL;
+  const webUrl = isAndroid ? PLAY_WEB_URL : APPLE_WEB_URL;
   try {
-    if (Platform.OS === "android") {
-      await Linking.openURL(STORE_APP_URL);
-      return;
-    }
-    await Linking.openURL(STORE_WEB_URL);
+    await Linking.openURL(appUrl);
   } catch {
+    // No store app installed to handle the scheme — the browser can still show it.
     try {
-      await Linking.openURL(STORE_WEB_URL);
+      await Linking.openURL(webUrl);
     } catch {}
   }
 };
