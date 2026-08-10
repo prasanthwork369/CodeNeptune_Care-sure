@@ -24,7 +24,10 @@ const FEATURED_LIMIT = 50;
 // Product shape. The fields line up — this just renames them.
 const toCategoryProduct = (p: Product): CategoryProduct => ({
   id: p.id,
-  productId: p.productId ?? p.id,
+  // No `?? p.id` fallback: that is the medicine id, and the product detail
+  // route resolves product ids only. Falling back navigated to "no product
+  // found" instead of simply doing nothing.
+  productId: p.productId ?? "",
   slug: p.slug ?? "",
   name: p.name,
   price: p.price,
@@ -52,6 +55,8 @@ const FeaturedProductsContent: React.FC = () => {
   // Stable, so the memoized cards don't re-render on every grid render.
   const handleProductPress = useCallback(
     (product: CategoryProduct) => {
+      // An item without a productId cannot resolve — inert beats a dead screen.
+      if (!product.productId) return;
       router.push({
         pathname: "/product/[id]",
         params: { id: product.productId },

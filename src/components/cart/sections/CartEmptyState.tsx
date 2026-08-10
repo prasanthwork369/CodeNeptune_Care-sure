@@ -109,12 +109,17 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
               <Touchable
                 key={product.id}
                 activeOpacity={0.85}
-                onPress={() =>
+                // productId only — no fallback to product.id. That is the
+                // medicine id, and /search/products/{id} resolves product ids
+                // only, so the old `?? product.id` navigated to a dead screen.
+                // Every other screen passes productId alone.
+                onPress={() => {
+                  if (!product.productId) return;
                   router.push({
                     pathname: "/product/[id]",
-                    params: { id: product.productId ?? product.id },
-                  })
-                }
+                    params: { id: product.productId },
+                  });
+                }}
                 style={{ width: exactScale(167), marginRight: exactScale(10) }}
               >
                 {/* Product image card */}

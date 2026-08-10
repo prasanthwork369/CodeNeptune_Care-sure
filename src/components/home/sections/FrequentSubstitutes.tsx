@@ -62,7 +62,11 @@ const FrequentItem = React.memo(
         {/* Tappable area → product detail */}
         <Touchable
           activeOpacity={0.7}
-          onPress={() => onProductPress?.(item.productId ?? item.id)}
+          onPress={() => {
+            // productId only: the medicine id cannot resolve on the product route.
+            if (!item.productId) return;
+            onProductPress?.(item.productId);
+          }}
           className="flex-row items-center flex-1"
         >
           <View

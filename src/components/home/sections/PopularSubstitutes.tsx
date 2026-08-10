@@ -124,7 +124,11 @@ const ProductCard = React.memo(
         {/* Image area — fixed height, tied to card width */}
         <Touchable
           activeOpacity={0.85}
-          onPress={() => onProductPress?.(product.productId ?? product.id)}
+          onPress={() => {
+            // productId only: the medicine id cannot resolve on the product route.
+            if (!product.productId) return;
+            onProductPress?.(product.productId);
+          }}
           style={{
             height: imageAreaHeight,
             backgroundColor: CONTENT_BG,
@@ -175,7 +179,11 @@ const ProductCard = React.memo(
         >
           <Touchable
             activeOpacity={0.85}
-            onPress={() => onProductPress?.(product.productId ?? product.id)}
+            onPress={() => {
+              // productId only: the medicine id cannot resolve on the product route.
+              if (!product.productId) return;
+              onProductPress?.(product.productId);
+            }}
           >
             <Text style={s.name} className="text-brand-text" numberOfLines={1}>
               {product.name}
