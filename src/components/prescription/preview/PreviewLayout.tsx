@@ -18,7 +18,6 @@ import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
-import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { logger } from "@/src/utils/logger";
 import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
@@ -32,6 +31,7 @@ import React, {
   useState,
 } from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
+import { requireInternet } from "@/src/utils/offline";
 import {
   DuplicateFileModal,
   FileTooLargeModal,
@@ -244,11 +244,9 @@ export const PreviewLayout: React.FC = () => {
   const removeItem = (index: number) => setShowRemoveModal(index);
 
   const handleSubmit = async () => {
-    const { isConnected } = useNetworkStore.getState();
-    if (isConnected === false) {
-      useNetworkStore.getState().showOfflineAlert();
-      return;
-    }
+    // Was a hand-rolled isConnected check calling showOfflineAlert directly;
+    // critical: true keeps that same blocking notice through the shared gate.
+    if (!requireInternet({ critical: true })) return;
     // Ref, not the `submitting` state: two taps in the same tick both read the
     // stale false, and the loser's finally would clear the winner's spinner.
     if (submitLockRef.current) return;

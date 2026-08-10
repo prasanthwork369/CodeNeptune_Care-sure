@@ -12,6 +12,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
+import { requireInternet } from "@/src/utils/offline";
 
 const EMPTY_COUPONS: Coupon[] = [];
 
@@ -51,6 +52,8 @@ export const CouponsLayout: React.FC = () => {
   const applyCode = async (code: string) => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
+    // Gate before the loader: an offline tap must look inert, not busy.
+    if (!requireInternet()) return;
     setValidatingCode(trimmed);
     try {
       const result = await couponService.validateCoupon(trimmed, subtotal);

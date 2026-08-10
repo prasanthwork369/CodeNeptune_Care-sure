@@ -20,6 +20,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";
+import { requireInternet } from "@/src/utils/offline";
 
 const EMPTY_COUPONS: Coupon[] = [];
 
@@ -50,6 +51,8 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
 
   const handleDirectApply = async () => {
     if (!pick) return;
+    // Gate before the loader: an offline tap must look inert, not busy.
+    if (!requireInternet()) return;
     setApplying(true);
     try {
       const result = await couponService.validateCoupon(

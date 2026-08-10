@@ -37,6 +37,7 @@ import { ReturnSuccessModal } from "./ReturnSuccessModal";
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
+import { requireInternet } from "@/src/utils/offline";
 
 function SectionCard({
   children,
@@ -316,6 +317,9 @@ export const ReturnProductLayout: React.FC = () => {
       );
       return;
     }
+    // Critical: uploads the evidence images then creates the return, so a
+    // half-finished attempt is worth blocking on.
+    if (!requireInternet({ critical: true })) return;
 
     try {
       setUploadingImages(true);

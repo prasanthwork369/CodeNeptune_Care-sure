@@ -26,6 +26,7 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { requireInternet } from "@/src/utils/offline";
 
 const OTHER_OPTION = "__other__";
 
@@ -103,6 +104,9 @@ export function CancelOrderLayout() {
     }
     setError("");
     if (!orderId) return;
+    // Critical: a cancellation the user believes succeeded but never reached
+    // the server is worse than a blocking notice.
+    if (!requireInternet({ critical: true })) return;
 
     setIsCancelling(true);
     try {

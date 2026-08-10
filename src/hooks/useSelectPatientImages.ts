@@ -17,6 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { logger } from "@/src/utils/logger";
+import { requireInternet } from "@/src/utils/offline";
 
 // Must match the storage folder Preview uploads to, so all prescription
 // images for an order land in the same place.
@@ -75,6 +76,8 @@ export function useSelectPatientImages(
       | CapturedAsset
     )[],
   ) => {
+    // Each asset is uploaded to storage, so none of this works offline.
+    if (!requireInternet()) return;
     setIsAddingImage(true);
     try {
       const newItems: PrescriptionItem[] = [];
@@ -190,6 +193,8 @@ export function useSelectPatientImages(
   const removeImage = async (index: number) => {
     const target = hosted[index];
     if (!target || removingIndex !== null) return;
+    // Gate before the spinner: an offline tap must look inert, not busy.
+    if (!requireInternet()) return;
     setRemovingIndex(index);
     try {
       if (__DEV__)
