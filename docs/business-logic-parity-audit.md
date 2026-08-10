@@ -133,6 +133,71 @@ on the two money rules above.
 
 ---
 
+## Per-screen component structure (2026-08-10)
+
+### Where the two agree
+
+Both clients use the same convention for screen sub-components: **`<feature>/sections/`**.
+This holds on every screen, so no screen needs restructuring.
+
+| Screen | Web | Mobile |
+|---|---|---|
+| Home | `home/sections` (10) | `home/sections` (25) |
+| Cart | `cart/sections/components` (8) | `cart/sections` (15) |
+| Search | `search/sections` (5) | `search/sections` (5) |
+| Product detail | `productTypeDetail/sections/moreinfo` (26) | `product/details/sections/moreinfo` (5) |
+| Prescription review | `cart-prescription-review/sections` (3) | `prescription/medicine-comparison/sections` (5) |
+
+Same shape, different feature names. Web nests one level deeper on cart
+(`sections/components`); mobile stops at `sections`. Cosmetic.
+
+### Where they diverge — shared UI grouping
+
+**Web groups shared UI by type. Mobile groups it by feature.**
+
+| Web type bucket | Mobile equivalent |
+|---|---|
+| `modals/` (16, flat) | each feature owns its modals |
+| `cards/` (6, flat) | each feature owns its cards |
+| `skeletons/` (4, flat) | `HomeProductCardSkeleton`, `PrescriptionSkeleton`, … beside their feature |
+| `forms/`, `loaders/`, `toasts/` | `common/`, `ui/` |
+
+### Assessment against current practice
+
+Grouping **by feature** is the prevailing convention in modern React codebases
+(colocation as described in the React docs, and the structure Bulletproof React
+codifies). The rule of thumb: code that changes together should live together.
+Type buckets are the older convention and degrade predictably — `modals/` becomes a
+dumping ground with no owner, and a cart change means editing three distant folders.
+
+Measured against that:
+
+- **Mobile is consistent and current.** One rule — feature folders, `sections/` for
+  screen parts, `ui/` for genuinely generic primitives — applied everywhere. It also
+  matches what `CLAUDE.md` mandates.
+- **Web is a hybrid.** Feature folders for pages, type buckets for shared UI. Common
+  in practice, but the two rules conflict and the boundary is arbitrary. The duplicate
+  `constants/` + `lib/constants/` and `validation/` + `validations/` directories are
+  the predictable symptom.
+
+### Verdict
+
+**Mobile does not adopt web's type buckets.** Moving 16 modals, 6 cards and 4
+skeletons out of their features into flat directories would be a large refactor that
+makes the code harder to navigate, contradicts `CLAUDE.md`, and moves mobile away
+from current practice rather than toward it.
+
+Web-only folders correctly absent on mobile: `layout/` (web header/footer/nav — mobile
+has the tab bar), `providers/` (a Next.js requirement), `downloadBanner/` (promotes
+installing the app), `shop/`.
+
+**Recommended direction is the reverse of the original assumption:** where the two
+structures differ, web should migrate toward feature grouping, not mobile toward type
+buckets. Only two web conventions were worth adopting, and both shipped —
+kebab-case file naming (`054baa2`) and shared status constants (`1a85d5c`).
+
+---
+
 ## Confirmed parity (no action)
 
 - Coins formula — `min(coinsBalance, sellingTotal × coinUsagePct% / coinValue)`, floored, then valued
