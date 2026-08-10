@@ -64,44 +64,65 @@ Do not install new libraries without approval.
 
 ## Architecture
 
-Use this folder structure:
+This is the actual structure. Keep it accurate — a wrong map is worse
+than none.
 
 ```
-app/
-  (auth)/
-  (tabs)/
-  (stack)/
-  (prescription)/
-components/
-constants/
-data/
-hooks/
-lib/
-services/
-store/
-types/
-assets/
+app/                 Expo Router routes only
+  (auth)/ (tabs)/ (stack)/ (prescription)/
+src/
+  api/               one file per backend resource: *.api.ts
+  components/        <feature>/sections/ for screen parts
+  constants/         icons, images, status codes, typography
+  features/          self-contained feature packages (prescription-scanner)
+  hooks/             queries/ mutations/ ui/ + feature hooks at the root
+  lib/               infrastructure: react-query, sqlite, storage, crashlytics
+  modules/           JS wrappers for our own native Android modules
+  services/          business logic on top of api/
+  store/             Zustand stores
+  theme/             colours, spacing, animations, screen transitions
+  types/             shared types
+  utils/             pure helpers, plus utils/offline/
+native/android/      hand-written Kotlin, copied in by plugins/
 ```
 
 **app/** is for routes and screens only. Screens compose components and
 call hooks or stores. They should not contain large reusable UI blocks
 or business logic.
 
-**components/** is for reusable UI. Create a component when it is
-reused in multiple places, when it makes a screen easier to read, or
-when it represents a clear UI concept. Examples for this app:
-CartLayout, HomeLayout, NotificationCard, LiquidTabBar. Do not create
-components too early.
+**components/** is for reusable UI, grouped **by feature, not by type**.
+A cart modal lives under `components/cart/`, not in a shared `modals/`
+folder. Screen sub-parts go in `<feature>/sections/`. Create a component
+when it is reused, when it makes a screen easier to read, or when it is
+a clear UI concept. Do not create components too early.
 
-**data/** holds hardcoded content. Keep it typed.
+**api/ vs services/** — `api/` is the raw HTTP call and nothing else.
+Add a matching `*.service.ts` **only** when something sits on top:
+response reshaping, business rules, or combining several calls. Roughly
+half the resources are api-only, and that is correct — do not add an
+empty pass-through service.
 
-**store/** holds Zustand stores. Examples of state to keep here:
-cart items (cartStore), auth/token (authStore), prescription draft
-(prescriptionDraftStore), location (locationStore), coupons
-(couponStore). Persist with AsyncStorage when needed.
+**hooks/** — `queries/` holds one hook per feature, and those hooks
+intentionally return **both** the query data and that feature's
+mutations (`useCart` exposes the cart plus add/update/remove). So a
+mutation is not necessarily in `mutations/`; look for the feature hook
+first. `mutations/` is for mutations with no query to belong to.
+`ui/` is for presentation-level hooks.
 
-**lib/** holds external service helpers (api client, storage, cn.ts).
-Never expose secret keys here.
+**store/** holds Zustand stores: cart items (cartStore), auth/token
+(authStore), prescription draft (prescriptionDraftStore), location
+(locationStore), coupons (couponStore). Persist with AsyncStorage when
+needed.
+
+**lib/ vs utils/ vs modules/** — `lib/` is infrastructure wiring
+(react-query client, sqlite, token storage). `utils/` is pure helpers
+with no setup of their own. `modules/` is only the JS side of our own
+native Android modules, whose Kotlin lives in `native/android/` and is
+copied into the generated project by `plugins/withCustomNativeFiles.js`.
+Never edit the generated `android/` folder — it is gitignored and
+regenerated on every prebuild.
+
+Never expose secret keys anywhere in `src/`.
 
 --
 
