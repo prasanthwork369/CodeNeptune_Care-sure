@@ -10,7 +10,7 @@ import { Text, View } from "react-native";
  * overlay does not sit on top of the UI during normal development — the
  * component and its wiring stay intact, nothing to re-add.
  */
-const VISIBLE = true;
+const VISIBLE = false;
 
 export function DevPreviewToggler() {
   if (!__DEV__ || !VISIBLE) return null;
