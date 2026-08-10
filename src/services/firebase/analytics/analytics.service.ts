@@ -70,4 +70,12 @@ export const analyticsService = {
       currency: "INR",
       item_count: itemCount,
     }),
+
+  // Answers "how many users are blocked right now?" — the first question asked
+  // the day a forced update or maintenance window is switched on.
+  logAppBlocked: (reason: "update" | "maintenance") =>
+    log("app_blocked", { reason }),
+
+  logSoftUpdatePrompt: (action: "shown" | "dismissed" | "accepted") =>
+    log("soft_update_prompt", { action }),
 };

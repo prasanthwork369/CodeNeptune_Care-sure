@@ -7,7 +7,10 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 interface SoftUpdateModalProps {
   visible: boolean;
   latestVersion?: string;
+  /** Later, Android back, or after Update — always closes the prompt. */
   onDismiss: () => void;
+  /** Update specifically, so it can be told apart from a decline. */
+  onUpdate?: () => void;
 }
 
 /**
@@ -18,6 +21,7 @@ export const SoftUpdateModal: React.FC<SoftUpdateModalProps> = ({
   visible,
   latestVersion,
   onDismiss,
+  onUpdate,
 }) => (
   <Modal
     visible={visible}
@@ -47,6 +51,7 @@ export const SoftUpdateModal: React.FC<SoftUpdateModalProps> = ({
 
           <Touchable
             onPress={() => {
+              onUpdate?.();
               // Closes too: returning from the store should not find it waiting.
               onDismiss();
               openAppStore();

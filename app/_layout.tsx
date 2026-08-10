@@ -4,7 +4,7 @@ import * as NavigationBar from "expo-navigation-bar";
 import { Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -70,6 +70,18 @@ const PushNotificationProvider = () => {
 const AppGate = () => {
   const { reason, maintenanceMessage } = useAppGate();
   const soft = useSoftUpdate();
+  // Update calls onUpdate then onDismiss; this stops that pair being counted
+  // as a decline as well as an acceptance.
+  const acceptedRef = useRef(false);
+
+  // Reported once per transition, not per render, so the counts stay truthful.
+  useEffect(() => {
+    if (reason) analyticsService.logAppBlocked(reason);
+  }, [reason]);
+
+  useEffect(() => {
+    if (soft.shouldPrompt) analyticsService.logSoftUpdatePrompt("shown");
+  }, [soft.shouldPrompt]);
 
   // A block always wins: the optional prompt must never sit on top of a screen
   // telling the user the app cannot run.
@@ -82,7 +94,18 @@ const AppGate = () => {
     <SoftUpdateModal
       visible={soft.shouldPrompt}
       latestVersion={soft.latestVersion}
-      onDismiss={soft.dismiss}
+      // Fires for Later and Android back; Update reports itself below first.
+      onDismiss={() => {
+        if (!acceptedRef.current) {
+          analyticsService.logSoftUpdatePrompt("dismissed");
+        }
+        acceptedRef.current = false;
+        soft.dismiss();
+      }}
+      onUpdate={() => {
+        acceptedRef.current = true;
+        analyticsService.logSoftUpdatePrompt("accepted");
+      }}
     />
   );
 };
