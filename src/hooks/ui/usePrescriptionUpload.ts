@@ -77,20 +77,35 @@ export function usePrescriptionUpload(
       }
     }
 
-    if (currentItems.length + uniqueInSelection.length > MAX_FILES) {
-      showErr("Limit Reached", `Maximum ${MAX_FILES} prescriptions allowed.`);
-      return;
-    }
+    // Trim to the free slots rather than dropping the batch: picking 11 must
+    // still load 10, not nothing.
+    const remainingSlots = Math.max(MAX_FILES - currentItems.length, 0);
+    const overLimit = uniqueInSelection.length > remainingSlots;
+    const accepted = overLimit
+      ? uniqueInSelection.slice(0, remainingSlots)
+      : uniqueInSelection;
 
     // Deferred until the duplicate notice is dismissed, so the preview
     // screen never appears underneath it before the user has
     // acknowledged the duplicate.
     const goToPreview = () => {
-      if (uniqueInSelection.length === 0) return;
-      addItems(uniqueInSelection);
+      if (accepted.length === 0) return;
+      addItems(accepted);
       isProceeding.current = true;
       router.push("/(prescription)/preview");
     };
+
+    if (overLimit) {
+      // Preview opens only once the notice is dismissed, so it never renders under it.
+      showErr(
+        "Limit Reached",
+        accepted.length > 0
+          ? `Maximum ${MAX_FILES} prescriptions allowed. Only the first ${accepted.length} were added.`
+          : `Maximum ${MAX_FILES} prescriptions allowed.`,
+        accepted.length > 0 ? goToPreview : undefined,
+      );
+      return;
+    }
 
     if (skippedCount.existing > 0 || skippedCount.internal > 0) {
       if (onDuplicate && firstDuplicate) {
