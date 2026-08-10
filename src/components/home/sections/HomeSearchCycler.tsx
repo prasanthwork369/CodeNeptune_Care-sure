@@ -1,6 +1,6 @@
 import { MEDICINES } from "@/src/constants/search-cycle";
+import { useVisibleInterval } from "@/src/hooks/ui/useVisibleInterval";
 import { exactScale } from "@/src/utils/exactScale";
-import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { AccessibilityInfo, StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -22,7 +22,6 @@ const SLIDE_EASING = Easing.out(Easing.cubic);
  * left while the next enters from the right, entirely on the UI thread.
  */
 export const HomeSearchCycler: React.FC = () => {
-  const isFocused = useIsFocused();
   const [activeIndex, setActiveIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -43,15 +42,13 @@ export const HomeSearchCycler: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isFocused || reduceMotion || MEDICINES.length <= 1) return;
-
-    const timer = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % MEDICINES.length);
-    }, CYCLE_INTERVAL_MS);
-
-    return () => clearInterval(timer);
-  }, [isFocused, reduceMotion]);
+  // useVisibleInterval adds the foreground check this was missing — it used to
+  // keep cycling with the app in the user's pocket.
+  useVisibleInterval(
+    () => setActiveIndex((current) => (current + 1) % MEDICINES.length),
+    CYCLE_INTERVAL_MS,
+    !reduceMotion && MEDICINES.length > 1,
+  );
 
   return (
     <View

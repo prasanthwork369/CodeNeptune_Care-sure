@@ -19,6 +19,7 @@ import Animated, {
 import { useFlyToCartSafe } from "@/src/components/animations/flyToCart";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsAppForeground } from "@/src/hooks/ui/useVisibleInterval";
 import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
 import { exactScale } from "@/src/utils/exactScale";
@@ -105,6 +106,7 @@ export const FloatingBannersCarousel = () => {
   const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
   const isHomeFocused = useUIStore((s) => s.isHomeFocused);
   const focused = isHomeFocused && !isFeedScrolling;
+  const isAppForeground = useIsAppForeground();
 
   const [isCartInteracting, setIsCartInteracting] = useState(false);
   // The cart mutation has no onMutate, so totalItems trails the server by a
@@ -137,12 +139,14 @@ export const FloatingBannersCarousel = () => {
 
   const startAutoplay = useCallback(() => {
     stopAutoplay();
-    if (bothActive && focused && !isCartInteracting) {
+    // Foreground check kept out of `focused` on purpose: folding it in there
+    // would also reset the banner index on background and jump on resume.
+    if (bothActive && focused && !isCartInteracting && isAppForeground) {
       timerRef.current = setInterval(() => {
         setActiveBannerIndex((prev) => (prev === 2 ? 1 : 2));
       }, 4000);
     }
-  }, [bothActive, focused, isCartInteracting, stopAutoplay]);
+  }, [bothActive, focused, isCartInteracting, isAppForeground, stopAutoplay]);
 
   // Auto-switch between banners when both are active
   useEffect(() => {

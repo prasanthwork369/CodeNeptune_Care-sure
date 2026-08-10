@@ -3,12 +3,14 @@ import {
   PRESCRIPTION_STATUS,
   PrescriptionStatusValue,
 } from "@/src/constants/prescription-status";
+import { useIsVisible } from "@/src/hooks/ui/useVisibleInterval";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import { Image } from "expo-image";
 import Animated, {
+  cancelAnimation,
   Easing,
   interpolate,
   useAnimatedStyle,
@@ -72,10 +74,14 @@ export const PrescriptionFloatingBanner = ({
 
   const config = STATUS_CONFIG[status];
   const isUnderReview = status === PRESCRIPTION_STATUS.NEW;
+  const isVisible = useIsVisible();
 
   // Auto-progress: loop 0 → 0.88 over 10s, snap back to 0, repeat
   useEffect(() => {
-    if (!isUnderReview) {
+    // An infinite withRepeat keeps the UI thread working forever, so it must
+    // stop when Home is not on screen or the app is backgrounded.
+    if (!isUnderReview || !isVisible) {
+      cancelAnimation(progressAnim);
       progressAnim.value = withTiming(0, { duration: DURATION });
       return;
     }
@@ -90,7 +96,7 @@ export const PrescriptionFloatingBanner = ({
       -1,
       false,
     );
-  }, [isUnderReview, progressAnim]);
+  }, [isUnderReview, isVisible, progressAnim]);
 
   useEffect(() => {
     if (visible) {

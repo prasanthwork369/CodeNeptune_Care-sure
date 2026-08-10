@@ -1,3 +1,4 @@
+import { useVisibleInterval } from "@/src/hooks/ui/useVisibleInterval";
 import React, { useEffect, useState } from "react";
 import { Text, TextStyle, View } from "react-native";
 import Animated, {
@@ -79,16 +80,17 @@ export const TextCycler: React.FC<TextCyclerProps> = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (words.length <= 1) return;
-    const timer = setInterval(() => {
+  // Purely decorative, so it must not tick while off screen or backgrounded.
+  useVisibleInterval(
+    () => {
       setActiveIndex((prev) => {
         setPrevIndex(prev);
         return (prev + 1) % words.length;
       });
-    }, interval);
-    return () => clearInterval(timer);
-  }, [words.length, interval]);
+    },
+    interval,
+    words.length > 1,
+  );
 
   if (words.length === 0) return null;
 
