@@ -20,6 +20,7 @@ import { useToastStore } from "@/src/store/toastStore";
 import { addressToLocation } from "@/src/utils/addressLocation";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { toPrefillParams } from "@/src/utils/locationPrefill";
+import { reportActionError, requireInternet } from "@/src/utils/offline";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useMemo, useRef, useState } from "react";
@@ -115,6 +116,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     };
 
     const handlePredictionSelect = async (prediction: LocationSuggestion) => {
+      // Gate before the spinner: an offline tap must look inert, not busy.
+      if (!requireInternet()) return;
       setIsResolving(true);
       try {
         const resolved = await locationApi.resolvePlace(prediction.placeId);
@@ -135,8 +138,11 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
         }
 
         goToAddAddress(toPrefillParams(resolved, prediction.mainText));
-      } catch {
-        showToast("Failed to get location details. Please try again.", "error");
+      } catch (err) {
+        // Connection failures go to the banner; everything else gets this toast.
+        reportActionError(err, {
+          message: "Failed to get location details. Please try again.",
+        });
       } finally {
         setIsResolving(false);
       }
@@ -186,17 +192,18 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
         showToast("This address is missing a pincode.", "warning");
         return;
       }
+      // Serviceability is a server call, so the address cannot be selected offline.
+      if (!requireInternet()) return;
       try {
         const result = await checkServiceability(addr.pincode);
         if (!result.serviceable) {
           showToast(`Sorry, we don't deliver to ${addr.pincode} yet.`, "error");
           return;
         }
-      } catch {
-        showToast(
-          "Could not verify serviceability. Please try again.",
-          "error",
-        );
+      } catch (err) {
+        reportActionError(err, {
+          message: "Could not verify serviceability. Please try again.",
+        });
         return;
       }
       const { location, addressId, pincode } = addressToLocation(addr);
@@ -211,6 +218,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
 
     const handleUseCurrentLocation = async () => {
       if (isLocating) return;
+      // GPS itself works offline but resolveCoords does not, so gate before the
+      // spinner — otherwise it fetches coords for seconds only to fail at the end.
+      if (!requireInternet()) return;
       setIsLocating(true);
       try {
         // This is a user-initiated action so allow the OS dialog to appear.
@@ -311,11 +321,12 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
         } catch {}
 
         goToAddAddress(toPrefillParams(resolved));
-      } catch {
-        Alert.alert(
-          "Could not fetch location",
-          "Please check that location services are enabled and try again.",
-        );
+      } catch (err) {
+        // GPS problems are already handled above, so anything landing here is the
+        // resolveCoords call — never blame location services for a network failure.
+        reportActionError(err, {
+          message: "Could not fetch location. Please try again.",
+        });
       } finally {
         setIsLocating(false);
       }
