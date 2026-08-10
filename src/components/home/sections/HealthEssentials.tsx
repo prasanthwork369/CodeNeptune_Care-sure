@@ -125,9 +125,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
     const { imageRef, triggerFly } = useFlyToCartTrigger(imageSource, id);
 
-    const handleAdd = useCallback(() => {
-      increment();
-      triggerFly();
+    const handleAdd = useCallback(async () => {
+      // Only animate on a confirmed add: offline the increment refuses and a
+      // fly-in would falsely show the item landing in the cart.
+      const added = await increment();
+      if (added) triggerFly();
     }, [increment, triggerFly]);
 
     const discountLabel =

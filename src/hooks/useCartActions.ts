@@ -102,10 +102,17 @@ export const useCartActions = (product: CartActionProduct) => {
     prevIsPendingRef.current = isPending;
   });
 
-  const increment = async () => {
+  /**
+   * Resolves true only when the item actually reached the cart.
+   *
+   * Callers use this to gate the fly-to-cart animation: it used to run
+   * unconditionally, so an offline add showed the item flying in and the badge
+   * counting up while nothing had been added.
+   */
+  const increment = async (): Promise<boolean> => {
     // Guest edits are local, so only a signed-in write needs the connection.
-    if (isAuthenticated && !requireInternet()) return;
-    if (isPending) return;
+    if (isAuthenticated && !requireInternet()) return false;
+    if (isPending) return false;
     if (isAuthenticated) setPending(pendingKey, true);
     try {
       if (cartItem) {
@@ -137,7 +144,7 @@ export const useCartActions = (product: CartActionProduct) => {
               medicineId: product.medicineId,
               price: product.price,
             });
-          return;
+          return false;
         }
 
         const formattedPackSize = product.packSize
@@ -172,8 +179,10 @@ export const useCartActions = (product: CartActionProduct) => {
         });
         void analyticsService.logAddToCart();
       }
+      return true;
     } catch (err) {
       notifyCartError(err);
+      return false;
     } finally {
       if (isAuthenticated) setPending(pendingKey, false);
     }

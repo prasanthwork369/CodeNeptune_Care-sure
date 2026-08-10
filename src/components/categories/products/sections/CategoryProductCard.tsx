@@ -46,10 +46,12 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
 
   const handlePress = () => onPress(product);
 
-  const handleIncrement = () => {
-    increment();
+  const handleIncrement = async () => {
+    // Only animate on a confirmed add: offline the increment refuses and a
+    // fly-in would falsely show the item landing in the cart.
+    const added = await increment();
     // Priceless rows are placeholders from the API — nothing to fly.
-    if (Number(product.price) > 0) triggerFly();
+    if (added && Number(product.price) > 0) triggerFly();
   };
 
   return (

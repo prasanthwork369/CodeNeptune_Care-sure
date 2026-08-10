@@ -51,10 +51,12 @@ const FrequentItem = React.memo(
 
     const { imageRef, triggerFly } = useFlyToCartTrigger(item.image, item.id);
 
-    const handleAdd = useCallback(() => {
+    const handleAdd = useCallback(async () => {
       if (disableCart) return;
-      increment();
-      triggerFly();
+      // Only animate on a confirmed add: offline the increment refuses and a
+      // fly-in would falsely show the item landing in the cart.
+      const added = await increment();
+      if (added) triggerFly();
     }, [disableCart, increment, triggerFly]);
 
     return (
