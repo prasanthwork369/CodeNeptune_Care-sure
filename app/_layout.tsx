@@ -20,6 +20,8 @@ import NetworkToast from "@/src/components/common/NetworkToast";
 import { Toast } from "@/src/components/common/Toast";
 import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
+import { AppGateScreen } from "@/src/components/common/AppGateScreen";
+import { useAppGate } from "@/src/hooks/ui/useAppGate";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
@@ -86,6 +88,7 @@ export default function RootLayout() {
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
   const interFontsLoaded = useAndroidInterFonts();
+  const appGate = useAppGate();
 
   // Tracks whether the JS animated splash has finished playing.
   // Auth loading and the animation run in parallel — the app only
@@ -217,6 +220,15 @@ export default function RootLayout() {
                       <View style={styles.splashFallback} />
                     )}
                   </View>
+                )}
+
+                {/* Last sibling so it paints above the splash too — a blocked app
+                    must never flash its content. Fail-open: an absent setting renders nothing. */}
+                {appGate.reason && (
+                  <AppGateScreen
+                    reason={appGate.reason}
+                    maintenanceMessage={appGate.maintenanceMessage}
+                  />
                 )}
               </View>
             </SafeAreaProvider>

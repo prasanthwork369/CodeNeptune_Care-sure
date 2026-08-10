@@ -32,6 +32,15 @@ export interface Settings {
   contactPhone?: string;
   contactEmail?: string;
   mapsApiKey?: string;
+  /**
+   * Lowest app version allowed to keep running, e.g. "1.4.0". Optional and not
+   * served by the backend yet — while it is absent the gate stays open, so
+   * shipping this ahead of the API can never lock anyone out.
+   */
+  minSupportedVersion?: string;
+  /** Blocks the app with a notice during planned backend downtime. */
+  maintenanceMode?: boolean;
+  maintenanceMessage?: string;
 }
 
 export interface PaymentSettings {
