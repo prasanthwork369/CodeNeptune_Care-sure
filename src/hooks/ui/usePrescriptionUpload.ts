@@ -2,7 +2,7 @@ import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { validatePrescriptionFile } from "@/src/utils/prescription";
 import {
   usePrescriptionUploadService,
   CapturedAsset,
@@ -20,7 +20,8 @@ export function usePrescriptionUpload(
 ) {
   const router = useNav();
   const addItems = usePrescriptionDraftStore((s) => s.addItems);
-  const { maxSizeBytes } = useUploadConfig();
+  // maxFiles is admin-driven with a clamped fallback; MAX_FILES is only the default.
+  const { maxSizeBytes, maxFiles } = useUploadConfig();
   // Valid files from a batch that also contained an oversized file —
   // held back until the "file too large" notice is dismissed, so the
   // preview screen never appears underneath it.
@@ -79,7 +80,7 @@ export function usePrescriptionUpload(
 
     // Trim to the free slots rather than dropping the batch: picking 11 must
     // still load 10, not nothing.
-    const remainingSlots = Math.max(MAX_FILES - currentItems.length, 0);
+    const remainingSlots = Math.max(maxFiles - currentItems.length, 0);
     const overLimit = uniqueInSelection.length > remainingSlots;
     const accepted = overLimit
       ? uniqueInSelection.slice(0, remainingSlots)
@@ -100,8 +101,8 @@ export function usePrescriptionUpload(
       showErr(
         "Limit Reached",
         accepted.length > 0
-          ? `Maximum ${MAX_FILES} prescriptions allowed. Only the first ${accepted.length} were added.`
-          : `Maximum ${MAX_FILES} prescriptions allowed.`,
+          ? `Maximum ${maxFiles} prescriptions allowed. Only the first ${accepted.length} were added.`
+          : `Maximum ${maxFiles} prescriptions allowed.`,
         accepted.length > 0 ? goToPreview : undefined,
       );
       return;

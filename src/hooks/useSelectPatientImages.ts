@@ -8,7 +8,6 @@ import {
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { PrescriptionItem } from "@/src/types/prescription";
 import {
-  MAX_FILES,
   validatePrescriptionFile,
   capturePrescriptionImages,
 } from "@/src/utils/prescription";
@@ -38,7 +37,7 @@ export function useSelectPatientImages(
   filesParam: string,
   imageUrlsParam: string,
 ) {
-  const { maxSizeBytes } = useUploadConfig();
+  const { maxSizeBytes, maxFiles } = useUploadConfig();
 
   const parse = <T>(raw: string, fallback: T): T => {
     try {
@@ -83,10 +82,10 @@ export function useSelectPatientImages(
       const newItems: PrescriptionItem[] = [];
       const newUploads: UploadedImage[] = [];
       for (const asset of assets) {
-        if (items.length + newItems.length >= MAX_FILES) {
+        if (items.length + newItems.length >= maxFiles) {
           Alert.alert(
             "Limit Reached",
-            `You can add a maximum of ${MAX_FILES} prescriptions.`,
+            `You can add a maximum of ${maxFiles} prescriptions.`,
           );
           break;
         }

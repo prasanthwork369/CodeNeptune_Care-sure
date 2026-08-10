@@ -1,5 +1,5 @@
 import { PrescriptionItem } from "@/src/types/prescription";
-import { MAX_FILES } from "@/src/utils/prescription";
+import { MAX_FILES_CEILING } from "@/src/utils/prescription";
 import { create } from "zustand";
 
 interface PrescriptionDraftState {
@@ -29,7 +29,9 @@ export const usePrescriptionDraftStore = create<PrescriptionDraftState>(
 
       if (uniqueToAdd.length > 0) {
         const merged = [...currentItems, ...uniqueToAdd];
-        set({ items: merged.slice(0, MAX_FILES) });
+        // Last-resort guard only. Callers enforce the admin-configured limit;
+        // capping at the default here would silently undo a raised setting.
+        set({ items: merged.slice(0, MAX_FILES_CEILING) });
       }
     },
     removeItem: (index) =>

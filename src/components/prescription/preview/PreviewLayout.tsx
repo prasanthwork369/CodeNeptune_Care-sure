@@ -20,7 +20,7 @@ import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { logger } from "@/src/utils/logger";
-import { MAX_FILES, validatePrescriptionFile } from "@/src/utils/prescription";
+import { validatePrescriptionFile } from "@/src/utils/prescription";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, {
@@ -51,7 +51,7 @@ export const PreviewLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
-  const { maxSizeBytes, maxSizeLabel } = useUploadConfig();
+  const { maxSizeBytes, maxSizeLabel, maxFiles } = useUploadConfig();
 
   const {
     takePhoto,
@@ -102,7 +102,7 @@ export const PreviewLayout: React.FC = () => {
       });
     }
     if (seed.length === 0) return;
-    // Merges with anything already picked; addItems dedupes and caps at MAX_FILES.
+    // Merges with anything already picked; addItems dedupes and caps at the configured limit.
     addItems(seed);
   }, []);
 
@@ -226,10 +226,10 @@ export const PreviewLayout: React.FC = () => {
         setDuplicateFileSize(item.size);
         continue;
       }
-      if (currentItems.length + newItems.length >= MAX_FILES) {
+      if (currentItems.length + newItems.length >= maxFiles) {
         showInfo(
           "Limit Reached",
-          `You can upload a maximum of ${MAX_FILES} prescriptions at once.`,
+          `You can upload a maximum of ${maxFiles} prescriptions at once.`,
         );
         break;
       }
@@ -339,7 +339,7 @@ export const PreviewLayout: React.FC = () => {
       <PreviewThumbnails
         items={items}
         activeIndex={activeIndex}
-        maxFiles={MAX_FILES}
+        maxFiles={maxFiles}
         onAdd={() => setShowAddSheet(true)}
         onSelect={setActiveIndex}
         onRemove={removeItem}

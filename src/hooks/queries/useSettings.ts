@@ -5,6 +5,8 @@ import { WEB_BASE_URL } from "../../utils/urls";
 import { apiCache, withSqliteCache } from "../../lib/sqlite/cache";
 import { settingsService } from "../../services/settings.service";
 import {
+  MAX_FILES,
+  MAX_FILES_CEILING,
   MAX_SIZE_BYTES,
   PRESCRIPTION_VALIDITY_MONTHS,
 } from "../../utils/prescription";
@@ -109,6 +111,14 @@ export function useUploadConfig() {
   const validityMonths =
     query.data?.prescriptionValidityMonths ?? PRESCRIPTION_VALIDITY_MONTHS;
 
+  // Clamped, not trusted: a 0 would block every upload and a 500 would exhaust
+  // memory on a low-end device before the request ever left.
+  const rawMaxFiles = query.data?.maxFiles;
+  const maxFiles =
+    typeof rawMaxFiles === "number" && Number.isFinite(rawMaxFiles)
+      ? Math.min(Math.max(Math.floor(rawMaxFiles), 1), MAX_FILES_CEILING)
+      : MAX_FILES;
+
   return {
     ...query,
     maxSizeBytes,
@@ -117,5 +127,6 @@ export function useUploadConfig() {
     validityMonths,
     /** Ready-to-render "3 months" / "1 year". */
     validityLabel: formatValidity(validityMonths),
+    maxFiles,
   };
 }

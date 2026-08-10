@@ -21,8 +21,15 @@ import { logger } from "@/src/utils/logger";
 export const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 export const PRESCRIPTION_VALIDITY_MONTHS = 6;
 
-/** Not backend-driven — the API exposes no per-request file count. */
+/**
+ * Fallback file count, used until the backend serves `maxFiles` on the upload
+ * settings endpoint. Prefer `useUploadConfig().maxFiles`, which applies the
+ * remote value; this is only the default when none has arrived.
+ */
 export const MAX_FILES = 10;
+
+/** Hard ceiling on the remote value — ten large images already strain low-end Android. */
+export const MAX_FILES_CEILING = 20;
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",

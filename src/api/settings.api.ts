@@ -24,6 +24,8 @@ export interface CartWalletSettings {
     isCoinsBonusActive: boolean;
     coinValueInRupees: number;
     coinUsagePercentage: number;
+    /** Per-transaction top-up cap. Optional — not served yet. */
+    maxTopUpAmount?: number;
   };
 }
 
@@ -58,6 +60,8 @@ export interface PaymentSettings {
 export interface UploadConfig {
   maxFileSizeMb: number;
   prescriptionValidityMonths: number;
+  /** Files per upload. Optional — not served yet; the app clamps and defaults. */
+  maxFiles?: number;
 }
 
 // Public axios instance — no auth headers, used for endpoints accessible without login

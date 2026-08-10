@@ -4,6 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
+import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useAddMoney, useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -24,7 +25,8 @@ import {
 } from "react-native-safe-area-context";
 
 const PRESETS = [500, 1000, 2000];
-const MAX_TOPUP = 2000;
+/** Fallback until the backend serves `wallet.maxTopUpAmount`. */
+const DEFAULT_MAX_TOPUP = 2000;
 
 export const AddMoneyLayout: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -35,6 +37,14 @@ export const AddMoneyLayout: React.FC = () => {
   // can briefly be null with loading=false — treat that as still pending too.
   const isBalancePending = balanceLoading || balance == null;
   const { addMoney, loading } = useAddMoney();
+  // Clamped so a bad admin value cannot block top-ups entirely or invite an
+  // amount the payment provider will reject.
+  const { data: walletSettings } = useCartWalletSettings();
+  const remoteMax = walletSettings?.wallet?.maxTopUpAmount;
+  const MAX_TOPUP =
+    typeof remoteMax === "number" && Number.isFinite(remoteMax) && remoteMax > 0
+      ? Math.min(remoteMax, 100000)
+      : DEFAULT_MAX_TOPUP;
   const router = useNav();
   const confettiRef = useRef<Dotlottie>(null);
   const inputRef = useRef<TextInput>(null);

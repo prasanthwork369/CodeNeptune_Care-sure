@@ -148,3 +148,42 @@ The mobile app must never be the only enforcement point.
 2. **`maxFiles`** — completes the upload config that already exists
 3. **`maxTopUpAmount`**
 4. **Version policy** — needed before the update gate can do anything
+
+---
+
+# Open questions for backend
+
+These are not config values — they are contract details the mobile app is
+currently guessing at.
+
+## Q1. Which field is the storage delete key? ⚠️
+
+`POST /storage/upload` — the app does not know what the response calls the key
+used for deletion, so it guesses:
+
+```ts
+data.path ?? data.key ?? deriveKeyFromUrl(data.url)
+```
+
+**Why this matters:** if the guess is wrong, `DELETE /storage/delete` silently
+fails and removed prescription images stay in the bucket permanently. That is
+both a storage cost and medical images persisting after a user removed them,
+which may matter for data-retention obligations.
+
+**Please confirm:**
+- exact field name for the delete key in the upload response
+- whether `DELETE /storage/delete` errors on an unknown key, or returns success
+
+## Q2. What status code does a non-serviceable pincode return?
+
+Mobile tolerates a **non-2xx** response whose body still carries `serviceable`.
+Web reads it only on 2xx. One of the two has the contract wrong.
+
+**Please confirm:** 200 with `serviceable: false`, or 4xx with the flag in the
+body?
+
+## Q3. Endpoint naming (minor)
+
+`/api/v1/settings/customer-website` is consumed by the mobile app as well as
+web. If mobile-only fields there are unwelcome, we can read them from a
+mobile-specific endpoint instead — small change on our side.
