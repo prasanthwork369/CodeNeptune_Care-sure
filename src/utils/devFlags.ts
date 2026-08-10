@@ -45,3 +45,32 @@ export const getDevGatePreview = (): DevGatePreview => DEV_GATE_PREVIEW;
 /** True only when the preview is both requested and permitted. */
 export const isGatePreview = (which: Exclude<DevGatePreview, null>): boolean =>
   __DEV__ && DEV_GATE_PREVIEW === which;
+
+/**
+ * "Update ready" banner preview.
+ *
+ * A finished flexible download only happens on a Play-installed build, so this
+ * is the one piece of update UI that is otherwise impossible to look at during
+ * development. Subscribable so the toggle takes effect without a reload.
+ */
+let DEV_UPDATE_READY = false;
+const updateReadyListeners = new Set<() => void>();
+
+export const setDevUpdateReady: (ready: boolean) => void = __DEV__
+  ? (ready: boolean) => {
+      DEV_UPDATE_READY = ready;
+      updateReadyListeners.forEach((l) => l());
+    }
+  : (_: boolean) => {
+      /* no-op in production */
+    };
+
+/** Always false outside dev, so consumers need no __DEV__ branch of their own. */
+export const getDevUpdateReady = (): boolean => __DEV__ && DEV_UPDATE_READY;
+
+export const subscribeDevUpdateReady = (listener: () => void): (() => void) => {
+  updateReadyListeners.add(listener);
+  return () => {
+    updateReadyListeners.delete(listener);
+  };
+};

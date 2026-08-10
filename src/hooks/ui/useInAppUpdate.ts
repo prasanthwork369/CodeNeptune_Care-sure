@@ -7,7 +7,18 @@ import {
   startImmediateUpdate,
 } from "@/src/modules/InAppUpdate";
 import { openAppStore } from "@/src/utils/appVersion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  getDevUpdateReady,
+  setDevUpdateReady,
+  subscribeDevUpdateReady,
+} from "@/src/utils/devFlags";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { AppState, AppStateStatus } from "react-native";
 
 // Play's own dialog is already on screen during a flow; re-checking on every
@@ -24,6 +35,11 @@ const RESUME_THROTTLE_MS = 60_000;
  */
 export function useInAppUpdate() {
   const [isDownloaded, setIsDownloaded] = useState(false);
+  // Dev-only preview of the "update ready" banner; always false in production.
+  const devReady = useSyncExternalStore(
+    subscribeDevUpdateReady,
+    getDevUpdateReady,
+  );
   // Refs, not state: these guard against a second launch within the same tick,
   // which state updates are too slow to prevent.
   const immediateLaunched = useRef(false);
@@ -81,6 +97,8 @@ export function useInAppUpdate() {
   }, []);
 
   const restartAndInstall = useCallback(async () => {
+    // Clears the preview so the dev banner behaves like the real one.
+    setDevUpdateReady(false);
     const ok = await completeFlexibleUpdate();
     // completeUpdate restarts the app; only a failure returns here.
     if (!ok) setIsDownloaded(false);
@@ -114,7 +132,7 @@ export function useInAppUpdate() {
 
   return {
     isSupported: isInAppUpdateSupported(),
-    isDownloaded,
+    isDownloaded: isDownloaded || devReady,
     runImmediateUpdate,
     runFlexibleUpdate,
     restartAndInstall,

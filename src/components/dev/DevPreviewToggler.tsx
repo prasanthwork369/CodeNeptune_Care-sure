@@ -1,5 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { queryClient } from "@/src/lib/react-query/queryClient";
+import { getDevUpdateReady, setDevUpdateReady } from "@/src/utils/devFlags";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { Text, View } from "react-native";
@@ -48,6 +49,15 @@ export function DevPreviewToggler() {
         style={{ backgroundColor: "#1e90ff", padding: 8 }}
       >
         <Text style={{ color: "#fff" }}>Force Soft Update</Text>
+      </Touchable>
+
+      {/* A real flexible download only completes on a Play-installed build, so
+          this is the only way to see the banner during development. */}
+      <Touchable
+        onPress={() => setDevUpdateReady(!getDevUpdateReady())}
+        style={{ backgroundColor: "#173D25", padding: 8, marginTop: 6 }}
+      >
+        <Text style={{ color: "#fff" }}>Toggle Update Ready</Text>
       </Touchable>
     </View>
   );
