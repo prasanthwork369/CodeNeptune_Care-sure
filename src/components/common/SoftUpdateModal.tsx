@@ -1,5 +1,4 @@
 import { Touchable } from "@/src/components/ui/Touchable";
-import { openAppStore } from "@/src/utils/appVersion";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Modal, StyleSheet, Text, View } from "react-native";
@@ -51,10 +50,11 @@ export const SoftUpdateModal: React.FC<SoftUpdateModalProps> = ({
 
           <Touchable
             onPress={() => {
+              // The parent decides what Update means — Play flexible update on
+              // Android, store link elsewhere. Closing either way, so returning
+              // from the store does not find the prompt still waiting.
               onUpdate?.();
-              // Closes too: returning from the store should not find it waiting.
               onDismiss();
-              openAppStore();
             }}
             className="bg-brand-primary"
             style={[styles.button, styles.primary]}

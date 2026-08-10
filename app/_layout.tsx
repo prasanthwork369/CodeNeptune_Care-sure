@@ -15,26 +15,29 @@ import "../src/utils/patchTextInput";
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
-import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
-import NetworkToast from "@/src/components/common/NetworkToast";
-import { Toast } from "@/src/components/common/Toast";
-import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";
-import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { AppGateScreen } from "@/src/components/common/AppGateScreen";
+import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
+import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";
+import NetworkToast from "@/src/components/common/NetworkToast";
 import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
+import { Toast } from "@/src/components/common/Toast";
+import { UpdateReadyBanner } from "@/src/components/common/UpdateReadyBanner";
+import DevPreviewToggler from "@/src/components/dev/DevPreviewToggler";
+import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { useAppGate } from "@/src/hooks/ui/useAppGate";
-import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
+import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
+import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
+import { queryClient } from "@/src/lib/react-query/queryClient";
+import { initDb } from "@/src/lib/sqlite/db";
 import {
   analyticsService,
   initCrashReporting,
   PERF_TRACES,
   usePerformanceTrace,
 } from "@/src/services/firebase";
-import { queryClient } from "@/src/lib/react-query/queryClient";
-import { initDb } from "@/src/lib/sqlite/db";
 import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { screenTransitions } from "@/src/theme";
@@ -70,9 +73,12 @@ const PushNotificationProvider = () => {
 const AppGate = () => {
   const { reason, maintenanceMessage } = useAppGate();
   const soft = useSoftUpdate();
+  const update = useInAppUpdate();
   // Update calls onUpdate then onDismiss; this stops that pair being counted
   // as a decline as well as an acceptance.
   const acceptedRef = useRef(false);
+  // Only after a Play attempt has failed does the button become a retry.
+  const [immediateFailed, setImmediateFailed] = useState(false);
 
   // Reported once per transition, not per render, so the counts stay truthful.
   useEffect(() => {
@@ -83,30 +89,59 @@ const AppGate = () => {
     if (soft.shouldPrompt) analyticsService.logSoftUpdatePrompt("shown");
   }, [soft.shouldPrompt]);
 
+  // Forced path: ask Play for an immediate update as soon as the block appears.
+  // Guarded inside the hook, so a re-render cannot relaunch the dialog.
+  useEffect(() => {
+    if (reason !== "update" || !update.isSupported) return;
+    update.runImmediateUpdate().then((ok) => setImmediateFailed(!ok));
+  }, [reason, update.isSupported]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // A block always wins: the optional prompt must never sit on top of a screen
   // telling the user the app cannot run.
   if (reason) {
     return (
-      <AppGateScreen reason={reason} maintenanceMessage={maintenanceMessage} />
+      <AppGateScreen
+        reason={reason}
+        maintenanceMessage={maintenanceMessage}
+        // Play's own UI covers this screen when the flow starts; this stays as
+        // the fallback for when it cannot, and becomes Retry once it has failed.
+        onUpdatePress={
+          update.isSupported
+            ? () => {
+                update.runImmediateUpdate().then((ok) => setImmediateFailed(!ok));
+              }
+            : undefined
+        }
+        updateLabel={immediateFailed ? "Retry" : undefined}
+      />
     );
   }
+
   return (
-    <SoftUpdateModal
-      visible={soft.shouldPrompt}
-      latestVersion={soft.latestVersion}
-      // Fires for Later and Android back; Update reports itself below first.
-      onDismiss={() => {
-        if (!acceptedRef.current) {
-          analyticsService.logSoftUpdatePrompt("dismissed");
-        }
-        acceptedRef.current = false;
-        soft.dismiss();
-      }}
-      onUpdate={() => {
-        acceptedRef.current = true;
-        analyticsService.logSoftUpdatePrompt("accepted");
-      }}
-    />
+    <>
+      <SoftUpdateModal
+        visible={soft.shouldPrompt}
+        latestVersion={soft.latestVersion}
+        // Fires for Later and Android back; Update reports itself below first.
+        onDismiss={() => {
+          if (!acceptedRef.current) {
+            analyticsService.logSoftUpdatePrompt("dismissed");
+          }
+          acceptedRef.current = false;
+          soft.dismiss();
+        }}
+        onUpdate={() => {
+          acceptedRef.current = true;
+          analyticsService.logSoftUpdatePrompt("accepted");
+          // Flexible downloads in the background; the app stays usable.
+          update.runFlexibleUpdate();
+        }}
+      />
+      <UpdateReadyBanner
+        visible={update.isDownloaded}
+        onRestart={update.restartAndInstall}
+      />
+    </>
   );
 };
 
@@ -250,6 +285,8 @@ export default function RootLayout() {
                     <SignupBonusPopup />
                   </>
                 )}
+
+                {__DEV__ && <DevPreviewToggler />}
 
                 {/* Splash curtain over the app tree; the tree still mounts and lays out beneath it once fonts are ready, so there is no white flash. */}
                 {showSplash && (

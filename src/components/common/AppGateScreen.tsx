@@ -8,6 +8,13 @@ import { StyleSheet, Text, View } from "react-native";
 interface AppGateScreenProps {
   reason: Exclude<AppGateReason, null>;
   maintenanceMessage?: string;
+  /**
+   * What the update action does. Defaults to the store link so the screen still
+   * works standalone; the gate passes the Play in-app update flow instead.
+   */
+  onUpdatePress?: () => void;
+  /** Label swaps to Retry once an update attempt has already failed. */
+  updateLabel?: string;
 }
 
 /**
@@ -18,6 +25,8 @@ interface AppGateScreenProps {
 export const AppGateScreen: React.FC<AppGateScreenProps> = ({
   reason,
   maintenanceMessage,
+  onUpdatePress,
+  updateLabel,
 }) => {
   const isUpdate = reason === "update";
 
@@ -36,13 +45,13 @@ export const AppGateScreen: React.FC<AppGateScreenProps> = ({
 
         {isUpdate && (
           <Touchable
-            onPress={openAppStore}
+            onPress={onUpdatePress ?? openAppStore}
             className="bg-brand-primary items-center justify-center"
             style={styles.button}
             accessibilityRole="button"
             accessibilityLabel="Update CareSure"
           >
-            <Text style={styles.buttonLabel}>Update now</Text>
+            <Text style={styles.buttonLabel}>{updateLabel ?? "Update now"}</Text>
           </Touchable>
         )}
       </View>

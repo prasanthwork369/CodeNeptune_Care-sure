@@ -12,6 +12,7 @@ const CUSTOM_PACKAGES = [
   "com.codeneptune.caresure.TextInputFilterPackage()",
   "com.codeneptune.caresure.PhoneNumberHintPackage()",
   "com.codeneptune.caresure.notifications.ProductOfferNotificationPackage()",
+  "com.codeneptune.caresure.inappupdate.InAppUpdatePackage()",
 ];
 
 // Gradle deps the copied sources need. PhoneNumberHintModule uses the Google
@@ -19,6 +20,10 @@ const CUSTOM_PACKAGES = [
 // play-services-auth. Injected here so it survives `expo prebuild --clean`.
 const CUSTOM_DEPENDENCIES = [
   'implementation("com.google.android.gms:play-services-auth:21.3.0")',
+  // Google Play In-App Updates. The official library, not a wrapper — the
+  // InAppUpdateModule sources call it directly.
+  'implementation("com.google.android.play:app-update:2.1.0")',
+  'implementation("com.google.android.play:app-update-ktx:2.1.0")',
 ];
 
 function copyRecursive(src, dest) {
