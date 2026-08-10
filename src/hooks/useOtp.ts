@@ -63,6 +63,10 @@ export function useOtp() {
   const [otpError, setOtpError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(30);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  // Refs, not state: both guards must hold within a single tick, which a
+  // setState cannot do.
+  const verifyLockRef = useRef(false);
+  const mergeLockRef = useRef(false);
 
   // Input mirrors only filled digits; its caret is ignored so edits land on activeSlot.
   const inputValue = slots.filter(Boolean).join("");
@@ -223,7 +227,9 @@ export function useOtp() {
     if (!requireInternet()) return;
     // Guard against double submission (auto-submit + button tap, or a
     // duplicate SMS event firing while a verify is already in flight).
-    if (loading || isRedirecting) return;
+    // The ref carries the guard: `loading` is state, so two taps in the same
+    // tick both read the stale false and both reach the API.
+    if (verifyLockRef.current || loading || isRedirecting) return;
     const otpCode = codeArg ?? code;
     const result = validate.otp(otpCode);
     if (!result.valid) {
@@ -231,6 +237,11 @@ export function useOtp() {
       return;
     }
     if (!phone) return;
+
+    // Taken before the first await, so the synchronous run of a second tap
+    // already sees it. Deliberately NOT released on success: the screen is
+    // navigating away and a late tap must not verify again.
+    verifyLockRef.current = true;
     try {
       await verifyOtp(phone, otpCode);
       void analyticsService.logLoginSuccess();
@@ -255,46 +266,61 @@ export function useOtp() {
 
       // Detached background merge — sequential to avoid backend write collisions.
       void (async () => {
-        const guestCart = useCartPendingStore.getState().guestCart;
-        if (!guestCart || guestCart.items.length === 0) return;
+        // Items are only removed after each one merges, so a second concurrent
+        // run would still see them and add duplicates to the cart.
+        if (mergeLockRef.current) return;
+        mergeLockRef.current = true;
+        try {
+          const guestCart = useCartPendingStore.getState().guestCart;
+          if (!guestCart || guestCart.items.length === 0) return;
 
-        let anyMerged = false;
-        for (const item of guestCart.items) {
-          try {
-            await cartApi.addItem({
-              medicineId: item.medicineId,
-              variantId: item.metadata?.selectedVariantId || null,
-              medicineName: item.medicineName,
-              medicineSlug: item.medicineSlug,
-              unitPrice: Number(item.unitPrice),
-              mrp: Number(
-                item.metadata?.price || item.originalPrice || item.unitPrice,
-              ),
-              discountPercent: Number(item.discountPercent || 0),
-              quantity: item.quantity,
-              requiresPrescription: item.requiresPrescription,
-              image: item.image,
-              metadata: item.metadata,
-            });
-            // Remove only items that actually merged, so a single failure does
-            // not wipe the whole guest cart — failed items stay for a retry.
-            useCartPendingStore.getState().removeGuestItem(item.id);
-            anyMerged = true;
-          } catch (err) {
-            if (__DEV__)
-              console.warn(
-                "[CartMerge] Failed to merge item:",
-                item.medicineId,
-                err,
-              );
+          let anyMerged = false;
+          for (const item of guestCart.items) {
+            try {
+              await cartApi.addItem({
+                medicineId: item.medicineId,
+                variantId: item.metadata?.selectedVariantId || null,
+                medicineName: item.medicineName,
+                medicineSlug: item.medicineSlug,
+                unitPrice: Number(item.unitPrice),
+                mrp: Number(
+                  item.metadata?.price || item.originalPrice || item.unitPrice,
+                ),
+                discountPercent: Number(item.discountPercent || 0),
+                quantity: item.quantity,
+                requiresPrescription: item.requiresPrescription,
+                image: item.image,
+                metadata: item.metadata,
+              });
+              // Remove only items that actually merged, so a single failure does
+              // not wipe the whole guest cart — failed items stay for a retry.
+              useCartPendingStore.getState().removeGuestItem(item.id);
+              anyMerged = true;
+            } catch (err) {
+              if (__DEV__)
+                console.warn(
+                  "[CartMerge] Failed to merge item:",
+                  item.medicineId,
+                  err,
+                );
+            }
           }
-        }
 
-        if (anyMerged) {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
+          if (anyMerged) {
+            queryClient.invalidateQueries({
+              queryKey: QUERY_KEYS.CUSTOMER.CART,
+            });
+          }
+        } finally {
+          // Released rather than latched forever: a partial merge must be
+          // retryable, and per-item failures already leave items in place.
+          mergeLockRef.current = false;
         }
       })();
     } catch {
+      // Released here only: a wrong or expired code must leave the user able
+      // to retype and try again.
+      verifyLockRef.current = false;
       // Wrong/expired code — clear boxes and refocus.
       resetOtp();
       setTimeout(() => inputRef.current?.focus(), 50);
