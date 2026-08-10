@@ -110,6 +110,29 @@ frozen one between validations. Backend re-validation at order creation remains 
 
 ---
 
+## Feature coverage (whole-application sweep, 2026-08-10)
+
+Web has **23 pages**; mobile has **44 screens**. Every web page except two has a mobile equivalent.
+
+**Web-only — no mobile equivalent:**
+
+| Web page | Status |
+|---|---|
+| `blogs` | No mobile equivalent |
+| `find-a-pharmacy` | No mobile equivalent |
+
+`privacy` and `terms` are **not** gaps — mobile links to them from `AuthFooter`, sourced via
+`settings.api.ts`.
+
+**Mobile-only — no web equivalent:** wallet (balance / add-money / history), notifications centre,
+notification preferences, delete account, coupons screen, frequent orders, order cancel, order tracking,
+FAQ / help, prescription upload, product comparison, dedicated login + OTP screens.
+
+Mobile is roughly twice the web app by feature count. Web is the trailing client on features as well as
+on the two money rules above.
+
+---
+
 ## Confirmed parity (no action)
 
 - Coins formula — `min(coinsBalance, sellingTotal × coinUsagePct% / coinValue)`, floored, then valued
