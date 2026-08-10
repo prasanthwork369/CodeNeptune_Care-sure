@@ -159,7 +159,14 @@ NetInfo lifts that.
       and [usePaymentCalculations.ts](../src/hooks/usePaymentCalculations.ts)
       (`critical: true`). These were the last callers of `showOfflineAlert()`, and
       the source of a modal appearing alongside the banner.
-- [ ] Wrap the direct-call sites listed above in `runOnlineAction`
+- [x] Gate the direct-call sites listed above — done 2026-08-10 via `requireInternet`:
+      location sheet (×3), coupon apply (`CartCouponSection`, `CouponsLayout`),
+      storage uploads (`useSelectPatientImages` add + delete, `ReturnProductLayout`),
+      order cancel (`CancelOrderLayout`), prescription upload (`PreviewLayout` — replaced
+      the last hand-rolled `isConnected` check), prescription download (`RxOrdersLayout`).
+      `critical: true` on order cancel, return submit and prescription upload; the rest
+      are banner-only per the single-signal policy. The viewer's `getById` is left
+      ungated deliberately — it is a read that falls back to the passed params.
 - [ ] `meta: { silentError: true }` on mutations whose screens already show inline
       errors — auth OTP, [MyProfileLayout](../src/components/profile/common/MyProfileLayout.tsx),
       email verification — to avoid telling the user twice

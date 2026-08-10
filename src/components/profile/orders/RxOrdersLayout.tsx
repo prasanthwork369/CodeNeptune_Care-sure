@@ -10,6 +10,7 @@ import {
   PRESCRIPTION_STATUS_LABELS,
 } from "@/src/constants/prescription-status";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
+import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
@@ -64,7 +65,11 @@ export const RxOrdersLayout: React.FC = () => {
           renderItem={({ item }) => (
             <PrescriptionCard
               item={item}
-              onDownloadPress={(url, fileName) => downloadFile(url, fileName)}
+              // Downloads fetch over the network, so gate before starting one.
+              onDownloadPress={(url, fileName) => {
+                if (!requireInternet()) return;
+                downloadFile(url, fileName);
+              }}
             />
           )}
           contentContainerStyle={{
