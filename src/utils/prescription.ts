@@ -210,7 +210,26 @@ export async function validatePrescriptionFile(
     return null;
   }
 
-  return { localUri: resolvedUri, name, type, size };
+  // isCopy is carried on the item so the uploader can delete the cache copy
+  // once the bytes are safely on the server — see deleteTempCopy below.
+  return { localUri: resolvedUri, name, type, size, isTempCopy: isCopy };
+}
+
+/**
+ * Removes the cache copy this app made for an upload.
+ *
+ * Deliberately a no-op unless `isTempCopy` is set, so it can never touch the
+ * user's original gallery or document file. Call it only after the upload has
+ * succeeded — a failed file must stay on disk for retry.
+ */
+export function deleteTempCopy(item: PrescriptionItem): void {
+  if (!item.isTempCopy) return;
+  try {
+    new File(item.localUri).delete();
+  } catch (e) {
+    // Best-effort: a stale cache file is not worth failing an upload over.
+    if (__DEV__) logger.debug("[Prescription] Temp cleanup failed:", e);
+  }
 }
 
 /** Returns every scanned page — the scanner's "+" button can capture several. */

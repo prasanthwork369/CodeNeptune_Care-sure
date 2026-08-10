@@ -1,6 +1,7 @@
 import { storageApi } from "@/src/api/storage.api";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { networkErrorMessage } from "@/src/utils/offline";
+import { deleteTempCopy } from "@/src/utils/prescription";
 import { toAppError } from "@/src/api/errors";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -102,6 +103,9 @@ export function usePrescriptionUploader(folder: string) {
         );
         urlsRef.current[key] = url;
         patch(key, { status: "success", progress: 100, url });
+        // Only now: the bytes are on the server, so the cache copy is dead
+        // weight. Failed files deliberately keep theirs for retry.
+        deleteTempCopy(item);
       } catch (e) {
         // Inline per file only — a toast per failure would stack duplicates.
         patch(key, {

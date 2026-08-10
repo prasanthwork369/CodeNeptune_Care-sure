@@ -10,6 +10,7 @@ import { PrescriptionItem } from "@/src/types/prescription";
 import {
   validatePrescriptionFile,
   capturePrescriptionImages,
+  deleteTempCopy,
 } from "@/src/utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
@@ -101,7 +102,11 @@ export function useSelectPatientImages(
           FOLDER,
         );
         newUploads.push(uploaded);
-        newItems.push({ ...item, localUri: uploaded.url });
+        // Bytes are on the server, so the cache copy can go.
+        deleteTempCopy(item);
+        // localUri is now the hosted URL, so it is no longer a temp copy —
+        // clearing the flag stops any later cleanup treating it as one.
+        newItems.push({ ...item, localUri: uploaded.url, isTempCopy: false });
       }
       if (newUploads.length > 0) {
         setHosted((prev) => [...prev, ...newUploads]);

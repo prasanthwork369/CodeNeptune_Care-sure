@@ -7,6 +7,12 @@ export interface PrescriptionItem {
   name: string;
   type: string;
   size?: number;
+  /**
+   * True only when `localUri` points at a copy this app made in the cache
+   * directory. The user's own gallery/document file is never marked, so
+   * cleanup can never delete it.
+   */
+  isTempCopy?: boolean;
 }
 
 export interface Prescription {
