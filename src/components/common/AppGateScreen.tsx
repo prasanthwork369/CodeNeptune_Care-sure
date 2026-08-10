@@ -1,12 +1,9 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import type { AppGateReason } from "@/src/hooks/ui/useAppGate";
+import { openAppStore } from "@/src/utils/appVersion";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
-import { Linking, Platform, StyleSheet, Text, View } from "react-native";
-
-const ANDROID_STORE = "market://details?id=com.codeneptune.caresure";
-const ANDROID_STORE_WEB =
-  "https://play.google.com/store/apps/details?id=com.codeneptune.caresure";
+import { StyleSheet, Text, View } from "react-native";
 
 interface AppGateScreenProps {
   reason: Exclude<AppGateReason, null>;
@@ -24,22 +21,6 @@ export const AppGateScreen: React.FC<AppGateScreenProps> = ({
 }) => {
   const isUpdate = reason === "update";
 
-  const openStore = async () => {
-    // The market:// scheme opens the Play Store app directly; the https URL is
-    // the fallback when no store app can handle it.
-    try {
-      if (Platform.OS === "android") {
-        await Linking.openURL(ANDROID_STORE);
-        return;
-      }
-      await Linking.openURL(ANDROID_STORE_WEB);
-    } catch {
-      try {
-        await Linking.openURL(ANDROID_STORE_WEB);
-      } catch {}
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.card}>
@@ -55,7 +36,7 @@ export const AppGateScreen: React.FC<AppGateScreenProps> = ({
 
         {isUpdate && (
           <Touchable
-            onPress={openStore}
+            onPress={openAppStore}
             className="bg-brand-primary items-center justify-center"
             style={styles.button}
             accessibilityRole="button"

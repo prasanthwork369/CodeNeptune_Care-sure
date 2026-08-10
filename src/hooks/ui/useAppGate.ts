@@ -17,7 +17,7 @@ export function useAppGate(): {
   const { data } = useSettings();
 
   if (data?.maintenanceMode === true) {
-    return { reason: "maintenance", maintenanceMessage: data.maintenanceMessage };
+     return { reason: "maintenance", maintenanceMessage: data.maintenanceMessage };
   }
   if (isUpdateRequired(data?.minSupportedVersion)) {
     return { reason: "update" };

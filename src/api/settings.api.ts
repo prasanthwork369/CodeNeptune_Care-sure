@@ -38,6 +38,11 @@ export interface Settings {
    * shipping this ahead of the API can never lock anyone out.
    */
   minSupportedVersion?: string;
+  /**
+   * Newest published version, e.g. "1.4.0". Below this the app still works, so
+   * the user only gets a dismissible prompt — never a block.
+   */
+  latestVersion?: string;
   /** Blocks the app with a notice during planned backend downtime. */
   maintenanceMode?: boolean;
   maintenanceMessage?: string;

@@ -21,7 +21,9 @@ import { Toast } from "@/src/components/common/Toast";
 import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { AppGateScreen } from "@/src/components/common/AppGateScreen";
+import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
 import { useAppGate } from "@/src/hooks/ui/useAppGate";
+import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
@@ -67,9 +69,21 @@ const PushNotificationProvider = () => {
 // RootLayout renders that provider, so a hook there would sit outside it.
 const AppGate = () => {
   const { reason, maintenanceMessage } = useAppGate();
-  if (!reason) return null;
+  const soft = useSoftUpdate();
+
+  // A block always wins: the optional prompt must never sit on top of a screen
+  // telling the user the app cannot run.
+  if (reason) {
+    return (
+      <AppGateScreen reason={reason} maintenanceMessage={maintenanceMessage} />
+    );
+  }
   return (
-    <AppGateScreen reason={reason} maintenanceMessage={maintenanceMessage} />
+    <SoftUpdateModal
+      visible={soft.shouldPrompt}
+      latestVersion={soft.latestVersion}
+      onDismiss={soft.dismiss}
+    />
   );
 };
 

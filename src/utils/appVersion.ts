@@ -1,4 +1,9 @@
 import * as Application from "expo-application";
+import { Linking, Platform } from "react-native";
+
+const ANDROID_PACKAGE = "com.codeneptune.caresure";
+const STORE_APP_URL = `market://details?id=${ANDROID_PACKAGE}`;
+const STORE_WEB_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
 /**
  * Compares dotted numeric versions ("1.4.0"). Returns -1, 0 or 1.
@@ -35,4 +40,28 @@ export const isUpdateRequired = (
   if (!/^\d+(\.\d+)*$/.test(minSupportedVersion)) return false;
   if (!/^\d+(\.\d+)*$/.test(installed)) return false;
   return compareVersions(installed, minSupportedVersion) < 0;
+};
+
+/**
+ * True when a newer build exists but the current one still works. Same
+ * fail-open rule: anything uncertain means "do not nag".
+ */
+export const isUpdateAvailable = (
+  latestVersion: string | undefined,
+  installed: string | null = currentAppVersion(),
+): boolean => isUpdateRequired(latestVersion, installed);
+
+/** Opens the store listing, falling back to the web URL when no store app handles it. */
+export const openAppStore = async (): Promise<void> => {
+  try {
+    if (Platform.OS === "android") {
+      await Linking.openURL(STORE_APP_URL);
+      return;
+    }
+    await Linking.openURL(STORE_WEB_URL);
+  } catch {
+    try {
+      await Linking.openURL(STORE_WEB_URL);
+    } catch {}
+  }
 };
