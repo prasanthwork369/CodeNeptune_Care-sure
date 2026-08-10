@@ -1,4 +1,4 @@
-import { NOTIFICATION_CHANNELS } from "../../constants/notificationChannels";
+import { NOTIFICATION_CHANNELS } from "../../constants/notification-channels";
 import { NotificationType } from "../../types/notification";
 import { isExpoGo } from "../../utils/environment";
 import { NOTIFICATION_ACTIONS } from "./notificationActions";

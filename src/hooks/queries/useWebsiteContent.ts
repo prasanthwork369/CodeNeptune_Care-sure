@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { websiteContentsService } from "../../services/websiteContent.service";
+import { websiteContentsService } from "../../services/website-content.service";
 
 export const websiteContentsKeys = {
   all: ["website-contents"] as const,

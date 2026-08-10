@@ -1,4 +1,4 @@
-import { familyMemberApi } from "../api/familyMember.api";
+import { familyMemberApi } from "../api/family-member.api";
 import { FamilyMemberInput } from "../types/familyMember";
 
 export const familyMemberService = {

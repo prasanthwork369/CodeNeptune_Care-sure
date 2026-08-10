@@ -1,5 +1,5 @@
 import type { EventDetail } from "@notifee/react-native";
-import { NOTIFICATION_CHANNELS } from "../../constants/notificationChannels";
+import { NOTIFICATION_CHANNELS } from "../../constants/notification-channels";
 import { NotificationData } from "../../types/notification";
 import { isExpoGo } from "../../utils/environment";
 import { handleNotificationAction } from "./notificationActions";

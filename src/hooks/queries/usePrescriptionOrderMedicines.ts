@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   prescriptionOrderApi,
   ApiPrescriptionOrderItem,
-} from "../../api/prescriptionOrder.api";
+} from "../../api/prescription-order.api";
 import { ComparisonMedicine } from "../../components/prescription/medicine-comparison/types";
 import { logger } from "@/src/utils/logger";
 

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { inAppNotificationApi } from "../../api/inAppNotification.api";
+import { inAppNotificationApi } from "../../api/in-app-notification.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
 

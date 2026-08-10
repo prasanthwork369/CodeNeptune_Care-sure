@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { INFO_ITEMS } from "@/src/constants/profiel_info";
+import { INFO_ITEMS } from "@/src/constants/profile-info";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
