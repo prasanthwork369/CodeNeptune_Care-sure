@@ -152,54 +152,57 @@ export default function RootLayout() {
           <KeyboardProvider>
             <SafeAreaProvider>
               <View style={{ flex: 1, backgroundColor: "#fff" }}>
-                <BottomSheetModalProvider>
-                  <StatusBar
-                    style="dark"
-                    translucent
-                    backgroundColor="transparent"
-                  />
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      ...screenTransitions.nativePush,
-                    }}
-                  >
-                    <Stack.Screen
-                      name="index"
-                      options={screenTransitions.fade}
-                    />
-                    {/* Every auth guard redirects here, so entering it must not read as a push */}
-                    <Stack.Screen
-                      name="(auth)"
-                      options={screenTransitions.none}
-                    />
-                    <Stack.Screen
-                      name="(tabs)"
-                      options={screenTransitions.authComplete}
-                    />
-                    <Stack.Screen name="(stack)" />
-                    <Stack.Screen name="(prescription)" />
-                    <Stack.Screen name="search" />
-                    <Stack.Screen name="notifications" />
-                    <Stack.Screen name="profile" />
-                    <Stack.Screen name="product" />
-                    <Stack.Screen
-                      name="+not-found"
-                      options={screenTransitions.result}
-                    />
-                  </Stack>
-                  <CartSyncProvider />
-                  <PushNotificationProvider />
-                </BottomSheetModalProvider>
-                <NetworkToast />
-                <Toast />
-                <GlobalAlertDialog />
-                <SignupBonusPopup />
+                <StatusBar
+                  style="dark"
+                  translucent
+                  backgroundColor="transparent"
+                />
 
-                {/* Splash curtain — sits above the entire app tree.
-                  Renders the animated splash while fonts/auth/animation
-                  are pending, then unmounts cleanly once the app underneath
-                  is fully ready. No white flash since app is already mounted. */}
+                {/* Android measures text with the family registered at that moment and never re-measures once a font loads later, so nothing may mount before Inter is ready. */}
+                {interFontsLoaded && (
+                  <>
+                    <BottomSheetModalProvider>
+                      <Stack
+                        screenOptions={{
+                          headerShown: false,
+                          ...screenTransitions.nativePush,
+                        }}
+                      >
+                        <Stack.Screen
+                          name="index"
+                          options={screenTransitions.fade}
+                        />
+                        {/* Every auth guard redirects here, so entering it must not read as a push */}
+                        <Stack.Screen
+                          name="(auth)"
+                          options={screenTransitions.none}
+                        />
+                        <Stack.Screen
+                          name="(tabs)"
+                          options={screenTransitions.authComplete}
+                        />
+                        <Stack.Screen name="(stack)" />
+                        <Stack.Screen name="(prescription)" />
+                        <Stack.Screen name="search" />
+                        <Stack.Screen name="notifications" />
+                        <Stack.Screen name="profile" />
+                        <Stack.Screen name="product" />
+                        <Stack.Screen
+                          name="+not-found"
+                          options={screenTransitions.result}
+                        />
+                      </Stack>
+                      <CartSyncProvider />
+                      <PushNotificationProvider />
+                    </BottomSheetModalProvider>
+                    <NetworkToast />
+                    <Toast />
+                    <GlobalAlertDialog />
+                    <SignupBonusPopup />
+                  </>
+                )}
+
+                {/* Splash curtain over the app tree; the tree still mounts and lays out beneath it once fonts are ready, so there is no white flash. */}
                 {showSplash && (
                   <View
                     style={StyleSheet.absoluteFillObject}

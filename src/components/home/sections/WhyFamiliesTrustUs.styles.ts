@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
   title: {
     fontWeight: "700",
     fontSize: moderateScale(16),
-    lineHeight: moderateScale(14),
+    // No lineHeight: 14 was below the 16 font size, so Inter's glyph box overflowed the line box and clipped.
     letterSpacing: 0,
     verticalAlign: "middle",
     color: "#222222",

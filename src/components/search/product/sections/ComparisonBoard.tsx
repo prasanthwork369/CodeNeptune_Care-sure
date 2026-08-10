@@ -299,11 +299,13 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 )}
               </View>
               <Text
-                className="font-inter-bold text-[#111827] mb-1 leading-[17px]"
+                className="font-inter-bold text-[#111827] mb-1"
                 style={{
+                  // 1.27x: product names carry descenders and Inter needs ~1.21x.
                   fontSize: moderateScale(15),
-                  lineHeight: moderateScale(17),
-                  minHeight: moderateScale(34),
+                  lineHeight: moderateScale(19),
+                  // Always two lines' worth, so one- and two-line cards stay aligned.
+                  minHeight: moderateScale(38),
                 }}
                 numberOfLines={2}
               >
@@ -446,11 +448,12 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       )}
                     </View>
                     <Text
-                      className="font-inter-bold text-[#111827] leading-[17px]"
+                      className="font-inter-bold text-[#111827]"
                       style={{
+                        // Must match the searched card above or the two columns misalign.
                         fontSize: moderateScale(15),
-                        lineHeight: moderateScale(17),
-                        minHeight: moderateScale(34),
+                        lineHeight: moderateScale(19),
+                        minHeight: moderateScale(38),
                         marginBottom: moderateScale(4),
                       }}
                       numberOfLines={2}

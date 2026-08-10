@@ -11,7 +11,8 @@ export const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: moderateScale(16),
-    lineHeight: moderateScale(18),
+    // 1.25x: city names like Jaipur/Kanpur have descenders and Inter's natural box is ~1.21x.
+    lineHeight: moderateScale(20),
     letterSpacing: 0,
     color: colors.text,
     // Caps the city so it ellipsizes at a fixed point, not just on icon collision.
