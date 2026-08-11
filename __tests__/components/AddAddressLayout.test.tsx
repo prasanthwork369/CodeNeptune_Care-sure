@@ -8,6 +8,10 @@ import { AddAddressLayout } from "@/src/components/profile/addresses/AddAddressL
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useAuthStore } from "@/src/store/authStore";
 
+jest.mock("@/src/components/ui/UnsavedChangesGuard", () => ({
+  UnsavedChangesGuard: () => null,
+}));
+
 const mockBack = jest.fn();
 jest.mock("@/src/hooks/useNav", () => ({
   useNav: () => ({

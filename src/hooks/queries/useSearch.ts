@@ -102,15 +102,15 @@ export const useSearchSuggestions = (query: string, limit = 8) => {
     };
   }, [query]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: QUERY_KEYS.SEARCH.SUGGESTIONS(debouncedSuggestionQuery),
     queryFn: () =>
       searchService.getSuggestions(debouncedSuggestionQuery, limit),
-    enabled: debouncedSuggestionQuery.trim().length >= 1,
-    staleTime: 5 * 60_000,
+    enabled: debouncedSuggestionQuery.trim().length >= 2,
+    staleTime: 0,
   });
 
-  return { suggestions: data ?? [], isLoading };
+  return { suggestions: data ?? [], isLoading: isFetching };
 };
 
 export const useSearchHistory = (limit = 10, offset = 0) => {

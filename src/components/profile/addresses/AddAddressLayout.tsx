@@ -1,6 +1,7 @@
 import { FormField } from "@/src/components/ui/FormField";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
 import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
@@ -88,6 +89,7 @@ export const AddAddressLayout: React.FC = () => {
   const [pincode, setPincode] = useState("");
   const [isDefault, setIsDefault] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [saveCompleted, setSaveCompleted] = useState(false);
 
   useEffect(() => {
     const showSub = Keyboard.addListener(
@@ -220,7 +222,8 @@ export const AddAddressLayout: React.FC = () => {
           setLocation(location, { addressId, pincode: addrPincode });
         }
       }
-      router.back();
+      setSaveCompleted(true);
+      setTimeout(() => router.back(), 0);
     } catch (err) {
       if (__DEV__) console.error("[Address Save Error]", err);
     }
@@ -250,9 +253,32 @@ export const AddAddressLayout: React.FC = () => {
     city.trim() &&
     state.trim() &&
     validate.pincode(pincode).valid;
+  const isDirty = existing
+    ? addressLabel !== ((existing.label as LabelType) ?? "HOME") ||
+      name !== (existing.name ?? "") ||
+      mobile !== (existing.phone ?? "") ||
+      line1 !== (existing.line1 ?? "") ||
+      line2 !== (existing.line2 ?? "") ||
+      city !== (existing.city ?? "") ||
+      state !== (existing.state ?? "") ||
+      pincode !== (existing.pincode ?? "") ||
+      isDefault !== (existing.isDefault ?? false)
+    : !!(
+        addressLabel ||
+        name ||
+        mobile ||
+        line1 ||
+        line2 ||
+        city ||
+        state ||
+        pincode
+      );
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
+      <UnsavedChangesGuard
+        hasUnsavedChanges={!saveCompleted && isDirty && (!isEdit || !!existing)}
+      />
       <ScreenHeader title={isEdit ? "Edit Address" : "Add New Address"} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}

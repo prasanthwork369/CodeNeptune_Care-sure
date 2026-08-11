@@ -5,6 +5,7 @@ import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { VerifiedBadge } from "@/src/components/ui/VerifiedBadge";
+import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
 import { icons } from "@/src/constants/icons";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useProfile } from "@/src/hooks/queries/useProfile";
@@ -140,6 +141,7 @@ export const MyProfileLayout: React.FC = () => {
   const [showEmailVerify, setShowEmailVerify] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [dobError, setDobError] = useState("");
+  const [saveCompleted, setSaveCompleted] = useState(false);
 
   // Hydrate the form once per profile (keyed by id). A background refetch of the
   // same profile returns a new object each time; re-syncing on every change would
@@ -189,7 +191,9 @@ export const MyProfileLayout: React.FC = () => {
       if (dob) {
         const dobValidation = validateDob(dob.toISOString());
         if (!dobValidation.valid) {
-          setDobError(dobValidation.error ?? "Please enter a valid date of birth.");
+          setDobError(
+            dobValidation.error ?? "Please enter a valid date of birth.",
+          );
           return;
         }
         setDobError("");
@@ -199,7 +203,8 @@ export const MyProfileLayout: React.FC = () => {
       if (Object.keys(payload).length === 0) return;
 
       await updateProfile(payload);
-      router.back();
+      setSaveCompleted(true);
+      setTimeout(() => router.back(), 0);
     } catch (e) {
       const err = asError(e);
       if (__DEV__) {
@@ -242,11 +247,27 @@ export const MyProfileLayout: React.FC = () => {
 
   // Opens the dedicated Delete Account confirmation screen, which handles the
   // actual deletion (and the "lose access to" details from the design).
-  const handleDeleteAccount = () =>
-    router.push("/profile/delete-account");
+  const handleDeleteAccount = () => router.push("/profile/delete-account");
+
+  const profileGender = profile?.gender?.toUpperCase() ?? "";
+  const currentDob = dob ? dob.toISOString().slice(0, 10) : "";
+  const initialDob = profile?.dateOfBirth
+    ? new Date(profile.dateOfBirth).toISOString().slice(0, 10)
+    : "";
+  const isDirty =
+    !!profile &&
+    (firstName !== (profile.firstName ?? "") ||
+      lastName !== (profile.lastName ?? "") ||
+      email !== (profile.email ?? "") ||
+      gender !==
+        (GENDERS.some((item) => item.value === profileGender)
+          ? profileGender
+          : "") ||
+      currentDob !== initialDob);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+      <UnsavedChangesGuard hasUnsavedChanges={!saveCompleted && isDirty} />
       <ScreenHeader title="My Profile" backgroundColor="#FFFFFF" showBorder />
 
       <ScrollView

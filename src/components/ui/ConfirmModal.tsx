@@ -17,6 +17,7 @@ export interface ConfirmModalProps {
   icon?: ImageSource;
   iconBg?: string;
   confirmBg?: string;
+  showConfirmIcon?: boolean;
 }
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -30,6 +31,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   icon,
   iconBg = "#FDEAEA",
   confirmBg = "#C22923",
+  showConfirmIcon = true,
 }) => (
   <Modal
     visible={visible}
@@ -97,7 +99,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               style={{ backgroundColor: confirmBg }}
               onPress={onConfirm}
             >
-              {!icon && (
+              {!icon && showConfirmIcon && (
                 <icons.delete_white width={16} height={16} fill="#FFFFFF" />
               )}
               <Text

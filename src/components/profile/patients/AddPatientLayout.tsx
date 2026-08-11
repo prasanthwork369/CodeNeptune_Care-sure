@@ -3,10 +3,16 @@ import { icons } from "@/src/constants/icons";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { FamilyMemberInput } from "@/src/types/familyMember";
-import { formatDobDisplay, getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
+import {
+  formatDobDisplay,
+  getMaxDob,
+  getMinDob,
+  validateDob,
+} from "@/src/utils/patient";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
@@ -66,6 +72,7 @@ export const AddPatientLayout: React.FC = () => {
   const isOffline = useIsOffline();
   const inFlight = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveCompleted, setSaveCompleted] = useState(false);
 
   const editPatient = id ? (members.find((m) => m.id === id) ?? null) : null;
   const isEditMode = !!editPatient;
@@ -140,15 +147,33 @@ export const AddPatientLayout: React.FC = () => {
       if (isEditMode && editPatient)
         await updateMember(editPatient.id, payload);
       else await addMember(payload);
-      router.back();
+      setSaveCompleted(true);
+      setTimeout(() => router.back(), 0);
     } catch {
       inFlight.current = false;
       setIsSubmitting(false);
     }
   };
 
+  const existingPhone = editPatient?.phone?.startsWith("+91")
+    ? editPatient.phone.slice(3)
+    : (editPatient?.phone ?? "");
+  const existingRelationship = editPatient?.relationship ?? "";
+  const currentRelationship =
+    relationship === "Other" ? otherRelationship : relationship;
+  const isDirty = editPatient
+    ? name !== (editPatient.name ?? "") ||
+      mobile !== existingPhone ||
+      dob !== (editPatient.dateOfBirth ?? "") ||
+      currentRelationship !== existingRelationship ||
+      gender !== (editPatient.gender ?? "")
+    : !!(name || mobile || dob || relationship || otherRelationship || gender);
+
   return (
     <View className="flex-1 bg-[#F5F6FB]">
+      <UnsavedChangesGuard
+        hasUnsavedChanges={!saveCompleted && isDirty && (!id || !!editPatient)}
+      />
       <ScreenHeader
         title={isEditMode ? "Edit Patient Details" : "Enter Patient Details"}
         backgroundColor="#F5F6FB"
@@ -381,9 +406,12 @@ export const AddPatientLayout: React.FC = () => {
                     gap: 5,
                   }}
                 >
-                  {React.cloneElement(icon as React.ReactElement<{ color?: string }>, {
-                    color: sel ? "#0F7635" : "#919EAB",
-                  })}
+                  {React.cloneElement(
+                    icon as React.ReactElement<{ color?: string }>,
+                    {
+                      color: sel ? "#0F7635" : "#919EAB",
+                    },
+                  )}
                   <Text
                     style={{
                       fontSize: moderateScale(11),

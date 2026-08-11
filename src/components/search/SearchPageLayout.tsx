@@ -5,6 +5,7 @@ import { SearchEmptyState } from "@/src/components/search/sections/SearchEmptySt
 import { SearchOfflineState } from "@/src/components/search/sections/SearchOfflineState";
 import { SearchRecentSection } from "@/src/components/search/sections/SearchRecentSection";
 import { SearchResultsList } from "@/src/components/search/sections/SearchResultsList";
+import { SearchSuggestionsBar } from "@/src/components/search/sections/SearchSuggestionsBar";
 import { useCart } from "@/src/hooks/queries/useCart";
 import {
   useSearch,
@@ -132,9 +133,6 @@ const toSearchedOnlyData = (item: ApiSearchMedicine) => {
   };
 };
 
-const noop = () => {};
-const EMPTY_HISTORY: never[] = [];
-
 const toRecommendData = (item: ApiSearchMedicine) => ({
   id: item.id,
   productId: item.productId ?? item.id,
@@ -211,7 +209,10 @@ export const SearchPageLayout = () => {
     isClearingHistory,
     deleteHistoryItem,
   } = useSearchHistory(5);
-  const { suggestions } = useSearchSuggestions(query, 5);
+  const { suggestions, isLoading: suggestionsLoading } = useSearchSuggestions(
+    query,
+    6,
+  );
   const { trending } = useTrendingSearches(5);
 
   const trendingTerms = useMemo(() => trending.map((t) => t.query), [trending]);
@@ -278,34 +279,36 @@ export const SearchPageLayout = () => {
           onProductPress={handleProductPress}
           onViewAllFrequent={handleViewAllFrequent}
         />
-      ) : isTyping ? (
-        // Distinct key: shares the component with the idle list, so without it a dismissed trending chip also hides the matching suggestion.
-        <SearchRecentSection
-          key="typing"
-          history={EMPTY_HISTORY}
-          trending={suggestions}
-          onTermPress={handleTermPress}
-          onClear={noop}
-          onDeleteHistoryItem={noop}
-          onProductPress={handleProductPress}
-          showFrequent={false}
-        />
-      ) : isLoading ? (
-        <SearchSkeleton />
-      ) : results.length === 0 ? (
-        <SearchEmptyState query={debouncedQuery} />
       ) : (
-        <SearchResultsList
-          results={results}
-          colWidth={colWidth}
-          bottomPad={adjustedBottom + 24}
-          toComparisonData={toComparisonData}
-          toSearchedOnlyData={toSearchedOnlyData}
-          toRecommendData={toRecommendData}
-          onRecommendPress={handleProductPress}
-          onEndReached={handleEndReached}
-          isFetchingNextPage={isFetchingNextPage}
-        />
+        <View className="flex-1">
+          {query.trim().length >= 2 && (
+            <SearchSuggestionsBar
+              suggestions={suggestions}
+              isLoading={suggestionsLoading}
+              onSelect={handleTermPress}
+            />
+          )}
+
+          {isTyping ? (
+            <SearchSkeleton />
+          ) : isLoading ? (
+            <SearchSkeleton />
+          ) : results.length === 0 ? (
+            <SearchEmptyState query={debouncedQuery} />
+          ) : (
+            <SearchResultsList
+              results={results}
+              colWidth={colWidth}
+              bottomPad={adjustedBottom + 24}
+              toComparisonData={toComparisonData}
+              toSearchedOnlyData={toSearchedOnlyData}
+              toRecommendData={toRecommendData}
+              onRecommendPress={handleProductPress}
+              onEndReached={handleEndReached}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          )}
+        </View>
       )}
     </View>
   );
