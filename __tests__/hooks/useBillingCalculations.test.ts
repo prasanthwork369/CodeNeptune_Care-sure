@@ -183,6 +183,61 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
     expect(result.toPay).toBe(400);
   });
 
+  it("treats a zero Corporate Credits per-order cap as no cap, matching web", () => {
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: true },
+    });
+    (useWalletBalance as jest.Mock).mockReturnValue({
+      balance: {
+        walletBalance: 0,
+        coinsBalance: 0,
+        corporateCredits: 1000,
+        minOrderValueForDiscount: 0,
+        maxDiscountPerOrder: 0,
+      },
+    });
+
+    const result = useBillingCalculations({
+      subtotal: 600,
+      mrpTotal: 600,
+      walletOn: false,
+      coinsOn: false,
+      corporateCreditsOn: true,
+    });
+
+    expect(result.corporateCreditsEligible).toBe(true);
+    expect(result.CORPORATE_CREDITS_DISCOUNT).toBe(600);
+    expect(result.toPay).toBe(0);
+  });
+
+  it("uses the payable subtotal including charges for Corporate Credits eligibility", () => {
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: true },
+    });
+    (useWalletBalance as jest.Mock).mockReturnValue({
+      balance: {
+        walletBalance: 0,
+        coinsBalance: 0,
+        corporateCredits: 1000,
+        minOrderValueForDiscount: 500,
+        maxDiscountPerOrder: 0,
+      },
+    });
+
+    const result = useBillingCalculations({
+      subtotal: 450,
+      mrpTotal: 450,
+      walletOn: false,
+      coinsOn: false,
+      corporateCreditsOn: true,
+      deliveryFee: 50,
+    });
+
+    expect(result.corporateCreditsEligible).toBe(true);
+    expect(result.CORPORATE_CREDITS_DISCOUNT).toBe(500);
+    expect(result.toPay).toBe(0);
+  });
+
   it("keeps paise exact: ₹130.31 + ₹50 delivery = ₹180.31 (not ₹180.30)", () => {
     // Regression: the old Math.round(x*10)/10 rounded to 10 paise and dropped
     // the ₹0.01, showing ₹180.30. Must stay paise-accurate.

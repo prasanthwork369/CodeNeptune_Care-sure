@@ -75,15 +75,20 @@ export const useBillingCalculations = ({
   const corporateCreditsMinOrderValue = Number(
     balance?.minOrderValueForDiscount ?? 0,
   );
+  const configuredCreditsCap = Number(balance?.maxDiscountPerOrder ?? 0);
+  // Web treats zero as "no per-order cap", not as a zero-value discount.
   const corporateCreditsMaxDiscount =
-    balance?.maxDiscountPerOrder != null
-      ? Number(balance.maxDiscountPerOrder)
-      : Infinity;
+    configuredCreditsCap > 0 ? configuredCreditsCap : corporateCreditsBalance;
 
-  const corporateCreditsEligible = subtotal >= corporateCreditsMinOrderValue;
+  // Match web: eligibility uses the payable subtotal after coupon/coins and
+  // includes delivery and handling charges.
+  const corporateCreditsEligible =
+    corporateCreditsMinOrderValue > 0
+      ? subtotalBeforeCredits >= corporateCreditsMinOrderValue
+      : true;
   const corporateCreditsRemainingForEligibility = Math.max(
     0,
-    roundToPaise(corporateCreditsMinOrderValue - subtotal),
+    roundToPaise(corporateCreditsMinOrderValue - subtotalBeforeCredits),
   );
   const CORPORATE_CREDITS_DISCOUNT =
     corporateCreditsOn && corporateCreditsEligible
