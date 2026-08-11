@@ -4,6 +4,7 @@ import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
@@ -117,6 +118,7 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
 
   afterEach(() => {
     useCheckoutStore.getState().clear();
+    useCheckoutDraftStore.getState().clearDraft();
   });
 
   it("shows location sheet when delivery address is missing", async () => {
@@ -160,6 +162,9 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
       id: "ord-100",
       estimatedDelivery: "Tomorrow",
     });
+    useCheckoutDraftStore.getState().setPatient("patient-1", "+919876543210");
+    useCheckoutDraftStore.getState().setPaymentMethod("CARD");
+    useCheckoutDraftStore.getState().setCouponCode("SAVE30");
 
     const { result } = renderHook(() => usePaymentCalculations());
 
@@ -168,6 +173,10 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     });
 
     expect(mockCreateOrder).toHaveBeenCalledTimes(1);
+    const draft = useCheckoutDraftStore.getState();
+    expect(draft.patientMemberId).toBe("");
+    expect(draft.paymentMethod).toBe("COD");
+    expect(draft.couponCode).toBe("");
     expect(orderNotification.showOrderPlaced).toHaveBeenCalledWith(
       expect.objectContaining({ orderId: "ord-100" }),
     );

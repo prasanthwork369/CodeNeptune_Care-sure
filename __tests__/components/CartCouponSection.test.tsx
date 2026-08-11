@@ -7,6 +7,7 @@ import { CartCouponSection } from "@/src/components/cart/sections/CartCouponSect
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { couponService } from "@/src/services/coupon.service";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import React from "react";
 
@@ -40,6 +41,7 @@ describe("CartCouponSection Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    useCheckoutDraftStore.getState().clearDraft();
     mockUseCoupons.mockReturnValue({
       data: mockCouponList,
       isLoading: false,
@@ -156,5 +158,97 @@ describe("CartCouponSection Component", () => {
     );
 
     expect(queryByText("Coupons & offers")).toBeNull();
+  });
+});
+
+describe("CartCouponSection draft recovery", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useCheckoutDraftStore.getState().clearDraft();
+    mockUseCoupons.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    } as any);
+  });
+
+  it("re-applies a coupon persisted from before the app closed", async () => {
+    useCheckoutDraftStore.getState().setCouponCode("SAVE30");
+    mockValidate.mockResolvedValueOnce({
+      valid: true,
+      discount: 30,
+      message: "Coupon applied",
+    });
+    const applyStoreMock = jest.fn();
+    useCouponStore.setState({ apply: applyStoreMock });
+
+    renderWithProviders(
+      <CartCouponSection
+        appliedCoupon={null}
+        onRemove={jest.fn()}
+        subtotal={500}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockValidate).toHaveBeenCalledWith("SAVE30", 500);
+    });
+    expect(applyStoreMock).toHaveBeenCalledWith({
+      code: "SAVE30",
+      discount: 30,
+      description: "Coupon applied",
+    });
+  });
+
+  it("drops a persisted coupon that is no longer valid without applying it", async () => {
+    useCheckoutDraftStore.getState().setCouponCode("EXPIRED10");
+    mockValidate.mockResolvedValueOnce({
+      valid: false,
+      discount: 0,
+      message: "This coupon has expired.",
+    });
+    const applyStoreMock = jest.fn();
+    useCouponStore.setState({ apply: applyStoreMock });
+
+    renderWithProviders(
+      <CartCouponSection
+        appliedCoupon={null}
+        onRemove={jest.fn()}
+        subtotal={500}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockValidate).toHaveBeenCalledWith("EXPIRED10", 500);
+    });
+    expect(applyStoreMock).not.toHaveBeenCalled();
+    expect(useCheckoutDraftStore.getState().couponCode).toBe("");
+  });
+
+  it("does not re-validate when a coupon is already applied", () => {
+    useCheckoutDraftStore.getState().setCouponCode("SAVE30");
+
+    renderWithProviders(
+      <CartCouponSection
+        appliedCoupon={{ code: "SAVE30", discount: 30, description: "" }}
+        onRemove={jest.fn()}
+        subtotal={500}
+      />,
+    );
+
+    expect(mockValidate).not.toHaveBeenCalled();
+  });
+
+  it("does not re-validate when nothing was persisted", () => {
+    renderWithProviders(
+      <CartCouponSection
+        appliedCoupon={null}
+        onRemove={jest.fn()}
+        subtotal={500}
+      />,
+    );
+
+    expect(mockValidate).not.toHaveBeenCalled();
   });
 });

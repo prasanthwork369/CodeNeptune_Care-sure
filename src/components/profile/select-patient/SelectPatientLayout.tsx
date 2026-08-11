@@ -4,6 +4,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { HealthProblem } from "@/src/api/health-problem.api";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { FamilyMember } from "@/src/types/familyMember";
 import { getAge } from "@/src/utils/patient";
 import { useNav } from "@/src/hooks/useNav";
@@ -57,7 +58,9 @@ export const SelectPatientLayout: React.FC = () => {
 
   useEffect(() => {
     if (!selectedPatientId && members.length > 0) {
-      setSelectedPatientId(members[0].id);
+      const draftId = useCheckoutDraftStore.getState().patientMemberId;
+      const stillExists = draftId && members.some((m) => m.id === draftId);
+      setSelectedPatientId(stillExists ? draftId : members[0].id);
     }
   }, [members, selectedPatientId]);
 
@@ -84,6 +87,9 @@ export const SelectPatientLayout: React.FC = () => {
       setIsAddPatientSheetVisible(true);
       return;
     }
+    useCheckoutDraftStore
+      .getState()
+      .setPatient(selectedPatient.id, selectedPatient.phone ?? "");
     router.push({
       pathname: "/(prescription)/payment",
       params: {

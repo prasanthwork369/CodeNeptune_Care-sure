@@ -10,6 +10,7 @@ import {
   usePerformanceTrace,
 } from "@/src/services/firebase";
 import { orderErrorMessage } from "@/src/utils/orderError";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -105,7 +106,9 @@ export function usePaymentCalculations() {
 
   const totalDiscount = sumOrderDiscounts(billBreakdown);
 
-  const [selectedMethod, setSelectedMethod] = useState("COD");
+  const selectedMethod = useCheckoutDraftStore((s) => s.paymentMethod);
+  const setSelectedMethod = useCheckoutDraftStore((s) => s.setPaymentMethod);
+  const clearCheckoutDraft = useCheckoutDraftStore((s) => s.clearDraft);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   // Drives the Place Order button loader for the WHOLE operation — including
   // the deferred prescription upload that runs before createOrder — so the
@@ -219,6 +222,7 @@ export function usePaymentCalculations() {
       removeCoupon();
       clearCheckout();
       clearPrescriptionOrder();
+      clearCheckoutDraft();
       // Fire-and-forget: a notification failure must never block the success
       // screen. Logged in dev so a silent failure is still visible.
       if (order?.id) {

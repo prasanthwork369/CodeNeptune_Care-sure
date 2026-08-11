@@ -9,6 +9,7 @@ import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useCouponAvailability } from "@/src/hooks/useCouponAvailability";
 import { useNav } from "@/src/hooks/useNav";
 import { couponService } from "@/src/services/coupon.service";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { CartCouponSectionProps } from "@/src/types/cart";
 import {
@@ -17,7 +18,7 @@ import {
   selectNextCouponUpsell,
 } from "@/src/utils/couponSelection";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 import { requireInternet } from "@/src/utils/offline";
@@ -37,6 +38,29 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
 
   // Same source the coupons screen uses, so a used-up coupon is never recommended.
   const unavailable = useCouponAvailability(coupons);
+
+  // Restores a coupon that was applied before the app was closed. Re-validates
+  // against the live API rather than trusting the stored draft, since the
+  // coupon may have expired or the cart subtotal may no longer qualify.
+  useEffect(() => {
+    const draftCode = useCheckoutDraftStore.getState().couponCode;
+    if (appliedCoupon || !draftCode || subtotal <= 0) return;
+    couponService
+      .validateCoupon(draftCode, subtotal)
+      .then((result) => {
+        if (result.valid) {
+          apply({
+            code: draftCode,
+            discount: Number(result.discount) || 0,
+            description: result.message ?? "",
+          });
+        } else {
+          useCheckoutDraftStore.getState().setCouponCode("");
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
 
   // Recomputed as the subtotal moves, so the card tracks what this cart can actually use.
   const pick = useMemo(

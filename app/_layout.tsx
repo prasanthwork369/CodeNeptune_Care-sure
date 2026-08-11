@@ -108,7 +108,9 @@ const AppGate = () => {
         onUpdatePress={
           update.isSupported
             ? () => {
-                update.runImmediateUpdate().then((ok) => setImmediateFailed(!ok));
+                update
+                  .runImmediateUpdate()
+                  .then((ok) => setImmediateFailed(!ok));
               }
             : undefined
         }

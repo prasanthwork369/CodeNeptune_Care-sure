@@ -6,6 +6,7 @@ import { queryClient } from "@/src/lib/react-query/queryClient";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { usePrescriptionDraftStore } from "./prescriptionDraftStore";
+import { useCheckoutDraftStore } from "./checkoutDraftStore";
 import { useCouponStore } from "./couponStore";
 import { useNotificationStore } from "./notificationStore";
 import { useLocationStore } from "./locationStore";
@@ -109,6 +110,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useReturnDraftStore.getState().clearReturnDraft();
     usePrescriptionOrderStore.getState().clear();
     useCartPendingStore.getState().clearGuestCart();
+    useCheckoutDraftStore.getState().clearDraft();
     queryClient.clear();
     // Whole cache, not just the profile: frequently_ordered is user-specific
     // too, and withSqliteCache serves stale entries whenever a fetch fails.

@@ -3,6 +3,7 @@ import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders"
 import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
 import { reportError } from "@/src/services/firebase";
 import { Text, View } from "react-native";
+import { fireEvent } from "@testing-library/react-native";
 
 jest.mock("@/src/services/firebase", () => ({
   reportError: jest.fn(),
@@ -44,10 +45,33 @@ describe("ErrorBoundary Component", () => {
     );
 
     expect(getByText("Something went wrong")).toBeTruthy();
-    expect(getByText("Please restart the app.")).toBeTruthy();
+    expect(
+      getByText("We could not open this screen. Please try again."),
+    ).toBeTruthy();
+    expect(getByText("Try Again")).toBeTruthy();
     expect(reportError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Render error in child component" }),
       "render-error-boundary",
     );
+  });
+
+  it("renders the child again after Try Again is pressed", () => {
+    const view = renderWithProviders(
+      <ErrorBoundary>
+        <ThrowingComponent />
+      </ErrorBoundary>,
+    );
+
+    // Simulate the underlying screen becoming healthy while the boundary is
+    // still displaying its fallback. The retry should reset only the boundary.
+    view.rerender(
+      <ErrorBoundary>
+        <Text>Recovered App Component</Text>
+      </ErrorBoundary>,
+    );
+
+    fireEvent.press(view.getByText("Try Again"));
+
+    expect(view.getByText("Recovered App Component")).toBeTruthy();
   });
 });

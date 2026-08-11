@@ -1,4 +1,5 @@
 import { reportError } from "@/src/services/firebase";
+import { AppButton } from "@/src/components/ui/AppButton";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -13,6 +14,10 @@ interface State {
 export class ErrorBoundary extends React.Component<Props, State> {
   state: State = { hasError: false };
 
+  private handleRetry = () => {
+    this.setState({ hasError: false });
+  };
+
   static getDerivedStateFromError(): State {
     return { hasError: true };
   }
@@ -26,7 +31,16 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <View style={styles.container}>
           <Text style={styles.title}>Something went wrong</Text>
-          <Text style={styles.subtitle}>Please restart the app.</Text>
+          <Text style={styles.subtitle}>
+            We could not open this screen. Please try again.
+          </Text>
+          <AppButton
+            title="Try Again"
+            size="sm"
+            onPress={this.handleRetry}
+            style={styles.retryButton}
+            accessibilityHint="Attempts to open the app again"
+          />
         </View>
       );
     }
@@ -51,5 +65,10 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: "#6A6A6A",
+    textAlign: "center",
+  },
+  retryButton: {
+    width: 140,
+    marginTop: 20,
   },
 });

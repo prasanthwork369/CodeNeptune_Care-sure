@@ -1,6 +1,7 @@
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useSelectPatientImages } from "@/src/hooks/useSelectPatientImages";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { HealthProblem } from "@/src/api/health-problem.api";
 import { sanitize, stripIndianCode, validate } from "@/src/utils/validation";
@@ -43,7 +44,9 @@ export function useSelectPatient() {
 
   useEffect(() => {
     if (!selectedPatientId && members.length > 0) {
-      setSelectedPatientId(members[0].id);
+      const draftId = useCheckoutDraftStore.getState().patientMemberId;
+      const stillExists = draftId && members.some((m) => m.id === draftId);
+      setSelectedPatientId(stillExists ? draftId : members[0].id);
     }
   }, [members, selectedPatientId]);
 
@@ -118,6 +121,9 @@ export function useSelectPatient() {
       setIsAddPatientSheetVisible(true);
       return;
     }
+    useCheckoutDraftStore
+      .getState()
+      .setPatient(selectedPatient.id, selectedPatient.phone ?? "");
     router.push({
       pathname: "/(prescription)/payment",
       params: {
