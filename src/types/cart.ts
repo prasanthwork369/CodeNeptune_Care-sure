@@ -133,6 +133,8 @@ export interface CartDeliveringToProps {
 export interface CartSavingsBannerProps {
   firstName: string;
   totalSavings: number;
+  /** Drives the banner's shrink-on-scroll — normal height at rest, compact while scrolled. */
+  scrollY?: import("react-native-reanimated").SharedValue<number>;
 }
 
 export interface CartFreeDeliveryProgressProps {

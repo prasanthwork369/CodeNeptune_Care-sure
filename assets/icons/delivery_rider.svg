@@ -1,0 +1,14 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5.5 18.5L7.7 13.1H13L14.7 16H18.3V18.5" stroke="#0F7635" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M7.7 13.1L6.55 10.55H4.9" stroke="#0F7635" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8.1 15.9H14.7" stroke="#36B37E" stroke-width="1.5" stroke-linecap="round"/>
+
+  <rect x="15.15" y="10.05" width="4.7" height="4.35" rx="0.8" fill="#F59E0B"/>
+  <path d="M17.5 10.05V14.4" stroke="#FFF7E6" stroke-width="0.75"/>
+  <path d="M15.15 11.55H19.85" stroke="#FFF7E6" stroke-width="0.75"/>
+
+  <circle cx="11.05" cy="5.55" r="2.15" fill="#F2B38F"/>
+  <path d="M8.75 5.45C8.75 3.85 9.75 2.8 11.2 2.8C12.65 2.8 13.65 3.75 13.65 5.1H10.65L9.9 5.8L8.75 5.45Z" fill="#0F7635"/>
+  <path d="M9.55 8.05L11.05 7.7C12.05 7.45 13.05 8 13.45 8.95L14.5 11.4L12.55 12.15L11.55 9.85L10.45 13.1H7.75L8.4 9.2C8.5 8.65 8.9 8.2 9.55 8.05Z" fill="#0F7635"/>
+  <path d="M13.15 9.05L15.55 10.65" stroke="#F2B38F" stroke-width="1.45" stroke-linecap="round"/>
+</svg>

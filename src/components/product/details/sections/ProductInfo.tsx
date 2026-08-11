@@ -1,9 +1,11 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { MedicineVariant } from "@/src/hooks/queries/useProduct";
+import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
-import { useSharedValue } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS, useSharedValue } from "react-native-reanimated";
 import { CarouselDot } from "@/src/components/animations/carousel";
 import {
   Image,
@@ -46,6 +48,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   selectedVariantId,
   onVariantSelect,
 }) => {
+  const router = useNav();
   const { width } = useWindowDimensions();
   const [, setActiveIndex] = useState(0);
   const progress = useSharedValue(0);
@@ -56,6 +59,21 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   const carouselImages = product.images?.length
     ? product.images
     : [product.image];
+
+  const openImageViewer = (index: number) => {
+    const uris = carouselImages
+      .map((img) => img?.uri)
+      .filter((uri): uri is string => !!uri);
+    if (!uris.length) return;
+    router.push({
+      pathname: "/product/image-viewer",
+      params: {
+        imageUrls: JSON.stringify(uris),
+        initialIndex: String(index),
+        productName: product.name,
+      },
+    });
+  };
 
   return (
     <View className="bg-transparent pt-4 pb-4">
@@ -71,31 +89,47 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           onProgressChange={(_, absoluteProgress) => {
             progress.value = absoluteProgress;
           }}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                width,
-                height: imgSize,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {item ? (
-                <Image
-                  source={item}
-                  style={{ width: imgSize, height: imgSize }}
-                  resizeMode="contain"
-                />
-              ) : (
-                <icons.placeholder
-                  width={imgSize * 0.7}
-                  height={imgSize * 0.7}
-                />
-              )}
-            </View>
-          )}
+          renderItem={({ item, index }) => {
+            // A plain Touchable here (RN's legacy responder system) fights
+            // the carousel's own gesture-handler-based pan for the swipe —
+            // a Tap gesture with a tight maxDistance fails fast on real
+            // swipe motion instead, so the carousel still owns the drag.
+            const tapGesture = Gesture.Tap()
+              .maxDistance(10)
+              .onEnd(() => {
+                runOnJS(openImageViewer)(index);
+              });
+
+            return (
+              <View
+                style={{
+                  width,
+                  height: imgSize,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {item ? (
+                  <GestureDetector gesture={tapGesture}>
+                    <View>
+                      <Image
+                        source={item}
+                        style={{ width: imgSize, height: imgSize }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </GestureDetector>
+                ) : (
+                  <icons.placeholder
+                    width={imgSize * 0.7}
+                    height={imgSize * 0.7}
+                  />
+                )}
+              </View>
+            );
+          }}
         />
-        {carouselImages.length > 1 && (
+        {carouselImages.length > 0 && (
           <View className="flex-row items-center justify-center mt-4 gap-x-1.5">
             {carouselImages.map((_, index) => (
               <CarouselDot

@@ -7,6 +7,7 @@ export default function ProductLayout() {
       screenOptions={{ headerShown: false, ...screenTransitions.nativePush }}
     >
       <Stack.Screen name="[id]" />
+      <Stack.Screen name="image-viewer" />
     </Stack>
   );
 }

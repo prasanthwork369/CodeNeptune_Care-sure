@@ -4,11 +4,13 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { cartMutations } from "@/src/services/cart.mutations";
 import { resolveUUID } from "@/src/utils/resolveUUID";
+import { Image } from "expo-image";
 import React, { useState } from "react";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 import { logger } from "@/src/utils/logger";
 
 function formatDate(dateStr?: string | null) {
@@ -30,7 +32,7 @@ function formatDate(dateStr?: string | null) {
 // "preAddStepper": editable qty stepper before adding, always shows the Add to cart button.
 type ProductCardVariant = "cartCounter" | "preAddStepper";
 
-export function ProductCard({
+export const ProductCard = React.memo(function ProductCard({
   item,
   index,
   variant = "cartCounter",
@@ -41,7 +43,7 @@ export function ProductCard({
 }) {
   const isStepperVariant = variant === "preAddStepper";
   const router = useNav();
-  const { items: cartItems, addItem, updateItem, removeItem } = useCart();
+  const { items: cartItems } = useCartRead();
   const [isAdding, setIsAdding] = useState(false);
   const [manualQty, setManualQty] = useState(1);
 
@@ -61,8 +63,8 @@ export function ProductCard({
     if (!cartItem || counterPending) return;
     setCounterPending(true);
     try {
-      if (newQty <= 0) await removeItem(cartItem.id);
-      else await updateItem(cartItem.id, { quantity: newQty });
+      if (newQty <= 0) await cartMutations.removeItem(cartItem.id);
+      else await cartMutations.updateItem(cartItem.id, { quantity: newQty });
     } finally {
       setCounterPending(false);
     }
@@ -76,7 +78,9 @@ export function ProductCard({
           c.medicineId === productId || c.metadata?.productId === productId,
       );
       if (existing) {
-        await updateItem(existing.id, { quantity: existing.quantity + qty });
+        await cartMutations.updateItem(existing.id, {
+          quantity: existing.quantity + qty,
+        });
       } else {
         const itemId = String(
           item.medicineId ?? item.productId ?? item.id ?? "",
@@ -112,7 +116,7 @@ export function ProductCard({
             slug,
             medicineId,
           });
-        await addItem({
+        await cartMutations.addItem({
           medicineId,
           variantId: null,
           medicineName: name,
@@ -242,7 +246,7 @@ export function ProductCard({
                 height: imgSize,
                 marginTop: isStepperVariant && itemDiscount ? 26 : 0,
               }}
-              resizeMode="contain"
+              contentFit="contain"
             />
           ) : item.image?.uri ? (
             <Image
@@ -252,7 +256,7 @@ export function ProductCard({
                 height: imgSize,
                 marginTop: isStepperVariant && itemDiscount ? 26 : 0,
               }}
-              resizeMode="contain"
+              contentFit="contain"
             />
           ) : (
             <icons.placeholder
@@ -645,4 +649,5 @@ export function ProductCard({
       )}
     </View>
   );
-}
+});
+ProductCard.displayName = "ProductCard";

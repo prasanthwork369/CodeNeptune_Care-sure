@@ -7,8 +7,9 @@ import { CartEmptyStateProps } from "@/src/types/cart";
 import { Product } from "@/src/types/home";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
+import { Image } from "expo-image";
 import React from "react";
-import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
   featuredProducts,
@@ -140,7 +141,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                     <Image
                       source={{ uri: product.image.uri }}
                       style={{ width: "82%", height: "82%" }}
-                      resizeMode="contain"
+                      contentFit="contain"
                     />
                   ) : (
                     <icons.placeholder width="58%" height="58%" />

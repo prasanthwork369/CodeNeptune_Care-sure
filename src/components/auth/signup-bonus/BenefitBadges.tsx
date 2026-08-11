@@ -1,7 +1,8 @@
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 const BADGE_ICON_BG = ["#FDF5FF", "#FFF8EC", "#E9F5FF"];
 
@@ -10,7 +11,7 @@ export const BadgeIcon = ({ icon }: { icon: string }) => (
   <Image
     source={{ uri: icon }}
     style={{ width: exactScale(16), height: exactScale(16) }}
-    resizeMode="contain"
+    contentFit="contain"
   />
 );
 

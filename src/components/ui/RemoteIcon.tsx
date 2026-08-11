@@ -1,5 +1,6 @@
+import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
-import { Image, ImageStyle, StyleProp } from "react-native";
+import { ImageStyle, StyleProp } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 interface RemoteIconProps {
@@ -84,7 +85,7 @@ export const RemoteIcon: React.FC<RemoteIconProps> = ({ uri, size, style }) => {
         <Image
           source={{ uri: resolved.dataUri }}
           style={[{ width: size, height: size }, style]}
-          resizeMode="contain"
+          contentFit="contain"
         />
       );
     }

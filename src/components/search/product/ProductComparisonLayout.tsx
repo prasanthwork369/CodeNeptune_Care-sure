@@ -160,8 +160,7 @@ export const ProductComparisonLayout: React.FC<
                   : adjustedBottom + 24,
               }}
               style={{ flex: 1 }}
-              bounces={false}
-              overScrollMode="never"
+              overScrollMode="auto"
             >
               {saltComposition && (
                 <SaltCompositionBanner composition={saltComposition} />

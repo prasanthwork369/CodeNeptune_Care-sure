@@ -198,8 +198,7 @@ export const ProductDetailsLayout: React.FC = () => {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
                 style={{ flex: 1 }}
-                bounces={false}
-                overScrollMode="never"
+                overScrollMode="auto"
               >
                 <View>
                   {saltComposition && (

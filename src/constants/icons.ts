@@ -52,6 +52,7 @@ import info_gray from "../../assets/icons/info_gray.svg";
 import info_error from "../../assets/icons/info_error.svg";
 import location from "../../assets/icons/location.svg";
 import moped_package from "../../assets/icons/moped_package.svg";
+import delivery_rider from "../../assets/icons/delivery_rider.svg";
 import my_location from "../../assets/icons/my_location.svg";
 import outline_gallery from "../../assets/icons/gallery_outline.svg";
 import notification from "../../assets/icons/notification.svg";
@@ -222,6 +223,7 @@ export const icons = {
   autorenew,
   Add_Cart,
   moped_package,
+  delivery_rider,
   location,
   shopping_bag,
   my_location,

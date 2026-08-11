@@ -230,7 +230,7 @@ export const OrderSuccessLayout: React.FC = () => {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          bounces={false}
+          overScrollMode="auto"
           contentContainerStyle={{
             alignItems: "center",
             paddingTop: exactScale(28),

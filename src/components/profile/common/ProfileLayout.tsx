@@ -144,9 +144,7 @@ export const ProfileLayout: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        bounces={false}
-        alwaysBounceVertical={false}
-        overScrollMode="never"
+        overScrollMode="auto"
         style={{ backgroundColor: "#F5F6FB" }}
         onScroll={handleScroll}
         scrollEventThrottle={16}

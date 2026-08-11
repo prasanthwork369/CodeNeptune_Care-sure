@@ -81,8 +81,8 @@ export const useProduct = (productId: string) => {
             : []),
           ...data.images
             .sort((a, b) => a.sortOrder - b.sortOrder)
-            .filter((img) => !!img.url)
-            .map((img) => ({ uri: img.url })),
+            .filter((img) => !!img.imageUrl)
+            .map((img) => ({ uri: img.imageUrl })),
         ],
       }
     : null;

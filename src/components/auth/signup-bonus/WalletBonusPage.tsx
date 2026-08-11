@@ -5,8 +5,9 @@ import {
 } from "@/src/types/signupBonus";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { BadgeIcon, BenefitBadges } from "./BenefitBadges";
 import { CARD_WIDTH } from "./constants";
@@ -92,7 +93,7 @@ export const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             width: exactScale(145),
             height: exactScale(115),
           }}
-          resizeMode="contain"
+          contentFit="contain"
         />
       )}
     </View>
@@ -127,7 +128,7 @@ export const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
             width: exactScale(56),
             height: exactScale(56),
           }}
-          resizeMode="contain"
+          contentFit="contain"
         />
       )}
 
@@ -162,7 +163,7 @@ export const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
                   <Image
                     source={{ uri: content.coinsIcon }}
                     style={{ width: exactScale(38), height: exactScale(38) }}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 )}
               </View>
@@ -215,7 +216,7 @@ export const WalletBonusPage: React.FC<WalletBonusPageProps> = ({
                   <Image
                     source={{ uri: content.balanceIcon }}
                     style={{ width: exactScale(38), height: exactScale(38) }}
-                    resizeMode="contain"
+                    contentFit="contain"
                   />
                 )}
               </View>

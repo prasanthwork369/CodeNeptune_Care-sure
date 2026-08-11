@@ -7,7 +7,7 @@ export const ProductDetailsSkeleton = () => {
     <ScrollView
       showsVerticalScrollIndicator={false}
       className="flex-1"
-      bounces={false}
+      overScrollMode="auto"
     >
       {/* Mock SaltCompositionBanner */}
       <View className="px-4 py-3">

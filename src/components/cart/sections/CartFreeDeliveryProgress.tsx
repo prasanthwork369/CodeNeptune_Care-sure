@@ -1,10 +1,19 @@
-import { exactScale } from "@/src/utils/exactScale";
-import React from "react";
-import { View, Text } from "react-native";
-import { cartStyles as s } from "../cart.styles";
-import { LinearGradient } from "expo-linear-gradient";
 import { icons } from "@/src/constants/icons";
 import { CartFreeDeliveryProgressProps } from "@/src/types/cart";
+import { exactScale } from "@/src/utils/exactScale";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useRef } from "react";
+import { Text, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import { cartStyles as s } from "../cart.styles";
+import { AnimatedDeliveryRider } from "./AnimatedDeliveryRider";
 
 export const CartFreeDeliveryProgress: React.FC<
   CartFreeDeliveryProgressProps
@@ -13,6 +22,25 @@ export const CartFreeDeliveryProgress: React.FC<
     100,
     Math.max(0, Math.round(progress * 100)),
   );
+  const reduceMotion = useReducedMotion();
+  const unlockedTextScale = useSharedValue(1);
+  const wasUnlockedRef = useRef(remainingForFreeDelivery <= 0);
+
+  useEffect(() => {
+    const isUnlocked = remainingForFreeDelivery <= 0;
+    const justUnlocked = !wasUnlockedRef.current && isUnlocked;
+    wasUnlockedRef.current = isUnlocked;
+    if (!justUnlocked || reduceMotion) return;
+
+    unlockedTextScale.value = withSequence(
+      withTiming(1.1, { duration: 140, easing: Easing.out(Easing.quad) }),
+      withTiming(1, { duration: 180, easing: Easing.inOut(Easing.quad) }),
+    );
+  }, [reduceMotion, remainingForFreeDelivery, unlockedTextScale]);
+
+  const unlockedTextStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: unlockedTextScale.value }],
+  }));
 
   return (
     <LinearGradient
@@ -56,21 +84,20 @@ export const CartFreeDeliveryProgress: React.FC<
                 more to free delivery
               </>
             ) : (
-              <Text className="font-inter-semibold">
+              <Animated.Text
+                className="font-inter-semibold"
+                style={unlockedTextStyle}
+              >
                 {"You've unlocked free delivery!"}
-              </Text>
+              </Animated.Text>
             )}
           </Text>
         </View>
-        <View
-          style={{ height: exactScale(6), marginTop: exactScale(12) }}
-          className="bg-[#F1E2C9] rounded-full overflow-hidden"
-        >
-          <View
-            className="h-full bg-[#0B0D10] rounded-full"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </View>
+
+        <AnimatedDeliveryRider
+          progress={progress}
+          remainingForFreeDelivery={remainingForFreeDelivery}
+        />
       </View>
     </LinearGradient>
   );

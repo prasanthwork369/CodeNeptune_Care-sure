@@ -45,7 +45,7 @@ export interface ApiProductSalt {
 
 export interface ApiProductImage {
   id: string;
-  url: string;
+  imageUrl: string;
   isPrimary: boolean;
   sortOrder: number;
 }

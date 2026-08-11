@@ -8,12 +8,14 @@ import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import Animated, {
   FadeInDown,
   FadeOutUp,
   LinearTransition,
   ReduceMotion,
+  useAnimatedScrollHandler,
+  useSharedValue,
 } from "react-native-reanimated";
 import {
   CartBillSummary,
@@ -99,9 +101,16 @@ export const CartLayout: React.FC = () => {
     isCartLoading,
   } = useCartCalculations();
 
-  const addressActionLabel = hasSavedAddress ? "Change Address" : "Add Address";
+  const addressActionLabel = hasSavedAddress ? "Change" : "Add Address";
 
   const shouldShowSavingsBanner = totalSavings > 0;
+
+  // Drives the savings banner's shrink-on-scroll — normal height at rest,
+  // compact once the cart starts scrolling.
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
 
   // Measures how long the cart takes to load its server data, not screen dwell.
   usePerformanceTrace({
@@ -136,25 +145,26 @@ export const CartLayout: React.FC = () => {
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="Cart" />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        overScrollMode="never"
-        bounces={false}
-        contentContainerStyle={{ paddingBottom: exactScale(24) }}
-      >
-        {shouldShowSavingsBanner && (
-          <Animated.View
-            entering={SAVINGS_BANNER_ENTERING}
-            exiting={SAVINGS_BANNER_EXITING}
-            layout={CART_CONTENT_LAYOUT}
-          >
-            <CartSavingsBanner
-              firstName={firstName}
-              totalSavings={totalSavings}
-            />
-          </Animated.View>
-        )}
+      {shouldShowSavingsBanner && (
+        <Animated.View
+          entering={SAVINGS_BANNER_ENTERING}
+          exiting={SAVINGS_BANNER_EXITING}
+        >
+          <CartSavingsBanner
+            firstName={firstName}
+            totalSavings={totalSavings}
+            scrollY={scrollY}
+          />
+        </Animated.View>
+      )}
 
+      <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
+        contentContainerStyle={{ paddingBottom: exactScale(24) }}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+      >
         <Animated.View layout={CART_CONTENT_LAYOUT}>
           <CartDeliveringTo
             label={
@@ -235,7 +245,7 @@ export const CartLayout: React.FC = () => {
 
           <CartTerms />
         </Animated.View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <CartFooter
         toPay={toPay}

@@ -5,10 +5,12 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useState } from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
+  Extrapolation,
+  interpolate,
   runOnJS,
   useAnimatedStyle,
   useReducedMotion,
@@ -20,8 +22,15 @@ const AMOUNT_OFFSET = exactScale(4);
 const AMOUNT_EXIT_DURATION = 90;
 const AMOUNT_ENTER_DURATION = 130;
 
+// Compacts as soon as the cart starts scrolling — a short distance so the
+// shrink feels tied to "you started scrolling," not a slow fade.
+const SCROLL_SHRINK_DISTANCE = 24;
+const PADDING_NORMAL = exactScale(12);
+const PADDING_COMPACT = exactScale(6);
+
 export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
   totalSavings,
+  scrollY,
 }) => {
   const reduceMotion = useReducedMotion();
   const [displayedSavings, setDisplayedSavings] = useState(totalSavings);
@@ -94,24 +103,40 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
     transform: [{ translateY: amountTranslateY.value }],
   }));
 
+  const bannerAnimatedStyle = useAnimatedStyle(() => ({
+    paddingVertical: scrollY
+      ? interpolate(
+          scrollY.value,
+          [0, SCROLL_SHRINK_DISTANCE],
+          [PADDING_NORMAL, PADDING_COMPACT],
+          Extrapolation.CLAMP,
+        )
+      : PADDING_NORMAL,
+  }));
+
   return (
-    <LinearGradient
-      colors={["#D0EBFE", "#D7FFEA"]}
-      start={{ x: 0, y: 0.5 }}
-      end={{ x: 1, y: 0.5 }}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: exactScale(16),
-        paddingVertical: exactScale(12),
-        gap: exactScale(10),
-        overflow: "hidden",
-      }}
+    <Animated.View
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: exactScale(16),
+          gap: exactScale(10),
+          overflow: "hidden",
+        },
+        bannerAnimatedStyle,
+      ]}
       accessible
       accessibilityRole="summary"
       accessibilityLabel={`You saved ₹${Number(displayedSavings).toFixed(2)} on this order`}
     >
+      <LinearGradient
+        colors={["#D0EBFE", "#D7FFEA"]}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={StyleSheet.absoluteFillObject}
+      />
       <Image
         source={HOME_IMAGES.discountTag}
         style={{ width: exactScale(32), height: exactScale(32) }}
@@ -134,6 +159,6 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
         {" on this Order"}
       </Text>
       <OfferShine />
-    </LinearGradient>
+    </Animated.View>
   );
 };

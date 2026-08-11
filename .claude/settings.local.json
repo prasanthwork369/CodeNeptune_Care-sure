@@ -16,7 +16,9 @@
       "PowerShell(npx jest --silent 2>&1)",
       "Bash(cd \"C:/Code Neptune/Caresure_Project/Customer_app/Caresure\" && grep -n \"minHeight\\\\|contentMinHeight\\\\|onLayout\\\\|LinearTransition\\\\|withTiming\\\\|scrollTo\\\\|opacity\" src/components/product/details/sections/MoreAboutSection.tsx | head -25)",
       "Read(//c/Code Neptune/Caresure_Project/Customer_app/Caresure/**)",
-      "Read(//c/Code Neptune/Web/customer-website/**)"
+      "Read(//c/Code Neptune/Web/customer-website/**)",
+      "Bash(cd \"e:\\\\Mobile\\\\Caresure\\\\Care-sure_Customer\" && echo \"---find package.json files---\" && find . -maxdepth 2 -iname \"package.json\" -not -path \"*/node_modules/*\" 2>/dev/null && echo \"---sibling dirs---\" && ls .. 2>/dev/null)",
+      "Read(//e/Mobile/Caresure/**)"
     ]
   }
 }

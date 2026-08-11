@@ -589,8 +589,6 @@ const HomeContent: React.FC = () => {
         renderItem={renderSection}
         showsVerticalScrollIndicator={false}
         className="flex-1"
-        bounces={false}
-        alwaysBounceVertical={false}
         overScrollMode="auto"
         decelerationRate="normal"
         nestedScrollEnabled
