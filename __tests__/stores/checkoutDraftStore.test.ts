@@ -5,12 +5,14 @@ describe("useCheckoutDraftStore — Checkout Draft Recovery State", () => {
     useCheckoutDraftStore.getState().clearDraft();
   });
 
-  it("initializes with empty patient/coupon and COD payment method", () => {
+  it("initializes with empty patient/coupon/symptoms and COD payment method", () => {
     const state = useCheckoutDraftStore.getState();
     expect(state.patientMemberId).toBe("");
     expect(state.patientPhone).toBe("");
     expect(state.paymentMethod).toBe("COD");
     expect(state.couponCode).toBe("");
+    expect(state.symptoms).toBe("");
+    expect(state.healthProblem).toBeNull();
   });
 
   it("sets the selected patient", () => {
@@ -33,10 +35,38 @@ describe("useCheckoutDraftStore — Checkout Draft Recovery State", () => {
     expect(useCheckoutDraftStore.getState().couponCode).toBe("SAVE30");
   });
 
+  it("sets symptoms and health problem", () => {
+    const problem = {
+      id: "flu",
+      slug: "flu",
+      label: "Flu",
+      icon: null,
+      description: null,
+      sortOrder: 1,
+      isActive: true,
+    };
+    useCheckoutDraftStore.getState().setSymptoms("Fever and cough");
+    useCheckoutDraftStore.getState().setHealthProblem(problem);
+
+    const state = useCheckoutDraftStore.getState();
+    expect(state.symptoms).toBe("Fever and cough");
+    expect(state.healthProblem).toEqual(problem);
+  });
+
   it("clears the draft back to defaults", () => {
     useCheckoutDraftStore.getState().setPatient("patient-1", "+919876543210");
     useCheckoutDraftStore.getState().setPaymentMethod("CARD");
     useCheckoutDraftStore.getState().setCouponCode("SAVE30");
+    useCheckoutDraftStore.getState().setSymptoms("Fever and cough");
+    useCheckoutDraftStore.getState().setHealthProblem({
+      id: "flu",
+      slug: "flu",
+      label: "Flu",
+      icon: null,
+      description: null,
+      sortOrder: 1,
+      isActive: true,
+    });
 
     useCheckoutDraftStore.getState().clearDraft();
 
@@ -45,5 +75,7 @@ describe("useCheckoutDraftStore — Checkout Draft Recovery State", () => {
     expect(state.patientPhone).toBe("");
     expect(state.paymentMethod).toBe("COD");
     expect(state.couponCode).toBe("");
+    expect(state.symptoms).toBe("");
+    expect(state.healthProblem).toBeNull();
   });
 });

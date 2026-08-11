@@ -11,6 +11,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useOrderTrackingSteps } from "@/src/hooks/useOrderTrackingSteps";
 import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
 import { buildCartInputs } from "@/src/utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { useLocalSearchParams } from "expo-router";
@@ -33,8 +34,10 @@ import {
   ItemsOrderedSection,
   PaymentMethodSection,
   PrescriptionSection,
+  ReturnStatusSection,
   SavingsBreakdownSection,
   SectionCard,
+  TrackingStatusBanner,
 } from "./tracking-sections";
 
 const EASE_OUT = Easing.out(Easing.cubic);
@@ -353,6 +356,10 @@ export const OrderTrackLayout: React.FC = () => {
     order?.status != null && order.status >= 5 && order.status <= 7;
 
   const trackingSteps = useOrderTrackingSteps(order);
+  const isDelayed = isOrderDelayed(order);
+  const cancellationReason = getCancellationReason(order);
+  const showExpectedDelivery =
+    !!order?.estimatedDelivery && order.status !== 0 && order.status !== 7;
 
   // Same "toStatus → timestamp" lookup the tracking steps use, needed here to
   // show the precise "Delivered on" date in the header above.
@@ -448,7 +455,20 @@ export const OrderTrackLayout: React.FC = () => {
               </Text>
             </View>
           </View>
+          {showExpectedDelivery && (
+            <Text
+              style={s.labelSm}
+              className="font-inter-medium text-brand-subtext mt-1.5"
+            >
+              Expected delivery: {formatDate(order?.estimatedDelivery)}
+            </Text>
+          )}
         </View>
+
+        <TrackingStatusBanner
+          delayed={isDelayed}
+          cancellationReason={cancellationReason}
+        />
 
         <SectionCard className="pt-4 pb-2">
           <Text
@@ -497,6 +517,8 @@ export const OrderTrackLayout: React.FC = () => {
             </>
           )}
         </SectionCard>
+
+        <ReturnStatusSection returns={order?.returns} />
 
         <ItemsOrderedSection
           items={items}

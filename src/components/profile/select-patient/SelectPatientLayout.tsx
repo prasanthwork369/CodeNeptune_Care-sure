@@ -64,9 +64,13 @@ export const SelectPatientLayout: React.FC = () => {
     }
   }, [members, selectedPatientId]);
 
-  const [symptoms, setSymptoms] = useState("");
+  const [symptoms, setSymptoms] = useState(
+    () => useCheckoutDraftStore.getState().symptoms,
+  );
   const [selectedHealthProblem, setSelectedHealthProblem] =
-    useState<HealthProblem | null>(null);
+    useState<HealthProblem | null>(
+      () => useCheckoutDraftStore.getState().healthProblem,
+    );
   const [customProblemText, setCustomProblemText] = useState("");
   const [showHealthSheet, setShowHealthSheet] = useState(false);
   const [isAddPatientSheetVisible, setIsAddPatientSheetVisible] =
@@ -87,9 +91,10 @@ export const SelectPatientLayout: React.FC = () => {
       setIsAddPatientSheetVisible(true);
       return;
     }
-    useCheckoutDraftStore
-      .getState()
-      .setPatient(selectedPatient.id, selectedPatient.phone ?? "");
+    const draft = useCheckoutDraftStore.getState();
+    draft.setPatient(selectedPatient.id, selectedPatient.phone ?? "");
+    draft.setSymptoms(symptoms);
+    draft.setHealthProblem(selectedHealthProblem);
     router.push({
       pathname: "/(prescription)/payment",
       params: {
