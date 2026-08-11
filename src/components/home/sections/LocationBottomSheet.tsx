@@ -77,7 +77,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     // Derived, not read straight from the store: this falls back to the default
     // (then the first) address, so exactly one card is always checked — and it
     // is the same address checkout will ship to.
-    const { selectedId } = useDeliveryAddress();
+    const { selectedId, hasSavedAddress } = useDeliveryAddress();
     const showToast = useToastStore((s) => s.show);
     const [isLocating, setIsLocating] = useState(false);
     const [inputValue, setInputValue] = useState("");
@@ -87,7 +87,6 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     const {
       addresses,
       loading: addressesLoading,
-      loaded: addressesLoaded,
       refetch,
     } = useAddress();
     const { checkServiceability } = usePincode();
@@ -362,10 +361,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
               marginBottom: exactScale(20),
             }}
           >
-            {title ??
-              (addressesLoaded && addresses.length > 0
-                ? "Change Address"
-                : "Add Address")}
+            {title ?? (hasSavedAddress ? "Change Address" : "Add Address")}
           </Text>
 
           {/* Search Box */}

@@ -85,8 +85,11 @@ export function useCartCalculations() {
   // Same resolved address the sheet highlights and checkout ships to. The old
   // local `selectedLocation` copy is gone: the sheet writes the pick to the
   // store, so a second copy here could only drift out of sync with it.
-  const { address: defaultAddress, displayLocation: deliveryLocation } =
-    useDeliveryAddress();
+  const {
+    address: defaultAddress,
+    displayLocation: deliveryLocation,
+    hasSavedAddress,
+  } = useDeliveryAddress();
 
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
@@ -341,6 +344,7 @@ export function useCartCalculations() {
     clearJustApplied,
     deliveryLocation,
     defaultAddress,
+    hasSavedAddress,
     showBillDetails,
     setShowBillDetails,
     showCoinsSheet,

@@ -2,7 +2,6 @@ import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
 import { LocationBottomSheet } from "@/src/components/home/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
@@ -58,6 +57,7 @@ export const CartLayout: React.FC = () => {
     removeCoupon,
     deliveryLocation,
     defaultAddress,
+    hasSavedAddress,
     showBillDetails,
     setShowBillDetails,
     showCoinsSheet,
@@ -95,9 +95,7 @@ export const CartLayout: React.FC = () => {
     isCartLoading,
   } = useCartCalculations();
 
-  const { addresses, loaded: addressLoaded } = useAddress();
-  const hasAddress = addressLoaded && addresses.length > 0;
-  const addressActionLabel = hasAddress ? "Change Address" : "Add Address";
+  const addressActionLabel = hasSavedAddress ? "Change Address" : "Add Address";
 
   const shouldShowSavingsBanner = totalSavings > 0;
 

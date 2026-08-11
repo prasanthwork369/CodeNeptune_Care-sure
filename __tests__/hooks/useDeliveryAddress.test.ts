@@ -83,3 +83,78 @@ describe("useDeliveryAddress — Resolved Address & Checkout Location Sync", () 
     expect(result.current.displayLocation?.city).toBe("Bengaluru");
   });
 });
+
+describe("useDeliveryAddress — hasSavedAddress", () => {
+  const savedAddress = {
+    id: "addr-1",
+    label: "Home",
+    isDefault: true,
+    line1: "123 Street",
+    city: "Delhi",
+    state: "Delhi",
+    pincode: "110001",
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useLocationStore.setState({
+      selectedAddressId: null,
+      location: null,
+      pincode: null,
+    });
+  });
+
+  it("is true once the list comes back with an address", () => {
+    (useAddress as jest.Mock).mockReturnValue({
+      addresses: [savedAddress],
+      loading: false,
+      loaded: true,
+    });
+
+    const { result } = renderHook(() => useDeliveryAddress());
+
+    expect(result.current.hasSavedAddress).toBe(true);
+  });
+
+  it("is false once the list comes back empty", () => {
+    (useAddress as jest.Mock).mockReturnValue({
+      addresses: [],
+      loading: false,
+      loaded: true,
+    });
+
+    const { result } = renderHook(() => useDeliveryAddress());
+
+    expect(result.current.hasSavedAddress).toBe(false);
+  });
+
+  // The reported bug: React Query is not persisted, so on the first cart open
+  // after launch the list was still loading and the banner said "Add Address"
+  // over the address the persisted location store was already showing.
+  it("stays true while loading when a saved address was previously picked", () => {
+    (useAddress as jest.Mock).mockReturnValue({
+      addresses: [],
+      loading: true,
+      loaded: false,
+    });
+    useLocationStore.setState({ selectedAddressId: "addr-1" });
+
+    const { result } = renderHook(() => useDeliveryAddress());
+
+    expect(result.current.hasSavedAddress).toBe(true);
+  });
+
+  // A GPS or manual-pincode pick records no addressId, so a genuinely new user
+  // still sees "Add Address" rather than a wrong "Change Address".
+  it("is false while loading for a user who never picked a saved address", () => {
+    (useAddress as jest.Mock).mockReturnValue({
+      addresses: [],
+      loading: true,
+      loaded: false,
+    });
+
+    const { result } = renderHook(() => useDeliveryAddress());
+
+    expect(result.current.hasSavedAddress).toBe(false);
+  });
+});
