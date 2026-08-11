@@ -1,7 +1,11 @@
-import type { ApiPrescription, PrescriptionHistoryItemData } from "@/src/types/prescription";
+import type {
+  ApiPrescription,
+  PrescriptionHistoryItemData,
+} from "@/src/types/prescription";
 import { SearchBar } from "@/src/components/home/sections/SearchBar";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { Touchable } from "@/src/components/ui/Touchable";
 import {
   PRESCRIPTION_STATUS,
@@ -41,9 +45,10 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     source?: string;
     toPay?: string;
   }>();
-  const { prescriptions, loading, refreshing, refetch } = usePrescriptions({
-    category: 2,
-  });
+  const { prescriptions, loading, refreshing, error, refetch } =
+    usePrescriptions({
+      category: 2,
+    });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
@@ -145,6 +150,12 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           <ShimmerBlock height={exactScale(110)} borderRadius={12} />
           <ShimmerBlock height={exactScale(110)} borderRadius={12} />
         </View>
+      ) : error && prescriptions.length === 0 ? (
+        <RetryState
+          title="Couldn't load prescriptions"
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
       ) : (
         <FlashList
           data={items}

@@ -31,16 +31,19 @@ export function useHomeData() {
     cards,
     appContent,
     isLoading: isHomeLoading,
+    error: homeError,
     refetch: refetchHome,
   } = useHome();
   const {
     products: featuredProducts,
     isLoading: isFeaturedLoading,
+    error: featuredError,
     refetch: refetchFeatured,
   } = useFeaturedMedicines();
   const {
     subcategories: featuredSubcategories,
     isLoading: isSubcategoriesLoading,
+    error: subcategoriesError,
     refetch: refetchSubcategories,
   } = useFeaturedSubcategories();
   const {
@@ -132,6 +135,7 @@ export function useHomeData() {
     isSubcategoriesLoading,
     addresses,
     frequentlyOrdered,
+    error: homeError || featuredError || subcategoriesError,
     isRefreshing,
     onRefresh,
   };

@@ -41,6 +41,7 @@ export const useSearch = () => {
     fetchNextPage,
     hasNextPage,
     error,
+    refetch,
   } = useInfiniteQuery({
     queryKey: QUERY_KEYS.SEARCH.MEDICINES(debouncedQuery),
     queryFn: ({ pageParam = 1 }) =>
@@ -70,6 +71,7 @@ export const useSearch = () => {
     fetchNextPage,
     hasNextPage,
     error,
+    refetch,
     debouncedQuery,
   };
 };

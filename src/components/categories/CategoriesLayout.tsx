@@ -1,4 +1,5 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { useCategories } from "@/src/hooks/queries/useCategories";
 import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
@@ -31,7 +32,7 @@ export const CategoriesLayout: React.FC = () => {
   // Scale height proportionally to maintain the design aspect ratio
   const cardHeight = cardWidth * (CARD_HEIGHT / CARD_WIDTH);
 
-  const { tabs, cards, isLoading } = useCategories();
+  const { tabs, cards, isLoading, error, refetch } = useCategories();
 
   useEffect(() => {
     if (tabs.length > 0 && !activeTabId) {
@@ -49,26 +50,30 @@ export const CategoriesLayout: React.FC = () => {
         rightSlot={<CategoriesHeaderActions />}
       />
 
-      <View className="flex-1 flex-row">
-        <CategoriesSidebar
-          tabs={tabs}
-          activeTabId={activeTabId}
-          onTabPress={setActiveTabId}
-          width={SIDEBAR_WIDTH}
-          safeAreaBottom={adjustedBottom}
-          isLoading={isLoading}
-        />
+      {error && tabs.length === 0 ? (
+        <RetryState onRetry={() => void refetch()} />
+      ) : (
+        <View className="flex-1 flex-row">
+          <CategoriesSidebar
+            tabs={tabs}
+            activeTabId={activeTabId}
+            onTabPress={setActiveTabId}
+            width={SIDEBAR_WIDTH}
+            safeAreaBottom={adjustedBottom}
+            isLoading={isLoading}
+          />
 
-        <CategoriesGrid
-          key={activeTabId}
-          cards={activeCards}
-          cardWidth={cardWidth}
-          cardHeight={cardHeight}
-          padding={GRID_PADDING}
-          safeAreaBottom={adjustedBottom}
-          isLoading={isLoading}
-        />
-      </View>
+          <CategoriesGrid
+            key={activeTabId}
+            cards={activeCards}
+            cardWidth={cardWidth}
+            cardHeight={cardHeight}
+            padding={GRID_PADDING}
+            safeAreaBottom={adjustedBottom}
+            isLoading={isLoading}
+          />
+        </View>
+      )}
     </View>
   );
 };

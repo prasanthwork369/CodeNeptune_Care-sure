@@ -15,6 +15,7 @@ export const useOrders = (params: UseOrdersParams = {}) => {
     data: orders = [],
     isLoading,
     isRefetching,
+    error,
     refetch,
   } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST(params),
@@ -29,6 +30,7 @@ export const useOrders = (params: UseOrdersParams = {}) => {
     orders,
     loading: isLoading,
     refreshing: isRefetching,
+    error,
     refetch,
   };
 };

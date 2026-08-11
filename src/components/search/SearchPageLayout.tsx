@@ -6,6 +6,7 @@ import { SearchOfflineState } from "@/src/components/search/sections/SearchOffli
 import { SearchRecentSection } from "@/src/components/search/sections/SearchRecentSection";
 import { SearchResultsList } from "@/src/components/search/sections/SearchResultsList";
 import { SearchSuggestionsBar } from "@/src/components/search/sections/SearchSuggestionsBar";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { useCart } from "@/src/hooks/queries/useCart";
 import {
   useSearch,
@@ -170,6 +171,7 @@ export const SearchPageLayout = () => {
     fetchNextPage,
     hasNextPage,
     error,
+    refetch,
     debouncedQuery,
   } = useSearch();
 
@@ -293,6 +295,13 @@ export const SearchPageLayout = () => {
             <SearchSkeleton />
           ) : isLoading ? (
             <SearchSkeleton />
+          ) : error && results.length === 0 ? (
+            <RetryState
+              title="Search unavailable"
+              message="We couldn't load search results. Please try again."
+              onRetry={() => void refetch()}
+              retrying={isFetching}
+            />
           ) : results.length === 0 ? (
             <SearchEmptyState query={debouncedQuery} />
           ) : (

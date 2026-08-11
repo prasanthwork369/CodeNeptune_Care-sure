@@ -22,6 +22,7 @@ import {
 } from "@/src/components/home/sections";
 import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
 import { icons } from "@/src/constants/icons";
 import { useHomeData } from "@/src/hooks/home/useHomeData";
@@ -119,6 +120,7 @@ const HomeContent: React.FC = () => {
     featuredSubcategories,
     isSubcategoriesLoading,
     frequentlyOrdered,
+    error,
     isRefreshing,
     onRefresh,
   } = useHomeData();
@@ -551,6 +553,25 @@ const HomeContent: React.FC = () => {
     ),
     [isRefreshing, onRefresh, insets.top],
   );
+
+  const hasNoHomeContent =
+    tabs.length === 0 &&
+    cards.length === 0 &&
+    !appContent &&
+    featuredProducts.length === 0 &&
+    featuredSubcategories.length === 0;
+
+  if (error && hasNoHomeContent && !isHomeLoading) {
+    return (
+      <View className="flex-1 bg-white">
+        <RetryState
+          title="Couldn't load home"
+          onRetry={() => void onRefresh()}
+          retrying={isRefreshing}
+        />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-white">

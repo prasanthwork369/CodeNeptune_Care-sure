@@ -10,6 +10,7 @@ import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
 import { RefreshControl, Text, View } from "react-native";
 import { MyOrdersSkeleton } from "../MyOrdersSkeleton";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { orderStyles as s } from "../orders.styles";
 import { OrderCard } from "./OrderCard";
 
@@ -36,7 +37,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   clearCart,
 }) => {
   const adjustedBottom = useAdjustedBottomInset();
-  const { orders, loading, refreshing, refetch } = useOrders(params);
+  const { orders, loading, refreshing, error, refetch } = useOrders(params);
 
   const renderItem = useCallback(
     ({ item }: { item: Order }) => (
@@ -56,6 +57,12 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
     <View style={{ width }}>
       {loading ? (
         <MyOrdersSkeleton />
+      ) : error && orders.length === 0 ? (
+        <RetryState
+          title="Couldn't load orders"
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
       ) : (
         <FlashList
           data={orders}

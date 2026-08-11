@@ -18,7 +18,7 @@ export const usePrescriptions = (params: UsePrescriptionsParams = {}) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { refetchInterval, ...queryParams } = params;
 
-  const { data, isLoading, isRefetching, refetch } = useQuery({
+  const { data, isLoading, isRefetching, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.PRESCRIPTIONS.LIST(queryParams),
     queryFn: () => prescriptionService.list(queryParams),
     enabled: isAuthenticated,
@@ -34,6 +34,7 @@ export const usePrescriptions = (params: UsePrescriptionsParams = {}) => {
     prescriptions,
     loading: isLoading,
     refreshing: isRefetching,
+    error,
     refetch,
   };
 };
