@@ -69,6 +69,9 @@ export const useCartActions = (product: CartActionProduct) => {
 
   const prevCountRef = useRef(count);
   const prevIsPendingRef = useRef(false);
+  // State updates are asynchronous; this lock also blocks a second tap made
+  // before the pending-store update has rendered.
+  const operationPendingRef = useRef(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
@@ -112,8 +115,9 @@ export const useCartActions = (product: CartActionProduct) => {
   const increment = async (): Promise<boolean> => {
     // Guest edits are local, so only a signed-in write needs the connection.
     if (isAuthenticated && !requireInternet()) return false;
-    if (isPending) return false;
-    if (isAuthenticated) setPending(pendingKey, true);
+    if (isPending || operationPendingRef.current) return false;
+    operationPendingRef.current = true;
+    setPending(pendingKey, true);
     try {
       if (cartItem) {
         await cartMutations.updateItem(cartItem.id, { quantity: count + 1 });
@@ -184,15 +188,17 @@ export const useCartActions = (product: CartActionProduct) => {
       notifyCartError(err);
       return false;
     } finally {
-      if (isAuthenticated) setPending(pendingKey, false);
+      operationPendingRef.current = false;
+      setPending(pendingKey, false);
     }
   };
 
   const decrement = async () => {
     // Guest edits are local, so only a signed-in write needs the connection.
     if (isAuthenticated && !requireInternet()) return;
-    if (isPending || count <= 0) return;
-    if (isAuthenticated) setPending(pendingKey, true);
+    if (isPending || operationPendingRef.current || count <= 0) return;
+    operationPendingRef.current = true;
+    setPending(pendingKey, true);
     try {
       if (count === 1) {
         await cartMutations.removeItem(cartItem!.id);
@@ -202,7 +208,8 @@ export const useCartActions = (product: CartActionProduct) => {
     } catch (err) {
       notifyCartError(err);
     } finally {
-      if (isAuthenticated) setPending(pendingKey, false);
+      operationPendingRef.current = false;
+      setPending(pendingKey, false);
     }
   };
 

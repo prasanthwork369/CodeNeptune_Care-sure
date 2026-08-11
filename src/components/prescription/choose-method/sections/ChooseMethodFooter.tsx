@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { Touchable } from "@/src/components/ui/Touchable";
+import { AppButton } from "@/src/components/ui/AppButton";
+import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { ChooseMethodFooterProps } from "@/src/types/prescription";
 import { moderateScale } from "@/src/utils/exactScale";
 
@@ -12,9 +13,9 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
   buttonLabel,
 }) => {
   return (
-    <View
-      className="bg-white border-t border-[#919EAB33] px-4 flex-row items-center justify-between"
-      style={{ paddingTop: 12, paddingBottom: safeAreaBottom + 12 }}
+    <StickyFooter
+      safeAreaBottom={safeAreaBottom}
+      contentStyle={{ flexDirection: "row", alignItems: "center" }}
     >
       <View>
         <Text
@@ -30,20 +31,12 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
           ₹{Number(toPay).toFixed(2)}
         </Text>
       </View>
-      <Touchable
-        activeOpacity={0.85}
+      <AppButton
+        title={buttonLabel}
         onPress={onProceed}
         disabled={!canProceed}
-        className="flex-1 ml-10 rounded-md py-4 items-center"
-        style={{ backgroundColor: canProceed ? "#0F7635" : "#919EAB66" }}
-      >
-        <Text
-          className="font-inter-semibold text-white"
-          style={{ fontSize: moderateScale(15) }}
-        >
-          {buttonLabel}
-        </Text>
-      </Touchable>
-    </View>
+        style={{ flex: 1, marginLeft: 40 }}
+      />
+    </StickyFooter>
   );
 };

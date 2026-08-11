@@ -92,6 +92,16 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     transform: [{ translateY: -Math.max(0, kbHeight.value - adjustedBottom) }],
   }));
 
+  // Keep the medicine background's bottom fade attached to the form edge.
+  // The form rises with the keyboard; without resizing this layer, the form
+  // covers the fade and leaves a hard transition on both Login and OTP.
+  const backgroundStyle = useAnimatedStyle(() => ({
+    height: Math.max(
+      verticalScale(150),
+      backgroundHeight - Math.max(0, kbHeight.value - adjustedBottom),
+    ),
+  }));
+
   // iOS lifts by nearly the full keyboard, so the bottom inset would double as a gap.
   const footerPaddingBottom =
     Platform.OS === "ios" && keyboardHeight > 0
@@ -124,16 +134,14 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   return (
     <View style={styles.root}>
       {/* Background illustration — fixed behind everything */}
-      <View
+      <Animated.View
         style={[
           styles.bgWrapper,
-          {
-            height: backgroundHeight,
-          },
+          backgroundStyle,
         ]}
       >
         <AuthMedicineBackground />
-      </View>
+      </Animated.View>
 
       {/* Skip button — fixed top-right */}
       <Animated.View

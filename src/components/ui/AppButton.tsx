@@ -126,8 +126,9 @@ export const AppButton: React.FC<AppButtonProps> = ({
       borderRadius: exactScale(6),
     },
     md: {
-      height: exactScale(48),
-      paddingHorizontal: exactScale(20),
+      height: exactScale(50),
+      paddingVertical: exactScale(16),
+      paddingHorizontal: exactScale(10),
       borderRadius: exactScale(10),
     },
     lg: {
@@ -175,8 +176,11 @@ export const AppButton: React.FC<AppButtonProps> = ({
       {loading ? (
         <ActivityIndicator size="small" color={getSpinnerColor()} />
       ) : (
-        <View className="flex-row items-center justify-center">
-          {leftIcon && <View className="mr-2">{leftIcon}</View>}
+        <View
+          className="flex-row items-center justify-center"
+          style={{ gap: exactScale(6) }}
+        >
+          {leftIcon && <View>{leftIcon}</View>}
           {children ? (
             children
           ) : (
@@ -187,7 +191,7 @@ export const AppButton: React.FC<AppButtonProps> = ({
               {title}
             </Text>
           )}
-          {rightIcon && <View className="ml-2">{rightIcon}</View>}
+          {rightIcon && <View>{rightIcon}</View>}
         </View>
       )}
     </Touchable>

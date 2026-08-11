@@ -1,3 +1,4 @@
+import { AppButton } from "@/src/components/ui/AppButton";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
@@ -37,7 +38,7 @@ interface ComparisonBoardProps {
 // Add-button section sizing. The board height is measured from the columns only,
 // so this section's height is added on top — keep the measurement offset derived
 // from these values so the bottom padding can never drift out of sync and clip.
-const ADD_BTN_HEIGHT = 46;
+const ADD_BTN_HEIGHT = 50;
 const ADD_BTN_PAD_TOP = 6;
 const ADD_BTN_PAD_BOTTOM = 16;
 // Total height of the bottom section. Both the recommended card's Add-button
@@ -633,29 +634,30 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               }}
             >
               {count === 0 ? (
-                <Touchable
+                <AppButton
+                  title="Add"
                   onPress={handleIncrement}
                   disabled={isPending}
+                  loading={isPending}
                   accessibilityRole="button"
                   accessibilityLabel={`Add ${recommended.name} to cart`}
-                  className="bg-brand-primary rounded-[12px] items-center justify-center"
-                  style={{ height: ADD_BTN_HEIGHT }}
-                >
-                  <Text
-                    className="font-inter-bold text-white"
-                    style={{ fontSize: moderateScale(15) }}
-                  >
-                    {isPending ? "Adding..." : "Add"}
-                  </Text>
-                </Touchable>
+                  accessibilityState={{ disabled: isPending }}
+                  textClassName="font-inter-bold"
+                />
               ) : (
                 <View
-                  className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[12px] bg-white"
-                  style={{ height: ADD_BTN_HEIGHT }}
+                  className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white"
+                  style={{
+                    height: ADD_BTN_HEIGHT,
+                    opacity: isPending ? 0.55 : 1,
+                  }}
                 >
                   <Touchable
                     onPress={handleDecrement}
                     disabled={isPending}
+                    accessibilityRole="button"
+                    accessibilityLabel="Decrease quantity"
+                    accessibilityState={{ disabled: isPending }}
                     className="flex-1 items-center justify-center h-full"
                   >
                     <Text
@@ -691,6 +693,9 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                   <Touchable
                     onPress={handleIncrement}
                     disabled={isPending}
+                    accessibilityRole="button"
+                    accessibilityLabel="Increase quantity"
+                    accessibilityState={{ disabled: isPending }}
                     className="flex-1 items-center justify-center h-full"
                   >
                     <Text

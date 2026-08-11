@@ -1,6 +1,7 @@
+import { AppButton } from "@/src/components/ui/AppButton";
+import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { ProductDetailsFooterProps } from "@/src/types/product";
@@ -37,9 +38,8 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
   );
   const { totalItems, totalPrice } = useCart();
   const { slideAnim, opacityAnim } = animations;
-  // Shared height for the qty-counter and View Cart pill so they line up
-  // with each other (and roughly with CART_BUTTON_HEIGHT used in the idle state).
-  const FOOTER_CONTROL_HEIGHT = exactScale(48);
+  // Shared global CTA height for the counter and View Cart action.
+  const FOOTER_CONTROL_HEIGHT = exactScale(50);
 
   if (hideAddButton && count === 0) return null;
 
@@ -90,46 +90,28 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
   );
 
   return (
-    <View
-      style={{
-        paddingBottom: safeAreaBottom + 12,
-        shadowColor: "#919EAB33",
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 12,
-      }}
-      className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-3 border-t border-[#F3F4F6] flex-row items-center justify-between"
+    <StickyFooter
+      safeAreaBottom={safeAreaBottom}
+      style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
+      contentStyle={{ flexDirection: "row", alignItems: "center" }}
     >
       {count === 0 ? (
         <>
           {priceBlock}
-          <Touchable
+          <AppButton
+            title="Add to Cart"
             onPress={increment}
             disabled={isPending}
-            activeOpacity={0.85}
-            className="bg-brand-primary rounded-[8px] items-center justify-center"
+            loading={isPending}
             style={{
               flexBasis: "42%",
               minWidth: exactScale(128),
               maxWidth: exactScale(140),
-              height: CART_BUTTON_HEIGHT,
               flexShrink: 0,
-              paddingHorizontal: exactScale(2),
             }}
-          >
-            {isPending ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text
-                numberOfLines={1}
-                className="font-inter-bold text-white"
-                style={{ fontSize: moderateScale(16) }}
-              >
-                Add to Cart
-              </Text>
-            )}
-          </Touchable>
+            textClassName="font-inter-bold"
+            textStyle={{ fontSize: moderateScale(16) }}
+          />
         </>
       ) : (
         <>
@@ -141,11 +123,15 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
               minWidth: exactScale(100),
               maxWidth: exactScale(120),
               height: FOOTER_CONTROL_HEIGHT,
+              opacity: isPending ? 0.55 : 1,
             }}
           >
             <Touchable
               onPress={decrement}
               disabled={isPending}
+              accessibilityRole="button"
+              accessibilityLabel="Decrease quantity"
+              accessibilityState={{ disabled: isPending }}
               activeOpacity={0.7}
               className="flex-1 items-center justify-center h-full"
             >
@@ -182,6 +168,9 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             <Touchable
               onPress={increment}
               disabled={isPending}
+              accessibilityRole="button"
+              accessibilityLabel="Increase quantity"
+              accessibilityState={{ disabled: isPending }}
               activeOpacity={0.7}
               className="flex-1 items-center justify-center h-full"
             >
@@ -198,10 +187,14 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
           <Touchable
             onPress={onViewCart}
             activeOpacity={0.85}
-            className="flex-1 flex-row items-center justify-between bg-brand-primary rounded-[12px] overflow-hidden"
+            className="flex-1 flex-row items-center justify-between bg-brand-primary overflow-hidden"
             style={{
               height: FOOTER_CONTROL_HEIGHT,
               marginLeft: exactScale(12),
+              borderRadius: exactScale(10),
+              paddingVertical: exactScale(16),
+              paddingHorizontal: exactScale(10),
+              gap: exactScale(6),
             }}
           >
             {/* Price + items */}
@@ -209,13 +202,15 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
               className="justify-center"
               style={{
                 flex: 1,
-                minWidth: 0,
-                paddingHorizontal: exactScale(12),
+                minWidth: exactScale(76),
+                paddingLeft: exactScale(4),
+                paddingRight: exactScale(6),
               }}
             >
               <Text
                 numberOfLines={1}
-                ellipsizeMode="tail"
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
                 className="font-inter-extrabold text-white"
                 style={{ fontSize: moderateScale(15) }}
               >
@@ -248,7 +243,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
               style={{
                 flexShrink: 1,
                 minWidth: 0,
-                paddingHorizontal: exactScale(8),
+                paddingLeft: exactScale(6),
               }}
             >
               <Text
@@ -268,6 +263,6 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
           </Touchable>
         </>
       )}
-    </View>
+    </StickyFooter>
   );
 };

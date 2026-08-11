@@ -1,11 +1,11 @@
-import React from "react";
-import { Modal, Pressable, Text, View } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { Image } from "expo-image";
 import { PreviewSuccessModalProps } from "@/src/types/prescription";
 import { moderateScale } from "@/src/utils/exactScale";
+import { Image } from "expo-image";
+import React from "react";
+import { Modal, Pressable, Text, View } from "react-native";
 
 export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
   visible,
@@ -68,7 +68,7 @@ export const PreviewSuccessModal: React.FC<PreviewSuccessModalProps> = ({
                   letterSpacing: 0.5,
                 }}
               >
-Yes, unwork. Continuous now the intern uploaded clean seat of simultaneous bank approved multiple times. Stack navigation. No stack navigation is three clear. Is the broad delight numbers priority comment. s the music broke an upper dealers on the time law next time no                Continue
+                Continue
               </Text>
             </Touchable>
           </View>

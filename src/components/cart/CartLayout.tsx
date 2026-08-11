@@ -5,6 +5,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
+import { useCartPendingStore } from "@/src/store/cartStore";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -44,6 +45,9 @@ const CART_CONTENT_LAYOUT = LinearTransition.duration(220).reduceMotion(
 
 export const CartLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
+  const hasPendingCartAction = useCartPendingStore((state) =>
+    Object.values(state.pendingIds).some(Boolean),
+  );
 
   const {
     walletOn,
@@ -237,7 +241,7 @@ export const CartLayout: React.FC = () => {
         toPay={toPay}
         safeAreaBottom={adjustedBottom}
         onProceed={handleProceed}
-        canProceed={chargesReady}
+        canProceed={chargesReady && !hasPendingCartAction}
       />
 
       <BillDetailsSheet

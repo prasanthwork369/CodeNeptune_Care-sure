@@ -1,10 +1,12 @@
 import { icons } from "@/src/constants/icons";
 import { PreviewThumbnailsProps } from "@/src/types/prescription";
+import { AppButton } from "@/src/components/ui/AppButton";
+import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { uploadKeyOf } from "@/src/hooks/ui/usePrescriptionUploader";
 import type { FileUploadState } from "@/src/hooks/ui/usePrescriptionUploader";
 import React from "react";
-import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
 
 const isPdf = (uri: string, type?: string) =>
@@ -115,85 +117,85 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
         {items.map((item, index) => {
           const state = uploadStates?.[uploadKeyOf(item)];
           return (
-          <Touchable
-            key={index}
-            onPress={() => onSelect(index)}
-            activeOpacity={0.8}
-          >
-            <View
-              className="w-[82px] h-[82px] rounded-lg overflow-hidden"
-              style={{
-                borderWidth: activeIndex === index ? 2 : 1,
-                borderColor: activeIndex === index ? "#0F7635" : "#919EAB33",
-                backgroundColor: "#F9FAFB",
-              }}
+            <Touchable
+              key={index}
+              onPress={() => onSelect(index)}
+              activeOpacity={0.8}
             >
-              {isPdf(item.localUri, item.type) ? (
-                <View className="flex-1 items-center justify-center">
-                  <icons.upload_file width={24} height={24} />
-                  <Text
-                    className="font-inter-bold text-[#1A1C1E] mt-1"
-                    style={{ fontSize: moderateScale(8) }}
-                  >
-                    PDF
-                  </Text>
-                </View>
-              ) : (
-                <Image
-                  source={{ uri: item.localUri }}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="contain"
-                />
-              )}
-              {state && (
-                <StatusBadge state={state} onRetry={() => onRetry?.(item)} />
-              )}
-            </View>
-            {!submitting && (
-              <Touchable
-                onPress={() => onRemove(index)}
-                className="absolute top-1.5 right-1.5 bg-white rounded-full w-5 h-5 items-center justify-center border border-[#919EAB33] z-30"
-                style={{ elevation: 2 }}
+              <View
+                className="w-[82px] h-[82px] rounded-lg overflow-hidden"
+                style={{
+                  borderWidth: activeIndex === index ? 2 : 1,
+                  borderColor: activeIndex === index ? "#0F7635" : "#919EAB33",
+                  backgroundColor: "#F9FAFB",
+                }}
               >
-                <icons.close_small width={10} height={10} fill="#222222" />
-              </Touchable>
-            )}
-          </Touchable>
+                {isPdf(item.localUri, item.type) ? (
+                  <View className="flex-1 items-center justify-center">
+                    <icons.upload_file width={24} height={24} />
+                    <Text
+                      className="font-inter-bold text-[#1A1C1E] mt-1"
+                      style={{ fontSize: moderateScale(8) }}
+                    >
+                      PDF
+                    </Text>
+                  </View>
+                ) : (
+                  <Image
+                    source={{ uri: item.localUri }}
+                    style={{ width: "100%", height: "100%" }}
+                    resizeMode="contain"
+                  />
+                )}
+                {state && (
+                  <StatusBadge state={state} onRetry={() => onRetry?.(item)} />
+                )}
+              </View>
+              {!submitting && (
+                <Touchable
+                  onPress={() => onRemove(index)}
+                  className="absolute top-1.5 right-1.5 bg-white rounded-full w-5 h-5 items-center justify-center border border-[#919EAB33] z-30"
+                  style={{ elevation: 2 }}
+                >
+                  <icons.close_small width={10} height={10} fill="#222222" />
+                </Touchable>
+              )}
+            </Touchable>
           );
         })}
       </ScrollView>
 
-      <View
-        className="px-3 py-4 border-t border-[#919EAB1A] flex-row items-center justify-between"
-        style={{ paddingBottom: Math.max(safeAreaBottom + 8, 24) }}
+      <StickyFooter
+        safeAreaBottom={safeAreaBottom}
+        contentStyle={{ flexDirection: "row", alignItems: "center" }}
       >
         <Text
           className="font-inter-medium text-[#000000]"
-          style={{ fontSize: moderateScale(14) }}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+          style={{
+            flexShrink: 1,
+            marginRight: 12,
+            fontSize: moderateScale(14),
+          }}
         >
           {items.length} Prescription
           {items.length !== 1 ? "s" : ""} Uploaded
         </Text>
-        <Touchable
-          className="bg-[#0F7635] py-3.5 rounded-md flex-row items-center justify-center gap-x-2"
-          activeOpacity={0.8}
+        <AppButton
+          title={submitting ? "Uploading..." : "Proceed"}
           disabled={submitting || items.length === 0}
-          style={{
-            opacity: submitting || items.length === 0 ? 0.6 : 1,
-            minWidth: 136,
-            paddingHorizontal: 24,
-          }}
+          loading={submitting}
+          style={{ flex: 1, minWidth: 136 }}
           onPress={onSubmit}
-        >
-          {submitting && <ActivityIndicator size="small" color="#fff" />}
-          <Text
-            className="text-white font-inter-semibold"
-            style={{ fontSize: moderateScale(14) }}
-          >
-            {submitting ? "Uploading..." : "Proceed"}
-          </Text>
-        </Touchable>
-      </View>
+          accessibilityLabel="Proceed with uploaded prescriptions"
+          accessibilityState={{
+            disabled: submitting || items.length === 0,
+            busy: submitting,
+          }}
+        />
+      </StickyFooter>
     </View>
   );
 };

@@ -3,7 +3,8 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { notifyCartError } from "@/src/utils/cartError";
 import { requireInternet } from "@/src/utils/offline";
 import { useAuthStore } from "@/src/store/authStore";
-import React, { useState } from "react";
+import { useCartPendingStore } from "@/src/store/cartStore";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { COUNTER_BTN, COUNTER_W, cartStyles as s } from "./cart.styles";
 
@@ -19,27 +20,39 @@ export const CartItemCounter: React.FC<CartItemCounterProps> = ({
   removeItem,
 }) => {
   const [isPending, setIsPending] = useState(false);
+  const operationPendingRef = useRef(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setCartPending = useCartPendingStore((s) => s.setPending);
+  const pendingKey = `cart-item:${item.id}`;
 
   const handleChange = async (newQty: number) => {
-    if (isPending) return;
+    if (isPending || operationPendingRef.current) return;
     // Guest edits are local, so only a signed-in write needs the connection.
     if (isAuthenticated && !requireInternet()) return;
+    operationPendingRef.current = true;
     setIsPending(true);
+    setCartPending(pendingKey, true);
     try {
       if (newQty <= 0) await removeItem(item.id);
       else await updateItem(item.id, { quantity: newQty });
     } catch (err) {
       notifyCartError(err);
     } finally {
+      operationPendingRef.current = false;
       setIsPending(false);
+      setCartPending(pendingKey, false);
     }
   };
 
   return (
     <View
       className="flex-row items-center justify-between rounded-[6px] overflow-hidden bg-white"
-      style={{ borderWidth: 1.5, borderColor: "#919EAB33", width: COUNTER_W }}
+      style={{
+        borderWidth: 1.5,
+        borderColor: "#919EAB33",
+        width: COUNTER_W,
+        opacity: isPending ? 0.55 : 1,
+      }}
     >
       <Touchable
         onPress={() => handleChange(item.qty - 1)}

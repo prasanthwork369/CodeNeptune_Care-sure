@@ -1,4 +1,5 @@
 import { AppButton } from "@/src/components/ui/AppButton";
+import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { CartFooterProps } from "@/src/types/cart";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
@@ -14,20 +15,18 @@ export const CartFooter: React.FC<CartFooterProps> = ({
   const formattedTotal = Number(toPay).toFixed(2);
 
   return (
-    <View
-      className="bg-white border-t border-[#F3F4F6] flex-row items-center justify-between"
-      style={{
-        paddingTop: exactScale(12),
-        paddingBottom: safeAreaBottom + exactScale(12),
-        paddingHorizontal: exactScale(16),
-        shadowColor: "#919EAB33",
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 12,
-      }}
+    <StickyFooter
+      safeAreaBottom={safeAreaBottom}
+      contentStyle={{ flexDirection: "row", alignItems: "center" }}
     >
-      <View style={{ marginRight: exactScale(12), minWidth: 0 }}>
+      <View
+        style={{
+          flexBasis: "30%",
+          minWidth: exactScale(76),
+          maxWidth: exactScale(100),
+          marginRight: exactScale(12),
+        }}
+      >
         <Text
           style={s.footerLabel}
           className="font-inter-medium text-brand-text"
@@ -38,6 +37,8 @@ export const CartFooter: React.FC<CartFooterProps> = ({
           style={s.footerTotal}
           className="font-inter-extrabold text-brand-text"
           numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
         >
           ₹{formattedTotal}
         </Text>
@@ -54,6 +55,6 @@ export const CartFooter: React.FC<CartFooterProps> = ({
           accessibilityHint="Continues to delivery and payment"
         />
       </View>
-    </View>
+    </StickyFooter>
   );
 };
