@@ -4,7 +4,6 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
 import { AddToCartInput, UpdateCartItemInput } from "@/src/types/cart";
 import { OrderTabKey } from "@/src/types/order";
-import { PanGestureHandler } from "react-native-gesture-handler";
 import React, { useCallback, useRef } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -79,42 +78,34 @@ export const MyOrdersLayout: React.FC = () => {
         onLayout={(e) => setPageWidth(e.nativeEvent.layout.width)}
       >
         {pageWidth > 0 && (
-          // PanGestureHandler fails if the gesture goes vertical first (≥5px),
-          // letting FlashList claim the scroll. Activates only on clearly
-          // horizontal swipes (≥10px) to switch tabs.
-          <PanGestureHandler
-            activeOffsetX={[-10, 10]}
-            failOffsetY={[-5, 5]}
+          <Animated.ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
+            decelerationRate="fast"
+            directionalLockEnabled
+            disableIntervalMomentum
           >
-            <Animated.ScrollView
-              ref={scrollRef}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              onScroll={scrollHandler}
-              scrollEventThrottle={16}
-              decelerationRate="fast"
-              directionalLockEnabled
-              disableIntervalMomentum
-            >
-              {TABS.map((tab) =>
-                visitedKeys.includes(tab.key) ? (
-                  <OrdersPage
-                    key={tab.key}
-                    tabKey={tab.key}
-                    params={tab.params}
-                    width={pageWidth}
-                    cartItemsRef={cartItemsRef}
-                    addItem={addItem}
-                    updateItem={updateItem}
-                    clearCart={clearCart}
-                  />
-                ) : (
-                  <View key={tab.key} style={{ width: pageWidth }} />
-                ),
-              )}
-            </Animated.ScrollView>
-          </PanGestureHandler>
+            {TABS.map((tab) =>
+              visitedKeys.includes(tab.key) ? (
+                <OrdersPage
+                  key={tab.key}
+                  tabKey={tab.key}
+                  params={tab.params}
+                  width={pageWidth}
+                  cartItemsRef={cartItemsRef}
+                  addItem={addItem}
+                  updateItem={updateItem}
+                  clearCart={clearCart}
+                />
+              ) : (
+                <View key={tab.key} style={{ width: pageWidth }} />
+              ),
+            )}
+          </Animated.ScrollView>
         )}
       </View>
     </View>

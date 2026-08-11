@@ -77,6 +77,8 @@ export const WalletHistoryLayout: React.FC = () => {
             onScroll={scrollHandler}
             scrollEventThrottle={16}
             decelerationRate="fast"
+            directionalLockEnabled
+            disableIntervalMomentum
           >
             {TABS.map((tab) => (
               <WalletHistoryPage
