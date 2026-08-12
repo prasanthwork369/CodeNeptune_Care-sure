@@ -74,6 +74,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     const router = useNav();
     const adjustedBottom = useAdjustedBottomInset();
     const setLocation = useLocationStore((s) => s.setLocation);
+    const setJustConfirmedLocation = useLocationStore(
+      (s) => s.setJustConfirmedLocation,
+    );
     // Derived, not read straight from the store: this falls back to the default
     // (then the first) address, so exactly one card is always checked — and it
     // is the same address checkout will ship to.
@@ -207,11 +210,10 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
       }
       const { location, addressId, pincode } = addressToLocation(addr);
       setLocation(location, { addressId, pincode });
+      // The Home header's "delivered here" hint now confirms this — a toast
+      // here too would just repeat the same message.
+      setJustConfirmedLocation(true);
       onSelect?.(addr.label, location.city, addr);
-      showToast(
-        `Delivery location set to ${addr.city} - ${addr.pincode}`,
-        "success",
-      );
       handleClose();
     };
 

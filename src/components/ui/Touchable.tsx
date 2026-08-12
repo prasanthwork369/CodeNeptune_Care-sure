@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import React, { useCallback, useRef } from "react";
 /* eslint-disable no-restricted-imports */
 import {
@@ -9,11 +10,14 @@ import {
 
 interface TouchableProps extends TouchableOpacityProps {
   throttleMs?: number;
+  /** Set false to opt a specific press out of the default light haptic tap. */
+  haptic?: boolean;
 }
 
 export const Touchable: React.FC<TouchableProps> = ({
   onPress,
   throttleMs = 500,
+  haptic = true,
   ...props
 }) => {
   const lastPress = useRef(0);
@@ -23,9 +27,10 @@ export const Touchable: React.FC<TouchableProps> = ({
       const now = Date.now();
       if (now - lastPress.current < throttleMs) return;
       lastPress.current = now;
+      if (haptic) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onPress?.(e);
     },
-    [onPress, throttleMs],
+    [onPress, throttleMs, haptic],
   );
 
   return (

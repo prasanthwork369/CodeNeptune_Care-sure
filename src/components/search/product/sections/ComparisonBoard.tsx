@@ -635,7 +635,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             >
               {count === 0 ? (
                 <AppButton
-                  title="Add"
+                  title="ADD"
                   onPress={handleIncrement}
                   disabled={isPending}
                   loading={isPending}

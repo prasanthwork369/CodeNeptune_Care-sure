@@ -230,7 +230,7 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
                 style={[cc.addText, { color: "#0F7635" }]}
                 className="font-inter-bold"
               >
-                Add
+                ADD
               </Text>
             )}
           </Touchable>

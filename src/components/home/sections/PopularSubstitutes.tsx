@@ -5,11 +5,11 @@ import type { Product } from "@/src/types/home";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  FlatList,
   LayoutChangeEvent,
   StyleSheet,
   Text,
@@ -376,16 +376,12 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({
       {isLoading ? (
         <HomeProductCardSkeleton count={4} />
       ) : (
-        <FlatList
+        <FlashList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={products}
           keyExtractor={(item) => item.id}
           renderItem={renderProduct}
-          removeClippedSubviews
-          initialNumToRender={4}
-          maxToRenderPerBatch={4}
-          windowSize={5}
           nestedScrollEnabled
           directionalLockEnabled
           contentContainerStyle={{

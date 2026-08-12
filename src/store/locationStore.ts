@@ -15,6 +15,9 @@ interface LocationState {
   selectedAddressId: string | null;
   pincode: string | null;
   reopenLocationSheet: boolean;
+  /** Drives the Home header's "delivered here" hint after picking an address.
+   * Session-only UI state, like reopenLocationSheet — never persisted. */
+  justConfirmedLocation: boolean;
   /** False until the persisted pick has been read back from AsyncStorage. */
   hasHydrated: boolean;
   setLocation: (
@@ -23,6 +26,7 @@ interface LocationState {
   ) => void;
   clearLocation: () => void;
   setReopenLocationSheet: (value: boolean) => void;
+  setJustConfirmedLocation: (value: boolean) => void;
   setHasHydrated: (value: boolean) => void;
 }
 
@@ -34,6 +38,7 @@ export const useLocationStore = create<LocationState>()(
       selectedAddressId: null,
       pincode: null,
       reopenLocationSheet: false,
+      justConfirmedLocation: false,
       hasHydrated: false,
       setLocation: (location, options) =>
         set({
@@ -50,6 +55,8 @@ export const useLocationStore = create<LocationState>()(
           pincode: null,
         }),
       setReopenLocationSheet: (value) => set({ reopenLocationSheet: value }),
+      setJustConfirmedLocation: (value) =>
+        set({ justConfirmedLocation: value }),
       setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {

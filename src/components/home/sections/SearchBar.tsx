@@ -2,7 +2,6 @@ import { TextCycler } from "@/src/components/ui/TextCycler";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
-import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { HomeSearchCycler } from "./HomeSearchCycler";
@@ -45,10 +44,7 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
       return (
         <Touchable
           testID="home-search-bar"
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            onPress();
-          }}
+          onPress={onPress}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
           activeOpacity={1}

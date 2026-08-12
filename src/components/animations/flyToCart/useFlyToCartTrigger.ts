@@ -11,15 +11,28 @@ export const useFlyToCartTrigger = (image: FlyImage, medicineId: string) => {
   const triggerFly = useCallback(() => {
     if (!ctx || !image || !medicineId) return;
 
+    // `measure`'s native callback has been observed to fire more than once
+    // for a single call on some Android devices. Each call to flyToCart bumps
+    // the banner's optimistic count by one, so an extra callback silently
+    // counted a second, non-existent item — this guard caps one triggerFly()
+    // invocation to a single flyToCart(), no matter how many times the
+    // native side calls back.
+    let hasFlown = false;
+    const fly = (x: number, y: number) => {
+      if (hasFlown) return;
+      hasFlown = true;
+      ctx.flyToCart(x, y, image, medicineId);
+    };
+
     imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
       if (pageX && pageY) {
-        ctx.flyToCart(pageX + width / 2, pageY + height / 2, image, medicineId);
+        fly(pageX + width / 2, pageY + height / 2);
         return;
       }
       // Some Android views report 0 from measure(); window coords still work.
       imageRef.current?.measureInWindow((winX, winY, winW, winH) => {
         if (winX === undefined || winY === undefined) return;
-        ctx.flyToCart(winX + winW / 2, winY + winH / 2, image, medicineId);
+        fly(winX + winW / 2, winY + winH / 2);
       });
     });
   }, [ctx, image, medicineId]);

@@ -597,7 +597,7 @@ export const ProductCard = React.memo(function ProductCard({
                 color: "#0F7635",
               }}
             >
-              Add
+              ADD
             </Text>
           )}
         </Touchable>

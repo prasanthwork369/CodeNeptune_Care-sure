@@ -49,10 +49,22 @@ import type { CategoryCard } from "@/src/types/home";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
+import {
+  FlashList,
+  FlashListRef,
+  ListRenderItem,
+} from "@shopify/flash-list";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { FlatList, ListRenderItem, RefreshControl, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// FlashList has no built-in Reanimated wrapper the way RN's FlatList does, so
+// the scroll-driven tab bar / sticky search animations (useAnimatedScrollHandler)
+// need this to attach correctly.
+const AnimatedFlashList = Animated.createAnimatedComponent(
+  FlashList,
+) as unknown as typeof FlashList;
 
 const EMPTY_BANNERS: NonNullable<
   ReturnType<typeof useHomeData>["appContent"]
@@ -71,7 +83,7 @@ type HomeSectionId =
   | "footer";
 
 // Health Essentials is flattened into one row per subcategory so the parent
-// FlatList virtualizes each row instead of mounting every horizontal list at once.
+// FlashList virtualizes each row instead of mounting every horizontal list at once.
 type HomeSection =
   | { id: HomeSectionId }
   | {
@@ -87,7 +99,7 @@ const HomeContent: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
 
   const [isLocationSheetVisible, setIsLocationSheetVisible] = useState(false);
-  const listRef = useRef<FlatList<HomeSection>>(null);
+  const listRef = useRef<FlashListRef<HomeSection>>(null);
 
   useScrollToTop(listRef);
 
@@ -343,6 +355,14 @@ const HomeContent: React.FC = () => {
     return feedSections;
   }, [frequentlyOrdered.length, isSubcategoriesLoading, featuredSubcategories]);
 
+  // Every section renders its own one-off layout except healthEssentialsRow,
+  // which repeats per subcategory — giving it a distinct type keeps FlashList
+  // from ever recycling a singleton section's view into a repeating row.
+  const getSectionItemType = useCallback(
+    (item: HomeSection) => ("kind" in item ? item.kind : item.id),
+    [],
+  );
+
   const renderSection: ListRenderItem<HomeSection> = useCallback(
     ({ item }) => {
       // Flattened Health Essentials row — one subcategory per list item.
@@ -582,21 +602,17 @@ const HomeContent: React.FC = () => {
       <Animated.View
         style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]}
       />
-      <Animated.FlatList
-        ref={listRef as React.Ref<Animated.FlatList<HomeSection>>}
+      <AnimatedFlashList
+        ref={listRef as React.Ref<FlashListRef<HomeSection>>}
         data={sections}
         keyExtractor={(item) => item.id}
         renderItem={renderSection}
+        getItemType={getSectionItemType}
         showsVerticalScrollIndicator={false}
-        className="flex-1"
         overScrollMode="auto"
         decelerationRate="normal"
         nestedScrollEnabled
-        initialNumToRender={4}
-        maxToRenderPerBatch={3}
-        windowSize={7}
-        updateCellsBatchingPeriod={32}
-        style={{ backgroundColor: "#FFFFFF" }}
+        style={{ flex: 1, backgroundColor: "#FFFFFF" }}
         contentContainerStyle={listContentStyle}
         onScroll={handleScroll}
         onScrollBeginDrag={handleScrollStart}

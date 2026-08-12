@@ -12,8 +12,9 @@ import {
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
+import { FlashList } from "@shopify/flash-list";
 import React from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { orderStyles as s } from "./orders.styles";
 
 export const RxOrdersLayout: React.FC = () => {
@@ -59,7 +60,7 @@ export const RxOrdersLayout: React.FC = () => {
       {loading ? (
         <RxOrdersSkeleton />
       ) : (
-        <FlatList
+        <FlashList
           data={prescriptions.map(mapItem)}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (

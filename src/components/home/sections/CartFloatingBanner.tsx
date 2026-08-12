@@ -53,10 +53,16 @@ export const CartFloatingBanner = ({
   const { totalItems: cartItems, items, clearCart } = useCart();
   const flyCtx = useFlyToCartSafe();
 
-  // The cart mutation has no onMutate, so cartItems trails the server by a
-  // round-trip. The provider's count is bumped the instant the fly launches —
-  // without it the banner would stay hidden until the request came back.
-  const totalItems = Math.max(cartItems, flyCtx?.visualCartCount ?? 0);
+  // cartMutations writes the cart query cache via setQueryData the instant
+  // the server responds, so cartItems (the real total) is already reliable —
+  // it does not trail behind visualCartCount, which depends on a slower,
+  // async native measure() call. Taking Math.max of the two let any drift in
+  // the optimistic counter permanently inflate the displayed number even
+  // after the real cart (and the Cart page) settled on the correct total, so
+  // the number here always trusts the real cart. Visibility (whether the
+  // banner renders at all) is controlled separately via the `visible` prop
+  // from the parent, which still uses visualCartCount for an instant show.
+  const totalItems = cartItems;
   const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
   const setUploadButtonCollapsed = useUIStore(
     (s) => s.setUploadButtonCollapsed,

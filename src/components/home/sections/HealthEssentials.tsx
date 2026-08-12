@@ -10,11 +10,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
+import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  FlatList,
   LayoutChangeEvent,
   StyleSheet,
   Text,
@@ -432,16 +432,12 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
               )}
             </View>
 
-            <FlatList
+            <FlashList
               horizontal
               showsHorizontalScrollIndicator={false}
               data={subcategory.products}
               keyExtractor={(item) => item.id}
               renderItem={renderProduct}
-              removeClippedSubviews
-              initialNumToRender={4}
-              maxToRenderPerBatch={4}
-              windowSize={5}
               nestedScrollEnabled
               directionalLockEnabled
               contentContainerStyle={{

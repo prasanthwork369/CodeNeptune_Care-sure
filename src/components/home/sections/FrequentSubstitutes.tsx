@@ -186,7 +186,7 @@ const FrequentItem = React.memo(
                 style={[s.addBtn, { color: "#0F7635" }]}
                 className="font-inter-bold"
               >
-                Add
+                ADD
               </Text>
             )}
           </Touchable>

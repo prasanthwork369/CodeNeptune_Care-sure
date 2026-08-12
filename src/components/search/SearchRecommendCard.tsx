@@ -181,7 +181,7 @@ export const SearchRecommendCard = React.memo(
                     style={[cc.addText, { color: "#0F7635" }]}
                     className="font-inter-bold"
                   >
-                    Add
+                    ADD
                   </Text>
                 )}
               </Touchable>

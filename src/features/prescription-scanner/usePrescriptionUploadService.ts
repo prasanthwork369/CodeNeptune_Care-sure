@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { Alert, Linking } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { ScannerService } from "./scanner.service";
@@ -27,6 +27,16 @@ export function usePrescriptionUploadService({
     }
   };
 
+  // Permission denials always need the same actionable dialog — a friendly
+  // title plus a direct path to Settings — regardless of which screen hosts
+  // this hook, so this bypasses the generic onError/InfoModal plumbing above.
+  const showPermissionAlert = (title: string, message: string) => {
+    Alert.alert(title, message, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Open Settings", onPress: () => void Linking.openSettings() },
+    ]);
+  };
+
   // ── 1. Camera Flow (via PrescriptionScanner) ─────────────────────────────
   const takePhoto = async () => {
     try {
@@ -35,9 +45,9 @@ export function usePrescriptionUploadService({
 
       if (status !== "granted") {
         if (!canAskAgain) {
-          showErr(
-            "Permission Required",
-            "Please allow camera access in Settings to continue.",
+          showPermissionAlert(
+            "Camera Access Required",
+            "CareSure needs camera access to scan your prescription. Please allow it in Settings to continue.",
           );
         }
         return;
@@ -70,9 +80,9 @@ export function usePrescriptionUploadService({
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
+        showPermissionAlert(
+          "Photo Access Required",
+          "CareSure needs access to your photos to upload a prescription. Please allow it in Settings to continue.",
         );
         return;
       }
@@ -102,9 +112,9 @@ export function usePrescriptionUploadService({
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
+        showPermissionAlert(
+          "Photo Access Required",
+          "CareSure needs access to your photos to upload a prescription. Please allow it in Settings to continue.",
         );
         return;
       }
@@ -133,9 +143,9 @@ export function usePrescriptionUploadService({
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        showErr(
-          "Permission Required",
-          "Please allow photo library access in Settings to continue.",
+        showPermissionAlert(
+          "Photo Access Required",
+          "CareSure needs access to your photos to upload a prescription. Please allow it in Settings to continue.",
         );
         return;
       }

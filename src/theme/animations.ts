@@ -32,7 +32,7 @@ export const screenTransitions = {
   /** Details, settings and edit flows use platform-native push/pop motion. */
   nativePush: {
     animation: "fade",
-    animationDuration: 250,
+    animationDuration: 200,
     gestureEnabled: true,
     contentStyle: { backgroundColor: "#FFFFFF" },
     freezeOnBlur: true,

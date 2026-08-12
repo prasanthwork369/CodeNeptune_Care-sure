@@ -278,7 +278,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
                             color: "#0F7635",
                           }}
                         >
-                          Add
+                          ADD
                         </Text>
                       )}
                     </Touchable>

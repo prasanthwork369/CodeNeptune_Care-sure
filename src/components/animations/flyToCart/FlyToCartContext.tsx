@@ -222,9 +222,13 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
     if (activeAnimations.length === 0) {
       if (totalItems > 0) {
         const isWithinLockout = Date.now() - lastAddTimestamp.current < 2000;
-        const shouldSync =
-          totalItems >= visualCartCount ||
-          (!hasJustAdded.current && !isWithinLockout);
+        // isWithinLockout already carries the "just added, give it a moment"
+        // grace period as a time check. Gating on hasJustAdded too made this
+        // permanent once visualCartCount ever overshot totalItems (e.g. a
+        // stale currentTotal read during a fly): totalItems could never catch
+        // up to a wrongly-inflated count, hasJustAdded never got reset, and
+        // the banner stayed stuck above the real total forever.
+        const shouldSync = totalItems >= visualCartCount || !isWithinLockout;
 
         if (shouldSync) {
           hasJustAdded.current = false;

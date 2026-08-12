@@ -6,14 +6,88 @@ import { useNotifications } from "@/src/hooks/queries/useNotifications";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
+import { useLocationStore } from "@/src/store/locationStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
 import type { DeliveryLocation } from "@/src/types/home";
 import { Image } from "expo-image";
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { styles as s } from "./HomeHeader.styles";
 import { exactScale } from "@/src/utils/exactScale";
+
+// How long the "delivered here" hint stays up before fading on its own.
+const LOCATION_HINT_AUTO_DISMISS_MS = 4000;
+// Lets Home settle in before the hint appears on a fresh open, rather than
+// popping in mid-entrance.
+const LOCATION_HINT_INITIAL_DELAY_MS = 700;
+
+const DeliveryLocationHint: React.FC = () => {
+  const visible = useLocationStore((store) => store.justConfirmedLocation);
+  const setJustConfirmedLocation = useLocationStore(
+    (store) => store.setJustConfirmedLocation,
+  );
+
+  // Also greets the delivery location on a fresh Home open, not just after an
+  // explicit address change — mirrors it fading in once, then hiding again.
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setJustConfirmedLocation(true),
+      LOCATION_HINT_INITIAL_DELAY_MS,
+    );
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    const timer = setTimeout(
+      () => setJustConfirmedLocation(false),
+      LOCATION_HINT_AUTO_DISMISS_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [visible, setJustConfirmedLocation]);
+
+  if (!visible) return null;
+
+  return (
+    <Animated.View
+      entering={FadeIn.duration(180)}
+      exiting={FadeOut.duration(150)}
+      style={{
+        position: "absolute",
+        top: "100%",
+        left: 0,
+        marginTop: exactScale(1),
+        zIndex: 20,
+      }}
+    >
+      <View style={s.locationHintArrow} />
+      <View className="flex-row items-center" style={s.locationHintBubble}>
+        <Text
+          style={s.locationHintText}
+          className="font-inter-medium flex-shrink"
+        >
+          Your order will be delivered here
+        </Text>
+        <Touchable
+          onPress={() => setJustConfirmedLocation(false)}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={{ marginLeft: exactScale(8) }}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss"
+        >
+          <icons.close_small
+            width={exactScale(12)}
+            height={exactScale(12)}
+            fill="#FFFFFF"
+          />
+        </Touchable>
+      </View>
+    </Animated.View>
+  );
+};
 
 const NotificationIcon = icons.notification;
 
@@ -53,7 +127,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
         style={{ paddingTop: insets.top + exactScale(10) }}
       >
         {/* Left: Delivery Location */}
-        <View style={{ flex: 1, minWidth: 0 }}>
+        <View style={{ flex: 1, minWidth: 0, position: "relative" }}>
           <Text
             style={s.deliverLabel}
             className="font-inter-semibold uppercase"
@@ -82,6 +156,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
               style={[s.dropDownIcon, { flexShrink: 0 }]}
             />
           </Touchable>
+          <DeliveryLocationHint />
         </View>
 
         {/* Right: Wallet + Notification */}
