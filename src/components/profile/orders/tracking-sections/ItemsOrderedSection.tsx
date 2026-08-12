@@ -148,6 +148,7 @@ export function ItemsOrderedSection({
                     source={{ uri: item.medicineSnapshot.image }}
                     style={s.productImg50}
                     contentFit="contain"
+                    cachePolicy="memory-disk"
                   />
                 ) : (
                   <icons.placeholder

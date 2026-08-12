@@ -247,6 +247,7 @@ export const ProductCard = React.memo(function ProductCard({
                 marginTop: isStepperVariant && itemDiscount ? 26 : 0,
               }}
               contentFit="contain"
+              cachePolicy="memory-disk"
             />
           ) : item.image?.uri ? (
             <Image
@@ -257,6 +258,7 @@ export const ProductCard = React.memo(function ProductCard({
                 marginTop: isStepperVariant && itemDiscount ? 26 : 0,
               }}
               contentFit="contain"
+              cachePolicy="memory-disk"
             />
           ) : (
             <icons.placeholder

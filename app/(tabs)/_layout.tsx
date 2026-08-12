@@ -22,7 +22,11 @@ const TabLayout = () => {
         headerShown: false,
         animation: "none",
         freezeOnBlur: true,
-        lazy: true,
+        // Only 3 tabs, and Home is already mounted at launch — eager-mounting
+        // Categories and Profile too costs a little during the splash screen
+        // but means every tab switch is instant from the very first tap,
+        // instead of the first visit to each tab paying a mount+fetch cost.
+        lazy: false,
       }}
       tabBar={renderTabBar}
     >

@@ -79,6 +79,7 @@ export const SearchRecommendCard = React.memo(
                 source={{ uri: data.thumbnailUrl }}
                 style={s.imgInner}
                 contentFit="contain"
+                cachePolicy="memory-disk"
               />
             ) : (
               <icons.placeholder width={64} height={64} />

@@ -66,7 +66,12 @@ export const withSqliteCache = <T>(key: string, fetcher: () => Promise<T>) => {
   return async (): Promise<T> => {
     try {
       const data = await fetcher();
-      apiCache.set(key, data);
+      // apiCache.set does a synchronous SQLite write (JSON.stringify + a
+      // blocking runSync call) — deferred a tick so it doesn't delay handing
+      // fresh data back to React Query/the UI. It's only ever read back as
+      // an offline fallback, never synchronously by this call, so a
+      // same-tick write isn't needed.
+      setTimeout(() => apiCache.set(key, data), 0);
       return data;
     } catch (err) {
       const cached = apiCache.get<T>(key);

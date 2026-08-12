@@ -88,6 +88,7 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
               source={source}
               style={{ width: "100%", height: "100%" }}
               contentFit="contain"
+              cachePolicy="memory-disk"
             />
           ) : (
             <icons.placeholder width={imageSize} height={imageSize} />

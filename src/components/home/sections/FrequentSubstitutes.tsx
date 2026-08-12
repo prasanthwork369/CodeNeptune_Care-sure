@@ -96,6 +96,7 @@ const FrequentItem = React.memo(
                 source={item.image?.uri ? item.image : undefined}
                 style={s.imgInner}
                 contentFit="contain"
+                cachePolicy="memory-disk"
               />
             </View>
             {!!item.discount && (

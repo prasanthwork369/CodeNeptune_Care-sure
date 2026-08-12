@@ -176,6 +176,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                 source={imageSource}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="contain"
+                cachePolicy="memory-disk"
               />
             </View>
           </View>

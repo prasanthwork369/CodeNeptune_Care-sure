@@ -156,6 +156,7 @@ const ProductCard = React.memo(
                 source={product.image}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="contain"
+                cachePolicy="memory-disk"
               />
             </View>
           </View>

@@ -85,9 +85,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const expiresAt = Date.now() + expiresIn * 1000;
     setAccessToken(token); // set in-memory immediately
     set({ isAuthenticated: true, isGuest: false, token });
-    await tokenStorage.set(token);
-    await tokenStorage.setExpiresAt(expiresAt);
-    await guestStorage.clear();
+    // Independent SecureStore/AsyncStorage keys — run concurrently instead
+    // of one round-trip after another so login doesn't wait on their sum.
+    await Promise.all([
+      tokenStorage.set(token),
+      tokenStorage.setExpiresAt(expiresAt),
+      guestStorage.clear(),
+    ]);
   },
 
   continueAsGuest: async () => {

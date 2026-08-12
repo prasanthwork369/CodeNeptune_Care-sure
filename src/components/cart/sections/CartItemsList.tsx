@@ -76,6 +76,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = React.memo(
                       source={line.image}
                       style={s.itemImg}
                       contentFit="contain"
+                      cachePolicy="memory-disk"
                     />
                   ) : (
                     <icons.placeholder

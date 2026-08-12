@@ -100,6 +100,7 @@ export const HomeProductCard: React.FC<Props> = React.memo(
                 source={item.image}
                 style={{ width: imageSize, height: imageSize }}
                 contentFit="contain"
+                cachePolicy="memory-disk"
               />
             ) : (
               <icons.placeholder

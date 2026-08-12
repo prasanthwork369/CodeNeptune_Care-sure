@@ -10,6 +10,7 @@ import {
   pickDefaultAddress,
 } from "@/src/utils/addressLocation";
 import { useCallback, useEffect, useState } from "react";
+import { InteractionManager } from "react-native";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { syncService } from "@/src/services/sync.service";
 
@@ -21,9 +22,15 @@ export function useHomeData() {
   const hasHydrated = useLocationStore((s) => s.hasHydrated);
 
   useEffect(() => {
-    syncService.performSync(queryClient, isAuthenticated).catch((err) => {
-      if (__DEV__) console.error("[Sync] Background sync check failed:", err);
+    // Runs up to 5 of its own sequential fetches on top of this hook's own
+    // queries below — deferred so it doesn't compete with the tab transition
+    // and the feed's first paint for JS-thread/network time.
+    const task = InteractionManager.runAfterInteractions(() => {
+      syncService.performSync(queryClient, isAuthenticated).catch((err) => {
+        if (__DEV__) console.error("[Sync] Background sync check failed:", err);
+      });
     });
+    return () => task.cancel();
   }, [isAuthenticated]);
 
   const {

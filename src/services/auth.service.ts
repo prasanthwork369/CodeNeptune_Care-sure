@@ -1,5 +1,5 @@
 import { authApi } from "../api/auth.api";
-import { CustomerProfile, profileApi } from "../api/profile.api";
+import { profileApi } from "../api/profile.api";
 import { setAccessToken } from "../api/client";
 import { tokenStorage } from "../lib/storage";
 import { useAuthStore } from "../store/authStore";
@@ -23,18 +23,30 @@ export const authService = {
     // backend clears isFirstTimeLogin on whichever profile fetch lands first.
     setAccessToken(accessToken);
 
-    let profile: CustomerProfile | null = null;
-    try {
-      profile = await profileApi.getProfile();
-    } catch (error) {
-      if (__DEV__) console.error("Failed to load profile after login:", error);
-    }
+    // Token persistence and the refresh token are independent SecureStore
+    // writes — run them together rather than one after the other. Both are
+    // awaited here because the caller navigates right after this resolves,
+    // and a killed app before either lands would lose the session.
+    await Promise.all([
+      useAuthStore.getState().login(accessToken, expiresIn),
+      refreshToken
+        ? tokenStorage.setRefreshToken(refreshToken)
+        : Promise.resolve(),
+    ]);
 
-    await useAuthStore.getState().login(accessToken, expiresIn);
-    if (profile) useAuthStore.getState().setUser(profile);
-    if (refreshToken) {
-      await tokenStorage.setRefreshToken(refreshToken);
-    }
+    // The profile fetch used to block navigation here, duplicating the fetch
+    // useProfile() (mounted in the tabs layout) already makes once Home is
+    // reached. It only needs to land eventually: SignupBonusPopup is the one
+    // consumer of authStore's `user`, and it already waits for Home plus the
+    // permission flow before reading it, so fetching it in the background
+    // after navigation has already started is equivalent, just not blocking.
+    void profileApi
+      .getProfile()
+      .then((profile) => useAuthStore.getState().setUser(profile))
+      .catch((error) => {
+        if (__DEV__)
+          console.error("Failed to load profile after login:", error);
+      });
 
     return data;
   },

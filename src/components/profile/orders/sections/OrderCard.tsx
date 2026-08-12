@@ -229,6 +229,7 @@ export const OrderCard = React.memo(function OrderCard({
                     source={{ uri: item.medicineSnapshot.image }}
                     style={s.productImg52}
                     contentFit="contain"
+                    cachePolicy="memory-disk"
                   />
                 ) : (
                   <icons.placeholder width={52} height={52} />

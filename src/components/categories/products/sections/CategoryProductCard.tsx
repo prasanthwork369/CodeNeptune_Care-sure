@@ -87,6 +87,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
                 source={product.image}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="contain"
+                cachePolicy="memory-disk"
               />
             ) : (
               <icons.placeholder width="78%" height="68%" />

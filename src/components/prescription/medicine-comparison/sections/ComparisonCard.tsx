@@ -89,6 +89,7 @@ const ImageBox: React.FC<{
         source={source}
         style={{ width: "80%", height: "80%" }}
         contentFit="contain"
+        cachePolicy="memory-disk"
       />
     ) : (
       <icons.placeholder width="70%" height="70%" />
