@@ -15,7 +15,11 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
   return (
     <StickyFooter
       safeAreaBottom={safeAreaBottom}
-      contentStyle={{ flexDirection: "row", alignItems: "center" }}
+      contentStyle={{
+        flexDirection: "row",
+        alignItems: "center",
+        maxWidth: undefined,
+      }}
     >
       <View>
         <Text

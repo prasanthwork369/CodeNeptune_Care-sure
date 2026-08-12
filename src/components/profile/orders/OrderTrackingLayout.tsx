@@ -411,6 +411,7 @@ export const OrderTrackLayout: React.FC = () => {
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         contentContainerStyle={{
           paddingTop: exactScale(12),
           paddingBottom:

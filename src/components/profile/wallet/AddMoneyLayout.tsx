@@ -99,6 +99,7 @@ export const AddMoneyLayout: React.FC = () => {
       {/* Amount Section */}
       <ScrollView
         keyboardShouldPersistTaps="handled"
+        overScrollMode="auto"
         contentContainerStyle={{
           alignItems: "center",
           paddingTop: 36,

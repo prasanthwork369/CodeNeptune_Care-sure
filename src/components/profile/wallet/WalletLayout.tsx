@@ -149,6 +149,7 @@ export const WalletLayout: React.FC = () => {
       <ScrollView
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         contentContainerStyle={[
           cardStyles.scrollContent,
           { paddingBottom: adjustedBottom + 40 },

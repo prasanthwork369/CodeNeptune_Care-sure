@@ -127,7 +127,6 @@ export const AppButton: React.FC<AppButtonProps> = ({
     },
     md: {
       height: exactScale(50),
-      paddingVertical: exactScale(16),
       paddingHorizontal: exactScale(10),
       borderRadius: exactScale(10),
     },

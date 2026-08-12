@@ -111,6 +111,7 @@ export const UploadLayout: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         className="flex-1"
         contentContainerStyle={{
           padding: exactScale(16),

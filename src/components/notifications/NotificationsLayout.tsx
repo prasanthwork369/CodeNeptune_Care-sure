@@ -200,6 +200,7 @@ export const NotificationsLayout: React.FC = () => {
       ) : (
         <ScrollView
           className="flex-1"
+          overScrollMode="auto"
           contentContainerStyle={[
             s.content,
             {

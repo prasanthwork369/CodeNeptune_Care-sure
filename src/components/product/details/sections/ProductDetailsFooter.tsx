@@ -93,7 +93,11 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
     <StickyFooter
       safeAreaBottom={safeAreaBottom}
       style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
-      contentStyle={{ flexDirection: "row", alignItems: "center" }}
+      contentStyle={{
+        flexDirection: "row",
+        alignItems: "center",
+        maxWidth: undefined,
+      }}
     >
       {count === 0 ? (
         <>
@@ -192,7 +196,6 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
               height: FOOTER_CONTROL_HEIGHT,
               marginLeft: exactScale(12),
               borderRadius: exactScale(10),
-              paddingVertical: exactScale(16),
               paddingHorizontal: exactScale(10),
               gap: exactScale(6),
             }}

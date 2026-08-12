@@ -19,6 +19,7 @@ const isFaq = (item: unknown): item is Faq =>
 const FaqSkeleton = () => (
   <ScrollView
     showsVerticalScrollIndicator={false}
+    overScrollMode="auto"
     contentContainerStyle={{ padding: 16 }}
   >
     <View
@@ -103,6 +104,7 @@ export const FaqLayout: React.FC = () => {
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
+          overScrollMode="auto"
           contentContainerStyle={{ padding: 16 }}
         >
           <View

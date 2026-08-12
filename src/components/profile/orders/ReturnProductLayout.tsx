@@ -441,6 +441,7 @@ export const ReturnProductLayout: React.FC = () => {
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         contentContainerStyle={{ paddingVertical: 12, gap: 10 }}
       >
         <SectionCard>

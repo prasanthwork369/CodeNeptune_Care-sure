@@ -17,7 +17,11 @@ export const CartFooter: React.FC<CartFooterProps> = ({
   return (
     <StickyFooter
       safeAreaBottom={safeAreaBottom}
-      contentStyle={{ flexDirection: "row", alignItems: "center" }}
+      contentStyle={{
+        flexDirection: "row",
+        alignItems: "center",
+        maxWidth: undefined,
+      }}
     >
       <View
         style={{

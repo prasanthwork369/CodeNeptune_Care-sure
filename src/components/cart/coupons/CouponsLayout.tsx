@@ -105,6 +105,7 @@ export const CouponsLayout: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         style={{ flex: 1 }}
         contentContainerStyle={{
           paddingHorizontal: exactScale(16),

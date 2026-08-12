@@ -164,6 +164,7 @@ export function CancelOrderLayout() {
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        overScrollMode="auto"
       >
         {/* Main Card */}
         {!!orderNumber && (

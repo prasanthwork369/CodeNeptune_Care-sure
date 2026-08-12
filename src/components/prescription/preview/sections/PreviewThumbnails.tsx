@@ -167,7 +167,11 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
 
       <StickyFooter
         safeAreaBottom={safeAreaBottom}
-        contentStyle={{ flexDirection: "row", alignItems: "center" }}
+        contentStyle={{
+          flexDirection: "row",
+          alignItems: "center",
+          maxWidth: undefined,
+        }}
       >
         <Text
           className="font-inter-medium text-[#000000]"

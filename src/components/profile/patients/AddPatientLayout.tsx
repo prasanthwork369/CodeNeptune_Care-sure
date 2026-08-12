@@ -185,6 +185,7 @@ export const AddPatientLayout: React.FC = () => {
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
+          overScrollMode="auto"
           contentContainerStyle={{
             paddingHorizontal: 20,
             paddingTop: 8,

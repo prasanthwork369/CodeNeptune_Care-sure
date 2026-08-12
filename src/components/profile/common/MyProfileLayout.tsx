@@ -273,6 +273,7 @@ export const MyProfileLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        overScrollMode="auto"
         contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
       >
         {/* First Name */}

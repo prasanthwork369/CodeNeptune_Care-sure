@@ -287,6 +287,7 @@ export const AddAddressLayout: React.FC = () => {
         <ScrollView
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
+          overScrollMode="auto"
           contentContainerStyle={{
             padding: 20,
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 2 : 30,

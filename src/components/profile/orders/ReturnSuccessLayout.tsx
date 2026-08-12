@@ -28,6 +28,7 @@ export function ReturnSuccessLayout() {
           paddingBottom: verticalScale(100),
         }}
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
       >
         {/* Top Header Section */}
         <View

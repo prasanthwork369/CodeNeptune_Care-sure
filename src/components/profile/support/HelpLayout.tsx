@@ -97,6 +97,7 @@ export const HelpLayout: React.FC = () => {
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
+          overScrollMode="auto"
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 16,

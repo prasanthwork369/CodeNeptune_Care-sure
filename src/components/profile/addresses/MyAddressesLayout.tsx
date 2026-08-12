@@ -166,6 +166,7 @@ export const MyAddressesLayout: React.FC = () => {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 16,

@@ -53,6 +53,7 @@ export const PaymentLayout: React.FC = () => {
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         contentContainerStyle={{
           padding: exactScale(16),
           paddingBottom: adjustedBottom + exactScale(100),

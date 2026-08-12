@@ -77,6 +77,7 @@ export const ChooseMethodLayout: React.FC = () => {
       <ScreenHeader title="Upload Prescription" backgroundColor="#FFFFFF" />
       <ScrollView
         showsVerticalScrollIndicator={false}
+        overScrollMode="auto"
         className="flex-1 bg-[#F5F6FB]"
         contentContainerStyle={{ padding: 16, gap: 12 }}
       >

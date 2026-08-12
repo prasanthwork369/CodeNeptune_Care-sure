@@ -165,6 +165,7 @@ export const NotificationSettingsLayout: React.FC = () => {
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
+          overScrollMode="auto"
           contentContainerStyle={{
             paddingTop: 8,
             paddingBottom: adjustedBottom + 24,

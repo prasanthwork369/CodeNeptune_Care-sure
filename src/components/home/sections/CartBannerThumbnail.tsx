@@ -1,4 +1,5 @@
 import { useThumbnailRemoval } from "@/src/components/animations/flyToCart";
+import { icons } from "@/src/constants/icons";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image, type ImageSource } from "expo-image";
 import React from "react";
@@ -41,11 +42,6 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
   // Wrapping an ImageSource again would hand expo-image {uri:{uri:...}}.
   const source = typeof image === "string" ? { uri: image } : image;
 
-  // Draw nothing rather than a placeholder. The slot is empty whenever the
-  // quantity implies a second product that has no thumbnail yet — a bumped
-  // quantity on one product, or the frame before the cart sync populates them.
-  if (!source) return null;
-
   // The puff is drawn by the banner, not here — the pill clips its own children.
   return (
     <View
@@ -87,11 +83,15 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
             imageStyle,
           ]}
         >
-          <Image
-            source={source}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="contain"
-          />
+          {source ? (
+            <Image
+              source={source}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="contain"
+            />
+          ) : (
+            <icons.placeholder width={imageSize} height={imageSize} />
+          )}
         </Animated.View>
 
         {/* White mask, so the image dissolves into the circle's own interior. */}
