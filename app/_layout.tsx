@@ -26,6 +26,7 @@ import DevPreviewToggler from "@/src/components/dev/DevPreviewToggler";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { useAppGate } from "@/src/hooks/ui/useAppGate";
 import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
+import { useOtaUpdate } from "@/src/hooks/ui/useOtaUpdate";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
 import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
@@ -74,6 +75,9 @@ const AppGate = () => {
   const { reason, maintenanceMessage } = useAppGate();
   const soft = useSoftUpdate();
   const update = useInAppUpdate();
+  // JS-only fixes via EAS Update — a separate lane from the native Play
+  // flow above, for changes that don't need a new binary at all.
+  const ota = useOtaUpdate();
   // Update calls onUpdate then onDismiss; this stops that pair being counted
   // as a decline as well as an acceptance.
   const acceptedRef = useRef(false);
@@ -139,9 +143,13 @@ const AppGate = () => {
           update.runFlexibleUpdate();
         }}
       />
+      {/* Shared banner for whichever lane has something ready — native Play
+          update takes priority in the unlikely case both land at once. */}
       <UpdateReadyBanner
-        visible={update.isDownloaded}
-        onRestart={update.restartAndInstall}
+        visible={update.isDownloaded || ota.isDownloaded}
+        onRestart={
+          update.isDownloaded ? update.restartAndInstall : ota.restartAndInstall
+        }
       />
     </>
   );

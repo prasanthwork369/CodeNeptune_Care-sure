@@ -14,6 +14,10 @@ try {
   // fallback if unparseable
 }
 
+// Single source of truth — reused for both `extra.eas.projectId` and the
+// EAS Update URL below, so the two can never drift apart.
+const easProjectId = "8af7d922-a6f0-45a5-8c9d-d51ba283e5c2";
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Caresure",
@@ -23,6 +27,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/icon.png",
   scheme: "caresure",
   userInterfaceStyle: "automatic",
+  // "fingerprint" (not "appVersion") because this app has custom native
+  // modules and config plugins — it auto-detects when native code/config
+  // actually changed and refuses to serve an OTA update to a binary it's
+  // incompatible with, instead of blindly matching on the version string.
+  runtimeVersion: {
+    policy: "fingerprint",
+  },
+  updates: {
+    url: `https://u.expo.dev/${easProjectId}`,
+  },
   // New Architecture is the only architecture as of this RN version (the
   // config key was removed) — this project already opted in, so no behavior
   // change, just no longer a configurable option.
@@ -123,6 +137,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-sqlite",
     "expo-status-bar",
+    "expo-updates",
     "expo-web-browser",
     "@react-native-firebase/app",
     "@react-native-firebase/analytics",
@@ -196,7 +211,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://api.caresure.dev",
     appEnv: process.env.EXPO_PUBLIC_APP_ENV ?? "development",
     eas: {
-      projectId: "8af7d922-a6f0-45a5-8c9d-d51ba283e5c2",
+      projectId: easProjectId,
     },
   },
 });
