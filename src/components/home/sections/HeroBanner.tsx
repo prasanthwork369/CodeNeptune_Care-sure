@@ -50,8 +50,6 @@ interface HeroBannerProps {
   isLoading?: boolean;
 }
 
-
-
 export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
   ({ content, isLoading }) => {
     const { width } = useWindowDimensions();
@@ -149,12 +147,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
             className="flex-[1.2] justify-start"
           >
             <View>
-              <View className="flex-row flex-wrap items-center" style={{ minWidth: 0 }}>
+              <View
+                className="flex-row flex-wrap items-center"
+                style={{ minWidth: 0 }}
+              >
                 <Text
                   style={[styles.titleText, dStyles.titleText]}
                   className="text-brand-text"
                 >
-                  {title}{title ? " " : ""}
+                  {title}
+                  {title ? " " : ""}
                 </Text>
                 {highlights.length > 0 && (
                   <TextCycler

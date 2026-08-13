@@ -99,7 +99,10 @@ export function toAppError(err: unknown): AppError {
   }
 
   // Axios aborts (ERR_CANCELED) and manual AbortController signals both land here.
-  if (code === "ERR_CANCELED" || (err as { name?: string } | null)?.name === "CanceledError") {
+  if (
+    code === "ERR_CANCELED" ||
+    (err as { name?: string } | null)?.name === "CanceledError"
+  ) {
     return new AppError("cancelled", "Request cancelled");
   }
 
@@ -138,8 +141,7 @@ export function toAppError(err: unknown): AppError {
     // — which on a 429 means hammering the endpoint that just said stop.
     if (status === 400)
       return new AppError("validation", message, status, data);
-    if (status === 409)
-      return new AppError("conflict", message, status, data);
+    if (status === 409) return new AppError("conflict", message, status, data);
     if (status === 429)
       return new AppError(
         "rate_limited",

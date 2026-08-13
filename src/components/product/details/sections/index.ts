@@ -13,4 +13,3 @@ export {
 export { SaltCompositionBanner } from "./SaltCompositionBanner";
 export { TrustBadge } from "./TrustBadge";
 export { NoSubstituteBanner } from "./NoSubstituteBanner";
-

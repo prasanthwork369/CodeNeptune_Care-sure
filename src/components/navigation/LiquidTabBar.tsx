@@ -360,7 +360,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   // the whole glass pill, so most of it has nothing solid behind it and
   // scrolled content shows straight through. Forcing it on gives every
   // screen, including Home, the full BAR_HEIGHT-tall opaque backdrop.
-  const keepBottomGradient = [
+  const useFullHeightGradient = [
     "index",
     "categories",
     "profile",
@@ -596,13 +596,16 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       <Animated.View
         style={[
           StyleSheet.absoluteFill,
-          keepBottomGradient ? undefined : animatedGradientStyle,
+          // Screen content (including Home's floating cart/prescription banner)
+          // cannot out-zIndex the tab navigator. Always dissolve this overlay
+          // with the bar so it does not wash out those banners while hiding.
+          animatedGradientStyle,
         ]}
         pointerEvents="none"
       >
         <TabBarFadeGradient
           visibleHeight={
-            keepBottomGradient
+            useFullHeightGradient
               ? BAR_HEIGHT + adjustedBottom + extraGap
               : undefined
           }

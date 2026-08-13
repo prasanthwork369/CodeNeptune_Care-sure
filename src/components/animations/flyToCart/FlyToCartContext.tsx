@@ -300,7 +300,12 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const flyToCart = useCallback(
-    (sourceX: number, sourceY: number, imageUrl: FlyImage, productId: string) => {
+    (
+      sourceX: number,
+      sourceY: number,
+      imageUrl: FlyImage,
+      productId: string,
+    ) => {
       const destination = destinationRef.current;
       const currentTotal = totalItemsRef.current;
       const id = Math.random().toString(36).substring(2, 9);

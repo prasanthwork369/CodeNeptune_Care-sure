@@ -5,7 +5,6 @@ import { icons } from "@/src/constants/icons";
 import { useSubstituteRequest } from "@/src/hooks/queries/useSubstituteRequest";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
-
 interface NoSubstituteBannerProps {
   productId: string;
   medicineUuid?: string;

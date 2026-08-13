@@ -6,8 +6,7 @@ export default function ProductDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
     <>
-      <Stack.Screen
-      />
+      <Stack.Screen />
       <ProductComparisonLayout id={id} />
     </>
   );

@@ -20,8 +20,12 @@ import type { FirebaseMessagingTypes } from "@react-native-firebase/messaging";
  * lazy-require them.
  */
 if (!isExpoGo) {
-  const messaging = require("@react-native-firebase/messaging").default;
-  messaging().setBackgroundMessageHandler(
+  const {
+    getMessaging,
+    setBackgroundMessageHandler,
+  } = require("@react-native-firebase/messaging");
+  setBackgroundMessageHandler(
+    getMessaging(),
     async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
       if (__DEV__)
         logger.debug("[BackgroundMessage]", JSON.stringify(remoteMessage));

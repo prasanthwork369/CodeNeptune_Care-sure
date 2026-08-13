@@ -9,13 +9,13 @@ import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
 import type { DeliveryLocation } from "@/src/types/home";
+import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { styles as s } from "./HomeHeader.styles";
-import { exactScale } from "@/src/utils/exactScale";
 
 // How long the "delivered here" hint stays up before fading on its own.
 const LOCATION_HINT_AUTO_DISMISS_MS = 4000;
@@ -124,7 +124,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
     return (
       <View
         className="flex-row justify-between items-center px-5 pb-2"
-        style={{ paddingTop: insets.top + exactScale(10) }}
+        // Keep controls below the status bar/notch with only a compact visual gap.
+        style={{ paddingTop: insets.top + exactScale(2) }}
       >
         {/* Left: Delivery Location */}
         <View style={{ flex: 1, minWidth: 0, position: "relative" }}>

@@ -10,7 +10,6 @@ import {
   searchCardStyles as s,
 } from "./search.styles";
 
-
 interface SearchNoSubstituteCardProps {
   data: {
     id: string;

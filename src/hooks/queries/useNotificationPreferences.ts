@@ -23,9 +23,10 @@ export const useNotificationPreferences = () => {
     mutationFn: (payload: UpdateNotificationPreferencesInput) =>
       notificationPreferencesApi.updatePreferences(payload),
     onMutate: async (payload) => {
-      const previous = queryClient.getQueryData<CustomerNotificationPreferences>(
-        QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,
-      );
+      const previous =
+        queryClient.getQueryData<CustomerNotificationPreferences>(
+          QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,
+        );
       queryClient.setQueryData(
         QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,
         (old?: CustomerNotificationPreferences) => ({ ...old, ...payload }),

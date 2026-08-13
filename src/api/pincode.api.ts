@@ -28,8 +28,7 @@ export const pincodeApi = {
       // If the error body still contains serviceability info, return it normally.
       const body = asError(e).response?.data;
       const errPayload = (body?.data ?? body) as
-        | Partial<PincodeCheckResponse>
-        | undefined;
+        Partial<PincodeCheckResponse> | undefined;
       if (__DEV__)
         logger.debug(
           "[pincodeApi] check error payload:",

@@ -142,7 +142,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     0,
     screenHeight - keyboardOffset - insets.top - verticalScale(8),
   );
-  
+
   const [skipScale] = React.useState(() => new RNAnimated.Value(1));
 
   const handleSkip = () => {
@@ -175,12 +175,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   return (
     <View style={styles.root}>
       {/* Background illustration — fixed behind everything */}
-      <Animated.View
-        style={[
-          styles.bgWrapper,
-          backgroundStyle,
-        ]}
-      >
+      <Animated.View style={[styles.bgWrapper, backgroundStyle]}>
         <AuthMedicineBackground />
       </Animated.View>
 
@@ -209,7 +204,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
           <BlurView
             intensity={60}
             tint="systemChromeMaterialLight"
-            experimentalBlurMethod="dimezisBlurView"
+            blurMethod="none"
             style={styles.skipBtn}
           >
             <Text style={styles.skipText}>Skip</Text>

@@ -10,10 +10,16 @@ import { logger } from "@/src/utils/logger";
  */
 const isPerfDisabled = isExpoGo || __DEV__;
 
-const getPerf = () => {
+// Native module absent in Expo Go — only required lazily, and always
+// through the modular API (the namespaced `perf()` call pattern this used
+// before is deprecated).
+const perfModule = (): typeof import("@react-native-firebase/perf") =>
+  require("@react-native-firebase/perf");
+
+const getPerformanceInstance = () => {
   if (isPerfDisabled) return null;
   try {
-    return require("@react-native-firebase/perf").default;
+    return perfModule().getPerformance();
   } catch {
     return null;
   }
@@ -22,8 +28,8 @@ const getPerf = () => {
 // Explicitly toggle performance metric collection based on build environment
 if (!isExpoGo) {
   try {
-    const perf = require("@react-native-firebase/perf").default;
-    perf().setPerformanceCollectionEnabled(!isPerfDisabled);
+    const performance = perfModule().getPerformance();
+    performance.dataCollectionEnabled = !isPerfDisabled;
   } catch {
     // Ignore in non-native / test environments
   }
@@ -123,11 +129,11 @@ class PerformanceService {
       );
     }
 
-    const perf = getPerf();
-    if (!perf) return;
+    const performance = getPerformanceInstance();
+    if (!performance) return;
 
     try {
-      const trace = await perf().newTrace(traceName);
+      const trace = perfModule().trace(performance, traceName);
 
       // Attach custom attributes if provided
       if (attributes) {
@@ -228,10 +234,10 @@ class PerformanceService {
     url: string,
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   ) {
-    const perf = getPerf();
-    if (!perf) return null;
+    const performance = getPerformanceInstance();
+    if (!performance) return null;
     try {
-      const metric = await perf().newHttpMetric(url, method);
+      const metric = perfModule().httpMetric(performance, url, method);
       await metric.start();
       return metric;
     } catch (err) {

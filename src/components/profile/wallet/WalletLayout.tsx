@@ -10,13 +10,7 @@ import { Transaction, TxIconType } from "@/src/types/wallet";
 import { logToTransactions } from "@/src/utils/walletTransactions";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Image,
-  LayoutChangeEvent,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Image, LayoutChangeEvent, ScrollView, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -334,9 +328,7 @@ export const WalletLayout: React.FC = () => {
           >
             Transaction History
           </Text>
-          <Touchable
-            onPress={() => router.push("/profile/wallet/history")}
-          >
+          <Touchable onPress={() => router.push("/profile/wallet/history")}>
             <Text
               style={s.walletTxTitle}
               className="font-inter-bold text-[#FF8A00]"

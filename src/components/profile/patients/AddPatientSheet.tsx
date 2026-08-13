@@ -7,7 +7,12 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
-import { formatDobDisplay, getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
+import {
+  formatDobDisplay,
+  getMaxDob,
+  getMinDob,
+  validateDob,
+} from "@/src/utils/patient";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
@@ -581,9 +586,12 @@ export function AddPatientSheet({
                     gap: exactScale(4),
                   }}
                 >
-                  {React.cloneElement(icon as React.ReactElement<{ color?: string }>, {
-                    color: sel ? "#0F7635" : "#919EAB",
-                  })}
+                  {React.cloneElement(
+                    icon as React.ReactElement<{ color?: string }>,
+                    {
+                      color: sel ? "#0F7635" : "#919EAB",
+                    },
+                  )}
                   <Text
                     className="font-inter-medium"
                     style={{

@@ -7,8 +7,8 @@ import { logger } from "@/src/utils/logger";
 
 // react-native-blob-util is a native module unavailable in Expo Go
 const getBlobUtil = ():
-  | typeof import("react-native-blob-util").default
-  | null => (isExpoGo ? null : require("react-native-blob-util").default);
+  typeof import("react-native-blob-util").default | null =>
+  isExpoGo ? null : require("react-native-blob-util").default;
 
 /**
  * Downloads a remote file from a URL to the local device storage.
@@ -88,7 +88,8 @@ export const downloadFile = async (
   } catch (e) {
     Alert.alert(
       "Download Error",
-      asError(e).message || "Failed to download prescription. Please try again.",
+      asError(e).message ||
+        "Failed to download prescription. Please try again.",
     );
   }
 };

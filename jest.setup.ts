@@ -91,10 +91,39 @@ jest.mock("@react-native-firebase/crashlytics", () => {
 jest.mock("@react-native-firebase/perf", () => ({
   __esModule: true,
   default: () => ({}),
+  // Modular API — matches what perfService.ts actually calls.
+  getPerformance: jest.fn(() => ({ dataCollectionEnabled: false })),
+  trace: jest.fn(() => ({
+    putAttribute: jest.fn(),
+    putMetric: jest.fn(),
+    start: jest.fn(),
+    stop: jest.fn(),
+  })),
+  httpMetric: jest.fn(() => ({
+    start: jest.fn(),
+    stop: jest.fn(),
+  })),
 }));
 jest.mock("@react-native-firebase/messaging", () => ({
   __esModule: true,
   default: () => ({}),
+  // Modular API — matches what messaging.service.ts / usePushNotifications.ts actually call.
+  getMessaging: jest.fn(() => ({})),
+  getToken: jest.fn(() => Promise.resolve("")),
+  registerDeviceForRemoteMessages: jest.fn(() => Promise.resolve()),
+  onTokenRefresh: jest.fn(() => () => {}),
+  onMessage: jest.fn(() => () => {}),
+  onNotificationOpenedApp: jest.fn(() => () => {}),
+  getInitialNotification: jest.fn(() => Promise.resolve(null)),
+  setBackgroundMessageHandler: jest.fn(),
+}));
+jest.mock("@react-native-firebase/analytics", () => ({
+  __esModule: true,
+  default: () => ({}),
+  // Modular API — matches what analytics.service.ts actually calls.
+  getAnalytics: jest.fn(() => ({})),
+  setAnalyticsCollectionEnabled: jest.fn(() => Promise.resolve()),
+  logEvent: jest.fn(() => Promise.resolve()),
 }));
 
 // Silence noisy RN warnings that don't affect assertions.

@@ -124,13 +124,7 @@ export const notifeeService = {
     const notifee = getNotifee().default;
     const { EventType } = getNotifee();
     return notifee.onForegroundEvent(
-      ({
-        type,
-        detail,
-      }: {
-        type: number;
-        detail: EventDetail;
-      }) => {
+      ({ type, detail }: { type: number; detail: EventDetail }) => {
         const n = detail.notification;
         if (!n) return;
 

@@ -12,8 +12,16 @@ export const getPackDivisor = (
 ): number => {
   if (!packSize) return 1;
   const containerUnits = [
-    "bottle", "tube", "vial", "pack", "box",
-    "inhaler", "syringe", "ampoule", "spray", "strip"
+    "bottle",
+    "tube",
+    "vial",
+    "pack",
+    "box",
+    "inhaler",
+    "syringe",
+    "ampoule",
+    "spray",
+    "strip",
   ];
   if (unit && containerUnits.includes(unit.toLowerCase())) {
     return 1;
@@ -95,9 +103,9 @@ export const useProduct = (productId: string) => {
         manufacturer:
           typeof data.recommendation.manufacturer === "string"
             ? data.recommendation.manufacturer
-            : data.recommendation.manufacturer?.name ??
+            : (data.recommendation.manufacturer?.name ??
               data.recommendation.brand?.name ??
-              "",
+              ""),
         packSize: data.recommendation.packSize,
         unit: data.recommendation.unit,
         description: [

@@ -51,7 +51,10 @@ export const SearchResultsList = React.memo(
 
     const hasComparisonRows = useMemo(
       () =>
-        results.some((item) => item.sourceType === SOURCE_TYPE.COMPARABLE && item.recommendation),
+        results.some(
+          (item) =>
+            item.sourceType === SOURCE_TYPE.COMPARABLE && item.recommendation,
+        ),
       [results],
     );
 

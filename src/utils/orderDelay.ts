@@ -10,7 +10,10 @@ type CancellationCheckOrder = Pick<Order, "status" | "statusLogs">;
 export function isOrderDelayed(
   order: DelayCheckOrder | null | undefined,
 ): boolean {
-  if (order?.status === CANCELLED_STATUS || order?.status === DELIVERED_STATUS) {
+  if (
+    order?.status === CANCELLED_STATUS ||
+    order?.status === DELIVERED_STATUS
+  ) {
     return false;
   }
   if (!order?.estimatedDelivery) return false;

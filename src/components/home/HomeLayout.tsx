@@ -49,11 +49,7 @@ import type { CategoryCard } from "@/src/types/home";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import {
-  FlashList,
-  FlashListRef,
-  ListRenderItem,
-} from "@shopify/flash-list";
+import { FlashList, FlashListRef, ListRenderItem } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { RefreshControl, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
@@ -555,9 +551,12 @@ const HomeContent: React.FC = () => {
   const listContentStyle = useMemo(
     () => ({
       backgroundColor: "#FFFFFF",
+      // Offsets the list's own `marginTop: -insets.top` (see the list's
+      // style prop) so visible content still starts in the same place.
+      paddingTop: insets.top,
       paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
     }),
-    [TAB_BAR_HEIGHT, hasFloatingBanner],
+    [TAB_BAR_HEIGHT, hasFloatingBanner, insets.top],
   );
 
   const refreshControl = useMemo(
@@ -612,7 +611,7 @@ const HomeContent: React.FC = () => {
         overScrollMode="auto"
         decelerationRate="normal"
         nestedScrollEnabled
-        style={{ flex: 1, backgroundColor: "#FFFFFF" }}
+        style={{ flex: 1, marginTop: -insets.top, backgroundColor: "#FFFFFF" }}
         contentContainerStyle={listContentStyle}
         onScroll={handleScroll}
         onScrollBeginDrag={handleScrollStart}

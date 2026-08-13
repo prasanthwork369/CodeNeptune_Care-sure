@@ -65,7 +65,9 @@ export const AppGateScreen: React.FC<AppGateScreenProps> = ({
             accessibilityRole="button"
             accessibilityLabel="Update CareSure"
           >
-            <Text style={styles.buttonLabel}>{updateLabel ?? "Update Now"}</Text>
+            <Text style={styles.buttonLabel}>
+              {updateLabel ?? "Update Now"}
+            </Text>
             {/* Pre-coloured white variant — these SVGs cannot be re-tinted via fill. */}
             <icons.arrow_up_white
               width={exactScale(16)}

@@ -17,7 +17,7 @@ export const substituteApi = {
   async createRequest(medicineId: string): Promise<SubstituteRequestResponse> {
     const response = await apiClient.post<SubstituteRequestResponse>(
       API_ENDPOINTS.SUBSTITUTE_REQUESTS,
-      { medicineId }
+      { medicineId },
     );
     return response.data;
   },

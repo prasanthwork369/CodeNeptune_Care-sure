@@ -1,5 +1,5 @@
 import { isExpoGo } from "@/src/utils/environment";
-import type FirebaseMessaging from "@react-native-firebase/messaging";
+import type { Messaging } from "@react-native-firebase/messaging";
 import { useRootNavigationState } from "expo-router";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
@@ -21,12 +21,13 @@ import { logger } from "@/src/utils/logger";
 
 // Firebase Messaging is a native module unavailable in Expo Go — a static
 // top-level `import` would crash the JS bundle on load there before the
-// isExpoGo checks below ever run. Only required lazily, after that check.
-const messaging = (): ReturnType<typeof FirebaseMessaging> =>
-  (
-    require("@react-native-firebase/messaging")
-      .default as typeof FirebaseMessaging
-  )();
+// isExpoGo checks below ever run. Only required lazily, after that check,
+// and always through the modular API (the namespaced `messaging()` call
+// pattern this used before is deprecated).
+const messagingModule = (): typeof import("@react-native-firebase/messaging") =>
+  require("@react-native-firebase/messaging");
+
+const messaging = (): Messaging => messagingModule().getMessaging();
 
 /** Builds a routing payload + de-dup id from a notification's `data` block. */
 const buildPayloadFromData = (
@@ -106,9 +107,12 @@ export const usePushNotifications = () => {
 
     // Token rotated mid-session — re-register with backend using the new token.
     // Always anonymous (false) — backend links user via deviceId at OTP verify.
-    const unsubscribe = messaging().onTokenRefresh((newToken) => {
-      notificationService.updateToken(newToken).catch(() => {});
-    });
+    const unsubscribe = messagingModule().onTokenRefresh(
+      messaging(),
+      (newToken) => {
+        notificationService.updateToken(newToken).catch(() => {});
+      },
+    );
 
     return unsubscribe;
   }, []);
@@ -125,29 +129,34 @@ export const usePushNotifications = () => {
   useEffect(() => {
     if (isExpoGo || Platform.OS !== "android") return;
 
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      if (__DEV__)
-        logger.debug(
-          "[PushNotificationHook] Foreground FCM message:",
-          JSON.stringify(remoteMessage, null, 2),
-        );
-      // Marketing product offers use the custom RemoteViews layout; a native
-      // failure falls through to the branded path so nothing is dropped.
-      const data = (remoteMessage?.data ?? {}) as NotificationData;
-      const shownAsOffer = await showProductOffer(data).catch(() => false);
-      // Present via notifee so the CareSure colour large icon shows. notifee
-      // notifications don't fire expo's addNotificationReceivedListener, so we
-      // save to the store here directly (single path, no duplicate).
-      if (!shownAsOffer) {
-        await notifeeService.displayBranded(remoteMessage).catch(() => {});
-      }
-      addNotification({
-        title:
-          remoteMessage?.notification?.title ?? data.title ?? "Notification",
-        body: remoteMessage?.notification?.body ?? data.discountText ?? "",
-        data,
-      });
-    });
+    const unsubscribe = messagingModule().onMessage(
+      messaging(),
+      async (remoteMessage) => {
+        if (__DEV__)
+          logger.debug(
+            "[PushNotificationHook] Foreground FCM message:",
+            JSON.stringify(remoteMessage, null, 2),
+          );
+        // Marketing product offers use the custom RemoteViews layout; a
+        // native failure falls through to the branded path so nothing is
+        // dropped.
+        const data = (remoteMessage?.data ?? {}) as NotificationData;
+        const shownAsOffer = await showProductOffer(data).catch(() => false);
+        // Present via notifee so the CareSure colour large icon shows.
+        // notifee notifications don't fire expo's
+        // addNotificationReceivedListener, so we save to the store here
+        // directly (single path, no duplicate).
+        if (!shownAsOffer) {
+          await notifeeService.displayBranded(remoteMessage).catch(() => {});
+        }
+        addNotification({
+          title:
+            remoteMessage?.notification?.title ?? data.title ?? "Notification",
+          body: remoteMessage?.notification?.body ?? data.discountText ?? "",
+          data,
+        });
+      },
+    );
 
     return unsubscribe;
   }, [addNotification]);
@@ -189,8 +198,8 @@ export const usePushNotifications = () => {
         `[PushNotificationHook] Cold-start gate — isLoaded:${isLoaded} navReady:${navReady}`,
       );
     if (!isLoaded || !navReady) return;
-    messaging()
-      .getInitialNotification()
+    messagingModule()
+      .getInitialNotification(messaging())
       .then((remoteMessage) => {
         if (__DEV__)
           logger.debug(
@@ -239,16 +248,19 @@ export const usePushNotifications = () => {
   // it here (again, not through expo's response listener for FCM messages).
   useEffect(() => {
     if (isExpoGo) return;
-    const unsubscribe = messaging().onNotificationOpenedApp((remoteMessage) => {
-      if (!remoteMessage) return;
-      if (__DEV__)
-        logger.debug(
-          "[PushNotificationHook] Notification opened app (FCM):",
-          JSON.stringify(remoteMessage, null, 2),
-        );
-      const { payload, tapId } = buildFcmTapPayload(remoteMessage);
-      NotificationNavigation.handleTap(payload, tapId);
-    });
+    const unsubscribe = messagingModule().onNotificationOpenedApp(
+      messaging(),
+      (remoteMessage) => {
+        if (!remoteMessage) return;
+        if (__DEV__)
+          logger.debug(
+            "[PushNotificationHook] Notification opened app (FCM):",
+            JSON.stringify(remoteMessage, null, 2),
+          );
+        const { payload, tapId } = buildFcmTapPayload(remoteMessage);
+        NotificationNavigation.handleTap(payload, tapId);
+      },
+    );
     return unsubscribe;
   }, []);
 

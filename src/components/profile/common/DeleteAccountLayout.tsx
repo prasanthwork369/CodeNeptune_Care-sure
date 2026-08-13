@@ -53,7 +53,8 @@ export const DeleteAccountLayout: React.FC = () => {
     } catch (e) {
       Alert.alert(
         "Delete Account",
-        asError(e).message ?? "Could not delete your account. Please try again.",
+        asError(e).message ??
+          "Could not delete your account. Please try again.",
       );
     }
   };

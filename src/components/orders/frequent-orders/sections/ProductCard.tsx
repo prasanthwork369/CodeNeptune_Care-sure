@@ -154,9 +154,7 @@ export const ProductCard = React.memo(function ProductCard({
     }
   };
 
-  const brandLine = [item.brand, item.description]
-    .filter(Boolean)
-    .join(" • ");
+  const brandLine = [item.brand, item.description].filter(Boolean).join(" • ");
 
   const itemDiscount =
     item.discount ||

@@ -13,11 +13,7 @@ import { colors } from "@/src/theme/colors";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "ghost"
-  | "danger";
+  "primary" | "secondary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 interface AppButtonProps {

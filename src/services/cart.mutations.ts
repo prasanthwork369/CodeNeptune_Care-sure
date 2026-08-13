@@ -2,7 +2,11 @@ import { queryClient } from "@/src/lib/react-query/queryClient";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
-import type { AddToCartInput, Cart, UpdateCartItemInput } from "@/src/types/cart";
+import type {
+  AddToCartInput,
+  Cart,
+  UpdateCartItemInput,
+} from "@/src/types/cart";
 import { cartService } from "./cart.service";
 
 /**

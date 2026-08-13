@@ -20,8 +20,7 @@ export const MoreAboutContent: React.FC<MoreAboutContentProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [descriptionHeight, setDescriptionHeight] = useState(0);
-  const isDescription =
-    section.designType === SECTION_DESIGN_TYPE.TEXT_BLOCK;
+  const isDescription = section.designType === SECTION_DESIGN_TYPE.TEXT_BLOCK;
   const descriptionCharacters = isDescription
     ? htmlToPlainText(section.html).length
     : 0;

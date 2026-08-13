@@ -61,7 +61,9 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
       zIndex: 110,
     };
 
-    // dimezisBlurView re-blurs the feed behind it every frame while attached
+    // No blurTarget is wired up, so Android already falls back to a flat
+    // tint here rather than a real per-frame blur — still worth detaching
+    // while hidden, since it stays a mounted native view either way.
     if (!rendered) {
       return (
         <Animated.View
@@ -79,7 +81,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
         <BlurView
           intensity={10}
           tint="systemUltraThinMaterialLight"
-          experimentalBlurMethod="dimezisBlurView"
+          blurMethod="none"
           style={{ overflow: "hidden" }}
         >
           <View
@@ -90,6 +92,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
               paddingTop: insets.top + exactScale(5),
               paddingBottom: exactScale(14),
               paddingHorizontal: exactScale(16),
+              backgroundColor: "#FFFFFF",
             }}
           >
             <View

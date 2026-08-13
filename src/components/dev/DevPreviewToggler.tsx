@@ -4,7 +4,6 @@ import { getDevUpdateReady, setDevUpdateReady } from "@/src/utils/devFlags";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text, View } from "react-native";
 
-
 const VISIBLE = false;
 
 export function DevPreviewToggler() {

@@ -87,11 +87,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     // Resolving a tapped suggestion — separate from the search spinner.
     const [isResolving, setIsResolving] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const {
-      addresses,
-      loading: addressesLoading,
-      refetch,
-    } = useAddress();
+    const { addresses, loading: addressesLoading, refetch } = useAddress();
     const { checkServiceability } = usePincode();
     const { predictions, isSearching } = useLocationSearch(inputValue);
 

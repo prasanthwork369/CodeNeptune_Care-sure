@@ -1,6 +1,6 @@
 import { asError } from "@/src/api/errors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type FirebaseMessaging from "@react-native-firebase/messaging";
+import type { Messaging } from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
@@ -15,6 +15,11 @@ import { logger } from "@/src/utils/logger";
 // can't be killed mid-way and leave the two halves out of sync.
 const CACHE_KEY = "caresure.push_token.registration";
 
+// Dev logs still show enough of the token to eyeball a change/mismatch
+// without printing the full credential to the device log.
+const maskToken = (token: string): string =>
+  token.length <= 12 ? "***" : `${token.slice(0, 6)}…${token.slice(-4)}`;
+
 // Session guards: skip a network call when the same key is already registered
 // (lastRegisteredKey) or a registration for it is currently in flight
 // (inProgressKey, prevents concurrent double-registration).
@@ -25,12 +30,13 @@ let inProgressKey: string | null = null;
 let __devApiCallCount = 0;
 
 // Firebase Messaging is a native module unavailable in Expo Go — a static
-// isExpoGo checks below ever run. Only required lazily, after that check.
-const messaging = (): ReturnType<typeof FirebaseMessaging> =>
-  (
-    require("@react-native-firebase/messaging")
-      .default as typeof FirebaseMessaging
-  )();
+// isExpoGo checks below ever run. Only required lazily, after that check,
+// and always through the modular API (the namespaced `messaging()` call
+// pattern this used before is deprecated).
+const messagingModule = (): typeof import("@react-native-firebase/messaging") =>
+  require("@react-native-firebase/messaging");
+
+const messaging = (): Messaging => messagingModule().getMessaging();
 
 // The identity of a registration: same token means
 // the backend already has what it needs, so we can skip the call.
@@ -155,10 +161,11 @@ export const notificationService = {
   getFcmToken: async (): Promise<string | null> => {
     if (isExpoGo) return null;
     try {
+      const { registerDeviceForRemoteMessages, getToken } = messagingModule();
       if (Platform.OS === "ios") {
-        await messaging().registerDeviceForRemoteMessages();
+        await registerDeviceForRemoteMessages(messaging());
       }
-      return await messaging().getToken();
+      return await getToken(messaging());
     } catch {
       return null;
     }
@@ -174,21 +181,21 @@ export const notificationService = {
     if (!granted) return;
 
     const token = await notificationService.getFcmToken();
-    if (__DEV__) logger.debug("[PushToken]", token);
     if (!token) return;
+    if (__DEV__) logger.debug("[PushToken]", maskToken(token));
 
     await syncToken(token);
   },
 
   updateToken: async (newToken: string): Promise<void> => {
-    if (__DEV__) logger.debug("[PushToken:refreshed]", newToken);
+    if (__DEV__) logger.debug("[PushToken:refreshed]", maskToken(newToken));
     await syncToken(newToken);
   },
 
   unregister: async (): Promise<void> => {
     if (isExpoGo) return;
     try {
-      const token = await messaging().getToken();
+      const token = await messagingModule().getToken(messaging());
       await notificationApi.removeToken(token).catch(() => {});
     } catch {}
 

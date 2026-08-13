@@ -120,7 +120,9 @@ export function useAvatarPreviewAnimation({
   const frameStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: interpolate(progress.value, [0, 1], [startX, 0]) },
-      { translateY: interpolate(progress.value, [0, 1], [startY, dragY.value]) },
+      {
+        translateY: interpolate(progress.value, [0, 1], [startY, dragY.value]),
+      },
       { scale: interpolate(progress.value, [0, 1], [startScale, 1]) },
     ],
   }));

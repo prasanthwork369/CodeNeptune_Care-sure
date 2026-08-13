@@ -46,6 +46,5 @@ export function TrackingStatusBanner({
         </Text>
       )}
     </View>
-    
   );
 }

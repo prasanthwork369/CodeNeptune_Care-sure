@@ -4,11 +4,7 @@ const { InAppUpdate } = NativeModules;
 
 /** Outcome of asking Play to start an update flow. */
 export type UpdateFlowResult =
-  | "accepted"
-  | "cancelled"
-  | "failed"
-  | "unavailable"
-  | "in_progress";
+  "accepted" | "cancelled" | "failed" | "unavailable" | "in_progress";
 
 export type InstallStatus =
   | "pending"

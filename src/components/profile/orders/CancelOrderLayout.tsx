@@ -46,7 +46,8 @@ export function CancelOrderLayout() {
   const queryClient = useQueryClient();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const bottomInset = useAdjustedBottomInset();
-  const scrollRef = useRef<React.ComponentRef<typeof KeyboardAwareScrollView>>(null);
+  const scrollRef =
+    useRef<React.ComponentRef<typeof KeyboardAwareScrollView>>(null);
 
   const { order, loading: orderLoading } = useOrderById(orderId);
   const { data: reasons = [], isLoading: reasonsLoading } =

@@ -4,10 +4,16 @@ type EventParams = Record<string, string | number | boolean | undefined>;
 
 const isAnalyticsDisabled = isExpoGo || __DEV__;
 
-const getAnalytics = () => {
+// Native module absent in Expo Go — only required lazily, and always
+// through the modular API (the namespaced `analytics()` call pattern this
+// used before is deprecated).
+const analyticsModule = (): typeof import("@react-native-firebase/analytics") =>
+  require("@react-native-firebase/analytics");
+
+const getAnalyticsInstance = () => {
   if (isAnalyticsDisabled) return null;
   try {
-    return require("@react-native-firebase/analytics").default;
+    return analyticsModule().getAnalytics();
   } catch {
     return null;
   }
@@ -16,15 +22,15 @@ const getAnalytics = () => {
 // Explicitly toggle analytics data collection based on build environment
 if (!isExpoGo) {
   try {
-    const analytics = require("@react-native-firebase/analytics").default;
-    analytics().setAnalyticsCollectionEnabled(!isAnalyticsDisabled);
+    const { getAnalytics, setAnalyticsCollectionEnabled } = analyticsModule();
+    setAnalyticsCollectionEnabled(getAnalytics(), !isAnalyticsDisabled);
   } catch {
     // Ignore in non-native / test environments
   }
 }
 
 const log = async (name: string, params?: EventParams) => {
-  const analytics = getAnalytics();
+  const analytics = getAnalyticsInstance();
   if (!analytics) return;
 
   const safeParams = params
@@ -34,7 +40,7 @@ const log = async (name: string, params?: EventParams) => {
     : undefined;
 
   try {
-    await analytics().logEvent(name, safeParams);
+    await analyticsModule().logEvent(analytics, name, safeParams);
   } catch (error) {
     // Telemetry must never affect a customer journey. Keep the failure visible
     // in development without sending data to a different destination.

@@ -15,7 +15,9 @@ import {
  * when the stripped text equals the previous value React sends no native update, so the
  * rejected character stays in the native buffer and the field stops responding.
  */
-export const applyAsciiOnlyFilter = (ref: React.ComponentRef<typeof TextInput> | null) => {
+export const applyAsciiOnlyFilter = (
+  ref: React.ComponentRef<typeof TextInput> | null,
+) => {
   if (Platform.OS !== "android" || !ref) return;
   try {
     const tag = findNodeHandle(ref);

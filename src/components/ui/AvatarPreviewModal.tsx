@@ -162,7 +162,11 @@ export const AvatarPreviewModal: React.FC<AvatarPreviewModalProps> = ({
           </Touchable>
 
           {title ? (
-            <Text numberOfLines={1} className="flex-1 font-inter-semibold" style={s.title}>
+            <Text
+              numberOfLines={1}
+              className="flex-1 font-inter-semibold"
+              style={s.title}
+            >
               {title}
             </Text>
           ) : (

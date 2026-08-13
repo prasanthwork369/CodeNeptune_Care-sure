@@ -46,7 +46,10 @@ export const ProfileUpdateCard: React.FC<ProfileUpdateCardProps> = ({
         </View>
 
         <View style={{ flex: 1, marginLeft: exactScale(14) }}>
-          <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
+          <View
+            className="flex-row items-center"
+            style={{ gap: exactScale(8) }}
+          >
             <Text
               className="font-inter-bold text-brand-text"
               style={{ fontSize: moderateScale(15) }}

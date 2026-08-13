@@ -156,38 +156,40 @@ export const AddMoneyLayout: React.FC = () => {
             >
               ₹
             </Text>
-         <TextInput
-  ref={(el) => {
-    applyDigitsOnlyFilter(el);
+            <TextInput
+              ref={(el) => {
+                applyDigitsOnlyFilter(el);
 
-    if (inputRef) {
-      (inputRef as React.MutableRefObject<TextInput | null>).current = el;
-    }
-  }}
-  autoFocus
-  value={amount}
-  onChangeText={handleAmountChange}
-  onFocus={() => setIsAmountFocused(true)}
-  onBlur={() => setIsAmountFocused(false)}
-  placeholder="0"
-  placeholderTextColor="#6A6A6A"
-  keyboardType="number-pad"
-  maxLength={6}
-  cursorColor="#0F7635"
-  selectionColor="#0F7635"
-  style={{
-    fontSize: moderateScale(44),
-    lineHeight: moderateScale(54),
-    fontWeight: "800",
-    color: "#111827",
-    minWidth: 100,
-    minHeight: moderateScale(60),
-    paddingHorizontal: 8,
-    paddingVertical: 0,
-    textAlignVertical: "center",
-    includeFontPadding: false,
-  }}
-/>
+                if (inputRef) {
+                  (
+                    inputRef as React.MutableRefObject<TextInput | null>
+                  ).current = el;
+                }
+              }}
+              autoFocus
+              value={amount}
+              onChangeText={handleAmountChange}
+              onFocus={() => setIsAmountFocused(true)}
+              onBlur={() => setIsAmountFocused(false)}
+              placeholder="0"
+              placeholderTextColor="#6A6A6A"
+              keyboardType="number-pad"
+              maxLength={6}
+              cursorColor="#0F7635"
+              selectionColor="#0F7635"
+              style={{
+                fontSize: moderateScale(44),
+                lineHeight: moderateScale(54),
+                fontWeight: "800",
+                color: "#111827",
+                minWidth: 100,
+                minHeight: moderateScale(60),
+                paddingHorizontal: 8,
+                paddingVertical: 0,
+                textAlignVertical: "center",
+                includeFontPadding: false,
+              }}
+            />
           </View>
           <Text
             style={{

@@ -26,7 +26,8 @@ export const useOrderById = (
     queryFn: () => orderService.getOrderById(orderId!),
     enabled: isAuthenticated && !!orderId,
     staleTime: 60_000,
-    refetchInterval: (query) => getOrderRefetchInterval(query.state.data?.status),
+    refetchInterval: (query) =>
+      getOrderRefetchInterval(query.state.data?.status),
   });
 
   return { order, loading: isLoading };

@@ -25,6 +25,13 @@ export function useHomeData() {
     // Runs up to 5 of its own sequential fetches on top of this hook's own
     // queries below — deferred so it doesn't compete with the tab transition
     // and the feed's first paint for JS-thread/network time.
+    //
+    // InteractionManager is deprecated in favor of requestIdleCallback, but
+    // intentionally NOT swapped here: requestIdleCallback fires once the JS
+    // thread looks idle, which can be immediately if the tab transition runs
+    // on the UI thread (Reanimated/native driver) — exactly the race this
+    // defer exists to avoid. runAfterInteractions still waits on RN's touch/
+    // animation interaction handles, which is the guarantee this code needs.
     const task = InteractionManager.runAfterInteractions(() => {
       syncService.performSync(queryClient, isAuthenticated).catch((err) => {
         if (__DEV__) console.error("[Sync] Background sync check failed:", err);

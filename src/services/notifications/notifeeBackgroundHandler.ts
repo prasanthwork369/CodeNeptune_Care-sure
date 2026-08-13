@@ -19,13 +19,7 @@ if (!isExpoGo) {
   const { EventType } = require("@notifee/react-native");
 
   notifee.onBackgroundEvent(
-    async ({
-      type,
-      detail,
-    }: {
-      type: number;
-      detail: EventDetail;
-    }) => {
+    async ({ type, detail }: { type: number; detail: EventDetail }) => {
       if (type !== EventType.ACTION_PRESS) return;
       const actionId = detail.pressAction?.id;
       if (!actionId) return;

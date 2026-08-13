@@ -20,11 +20,10 @@ interface TabBarGlassProps {
  */
 export const TabBarGlass: React.FC<TabBarGlassProps> = ({ radius }) => (
   <>
-    {/* Android blurs nothing without the experimental method — it falls back to a flat tint */}
     <BlurView
       intensity={40}
       tint={Platform.OS === "ios" ? "systemUltraThinMaterialLight" : "light"}
-      experimentalBlurMethod="dimezisBlurView"
+      blurMethod="none"
       pointerEvents="none"
       style={StyleSheet.absoluteFill}
     />

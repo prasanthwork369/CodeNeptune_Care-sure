@@ -183,13 +183,15 @@ export const syncService = {
           );
           // setQueriesData, not setQueryData: this key carries the caller's
           // params object, so match on the prefix instead of guessing it.
-          queryClient.setQueriesData({ queryKey: ["frequently-ordered"] }, data);
+          queryClient.setQueriesData(
+            { queryKey: ["frequently-ordered"] },
+            data,
+          );
         } catch (e) {
           if (__DEV__)
             console.error("[SyncService] Failed to sync frequentlyOrdered:", e);
         }
       }
-
     } catch (error) {
       if (__DEV__)
         console.error("[SyncService] Sync check execution error:", error);

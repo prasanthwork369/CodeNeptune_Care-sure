@@ -19,12 +19,14 @@ export const useSubstituteRequest = () => {
       });
       showToast(
         "Substitute request submitted! We will notify you once available.",
-        "success"
+        "success",
       );
     },
     onError: (err: any) => {
       const msg =
-        err?.response?.data?.message || err?.message || "Failed to submit request";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to submit request";
       showToast(msg, "error");
     },
   });

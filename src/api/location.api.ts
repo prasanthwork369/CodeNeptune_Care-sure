@@ -42,8 +42,7 @@ const resolve = async (
   } catch (e) {
     const body = asError(e).response?.data;
     const payload = (body?.data ?? body) as
-      | Partial<ResolvedLocation>
-      | undefined;
+      Partial<ResolvedLocation> | undefined;
     if (payload && typeof payload.serviceable === "boolean") {
       return payload as ResolvedLocation;
     }

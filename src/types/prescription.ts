@@ -28,8 +28,7 @@ export type ReminderFrequencyDays = 7 | 14 | 21 | 30;
 
 /** Set-reminder payload: recurring every N days, or a one-time custom date ("YYYY-MM-DD"). */
 export type ReminderInput =
-  | { frequencyDays: ReminderFrequencyDays }
-  | { remindAt: string };
+  { frequencyDays: ReminderFrequencyDays } | { remindAt: string };
 
 /** Refill reminder attached to a prescription; null/absent when never set. */
 export interface PrescriptionReminder {

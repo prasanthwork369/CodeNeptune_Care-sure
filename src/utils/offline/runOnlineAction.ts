@@ -1,5 +1,8 @@
 import type { AppError } from "@/src/api/errors";
-import { reportActionError, type NetworkFeedbackOptions } from "./networkFeedback";
+import {
+  reportActionError,
+  type NetworkFeedbackOptions,
+} from "./networkFeedback";
 import { requireInternet } from "./requireInternet";
 
 export type OnlineActionResult<T> =

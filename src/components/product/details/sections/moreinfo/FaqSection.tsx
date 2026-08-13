@@ -7,9 +7,7 @@ import { Text, View } from "react-native";
 
 const INITIAL_FAQ_COUNT = 4;
 
-const FaqRow: React.FC<
-  FaqItem & { open: boolean; onToggle: () => void }
-> = ({
+const FaqRow: React.FC<FaqItem & { open: boolean; onToggle: () => void }> = ({
   question,
   answer,
   open,

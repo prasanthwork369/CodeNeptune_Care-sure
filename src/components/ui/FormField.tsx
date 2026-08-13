@@ -38,11 +38,7 @@ export type FormFieldProps = {
   autoComplete?: TextInputProps["autoComplete"];
   textContentType?: TextInputProps["textContentType"];
   importantForAutofill?:
-    | "auto"
-    | "no"
-    | "noExcludeDescendants"
-    | "yes"
-    | "yesExcludeDescendants";
+    "auto" | "no" | "noExcludeDescendants" | "yes" | "yesExcludeDescendants";
   rightSlot?: React.ReactNode;
   variant?: FormFieldVariant;
   required?: boolean;
