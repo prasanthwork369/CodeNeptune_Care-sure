@@ -1,6 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
 // eslint-disable-next-line no-restricted-imports
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 
 const HOME_ROUTE = "/(tabs)" as const;
@@ -48,8 +47,30 @@ export function useNav() {
     router.replace(HOME_ROUTE);
   }, [router]);
 
+  // Pops every screen above the given route in one go — for flows entered
+  // through a variable number of intermediate screens (e.g. picking an
+  // existing prescription pushes prescription-history + the viewer on top
+  // of choose-method), so "leaving" always lands cleanly on the real origin
+  // instead of a single back() peeling off just one of those layers.
+  const dismissTo = useCallback(
+    (...args: Parameters<typeof router.dismissTo>) => {
+      if (!navigation.isFocused()) return;
+      router.dismissTo(...args);
+    },
+    [router, navigation],
+  );
+
+  // Pops the current nested stack all the way to its own root — no route-name
+  // matching involved, so nothing for params/getId to mismatch on. Use this
+  // (then replace at the root) when dismissTo's name lookup isn't reliably
+  // finding an existing screen further up the same stack.
+  const dismissAll = useCallback(() => {
+    if (!navigation.isFocused()) return;
+    router.dismissAll();
+  }, [router, navigation]);
+
   return useMemo(
-    () => ({ push, replace, back, canGoBack }),
-    [push, replace, back, canGoBack],
+    () => ({ push, replace, back, canGoBack, dismissTo, dismissAll }),
+    [push, replace, back, canGoBack, dismissTo, dismissAll],
   );
 }

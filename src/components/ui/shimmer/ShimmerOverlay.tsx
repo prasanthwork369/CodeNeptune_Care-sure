@@ -187,7 +187,7 @@ export const ShimmerOverlay = memo(function ShimmerOverlay({
 
 const styles = StyleSheet.create({
   clip: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: "hidden",
   },
   highlightTrack: {

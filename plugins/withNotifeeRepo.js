@@ -1,4 +1,4 @@
-const { withProjectBuildGradle } = require("@expo/config-plugins");
+const { withProjectBuildGradle } = require("expo/config-plugins");
 
 /**
  * notifee ships its native artifact `app.notifee:core` as a local Maven repo

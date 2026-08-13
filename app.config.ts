@@ -23,7 +23,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/icon.png",
   scheme: "caresure",
   userInterfaceStyle: "automatic",
-  newArchEnabled: true,
+  // New Architecture is the only architecture as of this RN version (the
+  // config key was removed) — this project already opted in, so no behavior
+  // change, just no longer a configurable option.
   ios: {
     bundleIdentifier: "com.codeneptune.caresure",
     supportsTablet: true,
@@ -38,7 +40,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: "#FFFFFF",
     },
     softwareKeyboardLayoutMode: "resize",
-    edgeToEdgeEnabled: true,
+    // Edge-to-edge is mandatory as of SDK 55 (no longer configurable) — the
+    // explicit opt-in this project already had is now just default behavior.
     predictiveBackGestureEnabled: false,
     intentFilters: [
       {
@@ -113,9 +116,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         },
       },
     ],
+    "expo-asset",
+    "expo-font",
+    "expo-image",
     "expo-router",
     "expo-secure-store",
     "expo-sqlite",
+    "expo-status-bar",
+    "expo-web-browser",
     "@react-native-firebase/app",
     "@react-native-firebase/analytics",
     "@react-native-firebase/crashlytics",

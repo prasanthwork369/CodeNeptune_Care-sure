@@ -78,6 +78,9 @@ export const reportActionError = (
     return appError;
   }
 
-  showToastOnce(opts.message ?? networkErrorMessage(appError.kind));
+  // `||`, not `??` — an explicit empty-string override must fall back too,
+  // or a caller that computes a blank message silently produces a toast
+  // with nothing readable in it.
+  showToastOnce(opts.message || networkErrorMessage(appError.kind));
   return appError;
 };

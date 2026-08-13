@@ -18,7 +18,14 @@
       "Read(//c/Code Neptune/Caresure_Project/Customer_app/Caresure/**)",
       "Read(//c/Code Neptune/Web/customer-website/**)",
       "Bash(cd \"e:\\\\Mobile\\\\Caresure\\\\Care-sure_Customer\" && echo \"---find package.json files---\" && find . -maxdepth 2 -iname \"package.json\" -not -path \"*/node_modules/*\" 2>/dev/null && echo \"---sibling dirs---\" && ls .. 2>/dev/null)",
-      "Read(//e/Mobile/Caresure/**)"
+      "Read(//e/Mobile/Caresure/**)",
+      "Bash(npx expo *)",
+      "Bash(npm -v)",
+      "Bash(export ANDROID_HOME=\"E:\\\\Android\\\\Sdk\")",
+      "Bash(yes)",
+      "Bash(\"/e/Android/Sdk/cmdline-tools/latest/bin/sdkmanager.bat\" --licenses)",
+      "Bash(\"/e/Android/Sdk/cmdline-tools/latest/bin/sdkmanager.bat\" \"platform-tools\" \"platforms;android-36\" \"build-tools;36.0.0\" \"platforms;android-35\" \"build-tools;35.0.0\")",
+      "Bash(\"/e/Android/Sdk/platform-tools/adb.exe\" version *)"
     ]
   }
 }

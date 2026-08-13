@@ -113,7 +113,9 @@ export const Toast: React.FC = () => {
     };
   }, [visible, message]);
 
-  if (!visible) return null;
+  // A blank message would still show the icon + close button with nothing
+  // readable between them — never worth surfacing, whatever produced it.
+  if (!visible || !message.trim()) return null;
 
   const c = CONFIG[type];
 

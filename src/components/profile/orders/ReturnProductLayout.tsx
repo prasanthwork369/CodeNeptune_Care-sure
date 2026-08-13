@@ -19,9 +19,8 @@ import { useNav } from "@/src/hooks/useNav";
 import { useReturnDraftStore } from "@/src/store/returnDraftStore";
 import { OrderItem } from "@/src/types/order";
 import { CreateReturnRequest, ReturnItemImages } from "@/src/types/return";
-import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,

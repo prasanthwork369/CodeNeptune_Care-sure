@@ -135,7 +135,7 @@ export const CartSavingsBanner: React.FC<CartSavingsBannerProps> = ({
         colors={["#D0EBFE", "#D7FFEA"]}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
       <Image
         source={HOME_IMAGES.discountTag}

@@ -90,9 +90,12 @@ export const CartLayout: React.FC = () => {
     featuredProducts,
     availableCoins,
     walletBalance,
+    walletHasRemainingAmount,
+    coinsHasRemainingAmount,
     corporateCreditsBalance,
     corporateCreditsEligible,
     corporateCreditsRemainingForEligibility,
+    corporateCreditsHasRemainingAmount,
     handleAddItem,
     handleProceed,
     updateItem,
@@ -209,6 +212,8 @@ export const CartLayout: React.FC = () => {
               value={walletOn}
               walletBalance={walletBalance}
               onToggle={handleWalletToggle}
+              hasRemainingAmount={walletHasRemainingAmount}
+              discountApplied={WALLET_DISCOUNT}
             />
           )}
 
@@ -219,6 +224,8 @@ export const CartLayout: React.FC = () => {
               onToggle={handleCorporateCreditsToggle}
               eligible={corporateCreditsEligible}
               remainingForEligibility={corporateCreditsRemainingForEligibility}
+              hasRemainingAmount={corporateCreditsHasRemainingAmount}
+              discountApplied={CORPORATE_CREDITS_DISCOUNT}
             />
           )}
 
@@ -229,6 +236,7 @@ export const CartLayout: React.FC = () => {
               redeemedCoins={Math.round(COINS_DISCOUNT / coinValue)}
               onToggle={handleCoinsToggle}
               onInfoPress={() => setShowCoinsSheet(true)}
+              hasRemainingAmount={coinsHasRemainingAmount}
             />
           )}
 

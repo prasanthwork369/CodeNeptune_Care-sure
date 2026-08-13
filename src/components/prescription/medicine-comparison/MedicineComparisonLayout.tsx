@@ -149,9 +149,11 @@ export const MedicineComparisonLayout: React.FC<
   // Use reusable calculations hook
   const {
     walletBalance,
+    walletHasRemainingAmount,
     availableCoins,
     maxCoinsUsable,
     coinValue,
+    coinsHasRemainingAmount,
     COUPON_DISCOUNT,
     COINS_DISCOUNT,
     WALLET_DISCOUNT,
@@ -159,6 +161,7 @@ export const MedicineComparisonLayout: React.FC<
     corporateCreditsBalance,
     corporateCreditsEligible,
     corporateCreditsRemainingForEligibility,
+    corporateCreditsHasRemainingAmount,
     productSavings,
     toPay,
     savingsRows,
@@ -298,6 +301,8 @@ export const MedicineComparisonLayout: React.FC<
             value={walletOn}
             walletBalance={walletBalance}
             onToggle={handleWalletToggle}
+            hasRemainingAmount={walletHasRemainingAmount}
+            discountApplied={WALLET_DISCOUNT}
           />
         )}
 
@@ -312,6 +317,8 @@ export const MedicineComparisonLayout: React.FC<
             }}
             eligible={corporateCreditsEligible}
             remainingForEligibility={corporateCreditsRemainingForEligibility}
+            hasRemainingAmount={corporateCreditsHasRemainingAmount}
+            discountApplied={CORPORATE_CREDITS_DISCOUNT}
           />
         )}
 
@@ -322,6 +329,7 @@ export const MedicineComparisonLayout: React.FC<
           redeemedCoins={coinsOn ? Math.floor(maxCoinsUsable) : 0}
           onToggle={handleCoinsToggle}
           onInfoPress={() => setShowCoinsSheet(true)}
+          hasRemainingAmount={coinsHasRemainingAmount}
         />
 
         {/* Total Bill */}

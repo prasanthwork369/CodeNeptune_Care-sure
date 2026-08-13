@@ -391,7 +391,7 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
             colors={[gradientStart || "#FFFFFF", gradientEnd || "#FFFFFF"]}
             start={{ x: 0, y: 1 }}
             end={{ x: 0, y: 0 }}
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
           />
 
           <View className="pt-6 pb-8">

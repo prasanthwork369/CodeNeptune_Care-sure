@@ -9,7 +9,12 @@ export const CartWalletSection: React.FC<CartWalletSectionProps> = ({
   value,
   walletBalance,
   onToggle,
+  hasRemainingAmount = true,
+  discountApplied = 0,
 }) => {
+  // discountApplied is 0 whenever the toggle is off, so this shows the full
+  // balance until it's in use, then the remainder left after this order.
+  const displayBalance = walletBalance - discountApplied;
   return (
     <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4">
       <View className="py-3.5 flex-row items-center">
@@ -29,12 +34,13 @@ export const CartWalletSection: React.FC<CartWalletSectionProps> = ({
             style={s.walletSub}
             className="font-inter-medium text-brand-subtext mt-0.5"
           >
-            Available Balance: ₹{Number(walletBalance).toFixed(2)}
+            Available Balance: ₹{Number(displayBalance).toFixed(2)}
           </Text>
         </View>
         <CustomSwitch
           value={value}
           onValueChange={onToggle}
+          disabled={!value && !hasRemainingAmount}
           accessibilityLabel="Use CareSure Wallet Credits"
         />
       </View>

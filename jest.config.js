@@ -5,6 +5,10 @@
  */
 module.exports = {
   preset: "jest-expo",
+  // Forces requires from/into react-native-worklets to resolve the non-native
+  // build under Jest, so mocking reanimated doesn't pull in the real
+  // TurboModule (which throws with no native runtime attached).
+  resolver: "react-native-worklets/jest/resolver.js",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   // Path alias: imports use "@/src/..." which resolves from the project root.
   moduleNameMapper: {

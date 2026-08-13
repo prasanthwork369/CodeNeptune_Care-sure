@@ -224,7 +224,6 @@ export const notificationService = {
         {
           name: "Order Updates",
           importance: Notifications.AndroidImportance.HIGH,
-          sound: "default",
         },
       );
       await Notifications.setNotificationChannelAsync(
@@ -232,7 +231,6 @@ export const notificationService = {
         {
           name: "Reminders",
           importance: Notifications.AndroidImportance.HIGH,
-          sound: "default",
         },
       );
       await Notifications.setNotificationChannelAsync(

@@ -115,7 +115,10 @@ export const AuthMedicineBackground = React.memo(() => {
         pointerEvents="none"
       />
 
-      {/* Bottom Professional Linear Gradient Fade */}
+      {/* Bottom Professional Linear Gradient Fade — 150 matches
+          AuthScreenShell's backgroundStyle shrink-minimum (verticalScale(150))
+          on purpose, so the fade always reaches solid white exactly at the
+          form panel's top edge instead of leaving a hard-edged seam there. */}
       <LinearGradient
         colors={[
           "rgba(255,255,255,0)",

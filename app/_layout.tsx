@@ -191,7 +191,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS === "android") {
-      NavigationBar.setButtonStyleAsync("dark").catch(() => {});
+      NavigationBar.setStyle("dark");
     }
   }, []);
 
@@ -238,11 +238,10 @@ export default function RootLayout() {
           <KeyboardProvider>
             <SafeAreaProvider>
               <View style={{ flex: 1, backgroundColor: "#fff" }}>
-                <StatusBar
-                  style="dark"
-                  translucent
-                  backgroundColor="transparent"
-                />
+                {/* Edge-to-edge is mandatory as of SDK 55+, so the status bar is
+                    always translucent — translucent/backgroundColor props were
+                    removed from expo-status-bar's API. */}
+                <StatusBar style="dark" />
 
                 {/* Android measures text with the family registered at that moment and never re-measures once a font loads later, so nothing may mount before Inter is ready. */}
                 {interFontsLoaded && (
@@ -293,7 +292,7 @@ export default function RootLayout() {
                 {/* Splash curtain over the app tree; the tree still mounts and lays out beneath it once fonts are ready, so there is no white flash. */}
                 {showSplash && (
                   <View
-                    style={StyleSheet.absoluteFillObject}
+                    style={StyleSheet.absoluteFill}
                     pointerEvents="box-only"
                   >
                     {interFontsLoaded ? (

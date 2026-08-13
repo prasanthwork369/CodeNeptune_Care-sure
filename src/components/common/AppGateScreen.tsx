@@ -80,7 +80,7 @@ export const AppGateScreen: React.FC<AppGateScreenProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",

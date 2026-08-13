@@ -1,9 +1,9 @@
 import { ConfirmModal } from "@/src/components/ui/ConfirmModal";
+import { useNavigation } from "expo-router";
 import {
   NavigationAction,
-  useNavigation,
   usePreventRemove,
-} from "@react-navigation/native";
+} from "expo-router/react-navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 interface UnsavedChangesGuardProps {

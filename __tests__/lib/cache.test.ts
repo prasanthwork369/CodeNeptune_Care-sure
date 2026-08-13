@@ -66,6 +66,9 @@ describe("apiCache & withSqliteCache — SQLite Offline Fallback", () => {
 
       const wrappedFn = withSqliteCache("test_key", mockFetcher);
       const result = await wrappedFn();
+      // The cache write is deferred via setTimeout(0,...) so it doesn't
+      // delay handing fresh data back to the caller — flush it before asserting.
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(mockFetcher).toHaveBeenCalledTimes(1);
       expect(db.runSync).toHaveBeenCalledWith(

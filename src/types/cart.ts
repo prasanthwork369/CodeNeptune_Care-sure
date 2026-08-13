@@ -168,6 +168,13 @@ export interface CartWalletSectionProps {
   value: boolean;
   walletBalance: number;
   onToggle: (v: boolean) => void;
+  /** False once Coupon + Coins + Corporate Credits already cover the whole
+   * bill — nothing left for Wallet to offset, so the toggle is disabled
+   * (but stays togglable off if it was already on). */
+  hasRemainingAmount?: boolean;
+  /** Amount of walletBalance this order is currently using (0 while toggled
+   * off) — subtracted from the displayed balance so it reflects what's left. */
+  discountApplied?: number;
 }
 
 export interface CartCorporateCreditsSectionProps {
@@ -176,6 +183,13 @@ export interface CartCorporateCreditsSectionProps {
   onToggle: (v: boolean) => void;
   eligible?: boolean;
   remainingForEligibility?: number;
+  /** False once Coins + Wallet already cover the whole bill — nothing left for
+   * Corporate Credits to offset, so the toggle is disabled (but stays
+   * togglable off if it was already on). */
+  hasRemainingAmount?: boolean;
+  /** Amount of balance this order is currently using (0 while toggled off) —
+   * subtracted from the displayed balance so it reflects what's left. */
+  discountApplied?: number;
 }
 
 export interface CartCoinsSectionProps {
@@ -184,6 +198,10 @@ export interface CartCoinsSectionProps {
   redeemedCoins: number;
   onToggle: () => void;
   onInfoPress: () => void;
+  /** False once Corporate Credits + Wallet already cover the whole bill —
+   * nothing left for Coins to offset, so the toggle is disabled (but stays
+   * togglable off if it was already on). */
+  hasRemainingAmount?: boolean;
 }
 
 export interface CartBillSummaryProps {

@@ -60,6 +60,11 @@ export const CustomSwitch: React.FC<CustomSwitchProps> = ({
       }}
     >
       <Animated.View
+        // Isolates this natively-driven animation onto its own GPU layer.
+        // Without it, Android's view-flattening can conflate this node with
+        // sibling views (e.g. the balance label next to this switch),
+        // making them stop repainting once the spring animation runs.
+        renderToHardwareTextureAndroid
         style={{
           width: KNOB_SIZE,
           height: KNOB_SIZE,

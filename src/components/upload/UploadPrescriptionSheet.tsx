@@ -91,11 +91,19 @@ export const UploadPrescriptionSheet: React.FC<
   const [showBeforeUpload, setShowBeforeUpload] = useState(false);
   const sheetRef = useRef<BottomSheetModal>(null);
 
+  // Resets the expanded "Before You Upload" section each time the sheet
+  // reopens. Adjusted during render, not inside the effect below — setState
+  // in an effect body forces an extra render/commit purely to undo local
+  // state; this collapses that into the same render that already changed
+  // isVisible (React's documented pattern for resetting state on a prop change).
+  const [prevIsVisible, setPrevIsVisible] = useState(isVisible);
+  if (isVisible !== prevIsVisible) {
+    setPrevIsVisible(isVisible);
+    if (isVisible) setShowBeforeUpload(false);
+  }
+
   useEffect(() => {
-    if (isVisible) {
-      setShowBeforeUpload(false);
-      sheetRef.current?.snapToIndex(0);
-    }
+    if (isVisible) sheetRef.current?.snapToIndex(0);
   }, [isVisible]);
 
   const adjustedBottom = useAdjustedBottomInset();

@@ -11,7 +11,9 @@ export const CartCoinsSection: React.FC<CartCoinsSectionProps> = ({
   redeemedCoins,
   onToggle,
   onInfoPress,
+  hasRemainingAmount = true,
 }) => {
+  const disabled = !value && !hasRemainingAmount;
   return (
     <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4 py-3.5 flex-row items-center">
       <Touchable
@@ -43,9 +45,10 @@ export const CartCoinsSection: React.FC<CartCoinsSectionProps> = ({
       </Touchable>
       <Touchable
         onPress={onToggle}
+        disabled={disabled}
         accessibilityRole="checkbox"
         accessibilityLabel="Use CareSure Coins"
-        accessibilityState={{ checked: value }}
+        accessibilityState={{ checked: value, disabled }}
         style={[
           s.coinsCheck,
           {
@@ -55,6 +58,7 @@ export const CartCoinsSection: React.FC<CartCoinsSectionProps> = ({
             justifyContent: "center",
             backgroundColor: value ? "#0F7635" : "white",
             borderColor: value ? "#0F7635" : "#9CA3AF",
+            opacity: disabled ? 0.6 : 1,
           },
         ]}
       >

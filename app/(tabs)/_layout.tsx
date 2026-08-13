@@ -1,9 +1,8 @@
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import LiquidTabBar from "@/src/components/navigation/LiquidTabBar";
 import { tabs as tabConfig } from "@/src/constants/data";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useAuthStore } from "@/src/store/authStore";
-import { Tabs } from "expo-router";
+import { Tabs, type BottomTabBarProps } from "expo-router/js-tabs";
 import React from "react";
 
 // Hoisted so the tab bar isn't remounted by a fresh closure on every render.

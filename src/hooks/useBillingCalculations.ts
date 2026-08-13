@@ -90,6 +90,15 @@ export const useBillingCalculations = ({
     0,
     roundToPaise(corporateCreditsMinOrderValue - subtotalBeforeCredits),
   );
+  // How much would still be owed if Corporate Credits weren't used at all —
+  // independent of corporateCreditsOn, since subtotalBeforeCredits already
+  // excludes it. If Coins + Wallet alone already cover the bill, there's
+  // nothing left for Corporate Credits to offset, so it should be un-toggleable.
+  const remainingWithoutCorporateCredits = walletOn
+    ? Math.max(subtotalBeforeCredits - walletBalance, 0)
+    : subtotalBeforeCredits;
+  const corporateCreditsHasRemainingAmount =
+    remainingWithoutCorporateCredits > 0;
   const CORPORATE_CREDITS_DISCOUNT =
     corporateCreditsOn && corporateCreditsEligible
       ? roundToPaise(
@@ -109,6 +118,36 @@ export const useBillingCalculations = ({
   const WALLET_DISCOUNT = walletOn
     ? roundToPaise(Math.min(walletBalance, subtotalBeforeWallet))
     : 0;
+  // Mirrors corporateCreditsHasRemainingAmount: subtotalBeforeWallet already
+  // reflects Corporate Credits' current on/off state, so this is exactly
+  // "is there anything left for Wallet to pay for".
+  const walletHasRemainingAmount = subtotalBeforeWallet > 0;
+
+  // Coins sits first in the waterfall, so simulate the rest of the chain
+  // (Corporate Credits, then Wallet, at their current on/off state) against
+  // the larger amount left over without Coins. If those alone already cover
+  // it, Coins has nothing left to offset either.
+  const afterCouponWithoutCoins = Math.max(
+    subtotal - COUPON_DISCOUNT + deliveryFee + handlingCharge,
+    0,
+  );
+  const corporateCoverWithoutCoins =
+    corporateCreditsOn && corporateCreditsEligible
+      ? Math.min(
+          corporateCreditsBalance,
+          corporateCreditsMaxDiscount,
+          afterCouponWithoutCoins,
+        )
+      : 0;
+  const afterCorporateWithoutCoins = Math.max(
+    afterCouponWithoutCoins - corporateCoverWithoutCoins,
+    0,
+  );
+  const walletCoverWithoutCoins = walletOn
+    ? Math.min(walletBalance, afterCorporateWithoutCoins)
+    : 0;
+  const coinsHasRemainingAmount =
+    afterCorporateWithoutCoins - walletCoverWithoutCoins > 0;
 
   const toPay = roundToPaise(
     Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0),
@@ -129,9 +168,11 @@ export const useBillingCalculations = ({
   return {
     isCorporateUser,
     walletBalance,
+    walletHasRemainingAmount,
     availableCoins,
     maxCoinsUsable,
     coinValue,
+    coinsHasRemainingAmount,
     COUPON_DISCOUNT,
     COINS_DISCOUNT,
     WALLET_DISCOUNT,
@@ -139,6 +180,7 @@ export const useBillingCalculations = ({
     corporateCreditsBalance,
     corporateCreditsEligible,
     corporateCreditsRemainingForEligibility,
+    corporateCreditsHasRemainingAmount,
     productSavings,
     toPay,
     savingsRows,

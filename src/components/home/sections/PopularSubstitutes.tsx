@@ -331,7 +331,7 @@ export const PopularSubstitutes: React.FC<PopularSubstitutesProps> = ({
         colors={["#F2FAF7", "#FFFFFF"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
       <View className="flex-row justify-between items-center mb-4 px-4">
         <View>

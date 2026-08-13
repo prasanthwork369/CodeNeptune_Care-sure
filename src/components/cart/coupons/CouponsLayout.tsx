@@ -9,8 +9,15 @@ import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useState } from "react";
-import { ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
+import {
+  BackHandler,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
 import { requireInternet } from "@/src/utils/offline";
 
@@ -47,6 +54,22 @@ export const CouponsLayout: React.FC = () => {
       (screenHeight - exactScale(SKELETON_LIST_OFFSET)) /
         exactScale(SKELETON_CARD_HEIGHT),
     ),
+  );
+
+  // Same Fabric re-parent conflict as the header's back button (see onBack
+  // below) via the Android hardware back button instead — that pop isn't
+  // routed through onBack at all, so it needs its own defer.
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          requestAnimationFrame(() => router.back());
+          return true;
+        },
+      );
+      return () => subscription.remove();
+    }, [router]),
   );
 
   const applyCode = async (code: string) => {
@@ -86,7 +109,14 @@ export const CouponsLayout: React.FC = () => {
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
-      <ScreenHeader title="Apply Coupon" />
+      <ScreenHeader
+        title="Apply Coupon"
+        // Same defer as applyCode below: this screen's coupon/cart queries can
+        // still be mid-render (skeleton -> list swap) when back is tapped —
+        // starting the pop transition in that same tick is the Fabric
+        // re-parent crash this file already had to fix once.
+        onBack={() => requestAnimationFrame(() => router.back())}
+      />
 
       {/* Fixed search bar — stays pinned while only the coupon list scrolls */}
       <View

@@ -7,8 +7,8 @@ import {
 } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { isExpoGo } from "@/src/utils/environment";
-import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "expo-router";
 import * as Location from "expo-location";
 import { useEffect, useRef } from "react";
 import { Alert, AppState } from "react-native";

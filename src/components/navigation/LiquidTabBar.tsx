@@ -6,8 +6,8 @@ import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useUIStore } from "@/src/store/uiStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import { exactScale } from "@/src/utils/exactScale";
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
+import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
@@ -355,7 +355,11 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
   const { width: screenWidth } = useWindowDimensions();
   const activeRouteName = state.routes[state.index]?.name;
-  const keepBottomGradient = ["categories", "profile"].includes(
+  // Only Home writes to the shared tabBarVisible value (via its scroll
+  // handler). Every other screen that doesn't drive it itself needs to force
+  // the gradient on here, or it inherits whatever hidden/faded state Home
+  // last left behind instead of always showing on open.
+  const keepBottomGradient = ["categories", "profile", "upload"].includes(
     activeRouteName,
   );
 

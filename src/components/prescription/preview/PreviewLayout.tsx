@@ -20,9 +20,9 @@ import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { PrescriptionItem } from "@/src/types/prescription";
 import { logger } from "@/src/utils/logger";
+import { requireInternet } from "@/src/utils/offline";
 import { validatePrescriptionFile } from "@/src/utils/prescription";
-import { useFocusEffect } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -31,7 +31,6 @@ import React, {
   useState,
 } from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
-import { requireInternet } from "@/src/utils/offline";
 import {
   DuplicateFileModal,
   FileTooLargeModal,
@@ -133,9 +132,10 @@ export const PreviewLayout: React.FC = () => {
   const deferredImageUrls = useRef<string[]>([]);
   const activeItem = items[activeIndex] ?? items[0];
 
-  // Stable identities, or React.memo on PreviewDisplay can never hold.
-  const goPrev = useCallback(() => setActiveIndex((prev) => prev - 1), []);
-  const goNext = useCallback(() => setActiveIndex((prev) => prev + 1), []);
+  // React Compiler memoizes these automatically — stable identities for
+  // React.memo(PreviewDisplay) without a manual dependency array to drift.
+  const goPrev = () => setActiveIndex((prev) => prev - 1);
+  const goNext = () => setActiveIndex((prev) => prev + 1);
 
   // Averaged across files so one large upload can't dominate the bar. Failed
   // files contribute 0 rather than freezing the percentage at their last value.
@@ -170,16 +170,25 @@ export const PreviewLayout: React.FC = () => {
       source === "cart" || useUIStore.getState().isRxFromCartFlow;
     useUIStore.getState().setIsRxFromCartFlow(false);
     if (isFromCart) {
-      router.replace("/choose-method");
+      // dismissTo's name lookup wasn't reliably discarding
+      // prescription-history + the viewer pushed on top of choose-method, so
+      // pop the whole (prescription) stack down to its root unconditionally,
+      // then land on a fresh choose-method — guarantees nothing is left
+      // dangling regardless of entry path.
+      router.dismissAll();
+      router.replace("/(prescription)/choose-method");
     } else {
       router.replace("/(tabs)/upload");
     }
   }, [clearItems, router, source]);
 
+  // useFocusEffect requires a memoized callback — it invokes it immediately
+  // when the screen is already focused, not just on future focus events, so
+  // an unstable reference here re-fires the handler right on mount.
   const handleBackPress = useCallback(() => {
     if (items.length > 0) setShowLeaveConfirm(true);
     else exitFlow();
-  }, [items.length, exitFlow]);
+  }, [items.length, exitFlow, setShowLeaveConfirm]);
 
   // Intercepts the Android hardware back button too, so it shows the same
   // warning instead of leaving (and silently dropping the draft) unprompted.

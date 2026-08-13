@@ -2,14 +2,9 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { getDevUpdateReady, setDevUpdateReady } from "@/src/utils/devFlags";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React from "react";
 import { Text, View } from "react-native";
 
-/**
- * Flip to true to bring the preview buttons back. Kept off by default so the
- * overlay does not sit on top of the UI during normal development — the
- * component and its wiring stay intact, nothing to re-add.
- */
+
 const VISIBLE = false;
 
 export function DevPreviewToggler() {

@@ -292,12 +292,12 @@ export const SplashAnimationScreen: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "#F4FAF5",
     overflow: "hidden",
   },
   decorativeLayer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: "hidden",
   },
   glow: {

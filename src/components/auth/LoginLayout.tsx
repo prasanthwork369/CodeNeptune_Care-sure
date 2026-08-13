@@ -1,6 +1,8 @@
 import { useLogin } from "@/src/hooks/useLogin";
-import React from "react";
-import { Text, View } from "react-native";
+import { useAuthStore } from "@/src/store/authStore";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
+import { BackHandler, Text, View } from "react-native";
 import { styles as s } from "./LoginLayout.styles";
 import { AuthFooter } from "./sections/AuthFooter";
 import { AuthScreenShell } from "./sections/AuthScreenShell";
@@ -24,6 +26,27 @@ export const LoginLayout: React.FC = () => {
     handleHintPress,
     handleGetOtp,
   } = useLogin();
+
+  // Expo Router's initial-deep-link anchor (unstable_settings in
+  // app/_layout.tsx) seeds a real Home route beneath this screen on every
+  // cold, unauthenticated launch — so the default hardware-back pop would
+  // silently drop the user into Home without ever going through the
+  // explicit Skip button. Exit the app instead, unless the user already
+  // opted into guest browsing (isGuest): that means Login was reached from
+  // a real in-app screen (e.g. guest checkout), where back should return there.
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          if (useAuthStore.getState().isGuest) return false;
+          BackHandler.exitApp();
+          return true;
+        },
+      );
+      return () => subscription.remove();
+    }, []),
+  );
 
   return (
     // Skip is left to AuthScreenShell's default — it already replaces to /(tabs).

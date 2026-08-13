@@ -14,7 +14,12 @@ export const CartCorporateCreditsSection: React.FC<
   onToggle,
   eligible = true,
   remainingForEligibility = 0,
+  hasRemainingAmount = true,
+  discountApplied = 0,
 }) => {
+  // discountApplied is 0 whenever the toggle is off, so this shows the full
+  // balance until it's in use, then the remainder left after this order.
+  const displayBalance = balance - discountApplied;
   return (
     <View className="mx-4 mt-3 bg-white border border-[#919EAB33] rounded-[12px] px-4">
       <View className="py-3.5 flex-row items-center">
@@ -34,13 +39,14 @@ export const CartCorporateCreditsSection: React.FC<
             style={s.walletSub}
             className="font-inter-medium text-brand-subtext mt-0.5"
           >
-            Available Balance: ₹{Number(balance).toFixed(2)}
+            Available Balance: ₹{Number(displayBalance).toFixed(2)}
           </Text>
         </View>
         {eligible ? (
           <CustomSwitch
             value={value}
             onValueChange={onToggle}
+            disabled={!value && !hasRemainingAmount}
             accessibilityLabel="Use Corporate Credits"
           />
         ) : null}

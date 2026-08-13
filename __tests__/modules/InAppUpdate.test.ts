@@ -19,6 +19,15 @@ jest.mock("react-native", () => ({
   },
 }));
 
+// jest.resetModules() below re-triggers expo's fetch polyfill, which pulls in
+// expo-modules-core's native view registry and, with it, nativewind's
+// css-interop — which reads Appearance/AppState/AccessibilityInfo from the
+// real "react-native" at import time. This test's minimal react-native mock
+// above doesn't provide those, and this test has nothing to do with styling,
+// so just no-op the whole styling runtime instead of reconstructing RN's API.
+jest.mock("react-native-css-interop", () => ({}));
+jest.mock("react-native-css-interop/jsx-runtime", () => require("react/jsx-runtime"));
+
 const load = () => require("@/src/modules/InAppUpdate");
 
 describe("InAppUpdate wrapper", () => {

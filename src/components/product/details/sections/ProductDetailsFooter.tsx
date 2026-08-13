@@ -234,6 +234,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             {/* Divider */}
             <View
               style={{
+                alignSelf: "center",
                 width: 1,
                 height: exactScale(28),
                 backgroundColor: "rgba(255,255,255,0.3)",

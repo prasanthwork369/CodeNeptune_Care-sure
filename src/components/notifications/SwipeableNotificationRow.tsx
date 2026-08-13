@@ -120,8 +120,6 @@ export const SwipeableNotificationRow: React.FC<
         friction={1.05}
         rightThreshold={exactScale(40)}
         dragOffsetFromRightEdge={exactScale(16)}
-        activeOffsetX={[-exactScale(16), exactScale(16)]}
-        failOffsetY={[-exactScale(12), exactScale(12)]}
         overshootLeft={false}
         overshootRight={false}
         renderRightActions={renderRightActions}
