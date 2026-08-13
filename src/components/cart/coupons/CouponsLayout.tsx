@@ -170,7 +170,8 @@ export const CouponsLayout: React.FC = () => {
         ) : (
           visibleCoupons.map((coupon) => {
             const isApplied =
-              applied?.code?.toUpperCase() === coupon.code?.toUpperCase();
+              applied?.code?.trim().toUpperCase() ===
+              coupon.code?.trim().toUpperCase();
             // Failed pre-validation despite meeting the min order
             // (e.g. usage limit reached) → show inactive. The
             // min-order case is already covered by `disabled`.

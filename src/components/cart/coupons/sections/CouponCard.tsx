@@ -170,7 +170,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
                   fontWeight: "700",
                 }}
               >
-                {isApplied ? "APPLIED" : "APPLY"}
+                {isApplied ? "APPLIED" : isUnavailable ? "USED" : "APPLY"}
               </Text>
             )}
           </Touchable>

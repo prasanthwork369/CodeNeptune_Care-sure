@@ -227,6 +227,8 @@ export interface CartFooterProps {
   /** False while admin charge settings are still loading — blocks checkout so
    * a bill without delivery/handling can't be frozen into an order. */
   canProceed?: boolean;
+  /** Rx carts go to choose-method first, so the button reads "Checkout" not "Pay". */
+  hasRxItem?: boolean;
 }
 
 export interface Coupon {

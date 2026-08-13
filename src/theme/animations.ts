@@ -31,8 +31,8 @@ export const springs = {
 export const screenTransitions = {
   /** Details, settings and edit flows use platform-native push/pop motion. */
   nativePush: {
-    animation: "fade",
-    animationDuration: 200,
+    animation: "slide_from_right",
+    animationDuration: 220,
     gestureEnabled: true,
     contentStyle: { backgroundColor: "#FFFFFF" },
     freezeOnBlur: true,
@@ -50,6 +50,9 @@ export const screenTransitions = {
   authComplete: {
     animation: "fade_from_bottom",
     animationDuration: 250,
+    // Without this the screen container is transparent and Home's skeleton
+    // shows through the fade instead of a clean transition.
+    contentStyle: { backgroundColor: "#FFFFFF" },
     freezeOnBlur: true,
   },
   /** Navigation-owned modal screens slide up and support native dismissal. */

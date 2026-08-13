@@ -8,7 +8,9 @@ import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
+  Animated as RNAnimated,
   Keyboard,
+  LayoutChangeEvent,
   Platform,
   Pressable,
   ScrollView,
@@ -22,7 +24,6 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -32,6 +33,9 @@ interface AuthScreenShellProps {
   onSkip?: () => void;
   footer?: React.ReactNode;
 }
+
+// Crash guard only — see backgroundStyle below.
+const MIN_BACKGROUND_HEIGHT = verticalScale(80);
 
 export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   children,
@@ -92,13 +96,35 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     transform: [{ translateY: -Math.max(0, kbHeight.value - adjustedBottom) }],
   }));
 
+  // Measured, not guessed: the sticky block's resting (pre-transform) top Y,
+  // relative to `container` — which starts flush with this screen's own top,
+  // so it's effectively the panel's resting Y on screen. A fixed height/floor
+  // formula here can only match the panel's *actual* position by coincidence
+  // (it did, briefly, at exactly one pair of magic numbers, and broke the
+  // instant OTP's longer content or deeper keyboard offset shifted the
+  // panel's real position without shifting the guess the same amount).
+  // Bridged into a shared value via an effect (not mutated directly in the
+  // onLayout handler) — React Compiler's immutability check only knows to
+  // skip analyzing useEffect bodies, same as kbHeight above.
+  const [panelRestY, setPanelRestY] = React.useState(backgroundHeight);
+  const panelTopY = useSharedValue(backgroundHeight);
+  React.useEffect(() => {
+    panelTopY.value = panelRestY;
+  }, [panelRestY, panelTopY]);
+  const handleStickyLayout = (e: LayoutChangeEvent) => {
+    setPanelRestY(e.nativeEvent.layout.y);
+  };
+
   // Keep the medicine background's bottom fade attached to the form edge.
   // The form rises with the keyboard; without resizing this layer, the form
   // covers the fade and leaves a hard transition on both Login and OTP.
+  // MIN_BACKGROUND_HEIGHT is only a crash guard for before the first
+  // onLayout measurement lands (or a pathological content/keyboard
+  // combination) — panelTopY is what actually drives this now.
   const backgroundStyle = useAnimatedStyle(() => ({
     height: Math.max(
-      verticalScale(150),
-      backgroundHeight - Math.max(0, kbHeight.value - adjustedBottom),
+      MIN_BACKGROUND_HEIGHT,
+      panelTopY.value - Math.max(0, kbHeight.value - adjustedBottom),
     ),
   }));
 
@@ -116,10 +142,8 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     0,
     screenHeight - keyboardOffset - insets.top - verticalScale(8),
   );
-  const skipScale = useSharedValue(1);
-  const skipStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: skipScale.value }],
-  }));
+  
+  const [skipScale] = React.useState(() => new RNAnimated.Value(1));
 
   const handleSkip = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -129,6 +153,23 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     } else {
       router.replace("/(tabs)");
     }
+  };
+
+  const handleSkipPressIn = () => {
+    RNAnimated.spring(skipScale, {
+      toValue: 0.93,
+      damping: 15,
+      stiffness: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+  const handleSkipPressOut = () => {
+    RNAnimated.spring(skipScale, {
+      toValue: 1,
+      damping: 15,
+      stiffness: 300,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
@@ -144,7 +185,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
       </Animated.View>
 
       {/* Skip button — fixed top-right */}
-      <Animated.View
+      <RNAnimated.View
         style={[
           styles.skipWrapper,
           {
@@ -154,19 +195,15 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
                 : verticalScale(53),
             right: width >= 390 ? scale(13) : scale(16),
           },
-          skipStyle,
+          { transform: [{ scale: skipScale }] },
         ]}
       >
         <Pressable
           style={styles.skipBtnOuter}
           accessibilityRole="button"
           accessibilityLabel="Skip"
-          onPressIn={() => {
-            skipScale.value = withSpring(0.93, { damping: 15, stiffness: 300 });
-          }}
-          onPressOut={() => {
-            skipScale.value = withSpring(1, { damping: 15, stiffness: 300 });
-          }}
+          onPressIn={handleSkipPressIn}
+          onPressOut={handleSkipPressOut}
           onPress={handleSkip}
         >
           <BlurView
@@ -179,7 +216,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
             <icons.arrow_forward_darkgreen width={6} height={11.08} />
           </BlurView>
         </Pressable>
-      </Animated.View>
+      </RNAnimated.View>
 
       <View style={styles.container}>
         {/* Tap area above the sticky block — dismiss keyboard */}
@@ -188,6 +225,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
         {/* Entire bottom block (panel + footer incl. policy links) rides as one unit, translating in sync with the keyboard */}
         <Animated.View
           style={[stickyStyle, { maxHeight: availableContentHeight }]}
+          onLayout={handleStickyLayout}
         >
           <ScrollView
             bounces={false}

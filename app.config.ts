@@ -16,12 +16,13 @@ try {
 
 // Single source of truth — reused for both `extra.eas.projectId` and the
 // EAS Update URL below, so the two can never drift apart.
-const easProjectId = "8af7d922-a6f0-45a5-8c9d-d51ba283e5c2";
+const easProjectId = "6e53d32b-6a5b-458e-9082-bbc1737ea34c";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Caresure",
   slug: "Caresure",
+  owner: "prasanthwork",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",

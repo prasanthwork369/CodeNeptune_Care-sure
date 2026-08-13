@@ -11,8 +11,10 @@ export const CartFooter: React.FC<CartFooterProps> = ({
   safeAreaBottom,
   onProceed,
   canProceed = true,
+  hasRxItem = false,
 }) => {
   const formattedTotal = Number(toPay).toFixed(2);
+  const buttonTitle = hasRxItem ? "Proceed to checkout" : "Proceed to pay";
 
   return (
     <StickyFooter
@@ -50,12 +52,12 @@ export const CartFooter: React.FC<CartFooterProps> = ({
 
       <View style={{ flex: 1, minWidth: 0 }}>
         <AppButton
-          title="Proceed to pay"
+          title={buttonTitle}
           onPress={onProceed}
           disabled={!canProceed}
           size="md"
           style={{ width: "100%", paddingHorizontal: exactScale(8) }}
-          accessibilityLabel={`Proceed to pay ₹${formattedTotal}`}
+          accessibilityLabel={`${buttonTitle} ₹${formattedTotal}`}
           accessibilityHint="Continues to delivery and payment"
         />
       </View>

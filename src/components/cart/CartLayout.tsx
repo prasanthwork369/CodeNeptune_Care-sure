@@ -105,6 +105,7 @@ export const CartLayout: React.FC = () => {
   } = useCartCalculations();
 
   const addressActionLabel = hasSavedAddress ? "Change" : "Add Address";
+  const hasRxItem = lines.some((line) => line.rx);
 
   const shouldShowSavingsBanner = totalSavings > 0;
 
@@ -260,6 +261,7 @@ export const CartLayout: React.FC = () => {
         safeAreaBottom={adjustedBottom}
         onProceed={handleProceed}
         canProceed={chargesReady && !hasPendingCartAction}
+        hasRxItem={hasRxItem}
       />
 
       <BillDetailsSheet

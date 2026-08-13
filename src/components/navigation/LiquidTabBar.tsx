@@ -355,13 +355,17 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const setTabBarHeight = useTabBarStore((s) => s.setTabBarHeight);
   const { width: screenWidth } = useWindowDimensions();
   const activeRouteName = state.routes[state.index]?.name;
-  // Only Home writes to the shared tabBarVisible value (via its scroll
-  // handler). Every other screen that doesn't drive it itself needs to force
-  // the gradient on here, or it inherits whatever hidden/faded state Home
-  // last left behind instead of always showing on open.
-  const keepBottomGradient = ["categories", "profile", "upload"].includes(
-    activeRouteName,
-  );
+  // Without this, TabBarFadeGradient falls back to its own default
+  // visibleHeight (~adjustedBottom + 4px) — nowhere near tall enough to back
+  // the whole glass pill, so most of it has nothing solid behind it and
+  // scrolled content shows straight through. Forcing it on gives every
+  // screen, including Home, the full BAR_HEIGHT-tall opaque backdrop.
+  const keepBottomGradient = [
+    "index",
+    "categories",
+    "profile",
+    "upload",
+  ].includes(activeRouteName);
 
   const pillRoutes = useMemo(
     () =>

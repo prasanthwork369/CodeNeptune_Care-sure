@@ -204,7 +204,6 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
             <View
               className="justify-center"
               style={{
-                flex: 1,
                 minWidth: exactScale(76),
                 paddingLeft: exactScale(4),
                 paddingRight: exactScale(6),
