@@ -21,9 +21,9 @@ interface TabBarGlassProps {
 export const TabBarGlass: React.FC<TabBarGlassProps> = ({ radius }) => (
   <>
     <BlurView
-      intensity={40}
+      intensity={45}
       tint={Platform.OS === "ios" ? "systemUltraThinMaterialLight" : "light"}
-      blurMethod="none"
+      experimentalBlurMethod="none"
       pointerEvents="none"
       style={StyleSheet.absoluteFill}
     />

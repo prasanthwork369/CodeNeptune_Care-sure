@@ -99,8 +99,8 @@ const HomeContent: React.FC = () => {
 
   useScrollToTop(listRef);
 
-  const searchBarAnim = useSlideUp(350);
-  const quickActionsAnim = useSlideUp(500);
+  const searchBarAnim = useSlideUp(0);
+  const quickActionsAnim = useSlideUp(50);
 
   // Select stable setters individually so HomeLayout never subscribes to the
   // whole UI store — otherwise every isFeedScrolling toggle would re-render

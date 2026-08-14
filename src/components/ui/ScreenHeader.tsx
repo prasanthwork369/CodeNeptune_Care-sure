@@ -7,12 +7,15 @@ import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
+import { GlassHeader } from "@/src/components/ui/GlassHeader";
+
 interface ScreenHeaderProps {
   title: string;
   onBack?: () => void;
   backgroundColor?: string;
   showBorder?: boolean;
   rightSlot?: React.ReactNode;
+  variant?: "default" | "glass";
 }
 
 export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
@@ -21,7 +24,18 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   backgroundColor,
   showBorder = true,
   rightSlot,
+  variant = "default",
 }) => {
+  if (variant === "glass") {
+    return (
+      <GlassHeader
+        title={title}
+        onBack={onBack}
+        rightSlot={rightSlot}
+        showBorder={showBorder}
+      />
+    );
+  }
   const router = useNav();
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());

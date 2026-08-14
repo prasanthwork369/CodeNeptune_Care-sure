@@ -4,14 +4,14 @@ import {
   useFlyToCartSafe,
   type VisualCartImage,
 } from "@/src/components/animations/flyToCart";
+import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { useUIStore } from "@/src/store/uiStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Text,

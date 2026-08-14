@@ -1,3 +1,4 @@
+import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import {
   PRESCRIPTION_STATUS,
@@ -5,10 +6,9 @@ import {
 } from "@/src/constants/prescription-status";
 import { useIsVisible } from "@/src/hooks/ui/useVisibleInterval";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
-import { Touchable } from "@/src/components/ui/Touchable";
-import React, { useEffect } from "react";
-import { Text, View } from "react-native";
 import { Image } from "expo-image";
+import { useEffect } from "react";
+import { Text, View } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -21,9 +21,9 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 
 const DURATION = 250;
 const EASE_IN_OUT = Easing.inOut(Easing.ease);

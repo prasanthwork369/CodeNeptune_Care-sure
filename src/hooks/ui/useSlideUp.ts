@@ -10,19 +10,21 @@ import {
 const easeOut = Easing.out(Easing.cubic);
 
 export function useSlideUp(delayMs: number) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
+  const opacity = useSharedValue(delayMs <= 0 ? 1 : 0);
+  const translateY = useSharedValue(delayMs <= 0 ? 0 : 20);
 
   useEffect(() => {
-    opacity.value = withDelay(
-      delayMs,
-      withTiming(1, { duration: 480, easing: easeOut }),
-    );
-    translateY.value = withDelay(
-      delayMs,
-      withTiming(0, { duration: 480, easing: easeOut }),
-    );
-  }, []);
+    if (delayMs > 0) {
+      opacity.value = withDelay(
+        delayMs,
+        withTiming(1, { duration: 350, easing: easeOut }),
+      );
+      translateY.value = withDelay(
+        delayMs,
+        withTiming(0, { duration: 350, easing: easeOut }),
+      );
+    }
+  }, [delayMs]);
 
   return useAnimatedStyle(() => ({
     opacity: opacity.value,
