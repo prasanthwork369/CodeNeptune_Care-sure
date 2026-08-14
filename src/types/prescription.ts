@@ -23,19 +23,24 @@ export interface Prescription {
   doctor: string;
 }
 
-/** Backend-accepted "Never Miss a Refill" frequencies. */
+/** Preset "Never Miss a Refill" chip values shown in the picker UI. */
 export type ReminderFrequencyDays = 7 | 14 | 21 | 30;
 
-/** Set-reminder payload: recurring every N days, or a one-time custom date ("YYYY-MM-DD"). */
-export type ReminderInput =
-  { frequencyDays: ReminderFrequencyDays } | { remindAt: string };
+/**
+ * Set-reminder payload. The backend only accepts a day-count — a custom
+ * calendar date is never sent as-is, it's converted to "days from today"
+ * first (see ReminderSheet). Any positive integer is valid, not just the
+ * 7/14/21/30 chip presets.
+ */
+export type ReminderInput = { frequencyDays: number };
 
 /** Refill reminder attached to a prescription; null/absent when never set. */
 export interface PrescriptionReminder {
   status: "active" | "cancelled" | "completed" | string;
   /** "once" for custom-date reminders; null frequencyDays goes with it. */
   type?: "recurring" | "once";
-  frequencyDays: ReminderFrequencyDays | null;
+  /** Day count the reminder was set with — a custom date may be any value, not just the chip presets. */
+  frequencyDays: number | null;
   nextRemindAt: string | null;
 }
 

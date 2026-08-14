@@ -28,6 +28,8 @@ export const QuickActions: React.FC<QuickActionsProps> = React.memo(
                 source={action.icon}
                 style={s.iconImg}
                 contentFit="contain"
+                cachePolicy="memory"
+                transition={150}
               />
             </View>
             <Text

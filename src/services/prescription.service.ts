@@ -13,13 +13,20 @@ import { AppError } from "@/src/api/errors";
 
 type SuccessResult<T> = { success: true; data: T };
 // `code` lets callers distinguish e.g. "Health Updates disabled" from a generic failure.
-type FailureResult = { success: false; error: string; code?: string };
+// `raw` is the untouched backend response body — kept only so __DEV__ logging
+// can surface field-level validation detail the generic `error` string drops.
+type FailureResult = {
+  success: false;
+  error: string;
+  code?: string;
+  raw?: unknown;
+};
 type ServiceResult<T> = SuccessResult<T> | FailureResult;
 
 function toFailure(err: unknown): FailureResult {
   if (err instanceof AppError) {
     const code = (err.data as { code?: string } | undefined)?.code;
-    return { success: false, error: err.message, code };
+    return { success: false, error: err.message, code, raw: err.data };
   }
   if (err instanceof Error) return { success: false, error: err.message };
   return { success: false, error: "Something went wrong" };

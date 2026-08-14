@@ -138,15 +138,15 @@ describe("useRefillReminder", () => {
     );
   });
 
-  it("sends a custom date as date-only remindAt (one-time reminder)", async () => {
-    const remindAt = "2026-09-01";
+  it("sends a custom date as a day-count frequencyDays (one-time reminder)", async () => {
+    const frequencyDays = 10;
     const serverNextRemindAt = "2026-09-01T03:30:00.000Z";
     service.setReminder.mockResolvedValue({
       success: true,
       data: {
         status: "active",
         type: "once",
-        frequencyDays: null,
+        frequencyDays,
         nextRemindAt: serverNextRemindAt,
       },
     });
@@ -156,10 +156,12 @@ describe("useRefillReminder", () => {
     );
 
     await act(async () => {
-      expect(await result.current.setReminder({ remindAt })).toBe(true);
+      expect(await result.current.setReminder({ frequencyDays })).toBe(true);
     });
 
-    expect(service.setReminder).toHaveBeenCalledWith("rx-1", { remindAt });
+    expect(service.setReminder).toHaveBeenCalledWith("rx-1", {
+      frequencyDays,
+    });
     expect(result.current.isActive).toBe(true);
     expect(result.current.nextRemindDate?.toISOString()).toBe(
       serverNextRemindAt,

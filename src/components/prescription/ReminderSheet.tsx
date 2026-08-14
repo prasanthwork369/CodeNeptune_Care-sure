@@ -30,9 +30,17 @@ const addDays = (days: number): Date => {
   return d;
 };
 
-// "YYYY-MM-DD" from local parts — toISOString() could shift the day across UTC.
-const toDateOnly = (d: Date): string =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+// The backend only accepts a day-count, so a picked calendar date is
+// converted to "days from today" before it's sent — never sent as a date.
+const daysFromToday = (target: Date): number => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const day = new Date(target);
+  day.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.round((day.getTime() - today.getTime()) / MS_PER_DAY));
+};
 
 export const ReminderSheet: React.FC<ReminderSheetProps> = ({
   isVisible,
@@ -55,7 +63,7 @@ export const ReminderSheet: React.FC<ReminderSheetProps> = ({
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const validDate = customDate < today ? new Date() : customDate;
-      input = { remindAt: toDateOnly(validDate) };
+      input = { frequencyDays: daysFromToday(validDate) };
     }
     onConfirm?.(input);
     onClose();

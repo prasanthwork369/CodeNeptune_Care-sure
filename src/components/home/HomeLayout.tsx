@@ -52,7 +52,10 @@ import { useFocusEffect } from "expo-router";
 import { FlashList, FlashListRef, ListRenderItem } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { RefreshControl, View } from "react-native";
-import Animated, { useSharedValue } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  useSharedValue,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // FlashList has no built-in Reanimated wrapper the way RN's FlatList does, so
@@ -100,7 +103,6 @@ const HomeContent: React.FC = () => {
   useScrollToTop(listRef);
 
   const searchBarAnim = useSlideUp(0);
-  const quickActionsAnim = useSlideUp(50);
 
   // Select stable setters individually so HomeLayout never subscribes to the
   // whole UI store — otherwise every isFeedScrolling toggle would re-render
@@ -430,8 +432,13 @@ const HomeContent: React.FC = () => {
 
         case "quickActions":
           return (
+            // `entering` ties the fade-in to this view's own mount inside the
+            // FlashList item, unlike a parent-scheduled shared-value timer
+            // (the old useSlideUp approach) which could fire before this view
+            // existed to consume it and leave the row stuck invisible.
             <Animated.View
-              style={[quickActionsAnim, { marginTop: exactScale(5) }]}
+              entering={FadeInDown.delay(50).duration(350)}
+              style={{ marginTop: exactScale(5) }}
             >
               <QuickActions
                 actions={QUICK_ACTIONS}
@@ -539,7 +546,6 @@ const HomeContent: React.FC = () => {
       isHomeLoading,
       isSubcategoriesLoading,
       openLocationSheet,
-      quickActionsAnim,
       goToSearch,
       searchRightSlot,
       searchBarAnim,
