@@ -14,23 +14,22 @@ import {
 import {
   CARD_HEIGHT,
   CARD_WIDTH,
-  GRID_PADDING,
-  GRID_GAP,
 } from "./categories.styles";
 
-const SIDEBAR_WIDTH = exactScale(86);
+const SIDEBAR_WIDTH = exactScale(80);
+const GRID_PADDING = exactScale(12);
+const GRID_GAP = exactScale(10);
 
 export const CategoriesLayout: React.FC = () => {
   const { width: windowWidth } = useWindowDimensions();
   const [activeTabId, setActiveTabId] = useState("");
   const adjustedBottom = useAdjustedBottomInset();
 
-  // Dynamically calculate width so cards fill the entire remaining space exactly
+  // 3-column grid calculation: image box (square) + text label below
   const availableGridWidth =
-    windowWidth - SIDEBAR_WIDTH - GRID_PADDING * 2 - GRID_GAP;
-  const cardWidth = availableGridWidth / 2;
-  // Scale height proportionally to maintain the design aspect ratio
-  const cardHeight = cardWidth * (CARD_HEIGHT / CARD_WIDTH);
+    windowWidth - SIDEBAR_WIDTH - GRID_PADDING * 2 - GRID_GAP * 2;
+  const cardWidth = Math.floor(availableGridWidth / 3);
+  const cardHeight = cardWidth + exactScale(34);
 
   const { tabs, cards, isLoading, error, refetch } = useCategories();
 
@@ -43,7 +42,7 @@ export const CategoriesLayout: React.FC = () => {
   const activeCards = cards.filter((card) => card.tabId === activeTabId);
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View className="flex-1 bg-white">
       <ScreenHeader
         title="Categories"
         showBorder

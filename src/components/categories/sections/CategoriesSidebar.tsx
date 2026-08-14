@@ -5,8 +5,9 @@ import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useEffect, useRef } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { sidebarStyles as s } from "../categories.styles";
-import { exactScale } from "@/src/utils/exactScale";
+import { LinearGradient } from "expo-linear-gradient";
+import { useTabBarStore } from "@/src/store/useTabBarStore";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -76,20 +77,21 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
     transform: [{ translateY: indicatorY.value }],
   }));
 
+  const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
+
   if (isLoading) {
     return (
-      <View className="bg-white border-r border-[#919EAB33]" style={{ width }}>
+      <View className="bg-[#F7F8FA] border-r border-[#919EAB33]" style={{ width }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingTop: exactScale(10),
-            paddingBottom:
-              components.tabBar.height + safeAreaBottom + exactScale(16),
+            paddingBottom: tabBarHeight + safeAreaBottom + exactScale(16),
           }}
         >
           {Array.from({ length: 7 }).map((_, i) => (
-            <View key={i} className="items-center py-5 gap-y-2">
-              <Skeleton width={28} height={28} borderRadius={14} />
+            <View key={i} className="items-center py-4 gap-y-2">
+              <Skeleton width={40} height={40} borderRadius={12} />
               <Skeleton width={44} height={10} borderRadius={4} />
             </View>
           ))}
@@ -100,16 +102,17 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
 
   return (
     <View
-      className="bg-white border-r border-[#919EAB33] z-10"
-      style={{ width }}
+      style={{ width, height: "100%", alignSelf: "stretch", backgroundColor: "#F2F4F7" }}
+      className="z-10"
     >
       <ScrollView
         ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
+        style={{ flex: 1, backgroundColor: "#F2F4F7" }}
         contentContainerStyle={{
-          paddingTop: exactScale(10),
-          paddingBottom:
-            components.tabBar.height + safeAreaBottom + exactScale(16),
+          backgroundColor: "#F2F2F7",
+          flexGrow: 1,
+          paddingBottom: tabBarHeight + safeAreaBottom + exactScale(16),
         }}
         onLayout={(e) => {
           viewportHeight.current = e.nativeEvent.layout.height;
@@ -119,24 +122,34 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
           style={[
             {
               position: "absolute",
-              right: 0,
+              left: 0,
               top: 0,
               width: 4.5,
               height: INDICATOR_HEIGHT,
+              borderTopRightRadius: 4,
+              borderBottomRightRadius: 4,
+              zIndex: 20,
             },
             indicatorStyle,
           ]}
-          className="bg-[#0F7635] rounded-l-full"
+          className="bg-[#0F7635]"
         />
 
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const isActive = tab.id === activeTabId;
+          const activeIndex = tabs.findIndex((t) => t.id === activeTabId);
+          const isAboveActive = index === activeIndex - 1;
+          const isBelowActive = index === activeIndex + 1;
+
+          const wrapperBg = isActive || isAboveActive || isBelowActive ? "#FFFFFF" : "#F2F4F7";
+          const itemBg = isActive ? "#FFFFFF" : "#F2F4F7";
+          const borderBottomRightRadius = isAboveActive ? exactScale(24) : 0;
+          const borderTopRightRadius = isBelowActive ? exactScale(24) : 0;
+
           return (
-            <Touchable
+            <View
               key={tab.id}
-              onPress={() => onTabPress(tab.id)}
-              activeOpacity={0.8}
-              className="items-center py-4"
+              style={{ backgroundColor: wrapperBg, width: "100%" }}
               onLayout={(e) => {
                 const { y, height } = e.nativeEvent.layout;
                 tabLayouts.current[tab.id] = { y, height };
@@ -145,28 +158,78 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                 }
               }}
             >
-              <View
-                style={s.iconWrap}
-                className="items-center justify-center mb-1"
+              <Touchable
+                onPress={() => onTabPress(tab.id)}
+                activeOpacity={0.85}
+                style={{
+                  backgroundColor: itemBg,
+                  borderBottomRightRadius,
+                  borderTopRightRadius,
+                  alignItems: "center",
+                  paddingVertical: exactScale(12),
+                  paddingHorizontal: exactScale(4),
+                }}
               >
-                <Image
-                  source={isActive ? tab.imageActive : tab.imageInactive}
-                  style={s.icon}
-                  contentFit="contain"
-                />
-              </View>
-              {/* Fixed 86px column, so the OS font setting must not widen this. */}
+              {isActive ? (
+                <LinearGradient
+                  colors={[
+                    "rgba(196, 241, 86, 0.24)",
+                    "rgba(80, 181, 59, 0.24)",
+                  ]}
+                  start={{ x: 0.0168, y: 0.5 }}
+                  end={{ x: 0.9966, y: 0.5 }}
+                  style={{
+                    width: exactScale(48),
+                    height: exactScale(48),
+                    borderRadius: 14,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 5,
+                  }}
+                >
+                  <Image
+                    source={tab.imageActive}
+                    style={{ width: exactScale(28), height: exactScale(28) }}
+                    contentFit="contain"
+                  />
+                </LinearGradient>
+              ) : (
+                <View
+                  style={{
+                    width: exactScale(48),
+                    height: exactScale(48),
+                    borderRadius: 14,
+                    backgroundColor: "#FFFFFF",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 5,
+                    borderWidth: 1,
+                    borderColor: "#E5E7EB",
+                  }}
+                >
+                  <Image
+                    source={tab.imageInactive}
+                    style={{ width: exactScale(28), height: exactScale(28) }}
+                    contentFit="contain"
+                  />
+                </View>
+              )}
               <Text
-                style={s.label}
-                className={`text-center px-1 text-brand-text ${isActive ? "font-inter-semibold" : "font-inter-medium"}`}
+                style={{
+                  fontSize: moderateScale(10.5),
+                  lineHeight: moderateScale(13),
+                  color: isActive ? "#0F7635" : "#334155",
+                }}
+                className={`text-center px-0.5 ${isActive ? "font-inter-bold" : "font-inter-medium"}`}
                 numberOfLines={2}
                 allowFontScaling={false}
               >
                 {breakableLabel(tab.label)}
               </Text>
             </Touchable>
-          );
-        })}
+          </View>
+        );
+      })}
       </ScrollView>
     </View>
   );

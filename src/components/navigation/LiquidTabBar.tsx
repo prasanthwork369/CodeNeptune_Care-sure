@@ -7,8 +7,8 @@ import { useUIStore } from "@/src/store/uiStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import { exactScale } from "@/src/utils/exactScale";
 import * as Haptics from "expo-haptics";
-import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { LinearGradient } from "expo-linear-gradient";
+import type { BottomTabBarProps } from "expo-router/js-tabs";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   DeviceEventEmitter,
@@ -409,17 +409,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   // short delay for the typeface cache to warm up -- which forces genuine native style
   // recomputes and lets the active label land on the bold weight without needing a tap.
   useEffect(() => {
-    if (Platform.OS !== "android") return;
-    const id = setTimeout(() => {
-      followerX.value = withSequence(
-        withTiming(lastValidIndex.current + 0.01, { duration: 16 }),
-        withTiming(lastValidIndex.current, { duration: 16 }),
-      );
-    }, 80);
-    return () => clearTimeout(id);
-  }, []);
-
-  useEffect(() => {
     if (activePillIndex !== -1) {
       pillOpacity.value = withSpring(1, SNAP_SPRING);
       leaderX.value = withSpring(activePillIndex, SNAP_SPRING);
@@ -427,6 +416,18 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     } else {
       pillOpacity.value = withTiming(0, { duration: 150 });
     }
+  }, [activePillIndex]);
+
+  // Android: warm up typeface cache for active tab label without breaking active tab index
+  useEffect(() => {
+    if (Platform.OS !== "android" || activePillIndex === -1) return;
+    const id = setTimeout(() => {
+      followerX.value = withSequence(
+        withTiming(activePillIndex + 0.001, { duration: 16 }),
+        withTiming(activePillIndex, { duration: 16 }),
+      );
+    }, 80);
+    return () => clearTimeout(id);
   }, [activePillIndex]);
 
   const navigateToTab = useCallback(

@@ -17,7 +17,7 @@ interface TouchableProps extends TouchableOpacityProps {
 export const Touchable: React.FC<TouchableProps> = ({
   onPress,
   throttleMs = 500,
-  haptic = true,
+  haptic = false,
   ...props
 }) => {
   const lastPress = useRef(0);

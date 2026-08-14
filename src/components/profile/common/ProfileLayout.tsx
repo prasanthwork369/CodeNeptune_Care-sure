@@ -5,6 +5,7 @@ import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useAuthStore } from "@/src/store/authStore";
+import { useTabBarStore } from "@/src/store/useTabBarStore";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect } from "expo-router";
 import React, { useState } from "react";
@@ -48,6 +49,7 @@ export const ProfileLayout: React.FC = () => {
   const scrollY = useSharedValue(0);
   const headerHeightShared = useSharedValue(0);
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, headerHeightShared);
+  const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
@@ -145,13 +147,13 @@ export const ProfileLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
-        style={{ backgroundColor: "#F5F6FB" }}
+        style={{ flex: 1, backgroundColor: "#F5F6FB" }}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{
           backgroundColor: "#F5F6FB",
           flexGrow: 1,
-          paddingBottom: components.tabBar.height + adjustedBottom + 16,
+          paddingBottom: tabBarHeight + adjustedBottom + 32,
         }}
         refreshControl={
           <RefreshControl

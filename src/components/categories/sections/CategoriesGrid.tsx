@@ -12,7 +12,8 @@ import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryCard } from "@/src/types/home";
-import { components } from "@/src/constants/theme";
+import { useTabBarStore } from "@/src/store/useTabBarStore";
+import { moderateScale } from "@/src/utils/exactScale";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 
 interface CategoriesGridProps {
@@ -45,6 +46,8 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
     height: CARD_IMAGE_HEIGHT * imageScale,
   };
 
+  const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
+
   if (isLoading) {
     return (
       <ScrollView
@@ -52,16 +55,16 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
         className="flex-1"
         contentContainerStyle={{
           padding,
-          paddingBottom: components.tabBar.height + safeAreaBottom + 40,
+          paddingBottom: tabBarHeight + safeAreaBottom + 32,
         }}
       >
-        <View style={s.grid}>
-          {Array.from({ length: 6 }).map((_, i) => (
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+          {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton
               key={i}
               width={cardWidth}
               height={cardHeight}
-              borderRadius={CARD_RADIUS}
+              borderRadius={12}
             />
           ))}
         </View>
@@ -72,18 +75,19 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      className="flex-1"
+      style={{ flex: 1, height: "100%" }}
       contentContainerStyle={{
         padding: padding,
-        paddingBottom: components.tabBar.height + safeAreaBottom + 40,
+        flexGrow: 1,
+        paddingBottom: tabBarHeight + safeAreaBottom + 32,
       }}
     >
-      <View style={s.column}>
-        {Array.from({ length: Math.ceil(Math.max(cards.length, 6) / 2) }).map(
+      <View style={{ gap: 14 }}>
+        {Array.from({ length: Math.ceil(Math.max(cards.length, 3) / 3) }).map(
           (_, rowIndex) => (
-            <View key={`row-${rowIndex}`} style={s.row}>
-              {[0, 1].map((col) => {
-                const index = rowIndex * 2 + col;
+            <View key={`row-${rowIndex}`} style={{ flexDirection: "row", gap: 10 }}>
+              {[0, 1, 2].map((col) => {
+                const index = rowIndex * 3 + col;
                 const card = cards[index];
                 if (!card) {
                   return (
@@ -108,26 +112,45 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                         },
                       })
                     }
-                    style={[
-                      s.card,
-                      {
-                        width: cardWidth,
-                        height: cardHeight,
-                        backgroundColor: card.bgColor,
-                      },
-                    ]}
+                    style={{
+                      width: cardWidth,
+                      height: cardHeight,
+                      alignItems: "center",
+                    }}
                   >
-                    <Text
-                      style={s.cardLabel}
-                      className="font-inter-semibold text-brand-text p-3 z-10"
+                    {/* Light blue rounded image container matching design */}
+                    <View
+                      style={{
+                        width: cardWidth,
+                        height: cardWidth,
+                        backgroundColor: "#EDF4FE",
+                        borderRadius: 12,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 4,
+                      }}
                     >
-                      {card.label}
+                      <Image
+                        source={card.image}
+                        style={{ width: "82%", height: "82%" }}
+                        contentFit="contain"
+                      />
+                    </View>
+
+                    {/* Category Title Text below the image container */}
+                    <Text
+                      style={{
+                        fontSize: moderateScale(11),
+                        lineHeight: moderateScale(14),
+                        textAlign: "center",
+                        color: "#1E293B",
+                        marginTop: 6,
+                      }}
+                      className="font-inter-semibold"
+                      numberOfLines={2}
+                    >
+                      {card.label.replace("\n", " ")}
                     </Text>
-                    <Image
-                      source={card.image}
-                      style={cardImageStyle}
-                      contentFit="contain"
-                    />
                   </Touchable>
                 );
               })}
