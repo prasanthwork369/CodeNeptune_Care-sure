@@ -1,4 +1,4 @@
-import { CreateReturnRequest, ReturnRecord } from "../types/return";
+import { CreateReturnRequest, ReturnRecord } from "@/src/features/orders/return.types";
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
 

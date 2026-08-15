@@ -24,7 +24,7 @@ import {
   buildPrescriptionOrderItems,
   sumOrderDiscounts,
 } from "@/src/utils/orderPayload";
-import { CreateOrderRequest } from "@/src/types/order";
+import { CreateOrderRequest } from "@/src/features/orders/types";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";

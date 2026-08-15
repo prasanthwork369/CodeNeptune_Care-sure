@@ -1,2 +1,2 @@
-import { ReturnProductLayout } from "@/src/components/profile/orders/ReturnProductLayout";
+import { ReturnProductLayout } from "@/src/features/orders/screens/ReturnProductLayout";
 export default ReturnProductLayout;

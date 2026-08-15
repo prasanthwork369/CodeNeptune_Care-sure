@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { orderService } from "../../services/order.service";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
-import { Order } from "../../types/order";
+import { Order } from "@/src/features/orders/types";
 
 // Cancelled and Delivered are terminal — nothing left to poll for.
 const TERMINAL_ORDER_STATUSES = [0, 7];

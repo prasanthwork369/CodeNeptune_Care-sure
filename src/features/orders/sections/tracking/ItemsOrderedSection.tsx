@@ -1,13 +1,13 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { OrderItem } from "@/src/types/order";
+import { OrderItem } from "../../types";
 import { exactScale } from "@/src/utils/exactScale";
 import { getOrderItemPricing } from "@/src/utils/order";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../orders.styles";
+import { orderStyles as s } from "../../orders.styles";
 import { SectionCard } from "./SectionCard";
 
 interface ItemsOrderedSectionProps {

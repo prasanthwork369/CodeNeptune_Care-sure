@@ -5,11 +5,11 @@ import {
   CartItem,
   UpdateCartItemInput,
 } from "@/src/features/cart/types";
-import { Order, OrderTabKey } from "@/src/types/order";
+import { Order, OrderTabKey } from "../types";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
 import { RefreshControl, Text, View } from "react-native";
-import { MyOrdersSkeleton } from "../MyOrdersSkeleton";
+import { MyOrdersSkeleton } from "../components/MyOrdersSkeleton";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { orderStyles as s } from "../orders.styles";
 import { OrderCard } from "./OrderCard";

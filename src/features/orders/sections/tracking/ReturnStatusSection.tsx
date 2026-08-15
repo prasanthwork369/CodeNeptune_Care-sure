@@ -1,5 +1,5 @@
-import { RETURN_STATUS_LABELS } from "@/src/constants/return-status";
-import { Order } from "@/src/types/order";
+import { RETURN_STATUS_LABELS } from "../../constants/return-status";
+import { Order } from "../../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";

@@ -8,8 +8,8 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import { useOrderTrackingSteps } from "@/src/hooks/useOrderTrackingSteps";
-import { ORDER_STATUS, TrackingStep } from "@/src/types/order";
+import { useOrderTrackingSteps } from "../hooks/useOrderTrackingSteps";
+import { ORDER_STATUS, TrackingStep } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
 import { buildCartInputs } from "@/src/utils/reorderCart";
@@ -24,11 +24,11 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { DigitalPrescriptionModal } from "./DigitalPrescriptionModal";
-import { InvoiceModal } from "./InvoiceModal";
-import { orderStyles as s } from "./orders.styles";
-import { OrderTrackingModal } from "./OrderTrackingModal";
-import { OrderTrackingSkeleton } from "./OrderTrackingSkeleton";
+import { DigitalPrescriptionModal } from "../components/DigitalPrescriptionModal";
+import { InvoiceModal } from "../components/InvoiceModal";
+import { orderStyles as s } from "../orders.styles";
+import { OrderTrackingModal } from "../components/OrderTrackingModal";
+import { OrderTrackingSkeleton } from "../components/OrderTrackingSkeleton";
 import {
   DeliveryAddressSection,
   ItemsOrderedSection,
@@ -38,7 +38,7 @@ import {
   SavingsBreakdownSection,
   SectionCard,
   TrackingStatusBanner,
-} from "./tracking-sections";
+} from "../sections/tracking";
 
 const EASE_OUT = Easing.out(Easing.cubic);
 

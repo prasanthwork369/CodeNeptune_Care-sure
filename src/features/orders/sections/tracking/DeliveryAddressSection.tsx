@@ -1,9 +1,9 @@
-import { Order } from "@/src/types/order";
+import { Order } from "../../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { format } from "@/src/utils/validation";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../orders.styles";
+import { orderStyles as s } from "../../orders.styles";
 import { SectionCard } from "./SectionCard";
 
 interface DeliveryAddressSectionProps {

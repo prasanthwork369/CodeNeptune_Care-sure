@@ -3,12 +3,12 @@ import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
 import { AddToCartInput, UpdateCartItemInput } from "@/src/features/cart/types";
-import { OrderTabKey } from "@/src/types/order";
+import { OrderTabKey } from "../types";
 import React, { useCallback, useRef } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import { orderStyles as s } from "./orders.styles";
-import { OrdersPage } from "./sections/OrdersPage";
+import { orderStyles as s } from "../orders.styles";
+import { OrdersPage } from "../sections/OrdersPage";
 
 const TABS: {
   key: OrderTabKey;

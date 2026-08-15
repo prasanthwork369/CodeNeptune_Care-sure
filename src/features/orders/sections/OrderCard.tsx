@@ -2,7 +2,7 @@ import { AlreadyHaveItemsModal } from "@/src/features/prescription/components/Al
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { Order, ORDER_STATUS } from "@/src/types/order";
+import { Order, ORDER_STATUS } from "../types";
 import {
   AddToCartInput,
   CartItem,

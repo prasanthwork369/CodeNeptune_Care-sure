@@ -2,7 +2,7 @@ import { icons } from "@/src/constants/icons";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../orders.styles";
+import { orderStyles as s } from "../../orders.styles";
 import { SectionCard } from "./SectionCard";
 
 export function PaymentMethodSection() {

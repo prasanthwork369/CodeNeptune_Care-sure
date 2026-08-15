@@ -1,2 +1,2 @@
-import { OrderTrackLayout } from "@/src/components/profile/orders/OrderTrackingLayout";
+import { OrderTrackLayout } from "@/src/features/orders/screens/OrderTrackingLayout";
 export default OrderTrackLayout;

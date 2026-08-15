@@ -1,7 +1,7 @@
 import React from "react";
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
-import { ReturnStatusSection } from "@/src/components/profile/orders/tracking-sections/ReturnStatusSection";
-import { RETURN_STATUS } from "@/src/constants/return-status";
+import { ReturnStatusSection } from "@/src/features/orders/sections/tracking/ReturnStatusSection";
+import { RETURN_STATUS } from "@/src/features/orders/constants/return-status";
 
 describe("ReturnStatusSection", () => {
   it("renders nothing when there are no returns", () => {

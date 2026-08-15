@@ -10,15 +10,15 @@ import {
   CLOSED_RETURN_STATUSES,
   REFUND_METHOD,
   RefundMethodValue,
-} from "@/src/constants/return";
+} from "../constants/return";
 import { useCreateReturn } from "@/src/hooks/mutations/useCreateReturn";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useOrderById } from "@/src/hooks/queries/useOrderById";
 import { usePaymentSettings } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { useReturnDraftStore } from "@/src/store/returnDraftStore";
-import { OrderItem } from "@/src/types/order";
-import { CreateReturnRequest, ReturnItemImages } from "@/src/types/return";
+import { OrderItem } from "../types";
+import { CreateReturnRequest, ReturnItemImages } from "../return.types";
 import { Image } from "expo-image";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -30,9 +30,9 @@ import {
   Text,
   View,
 } from "react-native";
-import { orderStyles as s } from "./orders.styles";
-import { ReturnReason, ReturnReasonModal } from "./ReturnReasonModal";
-import { ReturnSuccessModal } from "./ReturnSuccessModal";
+import { orderStyles as s } from "../orders.styles";
+import { ReturnReason, ReturnReasonModal } from "../components/ReturnReasonModal";
+import { ReturnSuccessModal } from "../components/ReturnSuccessModal";
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";

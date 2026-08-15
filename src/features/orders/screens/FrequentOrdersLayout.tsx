@@ -10,7 +10,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
-import { ProductCard } from "./sections";
+import { ProductCard } from "../sections/frequent";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const FrequentOrdersLayout: React.FC = () => {

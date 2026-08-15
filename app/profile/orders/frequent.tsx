@@ -1,2 +1,2 @@
-import { FrequentOrdersLayout } from "@/src/components/orders/frequent-orders/FrequentOrdersLayout";
+import { FrequentOrdersLayout } from "@/src/features/orders/screens/FrequentOrdersLayout";
 export default FrequentOrdersLayout;

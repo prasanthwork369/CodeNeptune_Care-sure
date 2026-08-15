@@ -1,4 +1,4 @@
-import { CreateOrderRequest, OrderMetadata } from "@/src/types/order";
+import { CreateOrderRequest, OrderMetadata } from "@/src/features/orders/types";
 
 export type OrderBillBreakdown = NonNullable<OrderMetadata["billBreakdown"]>;
 

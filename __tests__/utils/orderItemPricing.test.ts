@@ -1,4 +1,4 @@
-import { OrderItem } from "@/src/types/order";
+import { OrderItem } from "@/src/features/orders/types";
 import { getOrderItemPricing } from "@/src/utils/order";
 
 const makeItem = (overrides: Partial<OrderItem> = {}): OrderItem => ({

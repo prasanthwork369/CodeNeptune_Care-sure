@@ -1,5 +1,5 @@
 import { searchApi } from "@/src/api/search.api";
-import { OrderItem } from "@/src/types/order";
+import { OrderItem } from "@/src/features/orders/types";
 import { AddToCartInput } from "@/src/features/cart/types";
 
 export async function buildCartInputs(

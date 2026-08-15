@@ -1,2 +1,2 @@
-import { ReturnSuccessLayout } from "@/src/components/profile/orders/ReturnSuccessLayout";
+import { ReturnSuccessLayout } from "@/src/features/orders/screens/ReturnSuccessLayout";
 export default ReturnSuccessLayout;

@@ -5,14 +5,14 @@ import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/hooks/queries/useCancellationReasons";
-import { ReturnItemImages } from "@/src/types/return";
+import { ReturnItemImages } from "../return.types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
 import { Image, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { orderStyles as s } from "./orders.styles";
+import { orderStyles as s } from "../orders.styles";
 
 export type ReturnReason = {
   reason: string;

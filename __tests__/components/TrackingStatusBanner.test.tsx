@@ -1,6 +1,6 @@
 import React from "react";
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
-import { TrackingStatusBanner } from "@/src/components/profile/orders/tracking-sections/TrackingStatusBanner";
+import { TrackingStatusBanner } from "@/src/features/orders/sections/tracking/TrackingStatusBanner";
 
 describe("TrackingStatusBanner", () => {
   it("renders nothing when the order is neither delayed nor cancelled", () => {

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { returnService } from "../../services/return.service";
-import { CreateReturnRequest } from "../../types/return";
+import { CreateReturnRequest } from "@/src/features/orders/return.types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 export const useCreateReturn = () => {

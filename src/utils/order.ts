@@ -5,7 +5,7 @@ import {
   CreateOrderRequest,
   OrderItem,
   OrderMetadata,
-} from "@/src/types/order";
+} from "@/src/features/orders/types";
 
 export interface BuildOrderPayloadParams {
   cartItems: CartItem[];

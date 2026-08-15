@@ -1,5 +1,5 @@
 import { HOME_IMAGES } from "@/src/constants/images";
-import { orderStyles as s } from "./orders.styles";
+import { orderStyles as s } from "../orders.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Image, Modal, Text, View } from "react-native";

@@ -1,7 +1,7 @@
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { TrackingStep } from "@/src/types/order";
+import { TrackingStep } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo } from "react";

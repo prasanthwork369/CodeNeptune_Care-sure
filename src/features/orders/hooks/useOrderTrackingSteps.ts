@@ -1,4 +1,4 @@
-import { Order, TrackingStep } from "@/src/types/order";
+import { Order, TrackingStep } from "../types";
 import { useMemo } from "react";
 
 function formatDateTime(iso?: string | null) {

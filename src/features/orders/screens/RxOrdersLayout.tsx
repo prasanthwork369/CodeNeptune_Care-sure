@@ -1,9 +1,9 @@
 import type { ApiPrescription } from "@/src/features/prescription/types";
-import { RxOrdersSkeleton } from "@/src/components/profile/orders/PrescriptionSkeleton";
+import { RxOrdersSkeleton } from "../components/PrescriptionSkeleton";
 import {
   Prescription,
   PrescriptionCard,
-} from "@/src/components/profile/orders/sections/PrescriptionCard";
+} from "../sections/PrescriptionCard";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import {
   PRESCRIPTION_STATUS,
@@ -15,7 +15,7 @@ import { downloadFile } from "@/src/utils/fileDownload";
 import { FlashList } from "@shopify/flash-list";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "./orders.styles";
+import { orderStyles as s } from "../orders.styles";
 
 export const RxOrdersLayout: React.FC = () => {
   const { prescriptions, loading, refreshing, refetch } = usePrescriptions({

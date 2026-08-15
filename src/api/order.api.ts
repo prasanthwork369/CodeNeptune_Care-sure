@@ -1,4 +1,4 @@
-import { CreateOrderRequest, Order, OrderItem } from "../types/order";
+import { CreateOrderRequest, Order, OrderItem } from "@/src/features/orders/types";
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
 import { logger } from "@/src/utils/logger";

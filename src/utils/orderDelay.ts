@@ -1,4 +1,4 @@
-import { Order } from "@/src/types/order";
+import { Order } from "@/src/features/orders/types";
 
 const CANCELLED_STATUS = 0;
 const DELIVERED_STATUS = 7;

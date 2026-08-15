@@ -1,5 +1,5 @@
 import { orderApi, type OrderListParams } from "../api/order.api";
-import { CreateOrderRequest, Order } from "../types/order";
+import { CreateOrderRequest, Order } from "@/src/features/orders/types";
 
 export const orderService = {
   createOrder: (

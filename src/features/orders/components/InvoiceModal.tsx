@@ -4,7 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useSystemTemplate } from "@/src/hooks/queries/useSystemTemplates";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { Order } from "@/src/types/order";
+import { Order } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { downloadLocalFile } from "@/src/utils/fileDownload";
 import { BottomSheetView } from "@gorhom/bottom-sheet";

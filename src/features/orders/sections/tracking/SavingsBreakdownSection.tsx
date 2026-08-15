@@ -4,7 +4,7 @@ import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../orders.styles";
+import { orderStyles as s } from "../../orders.styles";
 
 interface SavingsBreakdownSectionProps {
   totalSaved: number;
