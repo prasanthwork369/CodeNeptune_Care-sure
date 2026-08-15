@@ -6,7 +6,7 @@ import { AppButton } from "@/src/components/ui/AppButton";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
+import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useSelectPatient } from "@/src/features/prescription/hooks/useSelectPatient";

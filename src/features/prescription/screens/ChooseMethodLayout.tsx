@@ -1,6 +1,6 @@
 import { AddPatientSheet } from "@/src/features/profile/components/AddPatientSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
+import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";

@@ -22,7 +22,9 @@ jest.mock("@/src/features/prescription/components/HealthProblemSheet", () => ({
   HealthProblemSheet: () => null,
 }));
 
-jest.mock("@/src/components/upload/UploadPrescriptionSheet", () => ({
+jest.mock(
+  "@/src/features/prescription/components/UploadPrescriptionSheet",
+  () => ({
   UploadPrescriptionSheet: () => null,
 }));
 

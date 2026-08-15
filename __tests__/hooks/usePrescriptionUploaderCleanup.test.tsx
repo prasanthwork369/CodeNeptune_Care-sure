@@ -12,7 +12,7 @@ jest.mock("@/src/utils/prescription", () => ({
   deleteTempCopy: (item: unknown) => mockDeleteTempCopy(item),
 }));
 
-import { usePrescriptionUploader } from "@/src/hooks/ui/usePrescriptionUploader";
+import { usePrescriptionUploader } from "@/src/features/prescription/hooks/usePrescriptionUploader";
 
 const item = (name: string): PrescriptionItem => ({
   localUri: `file:///cache/${name}`,

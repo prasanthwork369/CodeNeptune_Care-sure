@@ -6,7 +6,7 @@ import {
 } from "@/src/features/prescription/sections/preview";
 import { components } from "@/src/constants/theme";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
-import { usePrescriptionUpload } from "@/src/hooks/ui/usePrescriptionUpload";
+import { usePrescriptionUpload } from "../hooks/usePrescriptionUpload";
 import { useAuthStore } from "@/src/store/authStore";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { Redirect, useFocusEffect } from "expo-router";
@@ -19,7 +19,7 @@ import {
   ValidPrescriptionInfo,
   HowItWorks,
   WhyTrustUs,
-} from "./sections";
+} from "../sections/upload";
 
 export const UploadLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();

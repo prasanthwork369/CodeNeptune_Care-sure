@@ -10,7 +10,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { usePrescriptionPicker } from "@/src/hooks/ui/usePrescriptionPicker";
+import { usePrescriptionPicker } from "../hooks/usePrescriptionPicker";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";

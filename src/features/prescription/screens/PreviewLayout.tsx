@@ -1,7 +1,7 @@
 import { asError } from "@/src/api/errors";
 import { PrescriptionReviewSheet } from "@/src/features/prescription/components/PrescriptionReviewSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
+import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import {
@@ -13,7 +13,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
   uploadKeyOf,
   usePrescriptionUploader,
-} from "@/src/hooks/ui/usePrescriptionUploader";
+} from "../hooks/usePrescriptionUploader";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
