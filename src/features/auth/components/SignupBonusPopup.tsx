@@ -14,7 +14,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import {
   SignupBonusData,
   SignupBonusPopupContent,
-} from "@/src/types/signupBonus";
+} from "../types/signupBonus";
 import { exactScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { useQueryClient } from "@tanstack/react-query";

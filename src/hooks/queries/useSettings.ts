@@ -9,7 +9,7 @@ import {
   MAX_FILES_CEILING,
   MAX_SIZE_BYTES,
   PRESCRIPTION_VALIDITY_MONTHS,
-} from "../../utils/prescription";
+} from "@/src/features/prescription/utils/prescription";
 
 // Falls back to local URLs so one failed request can't leave the links dead all session.
 export function useMobileAppLinks() {

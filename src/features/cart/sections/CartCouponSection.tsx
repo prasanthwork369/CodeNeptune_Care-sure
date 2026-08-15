@@ -15,7 +15,7 @@ import {
   computeCouponDiscount,
   selectCartCoupon,
   selectNextCouponUpsell,
-} from "@/src/utils/couponSelection";
+} from "../utils/couponSelection";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";

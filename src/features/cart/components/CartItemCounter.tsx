@@ -1,6 +1,6 @@
 import { exactScale } from "@/src/utils/exactScale";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { notifyCartError } from "@/src/utils/cartError";
+import { notifyCartError } from "../utils/cartError";
 import { requireInternet } from "@/src/utils/offline";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";

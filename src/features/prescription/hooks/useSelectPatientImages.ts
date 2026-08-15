@@ -11,7 +11,7 @@ import {
   validatePrescriptionFile,
   capturePrescriptionImages,
   deleteTempCopy,
-} from "@/src/utils/prescription";
+} from "../utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";

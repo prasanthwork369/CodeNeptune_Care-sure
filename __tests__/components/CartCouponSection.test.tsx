@@ -4,7 +4,7 @@ import {
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
 import { CartCouponSection } from "@/src/features/cart/sections/CartCouponSection";
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
+import { COUPON_DISCOUNT_TYPE } from "@/src/features/cart/constants/coupon";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { couponService } from "@/src/services/coupon.service";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";

@@ -8,7 +8,7 @@ import {
   CartItem,
   UpdateCartItemInput,
 } from "@/src/features/cart/types";
-import { buildCartInputs } from "@/src/utils/reorderCart";
+import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { Image } from "expo-image";
 import React, { useState } from "react";

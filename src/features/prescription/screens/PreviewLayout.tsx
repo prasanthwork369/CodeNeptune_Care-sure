@@ -21,7 +21,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import { PrescriptionItem } from "@/src/features/prescription/types";
 import { logger } from "@/src/utils/logger";
 import { requireInternet } from "@/src/utils/offline";
-import { validatePrescriptionFile } from "@/src/utils/prescription";
+import { validatePrescriptionFile } from "../utils/prescription";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, {
   useCallback,

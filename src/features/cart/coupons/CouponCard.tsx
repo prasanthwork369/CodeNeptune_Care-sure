@@ -1,12 +1,12 @@
 import { Touchable } from "@/src/components/ui/Touchable";
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
+import { COUPON_DISCOUNT_TYPE } from "../constants/coupon";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { CouponCardProps } from "@/src/features/cart/types";
 import {
   formatCouponExpiry,
   formatCouponTerms,
-} from "@/src/utils/couponFormat";
+} from "../utils/couponFormat";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";

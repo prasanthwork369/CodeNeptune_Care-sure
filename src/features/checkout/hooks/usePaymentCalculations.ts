@@ -9,7 +9,7 @@ import {
   reportError,
   usePerformanceTrace,
 } from "@/src/services/firebase";
-import { orderErrorMessage } from "@/src/utils/orderError";
+import { orderErrorMessage } from "@/src/features/orders/utils/orderError";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";

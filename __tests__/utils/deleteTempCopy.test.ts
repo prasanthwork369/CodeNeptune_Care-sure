@@ -13,7 +13,7 @@ jest.mock("expo-file-system", () => ({
   Paths: { cache: "file:///cache/" },
 }));
 
-import { deleteTempCopy } from "@/src/utils/prescription";
+import { deleteTempCopy } from "@/src/features/prescription/utils/prescription";
 import type { PrescriptionItem } from "@/src/features/prescription/types";
 
 const item = (over: Partial<PrescriptionItem> = {}): PrescriptionItem => ({

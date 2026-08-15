@@ -1,5 +1,5 @@
 import { PrescriptionItem } from "@/src/features/prescription/types";
-import { MAX_FILES_CEILING } from "@/src/utils/prescription";
+import { MAX_FILES_CEILING } from "@/src/features/prescription/utils/prescription";
 import { create } from "zustand";
 
 interface PrescriptionDraftState {

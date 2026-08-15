@@ -1,9 +1,9 @@
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
+import { COUPON_DISCOUNT_TYPE } from "@/src/features/cart/constants/coupon";
 import { Coupon } from "@/src/features/cart/types";
 import {
   formatCouponExpiry,
   formatCouponTerms,
-} from "@/src/utils/couponFormat";
+} from "@/src/features/cart/utils/couponFormat";
 
 const coupon = (over: Partial<Coupon> & { code: string }): Coupon => ({
   id: over.code,

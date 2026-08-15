@@ -1,4 +1,4 @@
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
+import { COUPON_DISCOUNT_TYPE } from "../constants/coupon";
 import { Coupon } from "@/src/features/cart/types";
 
 export type CartCouponPick = {

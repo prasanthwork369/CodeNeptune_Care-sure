@@ -1,4 +1,4 @@
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
+import { COUPON_DISCOUNT_TYPE } from "../constants/coupon";
 import { Coupon } from "@/src/features/cart/types";
 
 // Shared by the coupons screen and the cart card so the two can never word the same coupon differently.

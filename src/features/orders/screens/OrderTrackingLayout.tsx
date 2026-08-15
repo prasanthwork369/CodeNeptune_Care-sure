@@ -12,7 +12,7 @@ import { useOrderTrackingSteps } from "../hooks/useOrderTrackingSteps";
 import { ORDER_STATUS, TrackingStep } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
-import { buildCartInputs } from "@/src/utils/reorderCart";
+import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";

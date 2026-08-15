@@ -6,7 +6,7 @@ import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { cartMutations } from "@/src/services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
 import { requireInternet } from "@/src/utils/offline";
-import { notifyCartError } from "@/src/utils/cartError";
+import { notifyCartError } from "../utils/cartError";
 import { analyticsService } from "@/src/services/firebase";
 
 /**

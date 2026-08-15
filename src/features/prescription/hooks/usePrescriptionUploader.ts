@@ -1,7 +1,7 @@
 import { storageApi } from "@/src/api/storage.api";
 import { PrescriptionItem } from "@/src/features/prescription/types";
 import { networkErrorMessage } from "@/src/utils/offline";
-import { deleteTempCopy } from "@/src/utils/prescription";
+import { deleteTempCopy } from "../utils/prescription";
 import { toAppError } from "@/src/api/errors";
 import { useCallback, useEffect, useRef, useState } from "react";
 

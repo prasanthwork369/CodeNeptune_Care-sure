@@ -1,4 +1,4 @@
-import { MEDICINES } from "@/src/constants/search-cycle";
+import { MEDICINES } from "../constants/search-cycle";
 import { useVisibleInterval } from "@/src/hooks/ui/useVisibleInterval";
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useEffect, useState } from "react";

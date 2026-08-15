@@ -1,4 +1,4 @@
-import { orderErrorMessage } from "@/src/utils/orderError";
+import { orderErrorMessage } from "@/src/features/orders/utils/orderError";
 import { AppError } from "@/src/api/errors";
 import { OFFLINE_MESSAGE } from "@/src/utils/offline";
 

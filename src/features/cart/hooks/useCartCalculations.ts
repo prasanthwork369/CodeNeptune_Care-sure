@@ -6,7 +6,7 @@ import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
-import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
+import { COUPON_DISCOUNT_TYPE } from "../constants/coupon";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";

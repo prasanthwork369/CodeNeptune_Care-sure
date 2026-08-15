@@ -1,5 +1,5 @@
 import { AppError } from "@/src/api/errors";
-import { cartErrorMessage, notifyCartError } from "@/src/utils/cartError";
+import { cartErrorMessage, notifyCartError } from "@/src/features/cart/utils/cartError";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useToastStore } from "@/src/store/toastStore";
 import {

@@ -2,7 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import {
   SignupBonusData,
   SignupBonusPopupContent,
-} from "@/src/types/signupBonus";
+} from "../../types/signupBonus";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
