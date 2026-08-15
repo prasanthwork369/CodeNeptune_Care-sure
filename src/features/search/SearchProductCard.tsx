@@ -4,7 +4,7 @@ import { ActivityIndicator, View, Text, Animated } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   cartCounterStyles as cc,

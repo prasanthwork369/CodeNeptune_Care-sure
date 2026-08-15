@@ -1,6 +1,6 @@
 import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
-import { CartFooterProps } from "@/src/types/cart";
+import { CartFooterProps } from "@/src/features/cart/types";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";

@@ -1,6 +1,6 @@
 import { Address } from "@/src/api/address.api";
 import { BillBreakdown } from "@/src/store/checkoutStore";
-import { CartItem } from "@/src/types/cart";
+import { CartItem } from "@/src/features/cart/types";
 import {
   CreateOrderRequest,
   OrderItem,

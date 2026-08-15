@@ -2,7 +2,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
-import { AddToCartInput, UpdateCartItemInput } from "@/src/types/cart";
+import { AddToCartInput, UpdateCartItemInput } from "@/src/features/cart/types";
 import { OrderTabKey } from "@/src/types/order";
 import React, { useCallback, useRef } from "react";
 import { View } from "react-native";

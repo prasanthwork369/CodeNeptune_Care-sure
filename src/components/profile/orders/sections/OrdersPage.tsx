@@ -4,7 +4,7 @@ import {
   AddToCartInput,
   CartItem,
   UpdateCartItemInput,
-} from "@/src/types/cart";
+} from "@/src/features/cart/types";
 import { Order, OrderTabKey } from "@/src/types/order";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";

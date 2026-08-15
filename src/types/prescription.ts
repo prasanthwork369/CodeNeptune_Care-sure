@@ -1,6 +1,6 @@
 import { PrescriptionStatusValue } from "@/src/constants/prescription-status";
 import type { FileUploadState } from "@/src/hooks/ui/usePrescriptionUploader";
-import type { CartItem } from "./cart";
+import type { CartItem } from "@/src/features/cart/types";
 
 export interface PrescriptionItem {
   localUri: string;

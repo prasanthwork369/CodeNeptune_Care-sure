@@ -1,4 +1,4 @@
-import { CartSavingsBanner } from "@/src/components/cart/sections/CartSavingsBanner";
+import { CartSavingsBanner } from "@/src/features/cart/sections/CartSavingsBanner";
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
 import React from "react";
 

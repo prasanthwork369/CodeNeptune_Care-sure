@@ -1,6 +1,6 @@
 import { searchApi } from "@/src/api/search.api";
 import { OrderItem } from "@/src/types/order";
-import { AddToCartInput } from "@/src/types/cart";
+import { AddToCartInput } from "@/src/features/cart/types";
 
 export async function buildCartInputs(
   items: OrderItem[],

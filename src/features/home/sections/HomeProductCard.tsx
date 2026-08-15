@@ -2,7 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { Product } from "@/src/types/home";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";

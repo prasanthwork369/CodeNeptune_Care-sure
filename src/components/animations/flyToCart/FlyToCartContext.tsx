@@ -1,5 +1,5 @@
 import { useCart } from "@/src/hooks/queries/useCart";
-import type { CartItem } from "@/src/types/cart";
+import type { CartItem } from "@/src/features/cart/types";
 import type { ImageSource } from "expo-image";
 import React, {
   createContext,

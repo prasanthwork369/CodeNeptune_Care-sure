@@ -3,7 +3,7 @@ import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { useCart } from "@/src/hooks/queries/useCart";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { ProductDetailsFooterProps } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";

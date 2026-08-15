@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { CartFooter } from "@/src/components/cart/sections/CartFooter";
+import { CartFooter } from "@/src/features/cart/sections/CartFooter";
 
 describe("CartFooter Component", () => {
   const onProceedMock = jest.fn();

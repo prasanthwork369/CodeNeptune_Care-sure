@@ -6,7 +6,7 @@ import type {
   AddToCartInput,
   Cart,
   UpdateCartItemInput,
-} from "@/src/types/cart";
+} from "@/src/features/cart/types";
 import { cartService } from "./cart.service";
 
 /**

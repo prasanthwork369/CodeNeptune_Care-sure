@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from "../utils/urls";
 import { apiClient } from "./client";
-import { Coupon, CouponValidationResult } from "../types/cart";
+import { Coupon, CouponValidationResult } from "../features/cart/types";
 
 export const couponApi = {
   getActiveCoupons: async (): Promise<Coupon[]> => {

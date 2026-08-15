@@ -5,7 +5,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import DescriptionIcon from "@/assets/icons/description.svg";
 import { colors } from "@/src/constants/theme";
-import { CartBillSummaryProps } from "@/src/types/cart";
+import { CartBillSummaryProps } from "@/src/features/cart/types";
 
 export const CartBillSummary: React.FC<CartBillSummaryProps> = ({
   mrpTotal,

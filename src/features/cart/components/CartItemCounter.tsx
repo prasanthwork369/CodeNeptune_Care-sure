@@ -6,7 +6,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import React, { useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { COUNTER_BTN, COUNTER_W, cartStyles as s } from "./cart.styles";
+import { COUNTER_BTN, COUNTER_W, cartStyles as s } from "../cart.styles";
 
 interface CartItemCounterProps {
   item: { id: string; qty: number };

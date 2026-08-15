@@ -12,7 +12,7 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { analyticsService } from "@/src/services/firebase";
-import { CartLine } from "@/src/types/cart";
+import { CartLine } from "@/src/features/cart/types";
 import { Product } from "@/src/types/home";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

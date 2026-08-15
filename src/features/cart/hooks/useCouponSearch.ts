@@ -1,4 +1,4 @@
-import { Coupon } from "@/src/types/cart";
+import { Coupon } from "@/src/features/cart/types";
 import { useMemo } from "react";
 
 // Filters the coupon list locally by the code typed in the search box.

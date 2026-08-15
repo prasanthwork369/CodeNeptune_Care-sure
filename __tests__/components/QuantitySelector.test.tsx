@@ -4,7 +4,7 @@ import {
   fireEvent,
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { CartItemCounter } from "@/src/components/cart/CartItemCounter";
+import { CartItemCounter } from "@/src/features/cart/components/CartItemCounter";
 
 describe("CartItemCounter Component", () => {
   const mockItem = { id: "item-101", qty: 2 };

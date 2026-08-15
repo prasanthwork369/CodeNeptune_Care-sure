@@ -1,5 +1,5 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import type { SubstituteProduct } from "@/src/types/home";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";

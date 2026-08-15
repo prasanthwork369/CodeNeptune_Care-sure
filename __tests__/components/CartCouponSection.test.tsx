@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { CartCouponSection } from "@/src/components/cart/sections/CartCouponSection";
+import { CartCouponSection } from "@/src/features/cart/sections/CartCouponSection";
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { couponService } from "@/src/services/coupon.service";

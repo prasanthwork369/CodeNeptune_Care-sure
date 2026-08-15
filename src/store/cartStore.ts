@@ -4,7 +4,7 @@ import {
   Cart,
   CartItem,
   UpdateCartItemInput,
-} from "@/src/types/cart";
+} from "@/src/features/cart/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

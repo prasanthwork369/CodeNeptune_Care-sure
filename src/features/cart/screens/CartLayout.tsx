@@ -1,9 +1,9 @@
-import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
-import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
+import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
+import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useCartCalculations } from "@/src/hooks/useCartCalculations";
+import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { exactScale } from "@/src/utils/exactScale";
@@ -33,7 +33,7 @@ import {
   CartSavingsBreakdown,
   CartTerms,
   CartWalletSection,
-} from "./sections";
+} from "../sections";
 
 const SAVINGS_BANNER_ENTERING = FadeInDown.duration(220).reduceMotion(
   ReduceMotion.System,

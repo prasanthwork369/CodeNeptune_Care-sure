@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import PercentDiscountIcon from "@/assets/icons/percent_discount.svg";
 import { colors } from "@/src/constants/theme";
-import { CartSavingsBreakdownProps } from "@/src/types/cart";
+import { CartSavingsBreakdownProps } from "@/src/features/cart/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CartSavingsBreakdown: React.FC<CartSavingsBreakdownProps> = ({

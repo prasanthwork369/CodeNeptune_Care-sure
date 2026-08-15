@@ -2,7 +2,7 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { cartService } from "@/src/services/cart.service";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
-import type { CartItem } from "@/src/types/cart";
+import type { CartItem } from "@/src/features/cart/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 

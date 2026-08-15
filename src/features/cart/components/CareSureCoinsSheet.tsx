@@ -6,7 +6,7 @@ import { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text, View } from "react-native";
-import { cartStyles as s } from "./cart.styles";
+import { cartStyles as s } from "../cart.styles";
 
 interface CareSureCoinsSheetProps {
   isVisible: boolean;

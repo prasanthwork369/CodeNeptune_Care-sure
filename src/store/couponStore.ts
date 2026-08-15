@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { AppliedCoupon } from "@/src/types/cart";
+import type { AppliedCoupon } from "@/src/features/cart/types";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 
 interface CouponState {

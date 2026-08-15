@@ -4,8 +4,8 @@ import { Image } from "expo-image";
 import { exactScale } from "@/src/utils/exactScale";
 import { cartStyles as s } from "../cart.styles";
 import { useNav } from "@/src/hooks/useNav";
-import { CartItemsListProps } from "@/src/types/cart";
-import { CartItemCounter } from "@/src/components/cart/CartItemCounter";
+import { CartItemsListProps } from "@/src/features/cart/types";
+import { CartItemCounter } from "@/src/features/cart/components/CartItemCounter";
 import { icons } from "@/src/constants/icons";
 
 export const CartItemsList: React.FC<CartItemsListProps> = React.memo(

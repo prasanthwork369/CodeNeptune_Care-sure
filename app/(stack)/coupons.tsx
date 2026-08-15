@@ -1,2 +1,2 @@
-import { CouponsLayout } from "@/src/components/cart/coupons/CouponsLayout";
+import { CouponsLayout } from "@/src/features/cart/screens/CouponsLayout";
 export default CouponsLayout;

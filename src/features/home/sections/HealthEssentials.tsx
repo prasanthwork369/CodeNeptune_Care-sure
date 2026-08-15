@@ -3,7 +3,7 @@ import {
   ApiFeaturedSubcategoryMetadata,
 } from "@/src/api/category.api";
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { LinearGradient } from "expo-linear-gradient";

@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 
 const mockRequireInternet = jest.fn(() => true);
 const mockAddItem = jest.fn();

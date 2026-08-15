@@ -5,7 +5,7 @@ import {
   AddToCartInput,
   UpdateCartItemInput,
   CheckoutInput,
-} from "../types/cart";
+} from "../features/cart/types";
 
 export const cartApi = {
   getCart: async (): Promise<Cart> => {

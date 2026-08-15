@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { CartDeliveringToProps } from "@/src/types/cart";
+import { CartDeliveringToProps } from "@/src/features/cart/types";
 import React from "react";
 import { Text, View } from "react-native";
 import { cartStyles as s } from "../cart.styles";

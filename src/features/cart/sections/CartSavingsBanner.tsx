@@ -1,6 +1,6 @@
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { CartSavingsBannerProps } from "@/src/types/cart";
+import { CartSavingsBannerProps } from "@/src/features/cart/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";

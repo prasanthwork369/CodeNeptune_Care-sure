@@ -2,7 +2,7 @@ import React from "react";
 import { ActivityIndicator, View, TextInput, Text } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { colors } from "@/src/constants/theme";
-import { CouponInputProps } from "@/src/types/cart";
+import { CouponInputProps } from "@/src/features/cart/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CouponInput: React.FC<CouponInputProps> = ({

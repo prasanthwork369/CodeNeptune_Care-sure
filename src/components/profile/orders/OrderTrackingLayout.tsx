@@ -1,4 +1,4 @@
-import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
+import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
 import { AlreadyHaveItemsModal } from "@/src/components/prescription/AlreadyHaveItemsModal";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";

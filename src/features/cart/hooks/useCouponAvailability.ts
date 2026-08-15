@@ -1,4 +1,4 @@
-import { Coupon } from "@/src/types/cart";
+import { Coupon } from "@/src/features/cart/types";
 import { useMemo } from "react";
 
 // Availability ships with the coupons payload as `isUsedUp`, matching the web

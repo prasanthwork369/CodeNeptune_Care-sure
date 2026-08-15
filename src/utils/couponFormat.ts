@@ -1,5 +1,5 @@
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
-import { Coupon } from "@/src/types/cart";
+import { Coupon } from "@/src/features/cart/types";
 
 // Shared by the coupons screen and the cart card so the two can never word the same coupon differently.
 export const formatCouponTerms = (coupon: Coupon) => {

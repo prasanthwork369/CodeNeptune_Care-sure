@@ -4,7 +4,7 @@ import {
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
 import { SearchProductCard } from "@/src/features/search/SearchProductCard";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { Animated } from "react-native";
 
 const mockPush = jest.fn();
@@ -14,7 +14,7 @@ jest.mock("@/src/hooks/useNav", () => ({
   }),
 }));
 
-jest.mock("@/src/hooks/useCartActions");
+jest.mock("@/src/features/cart/hooks/useCartActions");
 const mockUseCartActions = useCartActions as jest.MockedFunction<
   typeof useCartActions
 >;

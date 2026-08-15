@@ -1,4 +1,4 @@
-import type { Coupon } from "@/src/types/cart";
+import type { Coupon, CartCouponSectionProps } from "@/src/features/cart/types";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -6,12 +6,11 @@ import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
-import { useCouponAvailability } from "@/src/hooks/useCouponAvailability";
+import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
 import { useNav } from "@/src/hooks/useNav";
 import { couponService } from "@/src/services/coupon.service";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
-import { CartCouponSectionProps } from "@/src/types/cart";
 import {
   computeCouponDiscount,
   selectCartCoupon,

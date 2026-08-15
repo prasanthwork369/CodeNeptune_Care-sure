@@ -1,5 +1,5 @@
 import { useCartPendingStore } from "@/src/store/cartStore";
-import { AddToCartInput } from "@/src/types/cart";
+import { AddToCartInput } from "@/src/features/cart/types";
 
 /**
  * Real behavior tests for the guest cart Zustand store. Validates add / update /

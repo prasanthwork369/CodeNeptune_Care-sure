@@ -1,4 +1,4 @@
-import type { Product } from "./home";
+import type { Product } from "@/src/types/home";
 
 /** Free-form bag the backend round-trips; the listed keys are the ones we read. */
 export interface CartItemMetadata {

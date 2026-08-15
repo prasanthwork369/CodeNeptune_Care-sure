@@ -1,4 +1,4 @@
-import type { Cart, Coupon } from "@/src/types/cart";
+import type { Cart, Coupon } from "@/src/features/cart/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { tokenStorage } from "@/src/lib/storage";
 import { useAuthStore } from "@/src/store/authStore";

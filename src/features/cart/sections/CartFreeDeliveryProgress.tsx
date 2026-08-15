@@ -1,5 +1,5 @@
 import { icons } from "@/src/constants/icons";
-import { CartFreeDeliveryProgressProps } from "@/src/types/cart";
+import { CartFreeDeliveryProgressProps } from "@/src/features/cart/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef } from "react";

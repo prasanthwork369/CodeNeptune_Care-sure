@@ -2,7 +2,7 @@ import type { ImageSource } from "expo-image";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
-import { useCartRead } from "./queries/useCartRead";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { cartMutations } from "@/src/services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
 import { requireInternet } from "@/src/utils/offline";

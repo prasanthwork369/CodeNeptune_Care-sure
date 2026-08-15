@@ -4,7 +4,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import React from "react";
 import { Text, View } from "react-native";
-import { cartStyles as s } from "./cart.styles";
+import { cartStyles as s } from "../cart.styles";
 
 interface BillDetailsSheetProps {
   isVisible: boolean;

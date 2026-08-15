@@ -5,7 +5,7 @@ import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { durations } from "@/src/theme";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";

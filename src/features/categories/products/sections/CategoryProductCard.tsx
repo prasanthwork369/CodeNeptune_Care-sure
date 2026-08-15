@@ -2,7 +2,7 @@ import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
-import { useCartActions } from "@/src/hooks/useCartActions";
+import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { CategoryProductCardProps } from "@/src/types/category";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";

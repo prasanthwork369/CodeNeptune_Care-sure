@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { CartCoinsSectionProps } from "@/src/types/cart";
+import { CartCoinsSectionProps } from "@/src/features/cart/types";
 
 export const CartCoinsSection: React.FC<CartCoinsSectionProps> = ({
   value,

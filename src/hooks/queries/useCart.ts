@@ -7,7 +7,7 @@ import {
   AddToCartInput,
   CheckoutInput,
   UpdateCartItemInput,
-} from "../../types/cart";
+} from "@/src/features/cart/types";
 
 export const useCart = () => {
   const queryClient = useQueryClient();

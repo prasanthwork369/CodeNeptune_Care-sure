@@ -2,7 +2,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { COUPON_DISCOUNT_TYPE } from "@/src/constants/coupon";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
-import { CouponCardProps } from "@/src/types/cart";
+import { CouponCardProps } from "@/src/features/cart/types";
 import {
   formatCouponExpiry,
   formatCouponTerms,

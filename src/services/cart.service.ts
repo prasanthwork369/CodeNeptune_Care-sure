@@ -3,7 +3,7 @@ import {
   AddToCartInput,
   UpdateCartItemInput,
   CheckoutInput,
-} from "../types/cart";
+} from "../features/cart/types";
 
 export const cartService = {
   getCart: async () => {

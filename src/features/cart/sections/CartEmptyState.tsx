@@ -3,7 +3,7 @@ import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
 import { useNav } from "@/src/hooks/useNav";
-import { CartEmptyStateProps } from "@/src/types/cart";
+import { CartEmptyStateProps } from "@/src/features/cart/types";
 import { Product } from "@/src/types/home";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";

@@ -1,17 +1,17 @@
-import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
-import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
-import { CartBillSummary } from "@/src/components/cart/sections/CartBillSummary";
-import { CartCoinsSection } from "@/src/components/cart/sections/CartCoinsSection";
-import { CartConfetti } from "@/src/components/cart/sections/CartConfetti";
-import { CartCouponSection } from "@/src/components/cart/sections/CartCouponSection";
-import { CartDeliveringTo } from "@/src/components/cart/sections/CartDeliveringTo";
-import { CartFooter } from "@/src/components/cart/sections/CartFooter";
-import { CartSavingsBreakdown } from "@/src/components/cart/sections/CartSavingsBreakdown";
-import { CartTerms } from "@/src/components/cart/sections/CartTerms";
+import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
+import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
+import { CartBillSummary } from "@/src/features/cart/sections/CartBillSummary";
+import { CartCoinsSection } from "@/src/features/cart/sections/CartCoinsSection";
+import { CartConfetti } from "@/src/features/cart/sections/CartConfetti";
+import { CartCouponSection } from "@/src/features/cart/sections/CartCouponSection";
+import { CartDeliveringTo } from "@/src/features/cart/sections/CartDeliveringTo";
+import { CartFooter } from "@/src/features/cart/sections/CartFooter";
+import { CartSavingsBreakdown } from "@/src/features/cart/sections/CartSavingsBreakdown";
+import { CartTerms } from "@/src/features/cart/sections/CartTerms";
 import {
   CartWalletSection,
   CartCorporateCreditsSection,
-} from "@/src/components/cart/sections";
+} from "@/src/features/cart/sections";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useRefillReminder } from "@/src/hooks/useRefillReminder";

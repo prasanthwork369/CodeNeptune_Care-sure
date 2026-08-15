@@ -1,9 +1,9 @@
-import type { Coupon } from "@/src/types/cart";
+import type { Coupon } from "@/src/features/cart/types";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
-import { useCouponAvailability } from "@/src/hooks/useCouponAvailability";
-import { useCouponSearch } from "@/src/hooks/useCouponSearch";
+import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
+import { useCouponSearch } from "@/src/features/cart/hooks/useCouponSearch";
 import { useNav } from "@/src/hooks/useNav";
 import { couponService } from "@/src/services/coupon.service";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -18,7 +18,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { CouponCard, CouponCardSkeleton, CouponInput } from "./sections";
+import { CouponCard, CouponCardSkeleton, CouponInput } from "../coupons";
 import { requireInternet } from "@/src/utils/offline";
 
 const EMPTY_COUPONS: Coupon[] = [];
