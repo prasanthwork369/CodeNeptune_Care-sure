@@ -38,10 +38,17 @@ import {
   SavingsBanner,
 } from "../sections/medicine-comparison";
 
+import { MedicineComparisonSkeleton } from "../components/MedicineComparisonSkeleton";
+import { useComparisonPrescriptionId } from "../hooks/useComparisonPrescriptionId";
+import { usePrescriptionOrderMedicines } from "@/src/hooks/queries/usePrescriptionOrderMedicines";
+import { useLocalSearchParams } from "expo-router";
+import { Text } from "react-native";
+import { Touchable } from "@/src/components/ui/Touchable";
+
 import { ComparisonMedicine } from "../medicine-comparison.types";
 
 interface MedicineComparisonLayoutProps {
-  medicines: ComparisonMedicine[];
+  medicines?: ComparisonMedicine[];
   prescriptionId?: string;
   prescriptionOrderId?: string;
 }
@@ -50,7 +57,35 @@ interface MedicineComparisonLayoutProps {
 
 export const MedicineComparisonLayout: React.FC<
   MedicineComparisonLayoutProps
-> = ({ medicines, prescriptionId, prescriptionOrderId }) => {
+> = ({
+  medicines: propsMedicines,
+  prescriptionId: propsPrescriptionId,
+  prescriptionOrderId: propsPrescriptionOrderId,
+}) => {
+  const params = useLocalSearchParams<{
+    prescriptionOrderId?: string;
+    prescriptionId?: string;
+  }>();
+
+  const prescriptionOrderId =
+    propsPrescriptionOrderId ?? params.prescriptionOrderId;
+  const rawPrescriptionId = propsPrescriptionId ?? params.prescriptionId;
+
+  const {
+    medicines: queryMedicines,
+    isLoading,
+    refetch,
+  } = usePrescriptionOrderMedicines(
+    propsMedicines ? "" : (prescriptionOrderId ?? ""),
+  );
+
+  const resolvedPrescriptionId = useComparisonPrescriptionId(
+    rawPrescriptionId,
+    prescriptionOrderId,
+  );
+
+  const medicines = propsMedicines ?? queryMedicines;
+
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
@@ -68,7 +103,10 @@ export const MedicineComparisonLayout: React.FC<
   const [showCoinsSheet, setShowCoinsSheet] = useState(false);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
   // Server-backed refill reminder — state, API calls and error alerts live in the hook.
-  const refill = useRefillReminder({ prescriptionId, prescriptionOrderId });
+  const refill = useRefillReminder({
+    prescriptionId: resolvedPrescriptionId,
+    prescriptionOrderId,
+  });
   const [medicinesSectionLayout, setMedicinesSectionLayout] = useState({
     y: 0,
     height: 0,
@@ -219,10 +257,54 @@ export const MedicineComparisonLayout: React.FC<
       pathname: "/(prescription)/select-patient",
       params: {
         toPay: toPay.toFixed(2),
-        prescriptionId: prescriptionId ?? "",
+        prescriptionId: resolvedPrescriptionId ?? "",
       },
     });
   };
+
+  if (!propsMedicines && isLoading) {
+    return <MedicineComparisonSkeleton />;
+  }
+
+  if (!propsMedicines && medicines.length === 0) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#F9FAFB",
+          padding: 24,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "500",
+            color: "#6B7280",
+            textAlign: "center",
+            marginBottom: 20,
+          }}
+        >
+          No medicine comparison available for this prescription yet.
+        </Text>
+        <Touchable
+          onPress={() => refetch()}
+          style={{
+            backgroundColor: "#0F7635",
+            borderRadius: 12,
+            paddingVertical: 14,
+            paddingHorizontal: 32,
+          }}
+          activeOpacity={0.85}
+        >
+          <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>
+            Refresh
+          </Text>
+        </Touchable>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
@@ -276,7 +358,7 @@ export const MedicineComparisonLayout: React.FC<
         </View>
 
         {/* Refill Reminder — hidden without a prescription id (nothing to persist) */}
-        {prescriptionId && (
+        {resolvedPrescriptionId && (
           <RefillReminder
             value={refill.isActive}
             reminderDate={refill.nextRemindDate}
