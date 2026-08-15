@@ -1,4 +1,4 @@
-import { MoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
+import { MoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import Animated, {

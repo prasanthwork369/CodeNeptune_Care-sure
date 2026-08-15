@@ -6,7 +6,7 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useRef } from "react";
 import { Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { searchHeaderStyles as hs } from "@/src/components/search/search.styles";
+import { searchHeaderStyles as hs } from "@/src/features/search/search.styles";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface ProductHeaderProps {

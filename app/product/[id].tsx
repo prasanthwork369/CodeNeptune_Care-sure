@@ -1,4 +1,4 @@
-import { ProductDetailsLayout } from "@/src/components/product/details/ProductDetailsLayout";
+import { ProductDetailsLayout } from "@/src/features/product/screens/ProductDetailsLayout";
 import React from "react";
 
 export default function ProductScreen() {

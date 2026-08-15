@@ -4,7 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useCartActions } from "@/src/hooks/useCartActions";
-import { ProductDetailsFooterProps } from "@/src/types/product";
+import { ProductDetailsFooterProps } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";

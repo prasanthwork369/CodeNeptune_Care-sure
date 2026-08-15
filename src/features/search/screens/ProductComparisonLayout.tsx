@@ -8,20 +8,21 @@ import {
   ScrollableMoreAboutContent,
   StickyMoreAboutTabs,
   TrustBadge,
-} from "@/src/components/product/details/sections";
-import { ProductHeader } from "@/src/components/search/product/ProductHeader";
-import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
+} from "@/src/features/product/sections";
+import { ProductHeader } from "@/src/features/search/comparison/components/ProductHeader";
+import { ComparisonBoard } from "@/src/features/search/comparison/components/ComparisonBoard";
+import { ProductDetailsSkeleton } from "@/src/features/search/comparison/components/ProductDetailsSkeleton";
+import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
-import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
+import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useCallback, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { ComparisonBoard, ProductDetailsSkeleton } from "./sections";
 
 interface ProductComparisonLayoutProps {
   id: string;

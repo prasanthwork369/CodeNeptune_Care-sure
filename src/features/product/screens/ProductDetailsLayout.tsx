@@ -1,7 +1,7 @@
 import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
-import { ProductSkeleton } from "@/src/components/product/ProductSkeleton";
-import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
+import { ProductSkeleton } from "@/src/features/product/ProductSkeleton";
+import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
@@ -28,7 +28,7 @@ import {
   ScrollableMoreAboutContent,
   StickyMoreAboutTabs,
   TrustBadge,
-} from "./sections";
+} from "@/src/features/product/sections";
 
 export const ProductDetailsLayout: React.FC = () => {
   // Backend doesn't yet distinguish "checked, no substitute exists" from

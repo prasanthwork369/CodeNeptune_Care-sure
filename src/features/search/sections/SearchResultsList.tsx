@@ -1,7 +1,7 @@
 import { ApiSearchMedicine } from "@/src/api/search.api";
-import { SearchNoSubstituteCard } from "@/src/components/search/SearchNoSubstituteCard";
-import { SearchProductCard } from "@/src/components/search/SearchProductCard";
-import { SearchRecommendCard } from "@/src/components/search/SearchRecommendCard";
+import { SearchNoSubstituteCard } from "@/src/features/search/SearchNoSubstituteCard";
+import { SearchProductCard } from "@/src/features/search/SearchProductCard";
+import { SearchRecommendCard } from "@/src/features/search/SearchRecommendCard";
 import { SOURCE_TYPE } from "@/src/constants/source-type";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo } from "react";

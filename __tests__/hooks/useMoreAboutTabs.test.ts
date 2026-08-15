@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react-native";
-import { useMoreAboutTabs } from "@/src/hooks/product/useMoreAboutTabs";
+import { useMoreAboutTabs } from "@/src/features/product/hooks/useMoreAboutTabs";
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
 
 describe("useMoreAboutTabs", () => {

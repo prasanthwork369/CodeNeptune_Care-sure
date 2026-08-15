@@ -6,7 +6,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { durations } from "@/src/theme";
 import { useCartActions } from "@/src/hooks/useCartActions";
-import { RecommendedProduct, SearchedProduct } from "@/src/types/search";
+import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";

@@ -1,5 +1,5 @@
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
-import { MoreAboutSection } from "@/src/components/product/details/sections/MoreAboutSection";
+import { MoreAboutSection } from "@/src/features/product/sections/MoreAboutSection";
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
 import { fireEvent } from "@testing-library/react-native";
 import React from "react";

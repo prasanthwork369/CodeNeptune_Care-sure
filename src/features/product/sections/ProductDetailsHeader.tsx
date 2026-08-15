@@ -6,7 +6,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { colors } from "@/src/theme";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useNav } from "@/src/hooks/useNav";
-import { ProductDetailsHeaderProps } from "@/src/types/product";
+import { ProductDetailsHeaderProps } from "@/src/features/product/types";
 import React from "react";
 import { Alert, Share, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

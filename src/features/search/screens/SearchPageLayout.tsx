@@ -1,11 +1,11 @@
 import { ApiSearchMedicine } from "@/src/api/search.api";
-import { SearchSkeleton } from "@/src/components/search/SearchSkeleton";
-import { ProductHeader } from "@/src/components/search/product/ProductHeader";
-import { SearchEmptyState } from "@/src/components/search/sections/SearchEmptyState";
-import { SearchOfflineState } from "@/src/components/search/sections/SearchOfflineState";
-import { SearchRecentSection } from "@/src/components/search/sections/SearchRecentSection";
-import { SearchResultsList } from "@/src/components/search/sections/SearchResultsList";
-import { SearchSuggestionsBar } from "@/src/components/search/sections/SearchSuggestionsBar";
+import { SearchSkeleton } from "@/src/features/search/SearchSkeleton";
+import { ProductHeader } from "@/src/features/search/comparison/components/ProductHeader";
+import { SearchEmptyState } from "@/src/features/search/sections/SearchEmptyState";
+import { SearchOfflineState } from "@/src/features/search/sections/SearchOfflineState";
+import { SearchRecentSection } from "@/src/features/search/sections/SearchRecentSection";
+import { SearchResultsList } from "@/src/features/search/sections/SearchResultsList";
+import { SearchSuggestionsBar } from "@/src/features/search/sections/SearchSuggestionsBar";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { useCart } from "@/src/hooks/queries/useCart";
 import {

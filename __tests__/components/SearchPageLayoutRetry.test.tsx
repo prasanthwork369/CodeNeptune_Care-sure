@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { SearchPageLayout } from "@/src/components/search/SearchPageLayout";
+import { SearchPageLayout } from "@/src/features/search/screens/SearchPageLayout";
 import { useSearch } from "@/src/hooks/queries/useSearch";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 
@@ -32,22 +32,22 @@ jest.mock("@/src/services/firebase", () => ({
 
 // The screen only needs its search-results branch exercised here — the idle
 // state, suggestions bar and header are unrelated to retry behaviour.
-jest.mock("@/src/components/search/product/ProductHeader", () => ({
+jest.mock("@/src/features/search/comparison/components/ProductHeader", () => ({
   ProductHeader: () => null,
 }));
-jest.mock("@/src/components/search/sections/SearchRecentSection", () => ({
+jest.mock("@/src/features/search/sections/SearchRecentSection", () => ({
   SearchRecentSection: () => null,
 }));
-jest.mock("@/src/components/search/sections/SearchSuggestionsBar", () => ({
+jest.mock("@/src/features/search/sections/SearchSuggestionsBar", () => ({
   SearchSuggestionsBar: () => null,
 }));
-jest.mock("@/src/components/search/sections/SearchEmptyState", () => ({
+jest.mock("@/src/features/search/sections/SearchEmptyState", () => ({
   SearchEmptyState: () => null,
 }));
-jest.mock("@/src/components/search/SearchSkeleton", () => ({
+jest.mock("@/src/features/search/SearchSkeleton", () => ({
   SearchSkeleton: () => null,
 }));
-jest.mock("@/src/components/search/sections/SearchResultsList", () => {
+jest.mock("@/src/features/search/sections/SearchResultsList", () => {
   const { Text } = require("react-native");
   return {
     SearchResultsList: ({ results }: { results: unknown[] }) => (

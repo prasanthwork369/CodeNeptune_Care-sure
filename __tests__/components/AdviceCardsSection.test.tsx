@@ -1,5 +1,5 @@
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
-import { AdviceCardsSection } from "@/src/components/product/details/sections/moreinfo/AdviceCardsSection";
+import { AdviceCardsSection } from "@/src/features/product/sections/moreinfo/AdviceCardsSection";
 import React from "react";
 import { ScrollView } from "react-native";
 

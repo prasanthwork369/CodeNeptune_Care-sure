@@ -1,6 +1,6 @@
 import React from "react";
 import { View, ScrollView } from "react-native";
-import { Skeleton } from "../../../ui/Skeleton";
+import { Skeleton } from "@/src/components/ui/Skeleton";
 
 export const ProductDetailsSkeleton = () => {
   return (

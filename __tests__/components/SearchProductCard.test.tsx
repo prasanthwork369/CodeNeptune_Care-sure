@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { SearchProductCard } from "@/src/components/search/SearchProductCard";
+import { SearchProductCard } from "@/src/features/search/SearchProductCard";
 import { useCartActions } from "@/src/hooks/useCartActions";
 import { Animated } from "react-native";
 

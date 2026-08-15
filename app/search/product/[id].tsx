@@ -1,4 +1,4 @@
-import { ProductComparisonLayout } from "@/src/components/search/product/ProductComparisonLayout";
+import { ProductComparisonLayout } from "@/src/features/search/screens/ProductComparisonLayout";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
 
