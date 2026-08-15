@@ -1,6 +1,6 @@
 import { asError } from "@/src/api/errors";
 import { storageApi } from "@/src/api/storage.api";
-import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { RemoveConfirmModal } from "@/src/components/prescription/preview/sections/RemoveConfirmModal";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";

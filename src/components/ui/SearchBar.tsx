@@ -2,9 +2,9 @@ import { TextCycler } from "@/src/components/ui/TextCycler";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
+import { HomeSearchCycler } from "@/src/features/home/sections/HomeSearchCycler";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
-import { HomeSearchCycler } from "./HomeSearchCycler";
 import { styles as s, SEARCH_ICON_SIZE } from "./SearchBar.styles";
 import { exactScale } from "@/src/utils/exactScale";
 

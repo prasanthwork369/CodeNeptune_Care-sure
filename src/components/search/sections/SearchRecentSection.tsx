@@ -1,4 +1,4 @@
-import { FrequentSubstitutes } from "@/src/components/home/sections";
+import { FrequentSubstitutes } from "@/src/features/home/sections";
 import { icons } from "@/src/constants/icons";
 import { ApiSearchHistoryItem } from "@/src/api/search.api";
 import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";

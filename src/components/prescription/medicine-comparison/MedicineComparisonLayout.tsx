@@ -12,7 +12,7 @@ import {
   CartWalletSection,
   CartCorporateCreditsSection,
 } from "@/src/components/cart/sections";
-import { LocationBottomSheet } from "@/src/components/home/sections/LocationBottomSheet";
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useRefillReminder } from "@/src/hooks/useRefillReminder";
 import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";

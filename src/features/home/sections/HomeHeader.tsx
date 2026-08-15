@@ -4,7 +4,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
 import { useNotifications } from "@/src/hooks/queries/useNotifications";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
-import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
+import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useNotificationStore } from "@/src/store/notificationStore";

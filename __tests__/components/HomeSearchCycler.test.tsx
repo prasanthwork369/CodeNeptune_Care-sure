@@ -1,4 +1,4 @@
-import { HomeSearchCycler } from "@/src/components/home/sections/HomeSearchCycler";
+import { HomeSearchCycler } from "@/src/features/home/sections/HomeSearchCycler";
 import { act, render } from "@testing-library/react-native";
 import React from "react";
 import { AccessibilityInfo } from "react-native";

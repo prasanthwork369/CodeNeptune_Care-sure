@@ -1,4 +1,4 @@
-import { useFeaturedSubcategories } from "@/src/hooks/home/useFeaturedSubcategories";
+import { useFeaturedSubcategories } from "@/src/features/home/hooks/useFeaturedSubcategories";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useHome } from "@/src/hooks/queries/useHome";

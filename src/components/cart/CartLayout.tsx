@@ -1,6 +1,6 @@
 import { BillDetailsSheet } from "@/src/components/cart/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/components/cart/CareSureCoinsSheet";
-import { LocationBottomSheet } from "@/src/components/home/sections";
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useCartCalculations } from "@/src/hooks/useCartCalculations";

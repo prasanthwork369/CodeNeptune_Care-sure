@@ -1,4 +1,4 @@
-import { useCartFloatingBannerAnimation } from "@/src/components/animations/floatingBanner";
+import { useCartFloatingBannerAnimation } from "@/src/features/home/hooks/useCartFloatingBannerAnimation";
 import {
   SmokePuff,
   useFlyToCartSafe,

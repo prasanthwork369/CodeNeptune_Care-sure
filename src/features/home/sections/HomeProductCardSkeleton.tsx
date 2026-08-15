@@ -1,7 +1,7 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
-import { Skeleton } from "../../ui/Skeleton";
+import { Skeleton } from "@/src/components/ui/Skeleton";
 import { exactScale } from "@/src/utils/exactScale";
 
 const CardSkeleton = () => {

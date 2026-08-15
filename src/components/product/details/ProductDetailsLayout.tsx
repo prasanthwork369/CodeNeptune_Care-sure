@@ -1,7 +1,5 @@
-import {
-  LocationBottomSheet,
-  WhyFamiliesTrustUs,
-} from "@/src/components/home/sections";
+import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { ProductSkeleton } from "@/src/components/product/ProductSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/hooks/product/useMoreAboutScrollNavigation";
 import { useCart } from "@/src/hooks/queries/useCart";

@@ -2,7 +2,7 @@ import type {
   ApiPrescription,
   PrescriptionHistoryItemData,
 } from "@/src/types/prescription";
-import { SearchBar } from "@/src/components/home/sections/SearchBar";
+import { SearchBar } from "@/src/components/ui/SearchBar";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { RetryState } from "@/src/components/ui/RetryState";

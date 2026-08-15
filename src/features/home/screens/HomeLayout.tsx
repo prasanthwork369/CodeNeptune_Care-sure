@@ -3,6 +3,14 @@ import {
   FlyToCartOverlay,
   FlyToCartProvider,
 } from "@/src/components/animations/flyToCart";
+import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
+import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
+import { Touchable } from "@/src/components/ui/Touchable";
+import { RetryState } from "@/src/components/ui/RetryState";
+import { SearchBar } from "@/src/components/ui/SearchBar";
+import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
+import { icons } from "@/src/constants/icons";
 import {
   BannerCarousel,
   FloatingBannersCarousel,
@@ -12,28 +20,20 @@ import {
   HeroBanner,
   HomeFooter,
   HomeHeader,
-  LocationBottomSheet,
   QuickActions,
-  SearchBar,
   ShopByCategories,
   SmartSubstitution,
   StickySearchHeader,
-  WhyFamiliesTrustUs,
-} from "@/src/components/home/sections";
-import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
-import { Touchable } from "@/src/components/ui/Touchable";
-import { RetryState } from "@/src/components/ui/RetryState";
-import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
-import { icons } from "@/src/constants/icons";
-import { useHomeData } from "@/src/hooks/home/useHomeData";
-import { useHomeOnboarding } from "@/src/hooks/home/useHomeOnboarding";
-import { useHomeScroll } from "@/src/hooks/home/useHomeScroll";
-import { useScrollToTop } from "@/src/hooks/home/useScrollToTop";
+} from "@/src/features/home/sections";
+import { useHomeData } from "@/src/features/home/hooks/useHomeData";
+import { useHomeOnboarding } from "@/src/features/home/hooks/useHomeOnboarding";
+import { useHomeScroll } from "@/src/features/home/hooks/useHomeScroll";
+import { useScrollToTop } from "@/src/features/home/hooks/useScrollToTop";
+import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { useSettings } from "@/src/hooks/queries/useSettings";
-import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";

@@ -1,4 +1,4 @@
-import { LocationBottomSheet } from "@/src/components/home/sections";
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePaymentCalculations } from "@/src/hooks/usePaymentCalculations";

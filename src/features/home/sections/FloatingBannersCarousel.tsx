@@ -1,6 +1,6 @@
 import { PRESCRIPTION_STATUS } from "@/src/constants/prescription-status";
 import { useCart } from "@/src/hooks/queries/useCart";
-import { usePrescriptionBanner } from "@/src/hooks/ui/usePrescriptionBanner";
+import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
