@@ -1,7 +1,7 @@
 import { isExpoGo } from "@/src/utils/environment";
 import type { Messaging } from "@react-native-firebase/messaging";
 import { useRootNavigationState } from "expo-router";
-import * as Notifications from "expo-notifications";
+import type * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { messagingService as notificationService } from "../../services/firebase";
@@ -28,6 +28,13 @@ const messagingModule = (): typeof import("@react-native-firebase/messaging") =>
   require("@react-native-firebase/messaging");
 
 const messaging = (): Messaging => messagingModule().getMessaging();
+
+// expo-notifications throws on Android as soon as its JS module is evaluated
+// inside Expo Go (SDK 53 removed native push support there) — a static value
+// import would crash the whole bundle before any isExpoGo check below ever
+// ran. Lazily required instead; only types are imported statically above.
+const notificationsModule = (): typeof import("expo-notifications") =>
+  require("expo-notifications");
 
 /** Builds a routing payload + de-dup id from a notification's `data` block. */
 const buildPayloadFromData = (
@@ -224,11 +231,13 @@ export const usePushNotifications = () => {
   // so it never double-navigates with the FCM source above.
   useEffect(() => {
     if (!isLoaded || !navReady || isExpoGo) return;
-    Notifications.getLastNotificationResponseAsync().then((response) => {
-      if (!response) return;
-      const { payload, tapId } = buildTapPayload(response);
-      runColdStart(payload, tapId);
-    });
+    notificationsModule()
+      .getLastNotificationResponseAsync()
+      .then((response) => {
+        if (!response) return;
+        const { payload, tapId } = buildTapPayload(response);
+        runColdStart(payload, tapId);
+      });
   }, [isLoaded, navReady]);
 
   // Cold-start tap on a notifee-displayed (data-only) notification. Shares the
@@ -268,8 +277,10 @@ export const usePushNotifications = () => {
   useEffect(() => {
     if (isExpoGo) return;
 
+    const notifications = notificationsModule();
+
     // Foreground notification received — save to store
-    foregroundListener.current = Notifications.addNotificationReceivedListener(
+    foregroundListener.current = notifications.addNotificationReceivedListener(
       (notification) => {
         if (__DEV__)
           logger.debug(
@@ -287,7 +298,7 @@ export const usePushNotifications = () => {
 
     // Notification tapped (foreground / background)
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
+      notifications.addNotificationResponseReceivedListener((response) => {
         if (__DEV__)
           logger.debug(
             "[PushNotificationHook] Notification tapped (response listener):",

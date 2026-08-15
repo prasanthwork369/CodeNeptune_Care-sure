@@ -1,7 +1,6 @@
 import { asError } from "@/src/api/errors";
 import { Platform, Alert } from "react-native";
 import { Asset } from "expo-asset";
-import * as Notifications from "expo-notifications";
 import { isExpoGo } from "./environment";
 import { logger } from "@/src/utils/logger";
 
@@ -9,6 +8,13 @@ import { logger } from "@/src/utils/logger";
 const getBlobUtil = ():
   typeof import("react-native-blob-util").default | null =>
   isExpoGo ? null : require("react-native-blob-util").default;
+
+// expo-notifications throws on Android as soon as its JS module is evaluated
+// inside Expo Go (SDK 53 removed native push support there) — a static
+// import would crash the whole bundle before the isExpoGo checks (via
+// getBlobUtil, above) ever ran. Lazily required instead.
+const notificationsModule = (): typeof import("expo-notifications") =>
+  require("expo-notifications");
 
 /**
  * Downloads a remote file from a URL to the local device storage.
@@ -140,14 +146,15 @@ const persistLocalFile = async (
 
     // Show notification in Android notification tray using expo-notifications
     try {
-      let { status } = await Notifications.getPermissionsAsync();
+      const notifications = notificationsModule();
+      let { status } = await notifications.getPermissionsAsync();
       if (status !== "granted") {
         const { status: newStatus } =
-          await Notifications.requestPermissionsAsync();
+          await notifications.requestPermissionsAsync();
         status = newStatus;
       }
       if (status === "granted") {
-        await Notifications.scheduleNotificationAsync({
+        await notifications.scheduleNotificationAsync({
           content: {
             title: `${itemTypeLabel} Downloaded`,
             body: `${finalFileName} saved to Downloads folder successfully`,

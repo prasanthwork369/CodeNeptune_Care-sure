@@ -2,7 +2,6 @@ import { asError } from "@/src/api/errors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Messaging } from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { notificationApi } from "../../../api/notification.api";
 import { NOTIFICATION_CHANNELS } from "../../../constants/notification-channels";
@@ -37,6 +36,13 @@ const messagingModule = (): typeof import("@react-native-firebase/messaging") =>
   require("@react-native-firebase/messaging");
 
 const messaging = (): Messaging => messagingModule().getMessaging();
+
+// expo-notifications throws on Android as soon as its JS module is evaluated
+// inside Expo Go (SDK 53 removed native push support there) — a static import
+// would crash the whole bundle before any isExpoGo check below ever ran.
+// Lazily required instead, same as Firebase Messaging above.
+const notificationsModule = (): typeof import("expo-notifications") =>
+  require("expo-notifications");
 
 // The identity of a registration: same token means
 // the backend already has what it needs, so we can skip the call.
@@ -116,12 +122,13 @@ const syncToken = async (token: string): Promise<void> => {
 // Remove the `isExpoGo` checks below once running via a development build.
 export const notificationService = {
   requestPermission: async (): Promise<boolean> => {
-    if (!Device.isDevice) return false;
+    if (isExpoGo || !Device.isDevice) return false;
 
-    const { status: existing } = await Notifications.getPermissionsAsync();
+    const { status: existing } =
+      await notificationsModule().getPermissionsAsync();
     if (existing === "granted") return true;
 
-    const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await notificationsModule().requestPermissionsAsync();
     return status === "granted";
   },
 
@@ -129,8 +136,8 @@ export const notificationService = {
   // register the token for users who already granted, without asking anyone
   // who hasn't (the prompt is shown later, at a contextual moment).
   hasPermission: async (): Promise<boolean> => {
-    if (!Device.isDevice) return false;
-    const { status } = await Notifications.getPermissionsAsync();
+    if (isExpoGo || !Device.isDevice) return false;
+    const { status } = await notificationsModule().getPermissionsAsync();
     return status === "granted";
   },
 
@@ -208,7 +215,7 @@ export const notificationService = {
 
   configureBehavior: () => {
     if (isExpoGo) return;
-    Notifications.setNotificationHandler({
+    notificationsModule().setNotificationHandler({
       handleNotification: async () => ({
         shouldShowBanner: true,
         shouldShowList: true,
@@ -226,25 +233,26 @@ export const notificationService = {
   setupAndroidChannels: async (): Promise<void> => {
     if (isExpoGo || Platform.OS !== "android") return;
     try {
-      await Notifications.setNotificationChannelAsync(
+      const notifications = notificationsModule();
+      await notifications.setNotificationChannelAsync(
         NOTIFICATION_CHANNELS.ORDERS,
         {
           name: "Order Updates",
-          importance: Notifications.AndroidImportance.HIGH,
+          importance: notifications.AndroidImportance.HIGH,
         },
       );
-      await Notifications.setNotificationChannelAsync(
+      await notifications.setNotificationChannelAsync(
         NOTIFICATION_CHANNELS.REMINDERS,
         {
           name: "Reminders",
-          importance: Notifications.AndroidImportance.HIGH,
+          importance: notifications.AndroidImportance.HIGH,
         },
       );
-      await Notifications.setNotificationChannelAsync(
+      await notifications.setNotificationChannelAsync(
         NOTIFICATION_CHANNELS.OFFERS,
         {
           name: "Offers & Promotions",
-          importance: Notifications.AndroidImportance.DEFAULT,
+          importance: notifications.AndroidImportance.DEFAULT,
         },
       );
     } catch (error) {
