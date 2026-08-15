@@ -16,7 +16,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { profileStyles as s } from "../profile.styles";
+import { profileStyles as s } from "@/src/features/profile/profile.styles";
 
 import { styles as cardStyles } from "./WalletLayout.styles";
 import { TransactionHistorySheet } from "./TransactionHistorySheet";

@@ -1,4 +1,4 @@
-import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
+import { AddPatientSheet } from "@/src/features/profile/components/AddPatientSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { useCart } from "@/src/hooks/queries/useCart";

@@ -20,11 +20,11 @@ import {
   ProfileQuickTiles,
 } from "../sections";
 import UploadBottomSheet from "../sections/UploadBottomSheet";
-import { LogoutConfirmModal } from "./LogoutConfirmModal";
+import { LogoutConfirmModal } from "../components/LogoutConfirmModal";
 import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
 import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
 import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
-import { ProfileSkeleton } from "./ProfileSkeleton";
+import { ProfileSkeleton } from "../components/ProfileSkeleton";
 
 export const ProfileLayout: React.FC = () => {
   const insets = useSafeAreaInsets();

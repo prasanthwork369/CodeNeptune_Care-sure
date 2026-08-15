@@ -1,2 +1,2 @@
-import { AddAddressLayout } from "@/src/components/profile/addresses/AddAddressLayout";
+import { AddAddressLayout } from "@/src/features/profile/screens/AddAddressLayout";
 export default AddAddressLayout;

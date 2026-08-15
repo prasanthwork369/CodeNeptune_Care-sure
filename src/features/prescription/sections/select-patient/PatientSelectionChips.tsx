@@ -1,4 +1,4 @@
-import { PatientChipSkeleton } from "@/src/components/profile/patients/PatientSkeleton";
+import { PatientChipSkeleton } from "@/src/features/profile/components/PatientSkeleton";
 import { PatientSelectionChipsProps } from "@/src/types/patient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";

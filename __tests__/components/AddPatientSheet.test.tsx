@@ -2,7 +2,7 @@ import {
   fireEvent,
   renderWithProviders,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
+import { AddPatientSheet } from "@/src/features/profile/components/AddPatientSheet";
 import { StyleSheet } from "react-native";
 
 jest.mock("@/src/components/ui/GorhomBottomSheet", () => {

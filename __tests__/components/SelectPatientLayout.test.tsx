@@ -14,7 +14,7 @@ jest.mock("@/src/hooks/ui/useBottomInset", () => ({
   useAdjustedBottomInset: () => 0,
 }));
 
-jest.mock("@/src/components/profile/patients/AddPatientSheet", () => ({
+jest.mock("@/src/features/profile/components/AddPatientSheet", () => ({
   AddPatientSheet: () => null,
 }));
 

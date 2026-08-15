@@ -10,7 +10,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, Text, View } from "react-native";
-import { ConfirmActionModal } from "./ConfirmActionModal";
+import { ConfirmActionModal } from "../components/ConfirmActionModal";
 
 // The three things the user loses on deletion — icon + copy, matching the design.
 const LOSS_ITEMS = [

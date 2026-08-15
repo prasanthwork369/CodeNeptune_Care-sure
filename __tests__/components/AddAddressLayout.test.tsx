@@ -4,7 +4,7 @@ import {
   fireEvent,
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { AddAddressLayout } from "@/src/components/profile/addresses/AddAddressLayout";
+import { AddAddressLayout } from "@/src/features/profile/screens/AddAddressLayout";
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useAuthStore } from "@/src/store/authStore";
 

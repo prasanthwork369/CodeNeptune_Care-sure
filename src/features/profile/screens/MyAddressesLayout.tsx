@@ -10,7 +10,7 @@ import { AddressType } from "@/src/types/address";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
-import { AddressSkeleton } from "./AddressSkeleton";
+import { AddressSkeleton } from "../components/AddressSkeleton";
 
 const labelToType = (label: string): AddressType => {
   const l = label.toUpperCase();

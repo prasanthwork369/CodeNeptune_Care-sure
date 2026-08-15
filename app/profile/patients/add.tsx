@@ -1,2 +1,2 @@
-import { AddPatientLayout } from "@/src/components/profile/patients/AddPatientLayout";
+import { AddPatientLayout } from "@/src/features/profile/screens/AddPatientLayout";
 export default AddPatientLayout;

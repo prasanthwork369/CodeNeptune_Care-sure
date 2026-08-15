@@ -1,7 +1,7 @@
 import { HealthProblemSheet } from "@/src/features/prescription/components/HealthProblemSheet";
-import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
-import { PatientChipSkeleton } from "@/src/components/profile/patients/PatientSkeleton";
-import { PatientEmptyState } from "@/src/components/profile/select-patient/sections";
+import { AddPatientSheet } from "@/src/features/profile/components/AddPatientSheet";
+import { PatientChipSkeleton } from "@/src/features/profile/components/PatientSkeleton";
+import { PatientEmptyState } from "../sections/select-patient";
 import { AppButton } from "@/src/components/ui/AppButton";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";

@@ -1,2 +1,2 @@
-import { PatientDetailsLayout } from "@/src/components/profile/patients/PatientDetailsLayout";
+import { PatientDetailsLayout } from "@/src/features/profile/screens/PatientDetailsLayout";
 export default PatientDetailsLayout;

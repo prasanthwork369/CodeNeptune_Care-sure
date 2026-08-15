@@ -1,2 +1,2 @@
-import { DeleteAccountLayout } from "../../src/components/profile/common/DeleteAccountLayout";
+import { DeleteAccountLayout } from "@/src/features/profile/screens/DeleteAccountLayout";
 export default DeleteAccountLayout;

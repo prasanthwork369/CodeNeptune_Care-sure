@@ -1,4 +1,4 @@
-import { PatientSkeleton } from "./PatientSkeleton";
+import { PatientSkeleton } from "../components/PatientSkeleton";
 import { profileStyles as s } from "../profile.styles";
 import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";

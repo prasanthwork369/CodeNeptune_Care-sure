@@ -4,7 +4,7 @@ import {
   fireEvent,
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { EmailVerifyModal } from "@/src/components/profile/common/EmailVerifyModal";
+import { EmailVerifyModal } from "@/src/features/profile/components/EmailVerifyModal";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useOtpInput } from "@/src/hooks/ui/useOtpInput";
 

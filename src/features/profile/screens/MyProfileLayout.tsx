@@ -27,7 +27,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { EmailVerifyModal } from "./EmailVerifyModal";
+import { EmailVerifyModal } from "../components/EmailVerifyModal";
 
 // Label shown to the user vs. value sent to the backend (kept in sync with
 // AddPatientLayout — "Prefer not to say" maps to the "OTHER" gender value).

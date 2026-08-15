@@ -1,2 +1,2 @@
-import { ProfileLayout } from "@/src/components/profile/common/ProfileLayout";
+import { ProfileLayout } from "@/src/features/profile/screens/ProfileLayout";
 export default ProfileLayout;
