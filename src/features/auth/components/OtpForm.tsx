@@ -1,6 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
-import { OtpFormProps } from "@/src/types/auth";
 import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
@@ -10,6 +9,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { OtpFormProps } from "../types";
 import { styles as s } from "./OtpForm.styles";
 
 const OTP_LENGTH = 6;

@@ -4,7 +4,7 @@ import {
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
 import { TextInput } from "react-native";
-import { OtpForm } from "@/src/components/auth/sections/OtpForm";
+import { OtpForm } from "@/src/features/auth/components/OtpForm";
 
 describe("OtpForm Component", () => {
   const defaultProps = {

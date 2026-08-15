@@ -1,6 +1,6 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react-native";
-import { useOtp } from "@/src/hooks/useOtp";
+import { useOtp } from "@/src/features/auth/hooks/useOtp";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
 import { cartApi } from "@/src/api/cart.api";
 import { useCartPendingStore } from "@/src/store/cartStore";

@@ -1,9 +1,9 @@
-import { PolicyLink } from "@/src/components/auth/PolicyLink";
 import { icons } from "@/src/constants/icons";
 import { useMobileAppLinks } from "@/src/hooks/queries/useSettings";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { PolicyLink } from "./PolicyLink";
 import { styles as s } from "./AuthFooter.styles";
 
 type LinkKey = "terms" | "privacy" | "refund";

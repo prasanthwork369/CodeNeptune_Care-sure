@@ -4,7 +4,7 @@ import {
   renderWithProviders,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { LoginForm } from "@/src/components/auth/sections/LoginForm";
+import { LoginForm } from "@/src/features/auth/components/LoginForm";
 
 describe("LoginForm Component", () => {
   const defaultProps = {

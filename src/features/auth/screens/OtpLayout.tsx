@@ -1,13 +1,13 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useOtp } from "@/src/hooks/useOtp";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { AuthFooter } from "../components/AuthFooter";
+import { AuthScreenShell } from "../components/AuthScreenShell";
+import { OtpForm } from "../components/OtpForm";
+import { styles as formStyles } from "../components/OtpForm.styles";
+import { useOtp } from "../hooks/useOtp";
 import { styles as s } from "./OtpLayout.styles";
-import { AuthFooter } from "./sections/AuthFooter";
-import { AuthScreenShell } from "./sections/AuthScreenShell";
-import { OtpForm } from "./sections/OtpForm";
-import { styles as formStyles } from "./sections/OtpForm.styles";
 
 // Formats a raw phone number (e.g. +919444444444) into +91 94444 44444 for cleaner display on screen
 const formatPhoneNumber = (rawPhone: string) => {

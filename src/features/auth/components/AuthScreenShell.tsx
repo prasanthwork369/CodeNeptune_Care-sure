@@ -1,9 +1,9 @@
-import { AuthMedicineBackground } from "@/src/components/auth/AuthMedicineBackground";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useAuthStore } from "@/src/store/authStore";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
+import { AuthMedicineBackground } from "./AuthMedicineBackground";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import React from "react";

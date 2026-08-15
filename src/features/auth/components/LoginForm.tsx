@@ -1,8 +1,8 @@
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { colors } from "@/src/theme";
-import { LoginFormProps } from "@/src/types/auth";
 import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { LoginFormProps } from "../types";
 import { styles as s } from "./LoginForm.styles";
 
 const MAX_PHONE_DIGITS = 10;

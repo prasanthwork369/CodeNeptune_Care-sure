@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { Platform } from "react-native";
-import { useLogin } from "@/src/hooks/useLogin";
+import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { getPhoneNumberHint } from "@/src/modules/PhoneNumberHint";
 
 const mockRequestOtp = jest.fn();

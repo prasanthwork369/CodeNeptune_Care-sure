@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { cartStyles as s } from "../cart.styles";
 import { useMobileAppLinks } from "@/src/hooks/queries/useSettings";
-import { PolicyLink } from "@/src/components/auth/PolicyLink";
+import { PolicyLink } from "@/src/features/auth/components/PolicyLink";
 import { icons } from "@/src/constants/icons";
 import * as Haptics from "expo-haptics";
 

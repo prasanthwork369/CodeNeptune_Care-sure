@@ -1,2 +1,2 @@
-import { OtpLayout } from "@/src/components/auth/OtpLayout";
+import { OtpLayout } from "@/src/features/auth/screens/OtpLayout";
 export default OtpLayout;

@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native";
-import { useOtp } from "@/src/hooks/useOtp";
+import { useOtp } from "@/src/features/auth/hooks/useOtp";
 
 const mockVerifyOtp = jest.fn();
 const mockRequestOtp = jest.fn();

@@ -1,13 +1,13 @@
-import { useLogin } from "@/src/hooks/useLogin";
 import { useAuthStore } from "@/src/store/authStore";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
 import { BackHandler, Text, View } from "react-native";
+import { AuthFooter } from "../components/AuthFooter";
+import { AuthScreenShell } from "../components/AuthScreenShell";
+import { LoginForm } from "../components/LoginForm";
+import { LoginSubmitButton } from "../components/LoginSubmitButton";
+import { useLogin } from "../hooks/useLogin";
 import { styles as s } from "./LoginLayout.styles";
-import { AuthFooter } from "./sections/AuthFooter";
-import { AuthScreenShell } from "./sections/AuthScreenShell";
-import { LoginForm } from "./sections/LoginForm";
-import { LoginSubmitButton } from "./sections/LoginSubmitButton";
 
 /**
  * Presentation component for the Login screen.

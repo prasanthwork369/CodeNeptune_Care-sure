@@ -1,4 +1,4 @@
-import { OtpForm } from "@/src/components/auth/sections/OtpForm";
+import { OtpForm } from "@/src/features/auth/components/OtpForm";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
 import { useOtpInput } from "@/src/hooks/ui/useOtpInput";

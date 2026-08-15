@@ -1,8 +1,8 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { LoginSubmitButtonProps } from "@/src/types/auth";
 import React from "react";
 import { ActivityIndicator, Text } from "react-native";
+import { LoginSubmitButtonProps } from "../types";
 import { styles as s } from "./LoginForm.styles";
 
 export const LoginSubmitButton: React.FC<LoginSubmitButtonProps> = ({
