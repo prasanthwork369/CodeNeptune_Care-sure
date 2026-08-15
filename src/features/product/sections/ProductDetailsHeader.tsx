@@ -4,7 +4,7 @@ import { icons } from "@/src/constants/icons";
 import { productWebUrl } from "@/src/constants/urls";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { colors } from "@/src/theme";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useNav } from "@/src/hooks/useNav";
 import { ProductDetailsHeaderProps } from "@/src/features/product/types";
 import React from "react";
@@ -24,7 +24,7 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
   manufacturer,
   dosageForm,
 }) => {
-  const { totalItems: cartCount } = useCart();
+  const { totalItems: cartCount } = useCartRead();
   const router = useNav();
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());

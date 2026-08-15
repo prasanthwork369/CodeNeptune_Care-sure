@@ -2,7 +2,7 @@ import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { ProductDetailsFooterProps } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -36,7 +36,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
       requiresPrescription: product.requiresPrescription,
     },
   );
-  const { totalItems, totalPrice } = useCart();
+  const { totalItems, totalPrice } = useCartRead();
   const { slideAnim, opacityAnim } = animations;
   // Shared global CTA height for the counter and View Cart action.
   const FOOTER_CONTROL_HEIGHT = exactScale(50);

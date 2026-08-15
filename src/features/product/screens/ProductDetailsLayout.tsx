@@ -2,7 +2,7 @@ import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { ProductSkeleton } from "@/src/features/product/ProductSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct } from "@/src/hooks/queries/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -46,7 +46,7 @@ export const ProductDetailsLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { product, recommendation, saltComposition, variants, raw, isLoading } =
     useProduct(id);
-  const { items: cartItems } = useCart();
+  const { items: cartItems } = useCartRead();
   const { appContent, isLoading: isHomeLoading } = useHome();
 
   usePerformanceTrace({
@@ -54,9 +54,13 @@ export const ProductDetailsLayout: React.FC = () => {
     isLoading,
   });
 
+  // Depend on the route id + whether product has loaded, not the `product`
+  // object itself, so this fires once per product view instead of on every
+  // re-render (variant tap, location-sheet toggle, etc.) that touches it.
   useEffect(() => {
     if (product) void analyticsService.logProductView(raw?.sourceType);
-  }, [product, raw?.sourceType]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, !!product]);
 
   const mainScrollRef = React.useRef<ScrollView>(null);
   const [locationSheetVisible, setLocationSheetVisible] = useState(false);
