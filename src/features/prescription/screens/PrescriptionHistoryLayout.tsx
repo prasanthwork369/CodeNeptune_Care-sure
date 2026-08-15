@@ -1,7 +1,7 @@
 import type {
   ApiPrescription,
   PrescriptionHistoryItemData,
-} from "@/src/types/prescription";
+} from "@/src/features/prescription/types";
 import { SearchBar } from "@/src/components/ui/SearchBar";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
@@ -10,7 +10,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import {
   PRESCRIPTION_STATUS,
   PRESCRIPTION_STATUS_LABELS,
-} from "@/src/constants/prescription-status";
+} from "@/src/features/prescription/constants/prescription-status";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState, useMemo, useCallback } from "react";
@@ -19,7 +19,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
-import { PrescriptionHistoryItem } from "./sections";
+import { PrescriptionHistoryItem } from "../sections/history";
 
 // Status options for the filter sheet. `null` = show all.
 const STATUS_FILTERS: { label: string; value: number | null }[] = [

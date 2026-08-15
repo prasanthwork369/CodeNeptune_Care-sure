@@ -1,7 +1,7 @@
 import { asError } from "@/src/api/errors";
 import { storageApi } from "@/src/api/storage.api";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
-import { RemoveConfirmModal } from "@/src/components/prescription/preview/sections/RemoveConfirmModal";
+import { RemoveConfirmModal } from "@/src/features/prescription/sections/preview/RemoveConfirmModal";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";

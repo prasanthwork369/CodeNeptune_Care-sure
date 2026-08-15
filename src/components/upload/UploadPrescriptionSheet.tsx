@@ -2,7 +2,7 @@ import {
   DuplicateFileModal,
   FileTooLargeModal,
   InfoModal,
-} from "@/src/components/prescription/preview/sections";
+} from "@/src/features/prescription/sections/preview";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";

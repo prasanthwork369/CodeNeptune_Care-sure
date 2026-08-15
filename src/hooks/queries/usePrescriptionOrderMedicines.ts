@@ -3,7 +3,7 @@ import {
   prescriptionOrderApi,
   ApiPrescriptionOrderItem,
 } from "../../api/prescription-order.api";
-import { ComparisonMedicine } from "../../components/prescription/medicine-comparison/types";
+import { ComparisonMedicine } from "@/src/features/prescription/medicine-comparison.types";
 import { logger } from "@/src/utils/logger";
 
 const buildSaltComposition = (item: ApiPrescriptionOrderItem): string => {

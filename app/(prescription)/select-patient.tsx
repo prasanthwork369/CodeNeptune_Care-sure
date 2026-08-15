@@ -1,2 +1,2 @@
-import { SelectPatientLayout } from "@/src/components/prescription/SelectPatientLayout";
+import { SelectPatientLayout } from "@/src/features/prescription/screens/SelectPatientLayout";
 export default SelectPatientLayout;

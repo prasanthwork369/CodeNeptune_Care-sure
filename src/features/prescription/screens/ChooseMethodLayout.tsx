@@ -15,7 +15,7 @@ import {
   ChooseMethodFooter,
   RequiresPrescriptionWarning,
   UploadMethodCard,
-} from "./sections";
+} from "../sections/choose-method";
 
 export const ChooseMethodLayout: React.FC = () => {
   const router = useNav();

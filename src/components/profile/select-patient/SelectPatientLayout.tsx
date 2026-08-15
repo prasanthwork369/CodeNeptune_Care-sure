@@ -1,4 +1,4 @@
-import { HealthProblemSheet } from "@/src/components/prescription/HealthProblemSheet";
+import { HealthProblemSheet } from "@/src/features/prescription/components/HealthProblemSheet";
 import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";

@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native";
-import type { PrescriptionItem } from "@/src/types/prescription";
+import type { PrescriptionItem } from "@/src/features/prescription/types";
 
 const mockUpload = jest.fn();
 const mockDeleteTempCopy = jest.fn();

@@ -1,5 +1,5 @@
 import { storageApi } from "@/src/api/storage.api";
-import { PrescriptionItem } from "@/src/types/prescription";
+import { PrescriptionItem } from "@/src/features/prescription/types";
 import { networkErrorMessage } from "@/src/utils/offline";
 import { deleteTempCopy } from "@/src/utils/prescription";
 import { toAppError } from "@/src/api/errors";

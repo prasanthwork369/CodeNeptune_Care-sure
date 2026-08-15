@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
-import { ChooseMethodFooterProps } from "@/src/types/prescription";
+import { ChooseMethodFooterProps } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
 
 export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({

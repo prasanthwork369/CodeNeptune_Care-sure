@@ -6,7 +6,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useZoomGesture } from "@/src/hooks/ui/useZoomGesture";
 import { useLocalSearchParams } from "expo-router";
 import { icons } from "@/src/constants/icons";
-import { PRESCRIPTION_STATUS_LABELS } from "@/src/constants/prescription-status";
+import { PRESCRIPTION_STATUS_LABELS } from "@/src/features/prescription/constants/prescription-status";
 import { prescriptionService } from "@/src/services/prescription.service";
 import React, { useEffect, useMemo, useState } from "react";
 import {

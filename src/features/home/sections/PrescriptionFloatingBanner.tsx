@@ -3,7 +3,7 @@ import { icons } from "@/src/constants/icons";
 import {
   PRESCRIPTION_STATUS,
   PrescriptionStatusValue,
-} from "@/src/constants/prescription-status";
+} from "@/src/features/prescription/constants/prescription-status";
 import { useIsVisible } from "@/src/hooks/ui/useVisibleInterval";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { Image } from "expo-image";

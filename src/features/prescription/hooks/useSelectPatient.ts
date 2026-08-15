@@ -1,6 +1,6 @@
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
-import { useSelectPatientImages } from "@/src/hooks/useSelectPatientImages";
+import { useSelectPatientImages } from "./useSelectPatientImages";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { HealthProblem } from "@/src/api/health-problem.api";

@@ -1,7 +1,7 @@
 import { AnimatedImage } from "@/src/components/ui/AnimatedImage";
 import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { icons } from "@/src/constants/icons";
-import { PreviewDisplayProps } from "@/src/types/prescription";
+import { PreviewDisplayProps } from "@/src/features/prescription/types";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useZoomGesture } from "@/src/hooks/ui/useZoomGesture";
 import React, { useEffect } from "react";

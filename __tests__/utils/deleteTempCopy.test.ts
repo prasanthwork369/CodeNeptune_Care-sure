@@ -14,7 +14,7 @@ jest.mock("expo-file-system", () => ({
 }));
 
 import { deleteTempCopy } from "@/src/utils/prescription";
-import type { PrescriptionItem } from "@/src/types/prescription";
+import type { PrescriptionItem } from "@/src/features/prescription/types";
 
 const item = (over: Partial<PrescriptionItem> = {}): PrescriptionItem => ({
   localUri: "file:///cache/prescription_abc123.jpg",

@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { LinearGradient } from "expo-linear-gradient";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { CallMethodCardProps } from "@/src/types/prescription";
+import { CallMethodCardProps } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
 
 const RadioButton = ({ selected }: { selected: boolean }) => (

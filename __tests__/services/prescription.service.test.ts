@@ -1,6 +1,6 @@
 import { prescriptionService } from "@/src/services/prescription.service";
 import { prescriptionApi } from "@/src/api/prescription.api";
-import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import { AppError } from "@/src/api/errors";
 
 jest.mock("@/src/api/prescription.api", () => ({

@@ -3,7 +3,7 @@ import { ANIMATIONS } from "@/src/constants/images";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
-import { ReminderFrequencyDays, ReminderInput } from "@/src/types/prescription";
+import { ReminderFrequencyDays, ReminderInput } from "@/src/features/prescription/types";
 import React, { useState } from "react";
 import {
   Modal,

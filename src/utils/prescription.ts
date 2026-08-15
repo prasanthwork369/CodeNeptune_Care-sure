@@ -1,5 +1,5 @@
 import { File, Paths } from "expo-file-system";
-import { PrescriptionItem } from "../types/prescription";
+import { PrescriptionItem } from "@/src/features/prescription/types";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { CapturedAsset } from "../features/prescription-scanner";

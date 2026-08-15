@@ -25,7 +25,7 @@ import {
   sumOrderDiscounts,
 } from "@/src/utils/orderPayload";
 import { CreateOrderRequest } from "@/src/types/order";
-import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Alert } from "react-native";

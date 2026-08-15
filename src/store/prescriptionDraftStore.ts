@@ -1,4 +1,4 @@
-import { PrescriptionItem } from "@/src/types/prescription";
+import { PrescriptionItem } from "@/src/features/prescription/types";
 import { MAX_FILES_CEILING } from "@/src/utils/prescription";
 import { create } from "zustand";
 

@@ -1,8 +1,8 @@
-import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
-import { PRESCRIPTION_STATUS } from "@/src/constants/prescription-status";
+import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
+import { PRESCRIPTION_STATUS } from "@/src/features/prescription/constants/prescription-status";
 import { useDismissPrescription } from "@/src/hooks/mutations/usePrescriptionMutations";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
-import { ApiPrescription } from "@/src/types/prescription";
+import { ApiPrescription } from "@/src/features/prescription/types";
 import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useFocusEffect } from "expo-router";

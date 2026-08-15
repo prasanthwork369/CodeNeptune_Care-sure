@@ -2,7 +2,7 @@ import {
   fireEvent,
   renderWithProviders,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { SelectPatientLayout } from "@/src/components/prescription/SelectPatientLayout";
+import { SelectPatientLayout } from "@/src/features/prescription/screens/SelectPatientLayout";
 
 const mockHandleProceed = jest.fn();
 
@@ -18,7 +18,7 @@ jest.mock("@/src/components/profile/patients/AddPatientSheet", () => ({
   AddPatientSheet: () => null,
 }));
 
-jest.mock("@/src/components/prescription/HealthProblemSheet", () => ({
+jest.mock("@/src/features/prescription/components/HealthProblemSheet", () => ({
   HealthProblemSheet: () => null,
 }));
 
@@ -26,7 +26,7 @@ jest.mock("@/src/components/upload/UploadPrescriptionSheet", () => ({
   UploadPrescriptionSheet: () => null,
 }));
 
-jest.mock("@/src/hooks/useSelectPatient", () => ({
+jest.mock("@/src/features/prescription/hooks/useSelectPatient", () => ({
   useSelectPatient: () => ({
     router: { push: jest.fn() },
     toPay: "1100",

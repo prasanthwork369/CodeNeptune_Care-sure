@@ -1,4 +1,4 @@
-import type { ApiPrescription } from "@/src/types/prescription";
+import type { ApiPrescription } from "@/src/features/prescription/types";
 import { RxOrdersSkeleton } from "@/src/components/profile/orders/PrescriptionSkeleton";
 import {
   Prescription,
@@ -8,7 +8,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import {
   PRESCRIPTION_STATUS,
   PRESCRIPTION_STATUS_LABELS,
-} from "@/src/constants/prescription-status";
+} from "@/src/features/prescription/constants/prescription-status";
 import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";

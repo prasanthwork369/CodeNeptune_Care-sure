@@ -3,7 +3,7 @@ import {
   DuplicateFileModal,
   FileTooLargeModal,
   InfoModal,
-} from "@/src/components/prescription/preview/sections";
+} from "@/src/features/prescription/sections/preview";
 import { components } from "@/src/constants/theme";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { usePrescriptionUpload } from "@/src/hooks/ui/usePrescriptionUpload";

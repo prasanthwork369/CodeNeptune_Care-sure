@@ -1,6 +1,6 @@
-import { CallMethodCard } from "@/src/components/prescription/choose-method/sections/CallMethodCard";
-import { RequiresPrescriptionWarning } from "@/src/components/prescription/choose-method/sections/RequiresPrescriptionWarning";
-import { UploadMethodCard } from "@/src/components/prescription/choose-method/sections/UploadMethodCard";
+import { CallMethodCard } from "@/src/features/prescription/sections/choose-method/CallMethodCard";
+import { RequiresPrescriptionWarning } from "@/src/features/prescription/sections/choose-method/RequiresPrescriptionWarning";
+import { UploadMethodCard } from "@/src/features/prescription/sections/choose-method/UploadMethodCard";
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
 import React from "react";
 

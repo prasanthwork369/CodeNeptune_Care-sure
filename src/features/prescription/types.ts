@@ -1,4 +1,4 @@
-import { PrescriptionStatusValue } from "@/src/constants/prescription-status";
+import { PrescriptionStatusValue } from "./constants/prescription-status";
 import type { FileUploadState } from "@/src/hooks/ui/usePrescriptionUploader";
 import type { CartItem } from "@/src/features/cart/types";
 

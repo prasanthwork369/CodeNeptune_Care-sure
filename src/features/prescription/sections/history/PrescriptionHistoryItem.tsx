@@ -1,7 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { PrescriptionHistoryItemProps } from "@/src/types/prescription";
+import { PrescriptionHistoryItemProps } from "@/src/features/prescription/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React, { useState } from "react";

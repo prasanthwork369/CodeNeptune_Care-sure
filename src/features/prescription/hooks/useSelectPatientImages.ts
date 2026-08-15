@@ -6,7 +6,7 @@ import {
   UploadedImage,
 } from "@/src/api/storage.api";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
-import { PrescriptionItem } from "@/src/types/prescription";
+import { PrescriptionItem } from "../types";
 import {
   validatePrescriptionFile,
   capturePrescriptionImages,

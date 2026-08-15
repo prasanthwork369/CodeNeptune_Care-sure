@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { RequiresPrescriptionWarningProps } from "@/src/types/prescription";
+import { RequiresPrescriptionWarningProps } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
 
 const formatMedicineLabel = (label: string) =>

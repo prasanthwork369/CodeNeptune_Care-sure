@@ -1,7 +1,7 @@
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
-import { PrescriptionItem } from "@/src/types/prescription";
+import { PrescriptionItem } from "@/src/features/prescription/types";
 import { validatePrescriptionFile } from "@/src/utils/prescription";
 import {
   usePrescriptionUploadService,

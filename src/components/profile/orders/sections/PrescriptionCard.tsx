@@ -1,12 +1,12 @@
-import { PrescriptionRejectedModal } from "@/src/components/prescription/history/sections/PrescriptionRejectedModal";
-import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
+import { PrescriptionRejectedModal } from "@/src/features/prescription/sections/history/PrescriptionRejectedModal";
+import { ReminderSheet } from "@/src/features/prescription/components/ReminderSheet";
 import { formatReminderDateShort } from "@/src/utils/reminderDate";
 import { CardOptionsMenu } from "@/src/components/ui/CardOptionsMenu";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { useRefillReminder } from "@/src/hooks/useRefillReminder";
-import { PrescriptionReminder } from "@/src/types/prescription";
+import { PrescriptionReminder } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Share, Text, View } from "react-native";

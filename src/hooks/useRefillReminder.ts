@@ -1,5 +1,5 @@
 import { prescriptionService } from "@/src/services/prescription.service";
-import { PrescriptionReminder, ReminderInput } from "@/src/types/prescription";
+import { PrescriptionReminder, ReminderInput } from "@/src/features/prescription/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";

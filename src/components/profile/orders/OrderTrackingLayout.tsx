@@ -1,5 +1,5 @@
 import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
-import { AlreadyHaveItemsModal } from "@/src/components/prescription/AlreadyHaveItemsModal";
+import { AlreadyHaveItemsModal } from "@/src/features/prescription/components/AlreadyHaveItemsModal";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";

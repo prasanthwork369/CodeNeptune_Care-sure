@@ -1,2 +1,2 @@
-import { PrescriptionHistoryLayout } from "@/src/components/prescription/history/PrescriptionHistoryLayout";
+import { PrescriptionHistoryLayout } from "@/src/features/prescription/screens/PrescriptionHistoryLayout";
 export default PrescriptionHistoryLayout;

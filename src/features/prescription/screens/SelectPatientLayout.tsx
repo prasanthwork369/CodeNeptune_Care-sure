@@ -1,4 +1,4 @@
-import { HealthProblemSheet } from "@/src/components/prescription/HealthProblemSheet";
+import { HealthProblemSheet } from "@/src/features/prescription/components/HealthProblemSheet";
 import { AddPatientSheet } from "@/src/components/profile/patients/AddPatientSheet";
 import { PatientChipSkeleton } from "@/src/components/profile/patients/PatientSkeleton";
 import { PatientEmptyState } from "@/src/components/profile/select-patient/sections";
@@ -9,7 +9,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useSelectPatient } from "@/src/hooks/useSelectPatient";
+import { useSelectPatient } from "@/src/features/prescription/hooks/useSelectPatient";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { getAge } from "@/src/utils/patient";
 import { resolveAssetUrl } from "@/src/utils/urls";

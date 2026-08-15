@@ -3,12 +3,12 @@ import {
   PrescriptionListParams,
   PrescriptionUploadInput,
 } from "@/src/api/prescription.api";
-import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import {
   ApiPrescription,
   PrescriptionReminder,
   ReminderInput,
-} from "@/src/types/prescription";
+} from "@/src/features/prescription/types";
 import { AppError } from "@/src/api/errors";
 
 type SuccessResult<T> = { success: true; data: T };

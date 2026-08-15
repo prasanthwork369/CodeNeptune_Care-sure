@@ -1,2 +1,2 @@
-import { ChooseMethodLayout } from "@/src/components/prescription/choose-method/ChooseMethodLayout";
+import { ChooseMethodLayout } from "@/src/features/prescription/screens/ChooseMethodLayout";
 export default ChooseMethodLayout;

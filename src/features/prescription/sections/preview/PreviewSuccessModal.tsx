@@ -1,7 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { PreviewSuccessModalProps } from "@/src/types/prescription";
+import { PreviewSuccessModalProps } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React from "react";

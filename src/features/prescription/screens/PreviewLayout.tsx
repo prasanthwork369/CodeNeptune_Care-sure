@@ -1,9 +1,9 @@
 import { asError } from "@/src/api/errors";
-import { PrescriptionReviewSheet } from "@/src/components/prescription/PrescriptionReviewSheet";
+import { PrescriptionReviewSheet } from "@/src/features/prescription/components/PrescriptionReviewSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "@/src/components/upload/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { PRESCRIPTION_CATEGORY } from "@/src/constants/prescription-category";
+import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import {
   CapturedAsset,
   usePrescriptionUploadService,
@@ -18,7 +18,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
-import { PrescriptionItem } from "@/src/types/prescription";
+import { PrescriptionItem } from "@/src/features/prescription/types";
 import { logger } from "@/src/utils/logger";
 import { requireInternet } from "@/src/utils/offline";
 import { validatePrescriptionFile } from "@/src/utils/prescription";
@@ -41,7 +41,7 @@ import {
   PreviewThumbnails,
   RemoveConfirmModal,
   UploadProgressPanel,
-} from "./sections";
+} from "../sections/preview";
 
 const FOLDER = "customers/prescriptions";
 

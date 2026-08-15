@@ -15,7 +15,7 @@ import {
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useRefillReminder } from "@/src/hooks/useRefillReminder";
-import { ReminderSheet } from "@/src/components/prescription/ReminderSheet";
+import { ReminderSheet } from "@/src/features/prescription/components/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
@@ -23,7 +23,6 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
@@ -37,9 +36,9 @@ import {
   ComparisonCard,
   RefillReminder,
   SavingsBanner,
-} from "./sections";
+} from "../sections/medicine-comparison";
 
-import { ComparisonMedicine } from "./types";
+import { ComparisonMedicine } from "../medicine-comparison.types";
 
 interface MedicineComparisonLayoutProps {
   medicines: ComparisonMedicine[];

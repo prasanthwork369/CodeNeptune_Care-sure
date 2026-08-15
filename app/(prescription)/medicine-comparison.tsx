@@ -1,6 +1,6 @@
-import { MedicineComparisonSkeleton } from "@/src/components/prescription/medicine-comparison/MedicineComparisonSkeleton";
-import { MedicineComparisonLayout } from "@/src/components/prescription/medicine-comparison/MedicineComparisonLayout";
-import { useComparisonPrescriptionId } from "@/src/hooks/useComparisonPrescriptionId";
+import { MedicineComparisonSkeleton } from "@/src/features/prescription/components/MedicineComparisonSkeleton";
+import { MedicineComparisonLayout } from "@/src/features/prescription/screens/MedicineComparisonLayout";
+import { useComparisonPrescriptionId } from "@/src/features/prescription/hooks/useComparisonPrescriptionId";
 import { usePrescriptionOrderMedicines } from "@/src/hooks/queries/usePrescriptionOrderMedicines";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";

@@ -11,7 +11,7 @@ import { resolveAssetUrl } from "@/src/utils/urls";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { SafeBottomSheetInput } from "../ui/SafeBottomSheetInput";
+import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
 
 interface HealthProblemSheetProps {
   isVisible: boolean;

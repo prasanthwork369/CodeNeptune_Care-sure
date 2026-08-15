@@ -1,4 +1,4 @@
-import { PRESCRIPTION_STATUS } from "@/src/constants/prescription-status";
+import { PRESCRIPTION_STATUS } from "@/src/features/prescription/constants/prescription-status";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";

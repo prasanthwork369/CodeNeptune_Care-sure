@@ -1,2 +1,2 @@
-import { PreviewLayout } from "@/src/components/prescription/preview/PreviewLayout";
+import { PreviewLayout } from "@/src/features/prescription/screens/PreviewLayout";
 export default PreviewLayout;

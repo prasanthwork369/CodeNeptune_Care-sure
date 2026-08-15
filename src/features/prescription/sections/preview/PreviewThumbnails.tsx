@@ -1,5 +1,5 @@
 import { icons } from "@/src/constants/icons";
-import { PreviewThumbnailsProps } from "@/src/types/prescription";
+import { PreviewThumbnailsProps } from "@/src/features/prescription/types";
 import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { Touchable } from "@/src/components/ui/Touchable";

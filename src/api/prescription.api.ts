@@ -2,7 +2,7 @@ import {
   ApiPrescription,
   PrescriptionReminder,
   ReminderInput,
-} from "@/src/types/prescription";
+} from "@/src/features/prescription/types";
 import { API_ENDPOINTS } from "@/src/utils/urls";
 import { apiClient } from "./client";
 
