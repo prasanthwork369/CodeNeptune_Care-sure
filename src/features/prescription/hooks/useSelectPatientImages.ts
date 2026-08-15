@@ -1,4 +1,4 @@
-import type { CapturedAsset } from "@/src/features/prescription-scanner";
+import type { CapturedAsset } from "../scanner";
 import { asError } from "@/src/api/errors";
 import {
   deriveKeyFromUrl,

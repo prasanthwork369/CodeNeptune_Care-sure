@@ -6,7 +6,7 @@ import { validatePrescriptionFile } from "@/src/utils/prescription";
 import {
   usePrescriptionUploadService,
   CapturedAsset,
-} from "@/src/features/prescription-scanner";
+} from "@/src/features/prescription/scanner";
 
 export function usePrescriptionPicker(
   onClose: () => void,

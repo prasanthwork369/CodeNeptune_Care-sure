@@ -7,7 +7,7 @@ import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/pre
 import {
   CapturedAsset,
   usePrescriptionUploadService,
-} from "@/src/features/prescription-scanner";
+} from "../scanner";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import {
