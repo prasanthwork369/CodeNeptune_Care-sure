@@ -1,2 +1,2 @@
-import { WalletLayout } from "@/src/components/profile/wallet/WalletLayout";
+import { WalletLayout } from "@/src/features/wallet/screens/WalletLayout";
 export default WalletLayout;

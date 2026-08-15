@@ -5,7 +5,7 @@ import {
   WalletLog,
   AddMoneyPayload,
   WalletBalanceResponse,
-} from "../types/wallet";
+} from "@/src/features/wallet/types";
 
 export const walletApi = {
   getBalance: async (): Promise<WalletBalance> => {

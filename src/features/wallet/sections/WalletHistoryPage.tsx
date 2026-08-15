@@ -1,5 +1,5 @@
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
-import { Transaction } from "@/src/types/wallet";
+import { Transaction } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";

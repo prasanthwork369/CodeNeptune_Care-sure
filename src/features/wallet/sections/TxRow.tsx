@@ -1,5 +1,5 @@
 import { HOME_IMAGES } from "@/src/constants/images";
-import { Transaction, TxIconType } from "@/src/types/wallet";
+import { Transaction, TxIconType } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Image, Text, View } from "react-native";

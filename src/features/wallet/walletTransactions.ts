@@ -1,4 +1,4 @@
-import { Transaction, WalletLog } from "@/src/types/wallet";
+import { Transaction, WalletLog } from "./types";
 
 // Calendar months dictionary for localized transaction date formatting
 const MONTH = [

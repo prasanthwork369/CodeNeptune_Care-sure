@@ -1,2 +1,2 @@
-import { AddMoneyLayout } from "@/src/components/profile/wallet/AddMoneyLayout";
+import { AddMoneyLayout } from "@/src/features/wallet/screens/AddMoneyLayout";
 export default AddMoneyLayout;

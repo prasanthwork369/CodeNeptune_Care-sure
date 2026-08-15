@@ -7,12 +7,12 @@ import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
-import { WalletHistoryPage } from "./sections/WalletHistoryPage";
+import { WalletHistoryPage } from "../sections/WalletHistoryPage";
 import {
   filterTransactions,
   logToTransactions,
   WalletTabKey,
-} from "./walletHistory.helpers";
+} from "../walletHistory.helpers";
 
 const TABS: { key: WalletTabKey; label: string }[] = [
   { key: "All", label: "All" },

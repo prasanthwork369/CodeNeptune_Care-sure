@@ -1,4 +1,4 @@
-import { Transaction, WalletLog } from "@/src/types/wallet";
+import { Transaction, WalletLog } from "./types";
 
 // Deliberately separate from utils/walletTransactions.ts: this screen shows
 // whole rupees, its own titles, and amber coins. Merging them would change the UI.

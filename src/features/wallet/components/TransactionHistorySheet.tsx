@@ -4,7 +4,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useMemo } from "react";
 import { Image, Text, View } from "react-native";
-import { Transaction, TxIconType } from "@/src/types/wallet";
+import { Transaction, TxIconType } from "../types";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 

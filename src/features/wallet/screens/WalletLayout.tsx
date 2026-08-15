@@ -6,8 +6,8 @@ import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useWalletBalance, useWalletLogs } from "@/src/hooks/queries/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import { Transaction, TxIconType } from "@/src/types/wallet";
-import { logToTransactions } from "@/src/utils/walletTransactions";
+import { Transaction, TxIconType } from "../types";
+import { logToTransactions } from "../walletTransactions";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Image, LayoutChangeEvent, ScrollView, Text, View } from "react-native";
@@ -18,9 +18,9 @@ import Animated, {
 } from "react-native-reanimated";
 import { profileStyles as s } from "@/src/features/profile/profile.styles";
 
-import { styles as cardStyles } from "./WalletLayout.styles";
-import { TransactionHistorySheet } from "./TransactionHistorySheet";
-import { WalletInfoModal } from "./WalletInfoModal";
+import { styles as cardStyles } from "../wallet.styles";
+import { TransactionHistorySheet } from "../components/TransactionHistorySheet";
+import { WalletInfoModal } from "../components/WalletInfoModal";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 
 // Same near-critically-damped spring as the bottom LiquidTabBar's snap

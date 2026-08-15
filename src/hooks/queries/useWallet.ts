@@ -8,7 +8,7 @@ import { walletService } from "../../services/wallet.service";
 import { walletApi } from "../../api/wallet.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
-import { WalletLog } from "../../types/wallet";
+import { WalletLog } from "@/src/features/wallet/types";
 
 const LOGS_PAGE_SIZE = 20;
 
