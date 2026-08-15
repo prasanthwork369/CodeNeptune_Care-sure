@@ -23,6 +23,7 @@ import { logger } from "@/src/utils/logger";
 import { requireInternet } from "@/src/utils/offline";
 import { validatePrescriptionFile } from "../utils/prescription";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import React, {
   useCallback,
   useEffect,
@@ -47,6 +48,7 @@ const FOLDER = "customers/prescriptions";
 
 export const PreviewLayout: React.FC = () => {
   const router = useNav();
+  const queryClient = useQueryClient();
   const adjustedBottom = useAdjustedBottomInset();
   const { width: screenWidth } = useWindowDimensions();
   const [previewHeight, setPreviewHeight] = useState(0);
@@ -297,6 +299,13 @@ export const PreviewLayout: React.FC = () => {
         );
         return;
       }
+      // Same prefix useDismissPrescription's onSettled invalidates with —
+      // QUERY_KEYS.CUSTOMER.PRESCRIPTIONS.LIST(params) trails a params
+      // segment, so calling it with no args produces a trailing `undefined`
+      // that fails to prefix-match cached keys built with real params.
+      void queryClient.invalidateQueries({
+        queryKey: ["customer", "prescriptions"],
+      });
       setShowReviewSheet(true);
     } catch (e) {
       const error = asError(e);

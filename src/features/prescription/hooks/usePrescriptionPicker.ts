@@ -22,7 +22,8 @@ export function usePrescriptionPicker(
 ) {
   const router = useNav();
   const addItems = usePrescriptionDraftStore((s) => s.addItems);
-  const { maxSizeBytes } = useUploadConfig();
+  // maxFiles is admin-driven with a clamped fallback; MAX_FILES is only the default.
+  const { maxSizeBytes, maxFiles } = useUploadConfig();
 
   const showErr = (title: string, message: string, onDismiss?: () => void) =>
     onError?.(title, message, onDismiss);
@@ -49,12 +50,20 @@ export function usePrescriptionPicker(
       }
     }
 
+    // Trim to the free slots rather than dropping the batch: picking 11 must
+    // still load 10, not nothing.
+    const remainingSlots = Math.max(maxFiles - currentItems.length, 0);
+    const overLimit = uniqueInSelection.length > remainingSlots;
+    const accepted = overLimit
+      ? uniqueInSelection.slice(0, remainingSlots)
+      : uniqueInSelection;
+
     // Deferred until the duplicate notice (modal/info dialog) is dismissed,
     // so the preview screen never appears underneath it before the user
     // has acknowledged the duplicate.
     const goToPreview = () => {
-      if (uniqueInSelection.length === 0) return;
-      addItems(uniqueInSelection);
+      if (accepted.length === 0) return;
+      addItems(accepted);
       router.replace({
         pathname: "/(prescription)/preview",
         params: {
@@ -64,6 +73,18 @@ export function usePrescriptionPicker(
         },
       });
     };
+
+    if (overLimit) {
+      // Preview opens only once the notice is dismissed, so it never renders under it.
+      showErr(
+        "Limit Reached",
+        accepted.length > 0
+          ? `Maximum ${maxFiles} prescriptions allowed. Only the first ${accepted.length} were added.`
+          : `Maximum ${maxFiles} prescriptions allowed.`,
+        accepted.length > 0 ? goToPreview : undefined,
+      );
+      return;
+    }
 
     if (skippedCount.existing > 0 || skippedCount.internal > 0) {
       if (onDuplicate && firstDuplicate) {
