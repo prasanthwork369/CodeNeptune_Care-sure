@@ -1,2 +1,2 @@
-import { NotificationsLayout } from "@/src/components/notifications/NotificationsLayout";
+import { NotificationsLayout } from "@/src/features/notifications/screens/NotificationsLayout";
 export default NotificationsLayout;

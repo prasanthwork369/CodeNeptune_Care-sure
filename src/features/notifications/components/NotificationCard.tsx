@@ -3,8 +3,8 @@ import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { View, Text } from "react-native";
 import { Image } from "expo-image";
-import { icons } from "../../constants/icons";
-import { styles as s } from "./notifications.styles";
+import { icons } from "@/src/constants/icons";
+import { styles as s } from "../notifications.styles";
 
 interface NotificationCardProps {
   title: string;

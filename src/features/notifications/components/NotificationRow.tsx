@@ -9,7 +9,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { Text, TextStyle, View } from "react-native";
 import { SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import { SwipeableNotificationRow } from "./SwipeableNotificationRow";
-import { styles as s } from "./notifications.styles";
+import { styles as s } from "../notifications.styles";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

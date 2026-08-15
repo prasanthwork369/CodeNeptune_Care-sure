@@ -20,9 +20,9 @@ import {
   NotificationRow,
   SECTION_ORDER,
   getSectionKey,
-} from "./NotificationRow";
-import { NotificationsSkeleton } from "./NotificationsSkeleton";
-import { styles as s } from "./notifications.styles";
+} from "../components/NotificationRow";
+import { NotificationsSkeleton } from "../components/NotificationsSkeleton";
+import { styles as s } from "../notifications.styles";
 
 export const NotificationsLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
