@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import VerifiedUserWhiteIcon from "@/assets/icons/VerifiedUserWhiteIcon.svg";
-import { PaymentTotalBannerProps } from "@/src/types/payment";
+import { PaymentTotalBannerProps } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const PaymentTotalBanner: React.FC<PaymentTotalBannerProps> = ({

@@ -1,5 +1,5 @@
 import { icons } from "@/src/constants/icons";
-import { PaymentAddressCardProps } from "@/src/types/payment";
+import { PaymentAddressCardProps } from "../types";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";

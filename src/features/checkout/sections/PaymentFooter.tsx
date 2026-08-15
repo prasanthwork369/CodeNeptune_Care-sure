@@ -1,7 +1,7 @@
 import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import ArrowForwardIosWhite from "@/assets/icons/arrow_forward_ios_white.svg";
-import { PaymentFooterProps } from "@/src/types/payment";
+import { PaymentFooterProps } from "../types";
 import React from "react";
 
 export const PaymentFooter: React.FC<PaymentFooterProps> = ({

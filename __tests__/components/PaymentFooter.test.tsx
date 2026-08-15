@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { PaymentFooter } from "@/src/components/payment/sections/PaymentFooter";
+import { PaymentFooter } from "@/src/features/checkout/sections/PaymentFooter";
 
 jest.mock("@/assets/icons/arrow_forward_ios_white.svg", () => () => null);
 

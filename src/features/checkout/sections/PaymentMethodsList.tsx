@@ -1,4 +1,4 @@
-import { PaymentMethodsListProps } from "@/src/types/payment";
+import { PaymentMethodsListProps } from "../types";
 import { LinearGradient } from "expo-linear-gradient";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";

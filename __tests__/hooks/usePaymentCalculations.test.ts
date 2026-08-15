@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react-native";
-import { usePaymentCalculations } from "@/src/hooks/usePaymentCalculations";
+import { usePaymentCalculations } from "@/src/features/checkout/hooks/usePaymentCalculations";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { prescriptionService } from "@/src/services/prescription.service";

@@ -1,2 +1,2 @@
-import { OrderSuccessLayout } from "@/src/components/order/OrderSuccessLayout";
+import { OrderSuccessLayout } from "@/src/features/checkout/screens/OrderSuccessLayout";
 export default OrderSuccessLayout;

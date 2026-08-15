@@ -1,7 +1,7 @@
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { usePaymentCalculations } from "@/src/hooks/usePaymentCalculations";
+import { usePaymentCalculations } from "../hooks/usePaymentCalculations";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -11,7 +11,7 @@ import {
   PaymentHeader,
   PaymentMethodsList,
   PaymentTotalBanner,
-} from "./sections";
+} from "../sections";
 
 const PAYMENT_METHODS = [
   {

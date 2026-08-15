@@ -1,2 +1,2 @@
-import { PaymentLayout } from "@/src/components/payment/PaymentLayout";
+import { PaymentLayout } from "@/src/features/checkout/screens/PaymentLayout";
 export default PaymentLayout;

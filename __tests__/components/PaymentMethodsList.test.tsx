@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { PaymentMethodsList } from "@/src/components/payment/sections/PaymentMethodsList";
+import { PaymentMethodsList } from "@/src/features/checkout/sections/PaymentMethodsList";
 import { View } from "react-native";
 
 describe("PaymentMethodsList Component", () => {
