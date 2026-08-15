@@ -5,7 +5,7 @@ import {
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useCategoryProducts } from "@/src/hooks/queries/useCategories";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
@@ -28,7 +28,7 @@ const CategoryProductsContent: React.FC = () => {
   }>();
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { totalItems } = useCart();
+  const { totalItems } = useCartRead();
 
   const { products, isLoading, refetch } = useCategoryProducts({
     categorySlug: familySlug || slug,

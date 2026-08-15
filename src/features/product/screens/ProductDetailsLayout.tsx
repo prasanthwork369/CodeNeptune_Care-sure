@@ -4,7 +4,7 @@ import { ProductSkeleton } from "@/src/features/product/ProductSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
 import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useHome } from "@/src/hooks/queries/useHome";
-import { useProduct } from "@/src/hooks/queries/useProduct";
+import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import {
@@ -137,9 +137,10 @@ export const ProductDetailsLayout: React.FC = () => {
     mainScrollRef,
   );
 
-  const recPackSize = raw?.recommendation?.packSize
-    ? parseInt(String(raw.recommendation.packSize).match(/\d+/)?.[0] ?? "1")
-    : 1;
+  const recPackSize = getPackDivisor(
+    recommendation?.packSize,
+    recommendation?.unit,
+  );
   const recUnitPrice = recommendation
     ? // Use Math.floor to truncate trailing decimals, preventing rounding up (e.g. 199.50/200 = 0.99)
       (

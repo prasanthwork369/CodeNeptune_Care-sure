@@ -30,7 +30,7 @@ import { useHomeOnboarding } from "@/src/features/home/hooks/useHomeOnboarding";
 import { useHomeScroll } from "@/src/features/home/hooks/useHomeScroll";
 import { useScrollToTop } from "@/src/features/home/hooks/useScrollToTop";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/hooks/ui/useContactActions";
 import { useSettings } from "@/src/hooks/queries/useSettings";
@@ -113,7 +113,7 @@ const HomeContent: React.FC = () => {
   );
   const setFeedScrolling = useUIStore((s) => s.setFeedScrolling);
   const setHomeFocused = useUIStore((s) => s.setHomeFocused);
-  const { totalItems } = useCart();
+  const { totalItems } = useCartRead();
   // Owns the focus refetch for Home; the header and floating banner read the
   // same shared query without triggering their own.
   const { hasPendingPrescription } = usePrescriptionBanner({

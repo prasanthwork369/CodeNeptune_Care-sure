@@ -7,7 +7,7 @@ import { SearchRecentSection } from "@/src/features/search/sections/SearchRecent
 import { SearchResultsList } from "@/src/features/search/sections/SearchResultsList";
 import { SearchSuggestionsBar } from "@/src/features/search/sections/SearchSuggestionsBar";
 import { RetryState } from "@/src/components/ui/RetryState";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import {
   useSearch,
   useSearchHistory,
@@ -160,7 +160,7 @@ export const SearchPageLayout = () => {
   const colWidth = (width - 32) / 2;
 
   const isOffline = useIsOffline();
-  const { totalItems: cartCount } = useCart();
+  const { totalItems: cartCount } = useCartRead();
   const {
     query,
     setQuery,

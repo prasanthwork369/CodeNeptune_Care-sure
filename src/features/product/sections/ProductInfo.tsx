@@ -7,13 +7,8 @@ import React, { useState } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS, useSharedValue } from "react-native-reanimated";
 import { CarouselDot } from "@/src/components/animations/carousel";
-import {
-  Image,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { Image } from "expo-image";
 import Carousel from "react-native-reanimated-carousel";
 
 interface ProductInfoProps {
@@ -115,7 +110,8 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                       <Image
                         source={item}
                         style={{ width: imgSize, height: imgSize }}
-                        resizeMode="contain"
+                        contentFit="contain"
+                        cachePolicy="memory-disk"
                       />
                     </View>
                   </GestureDetector>

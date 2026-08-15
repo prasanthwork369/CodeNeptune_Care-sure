@@ -3,12 +3,12 @@ import { View, Text } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { icons } from "@/src/constants/icons";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CategoriesHeaderActions: React.FC = () => {
   const router = useNav();
-  const { totalItems } = useCart();
+  const { totalItems } = useCartRead();
 
   return (
     <View className="flex-row items-center" style={{ gap: exactScale(8) }}>

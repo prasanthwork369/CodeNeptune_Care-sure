@@ -7,7 +7,7 @@ import {
   ProductGrid,
 } from "@/src/features/categories/products/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useAllFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
@@ -43,7 +43,7 @@ const toCategoryProduct = (p: Product): CategoryProduct => ({
 const FeaturedProductsContent: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { totalItems } = useCart();
+  const { totalItems } = useCartRead();
   const { products, isLoading, refetch } =
     useAllFeaturedMedicines(FEATURED_LIMIT);
 

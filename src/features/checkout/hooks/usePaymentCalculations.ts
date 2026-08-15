@@ -78,6 +78,11 @@ export function usePaymentCalculations() {
   // reuse it so the backend can dedupe; leaving the screen starts a fresh key.
   const idempotencyKeyRef = useRef<string>("");
 
+  // Ref, not state, so a rapid double-tap in the same tick — before React
+  // re-renders the disabled button — cannot start a second checkout attempt
+  // (and cannot fire the deferred prescription upload twice).
+  const placingOrderRef = useRef(false);
+
   const prescriptionOrderItems = usePrescriptionOrderStore((s) => s.items);
   const clearPrescriptionOrder = usePrescriptionOrderStore((s) => s.clear);
   const isPrescriptionFlow = prescriptionOrderItems.length > 0;
@@ -133,6 +138,7 @@ export function usePaymentCalculations() {
   const hasAddress = !!deliveryCity && !!defaultAddress;
 
   const handlePlaceOrder = async () => {
+    if (placingOrderRef.current) return;
     // The one flow that keeps the blocking modal: placing an order must be
     // acknowledged as not-happening, not just implied by the banner.
     if (!requireInternet({ critical: true })) return;
@@ -152,6 +158,7 @@ export function usePaymentCalculations() {
     }
 
     // Loader on immediately, before any network call.
+    placingOrderRef.current = true;
     setPlacingOrder(true);
 
     // Generate the idempotency key once; a retry after failure reuses it so
@@ -261,6 +268,7 @@ export function usePaymentCalculations() {
       reportError(err, "placeOrder:cart");
       Alert.alert("Order Failed", orderErrorMessage(err));
     } finally {
+      placingOrderRef.current = false;
       setPlacingOrder(false);
       stopCheckoutTrace(
         { status: traceStatus },

@@ -13,7 +13,7 @@ import { ProductHeader } from "@/src/features/search/comparison/components/Produ
 import { ComparisonBoard } from "@/src/features/search/comparison/components/ComparisonBoard";
 import { ProductDetailsSkeleton } from "@/src/features/search/comparison/components/ProductDetailsSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useHome } from "@/src/hooks/queries/useHome";
 import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -41,7 +41,7 @@ export const ProductComparisonLayout: React.FC<
   const { product, recommendation, saltComposition, raw, isLoading } =
     useProduct(id);
   const { appContent, isLoading: isHomeLoading } = useHome();
-  const { items: cartItems, totalItems: cartCount } = useCart();
+  const { items: cartItems, totalItems: cartCount } = useCartRead();
   const storePincode = useLocationStore((s) => s.pincode);
 
   const recMedicineId = recommendation?.id ?? raw?.id;

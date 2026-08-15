@@ -1,5 +1,5 @@
 import { PRESCRIPTION_STATUS } from "@/src/features/prescription/constants/prescription-status";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
@@ -96,7 +96,7 @@ export const FloatingBannersCarousel = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const extraGap = exactScale(6);
   const { width } = useWindowDimensions();
-  const { totalItems } = useCart();
+  const { totalItems } = useCartRead();
   const { latestPrescription, hasPendingPrescription, dismissBanner } =
     usePrescriptionBanner();
   const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
