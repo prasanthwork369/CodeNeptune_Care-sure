@@ -58,6 +58,60 @@ const Divider = () => (
   />
 );
 
+// A single label + description + switch row (used for both channel sub-rows
+// and single-toggle sections). `bold` marks a top-level section title.
+// Declared here (module scope), not inside the screen component, so its
+// component identity is stable across renders — otherwise React would
+// unmount and remount every row whenever any one setting was toggled.
+const ToggleRow = ({
+  label,
+  desc,
+  value,
+  pending,
+  bold,
+  onToggle,
+}: {
+  label: string;
+  desc: string;
+  value: boolean;
+  pending: boolean;
+  bold?: boolean;
+  onToggle: (value: boolean) => void;
+}) => (
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+    }}
+  >
+    <View style={{ flex: 1, marginRight: 16 }}>
+      <Text
+        style={{
+          fontSize: moderateScale(15),
+          fontWeight: bold ? "700" : "500",
+          color: "#111827",
+          marginBottom: 3,
+        }}
+      >
+        {label}
+      </Text>
+      <Text
+        style={{
+          fontSize: moderateScale(13),
+          color: "#6B7280",
+          lineHeight: moderateScale(18),
+        }}
+      >
+        {desc}
+      </Text>
+    </View>
+    <CustomSwitch value={value} onValueChange={onToggle} disabled={pending} />
+  </View>
+);
+
 const NotificationSkeleton = () => (
   <View style={{ marginTop: 8 }}>
     {[1, 2, 3, 4].map((_, index) => (
@@ -105,57 +159,6 @@ export const NotificationSettingsLayout: React.FC = () => {
     }
   };
 
-  // A single label + description + switch row (used for both channel sub-rows
-  // and single-toggle sections). `bold` marks a top-level section title.
-  const ToggleRow = ({
-    label,
-    desc,
-    keyName,
-    bold,
-  }: {
-    label: string;
-    desc: string;
-    keyName: PreferenceKey;
-    bold?: boolean;
-  }) => (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 20,
-        paddingVertical: 14,
-      }}
-    >
-      <View style={{ flex: 1, marginRight: 16 }}>
-        <Text
-          style={{
-            fontSize: moderateScale(15),
-            fontWeight: bold ? "700" : "500",
-            color: "#111827",
-            marginBottom: 3,
-          }}
-        >
-          {label}
-        </Text>
-        <Text
-          style={{
-            fontSize: moderateScale(13),
-            color: "#6B7280",
-            lineHeight: moderateScale(18),
-          }}
-        >
-          {desc}
-        </Text>
-      </View>
-      <CustomSwitch
-        value={preferences?.[keyName] ?? false}
-        onValueChange={(v) => handleToggle(keyName, v)}
-        disabled={pendingKeys.has(keyName)}
-      />
-    </View>
-  );
-
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <ScreenHeader title="Notification" showBorder backgroundColor="#FFFFFF" />
@@ -195,7 +198,9 @@ export const NotificationSettingsLayout: React.FC = () => {
                       key={item.key}
                       label={item.label}
                       desc={item.desc}
-                      keyName={item.key}
+                      value={preferences?.[item.key] ?? false}
+                      pending={pendingKeys.has(item.key)}
+                      onToggle={(v) => handleToggle(item.key, v)}
                     />
                   ))}
                 </View>
@@ -203,7 +208,9 @@ export const NotificationSettingsLayout: React.FC = () => {
                 <ToggleRow
                   label={section.label}
                   desc={section.desc}
-                  keyName={section.key}
+                  value={preferences?.[section.key] ?? false}
+                  pending={pendingKeys.has(section.key)}
+                  onToggle={(v) => handleToggle(section.key, v)}
                   bold
                 />
               )}

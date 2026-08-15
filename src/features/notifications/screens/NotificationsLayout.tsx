@@ -15,14 +15,28 @@ import { exactScale } from "@/src/utils/exactScale";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { RefreshControl, Text, View } from "react-native";
+import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import {
   NotificationRow,
   SECTION_ORDER,
+  SectionKey,
   getSectionKey,
 } from "../components/NotificationRow";
 import { NotificationsSkeleton } from "../components/NotificationsSkeleton";
 import { styles as s } from "../notifications.styles";
+
+// Flattened so FlashList can virtualize section headers and notification rows
+// as a single scrollable list instead of mounting every row up front.
+type NotificationListRow =
+  | { rowType: "header"; key: string; label: SectionKey; isFirst: boolean }
+  | {
+      rowType: "notification";
+      key: string;
+      notification: NotificationLog;
+      section: SectionKey;
+      isLast: boolean;
+    };
 
 export const NotificationsLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
@@ -56,6 +70,31 @@ export const NotificationsLayout: React.FC = () => {
       })).filter((g) => g.items.length > 0),
     [notifications],
   );
+
+  // Flattened rows for FlashList — one entry per section header, one per
+  // notification. `getItemType` (below) keeps the two shapes from being
+  // recycled into each other.
+  const rows = useMemo<NotificationListRow[]>(() => {
+    const out: NotificationListRow[] = [];
+    sections.forEach((section, sectionIndex) => {
+      out.push({
+        rowType: "header",
+        key: `header-${section.key}`,
+        label: section.key,
+        isFirst: sectionIndex === 0,
+      });
+      section.items.forEach((notification, idx) => {
+        out.push({
+          rowType: "notification",
+          key: notification.id,
+          notification,
+          section: section.key,
+          isLast: idx === section.items.length - 1,
+        });
+      });
+    });
+    return out;
+  }, [sections]);
 
   const showError =
     !isLoading && !isEntryLoading && isError && notifications.length === 0;
@@ -170,6 +209,111 @@ export const NotificationsLayout: React.FC = () => {
     [dismissAsync, showToast],
   );
 
+  const keyExtractor = useCallback((item: NotificationListRow) => item.key, []);
+
+  const getItemType = useCallback(
+    (item: NotificationListRow) => item.rowType,
+    [],
+  );
+
+  const renderItem: ListRenderItem<NotificationListRow> = useCallback(
+    ({ item }) => {
+      if (item.rowType === "header") {
+        return (
+          <View style={item.isFirst ? s.firstSection : s.section}>
+            <Text style={s.sectionHeader}>{item.label}</Text>
+          </View>
+        );
+      }
+      return (
+        <NotificationRow
+          notification={item.notification}
+          section={item.section}
+          isLast={item.isLast}
+          onPress={handlePress}
+          onDismiss={handleDismiss}
+          onMarkRead={handleMarkRead}
+          onDelete={handleSwipeDelete}
+          onInteraction={closeOpenRow}
+          onWillOpen={handleRowWillOpen}
+          onDidClose={handleRowDidClose}
+        />
+      );
+    },
+    [
+      handlePress,
+      handleDismiss,
+      handleMarkRead,
+      handleSwipeDelete,
+      closeOpenRow,
+      handleRowWillOpen,
+      handleRowDidClose,
+    ],
+  );
+
+  const contentContainerStyle = useMemo(
+    () => ({
+      ...s.content,
+      paddingBottom: adjustedBottom + exactScale(16),
+      flexGrow: 1,
+    }),
+    [adjustedBottom],
+  );
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={isRefetching}
+        onRefresh={() => {
+          closeOpenRow();
+          void refetch();
+        }}
+        tintColor="#0F7635"
+        colors={["#0F7635"]}
+      />
+    ),
+    [isRefetching, closeOpenRow, refetch],
+  );
+
+  const listEmptyComponent = showError ? (
+    <View
+      className="flex-1 items-center justify-center"
+      style={{ paddingHorizontal: exactScale(24) }}
+    >
+      <Text style={s.errorTitle}>Unable to load notifications</Text>
+      <Text style={s.errorSub}>
+        Please check your connection and try again.
+      </Text>
+      <Touchable
+        onPress={() => void refetch()}
+        style={s.retryButton}
+        accessibilityLabel="Retry loading notifications"
+      >
+        <Text style={s.retryText}>Try Again</Text>
+      </Touchable>
+    </View>
+  ) : showEmpty ? (
+    <View className="flex-1 items-center justify-center">
+      <icons.notification
+        width={s.emptyIcon.width}
+        height={s.emptyIcon.height}
+        fill="#D1D5DB"
+      />
+      <Text
+        style={s.emptyTitle}
+        className="font-inter-semibold text-brand-subtext mt-4"
+      >
+        No notifications yet
+      </Text>
+      <Text
+        style={s.emptySub}
+        className="font-inter text-[#9CA3AF] mt-1 text-center"
+      >
+        {"We'll notify you about orders and offers"}
+      </Text>
+    </View>
+  ) : null;
+
   return (
     <View className="flex-1 bg-white">
       <ScreenHeader
@@ -198,28 +342,16 @@ export const NotificationsLayout: React.FC = () => {
       {shouldShowInitialShimmer ? (
         <NotificationsSkeleton />
       ) : (
-        <ScrollView
+        <FlashList
+          data={rows}
+          keyExtractor={keyExtractor}
+          getItemType={getItemType}
+          renderItem={renderItem}
           className="flex-1"
           overScrollMode="auto"
-          contentContainerStyle={[
-            s.content,
-            {
-              paddingBottom: adjustedBottom + exactScale(16),
-              flexGrow: 1,
-            },
-          ]}
+          contentContainerStyle={contentContainerStyle}
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={() => {
-                closeOpenRow();
-                void refetch();
-              }}
-              tintColor="#0F7635"
-              colors={["#0F7635"]}
-            />
-          }
+          refreshControl={refreshControl}
           onScrollBeginDrag={closeOpenRow}
           onTouchStart={(event) => {
             touchStartRef.current = {
@@ -238,72 +370,8 @@ export const NotificationsLayout: React.FC = () => {
               closeOpenRow();
             }
           }}
-        >
-          {showError && (
-            <View
-              className="flex-1 items-center justify-center"
-              style={{ paddingHorizontal: exactScale(24) }}
-            >
-              <Text style={s.errorTitle}>Unable to load notifications</Text>
-              <Text style={s.errorSub}>
-                Please check your connection and try again.
-              </Text>
-              <Touchable
-                onPress={() => void refetch()}
-                style={s.retryButton}
-                accessibilityLabel="Retry loading notifications"
-              >
-                <Text style={s.retryText}>Try Again</Text>
-              </Touchable>
-            </View>
-          )}
-
-          {showEmpty && (
-            <View className="flex-1 items-center justify-center">
-              <icons.notification
-                width={s.emptyIcon.width}
-                height={s.emptyIcon.height}
-                fill="#D1D5DB"
-              />
-              <Text
-                style={s.emptyTitle}
-                className="font-inter-semibold text-brand-subtext mt-4"
-              >
-                No notifications yet
-              </Text>
-              <Text
-                style={s.emptySub}
-                className="font-inter text-[#9CA3AF] mt-1 text-center"
-              >
-                {"We'll notify you about orders and offers"}
-              </Text>
-            </View>
-          )}
-
-          {sections.map((section, sectionIndex) => (
-            <View
-              key={section.key}
-              style={[s.section, sectionIndex === 0 && s.firstSection]}
-            >
-              <Text style={s.sectionHeader}>{section.key}</Text>
-              {section.items.map((notification, idx) => (
-                <NotificationRow
-                  key={notification.id}
-                  notification={notification}
-                  section={section.key}
-                  isLast={idx === section.items.length - 1}
-                  onPress={handlePress}
-                  onDismiss={handleDismiss}
-                  onMarkRead={handleMarkRead}
-                  onDelete={handleSwipeDelete}
-                  onInteraction={closeOpenRow}
-                  onWillOpen={handleRowWillOpen}
-                  onDidClose={handleRowDidClose}
-                />
-              ))}
-            </View>
-          ))}
-        </ScrollView>
+          ListEmptyComponent={listEmptyComponent}
+        />
       )}
     </View>
   );
