@@ -15,7 +15,10 @@ import { useLocalSearchParams } from "expo-router";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import React, { useCallback } from "react";
 import { Text, View } from "react-native";
-import { CategoryCartBanner, ProductGrid } from "./sections";
+import {
+  CategoryCartBanner,
+  ProductGrid,
+} from "@/src/features/categories/products/sections";
 
 const CategoryProductsContent: React.FC = () => {
   const { slug, name, familySlug } = useLocalSearchParams<{

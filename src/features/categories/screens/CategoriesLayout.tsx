@@ -10,11 +10,11 @@ import {
   CategoriesSidebar,
   CategoriesGrid,
   CategoriesHeaderActions,
-} from "./sections";
+} from "@/src/features/categories/sections";
 import {
   CARD_HEIGHT,
   CARD_WIDTH,
-} from "./categories.styles";
+} from "@/src/features/categories/categories.styles";
 
 const SIDEBAR_WIDTH = exactScale(80);
 const GRID_PADDING = exactScale(12);

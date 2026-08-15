@@ -5,7 +5,7 @@ import {
 import {
   CategoryCartBanner,
   ProductGrid,
-} from "@/src/components/categories/products/sections";
+} from "@/src/features/categories/products/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useCart } from "@/src/hooks/queries/useCart";
 import { useAllFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
