@@ -1,8 +1,9 @@
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Transaction } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import React, { useCallback } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { TxRow } from "./TxRow";
 
 interface WalletHistoryPageProps {
@@ -24,6 +25,17 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
   paddingBottom,
   onEndReached,
 }) => {
+  const keyExtractor = useCallback((tx: Transaction) => tx.id, []);
+
+  // Depends on transactions.length so the divider on the last row stays
+  // correct as more pages load in.
+  const renderItem: ListRenderItem<Transaction> = useCallback(
+    ({ item, index }) => (
+      <TxRow tx={item} isLast={index === transactions.length - 1} />
+    ),
+    [transactions.length],
+  );
+
   if (loading) {
     return (
       <View
@@ -62,29 +74,23 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
 
   return (
     <View style={{ width, flex: 1 }}>
-      <ScrollView
-        style={{ flex: 1 }}
+      <FlashList
+        data={transactions}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom, backgroundColor: "#FFFFFF" }}
-        onScroll={({ nativeEvent }) => {
-          const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
-          const reachedEnd =
-            contentOffset.y + layoutMeasurement.height >=
-            contentSize.height - 100;
-          if (reachedEnd) onEndReached();
-        }}
-        scrollEventThrottle={200}
-      >
-        {transactions.map((tx, idx) => (
-          <TxRow key={tx.id} tx={tx} isLast={idx === transactions.length - 1} />
-        ))}
-        {isFetchingNextPage && (
-          <ActivityIndicator
-            color="#0F7635"
-            style={{ paddingVertical: exactScale(16) }}
-          />
-        )}
-      </ScrollView>
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <ActivityIndicator
+              color="#0F7635"
+              style={{ paddingVertical: exactScale(16) }}
+            />
+          ) : null
+        }
+      />
     </View>
   );
 };
