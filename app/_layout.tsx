@@ -14,7 +14,7 @@ import "../src/utils/patchText";
 import "../src/utils/patchTextInput";
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
-import { SignupBonusPopup } from "@/src/components/auth/SignupBonusPopup";
+import { SignupBonusPopup } from "@/src/features/auth/components/SignupBonusPopup";
 import { AppGateScreen } from "@/src/components/common/AppGateScreen";
 import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
 import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";

@@ -1,7 +1,7 @@
 import { CarouselDot } from "@/src/components/animations/carousel";
-import { CorporateBenefitsPage } from "@/src/components/auth/signup-bonus/CorporateBenefitsPage";
-import { CARD_WIDTH } from "@/src/components/auth/signup-bonus/constants";
-import { WalletBonusPage } from "@/src/components/auth/signup-bonus/WalletBonusPage";
+import { CorporateBenefitsPage } from "./signup-bonus/CorporateBenefitsPage";
+import { CARD_WIDTH } from "./signup-bonus/constants";
+import { WalletBonusPage } from "./signup-bonus/WalletBonusPage";
 import { ANIMATIONS } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useWalletBalance } from "@/src/hooks/queries/useWallet";
