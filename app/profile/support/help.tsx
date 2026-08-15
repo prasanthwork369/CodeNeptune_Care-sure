@@ -1,2 +1,2 @@
-import { HelpLayout } from "@/src/components/profile/support/HelpLayout";
+import { HelpLayout } from "@/src/features/support/screens/HelpLayout";
 export default HelpLayout;

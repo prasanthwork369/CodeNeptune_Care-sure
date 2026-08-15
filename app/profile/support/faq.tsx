@@ -1,2 +1,2 @@
-import { FaqLayout } from "@/src/components/profile/support/FaqLayout";
+import { FaqLayout } from "@/src/features/support/screens/FaqLayout";
 export default FaqLayout;
