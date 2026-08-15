@@ -14,14 +14,17 @@ import {
   ActivityIndicator,
   Animated,
   Image,
-  PanResponder,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import ReAnimated, {
+  interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import Svg, { Line } from "react-native-svg";
@@ -122,10 +125,15 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     );
   }, [recommendedHeight, searchedBottomHeight, searchedTopHeight]);
 
-  // Animated value driving the expandable We Recommended section: 0 = half-width, 1 = full-width
-  const expandAnim = useRef(new Animated.Value(0)).current;
-  const currentExpandVal = useRef(0);
-  const expandStartVal = useRef(0);
+  // Reanimated shared value driving the expandable We Recommended section:
+  // 0 = half-width, 1 = full-width. Written directly from the drag gesture's
+  // UI-thread worklet below — no per-move JS-thread round trip, which is
+  // what the old PanResponder + legacy Animated version paid on every touch
+  // move.
+  const expandProgress = useSharedValue(0);
+  // expandProgress's value at gesture start, so onUpdate can offset from it.
+  const expandStart = useSharedValue(0);
+  const touchStart = useSharedValue({ x: 0, y: 0 });
   const isExpanded = useRef(false);
   const swapRotate = useRef(new Animated.Value(0)).current;
 
@@ -139,12 +147,12 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     swapBtnOpacity.value = withTiming(toValue, { duration: 180 });
   };
 
-  useEffect(() => {
-    const id = expandAnim.addListener(({ value }) => {
-      currentExpandVal.current = value;
-    });
-    return () => expandAnim.removeListener(id);
-  }, [expandAnim]);
+  // Bridges the gesture worklet's expand/collapse decision back to the
+  // JS-only `isExpanded` ref, so a later swap-button tap toggles from
+  // wherever the drag settled.
+  const setIsExpandedFlag = (expand: boolean) => {
+    isExpanded.current = expand;
+  };
 
   const handleSwap = () => {
     isExpanded.current = !isExpanded.current;
@@ -160,86 +168,90 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
       useNativeDriver: true,
     }).start();
 
-    Animated.spring(expandAnim, {
-      toValue: isExpanded.current ? 1 : 0,
-      useNativeDriver: false,
-      bounciness: 4,
-    }).start();
+    expandProgress.value = withSpring(isExpanded.current ? 1 : 0);
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      // Claim horizontal swipes from the very first touch so quick flicks are caught
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        const { dx, dy } = gestureState;
-        // Lower threshold (5px) so light swipes are claimed before the user lifts
-        return Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy) * 1.5;
-      },
-      onPanResponderGrant: () => {
-        expandStartVal.current = currentExpandVal.current;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        let newVal =
-          expandStartVal.current + -gestureState.dx / (cardWidth / 2);
-        newVal = Math.min(1, Math.max(0, newVal));
-        expandAnim.setValue(newVal);
-        swapBtnOpacity.value = Math.max(0, 1 - newVal * 2.5);
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        const { vx } = gestureState;
-        const pos = currentExpandVal.current;
+  // Mirrors the pre-migration PanResponder exactly: claims the gesture only
+  // once a horizontal move exceeds 5px and is steeper than a 1.5x dx:dy
+  // ratio (so a vertical scroll on the parent screen still wins), and yields
+  // explicitly once a move is clearly vertical instead. Velocity here is in
+  // points/second vs PanResponder's points/ms, hence comparing against 200
+  // (not 0.2) below — same threshold, converted units.
+  const dragGesture = Gesture.Pan()
+    .manualActivation(true)
+    .onTouchesDown((e) => {
+      "worklet";
+      const t = e.allTouches[0];
+      touchStart.value = { x: t.x, y: t.y };
+    })
+    .onTouchesMove((e, state) => {
+      "worklet";
+      const t = e.allTouches[0];
+      const dx = t.x - touchStart.value.x;
+      const dy = t.y - touchStart.value.y;
+      if (Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        state.activate();
+      } else if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) {
+        state.fail();
+      }
+    })
+    .onStart(() => {
+      expandStart.value = expandProgress.value;
+    })
+    .onUpdate((e) => {
+      let newVal = expandStart.value + -e.translationX / (cardWidth / 2);
+      newVal = Math.min(1, Math.max(0, newVal));
+      expandProgress.value = newVal;
+      swapBtnOpacity.value = Math.max(0, 1 - newVal * 2.5);
+    })
+    .onEnd((e) => {
+      const pos = expandProgress.value;
+      // Velocity-first: even a light flick at 200pt/s (== old 0.2pt/ms) is decisive
+      const fastLeft = e.velocityX < -200;
+      const fastRight = e.velocityX > 200;
 
-        // Velocity-first: even a light flick at vx > 0.2 is decisive
-        const fastLeft = vx < -0.2;
-        const fastRight = vx > 0.2;
+      let expand: boolean;
+      if (fastLeft) expand = true;
+      else if (fastRight) expand = false;
+      // Slow drag — snap to nearest side
+      else expand = pos >= 0.5;
 
-        let expand: boolean;
-        if (fastLeft) expand = true;
-        else if (fastRight) expand = false;
-        // Slow drag — snap to nearest side
-        else expand = pos >= 0.5;
-
-        isExpanded.current = expand;
-        Animated.spring(expandAnim, {
-          toValue: expand ? 1 : 0,
-          useNativeDriver: false,
-          bounciness: 4,
-        }).start();
-        animateSwapBtn(expand ? 0 : 1);
-      },
-      onPanResponderTerminate: () => {
-        // Another gesture (e.g. scroll) stole the touch — snap to nearest side cleanly
-        const expand = currentExpandVal.current >= 0.5;
-        isExpanded.current = expand;
-        Animated.spring(expandAnim, {
-          toValue: expand ? 1 : 0,
-          useNativeDriver: false,
-          bounciness: 4,
-        }).start();
-        animateSwapBtn(expand ? 0 : 1);
-      },
-    }),
-  ).current;
+      expandProgress.value = withSpring(expand ? 1 : 0);
+      swapBtnOpacity.value = withTiming(expand ? 0 : 1, { duration: 180 });
+      runOnJS(setIsExpandedFlag)(expand);
+    })
+    .onFinalize((_e, success) => {
+      // Another gesture (e.g. scroll) stole the touch — snap to nearest side cleanly.
+      // A normal release already handled everything in onEnd above.
+      if (success) return;
+      const expand = expandProgress.value >= 0.5;
+      expandProgress.value = withSpring(expand ? 1 : 0);
+      swapBtnOpacity.value = withTiming(expand ? 0 : 1, { duration: 180 });
+      runOnJS(setIsExpandedFlag)(expand);
+    });
 
   const swapRotateDeg = swapRotate.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "180deg"],
   });
 
-  const recLeft = expandAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [cardWidth / 2, 0],
-  });
-
-  const recWidth = expandAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [cardWidth / 2, cardWidth],
-  });
-
   // Was an interpolation between two identical colours — it drove a colour
   // calculation every frame for no visual change. It is simply a constant.
   const recBgColor = "#FEFFF9";
+
+  const expandableSectionStyle = useAnimatedStyle(() => ({
+    left: interpolate(expandProgress.value, [0, 1], [cardWidth / 2, 0]),
+    width: interpolate(
+      expandProgress.value,
+      [0, 1],
+      [cardWidth / 2, cardWidth],
+    ),
+    paddingLeft: interpolate(expandProgress.value, [0, 1], [4, 0]),
+  }));
+
+  const rightColAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: expandProgress.value,
+  }));
 
   // The recommended column lives inside a full-width measurement layer, but in the
   // collapsed state the visible half-card is narrower by the section's paddingLeft (4)
@@ -248,6 +260,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   const leftColWidth = cardWidth / 2 - 6.5;
 
   return (
+    <GestureDetector gesture={dragGesture}>
     <View
       className="mx-4  mb-2 overflow-hidden"
       style={{
@@ -255,7 +268,6 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         height: boardHeight,
         backgroundColor: "transparent",
       }}
-      {...panResponder.panHandlers}
     >
       {/* STATIC BASE LAYER — Left Column (You Searched) */}
       <View
@@ -383,21 +395,18 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
       </View>
 
       {/* EXPANDABLE WE RECOMMENDED SECTION */}
-      <Animated.View
-        style={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          left: recLeft,
-          width: recWidth,
-          paddingLeft: expandAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [4, 0],
-          }),
-          backgroundColor: "transparent",
-          overflow: "hidden",
-          zIndex: 10,
-        }}
+      <ReAnimated.View
+        style={[
+          {
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            backgroundColor: "transparent",
+            overflow: "hidden",
+            zIndex: 10,
+          },
+          expandableSectionStyle,
+        ]}
       >
         <Animated.View
           style={{
@@ -564,12 +573,18 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 </Animated.View>
 
                 {/* RIGHT DOCTOR TRUSTED GRAPHIC COLUMN */}
-                <Animated.View
-                  style={{
-                    width: cardWidth / 2,
-                    opacity: expandAnim,
-                  }}
-                  className="px-[12px] pt-10 pb-0 flex-col justify-between"
+                <ReAnimated.View
+                  style={[
+                    {
+                      width: cardWidth / 2,
+                      paddingHorizontal: 12,
+                      paddingTop: 40,
+                      paddingBottom: 0,
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                    },
+                    rightColAnimatedStyle,
+                  ]}
                 >
                   <View
                     className="flex-1 rounded-[12px] overflow-hidden"
@@ -621,7 +636,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       CareSure Assured
                     </Text>
                   </View>
-                </Animated.View>
+                </ReAnimated.View>
               </View>
             </View>
 
@@ -710,7 +725,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             </View>
           </View>
         </Animated.View>
-      </Animated.View>
+      </ReAnimated.View>
 
       {/* FLOATING SWAP BUTTON — Reanimated UI-thread opacity, zero blink */}
       <ReAnimated.View
@@ -758,5 +773,6 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         </Touchable>
       </ReAnimated.View>
     </View>
+    </GestureDetector>
   );
 };
