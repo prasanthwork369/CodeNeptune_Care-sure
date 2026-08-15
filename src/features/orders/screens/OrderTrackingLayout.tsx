@@ -604,7 +604,7 @@ export const OrderTrackLayout: React.FC = () => {
 
         <DeliveryAddressSection address={order?.deliveryAddress} />
 
-        <PaymentMethodSection />
+        <PaymentMethodSection order={order} />
 
         {order?.clinicalData && order?.status === 7 && (
           <PrescriptionSection onViewRx={() => setRxModalVisible(true)} />

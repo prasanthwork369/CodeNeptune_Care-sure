@@ -47,6 +47,9 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
     couponService
       .validateCoupon(draftCode, subtotal)
       .then((result) => {
+        // A manual apply (handleDirectApply) may have completed while this
+        // restore was in flight — never let a stale restore overwrite it.
+        if (useCouponStore.getState().applied) return;
         if (result.valid) {
           apply({
             code: draftCode,

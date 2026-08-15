@@ -3,9 +3,25 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
 import { orderStyles as s } from "../../orders.styles";
+import { PAYMENT_METHOD_LABELS } from "../../components/InvoiceModal";
+import { Order } from "../../types";
 import { SectionCard } from "./SectionCard";
 
-export function PaymentMethodSection() {
+interface PaymentMethodSectionProps {
+  order: Order | null | undefined;
+}
+
+// "1"/"COD" both mean cash on delivery — everything else in the map was paid online.
+const COD_KEYS = new Set(["1", "COD"]);
+
+export function PaymentMethodSection({ order }: PaymentMethodSectionProps) {
+  const rawPaymentMethod =
+    order?.paymentMethod ?? order?.metadata?.paymentMethod ?? "";
+  const key = String(rawPaymentMethod).toUpperCase();
+  const methodLabel =
+    PAYMENT_METHOD_LABELS[key] || String(rawPaymentMethod || "Not specified");
+  const isCod = COD_KEYS.has(key);
+
   return (
     <SectionCard
       style={{
@@ -35,13 +51,13 @@ export function PaymentMethodSection() {
             style={s.labelMd}
             className="font-inter-semibold text-brand-text"
           >
-            Paid online
+            {methodLabel}
           </Text>
           <Text
             style={s.labelSm}
             className="font-inter-medium text-brand-subtext"
           >
-            UPI / Netbanking
+            {isCod ? "Pay at delivery" : "Paid online"}
           </Text>
         </View>
       </View>

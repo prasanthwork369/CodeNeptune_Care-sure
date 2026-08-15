@@ -28,7 +28,7 @@ interface InvoiceModalProps {
   order: Order | null | undefined;
 }
 
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
+export const PAYMENT_METHOD_LABELS: Record<string, string> = {
   "1": "Cash on Delivery",
   "4": "CareSure Wallet",
   COD: "Cash on Delivery",

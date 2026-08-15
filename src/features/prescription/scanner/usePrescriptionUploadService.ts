@@ -1,6 +1,7 @@
 import { Alert, Linking } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import { useRef } from "react";
 import { ScannerService } from "./scanner.service";
 
 export interface CapturedAsset {
@@ -19,6 +20,10 @@ export function usePrescriptionUploadService({
   onAssetsReady,
   onError,
 }: UsePrescriptionUploadServiceOptions) {
+  // Ref, not state, so a rapid double-tap in the same tick can't launch a
+  // second native picker/scanner activity before the first one has opened.
+  const runningRef = useRef(false);
+
   const showErr = (title: string, message: string) => {
     if (onError) {
       onError(message);
@@ -39,6 +44,8 @@ export function usePrescriptionUploadService({
 
   // ── 1. Camera Flow (via PrescriptionScanner) ─────────────────────────────
   const takePhoto = async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
     try {
       const { status, canAskAgain } =
         await ImagePicker.requestCameraPermissionsAsync();
@@ -71,11 +78,15 @@ export function usePrescriptionUploadService({
       await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to take photo. Please try again.");
+    } finally {
+      runningRef.current = false;
     }
   };
 
   // ── 2. Gallery Flow ──────────────────────────────────────────────────────
   const chooseFromGallery = async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -103,11 +114,15 @@ export function usePrescriptionUploadService({
       await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to pick images. Please try again.");
+    } finally {
+      runningRef.current = false;
     }
   };
 
   // ── 3. PDF Flow ──────────────────────────────────────────────────────────
   const pickPdf = async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -134,11 +149,15 @@ export function usePrescriptionUploadService({
       await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to pick PDF. Please try again.");
+    } finally {
+      runningRef.current = false;
     }
   };
 
   // ── 4. Mixed Document Flow (Images + PDFs) ───────────────────────────────
   const pickDocument = async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -167,6 +186,8 @@ export function usePrescriptionUploadService({
       await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to pick document. Please try again.");
+    } finally {
+      runningRef.current = false;
     }
   };
 
