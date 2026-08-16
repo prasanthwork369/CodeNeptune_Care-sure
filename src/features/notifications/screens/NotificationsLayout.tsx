@@ -9,6 +9,7 @@ import {
 } from "@/src/hooks/mutations/useNotificationMutations";
 import { useNotifications } from "@/src/hooks/queries/useNotifications";
 import { usePrefetchOrder } from "@/src/hooks/queries/useOrderById";
+import { usePrefetchWallet } from "@/src/hooks/queries/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useToastStore } from "@/src/store/toastStore";
@@ -54,6 +55,7 @@ export const NotificationsLayout: React.FC = () => {
   const { mutate: dismissAll, isPending: isClearingAll } =
     useDismissAllNotifications();
   const prefetchOrder = usePrefetchOrder();
+  const prefetchWallet = usePrefetchWallet();
   const [isEntryLoading, setIsEntryLoading] = useState(true);
 
   useFocusEffect(
@@ -143,6 +145,7 @@ export const NotificationsLayout: React.FC = () => {
 
       // Wallet / coins → wallet screen
       if (event.startsWith("wallet.") || event.includes("coin")) {
+        prefetchWallet();
         router.push("/profile/wallet");
         return;
       }
@@ -164,7 +167,7 @@ export const NotificationsLayout: React.FC = () => {
       // Unknown event: the user is already on the notifications screen, so there
       // is nowhere more useful to send them — leave them here (already marked read).
     },
-    [closeOpenRow, markRead, prefetchOrder, router],
+    [closeOpenRow, markRead, prefetchOrder, prefetchWallet, router],
   );
 
   const handleClearAll = () => {

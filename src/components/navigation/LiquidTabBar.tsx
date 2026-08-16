@@ -10,7 +10,7 @@ import { exactScale } from "@/src/utils/exactScale";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import type { BottomTabBarProps } from "expo-router/js-tabs";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   DeviceEventEmitter,
   Image,
@@ -198,17 +198,35 @@ AnimatedUploadButton.displayName = "AnimatedUploadButton";
 
 // ─── Tab Item ─────────────────────────────────────────────────────────────────
 
+type TabIconComponent = React.ComponentType<{
+  color?: string;
+  width?: number;
+  height?: number;
+}>;
+
+function wrapIconWithAnimated(Icon: TabIconComponent) {
+  return Animated.createAnimatedComponent(Icon);
+}
+
+// tabs is a small, fixed set known at module load, so every icon this tab bar
+// can ever render is wrapped here once, up front — not inside TabItem. Any
+// derivation performed during render (even a cached lookup) still trips
+// react-hooks/static-components, since the linter can't prove it's cheap or
+// stable; only a value that is already a plain prop by the time TabItem
+// renders genuinely satisfies the rule.
+const ANIMATED_TABS = tabs.map((tab) => ({
+  ...tab,
+  icon: wrapIconWithAnimated(tab.icon),
+  activeIcon: tab.activeIcon
+    ? wrapIconWithAnimated(tab.activeIcon)
+    : undefined,
+}));
+
+type AnimatedTabIcon = ReturnType<typeof wrapIconWithAnimated>;
+
 interface TabItemProps {
-  icon: React.ComponentType<{
-    color?: string;
-    width?: number;
-    height?: number;
-  }>;
-  activeIcon?: React.ComponentType<{
-    color?: string;
-    width?: number;
-    height?: number;
-  }>;
+  icon: AnimatedTabIcon;
+  activeIcon?: AnimatedTabIcon;
   index: number;
   label: string;
   followerX: SharedValue<number>;
@@ -224,15 +242,6 @@ const TabItem = React.memo(
     followerX,
     pillOpacity,
   }: TabItemProps) => {
-    const AnimatedIcon = useMemo(
-      () => Animated.createAnimatedComponent(Icon),
-      [Icon],
-    );
-    const AnimatedActiveIcon = useMemo(
-      () => (ActiveIcon ? Animated.createAnimatedComponent(ActiveIcon) : null),
-      [ActiveIcon],
-    );
-
     const activeIconStyle = useAnimatedStyle(() => {
       "worklet";
       const dist = Math.abs(followerX.value - index);
@@ -316,9 +325,9 @@ const TabItem = React.memo(
             zoomStyle,
           ]}
         >
-          {AnimatedActiveIcon && (
+          {ActiveIcon && (
             <Animated.View style={activeIconStyle}>
-              <AnimatedActiveIcon
+              <ActiveIcon
                 width={ICON_SIZE}
                 height={ICON_SIZE}
                 color={ACTIVE_ICON_COLOR}
@@ -326,7 +335,7 @@ const TabItem = React.memo(
             </Animated.View>
           )}
           <Animated.View style={normalIconStyle}>
-            <AnimatedIcon
+            <Icon
               width={ICON_SIZE}
               height={ICON_SIZE}
               color={INACTIVE_ICON_COLOR}
@@ -381,9 +390,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     return pillRoutes.findIndex((r) => r.name === activeRoute.name);
   }, [state.index, pillRoutes]);
 
-  const lastValidIndex = useRef(activePillIndex === -1 ? 0 : activePillIndex);
-  if (activePillIndex !== -1) lastValidIndex.current = activePillIndex;
-
   // Derived, not measured — onLayout would fire a setState on every frame of the collapse
   const tabWidthShared = useDerivedValue(() => {
     const uploadWidth = interpolate(
@@ -397,8 +403,14 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     return inner / Math.max(1, pillRoutes.length);
   }, [screenWidth, pillRoutes.length]);
 
-  const leaderX = useSharedValue(lastValidIndex.current);
-  const followerX = useSharedValue(lastValidIndex.current);
+  // Only meaningful on mount: if the very first render already has the
+  // upload tab active (activePillIndex === -1), the pill still needs a real
+  // starting position instead of defaulting to 0. useSharedValue's initial
+  // argument is discarded on every render after the first, so this doesn't
+  // need to be tracked in a ref.
+  const initialPillIndex = activePillIndex === -1 ? 0 : activePillIndex;
+  const leaderX = useSharedValue(initialPillIndex);
+  const followerX = useSharedValue(initialPillIndex);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
 
   // Android: the active tab label's custom Inter typeface (set via useAnimatedStyle in
@@ -567,7 +579,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
         .map((route, index) => ({
           route,
           index,
-          tab: tabs.find((t) => t.name === route.name),
+          tab: ANIMATED_TABS.find((t) => t.name === route.name),
         }))
         .filter((item) => item.tab != null),
     [pillRoutes],

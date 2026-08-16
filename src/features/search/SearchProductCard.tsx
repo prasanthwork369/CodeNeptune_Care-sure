@@ -5,6 +5,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   cartCounterStyles as cc,
@@ -51,6 +52,12 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
     });
   }, [data.productId, data.id, router]);
 
+  const prefetchProduct = usePrefetchProduct();
+  const handlePrefetch = useCallback(() => {
+    const productId = data.productId ?? data.id;
+    if (productId) prefetchProduct(productId);
+  }, [prefetchProduct, data.productId, data.id]);
+
   const { count, increment, decrement, animations, isPending } = useCartActions(
     {
       medicineId: data.recId || data.id,
@@ -77,6 +84,7 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
       testID="search-result-item"
       activeOpacity={0.5}
       onPress={handleCardPress}
+      onPressIn={handlePrefetch}
       style={{ borderWidth: 1, borderColor: "#919EAB33" }}
       className="w-full rounded-[12px] bg-white overflow-hidden mb-5"
     >

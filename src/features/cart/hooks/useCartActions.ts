@@ -1,13 +1,16 @@
 import type { ImageSource } from "expo-image";
 import { useCartPendingStore } from "@/src/store/cartStore";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useQuery } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { cartService } from "@/src/services/cart.service";
 import { cartMutations } from "@/src/services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
 import { requireInternet } from "@/src/utils/offline";
 import { notifyCartError } from "../utils/cartError";
 import { analyticsService } from "@/src/services/firebase";
+import type { CartItem } from "../types";
 
 /**
  * Product identity for cart operations.
@@ -33,31 +36,52 @@ export interface CartActionProduct {
   requiresPrescription?: boolean;
 }
 
-export const useCartActions = (product: CartActionProduct) => {
-  // Read-only: writes go through cartMutations, so a card never allocates the
-  // five useMutation instances useCart builds.
-  const { items } = useCartRead();
+// Primary match: medicineId = variant UUID (new items).
+// Fallback: metadata.selectedVariantId match for items added with old code (medicineId = parent UUID).
+// Stable catalog-id fallback: reconciles the same product across surfaces
+// (e.g. a recommended item shown both in a comparison card and a standalone
+// card) when their medicineId differs. Excludes variant lines so it never
+// conflates two pack-size variants that share one productId.
+// Exact same predicate the old inline `.find()` used — only where it runs changed.
+function matchesCartItem(item: CartItem, product: CartActionProduct): boolean {
+  return (
+    item.medicineId === product.medicineId ||
+    (product.baseMedicineId != null &&
+      item.medicineId === product.baseMedicineId) ||
+    (product.variantId != null &&
+      item.metadata?.selectedVariantId === product.variantId) ||
+    (product.productId != null &&
+      !item.metadata?.selectedVariantId &&
+      item.metadata?.productId === product.productId)
+  );
+}
 
-  // Primary match: medicineId = variant UUID (new items).
-  // Fallback: metadata.selectedVariantId match for items added with old code (medicineId = parent UUID).
+export const useCartActions = (product: CartActionProduct) => {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const pendingKey = product.medicineId;
 
-  const cartItem = items.find(
-    (i) =>
-      i.medicineId === product.medicineId ||
-      (product.baseMedicineId != null &&
-        i.medicineId === product.baseMedicineId) ||
-      (product.variantId != null &&
-        i.metadata?.selectedVariantId === product.variantId) ||
-      // Stable catalog-id fallback: reconciles the same product across surfaces
-      // (e.g. a recommended item shown both in a comparison card and a standalone
-      // card) when their medicineId differs. Excludes variant lines so it never
-      // conflates two pack-size variants that share one productId.
-      (product.productId != null &&
-        !i.metadata?.selectedVariantId &&
-        i.metadata?.productId === product.productId),
+  // Narrow, per-card subscriptions: each card selects only its own matching
+  // item out of the shared cart (server cart via React Query `select`, guest
+  // cart via a Zustand selector) instead of reading the whole items array —
+  // so it only re-renders when ITS OWN item changes, not on every unrelated
+  // add/remove elsewhere in the cart. Both cart sources preserve unrelated
+  // items' object identity across updates (structural sharing / spread-map),
+  // so an unchanged match keeps the same reference and skips the re-render.
+  const { data: authCartItem } = useQuery({
+    queryKey: QUERY_KEYS.CUSTOMER.CART,
+    queryFn: cartService.getCart,
+    enabled: isAuthenticated,
+    staleTime: 10_000,
+    select: (cart) => cart.items.find((i) => matchesCartItem(i, product)),
+  });
+
+  const guestCartItem = useCartPendingStore((s) =>
+    isAuthenticated
+      ? undefined
+      : s.guestCart.items.find((i) => matchesCartItem(i, product)),
   );
 
+  const cartItem = isAuthenticated ? authCartItem : guestCartItem;
   const count = cartItem?.quantity ?? 0;
   // Subscribe to this product's pending flag only — a whole-store subscription
   // re-rendered every mounted card on each setPending call.
@@ -65,15 +89,18 @@ export const useCartActions = (product: CartActionProduct) => {
     (s) => s.pendingIds[pendingKey] ?? false,
   );
   const setPending = useCartPendingStore((s) => s.setPending);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const prevCountRef = useRef(count);
   const prevIsPendingRef = useRef(false);
   // State updates are asynchronous; this lock also blocks a second tap made
   // before the pending-store update has rendered.
   const operationPendingRef = useRef(false);
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const opacityAnim = useRef(new Animated.Value(1)).current;
+  // Lazy useState initializer, not useRef(new Animated.Value(...)).current —
+  // the latter still constructs (and discards) a new Animated.Value on every
+  // render since useRef's argument is evaluated unconditionally; useState's
+  // initializer function is guaranteed to run exactly once.
+  const [slideAnim] = useState(() => new Animated.Value(0));
+  const [opacityAnim] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     if (count !== prevCountRef.current) {

@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import type { MobileAppLinks, UploadConfig } from "../../api/settings.api";
+import type {
+  CartWalletSettings,
+  MobileAppLinks,
+  PaymentSettings,
+  Settings,
+  UploadConfig,
+} from "../../api/settings.api";
 import { WEB_BASE_URL } from "../../utils/urls";
 import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";
 import { settingsService } from "../../services/settings.service";
@@ -30,9 +36,15 @@ export function useMobileAppLinks() {
 }
 
 export function useCartWalletSettings() {
-  return useQuery({
+  const cached = useCachedSeed<CartWalletSettings>("settings_cart_wallet");
+
+  return useQuery<CartWalletSettings>({
     queryKey: ["cart-wallet-settings"],
-    queryFn: () => settingsService.getCartWalletSettings(),
+    queryFn: withSqliteCache("settings_cart_wallet", () =>
+      settingsService.getCartWalletSettings(),
+    ),
+    initialData: () => cached?.data,
+    initialDataUpdatedAt: () => cached?.updatedAt ?? 0,
     staleTime: 5 * 60 * 1000, // Caches for 5 minutes
     retry: 1,
     refetchOnWindowFocus: false,
@@ -40,9 +52,15 @@ export function useCartWalletSettings() {
 }
 
 export function useSettings() {
-  return useQuery({
+  const cached = useCachedSeed<Settings>("settings_general");
+
+  return useQuery<Settings>({
     queryKey: ["platform-settings"],
-    queryFn: () => settingsService.getSettings(),
+    queryFn: withSqliteCache("settings_general", () =>
+      settingsService.getSettings(),
+    ),
+    initialData: () => cached?.data,
+    initialDataUpdatedAt: () => cached?.updatedAt ?? 0,
     staleTime: 5 * 60 * 1000, // 5 minutes cache
     retry: 2,
     refetchOnWindowFocus: false,
@@ -50,9 +68,15 @@ export function useSettings() {
 }
 
 export function usePaymentSettings() {
-  return useQuery({
+  const cached = useCachedSeed<PaymentSettings>("settings_payment");
+
+  return useQuery<PaymentSettings>({
     queryKey: ["payment-settings"],
-    queryFn: () => settingsService.getPaymentSettings(),
+    queryFn: withSqliteCache("settings_payment", () =>
+      settingsService.getPaymentSettings(),
+    ),
+    initialData: () => cached?.data,
+    initialDataUpdatedAt: () => cached?.updatedAt ?? 0,
     staleTime: 5 * 60 * 1000, // 5 minutes cache
     retry: 1,
     refetchOnWindowFocus: false,

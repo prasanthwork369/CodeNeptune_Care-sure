@@ -1,15 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Address,
   addressApi,
   CreateAddressPayload,
   UpdateAddressPayload,
 } from "../../api/address.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
+import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";
 
 export const useAddress = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const cachedAddresses = useCachedSeed<Address[]>("customer_addresses");
 
   const {
     data: addresses = [],
@@ -17,9 +20,16 @@ export const useAddress = () => {
     isRefetching,
     isSuccess,
     refetch,
-  } = useQuery({
+  } = useQuery<Address[]>({
     queryKey: QUERY_KEYS.CUSTOMER.ADDRESSES,
-    queryFn: addressApi.getAddresses,
+    queryFn: withSqliteCache("customer_addresses", addressApi.getAddresses),
+    // placeholderData, not initialData: this hook sets refetchOnMount: false,
+    // and initialData would mark the query "already fetched", which combined
+    // with refetchOnMount: false would skip the real network call entirely on
+    // a cold start. placeholderData never does that, and it also keeps
+    // isSuccess/loaded false until the real fetch lands — useDeliveryAddress
+    // depends on that timing to avoid guessing "no saved address" too early.
+    placeholderData: () => cachedAddresses?.data,
     staleTime: 5 * 60_000,
     refetchOnMount: false,
     enabled: isAuthenticated,

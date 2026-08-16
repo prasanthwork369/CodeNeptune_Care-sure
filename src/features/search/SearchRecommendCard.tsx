@@ -1,9 +1,10 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
 import { moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
-import React from "react";
+import React, { useCallback } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import {
   cartCounterStyles as cc,
@@ -57,10 +58,16 @@ export const SearchRecommendCard = React.memo(
       });
     const { slideAnim, opacityAnim } = animations;
 
+    const prefetchProduct = usePrefetchProduct();
+    const handlePrefetch = useCallback(() => {
+      if (data.productId) prefetchProduct(data.productId);
+    }, [prefetchProduct, data.productId]);
+
     return (
       <Touchable
         activeOpacity={0.85}
         onPress={() => onPress(data.productId)}
+        onPressIn={handlePrefetch}
         style={[s.recCard, { padding: 0, overflow: "hidden", minHeight: 0 }]}
         className="w-full rounded-[16px] mb-4"
       >

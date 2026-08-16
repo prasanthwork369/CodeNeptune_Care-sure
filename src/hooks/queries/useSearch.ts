@@ -1,4 +1,5 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { apiCache, useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useAuthStore } from "@/src/store/authStore";
 import {
   useInfiniteQuery,
@@ -7,7 +8,12 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ApiSearchMedicine, searchApi } from "../../api/search.api";
+import {
+  ApiSearchHistoryItem,
+  ApiSearchMedicine,
+  ApiTrendingItem,
+  searchApi,
+} from "../../api/search.api";
 import { searchService } from "../../services/search.service";
 
 export const useSearch = () => {
@@ -118,31 +124,87 @@ export const useSearchSuggestions = (query: string, limit = 8) => {
 export const useSearchHistory = (limit = 10, offset = 0) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const queryClient = useQueryClient();
+  const cachedHistory =
+    useCachedSeed<ApiSearchHistoryItem[]>("search_history");
+
+  const historyKey = QUERY_KEYS.SEARCH.HISTORY({ limit, offset });
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: QUERY_KEYS.SEARCH.HISTORY({ limit, offset }),
-    queryFn: () => searchService.getHistory(limit, offset),
+    queryKey: historyKey,
+    queryFn: withSqliteCache("search_history", () =>
+      searchService.getHistory(limit, offset),
+    ),
+    initialData: () => cachedHistory?.data,
+    initialDataUpdatedAt: () => cachedHistory?.updatedAt ?? 0,
     enabled: isAuthenticated,
     staleTime: 5 * 60_000,
   });
 
   const HISTORY_KEY_PREFIX = ["search", "history"];
 
+  // Writes both the live query cache and the SQLite cold-start seed together,
+  // so a restart right after an add/delete/clear doesn't resurrect the old
+  // list. The background invalidate below still reconciles with server truth
+  // (e.g. the real id/createdAt a record call doesn't return). Returns the
+  // pre-update snapshot so a failed mutation's onError can restore it.
+  const writeHistory = (
+    updater: (current: ApiSearchHistoryItem[]) => ApiSearchHistoryItem[],
+  ): ApiSearchHistoryItem[] => {
+    const previous =
+      queryClient.getQueryData<ApiSearchHistoryItem[]>(historyKey) ?? [];
+    const next = updater(previous);
+    queryClient.setQueryData(historyKey, next);
+    apiCache.set("search_history", next);
+    return previous;
+  };
+
+  // A failed mutation restores the exact pre-optimistic snapshot to both the
+  // query cache and the SQLite seed, undoing writeHistory's side effects.
+  const restoreHistory = (previous: ApiSearchHistoryItem[]) => {
+    queryClient.setQueryData(historyKey, previous);
+    apiCache.set("search_history", previous);
+  };
+
   const { mutate: recordMutate } = useMutation({
     mutationFn: ({ query, productId }: { query: string; productId?: string }) =>
       searchService.recordHistory(query, productId),
+    // Move-to-front: drop any existing row for the same term first, then
+    // prepend a synthetic row — the record API returns void, so the real
+    // id/createdAt only arrive once the invalidate below refetches.
+    onMutate: ({ query, productId }) =>
+      writeHistory((current) => [
+        {
+          id: `optimistic-${Date.now()}`,
+          query,
+          productId,
+          createdAt: new Date().toISOString(),
+        },
+        ...current.filter((item) => item.query !== query),
+      ]),
+    onError: (_err, _vars, previous) => {
+      if (previous) restoreHistory(previous);
+    },
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: HISTORY_KEY_PREFIX }),
   });
 
   const { mutate: clearMutate, isPending: isClearingHistory } = useMutation({
     mutationFn: () => searchService.clearHistory(),
+    onMutate: () => writeHistory(() => []),
+    onError: (_err, _vars, previous) => {
+      if (previous) restoreHistory(previous);
+    },
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: HISTORY_KEY_PREFIX }),
   });
 
   const { mutate: deleteItemMutate } = useMutation({
     mutationFn: (id: string) => searchService.deleteHistoryItem(id),
+    onMutate: (id) =>
+      writeHistory((current) => current.filter((item) => item.id !== id)),
+    onError: (_err, _vars, previous) => {
+      if (previous) restoreHistory(previous);
+    },
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: HISTORY_KEY_PREFIX }),
   });
@@ -170,9 +232,15 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
 };
 
 export const useTrendingSearches = (limit = 6) => {
+  const cachedTrending = useCachedSeed<ApiTrendingItem[]>("search_trending");
+
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.SEARCH.TRENDING(limit),
-    queryFn: () => searchService.getTrending(limit),
+    queryFn: withSqliteCache("search_trending", () =>
+      searchService.getTrending(limit),
+    ),
+    initialData: () => cachedTrending?.data,
+    initialDataUpdatedAt: () => cachedTrending?.updatedAt ?? 0,
     staleTime: 30 * 60_000,
   });
 

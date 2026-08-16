@@ -1,20 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { familyMemberService } from "../../services/family-member.service";
-import { FamilyMemberInput } from "../../types/familyMember";
+import { FamilyMember, FamilyMemberInput } from "../../types/familyMember";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
+import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";
 
 export const useFamilyMembers = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const cachedMembers = useCachedSeed<FamilyMember[]>("family_members");
 
   const {
     data: rawData,
     isLoading,
     isRefetching,
-  } = useQuery({
+  } = useQuery<FamilyMember[]>({
     queryKey: QUERY_KEYS.CUSTOMER.MEMBERS,
-    queryFn: familyMemberService.getMembers,
+    queryFn: withSqliteCache("family_members", familyMemberService.getMembers),
+    initialData: () => cachedMembers?.data,
+    initialDataUpdatedAt: () => cachedMembers?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
     refetchOnMount: true,
     enabled: isAuthenticated,

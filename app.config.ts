@@ -132,7 +132,57 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     "expo-asset",
-    "expo-font",
+    // Android-only: natively embeds the exact 5 Inter weights patchText.ts maps
+    // every Text to, so they're registered with the OS font manager before the
+    // JS bundle even runs — removing the runtime useFonts() wait this currently
+    // costs on Android. No top-level/`ios` fonts key, so iOS is untouched and
+    // keeps rendering system SF Pro exactly as before. Each entry's fontFamily
+    // is registered verbatim via ReactFontManager.addCustomFont, so these names
+    // reach JS unchanged — patchText.ts's family map needs no change.
+    // Runtime gate (useAndroidInterFonts / app/_layout.tsx) is intentionally
+    // still in place until this has been verified on a real Android build.
+    [
+      "expo-font",
+      {
+        android: {
+          fonts: [
+            {
+              fontFamily: "Inter_400Regular",
+              fontDefinitions: [
+                { path: "./assets/fonts/Inter_400Regular.ttf", weight: 400 },
+              ],
+            },
+            {
+              fontFamily: "Inter_500Medium",
+              fontDefinitions: [
+                { path: "./assets/fonts/Inter_500Medium.ttf", weight: 500 },
+              ],
+            },
+            {
+              fontFamily: "Inter_600SemiBold",
+              fontDefinitions: [
+                { path: "./assets/fonts/Inter_600SemiBold.ttf", weight: 600 },
+              ],
+            },
+            {
+              fontFamily: "Inter_700Bold",
+              fontDefinitions: [
+                { path: "./assets/fonts/Inter_700Bold.ttf", weight: 700 },
+              ],
+            },
+            {
+              fontFamily: "Inter_800ExtraBold",
+              fontDefinitions: [
+                {
+                  path: "./assets/fonts/Inter_800ExtraBold.ttf",
+                  weight: 800,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
     "expo-image",
     "expo-router",
     "expo-secure-store",

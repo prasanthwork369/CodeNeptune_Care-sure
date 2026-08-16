@@ -8,8 +8,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { Transaction, TxIconType } from "../types";
 import { logToTransactions } from "../walletTransactions";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, LayoutChangeEvent, ScrollView, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -108,28 +107,15 @@ export const WalletLayout: React.FC = () => {
   });
 
   const router = useNav();
-  const {
-    balance,
-    loading: balanceLoading,
-    refetch: refetchBalance,
-  } = useWalletBalance();
+  // Freshness comes from the queries themselves — staleTime + refetchOnMount,
+  // plus useWalletBalance's own refetchOnWindowFocus — rather than a forced
+  // refetch on every screen focus, which refetched even when data was
+  // already fresh and caused a loading-state flash on every re-visit.
+  const { balance, loading: balanceLoading } = useWalletBalance();
 
   // A null balance with active loading=false still denotes a loading/pre-auth state.
   const isBalancePending = balanceLoading || balance == null;
-  const {
-    logs,
-    loading: logsLoading,
-    refetch: refetchLogs,
-  } = useWalletLogs(20, 0);
-
-  // Refetch on every screen focus so balance/transactions don't show stale
-  // cached data when the user navigates back to this tab repeatedly.
-  useFocusEffect(
-    useCallback(() => {
-      refetchBalance();
-      refetchLogs();
-    }, [refetchBalance, refetchLogs]),
-  );
+  const { logs, loading: logsLoading } = useWalletLogs(20, 0);
 
   const transactions: Transaction[] = logs.flatMap(logToTransactions);
   const previewTxs = transactions.slice(0, 5);

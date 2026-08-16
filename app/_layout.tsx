@@ -29,7 +29,6 @@ import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
 import { useOtaUpdate } from "@/src/hooks/ui/useOtaUpdate";
 import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
 import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
-import { useAndroidInterFonts } from "@/src/hooks/useAndroidInterFonts";
 import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
@@ -179,7 +178,6 @@ export default function RootLayout() {
   const pathname = usePathname();
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
-  const interFontsLoaded = useAndroidInterFonts();
 
   // Tracks whether the JS animated splash has finished playing.
   // Auth loading and the animation run in parallel — the app only
@@ -228,18 +226,17 @@ export default function RootLayout() {
     });
   }, []);
 
-  // Hide native splash as soon as fonts are ready so our
-  // animated JS splash takes over seamlessly.
+  // Hide native splash immediately so our animated JS splash takes over —
+  // Android's Inter fonts are natively embedded (see app.config.ts), so
+  // nothing here waits on a runtime font load anymore.
   useEffect(() => {
-    if (interFontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [interFontsLoaded]);
+    SplashScreen.hideAsync();
+  }, []);
 
   // Splash acts as a curtain over the fully-mounted app tree.
   // The app renders and initialises underneath while the splash plays —
   // so when the curtain lifts the home screen is already ready, no white flash.
-  const showSplash = !interFontsLoaded || !isAnimationDone || !isAuthLoaded;
+  const showSplash = !isAnimationDone || !isAuthLoaded;
 
   usePerformanceTrace({
     traceName: PERF_TRACES.APP_LAUNCH,
@@ -263,66 +260,56 @@ export default function RootLayout() {
                     removed from expo-status-bar's API. */}
                 <StatusBar style="dark" />
 
-                {/* Android measures text with the family registered at that moment and never re-measures once a font loads later, so nothing may mount before Inter is ready. */}
-                {interFontsLoaded && (
-                  <>
-                    <BottomSheetModalProvider>
-                      <Stack
-                        screenOptions={{
-                          headerShown: false,
-                          ...screenTransitions.nativePush,
-                        }}
-                      >
-                        <Stack.Screen
-                          name="index"
-                          options={screenTransitions.fade}
-                        />
-                        {/* Every auth guard redirects here, so entering it must not read as a push */}
-                        <Stack.Screen
-                          name="(auth)"
-                          options={screenTransitions.none}
-                        />
-                        <Stack.Screen
-                          name="(tabs)"
-                          options={screenTransitions.authComplete}
-                        />
-                        <Stack.Screen name="(stack)" />
-                        <Stack.Screen name="(prescription)" />
-                        <Stack.Screen name="search" />
-                        <Stack.Screen name="notifications" />
-                        <Stack.Screen name="profile" />
-                        <Stack.Screen name="product" />
-                        <Stack.Screen
-                          name="+not-found"
-                          options={screenTransitions.result}
-                        />
-                      </Stack>
-                      <CartSyncProvider />
-                      <PushNotificationProvider />
-                    </BottomSheetModalProvider>
-                    <NetworkToast />
-                    <Toast />
-                    <GlobalAlertDialog />
-                    <SignupBonusPopup />
-                  </>
-                )}
+                {/* Android's Inter fonts are natively embedded (app.config.ts), so
+                    the tree mounts immediately — no runtime font-load gate. */}
+                <BottomSheetModalProvider>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      ...screenTransitions.nativePush,
+                    }}
+                  >
+                    <Stack.Screen name="index" options={screenTransitions.fade} />
+                    {/* Every auth guard redirects here, so entering it must not read as a push */}
+                    <Stack.Screen
+                      name="(auth)"
+                      options={screenTransitions.none}
+                    />
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={screenTransitions.authComplete}
+                    />
+                    <Stack.Screen name="(stack)" />
+                    <Stack.Screen name="(prescription)" />
+                    <Stack.Screen name="search" />
+                    <Stack.Screen name="notifications" />
+                    <Stack.Screen name="profile" />
+                    <Stack.Screen name="product" />
+                    <Stack.Screen
+                      name="+not-found"
+                      options={screenTransitions.result}
+                    />
+                  </Stack>
+                  <CartSyncProvider />
+                  <PushNotificationProvider />
+                </BottomSheetModalProvider>
+                <NetworkToast />
+                <Toast />
+                <GlobalAlertDialog />
+                <SignupBonusPopup />
 
                 {__DEV__ && <DevPreviewToggler />}
 
-                {/* Splash curtain over the app tree; the tree still mounts and lays out beneath it once fonts are ready, so there is no white flash. */}
+                {/* Splash curtain over the app tree; the tree still mounts and lays out beneath it, so there is no white flash. */}
                 {showSplash && (
                   <View
                     style={StyleSheet.absoluteFill}
                     pointerEvents="box-only"
                   >
-                    {interFontsLoaded ? (
-                      <SplashAnimationScreen
-                        isAppReady={isAuthLoaded}
-                        onComplete={() => setIsAnimationDone(true)}
-                      />
-                    ) : (
-                      <View style={styles.splashFallback} />
-                    )}
+                    <SplashAnimationScreen
+                      isAppReady={isAuthLoaded}
+                      onComplete={() => setIsAnimationDone(true)}
+                    />
                   </View>
                 )}
 
@@ -337,10 +324,3 @@ export default function RootLayout() {
     </ErrorBoundary>
   );
 }
-
-const styles = StyleSheet.create({
-  splashFallback: {
-    flex: 1,
-    backgroundColor: "#F4FAF5",
-  },
-});

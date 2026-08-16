@@ -11,12 +11,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
   LayoutChangeEvent,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -444,35 +444,37 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
               )}
             </View>
 
-            <FlashList
+            <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              data={subcategory.products}
-              keyExtractor={(item) => item.id}
-              renderItem={renderProduct}
               nestedScrollEnabled
               directionalLockEnabled
               contentContainerStyle={{
+                flexDirection: "row",
                 paddingLeft: exactScale(20),
                 paddingRight: exactScale(40),
               }}
-              ItemSeparatorComponent={ProductSeparator}
-              // Sits after the last product so scrolling to the end
-              // leads into this subcategory.
-              ListFooterComponent={
-                onViewAll && subcategory.products.length > 0 ? (
-                  <View style={{ marginLeft: ROW_GAP }}>
-                    <ViewAllCard
-                      width={cardWidth}
-                      height={rowHeight}
-                      // Same accent the row's product cards use.
-                      accentColor={lineColor}
-                      onPress={() => onViewAll(subcategory)}
-                    />
-                  </View>
-                ) : null
-              }
-            />
+            >
+              {subcategory.products.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  {index > 0 && <ProductSeparator />}
+                  {renderProduct({ item, index })}
+                </React.Fragment>
+              ))}
+              {/* Sits after the last product so scrolling to the end
+                  leads into this subcategory. */}
+              {onViewAll && subcategory.products.length > 0 && (
+                <View style={{ marginLeft: ROW_GAP }}>
+                  <ViewAllCard
+                    width={cardWidth}
+                    height={rowHeight}
+                    // Same accent the row's product cards use.
+                    accentColor={lineColor}
+                    onPress={() => onViewAll(subcategory)}
+                  />
+                </View>
+              )}
+            </ScrollView>
           </View>
         </View>
       </View>

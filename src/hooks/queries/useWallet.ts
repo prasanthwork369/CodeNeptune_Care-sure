@@ -1,9 +1,11 @@
 import {
+  QueryClient,
   useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { walletService } from "../../services/wallet.service";
 import { walletApi } from "../../api/wallet.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
@@ -130,4 +132,33 @@ export const useInfiniteWalletLogs = () => {
     isFetchingNextPage: query.isFetchingNextPage,
     refetch: query.refetch,
   };
+};
+
+/**
+ * Warms wallet balance + the first wallet-logs page ahead of navigating to
+ * Wallet from a wallet notification, using the exact same keys/queryFns
+ * useWalletBalance and useWalletLogs(20, 0) read (firstPageKey is the same
+ * constant useInfiniteWalletLogs reads above — nothing new is introduced).
+ * Never throws — a failed/slow prefetch just means Wallet falls back to its
+ * own normal fetch-on-mount, same as today.
+ */
+const prefetchWallet = (queryClient: QueryClient): void => {
+  void queryClient
+    .prefetchQuery({
+      queryKey: QUERY_KEYS.CUSTOMER.WALLET.BALANCE,
+      queryFn: () => walletService.getBalance(),
+    })
+    .catch(() => {});
+  void queryClient
+    .prefetchQuery({
+      queryKey: firstPageKey,
+      queryFn: () => walletService.getLogs(LOGS_PAGE_SIZE, 0),
+    })
+    .catch(() => {});
+};
+
+/** Stable callback for wiring prefetchWallet into a wallet notification tap. */
+export const usePrefetchWallet = () => {
+  const queryClient = useQueryClient();
+  return useCallback(() => prefetchWallet(queryClient), [queryClient]);
 };
