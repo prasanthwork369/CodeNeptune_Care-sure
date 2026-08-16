@@ -1,6 +1,7 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
 import type { Product } from "@/src/types/home";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
@@ -106,6 +107,11 @@ const ProductCard = React.memo(
       cartMedicineId,
     );
 
+    const prefetchProduct = usePrefetchProduct();
+    const handlePrefetch = useCallback(() => {
+      if (product.productId) prefetchProduct(product.productId);
+    }, [prefetchProduct, product.productId]);
+
     const handleAdd = useCallback(async () => {
       // Only animate on a confirmed add: offline the increment refuses and a
       // fly-in would falsely show the item landing in the cart.
@@ -131,6 +137,7 @@ const ProductCard = React.memo(
             if (!product.productId) return;
             onProductPress?.(product.productId);
           }}
+          onPressIn={handlePrefetch}
           style={{
             height: imageAreaHeight,
             backgroundColor: CONTENT_BG,
@@ -187,6 +194,7 @@ const ProductCard = React.memo(
               if (!product.productId) return;
               onProductPress?.(product.productId);
             }}
+            onPressIn={handlePrefetch}
           >
             <Text style={s.name} className="text-brand-text" numberOfLines={1}>
               {product.name}

@@ -4,6 +4,7 @@ import {
 } from "@/src/api/category.api";
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { LinearGradient } from "expo-linear-gradient";
@@ -125,6 +126,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
     const { imageRef, triggerFly } = useFlyToCartTrigger(imageSource, id);
 
+    const prefetchProduct = usePrefetchProduct();
+    const handlePrefetch = useCallback(() => {
+      if (productId) prefetchProduct(productId);
+    }, [prefetchProduct, productId]);
+
     const handleAdd = useCallback(async () => {
       // Only animate on a confirmed add: offline the increment refuses and a
       // fly-in would falsely show the item landing in the cart.
@@ -151,6 +157,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
         <Touchable
           activeOpacity={0.85}
           onPress={() => onPress(productId)}
+          onPressIn={handlePrefetch}
           style={{
             height: imageAreaHeight,
             backgroundColor: contentBg,
@@ -208,7 +215,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             flexDirection: "column",
           }}
         >
-          <Touchable activeOpacity={0.85} onPress={() => onPress(productId)}>
+          <Touchable
+            activeOpacity={0.85}
+            onPress={() => onPress(productId)}
+            onPressIn={handlePrefetch}
+          >
             <Text
               style={s.name}
               className="font-inter-medium text-brand-text"

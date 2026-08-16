@@ -21,7 +21,9 @@ export const useWalletBalance = () => {
     enabled: isAuthenticated,
     staleTime: 60_000 * 5,
     retry: 1,
-    refetchOnWindowFocus: false,
+    // Balance can change while the app is backgrounded (top-up, order
+    // deduction) — refresh it the moment the user comes back.
+    refetchOnWindowFocus: true,
   });
 
   return {
@@ -75,8 +77,19 @@ export const useWalletLogs = (limit: number = 20, offset: number = 0) => {
   };
 };
 
+// The exact key useWalletLogs(LOGS_PAGE_SIZE, 0) builds — read-only, to seed
+// the infinite query below. Deliberately NOT the infinite query's own key:
+// a regular query's cache entry (a flat array) and an infinite query's cache
+// entry ({pages, pageParams}) are different shapes and must never share a
+// cache slot, or whichever hook reads it second breaks.
+const firstPageKey = QUERY_KEYS.CUSTOMER.WALLET.LOGS({
+  limit: LOGS_PAGE_SIZE,
+  offset: 0,
+});
+
 export const useInfiniteWalletLogs = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const queryClient = useQueryClient();
 
   const query = useInfiniteQuery({
     queryKey: QUERY_KEYS.CUSTOMER.WALLET.LOGS({ limit: LOGS_PAGE_SIZE }),
@@ -88,6 +101,21 @@ export const useInfiniteWalletLogs = () => {
       lastPage.length < LOGS_PAGE_SIZE
         ? undefined
         : lastPageParam + LOGS_PAGE_SIZE,
+    // Only consulted when THIS query has no cache entry of its own yet, so
+    // an already-loaded infinite cache (e.g. the user scrolled History
+    // before) is never overwritten. Reshapes Wallet home's already-fetched
+    // first page (useWalletLogs(20, 0)) into the InfiniteData shape this
+    // query expects, so History can paint instantly instead of refetching
+    // the same 20 rows the user just saw.
+    initialData: () => {
+      const firstPage = queryClient.getQueryData<WalletLog[]>(firstPageKey);
+      if (!firstPage) return undefined;
+      return { pages: [firstPage], pageParams: [0] };
+    },
+    // Carries over the ACTUAL fetch time of that seeded page, not "now" —
+    // otherwise a first page fetched 4 minutes ago would read as fresh for
+    // another full staleTime window instead of refetching on schedule.
+    initialDataUpdatedAt: () => queryClient.getQueryState(firstPageKey)?.dataUpdatedAt,
     staleTime: 60_000 * 5,
     retry: 1,
     refetchOnWindowFocus: false,

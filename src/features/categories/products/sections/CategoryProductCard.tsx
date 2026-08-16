@@ -3,11 +3,12 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
 import { CategoryProductCardProps } from "@/src/types/category";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useCallback } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import {
   CARD_BTN_H,
@@ -46,6 +47,11 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
 
   const handlePress = () => onPress(product);
 
+  const prefetchProduct = usePrefetchProduct();
+  const handlePrefetch = useCallback(() => {
+    if (product.productId) prefetchProduct(product.productId);
+  }, [prefetchProduct, product.productId]);
+
   const handleIncrement = async () => {
     // Only animate on a confirmed add: offline the increment refuses and a
     // fly-in would falsely show the item landing in the cart.
@@ -61,6 +67,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
         <Touchable
           activeOpacity={0.7}
           onPress={handlePress}
+          onPressIn={handlePrefetch}
           style={{
             height: cardWidth * 1.05,
             backgroundColor: "#FFFFFF",

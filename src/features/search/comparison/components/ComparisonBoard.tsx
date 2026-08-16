@@ -9,11 +9,11 @@ import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image as ExpoImage } from "expo-image";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Image,
   Text,
   useWindowDimensions,
   View,
@@ -304,10 +304,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               </Text>
               <View className="bg-white border border-[#E5E7EB] rounded-[10px] h-[100px] mb-2 items-center justify-center overflow-hidden">
                 {searched.image ? (
-                  <Image
+                  <ExpoImage
                     source={searched.image}
                     style={{ width: "85%", height: "85%" }}
-                    resizeMode="contain"
+                    contentFit="contain"
+                    cachePolicy="memory-disk"
                   />
                 ) : (
                   <icons.placeholder width="70%" height="70%" />
@@ -450,10 +451,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     </Text>
                     <View className="bg-white border border-[#E5E7EB] rounded-[10px] h-[100px] mb-2 items-center justify-center overflow-hidden">
                       {recommended.image ? (
-                        <Image
+                        <ExpoImage
                           source={recommended.image}
                           style={{ width: "85%", height: "85%" }}
-                          resizeMode="contain"
+                          contentFit="contain"
+                          cachePolicy="memory-disk"
                         />
                       ) : (
                         <icons.placeholder width="70%" height="70%" />
@@ -590,7 +592,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                     className="flex-1 rounded-[12px] overflow-hidden"
                     style={{ backgroundColor: "#E1F0D5", minHeight: 140 }}
                   >
-                    <Image
+                    <ExpoImage
                       source={HOME_IMAGES.doctorLogo}
                       style={{
                         position: "absolute",
@@ -599,7 +601,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                         width: moderateScale(100),
                         height: moderateScale(100),
                       }}
-                      resizeMode="contain"
+                      contentFit="contain"
+                      cachePolicy="memory-disk"
                     />
                     <View className="px-3 pt-3 z-10 w-[70%]">
                       <Text
@@ -609,7 +612,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                         Doctor{"\n"}Trusted{"\n"}Medicines
                       </Text>
                     </View>
-                    <Image
+                    <ExpoImage
                       source={HOME_IMAGES.doctor}
                       style={{
                         position: "absolute",
@@ -619,15 +622,17 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                         height: "90%",
                         zIndex: 5,
                       }}
-                      resizeMode="contain"
+                      contentFit="contain"
+                      cachePolicy="memory-disk"
                     />
                   </View>
 
                   <View className="mt-3 flex-row items-center justify-center bg-white rounded-[8px] border border-[#919EAB33] py-2">
-                    <Image
+                    <ExpoImage
                       source={HOME_IMAGES.shield}
                       style={{ width: 18, height: 18, marginRight: 4 }}
-                      resizeMode="contain"
+                      contentFit="contain"
+                      cachePolicy="memory-disk"
                     />
                     <Text
                       className="font-inter-medium text-brand-text"

@@ -17,6 +17,9 @@ interface ItemsOrderedSectionProps {
   // paid itemTotal / MRP total; used only to estimate a missing selling price.
   // It must never be displayed as an individual item's discount percentage.
   priceEstimateRatio?: number;
+  // True while `order` is placeholder data seeded from the orders list —
+  // Cancel/Return must wait for the real detail fetch before they're offered.
+  actionsDisabled?: boolean;
 }
 
 export function ItemsOrderedSection({
@@ -24,6 +27,7 @@ export function ItemsOrderedSection({
   orderId,
   orderStatus,
   priceEstimateRatio,
+  actionsDisabled,
 }: ItemsOrderedSectionProps) {
   const router = useNav();
 
@@ -41,7 +45,7 @@ export function ItemsOrderedSection({
           Items Ordered ({items.length})
         </Text>
         <View className="flex-row" style={{ gap: exactScale(8) }}>
-          {orderStatus === 7 && (
+          {orderStatus === 7 && !actionsDisabled && (
             <Touchable
               className="flex-row items-center"
               style={{
@@ -72,7 +76,7 @@ export function ItemsOrderedSection({
               </Text>
             </Touchable>
           )}
-          {orderStatus !== 7 && orderStatus !== 0 && (
+          {orderStatus !== 7 && orderStatus !== 0 && !actionsDisabled && (
             <Touchable
               className="flex-row items-center"
               style={{

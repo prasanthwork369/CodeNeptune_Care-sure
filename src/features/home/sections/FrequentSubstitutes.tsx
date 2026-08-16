@@ -1,5 +1,6 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
 import type { SubstituteProduct } from "@/src/types/home";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -51,6 +52,11 @@ const FrequentItem = React.memo(
 
     const { imageRef, triggerFly } = useFlyToCartTrigger(item.image, item.id);
 
+    const prefetchProduct = usePrefetchProduct();
+    const handlePrefetch = useCallback(() => {
+      if (item.productId) prefetchProduct(item.productId);
+    }, [prefetchProduct, item.productId]);
+
     const handleAdd = useCallback(async () => {
       if (disableCart) return;
       // Only animate on a confirmed add: offline the increment refuses and a
@@ -69,6 +75,7 @@ const FrequentItem = React.memo(
             if (!item.productId) return;
             onProductPress?.(item.productId);
           }}
+          onPressIn={handlePrefetch}
           className="flex-row items-center flex-1"
         >
           <View

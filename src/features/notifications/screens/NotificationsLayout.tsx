@@ -8,6 +8,7 @@ import {
   useMarkNotificationRead,
 } from "@/src/hooks/mutations/useNotificationMutations";
 import { useNotifications } from "@/src/hooks/queries/useNotifications";
+import { usePrefetchOrder } from "@/src/hooks/queries/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useToastStore } from "@/src/store/toastStore";
@@ -52,6 +53,7 @@ export const NotificationsLayout: React.FC = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: dismissAll, isPending: isClearingAll } =
     useDismissAllNotifications();
+  const prefetchOrder = usePrefetchOrder();
   const [isEntryLoading, setIsEntryLoading] = useState(true);
 
   useFocusEffect(
@@ -148,6 +150,7 @@ export const NotificationsLayout: React.FC = () => {
       // Orders → track when we have an id, otherwise the orders list
       if (event.startsWith("order.")) {
         if (notification.orderId) {
+          prefetchOrder(notification.orderId);
           router.push({
             pathname: "/profile/orders/track",
             params: { orderId: notification.orderId },
@@ -161,7 +164,7 @@ export const NotificationsLayout: React.FC = () => {
       // Unknown event: the user is already on the notifications screen, so there
       // is nowhere more useful to send them — leave them here (already marked read).
     },
-    [closeOpenRow, markRead, router],
+    [closeOpenRow, markRead, prefetchOrder, router],
   );
 
   const handleClearAll = () => {

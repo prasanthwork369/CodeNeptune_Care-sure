@@ -1,11 +1,11 @@
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { focusManager, QueryClientProvider } from "@tanstack/react-query";
 import * as NavigationBar from "expo-navigation-bar";
 import { Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { AppState, AppStateStatus, Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -206,6 +206,18 @@ export default function RootLayout() {
   useEffect(() => {
     const unsubscribe = initNetworkListener(apiClient);
     return () => unsubscribe();
+  }, []);
+
+  // Bridges RN's AppState to React Query's focusManager, so queries that opt
+  // into refetchOnWindowFocus refresh when the app returns from background.
+  // The global default stays refetchOnWindowFocus: false, so this alone
+  // changes nothing until a query explicitly opts in.
+  useEffect(() => {
+    const onAppStateChange = (status: AppStateStatus) => {
+      focusManager.setFocused(status === "active");
+    };
+    const subscription = AppState.addEventListener("change", onAppStateChange);
+    return () => subscription.remove();
   }, []);
 
   useEffect(() => {

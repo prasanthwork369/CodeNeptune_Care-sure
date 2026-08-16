@@ -245,7 +245,7 @@ export const OrderTrackLayout: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
-  const { order, loading } = useOrderById(orderId);
+  const { order, loading, isPlaceholderData } = useOrderById(orderId);
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [rxModalVisible, setRxModalVisible] = useState(false);
   const [billSheetVisible, setBillSheetVisible] = useState(false);
@@ -282,7 +282,7 @@ export const OrderTrackLayout: React.FC = () => {
   };
 
   const addItemsToCart = async (replace: boolean) => {
-    if (!order?.items?.length) return;
+    if (!order?.items?.length || isPlaceholderData) return;
     setIsProceeding(true);
     try {
       if (replace) await clearCart();
@@ -432,7 +432,7 @@ export const OrderTrackLayout: React.FC = () => {
         }
         showBorder
         rightSlot={
-          isInvoiceAvailable ? (
+          isInvoiceAvailable && !isPlaceholderData ? (
             <Touchable
               className="flex-row items-center"
               style={{ gap: exactScale(4) }}
@@ -571,6 +571,7 @@ export const OrderTrackLayout: React.FC = () => {
           orderId={orderId}
           orderStatus={order?.status}
           priceEstimateRatio={mrpTotal > 0 ? subtotal / mrpTotal : 1}
+          actionsDisabled={isPlaceholderData}
         />
 
         <SectionCard>
@@ -668,12 +669,12 @@ export const OrderTrackLayout: React.FC = () => {
           className="items-center"
           activeOpacity={0.85}
           onPress={handleReOrder}
-          disabled={isProceeding}
+          disabled={isProceeding || isPlaceholderData}
           style={{
             backgroundColor: "#0F7635",
             borderRadius: exactScale(8),
             paddingVertical: exactScale(15),
-            opacity: isProceeding ? 0.75 : 1,
+            opacity: isProceeding || isPlaceholderData ? 0.75 : 1,
           }}
         >
           {isProceeding ? (

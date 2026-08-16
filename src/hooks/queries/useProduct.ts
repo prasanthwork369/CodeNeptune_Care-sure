@@ -1,11 +1,37 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { medicineApi, MedicineVariant } from "../../api/medicine.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { formatPackLabel } from "../../utils/packLabel";
 import { resolveAssetUrl } from "../../utils/urls";
 
 export type { MedicineVariant };
+
+/**
+ * Warms the exact PRODUCT_BY_ID cache entry useProduct() reads below, so a
+ * card's onPressIn can have the fetch already in flight (or done) by the
+ * time the user actually taps through to Product Details. Never throws — a
+ * failed/slow prefetch just means the destination screen falls back to its
+ * own normal fetch-on-mount, same as today.
+ */
+const prefetchProduct = (queryClient: QueryClient, productId: string): void => {
+  if (!productId) return;
+  void queryClient
+    .prefetchQuery({
+      queryKey: QUERY_KEYS.CATALOG.PRODUCT_BY_ID(productId),
+      queryFn: () => medicineApi.getProductById(productId),
+    })
+    .catch(() => {});
+};
+
+/** Stable callback for wiring prefetchProduct into a card's onPressIn. */
+export const usePrefetchProduct = () => {
+  const queryClient = useQueryClient();
+  return useCallback(
+    (productId: string) => prefetchProduct(queryClient, productId),
+    [queryClient],
+  );
+};
 
 export const getPackDivisor = (
   packSize: string | number | null | undefined,

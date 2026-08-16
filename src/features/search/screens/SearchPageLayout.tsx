@@ -7,6 +7,7 @@ import { SearchRecentSection } from "@/src/features/search/sections/SearchRecent
 import { SearchResultsList } from "@/src/features/search/sections/SearchResultsList";
 import { SearchSuggestionsBar } from "@/src/features/search/sections/SearchSuggestionsBar";
 import { RetryState } from "@/src/components/ui/RetryState";
+import { resolveAssetUrl } from "@/src/utils/urls";
 import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import {
   useSearch,
@@ -79,7 +80,9 @@ const toComparisonData = (item: ApiSearchMedicine) => {
       brandName: item.brand?.name ?? "",
       price: searchedMrp,
       status: "Not for Purchase",
-      image: item.thumbnailUrl ? { uri: item.thumbnailUrl } : undefined,
+      image: item.thumbnailUrl
+        ? { uri: resolveAssetUrl(item.thumbnailUrl) }
+        : undefined,
       description: searchedPackLabel,
     },
     recommended: {
@@ -90,7 +93,9 @@ const toComparisonData = (item: ApiSearchMedicine) => {
       savings: savings > 0 ? savings : 0,
       savingsPercent: rec.discountPercentage,
       description: recPackLabel,
-      image: rec.thumbnailUrl ? { uri: rec.thumbnailUrl } : undefined,
+      image: rec.thumbnailUrl
+        ? { uri: resolveAssetUrl(rec.thumbnailUrl) }
+        : undefined,
       packSize: rec.packSize,
       unit: rec.unit,
     },
@@ -150,7 +155,9 @@ const toRecommendData = (item: ApiSearchMedicine) => ({
       ? parseFloat(item.mrp || item.price)
       : null,
   discountPercentage: item.discountPercentage || 0,
-  thumbnailUrl: item.thumbnailUrl,
+  thumbnailUrl: item.thumbnailUrl
+    ? resolveAssetUrl(item.thumbnailUrl)
+    : item.thumbnailUrl,
 });
 
 export const SearchPageLayout = () => {
