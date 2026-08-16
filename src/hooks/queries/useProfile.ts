@@ -7,19 +7,14 @@ import {
 } from "../../api/profile.api";
 import { apiClient } from "../../api/client";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
+import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { API_ENDPOINTS } from "../../utils/urls";
 import { useAuthStore } from "../../store/authStore";
 
 export const useProfile = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-
-  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
-  // React Query only consumes it to seed initialData.
-  const [cachedProfile] = useState(() =>
-    apiCache.getWithMeta<CustomerProfile>("customer_profile"),
-  );
+  const cachedProfile = useCachedSeed<CustomerProfile>("customer_profile");
 
   const {
     data: profile,
@@ -43,29 +38,42 @@ export const useProfile = () => {
   const updateProfile = (payload: UpdateProfilePayload) =>
     updateMutation.mutateAsync(payload);
 
+  // Covers both steps below (file upload + profile URL save), not just the
+  // update mutation — uploadAvatar calls apiClient/profileApi directly, so
+  // updateMutation.isPending alone never reflects the actual upload.
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
   const uploadAvatar = async (uri: string) => {
-    const filename = uri.split("/").pop() ?? "avatar.jpg";
-    const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
-    const type =
-      ext === "png"
-        ? "image/png"
-        : ext === "webp"
-          ? "image/webp"
-          : "image/jpeg";
+    setAvatarUploading(true);
+    try {
+      const filename = uri.split("/").pop() ?? "avatar.jpg";
+      const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
+      const type =
+        ext === "png"
+          ? "image/png"
+          : ext === "webp"
+            ? "image/webp"
+            : "image/jpeg";
 
-    // Step 1 — upload file, get back a URL
-    const form = new FormData();
-    form.append("file", { uri, name: filename, type } as unknown as Blob);
+      // Step 1 — upload file, get back a URL
+      const form = new FormData();
+      form.append("file", { uri, name: filename, type } as unknown as Blob);
 
-    const uploadRes = await apiClient.post(API_ENDPOINTS.STORAGE_UPLOAD, form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    const avatarUrl: string = uploadRes.data?.data?.url ?? uploadRes.data?.url;
-    if (!avatarUrl) throw new Error("Upload failed — no URL returned");
+      const uploadRes = await apiClient.post(
+        API_ENDPOINTS.STORAGE_UPLOAD,
+        form,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      const avatarUrl: string =
+        uploadRes.data?.data?.url ?? uploadRes.data?.url;
+      if (!avatarUrl) throw new Error("Upload failed — no URL returned");
 
-    // Step 2 — save URL to profile
-    await profileApi.updateProfile({ avatarUrl });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.PROFILE });
+      // Step 2 — save URL to profile
+      await profileApi.updateProfile({ avatarUrl });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.PROFILE });
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   const refreshProfile = () =>
@@ -76,7 +84,7 @@ export const useProfile = () => {
     loading: isLoading,
     refreshing: isRefetching,
     updating: updateMutation.isPending,
-    avatarUploading: updateMutation.isPending,
+    avatarUploading,
     error: updateMutation.error?.message ?? null,
     refreshProfile,
     updateProfile,

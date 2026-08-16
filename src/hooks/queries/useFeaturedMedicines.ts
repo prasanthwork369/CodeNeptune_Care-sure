@@ -1,12 +1,12 @@
 import type { ApiFeaturedMedicine } from "@/src/api/medicine.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { medicineApi } from "../../api/medicine.api";
 import type { Product } from "../../types/home";
 import { formatPackLabel } from "../../utils/packLabel";
 import { resolveAssetUrl } from "../../utils/urls";
-import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
+import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 // Shared by the home row and the full listing so both show identical pricing.
 export const mapFeaturedMedicine = (med: ApiFeaturedMedicine): Product => {
@@ -68,11 +68,7 @@ export const mapFeaturedMedicine = (med: ApiFeaturedMedicine): Product => {
 };
 
 export const useFeaturedMedicines = () => {
-  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
-  // React Query only consumes it to seed initialData.
-  const [cachedMed] = useState(() =>
-    apiCache.getWithMeta<ApiFeaturedMedicine[]>("featured_medicines"),
-  );
+  const cachedMed = useCachedSeed<ApiFeaturedMedicine[]>("featured_medicines");
 
   const {
     data: medicines = [],

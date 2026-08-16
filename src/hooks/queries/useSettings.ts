@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import type { MobileAppLinks, UploadConfig } from "../../api/settings.api";
 import { WEB_BASE_URL } from "../../utils/urls";
-import { apiCache, withSqliteCache } from "../../lib/sqlite/cache";
+import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";
 import { settingsService } from "../../services/settings.service";
 import {
   MAX_FILES,
@@ -84,11 +83,7 @@ export function useUploadConfig() {
   // survive being offline. Without this the hardcoded fallbacks below would
   // show on every cold start until the request landed, briefly telling the
   // user a limit the admin never set.
-  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
-  // React Query only consumes it to seed initialData.
-  const [cached] = useState(() =>
-    apiCache.getWithMeta<UploadConfig>("upload_config"),
-  );
+  const cached = useCachedSeed<UploadConfig>("upload_config");
 
   const query = useQuery({
     queryKey: ["upload-config"],

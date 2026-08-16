@@ -1,7 +1,7 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
+import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { categoryApi, type ApiCategoryFamily } from "../../api/category.api";
 import { resolveAssetUrl } from "../../utils/urls";
 import type { CategoryProduct } from "../../types/category";
@@ -18,10 +18,8 @@ const CARD_BG_COLORS = [
 ];
 
 export const useCategories = () => {
-  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
-  // React Query only consumes it to seed initialData.
-  const [cachedFamilies] = useState(() =>
-    apiCache.getWithMeta<ApiCategoryFamily[]>("category_family_map"),
+  const cachedFamilies = useCachedSeed<ApiCategoryFamily[]>(
+    "category_family_map",
   );
 
   const {

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { db } from "./db";
 
 export const apiCache = {
@@ -80,3 +81,16 @@ export const withSqliteCache = <T>(key: string, fetcher: () => Promise<T>) => {
     }
   };
 };
+
+/**
+ * Seeds a query's `initialData`/`initialDataUpdatedAt` from SQLite. Read once
+ * per mount — this is a blocking getFirstSync + JSON.parse, and React Query
+ * only consumes it to seed initialData, so it must not re-run on every render.
+ *
+ * Usage: `const cached = useCachedSeed<T>(key); initialData: () => cached?.data,
+ * initialDataUpdatedAt: () => cached?.updatedAt ?? 0`
+ */
+export function useCachedSeed<T>(key: string) {
+  const [cached] = useState(() => apiCache.getWithMeta<T>(key));
+  return cached;
+}

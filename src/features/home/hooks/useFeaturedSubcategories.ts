@@ -4,14 +4,11 @@ import {
 } from "@/src/api/category.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { apiCache, withSqliteCache } from "@/src/lib/sqlite/cache";
+import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 export const useFeaturedSubcategories = () => {
-  // Read once per mount — this is a blocking getFirstSync + JSON.parse, and
-  // React Query only consumes it to seed initialData.
-  const [cachedSub] = useState(() =>
-    apiCache.getWithMeta<ApiFeaturedSubcategory[]>("featured_subcategories"),
+  const cachedSub = useCachedSeed<ApiFeaturedSubcategory[]>(
+    "featured_subcategories",
   );
 
   const { data, isLoading, error, refetch } = useQuery({
