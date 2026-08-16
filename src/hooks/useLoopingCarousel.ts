@@ -112,7 +112,9 @@ export function useLoopingCarousel({
         scrollViewRef.current?.scrollTo({ x: slideWidth, animated: false });
       });
       currentScrollX.current = slideWidth;
-      setActivePageIndex(1);
+      // Deferred a tick (not left synchronous-in-effect) — still lands
+      // before the next paint, same as before.
+      queueMicrotask(() => setActivePageIndex(1));
     }
   }, [isLooping, isOpen, slideWidth]);
 
@@ -120,7 +122,9 @@ export function useLoopingCarousel({
   // may change again -- re-measure before trusting it.
   useEffect(() => {
     measuredSlides.current.clear();
-    setAllMeasured(false);
+    // Deferred a tick (not left synchronous-in-effect) — still lands
+    // before the next paint, same as before.
+    queueMicrotask(() => setAllMeasured(false));
   }, [slideCount]);
 
   // Reveal the card only after every slide is measured, one frame later so

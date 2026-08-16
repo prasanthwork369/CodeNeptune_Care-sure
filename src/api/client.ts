@@ -6,9 +6,35 @@ import {
   markUnreachable,
 } from "@/src/utils/offline/reachability";
 import { logger } from "@/src/utils/logger";
+import { requestQueue } from "@/src/utils/requestQueue";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { asError, toAppError } from "./errors";
+
+// Safe, idempotent writes only — never orders/payments/prescriptions/auth/
+// address/patient/coupon/cart mutations. See docs/offline-handling-audit.md.
+// Queued instead of rejected when offline, replayed automatically on reconnect.
+const isQueueableRequest = (config: AxiosRequestConfig): boolean => {
+  const method = (config.method ?? "").toLowerCase();
+  const url = config.url ?? "";
+
+  if (method === "patch") {
+    return (
+      url.startsWith("/api/v1/customers/notifications/") &&
+      (url.endsWith("/read") || url.endsWith("/dismiss"))
+    );
+  }
+  if (method === "post") {
+    return url === API_ENDPOINTS.SEARCH_HISTORY;
+  }
+  if (method === "delete") {
+    return (
+      url === API_ENDPOINTS.SEARCH_HISTORY ||
+      url.startsWith(`${API_ENDPOINTS.SEARCH_HISTORY}/`)
+    );
+  }
+  return false;
+};
 
 // In-memory token — mirrors window.__ACCESS_TOKEN__ from web client
 // Synchronous access avoids async race conditions in the request interceptor
@@ -67,6 +93,18 @@ apiClient.interceptors.request.use((config) => {
   // backstop — a call site that forgets requireInternet still can't fail
   // silently. Repeats collapse, so this never doubles a screen's own message.
   if (isOffline()) {
+    if (isQueueableRequest(config)) {
+      // A handful of safe, idempotent writes are queued instead of rejected —
+      // the response interceptor below hands this off to requestQueue and
+      // replays it on reconnect. No banner: this is a quiet success path, not
+      // a blocked action.
+      return Promise.reject(
+        Object.assign(new Error("Network offline — queued for replay"), {
+          code: "NETWORK_OFFLINE_QUEUEABLE",
+          config,
+        }),
+      );
+    }
     reportOffline();
     return Promise.reject(
       Object.assign(new Error("Network offline"), {
@@ -88,6 +126,15 @@ apiClient.interceptors.response.use(
     return res;
   },
   async (err) => {
+    // Hand safe, queueable writes to requestQueue instead of failing them —
+    // this resolves/rejects once the request actually replays on reconnect,
+    // exactly like the 401-retry branch below returns a deferred apiClient(...).
+    if (err.code === "NETWORK_OFFLINE_QUEUEABLE" && err.config) {
+      return new Promise<AxiosResponse>((resolve, reject) => {
+        requestQueue.add(err.config, resolve, reject);
+      });
+    }
+
     // A request that left before the drop was noticed still reads as offline.
     const isNetworkError =
       !err.response &&

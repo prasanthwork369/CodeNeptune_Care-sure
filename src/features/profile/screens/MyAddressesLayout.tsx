@@ -7,7 +7,7 @@ import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { AddressType } from "@/src/types/address";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
 import { AddressSkeleton } from "../components/AddressSkeleton";
@@ -135,14 +135,23 @@ const AddressCard = ({
 export const MyAddressesLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
-  const { addresses, loading, error, deleteAddress } = useAddress();
+  const { addresses, loading, error, deleting, deleteAddress } = useAddress();
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const shouldShowInitialShimmer = loading && addresses.length === 0;
+  // Ref, not state, so a rapid double-tap on the confirm dialog's button
+  // (before React re-renders to hide it) can't fire a second delete.
+  const deletingRef = useRef(false);
 
   const handleDeleteConfirm = async () => {
-    if (!confirmId) return;
+    if (!confirmId || deletingRef.current) return;
+    deletingRef.current = true;
+    const id = confirmId;
     setConfirmId(null);
-    await deleteAddress(confirmId);
+    try {
+      await deleteAddress(id);
+    } finally {
+      deletingRef.current = false;
+    }
   };
 
   return (
@@ -204,7 +213,7 @@ export const MyAddressesLayout: React.FC = () => {
                   })
                 }
                 onDelete={(id) => setConfirmId(id)}
-                deleting={null}
+                deleting={deleting}
               />
             ))}
             {addresses.length === 0 && (

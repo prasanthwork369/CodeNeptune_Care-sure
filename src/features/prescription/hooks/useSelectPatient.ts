@@ -5,8 +5,8 @@ import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
 import { HealthProblem } from "@/src/api/health-problem.api";
 import { sanitize, stripIndianCode, validate } from "@/src/utils/validation";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function useSelectPatient() {
@@ -120,11 +120,24 @@ export function useSelectPatient() {
     if (selectedPatientId === id) setSelectedPatientId(null);
   };
 
+  // Ref, not state, so a rapid double-tap on Continue (before React re-renders)
+  // can't push the payment screen twice. Re-armed on focus so coming back to
+  // this screen (e.g. Back from payment) doesn't leave Continue permanently
+  // disabled.
+  const isProceedingRef = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      isProceedingRef.current = false;
+    }, []),
+  );
+
   const handleProceed = () => {
+    if (isProceedingRef.current) return;
     if (!selectedPatient) {
       setIsAddPatientSheetVisible(true);
       return;
     }
+    isProceedingRef.current = true;
     const draft = useCheckoutDraftStore.getState();
     draft.setPatient(selectedPatient.id, selectedPatient.phone ?? "");
     draft.setSymptoms(symptoms);

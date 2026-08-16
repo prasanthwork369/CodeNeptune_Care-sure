@@ -23,16 +23,23 @@ export function useScrollJankTrace(traceName: PerfTraceName) {
   const jankyFramesRef = useRef(0);
   const startedRef = useRef(false);
   const sampledRef = useRef(false);
+  // Latest-ref indirection: the recursive requestAnimationFrame call goes
+  // through this ref instead of naming the tick function itself, since
+  // referencing a useCallback-memoized function from within its own body
+  // gets flagged as "accessed before it is declared".
+  const tickRef = useRef<() => void>(() => {});
 
   // Runs once per animation frame; a delayed callback means the JS thread was
   // busy, so the gap since the last frame reveals jank.
-  const tick = useCallback(() => {
-    const now = Date.now();
-    const delta = now - lastFrameRef.current;
-    lastFrameRef.current = now;
-    totalFramesRef.current += 1;
-    if (delta > JANK_FRAME_MS) jankyFramesRef.current += 1;
-    rafRef.current = requestAnimationFrame(tick);
+  useEffect(() => {
+    tickRef.current = () => {
+      const now = Date.now();
+      const delta = now - lastFrameRef.current;
+      lastFrameRef.current = now;
+      totalFramesRef.current += 1;
+      if (delta > JANK_FRAME_MS) jankyFramesRef.current += 1;
+      rafRef.current = requestAnimationFrame(() => tickRef.current());
+    };
   }, []);
 
   const start = useCallback(() => {
@@ -45,8 +52,8 @@ export function useScrollJankTrace(traceName: PerfTraceName) {
     jankyFramesRef.current = 0;
     lastFrameRef.current = Date.now();
     perfService.startTrace(traceName);
-    rafRef.current = requestAnimationFrame(tick);
-  }, [traceName, tick]);
+    rafRef.current = requestAnimationFrame(() => tickRef.current());
+  }, [traceName]);
 
   const stop = useCallback(() => {
     if (!startedRef.current) return;

@@ -33,6 +33,29 @@ class RequestQueue {
     resolve: QueuedRequest["resolve"],
     reject: QueuedRequest["reject"],
   ): Promise<void> {
+    // Same method + URL + body already queued (e.g. a duplicate offline tap
+    // on the same notification) — fold this caller into that entry instead
+    // of queueing a second identical write.
+    const duplicate = this.queue.find(
+      (r) =>
+        r.config.method === config.method &&
+        r.config.url === config.url &&
+        JSON.stringify(r.config.data) === JSON.stringify(config.data),
+    );
+    if (duplicate) {
+      const prevResolve = duplicate.resolve;
+      const prevReject = duplicate.reject;
+      duplicate.resolve = (value) => {
+        prevResolve(value);
+        resolve(value);
+      };
+      duplicate.reject = (reason) => {
+        prevReject(reason);
+        reject(reason);
+      };
+      return;
+    }
+
     if (this.queue.length >= MAX_SIZE) {
       reject(new Error("Offline queue full — request dropped"));
       return;
