@@ -12,6 +12,7 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { analyticsService } from "@/src/services/firebase";
+import { buildCartSnapshot } from "@/src/utils/cartSnapshot";
 import { CartLine } from "@/src/features/cart/types";
 import { Product } from "@/src/types/home";
 import { useFocusEffect } from "expo-router";
@@ -311,6 +312,7 @@ export function useCartCalculations() {
         corporateCreditsUsed: corporateCreditsOn,
         couponCode: appliedCoupon?.code ?? "",
       },
+      buildCartSnapshot(cartItems),
     );
     // All-OTC carts have nothing to collect, so they skip to payment.
     const hasRxItem = lines.some((l) => l.rx);

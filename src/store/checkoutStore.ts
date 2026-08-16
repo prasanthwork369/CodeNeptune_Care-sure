@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { CartSnapshotLine } from "@/src/utils/cartSnapshot";
 
 export interface BillBreakdown {
   subtotal: number;
@@ -15,6 +16,10 @@ export interface BillBreakdown {
 
 interface CheckoutState {
   bill: BillBreakdown | null;
+  // The cart lines `bill` was actually calculated from, frozen at the same
+  // moment — lets final submit refuse a stale bill if the live cart drifts
+  // from what was priced, instead of trusting it blindly (see cartSnapshot.ts).
+  cartSnapshot: CartSnapshotLine[];
   walletUsed: boolean;
   coinsUsed: boolean;
   corporateCreditsUsed: boolean;
@@ -27,19 +32,22 @@ interface CheckoutState {
       corporateCreditsUsed: boolean;
       couponCode: string;
     },
+    cartSnapshot: CartSnapshotLine[],
   ) => void;
   clear: () => void;
 }
 
 export const useCheckoutStore = create<CheckoutState>((set) => ({
   bill: null,
+  cartSnapshot: [],
   walletUsed: false,
   coinsUsed: false,
   corporateCreditsUsed: false,
   couponCode: "",
-  setBill: (bill, meta) =>
+  setBill: (bill, meta, cartSnapshot) =>
     set({
       bill,
+      cartSnapshot,
       walletUsed: meta.walletUsed,
       coinsUsed: meta.coinsUsed,
       corporateCreditsUsed: meta.corporateCreditsUsed,
@@ -48,6 +56,7 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
   clear: () =>
     set({
       bill: null,
+      cartSnapshot: [],
       walletUsed: false,
       coinsUsed: false,
       corporateCreditsUsed: false,

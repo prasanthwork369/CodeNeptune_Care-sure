@@ -18,6 +18,7 @@ import { requireInternet } from "@/src/utils/offline";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
+import { cartMatchesSnapshot } from "@/src/utils/cartSnapshot";
 import {
   buildCartOrderItems,
   buildOrderPayload,
@@ -89,6 +90,7 @@ export function usePaymentCalculations() {
 
   // Field selectors, or any checkout write re-runs the whole calculation.
   const bill = useCheckoutStore((s) => s.bill);
+  const cartSnapshot = useCheckoutStore((s) => s.cartSnapshot);
   const walletUsed = useCheckoutStore((s) => s.walletUsed);
   const coinsUsed = useCheckoutStore((s) => s.coinsUsed);
   const corporateCreditsUsed = useCheckoutStore((s) => s.corporateCreditsUsed);
@@ -153,6 +155,21 @@ export function usePaymentCalculations() {
       Alert.alert(
         "Order Total Unavailable",
         "We couldn't confirm your bill. Please go back to your cart and try again.",
+      );
+      return;
+    }
+
+    // The bill was frozen from the cart at "Proceed" time; the items actually
+    // submitted below are read live from the cart query, which can refetch
+    // and change mid-checkout (price update, quantity change elsewhere).
+    // Never submit a stale total against a cart that no longer matches it —
+    // the backend may or may not re-verify this, and that isn't assumed here.
+    // The doctor-prescribed comparison flow freezes its own items alongside
+    // its bill (prescriptionOrderItems), so it can't drift and is exempt.
+    if (!isPrescriptionFlow && !cartMatchesSnapshot(cartItems, cartSnapshot)) {
+      Alert.alert(
+        "Cart Changed",
+        "Your cart or pricing has changed since you started checkout. Please review your updated cart and try again.",
       );
       return;
     }

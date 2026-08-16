@@ -252,6 +252,9 @@ export const MedicineComparisonLayout: React.FC<
         corporateCreditsUsed: corporateCreditsOn,
         couponCode: appliedCoupon?.code ?? "",
       },
+      // This flow freezes its own items via setPrescriptionOrderItems above,
+      // not the live cart — no cart snapshot to compare at submit time.
+      [],
     );
     router.push({
       pathname: "/(prescription)/select-patient",

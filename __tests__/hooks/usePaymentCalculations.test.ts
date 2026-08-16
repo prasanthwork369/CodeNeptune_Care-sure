@@ -6,6 +6,7 @@ import { prescriptionService } from "@/src/services/prescription.service";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
+import { buildCartSnapshot } from "@/src/utils/cartSnapshot";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
@@ -94,6 +95,8 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
 
     // Both real flows compute a bill before reaching this screen; without one the hook
     // now refuses to place the order rather than trusting the route param.
+    // The cart snapshot must match the mocked useCart() items above exactly,
+    // or the new stale-cart guard refuses to place the order too.
     useCheckoutStore.getState().setBill(
       {
         subtotal: 200,
@@ -113,6 +116,15 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
         corporateCreditsUsed: false,
         couponCode: "",
       },
+      buildCartSnapshot([
+        {
+          medicineId: "med-1",
+          quantity: 2,
+          unitPrice: "100",
+          medicineName: "Paracetamol",
+          medicineSlug: "paracetamol",
+        } as never,
+      ]),
     );
   });
 
