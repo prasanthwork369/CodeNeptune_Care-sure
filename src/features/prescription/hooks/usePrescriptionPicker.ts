@@ -2,7 +2,10 @@ import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { PrescriptionItem } from "@/src/features/prescription/types";
-import { validatePrescriptionFile } from "../utils/prescription";
+import {
+  dedupeAgainstDraft,
+  validatePrescriptionFile,
+} from "../utils/prescription";
 import {
   usePrescriptionUploadService,
   CapturedAsset,
@@ -30,33 +33,8 @@ export function usePrescriptionPicker(
 
   const navigate = (files: PrescriptionItem[]) => {
     const currentItems = usePrescriptionDraftStore.getState().items;
-    const existingKeys = new Set(
-      currentItems.map((it) => `${it.name}-${it.size}-${it.type}`),
-    );
-    const seenKeys = new Set(existingKeys);
-    const uniqueInSelection: PrescriptionItem[] = [];
-    const skippedCount = { internal: 0, existing: 0 };
-    let firstDuplicate: PrescriptionItem | null = null;
-
-    for (const f of files) {
-      const key = `${f.name}-${f.size}-${f.type}`;
-      if (seenKeys.has(key)) {
-        if (existingKeys.has(key)) skippedCount.existing++;
-        else skippedCount.internal++;
-        if (!firstDuplicate) firstDuplicate = f;
-      } else {
-        uniqueInSelection.push(f);
-        seenKeys.add(key);
-      }
-    }
-
-    // Trim to the free slots rather than dropping the batch: picking 11 must
-    // still load 10, not nothing.
-    const remainingSlots = Math.max(maxFiles - currentItems.length, 0);
-    const overLimit = uniqueInSelection.length > remainingSlots;
-    const accepted = overLimit
-      ? uniqueInSelection.slice(0, remainingSlots)
-      : uniqueInSelection;
+    const { accepted, overLimit, hadDuplicates, firstDuplicate } =
+      dedupeAgainstDraft(files, currentItems, maxFiles);
 
     // Deferred until the duplicate notice (modal/info dialog) is dismissed,
     // so the preview screen never appears underneath it before the user
@@ -86,7 +64,7 @@ export function usePrescriptionPicker(
       return;
     }
 
-    if (skippedCount.existing > 0 || skippedCount.internal > 0) {
+    if (hadDuplicates) {
       if (onDuplicate && firstDuplicate) {
         onDuplicate(firstDuplicate.name, firstDuplicate.size, goToPreview);
       } else {

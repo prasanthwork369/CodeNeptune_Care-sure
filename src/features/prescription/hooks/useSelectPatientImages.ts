@@ -1,4 +1,4 @@
-import type { CapturedAsset } from "../scanner";
+import { ScannerService, type CapturedAsset } from "../scanner";
 import { asError } from "@/src/api/errors";
 import {
   deriveKeyFromUrl,
@@ -7,11 +7,7 @@ import {
 } from "@/src/api/storage.api";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { PrescriptionItem } from "../types";
-import {
-  validatePrescriptionFile,
-  capturePrescriptionImages,
-  deleteTempCopy,
-} from "../utils/prescription";
+import { validatePrescriptionFile, deleteTempCopy } from "../utils/prescription";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -157,7 +153,7 @@ export function useSelectPatientImages(
           );
         return;
       }
-      const scannedUris = await capturePrescriptionImages();
+      const { imageUris: scannedUris } = await ScannerService.scan();
       if (scannedUris.length > 0) {
         // One asset per scanned page, so multi-page scans are all kept.
         const assets = scannedUris.map((uri, index) => {

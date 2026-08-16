@@ -88,7 +88,6 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     });
     useNotificationStore.setState({
       notifications: [{ id: "n1" } as any],
-      unreadCount: 1,
     });
     useLocationStore.setState({ location: { label: "Home" } as any });
     useCheckoutStore.setState({

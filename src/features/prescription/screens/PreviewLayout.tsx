@@ -36,7 +36,6 @@ import {
   DuplicateFileModal,
   FileTooLargeModal,
   InfoModal,
-  PendingPrescriptionModal,
   PreviewDisplay,
   PreviewSuccessModal,
   PreviewThumbnails,
@@ -111,7 +110,6 @@ export const PreviewLayout: React.FC = () => {
   const [showConfirmed, setShowConfirmed] = useState(false);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
-  const [showPendingModal, setShowPendingModal] = useState(false);
   const [duplicateFileName, setDuplicateFileName] = useState("");
   const [duplicateFileSize, setDuplicateFileSize] = useState<
     number | undefined
@@ -449,18 +447,6 @@ export const PreviewLayout: React.FC = () => {
         onChooseAnother={() => {
           setTooLargeSizeMB(null);
           setShowAddSheet(true);
-        }}
-      />
-
-      <PendingPrescriptionModal
-        visible={showPendingModal}
-        onViewPrescriptions={() => {
-          setShowPendingModal(false);
-          router.push("/prescription-history");
-        }}
-        onClose={() => {
-          setShowPendingModal(false);
-          router.back();
         }}
       />
 

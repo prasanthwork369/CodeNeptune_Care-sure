@@ -232,45 +232,49 @@ export function deleteTempCopy(item: PrescriptionItem): void {
   }
 }
 
-/** Returns every scanned page — the scanner's "+" button can capture several. */
-export async function capturePrescriptionImages(): Promise<string[]> {
-  // Optional native module — absent from some binaries, so it stays lazy-required.
-  let DocumentScanner: {
-    scanDocument: () => Promise<{ scannedImages?: string[] }>;
-  } | null = null;
-  try {
-    DocumentScanner = require("react-native-document-scanner-plugin").default;
-  } catch {
-    // Ignore load/initialization error (e.g. if the native module is missing from the binary)
-  }
+/**
+ * Dedupes a freshly-picked/scanned batch against both itself and the current
+ * draft, using the same `name_size_type` key `usePrescriptionDraftStore` and
+ * `usePrescriptionUploader` already use — so the notice this drives always
+ * agrees with what the store will actually keep. Also trims to whatever
+ * remaining slots `maxFiles` leaves, same as before: picking 11 when 10 are
+ * free still loads 10, not nothing.
+ */
+export function dedupeAgainstDraft(
+  files: PrescriptionItem[],
+  currentItems: PrescriptionItem[],
+  maxFiles: number,
+): {
+  accepted: PrescriptionItem[];
+  overLimit: boolean;
+  hadDuplicates: boolean;
+  firstDuplicate: PrescriptionItem | null;
+} {
+  const keyOf = (it: { name: string; size?: number | null; type: string }) =>
+    `${it.name}_${it.size ?? 0}_${it.type}`;
 
-  if (DocumentScanner) {
-    try {
-      const result = await DocumentScanner.scanDocument();
-      if (result && result.scannedImages && result.scannedImages.length > 0) {
-        return [...result.scannedImages];
-      }
-      // If the user cancelled, return empty without showing the camera fallback
-      if (result) {
-        return [];
-      }
-    } catch (e) {
-      if (__DEV__) {
-        console.warn(
-          "[DocumentScanner] scanDocument failed, falling back to ImagePicker:",
-          e,
-        );
-      }
+  const existingKeys = new Set(currentItems.map(keyOf));
+  const seenKeys = new Set(existingKeys);
+  const uniqueInSelection: PrescriptionItem[] = [];
+  let hadDuplicates = false;
+  let firstDuplicate: PrescriptionItem | null = null;
+
+  for (const f of files) {
+    const key = keyOf(f);
+    if (seenKeys.has(key)) {
+      hadDuplicates = true;
+      if (!firstDuplicate) firstDuplicate = f;
+    } else {
+      uniqueInSelection.push(f);
+      seenKeys.add(key);
     }
   }
 
-  // Fallback to standard camera if scanner plugin is unavailable or fails
-  const result = await ImagePicker.launchCameraAsync({
-    quality: 0.9,
-    cameraType: ImagePicker.CameraType.back,
-  });
-  if (!result.canceled && result.assets && result.assets.length > 0) {
-    return [result.assets[0].uri];
-  }
-  return [];
+  const remainingSlots = Math.max(maxFiles - currentItems.length, 0);
+  const overLimit = uniqueInSelection.length > remainingSlots;
+  const accepted = overLimit
+    ? uniqueInSelection.slice(0, remainingSlots)
+    : uniqueInSelection;
+
+  return { accepted, overLimit, hadDuplicates, firstDuplicate };
 }
