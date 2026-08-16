@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable } from "react-native";
+import { colors } from "@/src/constants/theme";
 
 interface CustomSwitchProps {
   value: boolean;
@@ -52,7 +53,7 @@ export const CustomSwitch: React.FC<CustomSwitchProps> = ({
         width: TRACK_WIDTH,
         height: 24,
         borderRadius: 12,
-        backgroundColor: value ? "#0F7635" : "#D1D5DB",
+        backgroundColor: value ? colors.primary : "#D1D5DB",
         borderWidth: TRACK_BORDER,
         borderColor: "#919EAB33",
         padding: TRACK_PADDING,

@@ -1,4 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { colors } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
@@ -45,7 +46,7 @@ export const NotFoundLayout: React.FC = () => {
           onPress={() => router.replace("/")}
           activeOpacity={0.88}
           style={{
-            backgroundColor: "#0F7635",
+            backgroundColor: colors.primary,
             borderRadius: exactScale(12),
             paddingVertical: exactScale(14),
             paddingHorizontal: exactScale(32),

@@ -1,6 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { colors } from "@/src/constants/theme";
 import type { AppGateReason } from "@/src/hooks/ui/useAppGate";
 import { openAppStore } from "@/src/utils/appVersion";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     paddingVertical: exactScale(10),
     paddingHorizontal: exactScale(16),
     borderRadius: exactScale(48),
-    backgroundColor: "#0F7635",
+    backgroundColor: colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

@@ -4,6 +4,7 @@ import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { colors } from "@/src/constants/theme";
 import { typography } from "@/src/constants/typography";
 import { usePincode } from "@/src/hooks/mutations/usePincode";
 import { useAddress } from "@/src/hooks/queries/useAddress";
@@ -48,7 +49,7 @@ const labelToIcon = (label: string) => {
       <icons.home_add
         width={exactScale(16)}
         height={exactScale(16)}
-        fill="#0F7635"
+        fill={colors.primary}
       />
     );
   if (l === "WORK" || l === "OFFICE")
@@ -56,14 +57,14 @@ const labelToIcon = (label: string) => {
       <icons.business
         width={exactScale(16)}
         height={exactScale(16)}
-        fill="#0F7635"
+        fill={colors.primary}
       />
     );
   return (
     <icons.location_pin
       width={exactScale(16)}
       height={exactScale(16)}
-      fill="#0F7635"
+      fill={colors.primary}
     />
   );
 };
@@ -386,7 +387,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
               className="flex-row items-center bg-white"
             >
               {isSearching || isResolving ? (
-                <ActivityIndicator size="small" color="#0F7635" />
+                <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <icons.search_grey
                   width={exactScale(18)}
@@ -559,7 +560,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           {showPredictions ? (
             isSearching && predictions.length === 0 ? (
               <ActivityIndicator
-                color="#0F7635"
+                color={colors.primary}
                 style={{ marginVertical: exactScale(24) }}
               />
             ) : (
@@ -628,7 +629,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           ) : /* Saved addresses */
           addressesLoading ? (
             <ActivityIndicator
-              color="#0F7635"
+              color={colors.primary}
               style={{ marginVertical: exactScale(24) }}
             />
           ) : addresses.length === 0 ? (
@@ -660,7 +661,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
                   onPress={() => handleSelectAddress(addr)}
                   style={{
                     borderWidth: 1,
-                    borderColor: isSelected ? "#0F7635" : "#919EAB33",
+                    borderColor: isSelected ? colors.primary : "#919EAB33",
                     backgroundColor: isSelected ? "#F2FFF7" : "#FFFFFF",
                     position: "relative",
                     borderRadius: exactScale(8),
@@ -679,7 +680,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
                       <icons.check_circle
                         width={exactScale(20)}
                         height={exactScale(20)}
-                        fill="#0F7635"
+                        fill={colors.primary}
                       />
                     </View>
                   )}

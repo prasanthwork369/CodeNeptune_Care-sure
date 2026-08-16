@@ -1,3 +1,4 @@
+import { colors } from "@/src/constants/theme";
 import { moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import {
@@ -16,7 +17,7 @@ type FormFieldVariant = "outline" | "boxed";
 // and on older Android (e.g. Android 10) selectionColor also tints the cursor
 // drawable, overriding cursorColor. The caret must stay opaque; the selection
 // highlight being solid green is acceptable.
-const SELECTION_COLOR = "#0F7635";
+const SELECTION_COLOR = colors.primary;
 
 // Android tints the drag handle with selectionColor unless this is given, so the
 // dark green read as a heavy blob. A lighter brand green keeps it legible.
@@ -111,7 +112,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
               keyboardType={keyboardType}
               // Explicit caret/selection colors — some OEM keyboards/themes
               // render the default caret invisible against the white field.
-              cursorColor="#0F7635"
+              cursorColor={colors.primary}
               selectionColor={SELECTION_COLOR}
               caretHidden={false}
               // Vertical padding (not a fixed height) sizes the field so the
@@ -176,7 +177,7 @@ export const FormField = React.forwardRef<TextInput, FormFieldProps>(
           submitBehavior={returnKeyType === "done" ? "blurAndSubmit" : "submit"}
           // Explicit caret/selection colors so the cursor is visible on all
           // devices (some OEM themes render the default caret invisible).
-          cursorColor="#0F7635"
+          cursorColor={colors.primary}
           selectionColor={SELECTION_COLOR}
           selectionHandleColor={SELECTION_HANDLE_COLOR}
           autoCorrect={false}

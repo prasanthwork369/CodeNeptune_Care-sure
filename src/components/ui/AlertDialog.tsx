@@ -1,5 +1,6 @@
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { colors } from "@/src/constants/theme";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useRef } from "react";
 import { Image, Modal, Text, View } from "react-native";
@@ -154,7 +155,7 @@ export function AlertDialog({
                     alignItems: "center",
                     justifyContent: "center",
                   },
-                  btn.variant === "green" && { backgroundColor: "#0F7635" },
+                  btn.variant === "green" && { backgroundColor: colors.primary },
                   btn.variant === "red" && { backgroundColor: "#EF4444" },
                   btn.variant === "outline" && {
                     backgroundColor: "#fff",

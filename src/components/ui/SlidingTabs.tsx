@@ -1,4 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { colors } from "@/src/constants/theme";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleProp, Text, TextStyle, View } from "react-native";
@@ -31,7 +32,7 @@ interface SlidingTabsProps<T extends string> {
   progress?: SharedValue<number>;
 }
 
-const ACTIVE_COLOR = "#0F7635";
+const ACTIVE_COLOR = colors.primary;
 const INACTIVE_COLOR = "#6A6A6A";
 const INDICATOR_HEIGHT = 4;
 

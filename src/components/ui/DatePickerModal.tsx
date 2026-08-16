@@ -3,6 +3,7 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
+import { colors } from "@/src/constants/theme";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
@@ -77,7 +78,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
             maximumDate={maximumDate}
             themeVariant="light"
             textColor="#111827"
-            accentColor="#0F7635"
+            accentColor={colors.primary}
             style={{ backgroundColor: "#FFFFFF" }}
             onChange={(_, selected) => {
               if (selected) {
@@ -225,6 +226,6 @@ const s = StyleSheet.create({
   doneText: {
     fontSize: moderateScale(15),
     fontWeight: "600",
-    color: "#0F7635",
+    color: colors.primary,
   },
 });

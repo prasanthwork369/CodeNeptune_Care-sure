@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet, Image } from "react-native";
+import { colors } from "@/src/constants/theme";
 import Animated, {
   SharedValue,
   useSharedValue,
@@ -71,7 +72,7 @@ const FloatingItem: React.FC<FloatingItemProps> = ({
       borderRadius: IMAGE_SIZE / 2,
       backgroundColor: "#FFFFFF",
       borderWidth: 1.5,
-      borderColor: "#0F7635",
+      borderColor: colors.primary,
       opacity,
       transform: [{ scale }],
     };

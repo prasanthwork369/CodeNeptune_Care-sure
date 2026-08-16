@@ -13,26 +13,22 @@ import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
 import { FlashList } from "@shopify/flash-list";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Text, View } from "react-native";
 import { orderStyles as s } from "../orders.styles";
 
-export const RxOrdersLayout: React.FC = () => {
-  const { prescriptions, loading, refreshing, refetch } = usePrescriptions({
-    category: 2,
+function formatDate(iso: string) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
   });
+}
 
-  const formatDate = (iso: string) => {
-    if (!iso) return "";
-    const d = new Date(iso);
-    return d.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const mapItem = (item: ApiPrescription): Prescription => ({
+function mapItem(item: ApiPrescription): Prescription {
+  return {
     id: item.id,
     rxId: item.prescriptionOrderId ?? `#${item.id}`,
     prescriptionOrderId: item.prescriptionOrderId ?? null,
@@ -52,7 +48,31 @@ export const RxOrdersLayout: React.FC = () => {
     // Keep undefined as-is: undefined = "list didn't include it, fetch it";
     // null = "known: no reminder set". The hook treats them differently.
     reminder: item.reminder,
+  };
+}
+
+export const RxOrdersLayout: React.FC = () => {
+  const { prescriptions, loading, refreshing, refetch } = usePrescriptions({
+    category: 2,
   });
+
+  const data = useMemo(() => prescriptions.map(mapItem), [prescriptions]);
+
+  const keyExtractor = useCallback((item: Prescription) => item.id, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Prescription }) => (
+      <PrescriptionCard
+        item={item}
+        // Downloads fetch over the network, so gate before starting one.
+        onDownloadPress={(url, fileName) => {
+          if (!requireInternet()) return;
+          downloadFile(url, fileName);
+        }}
+      />
+    ),
+    [],
+  );
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -61,18 +81,9 @@ export const RxOrdersLayout: React.FC = () => {
         <RxOrdersSkeleton />
       ) : (
         <FlashList
-          data={prescriptions.map(mapItem)}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <PrescriptionCard
-              item={item}
-              // Downloads fetch over the network, so gate before starting one.
-              onDownloadPress={(url, fileName) => {
-                if (!requireInternet()) return;
-                downloadFile(url, fileName);
-              }}
-            />
-          )}
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
           contentContainerStyle={{
             padding: 16,
             paddingBottom: 40,

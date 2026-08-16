@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import React from "react";
 import { View } from "react-native";
+import { colors } from "@/src/constants/theme";
 import Animated from "react-native-reanimated";
 import { SmokePuff } from "./SmokePuff";
 import type { FlyImage } from "./FlyToCartContext";
@@ -89,7 +90,7 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: "#0F7635",
+              backgroundColor: colors.primary,
               top: 0,
               left: 0,
             },

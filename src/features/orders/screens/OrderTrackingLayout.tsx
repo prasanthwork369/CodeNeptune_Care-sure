@@ -15,7 +15,7 @@ import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
 import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -323,50 +323,95 @@ export const OrderTrackLayout: React.FC = () => {
     if (order && !animTriggered) setAnimTriggered(true);
   }, [order]);
 
-  const statusInfo = (order?.status != null
-    ? ORDER_STATUS[order.status]
-    : undefined) ?? {
-    label: "PENDING",
-    bg: "#FFFBE8",
-    text: "#92600A",
-    border: "#FFE998",
-  };
-  const items = order?.items ?? [];
-  const toPay = Number(order?.total ?? 0);
-  const deliveryFee = Number(order?.deliveryCharge ?? 0);
-  const handlingCharge = Number(order?.handlingCharge ?? 0);
+  // Bundled into one memo keyed on `order` — this screen polls every 30s and
+  // also re-renders on every local UI toggle (modals/sheets/isProceeding),
+  // none of which should re-run this derivation.
+  const {
+    statusInfo,
+    items,
+    toPay,
+    deliveryFee,
+    handlingCharge,
+    productDiscount,
+    couponDiscount,
+    walletDiscount,
+    coinsDiscount,
+    totalSaved,
+    subtotal,
+    mrpTotal,
+    isInvoiceAvailable,
+    isDelayed,
+    cancellationReason,
+    showExpectedDelivery,
+    deliveredLogTime,
+  } = useMemo(() => {
+    const statusInfo = (order?.status != null
+      ? ORDER_STATUS[order.status]
+      : undefined) ?? {
+      label: "PENDING",
+      bg: "#FFFBE8",
+      text: "#92600A",
+      border: "#FFE998",
+    };
+    const items = order?.items ?? [];
+    const toPay = Number(order?.total ?? 0);
+    const deliveryFee = Number(order?.deliveryCharge ?? 0);
+    const handlingCharge = Number(order?.handlingCharge ?? 0);
 
-  const bill = order?.metadata?.billBreakdown;
-  const productDiscount = Number(bill?.productDiscount ?? 0);
-  const couponDiscount = Number(bill?.couponDiscount ?? 0);
-  const walletDiscount = Number(bill?.walletDiscount ?? 0);
-  const coinsDiscount = Number(bill?.coinsDiscount ?? 0);
-  const totalSaved = Number(bill?.totalSaved ?? order?.discountAmount ?? 0);
+    const bill = order?.metadata?.billBreakdown;
+    const productDiscount = Number(bill?.productDiscount ?? 0);
+    const couponDiscount = Number(bill?.couponDiscount ?? 0);
+    const walletDiscount = Number(bill?.walletDiscount ?? 0);
+    const coinsDiscount = Number(bill?.coinsDiscount ?? 0);
+    const totalSaved = Number(bill?.totalSaved ?? order?.discountAmount ?? 0);
 
-  const subtotal = Number(order?.subtotal ?? bill?.itemTotal ?? 0);
-  const mrpTotal =
-    subtotal > 0
-      ? subtotal + productDiscount
-      : toPay +
-        Number(order?.discountAmount ?? 0) -
-        deliveryFee -
-        handlingCharge;
+    const subtotal = Number(order?.subtotal ?? bill?.itemTotal ?? 0);
+    const mrpTotal =
+      subtotal > 0
+        ? subtotal + productDiscount
+        : toPay +
+          Number(order?.discountAmount ?? 0) -
+          deliveryFee -
+          handlingCharge;
 
-  const isInvoiceAvailable =
-    order?.status != null && order.status >= 5 && order.status <= 7;
+    const isInvoiceAvailable =
+      order?.status != null && order.status >= 5 && order.status <= 7;
+
+    const isDelayed = isOrderDelayed(order);
+    const cancellationReason = getCancellationReason(order);
+    const showExpectedDelivery =
+      !!order?.estimatedDelivery && order.status !== 0 && order.status !== 7;
+
+    // Same "toStatus → timestamp" lookup the tracking steps use, needed here
+    // to show the precise "Delivered on" date in the header above.
+    const deliveredLogTime = (order?.statusLogs ?? []).reduce<string | null>(
+      (acc, log) =>
+        log.toStatus === "7" && log.createdAt ? log.createdAt : acc,
+      null,
+    );
+
+    return {
+      statusInfo,
+      items,
+      toPay,
+      deliveryFee,
+      handlingCharge,
+      productDiscount,
+      couponDiscount,
+      walletDiscount,
+      coinsDiscount,
+      totalSaved,
+      subtotal,
+      mrpTotal,
+      isInvoiceAvailable,
+      isDelayed,
+      cancellationReason,
+      showExpectedDelivery,
+      deliveredLogTime,
+    };
+  }, [order]);
 
   const trackingSteps = useOrderTrackingSteps(order);
-  const isDelayed = isOrderDelayed(order);
-  const cancellationReason = getCancellationReason(order);
-  const showExpectedDelivery =
-    !!order?.estimatedDelivery && order.status !== 0 && order.status !== 7;
-
-  // Same "toStatus → timestamp" lookup the tracking steps use, needed here to
-  // show the precise "Delivered on" date in the header above.
-  const deliveredLogTime = (order?.statusLogs ?? []).reduce<string | null>(
-    (acc, log) => (log.toStatus === "7" && log.createdAt ? log.createdAt : acc),
-    null,
-  );
 
   if (loading) {
     return (

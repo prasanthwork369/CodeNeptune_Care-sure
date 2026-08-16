@@ -1,5 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { colors } from "@/src/constants/theme";
 import React, { useEffect } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import Animated, {
@@ -69,7 +70,7 @@ export function ReasonDropdown({
           justifyContent: "space-between",
           width: "100%",
           borderWidth: 1,
-          borderColor: isOpen ? "#0F7635" : "#E5E7EB",
+          borderColor: isOpen ? colors.primary : "#E5E7EB",
           backgroundColor: "#fff",
           borderRadius: 10,
           paddingVertical: 14,
@@ -88,7 +89,7 @@ export function ReasonDropdown({
           {selectedLabel ?? placeholder}
         </Text>
         {loading ? (
-          <ActivityIndicator size="small" color="#0F7635" />
+          <ActivityIndicator size="small" color={colors.primary} />
         ) : (
           <Animated.View style={arrowStyle}>
             <icons.down_arrow width={14} height={14} fill="#6B7280" />
@@ -147,13 +148,13 @@ export function ReasonDropdown({
                       flex: 1,
                       fontSize: moderateScale(16),
                       fontWeight: "400",
-                      color: isSelected ? "#0F7635" : "#1A1C1E",
+                      color: isSelected ? colors.primary : "#1A1C1E",
                     }}
                   >
                     {item.label}
                   </Text>
                   {isSelected && (
-                    <icons.check_circle width={18} height={18} fill="#0F7635" />
+                    <icons.check_circle width={18} height={18} fill={colors.primary} />
                   )}
                 </Touchable>
               );
@@ -181,13 +182,13 @@ export function ReasonDropdown({
                   flex: 1,
                   fontSize: moderateScale(16),
                   fontWeight: "400",
-                  color: isOtherSelected ? "#0F7635" : "#1A1C1E",
+                  color: isOtherSelected ? colors.primary : "#1A1C1E",
                 }}
               >
                 Other
               </Text>
               {isOtherSelected && (
-                <icons.check_circle width={18} height={18} fill="#0F7635" />
+                <icons.check_circle width={18} height={18} fill={colors.primary} />
               )}
             </Touchable>
           )}

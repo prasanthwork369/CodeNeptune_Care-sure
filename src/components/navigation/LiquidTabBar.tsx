@@ -1,5 +1,6 @@
 import { tabs } from "@/src/constants/data";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { colors } from "@/src/constants/theme";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
@@ -55,7 +56,7 @@ import {
 
 // Translucent so the glass backdrop reads through the active tab too
 const ACTIVE_BG = "rgba(236,253,245,0.82)";
-const ACTIVE_ICON_COLOR = "#0F7635";
+const ACTIVE_ICON_COLOR = colors.primary;
 const INACTIVE_ICON_COLOR = "#6A6A6A";
 
 // Snappy spring — feels instant like Blinkit
