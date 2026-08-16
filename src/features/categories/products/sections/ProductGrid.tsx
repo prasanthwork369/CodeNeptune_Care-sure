@@ -20,6 +20,7 @@ const CELL_GAP = GRID_GAP / 2;
 interface ProductGridProps {
   products: CategoryProduct[];
   isLoading: boolean;
+  isRefreshing: boolean;
   onRefresh: () => void;
   onProductPress: (product: CategoryProduct) => void;
   paddingBottom: number;
@@ -29,6 +30,7 @@ interface ProductGridProps {
 export const ProductGrid: React.FC<ProductGridProps> = ({
   products,
   isLoading,
+  isRefreshing,
   onRefresh,
   onProductPress,
   paddingBottom,
@@ -36,16 +38,24 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   const { width } = useWindowDimensions();
   const cardWidth = (width - GRID_PADDING * 2 - GRID_GAP) / 2;
 
+  // Guards against a second pull-to-refresh firing while one is already in
+  // flight — RefreshControl's own `refreshing` prop reflects the real query
+  // state below, but this is a belt-and-braces check against duplicate calls.
+  const handleRefresh = useCallback(() => {
+    if (isRefreshing) return;
+    onRefresh();
+  }, [isRefreshing, onRefresh]);
+
   const refreshControl = useMemo(
     () => (
       <RefreshControl
-        refreshing={false}
-        onRefresh={onRefresh}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
         tintColor="#36B37E"
         colors={["#36B37E"]}
       />
     ),
-    [onRefresh],
+    [isRefreshing, handleRefresh],
   );
 
   const renderItem = useCallback(

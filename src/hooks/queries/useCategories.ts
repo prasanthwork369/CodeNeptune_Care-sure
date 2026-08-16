@@ -88,7 +88,7 @@ export const useCategoryProducts = (params: {
   page?: number;
   limit?: number;
 }) => {
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, isRefetching, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CATALOG.CATEGORY_PRODUCTS(
       params.subCategorySlug || params.categorySlug,
     ),
@@ -135,5 +135,12 @@ export const useCategoryProducts = (params: {
       });
   }, [data?.items]);
 
-  return { products, total: data?.total ?? 0, isLoading, error, refetch };
+  return {
+    products,
+    total: data?.total ?? 0,
+    isLoading,
+    isRefetching,
+    error,
+    refetch,
+  };
 };

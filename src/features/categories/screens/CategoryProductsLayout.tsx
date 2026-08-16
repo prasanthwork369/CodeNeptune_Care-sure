@@ -30,7 +30,7 @@ const CategoryProductsContent: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { totalItems } = useCartRead();
 
-  const { products, isLoading, refetch } = useCategoryProducts({
+  const { products, isLoading, isRefetching, refetch } = useCategoryProducts({
     categorySlug: familySlug || slug,
     subCategorySlug: familySlug ? slug : undefined,
   });
@@ -91,6 +91,7 @@ const CategoryProductsContent: React.FC = () => {
       <ProductGrid
         products={products}
         isLoading={isLoading}
+        isRefreshing={isRefetching}
         onRefresh={handleRefresh}
         onProductPress={handleProductPress}
         paddingBottom={

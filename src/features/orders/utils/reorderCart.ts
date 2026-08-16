@@ -5,39 +5,44 @@ import { AddToCartInput } from "@/src/features/cart/types";
 export async function buildCartInputs(
   items: OrderItem[],
 ): Promise<AddToCartInput[]> {
-  const results: AddToCartInput[] = [];
+  // Each item's price lookup is an independent network call — run them
+  // concurrently instead of one at a time. Promise.all preserves index
+  // order regardless of which fetch settles first, so the filter below
+  // still yields inputs in the same order as `items`.
+  const built = await Promise.all(items.map((item) => buildCartInput(item)));
+  return built.filter((input): input is AddToCartInput => input !== null);
+}
 
-  for (const item of items) {
-    let unitPrice = Number(item.unitPrice ?? 0);
+async function buildCartInput(
+  item: OrderItem,
+): Promise<AddToCartInput | null> {
+  let unitPrice = Number(item.unitPrice ?? 0);
 
-    if (!unitPrice) {
-      unitPrice = await fetchLivePrice(item);
-    }
-
-    if (!unitPrice) {
-      if (__DEV__)
-        console.warn(
-          "[reorderCart] skipping item — no price for",
-          item.medicineId,
-        );
-      continue;
-    }
-
-    results.push({
-      medicineId: item.medicineId,
-      variantId: null,
-      medicineName: item.medicineSnapshot?.name ?? item.medicineId,
-      medicineSlug: item.medicineSnapshot?.slug ?? item.medicineId,
-      unitPrice,
-      mrp: unitPrice,
-      discountPercent: 0,
-      quantity: item.quantity ?? 1,
-      requiresPrescription:
-        item.medicineSnapshot?.requiresPrescription ?? false,
-    });
+  if (!unitPrice) {
+    unitPrice = await fetchLivePrice(item);
   }
 
-  return results;
+  if (!unitPrice) {
+    if (__DEV__)
+      console.warn(
+        "[reorderCart] skipping item — no price for",
+        item.medicineId,
+      );
+    return null;
+  }
+
+  return {
+    medicineId: item.medicineId,
+    variantId: null,
+    medicineName: item.medicineSnapshot?.name ?? item.medicineId,
+    medicineSlug: item.medicineSnapshot?.slug ?? item.medicineId,
+    unitPrice,
+    mrp: unitPrice,
+    discountPercent: 0,
+    quantity: item.quantity ?? 1,
+    requiresPrescription:
+      item.medicineSnapshot?.requiresPrescription ?? false,
+  };
 }
 
 async function fetchLivePrice(item: OrderItem): Promise<number> {

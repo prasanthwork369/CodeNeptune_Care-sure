@@ -106,6 +106,7 @@ export const useAllFeaturedMedicines = (limit = 50) => {
   const {
     data: medicines = [],
     isLoading,
+    isRefetching,
     error,
     refetch,
   } = useQuery({
@@ -116,5 +117,5 @@ export const useAllFeaturedMedicines = (limit = 50) => {
 
   const products: Product[] = medicines.map(mapFeaturedMedicine);
 
-  return { products, isLoading, error, refetch };
+  return { products, isLoading, isRefetching, error, refetch };
 };
