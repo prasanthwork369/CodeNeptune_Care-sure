@@ -1,7 +1,6 @@
 import { authApi } from "../api/auth.api";
 import { profileApi } from "../api/profile.api";
 import { setAccessToken } from "../api/client";
-import { tokenStorage } from "../lib/storage";
 import { useAuthStore } from "../store/authStore";
 import { messagingService as notificationService } from "./firebase";
 import { getDeviceInfo } from "../lib/deviceInfo";
@@ -17,22 +16,13 @@ export const authService = {
     if (__DEV__) logger.debug("[VerifyOtp] deviceId:", deviceId);
 
     const data = await authApi.verifyOtp(phone, otp, deviceId);
-    const { accessToken, refreshToken, expiresIn } = data.data;
+    const { accessToken, expiresIn } = data.data;
 
     // Flipping `isAuthenticated` early starts useProfile()'s fetch, and the
     // backend clears isFirstTimeLogin on whichever profile fetch lands first.
     setAccessToken(accessToken);
 
-    // Token persistence and the refresh token are independent SecureStore
-    // writes — run them together rather than one after the other. Both are
-    // awaited here because the caller navigates right after this resolves,
-    // and a killed app before either lands would lose the session.
-    await Promise.all([
-      useAuthStore.getState().login(accessToken, expiresIn),
-      refreshToken
-        ? tokenStorage.setRefreshToken(refreshToken)
-        : Promise.resolve(),
-    ]);
+    await useAuthStore.getState().login(accessToken, expiresIn);
 
     // The profile fetch used to block navigation here, duplicating the fetch
     // useProfile() (mounted in the tabs layout) already makes once Home is

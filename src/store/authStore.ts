@@ -123,7 +123,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await tokenStorage.clear();
     await tokenStorage.clearExpiresAt();
     await tokenStorage.clearRefreshToken();
-    await tokenStorage.clearAvatarUri();
     await guestStorage.clear();
   },
 }));

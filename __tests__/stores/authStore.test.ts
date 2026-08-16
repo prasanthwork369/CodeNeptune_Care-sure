@@ -22,7 +22,6 @@ jest.mock("@/src/lib/storage", () => ({
     clear: jest.fn().mockResolvedValue(undefined),
     clearExpiresAt: jest.fn().mockResolvedValue(undefined),
     clearRefreshToken: jest.fn().mockResolvedValue(undefined),
-    clearAvatarUri: jest.fn().mockResolvedValue(undefined),
   },
   guestStorage: {
     get: jest.fn(),
@@ -134,7 +133,6 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     expect(tokenStorage.clear).toHaveBeenCalled();
     expect(tokenStorage.clearExpiresAt).toHaveBeenCalled();
     expect(tokenStorage.clearRefreshToken).toHaveBeenCalled();
-    expect(tokenStorage.clearAvatarUri).toHaveBeenCalled();
     expect(guestStorage.clear).toHaveBeenCalled();
   });
 

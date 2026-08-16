@@ -17,7 +17,6 @@ jest.mock("@/src/lib/storage", () => ({
     clear: jest.fn().mockResolvedValue(undefined),
     clearExpiresAt: jest.fn().mockResolvedValue(undefined),
     clearRefreshToken: jest.fn().mockResolvedValue(undefined),
-    clearAvatarUri: jest.fn().mockResolvedValue(undefined),
   },
   guestStorage: {
     get: jest.fn(),

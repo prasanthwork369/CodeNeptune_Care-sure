@@ -1,7 +1,6 @@
 import { authService } from "@/src/services/auth.service";
 import { authApi } from "@/src/api/auth.api";
 import { profileApi } from "@/src/api/profile.api";
-import { tokenStorage } from "@/src/lib/storage";
 import { useAuthStore } from "@/src/store/authStore";
 import { messagingService as notificationService } from "@/src/services/firebase";
 
@@ -24,12 +23,6 @@ jest.mock("@/src/lib/deviceInfo", () => ({
   getDeviceInfo: jest.fn().mockResolvedValue({ deviceId: "device-uuid-123" }),
 }));
 
-jest.mock("@/src/lib/storage", () => ({
-  tokenStorage: {
-    setRefreshToken: jest.fn().mockResolvedValue(undefined),
-  },
-}));
-
 jest.mock("@/src/services/firebase", () => ({
   messagingService: {
     unregister: jest.fn().mockResolvedValue(undefined),
@@ -49,7 +42,7 @@ describe("authService — Authentication Lifecycle Integration", () => {
     expect(result).toEqual({ success: true });
   });
 
-  it("verifyOtp includes deviceId, logs user in, sets refresh token, and fetches profile", async () => {
+  it("verifyOtp includes deviceId, logs user in, and fetches profile", async () => {
     (authApi.verifyOtp as jest.Mock).mockResolvedValueOnce({
       data: {
         accessToken: "access-123",
@@ -75,7 +68,6 @@ describe("authService — Authentication Lifecycle Integration", () => {
       "device-uuid-123",
     );
     expect(loginSpy).toHaveBeenCalledWith("access-123", 3600);
-    expect(tokenStorage.setRefreshToken).toHaveBeenCalledWith("refresh-456");
     expect(profileApi.getProfile).toHaveBeenCalled();
     expect(setUserSpy).toHaveBeenCalledWith({ id: "u-101", firstName: "Jane" });
   });

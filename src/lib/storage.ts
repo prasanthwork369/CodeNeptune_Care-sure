@@ -2,9 +2,12 @@ import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AUTH_TOKEN_KEY = "caresure.auth.token";
+// Refresh tokens are no longer written here — the 401 refresh flow uses the
+// httpOnly cookie (see api/client.ts, withCredentials: true). This key only
+// still exists so clearRefreshToken() can delete any stray value a
+// pre-cleanup install may have persisted.
 const AUTH_REFRESH_TOKEN_KEY = "caresure.auth.refreshToken";
 const AUTH_EXPIRES_AT_KEY = "caresure.auth.expiresAt";
-const AVATAR_URI_KEY = "caresure.profile.avatarUri";
 
 export const tokenStorage = {
   async get(): Promise<string | null> {
@@ -38,24 +41,9 @@ export const tokenStorage = {
       await SecureStore.deleteItemAsync(AUTH_EXPIRES_AT_KEY);
     } catch {}
   },
-  async getRefreshToken(): Promise<string | null> {
-    try {
-      return await SecureStore.getItemAsync(AUTH_REFRESH_TOKEN_KEY);
-    } catch {
-      return null;
-    }
-  },
-  async setRefreshToken(token: string): Promise<void> {
-    await SecureStore.setItemAsync(AUTH_REFRESH_TOKEN_KEY, token);
-  },
   async clearRefreshToken(): Promise<void> {
     try {
       await SecureStore.deleteItemAsync(AUTH_REFRESH_TOKEN_KEY);
-    } catch {}
-  },
-  async clearAvatarUri(): Promise<void> {
-    try {
-      await SecureStore.deleteItemAsync(AVATAR_URI_KEY);
     } catch {}
   },
 };
