@@ -1,9 +1,20 @@
+import { Image } from "expo-image";
 import React from "react";
-import { View, ScrollView } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Skeleton } from "@/src/components/ui/Skeleton";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
-export const ProductSkeleton = () => {
+interface ProductSkeletonProps {
+  previewName?: string;
+  previewImage?: string;
+  previewBrand?: string;
+}
+
+export const ProductSkeleton: React.FC<ProductSkeletonProps> = ({
+  previewName,
+  previewImage,
+  previewBrand,
+}) => {
   const imgSize = exactScale(215);
 
   return (
@@ -12,9 +23,30 @@ export const ProductSkeleton = () => {
       contentContainerStyle={{ paddingBottom: exactScale(100) }}
       className="flex-1"
     >
-      {/* Image Carousel Mock */}
+      {/* Image Carousel Mock / Preview */}
       <View className="mb-8 pt-4 items-center">
-        <Skeleton width={imgSize} height={imgSize} borderRadius={16} />
+        {previewImage ? (
+          <View
+            style={{
+              width: imgSize,
+              height: imgSize,
+              borderRadius: 16,
+              overflow: "hidden",
+              backgroundColor: "#F9FAFB",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              source={{ uri: previewImage }}
+              style={{ width: imgSize, height: imgSize }}
+              contentFit="contain"
+              cachePolicy="memory-disk"
+            />
+          </View>
+        ) : (
+          <Skeleton width={imgSize} height={imgSize} borderRadius={16} />
+        )}
         <View className="flex-row items-center justify-center mt-4 gap-x-1.5">
           {[1, 2, 3].map((i) => (
             <Skeleton
@@ -27,24 +59,58 @@ export const ProductSkeleton = () => {
         </View>
       </View>
 
-      {/* Product Details Mock */}
+      {/* Product Details Mock / Preview */}
       <View className="px-5">
-        <Skeleton
-          width={100}
-          height={13}
-          style={{ marginBottom: exactScale(8) }}
-        />
-        <Skeleton
-          width="90%"
-          height={24}
-          style={{ marginBottom: exactScale(8) }}
-        />
-        <Skeleton
-          width="60%"
-          height={24}
-          style={{ marginBottom: exactScale(16) }}
-        />
+        {previewBrand ? (
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: moderateScale(12),
+              color: "#6B7280",
+              marginBottom: exactScale(6),
+            }}
+            className="font-inter-medium"
+          >
+            {previewBrand}
+          </Text>
+        ) : (
+          <Skeleton
+            width={100}
+            height={13}
+            style={{ marginBottom: exactScale(8) }}
+          />
+        )}
 
+        {previewName ? (
+          <Text
+            numberOfLines={2}
+            style={{
+              fontSize: moderateScale(18),
+              fontWeight: "700",
+              color: "#111827",
+              marginBottom: exactScale(12),
+              lineHeight: moderateScale(24),
+            }}
+            className="font-inter-bold"
+          >
+            {previewName}
+          </Text>
+        ) : (
+          <>
+            <Skeleton
+              width="90%"
+              height={24}
+              style={{ marginBottom: exactScale(8) }}
+            />
+            <Skeleton
+              width="60%"
+              height={24}
+              style={{ marginBottom: exactScale(16) }}
+            />
+          </>
+        )}
+
+        {/* Pricing Skeleton - always fresh from API */}
         <View className="flex-row items-baseline gap-x-2 mb-4">
           <Skeleton width={80} height={28} />
           <Skeleton width={60} height={16} />

@@ -37,9 +37,18 @@ export const ProductDetailsLayout: React.FC = () => {
   // when the user arrived here specifically from a SearchNoSubstituteCard
   // tap (which already confirmed no substitute via its own sourceType/
   // recommendation check), not on every product details page visit.
-  const { id, fromNoSubstitute } = useLocalSearchParams<{
+  const {
+    id,
+    fromNoSubstitute,
+    previewName,
+    previewImage,
+    previewBrand,
+  } = useLocalSearchParams<{
     id: string;
     fromNoSubstitute?: string;
+    previewName?: string;
+    previewImage?: string;
+    previewBrand?: string;
   }>();
   const showNoSubstituteBanner = fromNoSubstitute === "true";
   const router = useNav();
@@ -129,8 +138,9 @@ export const ProductDetailsLayout: React.FC = () => {
 
   const goBack = useCallback(() => router.back(), [router]);
 
-  const manufacturer = raw?.manufacturer?.name ?? raw?.brand?.name ?? "";
-  const medicineName = raw?.name ?? "";
+  const manufacturer =
+    raw?.manufacturer?.name ?? raw?.brand?.name ?? previewBrand ?? "";
+  const medicineName = raw?.name ?? previewName ?? "";
   const moreAboutNavigation = useMoreAboutScrollNavigation(
     raw?.additionalData,
     mainScrollRef,
@@ -167,7 +177,11 @@ export const ProductDetailsLayout: React.FC = () => {
           />
 
           {isLoading ? (
-            <ProductSkeleton />
+            <ProductSkeleton
+              previewName={previewName}
+              previewImage={previewImage}
+              previewBrand={previewBrand}
+            />
           ) : !product ? (
             <View
               style={{

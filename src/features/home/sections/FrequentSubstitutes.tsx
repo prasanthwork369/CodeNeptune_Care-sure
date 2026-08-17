@@ -12,7 +12,13 @@ import { exactScale } from "@/src/utils/exactScale";
 
 interface FrequentSubstitutesProps {
   substitutes: SubstituteProduct[];
-  onProductPress?: (id: string) => void;
+  isLoading?: boolean;
+  onProductPress?: (
+    id: string,
+    name?: string,
+    image?: string,
+    brand?: string,
+  ) => void;
   onViewAll?: () => void;
   disableCart?: boolean;
 }
@@ -26,7 +32,12 @@ const FrequentItem = React.memo(
     disableCart,
   }: {
     item: SubstituteProduct;
-    onProductPress?: (id: string) => void;
+    onProductPress?: (
+      id: string,
+      name?: string,
+      image?: string,
+      brand?: string,
+    ) => void;
     disableCart?: boolean;
   }) => {
     const { count, increment, decrement, isPending, animations } =
@@ -66,14 +77,31 @@ const FrequentItem = React.memo(
     }, [disableCart, increment, triggerFly]);
 
     return (
-      <View className="flex-row items-center  pb-4">
+      <View
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: exactScale(12),
+          borderWidth: 1,
+          borderColor: "#919EAB1A",
+        }}
+        className="p-3 mb-2.5 flex-row items-center justify-between"
+      >
         {/* Tappable area → product detail */}
         <Touchable
-          activeOpacity={0.7}
+          activeOpacity={0.85}
           onPress={() => {
             // productId only: the medicine id cannot resolve on the product route.
             if (!item.productId) return;
-            onProductPress?.(item.productId);
+            const previewImage =
+              typeof item.image === "string"
+                ? item.image
+                : (item.image as { uri?: string } | undefined)?.uri;
+            onProductPress?.(
+              item.productId,
+              item.name,
+              previewImage,
+              item.brand,
+            );
           }}
           onPressIn={handlePrefetch}
           className="flex-row items-center flex-1"

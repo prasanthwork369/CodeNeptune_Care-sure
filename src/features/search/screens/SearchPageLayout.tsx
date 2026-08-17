@@ -244,7 +244,21 @@ export const SearchPageLayout = () => {
   );
 
   const handleProductPress = useCallback(
-    (id: string) => router.push({ pathname: "/product/[id]", params: { id } }),
+    (
+      id: string,
+      previewName?: string,
+      previewImage?: string,
+      previewBrand?: string,
+    ) =>
+      router.push({
+        pathname: "/product/[id]",
+        params: {
+          id,
+          previewName: previewName || undefined,
+          previewImage: previewImage || undefined,
+          previewBrand: previewBrand || undefined,
+        },
+      }),
     [router],
   );
 

@@ -25,12 +25,18 @@ interface SearchRecommendCardProps {
     mrp: number | null;
     discountPercentage: number;
     thumbnailUrl?: string;
+    packLabel?: string;
   };
-  onPress: (productId: string) => void;
+  onPress: (
+    id: string,
+    name?: string,
+    image?: string,
+    brand?: string,
+  ) => void;
 }
 
-export const SearchRecommendCard = React.memo(
-  ({ data, onPress }: SearchRecommendCardProps) => {
+export const SearchRecommendCard: React.FC<SearchRecommendCardProps> =
+  React.memo(({ data, onPress }) => {
     const savings =
       data.mrp != null && data.price != null ? data.mrp - data.price : 0;
     const hasSavings = savings > 0;
@@ -66,7 +72,14 @@ export const SearchRecommendCard = React.memo(
     return (
       <Touchable
         activeOpacity={0.85}
-        onPress={() => onPress(data.productId)}
+        onPress={() =>
+          onPress(
+            data.productId,
+            data.name,
+            data.thumbnailUrl || undefined,
+            data.manufacturer || undefined,
+          )
+        }
         onPressIn={handlePrefetch}
         style={[s.recCard, { padding: 0, overflow: "hidden", minHeight: 0 }]}
         className="w-full rounded-[16px] mb-4"

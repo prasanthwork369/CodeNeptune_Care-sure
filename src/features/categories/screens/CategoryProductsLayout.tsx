@@ -43,9 +43,17 @@ const CategoryProductsContent: React.FC = () => {
   // Stable, so the memoized cards don't re-render on every grid render.
   const handleProductPress = useCallback(
     (product: CategoryProduct) => {
+      const previewImage =
+        typeof product.image === "string"
+          ? product.image
+          : (product.image as { uri?: string } | undefined)?.uri;
       router.push({
         pathname: "/product/[id]",
-        params: { id: product.productId },
+        params: {
+          id: product.productId,
+          previewName: product.name,
+          previewImage: previewImage || undefined,
+        },
       });
     },
     [router],

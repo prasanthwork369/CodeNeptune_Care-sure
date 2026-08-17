@@ -57,9 +57,17 @@ const FeaturedProductsContent: React.FC = () => {
     (product: CategoryProduct) => {
       // An item without a productId cannot resolve — inert beats a dead screen.
       if (!product.productId) return;
+      const previewImage =
+        typeof product.image === "string"
+          ? product.image
+          : (product.image as { uri?: string } | undefined)?.uri;
       router.push({
         pathname: "/product/[id]",
-        params: { id: product.productId },
+        params: {
+          id: product.productId,
+          previewName: product.name,
+          previewImage: previewImage || undefined,
+        },
       });
     },
     [router],

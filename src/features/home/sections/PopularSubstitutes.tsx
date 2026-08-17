@@ -25,7 +25,12 @@ import { exactScale } from "@/src/utils/exactScale";
 interface PopularSubstitutesProps {
   products: Product[];
   isLoading?: boolean;
-  onProductPress?: (id: string) => void;
+  onProductPress?: (
+    id: string,
+    name?: string,
+    image?: string,
+    brand?: string,
+  ) => void;
   onViewAll?: () => void;
   /** Catalogue size from the backend; the subtitle is hidden without it. */
   totalCount?: number;
@@ -49,22 +54,17 @@ const ProductCard = React.memo(
   }: {
     product: Product;
     cardWidth: number;
-    onProductPress?: (id: string) => void;
-    onLayout?: (e: LayoutChangeEvent) => void;
+    onProductPress?: (
+      id: string,
+      name?: string,
+      image?: string,
+      brand?: string,
+    ) => void;
+    onLayout?: (event: LayoutChangeEvent) => void;
   }) => {
-    // Image area height is tied to card width (so the image proportion matches
-    // the design); the details area below it is NOT forced into a matching
-    // half-split -- it sizes itself to its actual text/button content instead,
-    // so it can't end up taller (huge empty gap) or shorter (squeezed/no gap)
-    // than what the content needs on any given screen width.
     const imageAreaHeight = cardWidth * 0.875;
     const imageSize = imageAreaHeight * 0.65;
 
-    // Add-to-cart mirrors the web ProductCard: the card shows the base price
-    // (below), but the cart receives the default variant (variant[0]) when the
-    // API expands one. Keyed by the variant UUID like the mobile PDP, so adding
-    // the same variant here or on the PDP lands in one cart row. Falls back to
-    // the base medicine when no variant is present.
     const v = product.defaultVariant;
     const cartMedicineId = v ? v.id : product.id;
     const { count, increment, decrement, animations, isPending } =
@@ -91,7 +91,7 @@ const ProductCard = React.memo(
               productId: product.productId,
               name: product.name,
               slug: product.slug,
-              price: product.price as number,
+              price: product.price,
               originalPrice: product.originalPrice,
               discountPercent: product.discountPercent,
               image: product.image,
@@ -135,7 +135,16 @@ const ProductCard = React.memo(
           onPress={() => {
             // productId only: the medicine id cannot resolve on the product route.
             if (!product.productId) return;
-            onProductPress?.(product.productId);
+            const previewImage =
+              typeof product.image === "string"
+                ? product.image
+                : (product.image as { uri?: string } | undefined)?.uri;
+            onProductPress?.(
+              product.productId,
+              product.name,
+              previewImage,
+              product.brand,
+            );
           }}
           onPressIn={handlePrefetch}
           style={{

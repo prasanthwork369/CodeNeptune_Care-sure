@@ -72,7 +72,7 @@ interface ProductCardProps {
   thumbnailUrl: string;
   accentColor: string;
   cardWidth: number;
-  onPress: (productId: string) => void;
+  onPress: (id: string, name?: string, image?: string, brand?: string) => void;
   packSize?: string;
   unit?: string;
   onLayout?: (e: LayoutChangeEvent) => void;
@@ -156,7 +156,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
         {/* Image area — fixed height, tied to card width */}
         <Touchable
           activeOpacity={0.85}
-          onPress={() => onPress(productId)}
+          onPress={() => {
+            const previewImage = thumbnailUrl
+              ? resolveAssetUrl(thumbnailUrl)
+              : undefined;
+            onPress(productId, name, previewImage);
+          }}
           onPressIn={handlePrefetch}
           style={{
             height: imageAreaHeight,
@@ -328,7 +333,12 @@ ProductCard.displayName = "HealthEssentialsProductCard";
 interface HealthEssentialsSectionProps {
   subcategory: ApiFeaturedSubcategory;
   themeIndex: number;
-  onProductPress: (productId: string) => void;
+  onProductPress: (
+    productId: string,
+    name?: string,
+    image?: string,
+    brand?: string,
+  ) => void;
   onViewAll?: (subcategory: ApiFeaturedSubcategory) => void;
 }
 

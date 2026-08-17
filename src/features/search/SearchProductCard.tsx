@@ -46,11 +46,20 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
   const router = useNav();
 
   const handleCardPress = useCallback(() => {
+    const previewImage =
+      typeof data.recommended.image === "string"
+        ? data.recommended.image
+        : data.recommended.image?.uri;
     router.push({
       pathname: "/search/product/[id]",
-      params: { id: data.productId ?? data.id },
+      params: {
+        id: data.productId ?? data.id,
+        previewName: data.recommended.name,
+        previewImage: previewImage || undefined,
+        previewBrand: data.recommended.manufacturer || undefined,
+      },
     });
-  }, [data.productId, data.id, router]);
+  }, [data, router]);
 
   const prefetchProduct = usePrefetchProduct();
   const handlePrefetch = useCallback(() => {

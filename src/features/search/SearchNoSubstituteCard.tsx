@@ -33,7 +33,12 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
   const handleCardPress = () => {
     router.push({
       pathname: "/product/[id]",
-      params: { id: data.productId ?? data.id, fromNoSubstitute: "true" },
+      params: {
+        id: data.productId ?? data.id,
+        fromNoSubstitute: "true",
+        previewName: data.searched.name,
+        previewBrand: data.searched.manufacturer || undefined,
+      },
     });
   };
 
