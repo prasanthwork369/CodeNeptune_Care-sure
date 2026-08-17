@@ -9,16 +9,18 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 
-export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
-  productId,
-  medicineUuid,
-  baseMedicineId,
-  variantId,
-  product,
-  safeAreaBottom,
-  onViewCart,
-  hideAddButton = false,
-}) => {
+export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> =
+  React.memo(
+    ({
+      productId,
+      medicineUuid,
+      baseMedicineId,
+      variantId,
+      product,
+      safeAreaBottom,
+      onViewCart,
+      hideAddButton = false,
+    }) => {
   const { count, increment, decrement, animations, isPending } = useCartActions(
     {
       medicineId: medicineUuid ?? productId,
@@ -268,4 +270,6 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> = ({
       )}
     </StickyFooter>
   );
-};
+});
+
+ProductDetailsFooter.displayName = "ProductDetailsFooter";

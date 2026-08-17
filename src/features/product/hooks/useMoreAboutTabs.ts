@@ -17,6 +17,11 @@ export const useMoreAboutTabs = (
   const activeSection =
     sections.find((section) => section.id === activeTabId) ?? sections[0];
 
+  // Ref mirror prevents duplicate state updates and redundant animations/scrolls
+  // when scroll events fire repeatedly before React finishes re-rendering.
+  const activeTabIdRef = useRef<string | null>(activeTabId);
+  activeTabIdRef.current = activeTabId;
+
   const tabsScrollRef = useRef<ScrollView>(null);
   const pendingScrollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tabLayouts = useRef<Record<string, { x: number; width: number }>>({});
@@ -26,6 +31,7 @@ export const useMoreAboutTabs = (
   // Reset tab selection when product data changes
   useEffect(() => {
     setSelectedTabId(null);
+    activeTabIdRef.current = null;
     indicatorWidth.value = 0;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [additionalData]);
@@ -53,6 +59,10 @@ export const useMoreAboutTabs = (
     indicatorDuration: number,
     centreDelay: number,
   ) => {
+    // Avoid duplicate work if tab is already active and indicator is placed
+    if (tabId === activeTabIdRef.current && indicatorWidth.value > 0) return;
+    activeTabIdRef.current = tabId;
+
     const layout = tabLayouts.current[tabId];
     if (layout) {
       if (indicatorDuration === 0) {
@@ -75,9 +85,7 @@ export const useMoreAboutTabs = (
   };
 
   const handleTabPress = (tabId: string) => activateTab(tabId, 250, 50);
-  // During a fast vertical fling several sections can be crossed in quick
-  // succession. Update the underline promptly, but debounce horizontal tab
-  // centering so competing ScrollView animations do not produce a jerk.
+  // During vertical scroll, update underline smoothly and center tab with debounce
   const syncActiveSectionId = (tabId: string) => activateTab(tabId, 60, 100);
 
   const handleTabLayout = (

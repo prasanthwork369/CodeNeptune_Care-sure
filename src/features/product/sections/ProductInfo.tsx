@@ -3,8 +3,8 @@ import { icons } from "@/src/constants/icons";
 import { MedicineVariant } from "@/src/hooks/queries/useProduct";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import React, { useState } from "react";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import React, { useCallback, useState } from "react";
+import { Gesture, GestureDetector, type PanGesture } from "react-native-gesture-handler";
 import { runOnJS, useSharedValue } from "react-native-reanimated";
 import { CarouselDot } from "@/src/components/animations/carousel";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
@@ -35,14 +35,15 @@ interface ProductInfoProps {
   onVariantSelect?: (id: string) => void;
 }
 
-export const ProductInfo: React.FC<ProductInfoProps> = ({
-  productId,
-  medicineUuid,
-  product,
-  variants = [],
-  selectedVariantId,
-  onVariantSelect,
-}) => {
+export const ProductInfo: React.FC<ProductInfoProps> = React.memo(
+  ({
+    productId,
+    medicineUuid,
+    product,
+    variants = [],
+    selectedVariantId,
+    onVariantSelect,
+  }) => {
   const router = useNav();
   const { width } = useWindowDimensions();
   const [, setActiveIndex] = useState(0);
@@ -70,6 +71,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
     });
   };
 
+  // Release vertical drag immediately to parent ScrollView while preserving horizontal swipe.
+  const handleConfigurePanGesture = useCallback((panGesture: PanGesture) => {
+    panGesture.activeOffsetX([-10, 10]).failOffsetY([-10, 10]);
+  }, []);
+
   return (
     <View className="bg-transparent pt-4 pb-4">
       <View className="mb-8">
@@ -84,6 +90,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           onProgressChange={(_, absoluteProgress) => {
             progress.value = absoluteProgress;
           }}
+          onConfigurePanGesture={handleConfigurePanGesture}
           renderItem={({ item, index }) => {
             // A plain Touchable here (RN's legacy responder system) fights
             // the carousel's own gesture-handler-based pan for the swipe —
@@ -231,6 +238,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             </Text>
             <ScrollView
               horizontal
+              nestedScrollEnabled
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
                 gap: exactScale(10),
@@ -333,4 +341,6 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       </View>
     </View>
   );
-};
+});
+
+ProductInfo.displayName = "ProductInfo";

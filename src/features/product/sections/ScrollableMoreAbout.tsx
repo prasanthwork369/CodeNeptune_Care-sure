@@ -71,12 +71,25 @@ export const StickyMoreAboutTabs: React.FC<{
 }> = ({ navigation }) => {
   const visibility = useSharedValue(0);
 
+  // Track the previous sticky state so we can skip withTiming on show
+  // (instant appearance eliminates the ~150ms gap between original tabs
+  // leaving the screen and the sticky overlay becoming visible) while still
+  // animating the hide for a natural feel when scrolling back upward.
   useEffect(() => {
-    visibility.value = withTiming(navigation.isSticky ? 1 : 0, {
-      duration: navigation.isSticky ? 120 : 80,
-      easing: Easing.out(Easing.quad),
-      reduceMotion: ReduceMotion.System,
-    });
+    if (navigation.isSticky) {
+      // Show: cancel any in-progress hide animation and snap to fully visible.
+      // The original inline tabs have already scrolled off-screen by the time
+      // isSticky becomes true, so an instant cut-in is not perceptible and
+      // eliminates the visible gap that a fade-in would create.
+      visibility.value = 1;
+    } else {
+      // Hide: short fade so the overlay doesn't flash off on upward scroll.
+      visibility.value = withTiming(0, {
+        duration: 60,
+        easing: Easing.out(Easing.quad),
+        reduceMotion: ReduceMotion.System,
+      });
+    }
   }, [navigation.isSticky, visibility]);
 
   const animatedStyle = useAnimatedStyle(() => ({

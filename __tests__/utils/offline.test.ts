@@ -85,7 +85,7 @@ describe("reportActionError", () => {
     reportActionError(new AppError("server", "boom"));
 
     expect(firstShownAt).toBe(
-      "We couldn't reach our servers. Please try again in a moment.",
+      "Server temporarily unavailable. Please try again in a moment.",
     );
     expect(useToastStore.getState().visible).toBe(false);
   });
@@ -95,12 +95,22 @@ describe("reportActionError", () => {
     expect(useToastStore.getState().visible).toBe(false);
   });
 
-  it("leaves connection failures to the banner alone", () => {
+  it("leaves connection failures to the banner alone when offline", () => {
+    goOffline();
     reportActionError(new AppError("offline", "never sent"));
     reportActionError(new AppError("network", "socket hang up"));
 
     expect(useToastStore.getState().visible).toBe(false);
     expect(useNetworkStore.getState().offlineAlertVisible).toBe(false);
+  });
+
+  it("toasts a connection failure when online", () => {
+    reportActionError(new AppError("network", "socket hang up"));
+
+    expect(useToastStore.getState().visible).toBe(true);
+    expect(useToastStore.getState().message).toBe(
+      "Unable to reach server. Please try again.",
+    );
   });
 
   it("still toasts a server failure, which the banner says nothing about", () => {

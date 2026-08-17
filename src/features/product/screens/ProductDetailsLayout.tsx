@@ -2,8 +2,8 @@ import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { ProductSkeleton } from "@/src/features/product/ProductSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
-import { useHome } from "@/src/hooks/queries/useHome";
+import { useInCartVariantId } from "@/src/hooks/queries/useCartRead";
+import { useAppContent } from "@/src/hooks/queries/useHome";
 import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
@@ -15,7 +15,7 @@ import {
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import {
   KnowYourMedicine,
@@ -46,8 +46,8 @@ export const ProductDetailsLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { product, recommendation, saltComposition, variants, raw, isLoading } =
     useProduct(id);
-  const { items: cartItems } = useCartRead();
-  const { appContent, isLoading: isHomeLoading } = useHome();
+  const inCartVariantId = useInCartVariantId(variants);
+  const { data: appContent, isLoading: isContentLoading } = useAppContent();
 
   usePerformanceTrace({
     traceName: PERF_TRACES.PRODUCT_DETAILS_LOAD,
@@ -68,60 +68,59 @@ export const ProductDetailsLayout: React.FC = () => {
     null,
   );
 
-  // Preselect whichever variant is already in the cart (each variant UUID is
-  // its own cart row — see useCartActions), so "Add to Cart" reflects the
-  // actual cart state no matter which variant the user added from elsewhere
-  // (search results, recommend cards, etc.). Falls back to the first variant.
-  //
-  // Search-comparison flows add the recommendation's own id (not a variant
-  // UUID from this product's variants list) as medicineId — so also match by
-  // the packSize/unit stored in cart metadata to find the right variant.
+  // Preselect whichever variant is already in the cart, falling back to first.
   useEffect(() => {
     if (variants.length > 0 && !selectedVariantId) {
-      const inCart = variants.find((v) =>
-        cartItems.some(
-          (i) =>
-            i.medicineId === v.id ||
-            (i.metadata?.packSize === v.packSize &&
-              i.metadata?.unit === v.unit),
-        ),
-      );
-      setSelectedVariantId((inCart ?? variants[0]).id);
+      setSelectedVariantId(inCartVariantId ?? variants[0].id);
     }
-  }, [variants, cartItems]);
+  }, [variants, selectedVariantId, inCartVariantId]);
 
-  const selectedVariant =
-    variants.find((v) => v.id === selectedVariantId) ?? variants[0] ?? null;
+  const selectedVariant = useMemo(
+    () =>
+      variants.find((v) => v.id === selectedVariantId) ?? variants[0] ?? null,
+    [variants, selectedVariantId],
+  );
 
-  // Merge selected variant price into product for footer/cart.
-  // The variant's `price` is ALREADY the discounted selling price and `mrp` is
-  // the strikethrough MRP — do NOT re-apply the discount (that double-discounts).
-  const effectiveDiscountPct = selectedVariant
-    ? selectedVariant.discountPercentage > 0
-      ? selectedVariant.discountPercentage
-      : (product?.savingsPercent ?? 0)
-    : 0;
-  const variantSellingPrice = selectedVariant?.price ?? 0;
-  const variantMrp = selectedVariant
-    ? (selectedVariant.mrp ?? selectedVariant.price)
-    : 0;
-  const activeProduct =
-    product && selectedVariant
-      ? {
-          ...product,
-          price: variantSellingPrice,
-          originalPrice:
-            variantMrp > variantSellingPrice ? variantMrp : undefined,
-          savingsPercent:
-            effectiveDiscountPct > 0 ? effectiveDiscountPct : undefined,
-          packSize: parseFloat(selectedVariant.packSize) || product.packSize,
-          packLabel: formatPackLabel({
-            packSize: selectedVariant.packSize,
-            unit: selectedVariant.unit,
-            dosageForm: product.dosageForm,
-          }),
-        }
-      : product;
+  // Merge selected variant price and pack metadata into a stable product object.
+  const activeProduct = useMemo(() => {
+    if (!product) return null;
+    if (!selectedVariant) return product;
+
+    const effectiveDiscountPct =
+      selectedVariant.discountPercentage > 0
+        ? selectedVariant.discountPercentage
+        : (product.savingsPercent ?? 0);
+    const variantSellingPrice = selectedVariant.price;
+    const variantMrp = selectedVariant.mrp ?? selectedVariant.price;
+
+    return {
+      ...product,
+      price: variantSellingPrice,
+      originalPrice:
+        variantMrp > variantSellingPrice ? variantMrp : undefined,
+      savingsPercent:
+        effectiveDiscountPct > 0 ? effectiveDiscountPct : undefined,
+      packSize: parseFloat(selectedVariant.packSize) || product.packSize,
+      packLabel: formatPackLabel({
+        packSize: selectedVariant.packSize,
+        unit: selectedVariant.unit,
+        dosageForm: product.dosageForm,
+      }),
+    };
+  }, [product, selectedVariant]);
+
+  const footerProduct = useMemo(() => {
+    if (!activeProduct) return null;
+    return {
+      ...activeProduct,
+      packSize: selectedVariant
+        ? `${selectedVariant.packSize} ${selectedVariant.unit}`
+        : activeProduct.packSize != null
+          ? String(activeProduct.packSize)
+          : undefined,
+      unit: selectedVariant?.unit,
+    };
+  }, [activeProduct, selectedVariant]);
 
   // When a variant is selected, use the VARIANT's UUID as medicineId.
   // The backend cart unique-key is medicineId only — different variant UUIDs = separate rows.
@@ -236,7 +235,7 @@ export const ProductDetailsLayout: React.FC = () => {
 
                   <WhyFamiliesTrustUs
                     promise={appContent?.promise}
-                    isLoading={isHomeLoading}
+                    isLoading={isContentLoading}
                     showTitle={false}
                   />
                 </View>
@@ -250,6 +249,7 @@ export const ProductDetailsLayout: React.FC = () => {
           )}
 
           {activeProduct &&
+            footerProduct &&
             (recommendation || !showNoSubstituteBanner ? (
               <ProductDetailsFooter
                 productId={id}
@@ -263,15 +263,7 @@ export const ProductDetailsLayout: React.FC = () => {
                 // in the cart.
                 baseMedicineId={variants.length > 0 ? undefined : raw?.id}
                 variantId={activeVariantId}
-                product={{
-                  ...activeProduct,
-                  packSize: selectedVariant
-                    ? `${selectedVariant.packSize} ${selectedVariant.unit}`
-                    : activeProduct.packSize != null
-                      ? String(activeProduct.packSize)
-                      : undefined,
-                  unit: selectedVariant?.unit,
-                }}
+                product={footerProduct}
                 safeAreaBottom={adjustedBottom}
                 onViewCart={() => router.push("/(stack)/cart")}
               />

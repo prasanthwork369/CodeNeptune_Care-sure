@@ -13,6 +13,10 @@ export const useMoreAboutScrollNavigation = (
 ) => {
   const tabs = useMoreAboutTabs(additionalData);
   const [isSticky, setIsSticky] = useState(false);
+  // Ref mirror of isSticky so handleScroll's useCallback can read the current
+  // value without adding isSticky to its dep array (which would recreate the
+  // callback on every sticky transition and break callback stability).
+  const isStickyRef = useRef(false);
   const sectionLayouts = useRef<Record<string, { y: number; height: number }>>(
     {},
   );
@@ -25,6 +29,9 @@ export const useMoreAboutScrollNavigation = (
   useEffect(() => {
     sectionLayouts.current = {};
     tabsY.current = null;
+    // Sync both the state and its ref mirror so handleScroll reads the correct
+    // baseline after a product change (e.g. navigating between PDPs).
+    isStickyRef.current = false;
     setIsSticky(false);
   }, [additionalData]);
 
@@ -37,9 +44,9 @@ export const useMoreAboutScrollNavigation = (
 
   const handleTabPress = useCallback(
     (sectionId: string) => {
-      pressedSectionId.current = sectionId;
       const sectionLayout = sectionLayouts.current[sectionId];
       if (sectionLayout) {
+        pressedSectionId.current = sectionId;
         isTabPressScrolling.current = true;
         if (scrollTimer.current) clearTimeout(scrollTimer.current);
         parentScrollRef.current?.scrollTo({
@@ -48,6 +55,7 @@ export const useMoreAboutScrollNavigation = (
         });
         scrollTimer.current = setTimeout(() => {
           isTabPressScrolling.current = false;
+          pressedSectionId.current = null;
         }, 700);
       }
       tabs.setActiveSectionId(sectionId);
@@ -60,19 +68,47 @@ export const useMoreAboutScrollNavigation = (
       const { contentOffset, contentSize, layoutMeasurement } =
         event.nativeEvent;
       const scrollY = contentOffset.y;
-      setIsSticky(tabsY.current !== null && scrollY >= tabsY.current);
+      // Hysteresis dead-zone (±2dp) prevents flicker when the user slow-scrolls
+      // exactly at the threshold boundary. Without this, every frame that
+      // crosses tabsY triggers a show→hide→show sequence, causing the opacity
+      // animation to interrupt itself and produce a visible flicker.
+      //
+      // - Currently hidden  → show only when scrollY ≥ tabsY + 2
+      // - Currently visible → hide only when scrollY ≤ tabsY - 2
+      //
+      // isStickyRef (ref mirror of isSticky) is used instead of the state
+      // value so this closure never goes stale without being in the dep array.
+      if (tabsY.current !== null) {
+        const showThreshold = tabsY.current + 2;
+        const hideThreshold = tabsY.current - 2;
+        const nextSticky = isStickyRef.current
+          ? scrollY > hideThreshold   // currently shown: hide only if clearly above
+          : scrollY >= showThreshold; // currently hidden: show only if clearly past
+        if (nextSticky !== isStickyRef.current) {
+          isStickyRef.current = nextSticky;
+          setIsSticky(nextSticky);
+        }
+      }
       if (isTabPressScrolling.current || pressedSectionId.current) return;
 
       const firstLayout = sectionLayouts.current[tabs.sections[0]?.id];
       const lastLayout =
         sectionLayouts.current[tabs.sections[tabs.sections.length - 1]?.id];
       const availableHeight = layoutMeasurement.height - tabsHeight.current;
-      const isAtBottom =
-        scrollY + layoutMeasurement.height >= contentSize.height - 1;
+      const maxScrollY = Math.max(
+        0,
+        contentSize.height - layoutMeasurement.height,
+      );
+      const remainingScroll =
+        contentSize.height - (scrollY + layoutMeasurement.height);
+      const isNearBottom = remainingScroll <= 32;
 
-      if (isAtBottom) {
-        const lastSectionId = tabs.sections.at(-1)?.id;
-        if (lastSectionId && lastSectionId !== tabs.activeSection?.id) {
+      // When reaching or near bottom, activate the final section even if maxScrollY
+      // prevents its top edge from physically reaching the 20% visible line.
+      if (isNearBottom) {
+        const lastSectionId =
+          tabs.sections[tabs.sections.length - 1]?.id;
+        if (lastSectionId) {
           tabs.syncActiveSectionId(lastSectionId);
         }
         return;
@@ -84,19 +120,27 @@ export const useMoreAboutScrollNavigation = (
         lastLayout.y + lastLayout.height - firstLayout.y <=
           availableHeight * 1.5;
 
-      // With little vertical overflow, several short sections remain visible
-      // together and there is not enough scroll range to give each heading a
-      // reliable activation point. Preserve the user's selected tab instead
-      // of making the indicator jump between those sections.
+      // With little vertical overflow, preserve selected tab.
       if (isCompactContent) return;
 
-      // Use an activation line below the sticky tabs. At the real bottom,
-      // select the final section because it cannot reach that line naturally.
+      // Activation line below sticky tabs.
       const visibleY = scrollY + tabsHeight.current + availableHeight * 0.2;
       let visibleSectionId: string | undefined;
       for (const section of tabs.sections) {
         const layout = sectionLayouts.current[section.id];
-        if (layout && layout.y <= visibleY) visibleSectionId = section.id;
+        if (!layout) continue;
+
+        if (layout.y <= visibleY) {
+          visibleSectionId = section.id;
+          continue;
+        }
+
+        // Clamped threshold for physically unreachable end sections.
+        const requiredScrollY =
+          layout.y - tabsHeight.current - availableHeight * 0.2;
+        if (requiredScrollY > maxScrollY && scrollY >= maxScrollY - 32) {
+          visibleSectionId = section.id;
+        }
       }
       if (visibleSectionId && visibleSectionId !== tabs.activeSection?.id) {
         tabs.syncActiveSectionId(visibleSectionId);

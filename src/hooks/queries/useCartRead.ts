@@ -55,3 +55,79 @@ export const useCartRead = () => {
     isLoading: isAuthenticated ? isLoading : false,
   };
 };
+
+/**
+ * Selects only the total item count from the cart for header badge display.
+ */
+export const useCartCount = (): number => {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  const { data: authCount } = useQuery({
+    queryKey: QUERY_KEYS.CUSTOMER.CART,
+    queryFn: cartService.getCart,
+    enabled: isAuthenticated,
+    staleTime: 10_000,
+    select: (cart) => {
+      let count = 0;
+      for (const item of cart?.items ?? []) {
+        count += item.quantity;
+      }
+      return count;
+    },
+  });
+
+  const guestCount = useCartPendingStore((s) => {
+    if (isAuthenticated) return 0;
+    let count = 0;
+    for (const item of s.guestCart.items) {
+      count += item.quantity;
+    }
+    return count;
+  });
+
+  return (isAuthenticated ? authCount : guestCount) ?? 0;
+};
+
+/**
+ * Selects only the matching variant ID from cart for variant preselection.
+ * Returns a primitive string, preventing parent re-renders on cart quantity changes.
+ */
+export const useInCartVariantId = (
+  variants: { id: string; packSize?: string; unit?: string }[],
+): string | undefined => {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  const { data: authVariantId } = useQuery({
+    queryKey: QUERY_KEYS.CUSTOMER.CART,
+    queryFn: cartService.getCart,
+    enabled: isAuthenticated && variants.length > 0,
+    staleTime: 10_000,
+    select: (cart) => {
+      if (!cart?.items?.length) return undefined;
+      const inCart = variants.find((v) =>
+        cart.items.some(
+          (i) =>
+            i.medicineId === v.id ||
+            (i.metadata?.packSize === v.packSize &&
+              i.metadata?.unit === v.unit),
+        ),
+      );
+      return inCart?.id;
+    },
+  });
+
+  const guestVariantId = useCartPendingStore((s) => {
+    if (isAuthenticated || variants.length === 0) return undefined;
+    const inCart = variants.find((v) =>
+      s.guestCart.items.some(
+        (i) =>
+          i.medicineId === v.id ||
+          (i.metadata?.packSize === v.packSize &&
+            i.metadata?.unit === v.unit),
+      ),
+    );
+    return inCart?.id;
+  });
+
+  return isAuthenticated ? authVariantId : guestVariantId;
+};

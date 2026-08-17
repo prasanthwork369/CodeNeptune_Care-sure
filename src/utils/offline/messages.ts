@@ -15,10 +15,11 @@ export const OFFLINE_MESSAGE =
 export const networkErrorMessage = (kind: AppErrorKind): string => {
   switch (kind) {
     case "offline":
-    case "network":
       return OFFLINE_MESSAGE;
+    case "network":
+      return "Unable to reach server. Please try again.";
     case "timeout":
-      return "That took too long. Please try again.";
+      return "Request timed out. Please try again.";
     case "unauthorized":
     case "forbidden":
       return "Your session has expired. Please log in and try again.";
@@ -31,7 +32,7 @@ export const networkErrorMessage = (kind: AppErrorKind): string => {
     case "conflict":
       return "That's already been updated. Please refresh and try again.";
     case "server":
-      return "We couldn't reach our servers. Please try again in a moment.";
+      return "Server temporarily unavailable. Please try again in a moment.";
     default:
       return "Something went wrong. Please try again.";
   }

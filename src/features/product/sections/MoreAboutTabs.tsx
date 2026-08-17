@@ -21,15 +21,16 @@ interface MoreAboutTabsProps {
   ) => void;
 }
 
-export const MoreAboutTabs: React.FC<MoreAboutTabsProps> = ({
-  sections,
-  activeSectionId,
-  tabsScrollRef,
-  indicatorX,
-  indicatorWidth,
-  onTabPress,
-  onTabLayout,
-}) => {
+export const MoreAboutTabs: React.FC<MoreAboutTabsProps> = React.memo(
+  ({
+    sections,
+    activeSectionId,
+    tabsScrollRef,
+    indicatorX,
+    indicatorWidth,
+    onTabPress,
+    onTabLayout,
+  }) => {
   const indicatorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: indicatorX.value }],
     width: indicatorWidth.value,
@@ -107,4 +108,6 @@ export const MoreAboutTabs: React.FC<MoreAboutTabsProps> = ({
       </ScrollView>
     </View>
   );
-};
+});
+
+MoreAboutTabs.displayName = "MoreAboutTabs";

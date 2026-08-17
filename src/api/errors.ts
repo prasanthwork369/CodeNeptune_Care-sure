@@ -89,6 +89,26 @@ export type CaughtError = {
 export const asError = (err: unknown): CaughtError =>
   (err ?? {}) as CaughtError;
 
+const extractSafeMessage = (data: unknown, fallback: string): string => {
+  if (typeof data === "object" && data !== null) {
+    const msg =
+      (data as { message?: unknown; error?: unknown }).message ??
+      (data as { message?: unknown; error?: unknown }).error;
+    if (typeof msg === "string") {
+      const trimmed = msg.trim();
+      if (
+        trimmed &&
+        !trimmed.startsWith("Request failed") &&
+        !trimmed.includes("[object") &&
+        !trimmed.startsWith("<!DOCTYPE")
+      ) {
+        return trimmed;
+      }
+    }
+  }
+  return fallback;
+};
+
 export function toAppError(err: unknown): AppError {
   if (err instanceof AppError) return err;
 
@@ -110,24 +130,40 @@ export function toAppError(err: unknown): AppError {
     if (err.code === "ECONNABORTED" || err.code === "ETIMEDOUT") {
       return new AppError(
         "timeout",
-        "Request timed out. Please check your connection.",
+        "Request timed out. Please try again.",
       );
     }
     // No response covers DNS failure, connection reset and unreachable host.
     if (!err.response) {
       return new AppError(
         "network",
-        "Connection error. Please check your internet or try again.",
+        "Unable to reach server. Please try again.",
       );
     }
     const status = err.response.status;
-    const data = err.response.data as { message?: string } | undefined;
-    const message = data?.message ?? err.message;
+    const data = err.response.data;
 
     if (status === 401)
-      return new AppError("unauthorized", message, status, data);
-    if (status === 403) return new AppError("forbidden", message, status, data);
-    if (status === 404) return new AppError("not_found", message, status, data);
+      return new AppError(
+        "unauthorized",
+        "Your session has expired. Please log in and try again.",
+        status,
+        data,
+      );
+    if (status === 403)
+      return new AppError(
+        "forbidden",
+        extractSafeMessage(data, "Access denied. Please try again."),
+        status,
+        data,
+      );
+    if (status === 404)
+      return new AppError(
+        "not_found",
+        extractSafeMessage(data, "That's no longer available."),
+        status,
+        data,
+      );
     if (status === 413)
       return new AppError(
         "validation",
@@ -135,17 +171,30 @@ export function toAppError(err: unknown): AppError {
         status,
         data,
       );
-    if (status === 422)
-      return new AppError("validation", message, status, data);
-    // Explicit, or an unmapped 4xx falls through to `unknown` and gets retried
-    // — which on a 429 means hammering the endpoint that just said stop.
-    if (status === 400)
-      return new AppError("validation", message, status, data);
-    if (status === 409) return new AppError("conflict", message, status, data);
+    if (status === 400 || status === 422)
+      return new AppError(
+        "validation",
+        extractSafeMessage(data, "Please check the details and try again."),
+        status,
+        data,
+      );
+    if (status === 409)
+      return new AppError(
+        "conflict",
+        extractSafeMessage(
+          data,
+          "That's already been updated. Please refresh and try again.",
+        ),
+        status,
+        data,
+      );
     if (status === 429)
       return new AppError(
         "rate_limited",
-        message,
+        extractSafeMessage(
+          data,
+          "Too many requests. Please wait a moment and try again.",
+        ),
         status,
         data,
         parseRetryAfter(err.response.headers?.["retry-after"]),
@@ -153,11 +202,16 @@ export function toAppError(err: unknown): AppError {
     if (status >= 500)
       return new AppError(
         "server",
-        "Server error. Please try again later.",
+        "Server temporarily unavailable. Please try again in a moment.",
         status,
         data,
       );
-    return new AppError("unknown", message, status, data);
+    return new AppError(
+      "unknown",
+      extractSafeMessage(data, "Something went wrong. Please try again."),
+      status,
+      data,
+    );
   }
 
   if (err instanceof Error) {

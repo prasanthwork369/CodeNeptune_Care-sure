@@ -4,27 +4,29 @@ import { icons } from "@/src/constants/icons";
 import { productWebUrl } from "@/src/constants/urls";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { colors } from "@/src/theme";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartCount } from "@/src/hooks/queries/useCartRead";
 import { useNav } from "@/src/hooks/useNav";
 import { ProductDetailsHeaderProps } from "@/src/features/product/types";
 import React from "react";
 import { Alert, Share, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
-  title,
-  backgroundColor,
-  showBorder = true,
-  onBack,
-  productId,
-  productType,
-  slug,
-  packLabel,
-  price,
-  manufacturer,
-  dosageForm,
-}) => {
-  const { totalItems: cartCount } = useCartRead();
+export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> =
+  React.memo(
+    ({
+      title,
+      backgroundColor,
+      showBorder = true,
+      onBack,
+      productId,
+      productType,
+      slug,
+      packLabel,
+      price,
+      manufacturer,
+      dosageForm,
+    }) => {
+      const cartCount = useCartCount();
   const router = useNav();
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
@@ -137,4 +139,6 @@ export const ProductDetailsHeader: React.FC<ProductDetailsHeaderProps> = ({
       </View>
     </View>
   );
-};
+});
+
+ProductDetailsHeader.displayName = "ProductDetailsHeader";

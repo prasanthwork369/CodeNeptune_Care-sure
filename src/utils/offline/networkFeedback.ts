@@ -2,6 +2,7 @@ import { AppError, toAppError } from "@/src/api/errors";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { networkErrorMessage } from "./messages";
+import { isOffline } from "./networkState";
 
 /**
  * The single place that decides HOW a network problem is shown, so no screen
@@ -63,6 +64,14 @@ export const reportOffline = (opts: NetworkFeedbackOptions = {}): void => {
  * Reports a failed action. Cancellations stay silent — they are debounce/unmount
  * aborts, not failures the user caused or can fix.
  */
+const BUSINESS_ERROR_KINDS: AppError["kind"][] = [
+  "validation",
+  "conflict",
+  "not_found",
+  "forbidden",
+  "rate_limited",
+];
+
 export const reportActionError = (
   error: unknown,
   opts: NetworkFeedbackOptions & { message?: string } = {},
@@ -70,17 +79,27 @@ export const reportActionError = (
   const appError = toAppError(error);
   if (appError.kind === "cancelled" || opts.silent) return appError;
 
-  // Connection failures belong to the banner. By the time one surfaces the client
-  // has already marked the app unreachable, so the banner is up — a toast here
-  // would be the same news a second time.
-  if (appError.kind === "offline" || appError.kind === "network") {
+  // If the offline alert dialog is already visible, avoid showing a toast over it.
+  if (useNetworkStore.getState().offlineAlertVisible) return appError;
+
+  // Connection failures when the device is truly offline belong to the banner.
+  if (
+    appError.kind === "offline" ||
+    (appError.kind === "network" && isOffline())
+  ) {
     reportOffline(opts);
     return appError;
   }
 
-  // `||`, not `??` — an explicit empty-string override must fall back too,
-  // or a caller that computes a blank message silently produces a toast
-  // with nothing readable in it.
-  showToastOnce(opts.message || networkErrorMessage(appError.kind));
+  // Preserve backend business messages for validation/conflict/not-found;
+  // use sanitized standard copy for technical transport/server errors.
+  const fallbackMessage = networkErrorMessage(appError.kind);
+  const resolvedMessage =
+    opts.message ||
+    (BUSINESS_ERROR_KINDS.includes(appError.kind) && appError.message
+      ? appError.message
+      : fallbackMessage);
+
+  showToastOnce(resolvedMessage);
   return appError;
 };

@@ -5,6 +5,21 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useCategories } from "./useCategories";
 
+/**
+ * Narrow subscription for app content (promise, banners, etc.) without subscribing to categories.
+ */
+export const useAppContent = () => {
+  const cachedContent = useCachedSeed<ApiAppContent>("app_contents");
+
+  return useQuery({
+    queryKey: QUERY_KEYS.APP.CONTENTS,
+    queryFn: withSqliteCache("app_contents", homeApi.getAppContents),
+    initialData: () => cachedContent?.data,
+    initialDataUpdatedAt: () => cachedContent?.updatedAt ?? 0,
+    staleTime: 10 * 60_000,
+  });
+};
+
 export const useHome = () => {
   const {
     tabs,
@@ -14,20 +29,12 @@ export const useHome = () => {
     refetch: refetchCategories,
   } = useCategories();
 
-  const cachedContent = useCachedSeed<ApiAppContent>("app_contents");
-
   const {
     data: appContent,
     isLoading: isContentLoading,
     error: contentError,
     refetch: refetchContent,
-  } = useQuery({
-    queryKey: QUERY_KEYS.APP.CONTENTS,
-    queryFn: withSqliteCache("app_contents", homeApi.getAppContents),
-    initialData: () => cachedContent?.data,
-    initialDataUpdatedAt: () => cachedContent?.updatedAt ?? 0,
-    staleTime: 10 * 60_000,
-  });
+  } = useAppContent();
 
   const refetch = async () => {
     await Promise.all([refetchCategories(), refetchContent()]);

@@ -1,10 +1,7 @@
 import { tokenStorage } from "@/src/lib/storage";
 import { isOffline } from "@/src/utils/offline/networkState";
 import { reportOffline } from "@/src/utils/offline/networkFeedback";
-import {
-  markReachable,
-  markUnreachable,
-} from "@/src/utils/offline/reachability";
+
 import { logger } from "@/src/utils/logger";
 import { requestQueue } from "@/src/utils/requestQueue";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
@@ -120,11 +117,7 @@ apiClient.interceptors.request.use((config) => {
 
 // 401 response interceptor — refresh and retry
 apiClient.interceptors.response.use(
-  (res) => {
-    // Proof the app can reach the network, whatever NetInfo currently believes.
-    markReachable();
-    return res;
-  },
+  (res) => res,
   async (err) => {
     // Hand safe, queueable writes to requestQueue instead of failing them —
     // this resolves/rejects once the request actually replays on reconnect,
@@ -140,9 +133,6 @@ apiClient.interceptors.response.use(
       !err.response &&
       err.code !== "ECONNABORTED" &&
       err.code !== "NETWORK_OFFLINE";
-    // Equally, a connection-level failure proves it cannot — this is what catches
-    // an OS-level per-app network block, where NetInfo still reports connected.
-    if (isNetworkError) markUnreachable();
     if (isNetworkError && isOffline()) {
       return Promise.reject(
         Object.assign(new Error("Network offline"), {
