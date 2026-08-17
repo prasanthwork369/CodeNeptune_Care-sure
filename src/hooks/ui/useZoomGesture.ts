@@ -1,6 +1,5 @@
 import { Gesture } from "react-native-gesture-handler";
 import {
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -10,34 +9,22 @@ interface UseZoomGestureOptions {
   containerWidth: number;
   containerHeight: number;
   maxScale?: number;
-  /**
-   * Opt-in: when provided, a horizontal drag released while NOT zoomed in
-   * triggers these instead of being released untouched. Only pass these for
-   * screens that want swipe-between-images — doing so means this screen's
-   * pan gesture claims unzoomed horizontal touches too, which trades away
-   * the native iOS edge-swipe-back preservation described below. Callers
-   * that don't pass them keep the original fail-fast behavior exactly.
-   */
-  onSwipeLeft?: () => void;
-  onSwipeRight?: () => void;
 }
 
-const SWIPE_DISTANCE = 60;
-const SWIPE_VELOCITY = 400;
-
 /**
- * Shared production hook for image & document pinch-to-zoom and pan gestures.
+ * Per-page pinch-to-zoom, double-tap, and zoomed-state pan.
  *
- * Uses worklet-level manualActivation on panGesture so unzoomed touches fail
- * instantly on the UI thread, preserving native iOS swipe-back gestures —
- * unless onSwipeLeft/onSwipeRight opt a screen into swipe-between-images.
+ * Horizontal swiping between pages is fully delegated to the native
+ * paged FlatList in ProductImageViewerLayout — this hook owns zoom only.
+ *
+ * panGesture fails immediately via manualActivation when NOT zoomed
+ * (savedScale === 1), so native FlatList paging gets every unzoomed
+ * horizontal drag without competition.
  */
 export function useZoomGesture({
   containerWidth,
   containerHeight,
   maxScale = 6,
-  onSwipeLeft,
-  onSwipeRight,
 }: UseZoomGestureOptions) {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
@@ -48,9 +35,9 @@ export function useZoomGesture({
 
   const resetZoom = () => {
     "worklet";
-    scale.value = withTiming(1, { duration: 250 });
-    translateX.value = withTiming(0, { duration: 250 });
-    translateY.value = withTiming(0, { duration: 250 });
+    scale.value = withTiming(1, { duration: 200 });
+    translateX.value = 0;
+    translateY.value = 0;
     savedScale.value = 1;
     savedTranslateX.value = 0;
     savedTranslateY.value = 0;
@@ -58,9 +45,11 @@ export function useZoomGesture({
 
   const pinchGesture = Gesture.Pinch()
     .onUpdate((e) => {
+      "worklet";
       scale.value = Math.min(Math.max(savedScale.value * e.scale, 1), maxScale);
     })
     .onEnd(() => {
+      "worklet";
       if (scale.value <= 1) {
         resetZoom();
       } else {
@@ -68,21 +57,22 @@ export function useZoomGesture({
       }
     });
 
-  const allowUnzoomedSwipe = !!(onSwipeLeft || onSwipeRight);
-
   const panGesture = Gesture.Pan()
     .minPointers(1)
     .maxPointers(1)
     .manualActivation(true)
     .onTouchesMove((_, state) => {
       "worklet";
-      if (savedScale.value > 1 || allowUnzoomedSwipe) {
+      // Only activate when zoomed in — unzoomed drags pass straight through
+      // to the native FlatList pager, preserving full-speed native momentum.
+      if (savedScale.value > 1) {
         state.activate();
       } else {
         state.fail();
       }
     })
     .onUpdate((e) => {
+      "worklet";
       if (savedScale.value > 1) {
         const maxX = (containerWidth * (savedScale.value - 1)) / 2;
         const maxY = (containerHeight * (savedScale.value - 1)) / 2;
@@ -96,31 +86,22 @@ export function useZoomGesture({
         );
       }
     })
-    .onEnd((e) => {
+    .onEnd(() => {
+      "worklet";
       if (savedScale.value > 1) {
         savedTranslateX.value = translateX.value;
         savedTranslateY.value = translateY.value;
-        return;
-      }
-      if (!allowUnzoomedSwipe) return;
-      const isSwipeLeft =
-        e.translationX < -SWIPE_DISTANCE || e.velocityX < -SWIPE_VELOCITY;
-      const isSwipeRight =
-        e.translationX > SWIPE_DISTANCE || e.velocityX > SWIPE_VELOCITY;
-      if (isSwipeLeft && onSwipeLeft) {
-        runOnJS(onSwipeLeft)();
-      } else if (isSwipeRight && onSwipeRight) {
-        runOnJS(onSwipeRight)();
       }
     });
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .maxDuration(250)
-    // Fails fast on any real movement, so a drag hands off to panGesture
+    // Fails fast on any real movement so a drag hands off to panGesture
     // immediately instead of panGesture waiting on this to resolve.
     .maxDistance(10)
     .onEnd(() => {
+      "worklet";
       if (scale.value > 1) {
         resetZoom();
       } else {
@@ -129,24 +110,26 @@ export function useZoomGesture({
       }
     });
 
-  // Race, not Exclusive: panGesture activates itself manually (via
-  // onTouchesMove) rather than through the declarative criteria Exclusive
-  // arbitrates over, so Exclusive left it waiting on doubleTap to fail before
-  // it was allowed to visibly take over — which read as "dragging does
-  // nothing" while zoomed in. Race lets whichever gesture actually
-  // recognizes first win immediately.
+  // Race, not Exclusive: panGesture activates itself manually via
+  // onTouchesMove, so Exclusive would leave it waiting on doubleTap to
+  // fail first — which read as "drag does nothing" while zoomed in.
+  // Race lets whichever gesture actually recognizes first win immediately.
   const composedGesture = Gesture.Simultaneous(
     pinchGesture,
     Gesture.Race(doubleTap, panGesture),
   );
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const zoomAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
       { scale: scale.value },
     ],
   }));
+
+  // Alias kept for backward-compat with AvatarPreviewModal,
+  // PrescriptionViewerLayout and PreviewDisplay which destructure animatedStyle.
+  const animatedStyle = zoomAnimatedStyle;
 
   return {
     scale,
@@ -155,6 +138,7 @@ export function useZoomGesture({
     translateY,
     resetZoom,
     composedGesture,
+    zoomAnimatedStyle,
     animatedStyle,
   };
 }

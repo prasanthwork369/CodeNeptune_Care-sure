@@ -1,29 +1,19 @@
 import { asError } from "@/src/api/errors";
-import { PrescriptionReviewSheet } from "@/src/features/prescription/components/PrescriptionReviewSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { PrescriptionReviewSheet } from "@/src/features/prescription/components/PrescriptionReviewSheet";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
-import {
-  CapturedAsset,
-  usePrescriptionUploadService,
-} from "../scanner";
+import { PrescriptionItem } from "@/src/features/prescription/types";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import {
-  uploadKeyOf,
-  usePrescriptionUploader,
-} from "../hooks/usePrescriptionUploader";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
-import { PrescriptionItem } from "@/src/features/prescription/types";
 import { logger } from "@/src/utils/logger";
 import { requireInternet } from "@/src/utils/offline";
-import { validatePrescriptionFile } from "../utils/prescription";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -32,6 +22,12 @@ import React, {
   useState,
 } from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
+import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
+import {
+  uploadKeyOf,
+  usePrescriptionUploader,
+} from "../hooks/usePrescriptionUploader";
+import { CapturedAsset, usePrescriptionUploadService } from "../scanner";
 import {
   DuplicateFileModal,
   FileTooLargeModal,
@@ -42,6 +38,7 @@ import {
   RemoveConfirmModal,
   UploadProgressPanel,
 } from "../sections/preview";
+import { validatePrescriptionFile } from "../utils/prescription";
 
 const FOLDER = "customers/prescriptions";
 
@@ -412,7 +409,7 @@ export const PreviewLayout: React.FC = () => {
         icon={HOME_IMAGES.leaveWarning}
         iconBg="#FFF1F1"
         confirmBg="#E02D5B"
-        cancelLabel="Great"
+        cancelLabel="Continue"
         confirmLabel="Leave"
         onConfirm={() => {
           setShowLeaveConfirm(false);

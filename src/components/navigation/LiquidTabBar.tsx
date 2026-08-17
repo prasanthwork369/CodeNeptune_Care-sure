@@ -15,12 +15,11 @@ import {
   DeviceEventEmitter,
   Image,
   LayoutChangeEvent,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -32,9 +31,8 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withSequence,
   withSpring,
-  withTiming,
+  withTiming
 } from "react-native-reanimated";
 import {
   ACTIVE_HEIGHT,
@@ -217,9 +215,7 @@ function wrapIconWithAnimated(Icon: TabIconComponent) {
 const ANIMATED_TABS = tabs.map((tab) => ({
   ...tab,
   icon: wrapIconWithAnimated(tab.icon),
-  activeIcon: tab.activeIcon
-    ? wrapIconWithAnimated(tab.activeIcon)
-    : undefined,
+  activeIcon: tab.activeIcon ? wrapIconWithAnimated(tab.activeIcon) : undefined,
 }));
 
 type AnimatedTabIcon = ReturnType<typeof wrapIconWithAnimated>;
@@ -228,6 +224,7 @@ interface TabItemProps {
   icon: AnimatedTabIcon;
   activeIcon?: AnimatedTabIcon;
   index: number;
+  isActive: boolean;
   label: string;
   followerX: SharedValue<number>;
   pillOpacity: SharedValue<number>;
@@ -238,6 +235,7 @@ const TabItem = React.memo(
     icon: Icon,
     activeIcon: ActiveIcon,
     index,
+    isActive,
     label,
     followerX,
     pillOpacity,
@@ -285,18 +283,6 @@ const TabItem = React.memo(
           [INACTIVE_ICON_COLOR, ACTIVE_ICON_COLOR],
         ),
         fontSize: tabStyles.tabLabel.fontSize,
-        // This style is written straight to the native view from the UI thread, bypassing
-        // the global Text patch (src/utils/patchText.ts) -- so unlike everywhere else in the
-        // app, the real loaded font name must be set here directly instead of a numeric
-        // fontWeight. iOS keeps numeric fontWeight since SF Pro honors it natively.
-        fontFamily:
-          Platform.OS === "android"
-            ? w > 0.5
-              ? "Inter_700Bold"
-              : "Inter_500Medium"
-            : undefined,
-        fontWeight:
-          Platform.OS === "android" ? "normal" : w > 0.5 ? "700" : "500",
         marginTop: TAB_LABEL_MARGIN_TOP,
         textAlign: "center",
         width: "100%",
@@ -343,7 +329,11 @@ const TabItem = React.memo(
           </Animated.View>
         </Animated.View>
         <AnimatedText
-          style={animatedTextStyle}
+          style={[
+            animatedTextStyle,
+            // fontFamily is intentionally omitted here — patchText.sanitizeStyle
+            { fontWeight: isActive ? "700" : "500" },
+          ]}
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.7}
@@ -413,14 +403,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const followerX = useSharedValue(initialPillIndex);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
 
-  // Android: the active tab label's custom Inter typeface (set via useAnimatedStyle in
-  // TabItem) can fail to resolve on the very first paint -- the native Text view is
-  // created before the font is queryable in Android's typeface cache, and only a real
-  // prop update (like tapping a tab) re-resolves it correctly. Setting followerX to the
-  // same value it already holds is a no-op (Reanimated skips pushing an update when the
-  // value doesn't change), so we animate it away and back over real frames -- after a
-  // short delay for the typeface cache to warm up -- which forces genuine native style
-  // recomputes and lets the active label land on the bold weight without needing a tap.
   useEffect(() => {
     if (activePillIndex !== -1) {
       pillOpacity.value = withSpring(1, SNAP_SPRING);
@@ -429,18 +411,6 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     } else {
       pillOpacity.value = withTiming(0, { duration: 150 });
     }
-  }, [activePillIndex]);
-
-  // Android: warm up typeface cache for active tab label without breaking active tab index
-  useEffect(() => {
-    if (Platform.OS !== "android" || activePillIndex === -1) return;
-    const id = setTimeout(() => {
-      followerX.value = withSequence(
-        withTiming(activePillIndex + 0.001, { duration: 16 }),
-        withTiming(activePillIndex, { duration: 16 }),
-      );
-    }, 80);
-    return () => clearTimeout(id);
   }, [activePillIndex]);
 
   const navigateToTab = useCallback(
@@ -685,6 +655,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
                 <TabItem
                   key={route.key}
                   index={index}
+                  isActive={activePillIndex === index}
                   icon={tab!.icon}
                   activeIcon={tab!.activeIcon}
                   label={tab!.title}

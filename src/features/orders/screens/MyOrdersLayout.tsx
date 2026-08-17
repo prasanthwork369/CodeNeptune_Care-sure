@@ -26,6 +26,8 @@ export const MyOrdersLayout: React.FC = () => {
   const {
     scrollRef,
     scrollHandler,
+    handleMomentumScrollEnd,
+    handleScrollEndDrag,
     progress,
     pageWidth,
     setPageWidth,
@@ -84,6 +86,8 @@ export const MyOrdersLayout: React.FC = () => {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             onScroll={scrollHandler}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
+            onScrollEndDrag={handleScrollEndDrag}
             scrollEventThrottle={16}
             decelerationRate="fast"
             directionalLockEnabled

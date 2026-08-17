@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import type Animated from "react-native-reanimated";
 import {
   runOnJS,
@@ -26,12 +27,35 @@ export function usePagerTabs<T extends string>(keys: readonly T[]) {
     setVisitedKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
   }, []);
 
-  const onActiveKeyChange = useCallback(
-    (key: T) => {
-      setActiveKey(key);
-      markVisited(key);
+  const onScrollSettle = useCallback(
+    (x: number) => {
+      if (pageWidth <= 0) return;
+      const index = Math.round(x / pageWidth);
+      const key = keys[index];
+      if (key !== undefined) {
+        setActiveKey(key);
+        markVisited(key);
+      }
     },
-    [markVisited],
+    [keys, pageWidth, markVisited],
+  );
+
+  const handleMomentumScrollEnd = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      onScrollSettle(e.nativeEvent.contentOffset.x);
+    },
+    [onScrollSettle],
+  );
+
+  const handleScrollEndDrag = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const velocity = e.nativeEvent.velocity;
+      // Settle immediately if there is no remaining momentum (velocity near 0).
+      if (!velocity || Math.abs(velocity.x) < 0.1) {
+        onScrollSettle(e.nativeEvent.contentOffset.x);
+      }
+    },
+    [onScrollSettle],
   );
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -45,29 +69,33 @@ export function usePagerTabs<T extends string>(keys: readonly T[]) {
     pageWidth > 0 ? scrollX.value / pageWidth : 0,
   );
 
-  // Label flips at the halfway point, matching standard pagers.
+  // Label flips at the halfway point for active tab visual highlight.
   useAnimatedReaction(
     () => Math.round(progress.value),
     (index, previous) => {
       if (index === previous) return;
       const key = keys[index];
-      if (key !== undefined) runOnJS(onActiveKeyChange)(key);
+      if (key !== undefined) runOnJS(setActiveKey)(key);
     },
-    [keys, onActiveKeyChange],
+    [keys],
   );
 
   const goToTab = useCallback(
     (key: T) => {
       const index = keys.indexOf(key);
       if (index < 0 || pageWidth === 0) return;
+      setActiveKey(key);
+      markVisited(key);
       scrollRef.current?.scrollTo({ x: index * pageWidth, animated: true });
     },
-    [keys, pageWidth, scrollRef],
+    [keys, pageWidth, scrollRef, markVisited],
   );
 
   return {
     scrollRef,
     scrollHandler,
+    handleMomentumScrollEnd,
+    handleScrollEndDrag,
     progress,
     pageWidth,
     setPageWidth,

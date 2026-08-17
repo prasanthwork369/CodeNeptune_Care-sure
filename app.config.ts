@@ -89,6 +89,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Resolves the manifest-merger clash between expo-notifications and
     // @react-native-firebase/messaging over default_notification_color.
     "./plugins/withFirebaseNotificationColorFix",
+    // Default Gradle JVM heap OOM'd during R8 minification on this project's
+    // dependency graph — must run before the build, not just tune R8 itself.
+    "./plugins/withGradleJvmHeap",
     // R8 is off by default in the React Native template, which left ~50MB of
     // unshrunk dex — and ART roughly doubles that again on disk at install.
     [

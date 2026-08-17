@@ -2,7 +2,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useInfiniteWalletLogs } from "@/src/hooks/queries/useWallet";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -27,6 +27,8 @@ export const WalletHistoryLayout: React.FC = () => {
   const {
     scrollRef,
     scrollHandler,
+    handleMomentumScrollEnd,
+    handleScrollEndDrag,
     progress,
     pageWidth,
     setPageWidth,
@@ -38,11 +40,20 @@ export const WalletHistoryLayout: React.FC = () => {
   const { logs, loading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteWalletLogs();
 
-  const all = logs.flatMap(logToTransactions);
+  const all = useMemo(() => logs.flatMap(logToTransactions), [logs]);
 
-  const loadMore = () => {
+  const transactionsByTab = useMemo(
+    () => ({
+      All: filterTransactions(all, "All"),
+      Debited: filterTransactions(all, "Debited"),
+      Credited: filterTransactions(all, "Credited"),
+    }),
+    [all],
+  );
+
+  const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-  };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
@@ -75,6 +86,8 @@ export const WalletHistoryLayout: React.FC = () => {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             onScroll={scrollHandler}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
+            onScrollEndDrag={handleScrollEndDrag}
             scrollEventThrottle={16}
             decelerationRate="fast"
             directionalLockEnabled
@@ -83,7 +96,7 @@ export const WalletHistoryLayout: React.FC = () => {
             {TABS.map((tab) => (
               <WalletHistoryPage
                 key={tab.key}
-                transactions={filterTransactions(all, tab.key)}
+                transactions={transactionsByTab[tab.key]}
                 width={pageWidth}
                 loading={loading}
                 isFetchingNextPage={isFetchingNextPage}
