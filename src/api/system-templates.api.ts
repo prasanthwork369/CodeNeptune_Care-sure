@@ -1,6 +1,6 @@
 /**
- * @module src/services/system-templates.service
- * Service for fetching public system document templates (invoices, receipts, etc.)
+ * @module src/api/system-templates.api
+ * API functions for fetching public system document templates (invoices, receipts, etc.)
  * These endpoints are public and do not require authentication.
  */
 
@@ -22,15 +22,10 @@ interface SystemTemplateResponse {
   message?: string;
 }
 
-export const systemTemplatesService = {
+export const systemTemplatesApi = {
   /**
    * Fetches a single active system template by its unique (event, channel) key.
    * No authentication required — public endpoint.
-   *
-   * @param event     - The system event name (e.g. 'INVOICE_DOCUMENT')
-   * @param channel   - The channel (default: 'DOCUMENT')
-   * @param variables - Optional map used to interpolate {{variableName}} placeholders
-   *                    in the template's subject/body/redirectUrl (e.g. { orderId: '...' })
    */
   getPublicTemplate: async (
     event: string,

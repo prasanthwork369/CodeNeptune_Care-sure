@@ -8,7 +8,7 @@ import { colors } from "@/src/constants/theme";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
 import { useNav } from "@/src/hooks/useNav";
-import { couponService } from "@/src/services/coupon.service";
+import { couponApi } from "../api/coupon.api";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import {
@@ -44,7 +44,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   useEffect(() => {
     const draftCode = useCheckoutDraftStore.getState().couponCode;
     if (appliedCoupon || !draftCode || subtotal <= 0) return;
-    couponService
+    couponApi
       .validateCoupon(draftCode, subtotal)
       .then((result) => {
         // A manual apply (handleDirectApply) may have completed while this
@@ -81,7 +81,7 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
     if (!requireInternet()) return;
     setApplying(true);
     try {
-      const result = await couponService.validateCoupon(
+      const result = await couponApi.validateCoupon(
         pick.coupon.code,
         subtotal,
       );

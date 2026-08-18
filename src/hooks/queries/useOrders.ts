@@ -1,6 +1,6 @@
 import type { OrderListParams } from "@/src/features/orders/types";
 import { useQuery } from "@tanstack/react-query";
-import { orderService } from "../../services/order.service";
+import { orderApi } from "@/src/features/orders/api/order.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
@@ -18,7 +18,7 @@ export const useOrders = (params: UseOrdersParams = {}) => {
     refetch,
   } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST(params),
-    queryFn: () => orderService.listOrders(params),
+    queryFn: () => orderApi.listOrders(params),
     enabled: isAuthenticated,
     staleTime: 60_000,
     retry: 1,
@@ -39,13 +39,13 @@ export function useFrequentlyOrdered(
 ) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const cachedFreq = useCachedSeed<
-    Awaited<ReturnType<typeof orderService.getFrequentlyOrdered>>
+    Awaited<ReturnType<typeof orderApi.getFrequentlyOrdered>>
   >("frequently_ordered");
 
   return useQuery({
     queryKey: ["frequently-ordered", params],
     queryFn: withSqliteCache("frequently_ordered", () =>
-      orderService.getFrequentlyOrdered(params),
+      orderApi.getFrequentlyOrdered(params),
     ),
     initialData: () => cachedFreq?.data,
     initialDataUpdatedAt: () => cachedFreq?.updatedAt ?? 0,

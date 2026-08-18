@@ -1,4 +1,4 @@
-import { prescriptionService } from "@/src/services/prescription.service";
+import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { prescriptionApi } from "@/src/features/prescription/api/prescription.api";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import { AppError } from "@/src/api/errors";

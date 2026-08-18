@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { cartService } from "@/src/services/cart.service";
-import { cartMutations } from "@/src/services/cart.mutations";
+import { cartApi } from "../api/cart.api";
+import { cartMutations } from "../services/cart.mutations";
 import { useAuthStore } from "@/src/store/authStore";
 import { requireInternet } from "@/src/utils/offline";
 import { notifyCartError } from "../utils/cartError";
@@ -69,7 +69,7 @@ export const useCartActions = (product: CartActionProduct) => {
   // so an unchanged match keeps the same reference and skips the re-render.
   const { data: authCartItem } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
-    queryFn: cartService.getCart,
+    queryFn: cartApi.getCart,
     enabled: isAuthenticated,
     staleTime: 10_000,
     select: (cart) => cart.items.find((i) => matchesCartItem(i, product)),

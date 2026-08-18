@@ -1,5 +1,5 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { cartService } from "@/src/services/cart.service";
+import { cartApi } from "@/src/features/cart/api/cart.api";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import type { CartItem } from "@/src/features/cart/types";
@@ -22,7 +22,7 @@ export const useCartRead = () => {
 
   const { data: cart, isLoading } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
-    queryFn: cartService.getCart,
+    queryFn: cartApi.getCart,
     enabled: isAuthenticated,
     // Mutations keep this cache fresh via setQueryData, so a short staleTime
     // just avoids redundant refetches on every screen focus/tab switch.
@@ -64,7 +64,7 @@ export const useCartCount = (): number => {
 
   const { data: authCount } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
-    queryFn: cartService.getCart,
+    queryFn: cartApi.getCart,
     enabled: isAuthenticated,
     staleTime: 10_000,
     select: (cart) => {
@@ -99,7 +99,7 @@ export const useInCartVariantId = (
 
   const { data: authVariantId } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
-    queryFn: cartService.getCart,
+    queryFn: cartApi.getCart,
     enabled: isAuthenticated && variants.length > 0,
     staleTime: 10_000,
     select: (cart) => {

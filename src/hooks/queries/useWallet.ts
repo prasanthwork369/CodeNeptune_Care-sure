@@ -6,7 +6,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { walletService } from "../../services/wallet.service";
 import { walletApi } from "@/src/features/wallet/api/wallet.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
@@ -19,7 +18,7 @@ export const useWalletBalance = () => {
 
   const { data, isLoading, isRefetching, refetch } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.WALLET.BALANCE,
-    queryFn: () => walletService.getBalance(),
+    queryFn: () => walletApi.getBalance(),
     enabled: isAuthenticated,
     staleTime: 60_000 * 5,
     retry: 1,
@@ -64,7 +63,7 @@ export const useWalletLogs = (limit: number = 20, offset: number = 0) => {
 
   const { data, isLoading, isRefetching, refetch } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.WALLET.LOGS({ limit, offset }),
-    queryFn: () => walletService.getLogs(limit, offset),
+    queryFn: () => walletApi.getLogs(limit, offset),
     enabled: isAuthenticated,
     staleTime: 60_000 * 5,
     retry: 1,
@@ -96,7 +95,7 @@ export const useInfiniteWalletLogs = () => {
   const query = useInfiniteQuery({
     queryKey: QUERY_KEYS.CUSTOMER.WALLET.LOGS({ limit: LOGS_PAGE_SIZE }),
     queryFn: ({ pageParam }) =>
-      walletService.getLogs(LOGS_PAGE_SIZE, pageParam),
+      walletApi.getLogs(LOGS_PAGE_SIZE, pageParam),
     enabled: isAuthenticated,
     initialPageParam: 0,
     getNextPageParam: (lastPage: WalletLog[], _pages, lastPageParam) =>
@@ -146,13 +145,13 @@ const prefetchWallet = (queryClient: QueryClient): void => {
   void queryClient
     .prefetchQuery({
       queryKey: QUERY_KEYS.CUSTOMER.WALLET.BALANCE,
-      queryFn: () => walletService.getBalance(),
+      queryFn: () => walletApi.getBalance(),
     })
     .catch(() => {});
   void queryClient
     .prefetchQuery({
       queryKey: firstPageKey,
-      queryFn: () => walletService.getLogs(LOGS_PAGE_SIZE, 0),
+      queryFn: () => walletApi.getLogs(LOGS_PAGE_SIZE, 0),
     })
     .catch(() => {});
 };

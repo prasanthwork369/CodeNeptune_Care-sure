@@ -8,7 +8,7 @@ import type {
 } from "../../api/settings.api";
 import { WEB_BASE_URL } from "../../utils/urls";
 import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";
-import { settingsService } from "../../services/settings.service";
+import { settingsApi } from "../../api/settings.api";
 import {
   MAX_FILES,
   MAX_FILES_CEILING,
@@ -20,7 +20,7 @@ import {
 export function useMobileAppLinks() {
   const query = useQuery({
     queryKey: ["mobile-app-links"],
-    queryFn: () => settingsService.getMobileAppLinks(),
+    queryFn: () => settingsApi.getMobileAppLinks(),
     staleTime: 24 * 60 * 60 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
@@ -41,7 +41,7 @@ export function useCartWalletSettings() {
   return useQuery<CartWalletSettings>({
     queryKey: ["cart-wallet-settings"],
     queryFn: withSqliteCache("settings_cart_wallet", () =>
-      settingsService.getCartWalletSettings(),
+      settingsApi.getCartWalletSettings(),
     ),
     initialData: () => cached?.data,
     initialDataUpdatedAt: () => cached?.updatedAt ?? 0,
@@ -57,7 +57,7 @@ export function useSettings() {
   return useQuery<Settings>({
     queryKey: ["platform-settings"],
     queryFn: withSqliteCache("settings_general", () =>
-      settingsService.getSettings(),
+      settingsApi.getSettings(),
     ),
     initialData: () => cached?.data,
     initialDataUpdatedAt: () => cached?.updatedAt ?? 0,
@@ -73,7 +73,7 @@ export function usePaymentSettings() {
   return useQuery<PaymentSettings>({
     queryKey: ["payment-settings"],
     queryFn: withSqliteCache("settings_payment", () =>
-      settingsService.getPaymentSettings(),
+      settingsApi.getPaymentSettings(),
     ),
     initialData: () => cached?.data,
     initialDataUpdatedAt: () => cached?.updatedAt ?? 0,
@@ -112,7 +112,7 @@ export function useUploadConfig() {
   const query = useQuery({
     queryKey: ["upload-config"],
     queryFn: withSqliteCache("upload_config", () =>
-      settingsService.getUploadConfig(),
+      settingsApi.getUploadConfig(),
     ),
     initialData: () => cached?.data,
     initialDataUpdatedAt: () => cached?.updatedAt ?? 0,

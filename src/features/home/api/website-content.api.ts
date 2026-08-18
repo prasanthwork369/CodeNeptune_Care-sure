@@ -1,6 +1,6 @@
-import { apiClient } from "../api/client";
+import { apiClient } from "@/src/api/client";
 
-export const websiteContentsService = {
+export const websiteContentsApi = {
   getContent: async (category: string) => {
     const { data } = await apiClient.get(
       `/api/v1/website-contents/${category}`,

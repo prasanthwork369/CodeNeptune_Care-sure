@@ -5,7 +5,7 @@ import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
 import { useCouponSearch } from "@/src/features/cart/hooks/useCouponSearch";
 import { useNav } from "@/src/hooks/useNav";
-import { couponService } from "@/src/services/coupon.service";
+import { couponApi } from "../api/coupon.api";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -79,7 +79,7 @@ export const CouponsLayout: React.FC = () => {
     if (!requireInternet()) return;
     setValidatingCode(trimmed);
     try {
-      const result = await couponService.validateCoupon(trimmed, subtotal);
+      const result = await couponApi.validateCoupon(trimmed, subtotal);
       if (result.valid) {
         apply({
           code: trimmed,

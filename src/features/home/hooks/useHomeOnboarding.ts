@@ -1,4 +1,4 @@
-import { locationService } from "@/src/services/location.service";
+import { locationService } from "@/src/features/location/services/location.service";
 import { messagingService as notificationService } from "@/src/services/firebase";
 import { useAuthStore } from "@/src/store/authStore";
 import {

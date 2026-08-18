@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { websiteContentsService } from "../../services/website-content.service";
+import { websiteContentsApi } from "@/src/features/home/api/website-content.api";
 
 export const websiteContentsKeys = {
   all: ["website-contents"] as const,
@@ -9,7 +9,7 @@ export const websiteContentsKeys = {
 export function useWebsiteContent(category: string) {
   return useQuery({
     queryKey: websiteContentsKeys.category(category),
-    queryFn: () => websiteContentsService.getContent(category),
+    queryFn: () => websiteContentsApi.getContent(category),
     staleTime: 10 * 60 * 1000, // 10 minutes stale time
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     refetchOnWindowFocus: false, // Don't refetch on window focus

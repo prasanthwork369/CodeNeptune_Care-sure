@@ -1,4 +1,4 @@
-import { authService } from "@/src/services/auth.service";
+import { authService } from "@/src/features/auth/services/auth.service";
 import { authApi } from "@/src/features/auth/api/auth.api";
 import { profileApi } from "@/src/features/profile/api/profile.api";
 import { useAuthStore } from "@/src/store/authStore";

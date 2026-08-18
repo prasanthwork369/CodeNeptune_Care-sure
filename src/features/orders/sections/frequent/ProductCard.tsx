@@ -5,7 +5,7 @@ import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
 import { useCartRead } from "@/src/hooks/queries/useCartRead";
-import { cartMutations } from "@/src/services/cart.mutations";
+import { cartMutations } from "@/src/features/cart/services/cart.mutations";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import { Image } from "expo-image";
 import React, { useState } from "react";

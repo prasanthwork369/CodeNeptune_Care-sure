@@ -7,7 +7,7 @@ import { PrescriptionItem } from "@/src/features/prescription/types";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import { prescriptionService } from "@/src/services/prescription.service";
+import { prescriptionService } from "../services/prescription.service";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { logger } from "@/src/utils/logger";

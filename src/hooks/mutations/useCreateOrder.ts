@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderService } from "../../services/order.service";
+import { orderApi } from "@/src/features/orders/api/order.api";
 import { CreateOrderRequest } from "@/src/features/orders/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
@@ -8,7 +8,7 @@ export const useCreateOrder = () => {
 
   const mutation = useMutation({
     mutationFn: (vars: { data: CreateOrderRequest; idempotencyKey?: string }) =>
-      orderService.createOrder(vars.data, vars.idempotencyKey),
+      orderApi.createOrder(vars.data, vars.idempotencyKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART });
       queryClient.invalidateQueries({

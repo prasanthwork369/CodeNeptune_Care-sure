@@ -8,7 +8,7 @@ import { useWalletBalance } from "@/src/hooks/queries/useWallet";
 import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
 import { useLoopingCarousel } from "@/src/hooks/useLoopingCarousel";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { walletService } from "@/src/services/wallet.service";
+import { walletApi } from "@/src/features/wallet/api/wallet.api";
 import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";
 import {
@@ -99,11 +99,11 @@ export const SignupBonusPopup: React.FC<Props> = ({
       }
 
       try {
-        const logs = await walletService.getLogs(5, 0);
+        const logs = await walletApi.getLogs(5, 0);
         if (cancelled) return;
 
         const signupLog = logs.find(
-          (log) => log.referenceType === "signup_bonus",
+          (log: { referenceType?: string }) => log.referenceType === "signup_bonus",
         );
 
         if (signupLog) {

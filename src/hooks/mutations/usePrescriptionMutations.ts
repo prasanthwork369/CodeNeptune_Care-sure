@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { prescriptionService } from "../../services/prescription.service";
+import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 
 type PrescriptionsListResult =
   | { success: true; data: { id: string; isDismissed: boolean }[] }

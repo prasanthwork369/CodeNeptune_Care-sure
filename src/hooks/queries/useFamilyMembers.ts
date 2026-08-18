@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { familyMemberService } from "../../services/family-member.service";
+import { familyMemberApi } from "@/src/features/profile/api/family-member.api";
 import type {
   FamilyMember,
   FamilyMemberInput,
@@ -19,7 +19,7 @@ export const useFamilyMembers = () => {
     isRefetching,
   } = useQuery<FamilyMember[]>({
     queryKey: QUERY_KEYS.CUSTOMER.MEMBERS,
-    queryFn: withSqliteCache("family_members", familyMemberService.getMembers),
+    queryFn: withSqliteCache("family_members", familyMemberApi.getMembers),
     initialData: () => cachedMembers?.data,
     initialDataUpdatedAt: () => cachedMembers?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
@@ -32,7 +32,7 @@ export const useFamilyMembers = () => {
 
   const addMutation = useMutation({
     mutationFn: (payload: FamilyMemberInput) =>
-      familyMemberService.addMember(payload),
+      familyMemberApi.addMember(payload),
     onSuccess: invalidate,
   });
 
@@ -43,12 +43,12 @@ export const useFamilyMembers = () => {
     }: {
       id: string;
       payload: Partial<FamilyMemberInput>;
-    }) => familyMemberService.updateMember(id, payload),
+    }) => familyMemberApi.updateMember(id, payload),
     onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => familyMemberService.deleteMember(id),
+    mutationFn: (id: string) => familyMemberApi.deleteMember(id),
     onSuccess: invalidate,
   });
 

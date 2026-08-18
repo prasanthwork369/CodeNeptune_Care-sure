@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  cancellationReasonService,
+  cancellationReasonApi,
   GetCancellationReasonsParams,
-} from "@/src/services/cancellation-reason.service";
+} from "@/src/features/orders/api/cancellation-reason.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 /**
@@ -16,7 +16,7 @@ export function useCancellationReasons(
 ) {
   return useQuery({
     queryKey: QUERY_KEYS.CANCELLATION_REASONS.LIST(params),
-    queryFn: () => cancellationReasonService.list(params),
+    queryFn: () => cancellationReasonApi.list(params),
     staleTime: 5 * 60 * 1000, // 5 min — reasons rarely change
     retry: 1,
     refetchOnWindowFocus: false,

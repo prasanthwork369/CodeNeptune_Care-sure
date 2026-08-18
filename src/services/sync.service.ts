@@ -5,7 +5,7 @@ import { db } from "../lib/sqlite/db";
 import { homeApi } from "../features/home/api/home.api";
 import { categoryApi } from "../features/categories/api/category.api";
 import { medicineApi } from "../features/product/api/medicine.api";
-import { orderService } from "./order.service";
+import { orderApi } from "../features/orders/api/order.api";
 import { QUERY_KEYS } from "../lib/react-query/queryKeys";
 import { QueryClient } from "@tanstack/react-query";
 
@@ -175,7 +175,7 @@ export const syncService = {
       // 5. frequentlyOrdered
       if (isAuthenticated && components.frequentlyOrdered?.needsSync) {
         try {
-          const data = await orderService.getFrequentlyOrdered({ limit: 5 });
+          const data = await orderApi.getFrequentlyOrdered({ limit: 5 });
           apiCache.set("frequently_ordered", data);
           await this.updateSyncTimestamp(
             "frequentlyOrdered",

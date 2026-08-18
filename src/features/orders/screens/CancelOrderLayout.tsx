@@ -1,4 +1,4 @@
-import type { CancellationReason } from "@/src/services/cancellation-reason.service";
+import type { CancellationReason } from "@/src/features/orders/api/cancellation-reason.api";
 import { orderApi } from "@/src/features/orders/api/order.api";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";

@@ -1,6 +1,6 @@
 /**
- * @module services/cancellation-reason
- * Fetches active cancellation reasons for the customer website.
+ * @module features/orders/api/cancellation-reason.api
+ * Fetches active cancellation reasons for the customer app.
  *
  * status        => 1=ACTIVE
  * applicable_to => 1=ORDER | 2=RETURN | 3=BOTH
@@ -45,7 +45,7 @@ export interface GetCancellationReasonsParams {
   page?: number;
 }
 
-export const cancellationReasonService = {
+export const cancellationReasonApi = {
   /**
    * Fetches active cancellation reasons.
    * Defaults pre-filter for customer-facing ORDER cancellations (actor_type=1, applicable_to=1, status=1).
@@ -69,4 +69,4 @@ export const cancellationReasonService = {
   },
 };
 
-export default cancellationReasonService;
+export default cancellationReasonApi;

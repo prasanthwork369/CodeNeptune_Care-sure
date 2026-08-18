@@ -6,8 +6,8 @@ import type {
   AddToCartInput,
   Cart,
   UpdateCartItemInput,
-} from "@/src/features/cart/types";
-import { cartService } from "./cart.service";
+} from "../types";
+import { cartApi } from "../api/cart.api";
 
 /**
  * Cart writes as plain functions rather than useMutation hooks.
@@ -22,7 +22,7 @@ export const cartMutations = {
     if (!useAuthStore.getState().isAuthenticated) {
       return useCartPendingStore.getState().addGuestItem(input);
     }
-    const cart = await cartService.addItem(input);
+    const cart = await cartApi.addItem(input);
     queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, cart);
     return cart;
   },
@@ -31,7 +31,7 @@ export const cartMutations = {
     if (!useAuthStore.getState().isAuthenticated) {
       return useCartPendingStore.getState().updateGuestItem(itemId, input);
     }
-    const cart = await cartService.updateItem(itemId, input);
+    const cart = await cartApi.updateItem(itemId, input);
     queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, cart);
     return cart;
   },
@@ -40,7 +40,7 @@ export const cartMutations = {
     if (!useAuthStore.getState().isAuthenticated) {
       return useCartPendingStore.getState().removeGuestItem(itemId);
     }
-    const cart = await cartService.removeItem(itemId);
+    const cart = await cartApi.removeItem(itemId);
     queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, cart);
     return cart;
   },

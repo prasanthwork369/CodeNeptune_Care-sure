@@ -6,13 +6,13 @@ import {
 import { CartCouponSection } from "@/src/features/cart/sections/CartCouponSection";
 import { COUPON_DISCOUNT_TYPE } from "@/src/features/cart/constants/coupon";
 import { useCoupons } from "@/src/hooks/queries/useCoupons";
-import { couponService } from "@/src/services/coupon.service";
+import { couponApi } from "@/src/features/cart/api/coupon.api";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import React from "react";
 
 jest.mock("@/src/hooks/queries/useCoupons");
-jest.mock("@/src/services/coupon.service");
+jest.mock("@/src/features/cart/api/coupon.api");
 jest.mock("@/src/hooks/useNav", () => ({
   useNav: () => ({
     push: jest.fn(),
@@ -20,7 +20,7 @@ jest.mock("@/src/hooks/useNav", () => ({
 }));
 
 const mockUseCoupons = useCoupons as jest.MockedFunction<typeof useCoupons>;
-const mockValidate = couponService.validateCoupon as jest.Mock;
+const mockValidate = couponApi.validateCoupon as jest.Mock;
 
 describe("CartCouponSection Component", () => {
   const onRemoveMock = jest.fn();

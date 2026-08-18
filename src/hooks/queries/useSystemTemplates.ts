@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { systemTemplatesService } from "@/src/services/system-templates.service";
+import { systemTemplatesApi } from "@/src/api/system-templates.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 /**
@@ -29,7 +29,7 @@ export function useSystemTemplate(
   return useQuery({
     queryKey: QUERY_KEYS.SYSTEM_TEMPLATES.BY_EVENT(event, channel, variables),
     queryFn: () =>
-      systemTemplatesService.getPublicTemplate(event, channel, variables),
+      systemTemplatesApi.getPublicTemplate(event, channel, variables),
     enabled: enabled && !!event,
     staleTime: 10 * 60 * 1000, // 10 minutes — document templates rarely change
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes

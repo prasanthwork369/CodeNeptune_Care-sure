@@ -1,7 +1,7 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { cartService } from "../../services/cart.service";
+import { cartApi } from "@/src/features/cart/api/cart.api";
 import { useAuthStore } from "../../store/authStore";
 import {
   AddToCartInput,
@@ -20,7 +20,7 @@ export const useCart = () => {
 
   const { data: cart, isLoading } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
-    queryFn: cartService.getCart,
+    queryFn: cartApi.getCart,
     enabled: isAuthenticated,
     // Mutations keep this cache fresh via setQueryData, so a short staleTime
     // just avoids redundant refetches on every screen focus/tab switch.
@@ -28,7 +28,7 @@ export const useCart = () => {
   });
 
   const addItemMutation = useMutation({
-    mutationFn: (input: AddToCartInput) => cartService.addItem(input),
+    mutationFn: (input: AddToCartInput) => cartApi.addItem(input),
     onSuccess: (updatedCart) =>
       queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, updatedCart),
   });
@@ -40,25 +40,25 @@ export const useCart = () => {
     }: {
       itemId: string;
       input: UpdateCartItemInput;
-    }) => cartService.updateItem(itemId, input),
+    }) => cartApi.updateItem(itemId, input),
     onSuccess: (updatedCart) =>
       queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, updatedCart),
   });
 
   const removeItemMutation = useMutation({
-    mutationFn: (itemId: string) => cartService.removeItem(itemId),
+    mutationFn: (itemId: string) => cartApi.removeItem(itemId),
     onSuccess: (updatedCart) =>
       queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, updatedCart),
   });
 
   const clearCartMutation = useMutation({
-    mutationFn: cartService.clearCart,
+    mutationFn: cartApi.clearCart,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART }),
   });
 
   const checkoutMutation = useMutation({
-    mutationFn: (input: CheckoutInput) => cartService.checkout(input),
+    mutationFn: (input: CheckoutInput) => cartApi.checkout(input),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.CART }),
   });

@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { orderService } from "../../services/order.service";
+import { orderApi } from "@/src/features/orders/api/order.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
 import { Order } from "@/src/features/orders/types";
@@ -24,7 +24,7 @@ const prefetchOrder = (queryClient: QueryClient, orderId: string): void => {
   void queryClient
     .prefetchQuery({
       queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId),
-      queryFn: () => orderService.getOrderById(orderId),
+      queryFn: () => orderApi.getOrderById(orderId),
     })
     .catch(() => {});
 };
@@ -63,7 +63,7 @@ export const useOrderById = (
     isPlaceholderData,
   } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId!),
-    queryFn: () => orderService.getOrderById(orderId!),
+    queryFn: () => orderApi.getOrderById(orderId!),
     enabled: isAuthenticated && !!orderId,
     staleTime: 60_000,
     // Active order status can change while the app is backgrounded — refresh

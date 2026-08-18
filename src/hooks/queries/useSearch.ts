@@ -14,7 +14,6 @@ import type {
   ApiSearchMedicine,
   ApiTrendingItem,
 } from "@/src/features/search/types";
-import { searchService } from "../../services/search.service";
 
 export const useSearch = () => {
   const [query, setQuery] = useState("");
@@ -113,7 +112,7 @@ export const useSearchSuggestions = (query: string, limit = 8) => {
   const { data, isFetching } = useQuery({
     queryKey: QUERY_KEYS.SEARCH.SUGGESTIONS(debouncedSuggestionQuery),
     queryFn: () =>
-      searchService.getSuggestions(debouncedSuggestionQuery, limit),
+      searchApi.getSuggestions(debouncedSuggestionQuery, limit),
     enabled: debouncedSuggestionQuery.trim().length >= 2,
     staleTime: 0,
   });
@@ -132,7 +131,7 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: historyKey,
     queryFn: withSqliteCache("search_history", () =>
-      searchService.getHistory(limit, offset),
+      searchApi.getHistory(limit, offset),
     ),
     initialData: () => cachedHistory?.data,
     initialDataUpdatedAt: () => cachedHistory?.updatedAt ?? 0,
@@ -167,7 +166,7 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
 
   const { mutate: recordMutate } = useMutation({
     mutationFn: ({ query, productId }: { query: string; productId?: string }) =>
-      searchService.recordHistory(query, productId),
+      searchApi.recordHistory(query, productId),
     // Move-to-front: drop any existing row for the same term first, then
     // prepend a synthetic row — the record API returns void, so the real
     // id/createdAt only arrive once the invalidate below refetches.
@@ -189,7 +188,7 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
   });
 
   const { mutate: clearMutate, isPending: isClearingHistory } = useMutation({
-    mutationFn: () => searchService.clearHistory(),
+    mutationFn: () => searchApi.clearHistory(),
     onMutate: () => writeHistory(() => []),
     onError: (_err, _vars, previous) => {
       if (previous) restoreHistory(previous);
@@ -199,7 +198,7 @@ export const useSearchHistory = (limit = 10, offset = 0) => {
   });
 
   const { mutate: deleteItemMutate } = useMutation({
-    mutationFn: (id: string) => searchService.deleteHistoryItem(id),
+    mutationFn: (id: string) => searchApi.deleteHistoryItem(id),
     onMutate: (id) =>
       writeHistory((current) => current.filter((item) => item.id !== id)),
     onError: (_err, _vars, previous) => {
@@ -237,7 +236,7 @@ export const useTrendingSearches = (limit = 6) => {
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.SEARCH.TRENDING(limit),
     queryFn: withSqliteCache("search_trending", () =>
-      searchService.getTrending(limit),
+      searchApi.getTrending(limit),
     ),
     initialData: () => cachedTrending?.data,
     initialDataUpdatedAt: () => cachedTrending?.updatedAt ?? 0,

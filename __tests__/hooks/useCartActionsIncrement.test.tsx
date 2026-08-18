@@ -10,7 +10,7 @@ jest.mock("@/src/utils/offline", () => ({
   requireInternet: () => mockRequireInternet(),
 }));
 
-jest.mock("@/src/services/cart.mutations", () => ({
+jest.mock("@/src/features/cart/services/cart.mutations", () => ({
   cartMutations: {
     addItem: (...a: unknown[]) => mockAddItem(...a),
     updateItem: (...a: unknown[]) => mockUpdateItem(...a),

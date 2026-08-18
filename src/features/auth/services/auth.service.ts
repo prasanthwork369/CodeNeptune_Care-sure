@@ -1,9 +1,9 @@
-import { authApi } from "../features/auth/api/auth.api";
-import { profileApi } from "../features/profile/api/profile.api";
-import { setAccessToken } from "../api/client";
-import { useAuthStore } from "../store/authStore";
-import { messagingService as notificationService } from "./firebase";
-import { getDeviceInfo } from "../lib/deviceInfo";
+import { authApi } from "../api/auth.api";
+import { profileApi } from "@/src/features/profile/api/profile.api";
+import { setAccessToken } from "@/src/api/client";
+import { useAuthStore } from "@/src/store/authStore";
+import { messagingService as notificationService } from "@/src/services/firebase";
+import { getDeviceInfo } from "@/src/lib/deviceInfo";
 import { logger } from "@/src/utils/logger";
 
 export const authService = {

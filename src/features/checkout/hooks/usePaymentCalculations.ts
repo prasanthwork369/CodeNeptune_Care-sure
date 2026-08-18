@@ -16,7 +16,7 @@ import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { requireInternet } from "@/src/utils/offline";
 import { useNav } from "@/src/hooks/useNav";
-import { prescriptionService } from "@/src/services/prescription.service";
+import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
 import { cartMatchesSnapshot } from "@/src/utils/cartSnapshot";
 import {

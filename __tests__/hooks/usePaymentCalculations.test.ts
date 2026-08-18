@@ -2,7 +2,7 @@ import { renderHook, act } from "@testing-library/react-native";
 import { usePaymentCalculations } from "@/src/features/checkout/hooks/usePaymentCalculations";
 import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
-import { prescriptionService } from "@/src/services/prescription.service";
+import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
@@ -46,7 +46,7 @@ jest.mock("@/src/hooks/useDeliveryAddress", () => ({
   useDeliveryAddress: jest.fn(),
 }));
 
-jest.mock("@/src/services/prescription.service", () => ({
+jest.mock("@/src/features/prescription/services/prescription.service", () => ({
   prescriptionService: {
     upload: jest.fn(),
   },

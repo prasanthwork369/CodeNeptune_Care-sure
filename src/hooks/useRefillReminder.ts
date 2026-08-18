@@ -1,4 +1,4 @@
-import { prescriptionService } from "@/src/services/prescription.service";
+import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { PrescriptionReminder, ReminderInput } from "@/src/features/prescription/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
