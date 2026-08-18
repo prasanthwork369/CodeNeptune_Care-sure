@@ -1,6 +1,6 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { useTabIndicator } from "@/src/features/home/hooks/useTabIndicator";
-import type { CategoryTab } from "@/src/types/home";
+import type { CategoryTab } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, View } from "react-native";

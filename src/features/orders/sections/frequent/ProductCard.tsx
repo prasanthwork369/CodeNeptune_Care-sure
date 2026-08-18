@@ -1,4 +1,4 @@
-import type { FrequentOrderItem } from "@/src/api/order.api";
+import type { FrequentOrderItem } from "@/src/features/orders/types";
 import { asError } from "@/src/api/errors";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";

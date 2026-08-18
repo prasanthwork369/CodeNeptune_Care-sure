@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
-import { ProductSection } from "@/src/types/productSection";
+import { ProductSection } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { htmlToPlainText } from "@/src/utils/productSections";
 import { LinearGradient } from "expo-linear-gradient";

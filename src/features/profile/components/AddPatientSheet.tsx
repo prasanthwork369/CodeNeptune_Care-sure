@@ -6,7 +6,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
-import { FamilyMember, FamilyMemberInput } from "@/src/types/familyMember";
+import type { FamilyMember, FamilyMemberInput } from "../types";
 import {
   formatDobDisplay,
   getMaxDob,

@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Messaging } from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
-import { notificationApi } from "../../../api/notification.api";
+import { notificationApi } from "@/src/features/notifications/api/notification.api";
 import { NOTIFICATION_CHANNELS } from "../../../constants/notification-channels";
 import { getDeviceInfo } from "../../../lib/deviceInfo";
 import { isExpoGo } from "../../../utils/environment";

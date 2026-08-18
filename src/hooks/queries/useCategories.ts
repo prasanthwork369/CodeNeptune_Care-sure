@@ -2,10 +2,13 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { categoryApi, type ApiCategoryFamily } from "../../api/category.api";
+import { categoryApi } from "@/src/features/categories/api/category.api";
+import type {
+  ApiCategoryFamily,
+  CategoryProduct,
+} from "@/src/features/categories/types";
 import { resolveAssetUrl } from "../../utils/urls";
-import type { CategoryProduct } from "../../types/category";
-import type { CategoryCard, CategoryTab } from "../../types/home";
+import type { CategoryCard, CategoryTab } from "@/src/features/home/types";
 
 const CARD_BG_COLORS = [
   "#E1F7F3",

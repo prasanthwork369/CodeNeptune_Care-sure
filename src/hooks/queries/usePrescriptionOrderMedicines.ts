@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  prescriptionOrderApi,
+import { prescriptionOrderApi } from "@/src/features/prescription/api/prescription-order.api";
+import type {
   ApiPrescriptionOrderItem,
-} from "../../api/prescription-order.api";
-import { ComparisonMedicine } from "@/src/features/prescription/medicine-comparison.types";
+  ComparisonMedicine,
+} from "@/src/features/prescription/types";
 import { logger } from "@/src/utils/logger";
 
 const buildSaltComposition = (item: ApiPrescriptionOrderItem): string => {

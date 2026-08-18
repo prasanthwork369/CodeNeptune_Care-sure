@@ -1,4 +1,4 @@
-import type { DeliveryLocation, QuickAction } from "@/src/types/home";
+import type { DeliveryLocation, QuickAction } from "@/src/features/home/types";
 import { icons } from "./icons";
 import { HOME_IMAGES } from "./images";
 

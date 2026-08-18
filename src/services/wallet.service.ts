@@ -1,4 +1,4 @@
-import { walletApi } from "../api/wallet.api";
+import { walletApi } from "../features/wallet/api/wallet.api";
 
 export const walletService = {
   getBalance: () => walletApi.getBalance(),

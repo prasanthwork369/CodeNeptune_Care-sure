@@ -11,7 +11,7 @@ import {
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
-import type { CategoryCard } from "@/src/types/home";
+import type { CategoryCard } from "@/src/features/home/types";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import { moderateScale } from "@/src/utils/exactScale";
 import { Skeleton } from "@/src/components/ui/Skeleton";

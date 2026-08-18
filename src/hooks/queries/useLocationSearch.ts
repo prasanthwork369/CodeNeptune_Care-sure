@@ -1,4 +1,5 @@
-import { locationApi, LocationPrediction } from "@/src/api/location.api";
+import { locationApi } from "@/src/features/location/api/location.api";
+import type { LocationPrediction } from "@/src/features/location/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";

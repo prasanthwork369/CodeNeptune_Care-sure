@@ -18,7 +18,7 @@ import { usePaymentSettings } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { useReturnDraftStore } from "@/src/store/returnDraftStore";
 import { OrderItem } from "../types";
-import { CreateReturnRequest, ReturnItemImages } from "../return.types";
+import { CreateReturnRequest, ReturnItemImages } from "../types";
 import { Image } from "expo-image";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";

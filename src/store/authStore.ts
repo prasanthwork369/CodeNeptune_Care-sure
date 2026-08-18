@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { tokenStorage, guestStorage } from "@/src/lib/storage";
-import type { CustomerProfile } from "../api/profile.api";
+import type { CustomerProfile } from "../features/profile/types";
 import { setAccessToken } from "../api/client";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { apiCache } from "@/src/lib/sqlite/cache";

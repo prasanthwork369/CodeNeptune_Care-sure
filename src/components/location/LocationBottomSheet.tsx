@@ -1,5 +1,5 @@
-import { Address } from "@/src/api/address.api";
-import { locationApi } from "@/src/api/location.api";
+import { Address } from "@/src/types/address";
+import { locationApi } from "@/src/features/location/api/location.api";
 import { BottomSheetTextInput } from "@/src/components/ui/BottomSheetTextInput";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { Touchable } from "@/src/components/ui/Touchable";

@@ -1,4 +1,4 @@
-import type { OrderListParams } from "@/src/api/order.api";
+import type { OrderListParams } from "@/src/features/orders/types";
 import { useQuery } from "@tanstack/react-query";
 import { orderService } from "../../services/order.service";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";

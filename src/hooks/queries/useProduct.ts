@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
-import { medicineApi, MedicineVariant } from "../../api/medicine.api";
+import { medicineApi } from "@/src/features/product/api/medicine.api";
+import type { MedicineVariant } from "@/src/features/product/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { formatPackLabel } from "../../utils/packLabel";
 import { resolveAssetUrl } from "../../utils/urls";

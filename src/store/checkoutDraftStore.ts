@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { HealthProblem } from "@/src/api/health-problem.api";
+import type { HealthProblem } from "@/src/features/prescription/types";
 
 interface CheckoutDraftState {
   patientMemberId: string;

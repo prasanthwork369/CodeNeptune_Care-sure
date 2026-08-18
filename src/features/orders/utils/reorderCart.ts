@@ -1,4 +1,4 @@
-import { searchApi } from "@/src/api/search.api";
+import { searchApi } from "@/src/features/search/api/search.api";
 import { OrderItem } from "@/src/features/orders/types";
 import { AddToCartInput } from "@/src/features/cart/types";
 

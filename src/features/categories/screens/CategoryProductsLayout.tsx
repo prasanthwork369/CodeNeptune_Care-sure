@@ -9,7 +9,7 @@ import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useCategoryProducts } from "@/src/hooks/queries/useCategories";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import type { CategoryProduct } from "@/src/types/category";
+import type { CategoryProduct } from "@/src/features/categories/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { useLocalSearchParams } from "expo-router";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";

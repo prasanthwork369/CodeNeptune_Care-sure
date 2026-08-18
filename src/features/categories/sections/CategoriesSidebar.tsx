@@ -1,5 +1,5 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
-import type { CategoryTab } from "@/src/types/home";
+import type { CategoryTab } from "@/src/features/home/types";
 import { components } from "@/src/constants/theme";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";

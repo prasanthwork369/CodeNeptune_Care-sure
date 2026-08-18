@@ -11,7 +11,7 @@ import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { openInAppBrowser } from "@/src/utils/browser";
-import { ApiBanner, CategoryCard } from "@/src/types/home";
+import { ApiBanner, CategoryCard } from "@/src/features/home/types";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { useUIStore } from "@/src/store/uiStore";
 import { useSharedValue } from "react-native-reanimated";

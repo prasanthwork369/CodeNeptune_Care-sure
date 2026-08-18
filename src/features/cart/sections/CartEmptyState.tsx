@@ -4,7 +4,7 @@ import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
 import { useNav } from "@/src/hooks/useNav";
 import { CartEmptyStateProps } from "@/src/features/cart/types";
-import { Product } from "@/src/types/home";
+import { Product } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
 import { Image } from "expo-image";

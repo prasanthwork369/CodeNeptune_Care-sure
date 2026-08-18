@@ -4,7 +4,7 @@ import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
-import { CategoryProductCardProps } from "@/src/types/category";
+import { CategoryProductCardProps } from "@/src/features/categories/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";

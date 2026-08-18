@@ -9,7 +9,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { icons } from "@/src/constants/icons";
 import { format } from "@/src/utils/validation";
-import type { CustomerProfile } from "@/src/api/profile.api";
+import type { CustomerProfile } from "../types";
 
 interface ProfileHeaderProps {
   profile?: CustomerProfile | null;

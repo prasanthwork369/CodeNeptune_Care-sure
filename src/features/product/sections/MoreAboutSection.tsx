@@ -1,5 +1,5 @@
 import { useMoreAboutTabs } from "@/src/features/product/hooks/useMoreAboutTabs";
-import { ApiAdditionalDataMap } from "@/src/types/productSection";
+import { ApiAdditionalDataMap } from "@/src/features/product/types";
 import React from "react";
 import { View } from "react-native";
 import { MoreAboutContent, MoreAboutHeading } from "./MoreAboutContent";

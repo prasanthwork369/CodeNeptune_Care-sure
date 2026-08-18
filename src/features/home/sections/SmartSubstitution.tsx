@@ -1,6 +1,6 @@
 import React from "react";
 import { PopularSubstitutes } from "./PopularSubstitutes";
-import type { Product } from "@/src/types/home";
+import type { Product } from "@/src/features/product/types";
 
 interface SmartSubstitutionProps {
   products: Product[];

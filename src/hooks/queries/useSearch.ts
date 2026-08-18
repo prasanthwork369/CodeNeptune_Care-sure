@@ -8,12 +8,12 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
+import { searchApi } from "@/src/features/search/api/search.api";
+import type {
   ApiSearchHistoryItem,
   ApiSearchMedicine,
   ApiTrendingItem,
-  searchApi,
-} from "../../api/search.api";
+} from "@/src/features/search/types";
 import { searchService } from "../../services/search.service";
 
 export const useSearch = () => {

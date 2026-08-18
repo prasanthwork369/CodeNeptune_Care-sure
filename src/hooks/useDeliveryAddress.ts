@@ -1,6 +1,6 @@
 import { useAddress } from "@/src/hooks/queries/useAddress";
 import { useLocationStore } from "@/src/store/locationStore";
-import type { DeliveryLocation } from "@/src/types/home";
+import type { DeliveryLocation } from "@/src/features/home/types";
 import {
   addressToLocation,
   pickDeliveryAddress,

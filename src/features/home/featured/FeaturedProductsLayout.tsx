@@ -11,8 +11,8 @@ import { useCartRead } from "@/src/hooks/queries/useCartRead";
 import { useAllFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import type { CategoryProduct } from "@/src/types/category";
-import type { Product } from "@/src/types/home";
+import type { CategoryProduct } from "@/src/features/categories/types";
+import type { Product } from "@/src/features/product/types";
 import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 

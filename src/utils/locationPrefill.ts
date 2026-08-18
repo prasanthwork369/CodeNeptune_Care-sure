@@ -1,4 +1,4 @@
-import type { ResolvedLocation } from "@/src/api/location.api";
+import type { ResolvedLocation } from "@/src/features/location/types";
 
 /** Route params the add-address screen reads to pre-fill its form. */
 export type PrefillParams = Record<string, string>;

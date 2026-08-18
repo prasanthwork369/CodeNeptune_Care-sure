@@ -1,4 +1,4 @@
-import { NotificationLog } from "@/src/api/in-app-notification.api";
+import type { NotificationLog } from "../types";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";

@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { familyMemberService } from "../../services/family-member.service";
-import { FamilyMember, FamilyMemberInput } from "../../types/familyMember";
+import type {
+  FamilyMember,
+  FamilyMemberInput,
+} from "@/src/features/profile/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
 import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";

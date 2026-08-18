@@ -1,7 +1,7 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { TextCycler } from "@/src/components/ui/TextCycler";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { ApiHero } from "@/src/types/home";
+import { ApiHero } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";

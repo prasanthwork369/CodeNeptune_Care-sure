@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { REFUND_METHOD, RefundMethodValue } from "@/src/features/orders/constants/return";
-import { ConfirmedReturnItem } from "@/src/features/orders/return.types";
+import type { ConfirmedReturnItem } from "@/src/features/orders/types";
 
 interface ReturnDraftState {
   orderId: string | null;

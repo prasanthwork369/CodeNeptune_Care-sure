@@ -1,4 +1,4 @@
-import { medicineApi } from "@/src/api/medicine.api";
+import { medicineApi } from "@/src/features/product/api/medicine.api";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

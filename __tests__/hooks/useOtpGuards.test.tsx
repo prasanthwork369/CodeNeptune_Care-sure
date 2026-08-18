@@ -20,7 +20,7 @@ jest.mock("@/src/hooks/mutations/useAuth", () => ({
   }),
 }));
 
-jest.mock("@/src/api/cart.api", () => ({
+jest.mock("@/src/features/cart/api/cart.api", () => ({
   cartApi: { addItem: (...a: unknown[]) => mockAddItem(...a) },
 }));
 

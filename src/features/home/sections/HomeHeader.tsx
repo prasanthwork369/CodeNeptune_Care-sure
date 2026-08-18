@@ -8,7 +8,7 @@ import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescription
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
-import type { DeliveryLocation } from "@/src/types/home";
+import type { DeliveryLocation } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React, { useEffect } from "react";

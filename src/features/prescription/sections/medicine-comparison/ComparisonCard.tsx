@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { ComparisonMedicine } from "../../medicine-comparison.types";
+import type { ComparisonMedicine } from "@/src/features/prescription/types";
 
 interface ComparisonCardProps {
   item: ComparisonMedicine;

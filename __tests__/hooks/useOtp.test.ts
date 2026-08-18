@@ -2,8 +2,11 @@ import React from "react";
 import { renderHook, act } from "@testing-library/react-native";
 import { useOtp } from "@/src/features/auth/hooks/useOtp";
 import { useAuth } from "@/src/hooks/mutations/useAuth";
-import { cartApi } from "@/src/api/cart.api";
+import { cartApi } from "@/src/features/cart/api/cart.api";
+import { useAuthStore } from "@/src/store/authStore";
+import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { useNav } from "@/src/hooks/useNav";
@@ -22,7 +25,7 @@ jest.mock("@/src/hooks/mutations/useAuth", () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/src/api/cart.api", () => ({
+jest.mock("@/src/features/cart/api/cart.api", () => ({
   cartApi: {
     addItem: jest.fn().mockResolvedValue({ success: true }),
   },

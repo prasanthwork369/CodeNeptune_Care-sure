@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { homeApi } from "../../api/home.api";
-import type { ApiAppContent } from "../../types/home";
+import { homeApi } from "../../features/home/api/home.api";
+import type { ApiAppContent } from "../../features/home/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useCategories } from "./useCategories";

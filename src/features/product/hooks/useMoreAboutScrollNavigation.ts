@@ -1,4 +1,4 @@
-import { ApiAdditionalDataMap } from "@/src/types/productSection";
+import { ApiAdditionalDataMap } from "@/src/features/product/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   NativeScrollEvent,

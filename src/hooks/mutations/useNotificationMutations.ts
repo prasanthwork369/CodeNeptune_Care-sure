@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { inAppNotificationApi } from "../../api/in-app-notification.api";
+import { inAppNotificationApi } from "@/src/features/notifications/api/in-app-notification.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 export const useDismissNotification = () => {

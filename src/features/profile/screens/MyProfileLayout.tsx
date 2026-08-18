@@ -1,5 +1,5 @@
 import { asError } from "@/src/api/errors";
-import { UpdateProfilePayload } from "@/src/api/profile.api";
+import { UpdateProfilePayload } from "../types";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";

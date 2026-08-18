@@ -1,5 +1,5 @@
-import { authApi } from "../api/auth.api";
-import { profileApi } from "../api/profile.api";
+import { authApi } from "../features/auth/api/auth.api";
+import { profileApi } from "../features/profile/api/profile.api";
 import { setAccessToken } from "../api/client";
 import { useAuthStore } from "../store/authStore";
 import { messagingService as notificationService } from "./firebase";

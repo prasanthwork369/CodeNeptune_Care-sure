@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { walletService } from "../../services/wallet.service";
-import { walletApi } from "../../api/wallet.api";
+import { walletApi } from "@/src/features/wallet/api/wallet.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "../../store/authStore";
 import { WalletLog } from "@/src/features/wallet/types";

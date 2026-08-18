@@ -1,4 +1,4 @@
-import { cartApi } from "../api/cart.api";
+import { cartApi } from "../features/cart/api/cart.api";
 import {
   AddToCartInput,
   UpdateCartItemInput,

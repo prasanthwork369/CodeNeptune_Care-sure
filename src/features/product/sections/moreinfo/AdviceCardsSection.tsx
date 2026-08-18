@@ -1,5 +1,5 @@
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
-import { SafetyAdviceItem } from "@/src/types/productSection";
+import { SafetyAdviceItem } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useRef, useState } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";

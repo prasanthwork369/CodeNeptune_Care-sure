@@ -1,4 +1,4 @@
-import { couponApi } from "../api/coupon.api";
+import { couponApi } from "../features/cart/api/coupon.api";
 
 export const couponService = {
   getActiveCoupons: () => couponApi.getActiveCoupons(),

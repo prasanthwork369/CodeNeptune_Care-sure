@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { FaqItem } from "@/src/types/productSection";
+import { FaqItem } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { Text, View } from "react-native";

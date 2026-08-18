@@ -1,4 +1,4 @@
-import { Address } from "@/src/api/address.api";
+import { Address } from "@/src/types/address";
 import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";

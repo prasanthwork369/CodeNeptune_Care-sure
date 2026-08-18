@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/src/store/authStore";
 import { tokenStorage, guestStorage } from "@/src/lib/storage";
 import { setAccessToken, getAccessToken } from "@/src/api/client";
-import { profileApi } from "@/src/api/profile.api";
+import { profileApi } from "@/src/features/profile/api/profile.api";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
@@ -30,7 +30,7 @@ jest.mock("@/src/lib/storage", () => ({
   },
 }));
 
-jest.mock("@/src/api/profile.api", () => ({
+jest.mock("@/src/features/profile/api/profile.api", () => ({
   profileApi: {
     getProfile: jest.fn(),
   },

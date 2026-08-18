@@ -1,4 +1,4 @@
-import { PrescriptionListParams } from "@/src/api/prescription.api";
+import type { PrescriptionListParams } from "@/src/features/prescription/types";
 
 interface OrderListParams {
   page?: number;

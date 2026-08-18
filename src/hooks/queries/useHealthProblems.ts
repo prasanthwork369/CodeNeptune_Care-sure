@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { healthProblemApi, HealthProblem } from "../../api/health-problem.api";
+import { healthProblemApi } from "@/src/features/prescription/api/health-problem.api";
+import type { HealthProblem } from "@/src/features/prescription/types";
 import { QUERY_KEYS } from "../../lib/react-query/queryKeys";
 
 export const useHealthProblems = (params?: {

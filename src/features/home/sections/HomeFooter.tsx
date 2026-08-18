@@ -4,7 +4,7 @@ import React from "react";
 import { Text, View, useWindowDimensions } from "react-native";
 import { SvgUri } from "react-native-svg";
 
-import { ApiAppContent } from "@/src/types/home";
+import { ApiAppContent } from "@/src/features/home/types";
 import {
   exactScale,
   moderateScale,

@@ -2,7 +2,7 @@ import { syncService } from "@/src/services/sync.service";
 import { apiClient } from "@/src/api/client";
 import { db } from "@/src/lib/sqlite/db";
 import { apiCache } from "@/src/lib/sqlite/cache";
-import { homeApi } from "@/src/api/home.api";
+import { homeApi } from "@/src/features/home/api/home.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { QueryClient } from "@tanstack/react-query";
 
@@ -18,20 +18,20 @@ jest.mock("@/src/lib/sqlite/cache", () => ({
   },
 }));
 
-jest.mock("@/src/api/home.api", () => ({
+jest.mock("@/src/features/home/api/home.api", () => ({
   homeApi: {
     getAppContents: jest.fn(),
   },
 }));
 
-jest.mock("@/src/api/category.api", () => ({
+jest.mock("@/src/features/categories/api/category.api", () => ({
   categoryApi: {
     getCategoryFamilyMap: jest.fn(),
     getFeaturedSubcategories: jest.fn(),
   },
 }));
 
-jest.mock("@/src/api/medicine.api", () => ({
+jest.mock("@/src/features/product/api/medicine.api", () => ({
   medicineApi: {
     getFeaturedCards: jest.fn(),
   },

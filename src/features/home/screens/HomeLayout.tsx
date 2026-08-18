@@ -1,4 +1,4 @@
-import { ApiFeaturedSubcategory } from "@/src/api/category.api";
+import { ApiFeaturedSubcategory } from "@/src/features/categories/types";
 import {
   FlyToCartOverlay,
   FlyToCartProvider,
@@ -45,7 +45,7 @@ import {
 } from "@/src/services/firebase";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
-import type { CategoryCard } from "@/src/types/home";
+import type { CategoryCard } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";

@@ -1,4 +1,4 @@
-import { searchApi } from "../api/search.api";
+import { searchApi } from "../features/search/api/search.api";
 
 export const searchService = {
   medicines: (query: string, page?: number, limit?: number) =>

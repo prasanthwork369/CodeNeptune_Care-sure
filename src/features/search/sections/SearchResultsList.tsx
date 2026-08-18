@@ -1,4 +1,4 @@
-import { ApiSearchMedicine } from "@/src/api/search.api";
+import { ApiSearchMedicine } from "@/src/features/search/types";
 import { SearchNoSubstituteCard } from "@/src/features/search/SearchNoSubstituteCard";
 import { SearchProductCard } from "@/src/features/search/SearchProductCard";
 import { SearchRecommendCard } from "@/src/features/search/SearchRecommendCard";

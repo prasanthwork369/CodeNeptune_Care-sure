@@ -3,7 +3,7 @@ import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { CategoryTabs } from "./CategoryTabs";
 import { CategoryCards } from "./CategoryCards";
-import type { CategoryTab, CategoryCard } from "@/src/types/home";
+import type { CategoryTab, CategoryCard } from "@/src/features/home/types";
 
 interface ShopByCategoriesProps {
   tabs: CategoryTab[];

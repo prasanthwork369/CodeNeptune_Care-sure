@@ -4,7 +4,7 @@ import { styles as s } from "./CategoryCards.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { Image } from "expo-image";
 import { icons } from "@/src/constants/icons";
-import type { CategoryCard } from "@/src/types/home";
+import type { CategoryCard } from "@/src/features/home/types";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { exactScale } from "@/src/utils/exactScale";
 import { useResponsiveTier } from "@/src/hooks/ui/useResponsiveTier";

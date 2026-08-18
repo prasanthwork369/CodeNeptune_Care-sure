@@ -1,6 +1,7 @@
 import { asError } from "@/src/api/errors";
 import { useState } from "react";
-import { pincodeApi, PincodeCheckResponse } from "@/src/api/pincode.api";
+import { pincodeApi } from "@/src/features/location/api/pincode.api";
+import type { PincodeCheckResponse } from "@/src/features/location/types";
 
 export const usePincode = () => {
   const [isChecking, setIsChecking] = useState(false);

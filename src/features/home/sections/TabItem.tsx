@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import type { CategoryTab } from "@/src/types/home";
+import type { CategoryTab } from "@/src/features/home/types";
 import { springs } from "@/src/theme";
 
 interface TabItemProps {

@@ -1,5 +1,5 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
-import type { CategoryProduct } from "@/src/types/category";
+import type { CategoryProduct } from "@/src/features/categories/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo } from "react";

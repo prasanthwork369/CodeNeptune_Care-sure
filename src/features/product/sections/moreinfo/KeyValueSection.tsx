@@ -1,4 +1,4 @@
-import { KeyValueRow } from "@/src/types/productSection";
+import { KeyValueRow } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";

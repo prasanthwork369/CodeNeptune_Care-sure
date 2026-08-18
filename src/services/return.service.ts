@@ -1,5 +1,5 @@
-import { returnApi } from "../api/return.api";
-import { CreateReturnRequest, ReturnRecord } from "@/src/features/orders/return.types";
+import { returnApi } from "../features/orders/api/return.api";
+import type { CreateReturnRequest, ReturnRecord } from "@/src/features/orders/types";
 
 export const returnService = {
   createReturn: (data: CreateReturnRequest): Promise<ReturnRecord> =>

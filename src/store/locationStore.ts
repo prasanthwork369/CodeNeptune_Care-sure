@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { DeliveryLocation } from "@/src/types/home";
+import type { DeliveryLocation } from "@/src/features/home/types";
 
 interface SetLocationOptions {
   coords?: { latitude: number; longitude: number };

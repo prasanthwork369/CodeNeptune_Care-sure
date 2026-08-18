@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { profileApi } from "../../api/profile.api";
+import { profileApi } from "@/src/features/profile/api/profile.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 /**

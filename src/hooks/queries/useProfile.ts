@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import {
-  profileApi,
-  UpdateProfilePayload,
+import { profileApi } from "@/src/features/profile/api/profile.api";
+import type {
   CustomerProfile,
-} from "../../api/profile.api";
+  UpdateProfilePayload,
+} from "@/src/features/profile/types";
 import { apiClient } from "../../api/client";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";

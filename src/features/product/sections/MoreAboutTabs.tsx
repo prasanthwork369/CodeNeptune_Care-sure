@@ -1,5 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
-import { ProductSection } from "@/src/types/productSection";
+import { ProductSection } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";

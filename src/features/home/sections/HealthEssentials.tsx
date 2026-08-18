@@ -1,7 +1,8 @@
-import {
+import type {
+  ApiCategoryProductItem,
   ApiFeaturedSubcategory,
   ApiFeaturedSubcategoryMetadata,
-} from "@/src/api/category.api";
+} from "@/src/features/categories/types";
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";

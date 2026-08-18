@@ -1,4 +1,4 @@
-import { ApiSearchMedicine } from "@/src/api/search.api";
+import { ApiSearchMedicine } from "@/src/features/search/types";
 import { SearchSkeleton } from "@/src/features/search/SearchSkeleton";
 import { ProductHeader } from "@/src/features/search/comparison/components/ProductHeader";
 import { SearchEmptyState } from "@/src/features/search/sections/SearchEmptyState";

@@ -1,12 +1,10 @@
-import {
-  prescriptionApi,
-  PrescriptionListParams,
-  PrescriptionUploadInput,
-} from "@/src/api/prescription.api";
+import { prescriptionApi } from "@/src/features/prescription/api/prescription.api";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
-import {
+import type {
   ApiPrescription,
+  PrescriptionListParams,
   PrescriptionReminder,
+  PrescriptionUploadInput,
   ReminderInput,
 } from "@/src/features/prescription/types";
 import { AppError } from "@/src/api/errors";

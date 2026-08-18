@@ -1,5 +1,5 @@
-import { familyMemberApi } from "../api/family-member.api";
-import { FamilyMemberInput } from "../types/familyMember";
+import { familyMemberApi } from "../features/profile/api/family-member.api";
+import type { FamilyMemberInput } from "../features/profile/types";
 
 export const familyMemberService = {
   getMembers: () => familyMemberApi.getMembers(),

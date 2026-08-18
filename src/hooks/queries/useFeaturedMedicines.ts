@@ -1,9 +1,8 @@
-import type { ApiFeaturedMedicine } from "@/src/api/medicine.api";
+import type { ApiFeaturedMedicine, Product } from "@/src/features/product/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { medicineApi } from "../../api/medicine.api";
-import type { Product } from "../../types/home";
+import { medicineApi } from "@/src/features/product/api/medicine.api";
 import { formatPackLabel } from "../../utils/packLabel";
 import { resolveAssetUrl } from "../../utils/urls";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";

@@ -44,7 +44,7 @@ import { usePrescriptionOrderMedicines } from "@/src/hooks/queries/usePrescripti
 import { useLocalSearchParams } from "expo-router";
 import { Touchable } from "@/src/components/ui/Touchable";
 
-import { ComparisonMedicine } from "../medicine-comparison.types";
+import type { ComparisonMedicine } from "../types";
 
 interface MedicineComparisonLayoutProps {
   medicines?: ComparisonMedicine[];

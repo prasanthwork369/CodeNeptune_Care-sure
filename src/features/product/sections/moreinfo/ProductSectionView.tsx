@@ -1,6 +1,6 @@
 import { HtmlContent } from "@/src/components/ui/HtmlContent";
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
-import { ProductSection } from "@/src/types/productSection";
+import { ProductSection } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";

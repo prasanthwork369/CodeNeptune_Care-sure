@@ -1,7 +1,7 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
-import type { SubstituteProduct } from "@/src/types/home";
+import type { SubstituteProduct } from "@/src/features/product/types";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";

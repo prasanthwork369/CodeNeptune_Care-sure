@@ -1,4 +1,4 @@
-import type { FrequentOrderItem } from "@/src/api/order.api";
+import type { FrequentOrderItem } from "@/src/features/orders/types";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Touchable } from "@/src/components/ui/Touchable";

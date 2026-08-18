@@ -1,5 +1,5 @@
-import type { Address } from "@/src/api/address.api";
-import type { DeliveryLocation } from "@/src/types/home";
+import type { Address } from "@/src/types/address";
+import type { DeliveryLocation } from "@/src/features/home/types";
 
 /** The args needed to seed the location store from a saved address. */
 export interface AddressLocation {

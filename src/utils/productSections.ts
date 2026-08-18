@@ -9,7 +9,7 @@ import {
   KeyValueRow,
   ProductSection,
   SafetyAdviceItem,
-} from "@/src/types/productSection";
+} from "@/src/features/product/types";
 
 // The backend sends arrays either as real arrays or as a JSON-encoded string.
 const toArray = (data: unknown): unknown[] => {

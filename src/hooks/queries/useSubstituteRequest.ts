@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { substituteApi } from "../../api/substitute.api";
+import { substituteApi } from "@/src/features/search/api/substitute.api";
 import { useToastStore } from "../../store/toastStore";
 import { useAuthStore } from "../../store/authStore";
 import { useNav } from "../useNav";

@@ -1,10 +1,10 @@
 import { authService } from "@/src/services/auth.service";
-import { authApi } from "@/src/api/auth.api";
-import { profileApi } from "@/src/api/profile.api";
+import { authApi } from "@/src/features/auth/api/auth.api";
+import { profileApi } from "@/src/features/profile/api/profile.api";
 import { useAuthStore } from "@/src/store/authStore";
 import { messagingService as notificationService } from "@/src/services/firebase";
 
-jest.mock("@/src/api/auth.api", () => ({
+jest.mock("@/src/features/auth/api/auth.api", () => ({
   authApi: {
     requestOtp: jest.fn(),
     verifyOtp: jest.fn(),
@@ -12,7 +12,7 @@ jest.mock("@/src/api/auth.api", () => ({
   },
 }));
 
-jest.mock("@/src/api/profile.api", () => ({
+jest.mock("@/src/features/profile/api/profile.api", () => ({
   profileApi: {
     getProfile: jest.fn(),
     deleteAccount: jest.fn(),

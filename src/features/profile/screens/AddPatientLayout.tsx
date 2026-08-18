@@ -2,7 +2,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { icons } from "@/src/constants/icons";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
-import { FamilyMemberInput } from "@/src/types/familyMember";
+import type { FamilyMemberInput } from "../types";
 import {
   formatDobDisplay,
   getMaxDob,

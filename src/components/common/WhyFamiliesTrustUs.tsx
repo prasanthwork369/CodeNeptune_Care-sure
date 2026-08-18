@@ -1,4 +1,4 @@
-import type { ApiAppContent } from "@/src/types/home";
+import type { ApiAppContent } from "@/src/features/home/types";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";

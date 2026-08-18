@@ -5,7 +5,7 @@ import { useCart } from "@/src/hooks/queries/useCart";
 import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
-import { FamilyMember } from "@/src/types/familyMember";
+import type { FamilyMember } from "@/src/features/profile/types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, View } from "react-native";

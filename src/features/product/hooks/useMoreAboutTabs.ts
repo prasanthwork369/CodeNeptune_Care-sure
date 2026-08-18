@@ -1,4 +1,4 @@
-import { ApiAdditionalDataMap } from "@/src/types/productSection";
+import { ApiAdditionalDataMap } from "@/src/features/product/types";
 import { parseProductSections } from "@/src/utils/productSections";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, ScrollView } from "react-native";

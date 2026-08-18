@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { Image } from "expo-image";
-import type { QuickAction } from "@/src/types/home";
+import type { QuickAction } from "@/src/features/home/types";
 import { styles as s } from "./QuickActions.styles";
 
 interface QuickActionsProps {

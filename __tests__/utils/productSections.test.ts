@@ -1,5 +1,5 @@
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
-import { ApiAdditionalDataMap } from "@/src/types/productSection";
+import { ApiAdditionalDataMap } from "@/src/features/product/types";
 import { humanizeKey, parseProductSections } from "@/src/utils/productSections";
 
 describe("humanizeKey", () => {

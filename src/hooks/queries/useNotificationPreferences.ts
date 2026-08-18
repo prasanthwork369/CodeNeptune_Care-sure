@@ -1,9 +1,9 @@
-import type { CustomerNotificationPreferences } from "@/src/api/notification-preferences.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  notificationPreferencesApi,
+import { notificationPreferencesApi } from "@/src/features/notifications/api/notification-preferences.api";
+import type {
+  CustomerNotificationPreferences,
   UpdateNotificationPreferencesInput,
-} from "@/src/api/notification-preferences.api";
+} from "@/src/features/notifications/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useAuthStore } from "@/src/store/authStore";
 

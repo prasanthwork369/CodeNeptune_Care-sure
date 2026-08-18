@@ -1,4 +1,4 @@
-import { Address } from "@/src/api/address.api";
+import type { Address } from "@/src/types/address";
 import { BillBreakdown } from "@/src/store/checkoutStore";
 import { CartItem } from "@/src/features/cart/types";
 import {

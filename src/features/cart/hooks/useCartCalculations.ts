@@ -13,7 +13,7 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { analyticsService } from "@/src/services/firebase";
 import { buildCartSnapshot } from "@/src/utils/cartSnapshot";
 import { CartLine } from "@/src/features/cart/types";
-import { Product } from "@/src/types/home";
+import type { Product } from "@/src/features/product/types";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { HealthProblem } from "@/src/api/health-problem.api";
+import type { HealthProblem } from "../types";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
