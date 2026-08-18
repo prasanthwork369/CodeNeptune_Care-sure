@@ -1,10 +1,15 @@
 import React from "react";
-import {
-  findNodeHandle,
-  NativeModules,
-  Platform,
-  TextInput,
-} from "react-native";
+import { findNodeHandle, Platform, TextInput } from "react-native";
+import { requireOptionalNativeModule } from "expo-modules-core";
+
+// Optional: this native module is Android-only (see
+// modules/text-input-filter/expo-module.config.json), so it's absent on iOS
+// and in Expo Go — requireOptionalNativeModule returns null there instead of
+// throwing, matching the old NativeModules bridge lookup's `undefined`.
+const TextInputFilter = requireOptionalNativeModule<{
+  applyAsciiOnly: (reactTag: number) => void;
+  applyDigitsOnly: (reactTag: number, maxLength: number) => void;
+}>("TextInputFilter");
 
 /**
  * Applies a native Android InputFilter to a React Native TextInput reference
@@ -21,8 +26,8 @@ export const applyAsciiOnlyFilter = (
   if (Platform.OS !== "android" || !ref) return;
   try {
     const tag = findNodeHandle(ref);
-    if (tag && NativeModules.TextInputFilter?.applyAsciiOnly) {
-      NativeModules.TextInputFilter.applyAsciiOnly(tag);
+    if (tag && TextInputFilter?.applyAsciiOnly) {
+      TextInputFilter.applyAsciiOnly(tag);
     }
   } catch (err) {
     if (__DEV__) {
@@ -38,8 +43,8 @@ export const applyDigitsOnlyFilter = (
   if (Platform.OS !== "android" || !ref) return;
   try {
     const tag = findNodeHandle(ref);
-    if (tag && NativeModules.TextInputFilter?.applyDigitsOnly) {
-      NativeModules.TextInputFilter.applyDigitsOnly(tag, maxLength);
+    if (tag && TextInputFilter?.applyDigitsOnly) {
+      TextInputFilter.applyDigitsOnly(tag, maxLength);
     }
   } catch (err) {
     if (__DEV__) {

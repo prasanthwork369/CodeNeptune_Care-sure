@@ -54,7 +54,7 @@ export function usePrescriptionUploadService({
         if (!canAskAgain) {
           showPermissionAlert(
             "Camera Access Required",
-            "CareSure needs camera access to scan your prescription. Please allow it in Settings to continue.",
+            "CareSure needs access to your camera to take a photo of your prescription. Please allow Camera access in Settings to continue.",
           );
         }
         return;
@@ -93,7 +93,7 @@ export function usePrescriptionUploadService({
       if (status !== "granted") {
         showPermissionAlert(
           "Photo Access Required",
-          "CareSure needs access to your photos to upload a prescription. Please allow it in Settings to continue.",
+          "CareSure needs access to your photos to upload a prescription. Please allow Photo access in Settings to continue.",
         );
         return;
       }
@@ -127,9 +127,10 @@ export function usePrescriptionUploadService({
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
+        // File-specific wording — this is a PDF pick, not a photo pick.
         showPermissionAlert(
-          "Photo Access Required",
-          "CareSure needs access to your photos to upload a prescription. Please allow it in Settings to continue.",
+          "File Access Required",
+          "CareSure needs access to your files to upload a prescription PDF. Please allow Storage access in Settings to continue.",
         );
         return;
       }
@@ -164,7 +165,7 @@ export function usePrescriptionUploadService({
       if (status !== "granted") {
         showPermissionAlert(
           "Photo Access Required",
-          "CareSure needs access to your photos to upload a prescription. Please allow it in Settings to continue.",
+          "CareSure needs access to your photos to upload a prescription. Please allow Photo access in Settings to continue.",
         );
         return;
       }

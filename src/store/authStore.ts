@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { tokenStorage, guestStorage } from "@/src/lib/storage";
-import { profileApi, CustomerProfile } from "../api/profile.api";
+import type { CustomerProfile } from "../api/profile.api";
 import { setAccessToken } from "../api/client";
 import { queryClient } from "@/src/lib/react-query/queryClient";
-import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { usePrescriptionDraftStore } from "./prescriptionDraftStore";
 import { useCheckoutDraftStore } from "./checkoutDraftStore";
@@ -14,7 +13,6 @@ import { useCheckoutStore } from "./checkoutStore";
 import { useReturnDraftStore } from "./returnDraftStore";
 import { usePrescriptionOrderStore } from "./prescriptionOrderStore";
 import { useCartPendingStore } from "./cartStore";
-import { AppError } from "../api/errors";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -42,7 +40,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (token) {
         setAccessToken(token);
 
-        // Load from cache instantly, then refresh in the background.
+        // Load from SQLite cache for instant first paint and offline support.
+        // React Query's useProfile handles background network refresh.
         const cachedProfile = apiCache.get<CustomerProfile>("customer_profile");
         set({
           token,
@@ -50,27 +49,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: cachedProfile,
           isLoaded: true,
         });
-
-        profileApi
-          .getProfile()
-          .then((profile) => {
-            set({ user: profile });
-            apiCache.set("customer_profile", profile);
-            // Seed React Query too, or useProfile (mounted by the tabs layout)
-            // fires a second identical request on every cold start.
-            queryClient.setQueryData(QUERY_KEYS.CUSTOMER.PROFILE, profile);
-          })
-          .catch(async (err) => {
-            // Only drop the session on a confirmed auth failure (401/403).
-            // A network, timeout, or 5xx error at startup must keep the
-            // user signed in so offline launches work off the cached profile.
-            const isAuthFailure =
-              err instanceof AppError &&
-              (err.status === 401 || err.status === 403);
-            if (isAuthFailure) {
-              await get().logout();
-            }
-          });
       } else {
         const isGuest = await guestStorage.get();
         set({ isGuest, isLoaded: true });

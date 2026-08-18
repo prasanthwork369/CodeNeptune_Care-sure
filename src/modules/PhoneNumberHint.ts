@@ -1,6 +1,11 @@
-import { NativeModules, Platform } from "react-native";
+import { Platform } from "react-native";
+import { requireOptionalNativeModule } from "expo-modules-core";
 
-const { PhoneNumberHint } = NativeModules;
+// Optional: Android-only (see modules/phone-number-hint/expo-module.config.json),
+// so it's absent on iOS/Expo Go — this returns null there instead of throwing.
+const PhoneNumberHint = requireOptionalNativeModule<{
+  getPhoneNumberHint: () => Promise<string | null>;
+}>("PhoneNumberHint");
 
 /**
  * Shows the Android native phone number hint picker (Google Identity Services).

@@ -3,10 +3,12 @@ const { withGradleProperties } = require("expo/config-plugins");
 const JVM_ARGS_KEY = "org.gradle.jvmargs";
 // R8 minification (enableMinifyInReleaseBuilds) OOM'd at the template's default
 // heap (~2048m) on this project's dependency graph (Firebase, ML Kit scanner,
-// notifee, Reanimated, custom native modules). 4608m leaves headroom on a
-// 16GB dev machine while giving R8 enough room to actually complete.
+// notifee, Reanimated, custom native modules). 4608m fixed that, but debug
+// APK packaging (zipflinger, a no-isolation worker sharing this same heap)
+// OOM'd at 4608m too once the 3 new local Expo modules added more
+// classes/resources to merge — 6144m covers both on a 16GB dev machine.
 const JVM_ARGS_VALUE =
-  "-Xmx4608m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError";
+  "-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError";
 
 /**
  * Raises the Gradle daemon's JVM heap so release-build R8 minification has

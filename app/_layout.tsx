@@ -14,7 +14,6 @@ import "../src/utils/patchText";
 import "../src/utils/patchTextInput";
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
-import { SignupBonusPopup } from "@/src/features/auth/components/SignupBonusPopup";
 import { AppGateScreen } from "@/src/components/common/AppGateScreen";
 import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
 import { GlobalAlertDialog } from "@/src/components/common/GlobalAlertDialog";
@@ -24,6 +23,7 @@ import { Toast } from "@/src/components/common/Toast";
 import { UpdateReadyBanner } from "@/src/components/common/UpdateReadyBanner";
 import DevPreviewToggler from "@/src/components/dev/DevPreviewToggler";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
+import { SignupBonusPopup } from "@/src/features/auth/components/SignupBonusPopup";
 import { useAppGate } from "@/src/hooks/ui/useAppGate";
 import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
 import { useOtaUpdate } from "@/src/hooks/ui/useOtaUpdate";

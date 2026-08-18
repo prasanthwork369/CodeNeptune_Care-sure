@@ -22,14 +22,13 @@ export function useAppGate(): {
   maintenanceMessage?: string;
 } {
   const { data, refetch } = useSettings();
-  const lastCheckedAt = useRef(Date.now());
+  const lastCheckedAt = useRef(0);
   const devPreview = __DEV__ ? getDevGatePreview() : null;
 
-  // React Query's focusManager is not wired to AppState in this app, so
-  // refetchOnWindowFocus would do nothing. Without this the gate is only
-  // evaluated at cold start — an urgent forced update would miss every user
-  // who keeps the app backgrounded rather than closing it.
+  // useSettings opts out of window-focus refetches, so we manually recheck
+  // on app foreground with a 60s throttle to catch urgent maintenance/updates.
   useEffect(() => {
+    lastCheckedAt.current = Date.now();
     const sub = AppState.addEventListener("change", (s: AppStateStatus) => {
       if (s !== "active") return;
       const now = Date.now();

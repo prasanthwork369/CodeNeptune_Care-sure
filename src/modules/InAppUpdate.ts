@@ -1,6 +1,5 @@
-import { NativeEventEmitter, NativeModules, Platform } from "react-native";
-
-const { InAppUpdate } = NativeModules;
+import { Platform } from "react-native";
+import { requireOptionalNativeModule } from "expo-modules-core";
 
 /** Outcome of asking Play to start an update flow. */
 export type UpdateFlowResult =
@@ -33,6 +32,21 @@ export interface InstallStateEvent {
   totalBytes: number;
 }
 
+// Optional: Android-only (see modules/in-app-update/expo-module.config.json),
+// so it's absent on iOS/Expo Go — this returns null there instead of throwing.
+// Expo native modules that declare events get addListener/removeListeners
+// for free, replacing the old NativeEventEmitter(InAppUpdate) wrapper below.
+const InAppUpdate = requireOptionalNativeModule<{
+  checkUpdateAvailability: () => Promise<UpdateAvailability>;
+  startFlexibleUpdate: () => Promise<UpdateFlowResult>;
+  startImmediateUpdate: () => Promise<UpdateFlowResult>;
+  completeFlexibleUpdate: () => Promise<boolean>;
+  addListener: (
+    eventName: "InAppUpdate:state",
+    listener: (event: InstallStateEvent) => void,
+  ) => { remove: () => void };
+}>("InAppUpdate");
+
 const UNAVAILABLE: UpdateAvailability = {
   available: false,
   immediateInProgress: false,
@@ -51,7 +65,7 @@ export const isInAppUpdateSupported = (): boolean =>
 export async function checkUpdateAvailability(): Promise<UpdateAvailability> {
   if (!isInAppUpdateSupported()) return UNAVAILABLE;
   try {
-    return await InAppUpdate.checkUpdateAvailability();
+    return await InAppUpdate!.checkUpdateAvailability();
   } catch {
     return UNAVAILABLE;
   }
@@ -60,7 +74,7 @@ export async function checkUpdateAvailability(): Promise<UpdateAvailability> {
 export async function startFlexibleUpdate(): Promise<UpdateFlowResult> {
   if (!isInAppUpdateSupported()) return "unavailable";
   try {
-    return await InAppUpdate.startFlexibleUpdate();
+    return await InAppUpdate!.startFlexibleUpdate();
   } catch {
     return "failed";
   }
@@ -69,7 +83,7 @@ export async function startFlexibleUpdate(): Promise<UpdateFlowResult> {
 export async function startImmediateUpdate(): Promise<UpdateFlowResult> {
   if (!isInAppUpdateSupported()) return "unavailable";
   try {
-    return await InAppUpdate.startImmediateUpdate();
+    return await InAppUpdate!.startImmediateUpdate();
   } catch {
     return "failed";
   }
@@ -79,7 +93,7 @@ export async function startImmediateUpdate(): Promise<UpdateFlowResult> {
 export async function completeFlexibleUpdate(): Promise<boolean> {
   if (!isInAppUpdateSupported()) return false;
   try {
-    return await InAppUpdate.completeFlexibleUpdate();
+    return await InAppUpdate!.completeFlexibleUpdate();
   } catch {
     return false;
   }
@@ -93,7 +107,6 @@ export function addInstallStateListener(
   handler: (event: InstallStateEvent) => void,
 ): () => void {
   if (!isInAppUpdateSupported()) return () => {};
-  const emitter = new NativeEventEmitter(InAppUpdate);
-  const sub = emitter.addListener("InAppUpdate:state", handler);
+  const sub = InAppUpdate!.addListener("InAppUpdate:state", handler);
   return () => sub.remove();
 }

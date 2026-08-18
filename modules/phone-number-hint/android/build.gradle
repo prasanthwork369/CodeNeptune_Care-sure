@@ -1,0 +1,20 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'com.codeneptune.caresure'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.phonenumberhint"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+}
+
+dependencies {
+  // GetPhoneNumberHintIntentRequest / Identity — Google Identity Phone Number Hint API.
+  implementation 'com.google.android.gms:play-services-auth:21.3.0'
+}

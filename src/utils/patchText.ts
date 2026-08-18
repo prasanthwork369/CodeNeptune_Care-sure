@@ -7,7 +7,7 @@ import OriginalTextImport from "react-native/Libraries/Text/Text";
 
 const OriginalText = OriginalTextImport as unknown as typeof RN.Text;
 
-// Only these Inter weights are loaded by useAndroidInterFonts.
+// Inter weights natively embedded via expo-font config plugin.
 const ANDROID_WEIGHT_TO_INTER_FAMILY = {
   "400": "Inter_400Regular",
   normal: "Inter_400Regular",

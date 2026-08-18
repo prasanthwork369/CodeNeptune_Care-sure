@@ -1,0 +1,12 @@
+R_DEF: Internal format may change without notice
+local
+drawable bg_notification_action_btn
+id notif_action_btn
+id notif_coupon
+id notif_discount
+id notif_image
+id notif_mrp
+id notif_offer_price
+id notif_title
+layout notification_product_collapsed
+layout notification_product_expanded

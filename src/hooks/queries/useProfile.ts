@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   profileApi,
   UpdateProfilePayload,
@@ -14,6 +14,7 @@ import { useAuthStore } from "../../store/authStore";
 export const useProfile = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setUser = useAuthStore((s) => s.setUser);
   const cachedProfile = useCachedSeed<CustomerProfile>("customer_profile");
 
   const {
@@ -28,6 +29,13 @@ export const useProfile = () => {
     staleTime: 2 * 60_000,
     enabled: isAuthenticated,
   });
+
+  // Keep authStore user state synchronized with fresh profile query data.
+  useEffect(() => {
+    if (profile) {
+      setUser(profile);
+    }
+  }, [profile, setUser]);
 
   const updateMutation = useMutation({
     mutationFn: profileApi.updateProfile,

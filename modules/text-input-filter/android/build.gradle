@@ -1,0 +1,21 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'com.codeneptune.caresure'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.textinputfilter"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+}
+
+dependencies {
+  // UIManagerHelper/ViewUtil/UiThreadUtil — resolves the TextInput view by
+  // reactTag the same way the original ReactContextBaseJavaModule did.
+  implementation 'com.facebook.react:react-android'
+}

@@ -136,67 +136,35 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     expect(guestStorage.clear).toHaveBeenCalled();
   });
 
-  it("initialize loads cached profile instantly and refreshes in background", async () => {
+  it("initialize loads token and cached profile instantly from SQLite", async () => {
     (tokenStorage.get as jest.Mock).mockResolvedValueOnce("stored-token-123");
     (apiCache.get as jest.Mock).mockReturnValueOnce({
       id: "u1",
       firstName: "CachedUser",
     });
-    (profileApi.getProfile as jest.Mock).mockResolvedValueOnce({
-      id: "u1",
-      firstName: "RefreshedUser",
-    });
 
     await useAuthStore.getState().initialize();
-    await Promise.resolve(); // Flush microtask queue for background getProfile.then()
 
     expect(getAccessToken()).toBe("stored-token-123");
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().isLoaded).toBe(true);
     expect(useAuthStore.getState().user).toEqual({
-      id: "u1",
-      firstName: "RefreshedUser",
-    });
-    expect(apiCache.set).toHaveBeenCalledWith("customer_profile", {
-      id: "u1",
-      firstName: "RefreshedUser",
-    });
-  });
-
-  it("initialize logs out silently on a confirmed auth failure (401 expired token)", async () => {
-    (tokenStorage.get as jest.Mock).mockResolvedValueOnce("expired-token");
-    (apiCache.get as jest.Mock).mockReturnValueOnce(null);
-    (profileApi.getProfile as jest.Mock).mockRejectedValueOnce(
-      new AppError("unauthorized", "401 Unauthorized", 401),
-    );
-
-    const logoutSpy = jest.spyOn(useAuthStore.getState(), "logout");
-
-    await useAuthStore.getState().initialize();
-    await Promise.resolve(); // Flush microtask queue for background getProfile.catch()
-    await Promise.resolve();
-
-    expect(logoutSpy).toHaveBeenCalled();
-  });
-
-  it("initialize preserves the session when the profile fetch fails on a network error", async () => {
-    (tokenStorage.get as jest.Mock).mockResolvedValueOnce("valid-token");
-    (apiCache.get as jest.Mock).mockReturnValueOnce({
       id: "u1",
       firstName: "CachedUser",
     });
-    (profileApi.getProfile as jest.Mock).mockRejectedValueOnce(
-      new AppError("network", "No Internet Connection."),
-    );
+    // profileApi.getProfile should NOT be called directly by authStore — useProfile owns network refresh
+    expect(profileApi.getProfile).not.toHaveBeenCalled();
+  });
 
-    const logoutSpy = jest.spyOn(useAuthStore.getState(), "logout");
+  it("initialize restores guest session when no token is present", async () => {
+    (tokenStorage.get as jest.Mock).mockResolvedValueOnce(null);
+    (guestStorage.get as jest.Mock).mockResolvedValueOnce(true);
 
     await useAuthStore.getState().initialize();
-    await Promise.resolve();
-    await Promise.resolve();
 
-    // Network failure must NOT log the user out — session stays on cached profile.
-    expect(logoutSpy).not.toHaveBeenCalled();
-    expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(getAccessToken()).toBe("valid-token");
+    expect(getAccessToken()).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().isGuest).toBe(true);
+    expect(useAuthStore.getState().isLoaded).toBe(true);
   });
 });

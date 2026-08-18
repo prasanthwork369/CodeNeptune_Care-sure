@@ -1,3 +1,4 @@
+import { getAccessToken } from "@/src/api/client";
 import type { Cart, Coupon } from "@/src/features/cart/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { tokenStorage } from "@/src/lib/storage";
@@ -28,11 +29,25 @@ export const useCartSocketSync = () => {
       const token = await tokenStorage.get();
       if (!token || !mounted) return;
 
+      // Kept as one mutable object (not replaced) — engine.io reads
+      // `extraHeaders` fresh from this same reference on every reconnect
+      // attempt, so updating its value in place is what lets a reconnect
+      // pick up a token Axios refreshed after this socket first connected.
+      const authHeaders = { Authorization: `Bearer ${token}` };
+
       const socket: Socket = io(API_BASE_URL, {
-        extraHeaders: { Authorization: `Bearer ${token}` },
+        extraHeaders: authHeaders,
         transports: ["websocket"],
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
+      });
+
+      // Fires before each reconnect attempt (not the first connect) — refresh
+      // from the same in-memory token Axios's interceptor keeps current, so a
+      // reconnect never hands the server the JWT this socket started with.
+      socket.io.on("reconnect_attempt", () => {
+        const current = getAccessToken();
+        if (current) authHeaders.Authorization = `Bearer ${current}`;
       });
 
       socket.on("connect", () => {

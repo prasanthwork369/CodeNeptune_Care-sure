@@ -243,9 +243,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withNotifeeRepo",
     // Keeps expo-image-picker's crop toolbar readable on light-themed devices.
     "./plugins/withCropScreenColors",
-    // Copies native/android/ custom sources into the generated android/ project
-    // and registers their ReactPackages — survives `expo prebuild --clean`.
-    "./plugins/withCustomNativeFiles",
     // Lets Android Studio Profiler attach to release builds without debuggable=true.
     "./plugins/withProfileable",
     [
