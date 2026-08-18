@@ -312,7 +312,7 @@ export const OrderTrackLayout: React.FC = () => {
       setIsProceeding(false);
       cartNavTimer.current = setTimeout(() => {
         cartNavTimer.current = null;
-        router.push("/(stack)/cart");
+        router.push("/(commerce)/cart");
       }, 100);
     } catch (err) {
       if (__DEV__) console.error("[ReOrder]", err);

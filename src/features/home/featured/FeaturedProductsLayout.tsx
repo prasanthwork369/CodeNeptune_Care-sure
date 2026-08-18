@@ -100,7 +100,7 @@ const FeaturedProductsContent: React.FC = () => {
           zIndex: 50,
         }}
       >
-        <CategoryCartBanner onPress={() => router.push("/(stack)/cart")} />
+        <CategoryCartBanner onPress={() => router.push("/(commerce)/cart")} />
       </View>
       <FlyToCartOverlay />
     </View>

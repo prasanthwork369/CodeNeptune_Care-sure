@@ -262,7 +262,7 @@ export function usePaymentCalculations() {
           });
       }
       router.replace({
-        pathname: "/(stack)/order-success",
+        pathname: "/(commerce)/order-success",
         params: {
           orderId: order?.orderId ?? order?.id ?? "",
           total: String(Number(billBreakdown.toPay).toFixed(2)),

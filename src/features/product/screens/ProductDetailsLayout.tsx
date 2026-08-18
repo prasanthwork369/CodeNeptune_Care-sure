@@ -279,7 +279,7 @@ export const ProductDetailsLayout: React.FC = () => {
                 variantId={activeVariantId}
                 product={footerProduct}
                 safeAreaBottom={adjustedBottom}
-                onViewCart={() => router.push("/(stack)/cart")}
+                onViewCart={() => router.push("/(commerce)/cart")}
               />
             ) : (
               <NoSubstituteBanner

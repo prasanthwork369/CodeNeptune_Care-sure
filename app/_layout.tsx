@@ -279,7 +279,8 @@ export default function RootLayout() {
                       name="(tabs)"
                       options={screenTransitions.authComplete}
                     />
-                    <Stack.Screen name="(stack)" />
+                    <Stack.Screen name="(commerce)" />
+                    <Stack.Screen name="(catalog)" />
                     <Stack.Screen name="(prescription)" />
                     <Stack.Screen name="search" />
                     <Stack.Screen name="notifications" />

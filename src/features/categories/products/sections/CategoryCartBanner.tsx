@@ -5,6 +5,7 @@ import {
   ThumbnailItem,
   AnimatedCount,
 } from "@/src/components/animations/flyToCart";
+import { useCart } from "@/src/hooks/queries/useCart";
 import React, { useEffect, useRef } from "react";
 import { Text, View } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
@@ -33,6 +34,10 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
   // Expand to the original designed pill width (centered)
   const PILL_W = 250;
 
+  // visualCartCount only drives the fly-animation timing (circle → pill
+  // expansion) — the displayed number always trusts the real cart total,
+  // same as CartFloatingBanner, so it can't drift or get stuck.
+  const { totalItems } = useCart();
   const visualCartCount = ctx?.visualCartCount ?? 0;
   const visualCartImages = ctx?.visualCartImages ?? [];
   const bounceSharedValue = ctx?.bounceSharedValue ?? null;
@@ -250,7 +255,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
             >
               View cart
             </Text>
-            <AnimatedCount count={visualCartCount} />
+            <AnimatedCount count={totalItems} />
           </Animated.View>
 
           {/* Chevron — fades in last */}

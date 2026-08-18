@@ -25,7 +25,7 @@ interface BannerCarouselProps {
 }
 
 const BANNER_ROUTE_MAP: Record<string, Href> = {
-  "/cart": "/(stack)/cart",
+  "/cart": "/(commerce)/cart",
   "/category": "/categories",
   "/categories": "/categories",
   "/search": "/search",

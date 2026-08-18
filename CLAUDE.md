@@ -69,7 +69,7 @@ than none.
 
 ```
 app/                 Expo Router routes only
-  (auth)/ (tabs)/ (stack)/ (prescription)/
+  (auth)/ (tabs)/ (commerce)/ (catalog)/ (prescription)/
 src/
   api/               one file per backend resource: *.api.ts
   components/        <feature>/sections/ for screen parts

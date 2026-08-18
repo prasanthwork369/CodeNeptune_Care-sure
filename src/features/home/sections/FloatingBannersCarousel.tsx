@@ -235,7 +235,7 @@ export const FloatingBannersCarousel = () => {
   }));
 
   const handleCartPress = () => {
-    router.push("/(stack)/cart");
+    router.push("/(commerce)/cart");
   };
 
   const handleRxPress = () => {
@@ -520,7 +520,7 @@ export const FloatingBannersCarousel = () => {
               <BannerFadeGradient />
               <CartFloatingBanner
                 visible={isCartActive}
-                onViewCart={() => router.push("/(stack)/cart")}
+                onViewCart={() => router.push("/(commerce)/cart")}
                 onInteractionChange={setIsCartInteracting}
               />
             </Animated.View>

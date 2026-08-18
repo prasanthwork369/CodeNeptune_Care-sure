@@ -266,7 +266,7 @@ const HomeContent: React.FC = () => {
   }, [router]);
 
   const handleViewAllSubstitutes = useCallback(() => {
-    router.push("/(stack)/featured");
+    router.push("/(catalog)/featured");
   }, [router]);
 
   // Each Health Essentials row is one subcategory. The featured API returns no

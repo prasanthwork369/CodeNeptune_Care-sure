@@ -193,7 +193,7 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
       expect.objectContaining({ orderId: "ord-100" }),
     );
     expect(mockRouter.replace).toHaveBeenCalledWith({
-      pathname: "/(stack)/order-success",
+      pathname: "/(commerce)/order-success",
       params: { orderId: "ord-100", total: "200.00" },
     });
     // Order is created with an idempotency key (2nd arg) + it in metadata.

@@ -2,7 +2,7 @@ import { useAuthStore } from "@/src/store/authStore";
 import { screenTransitions } from "@/src/theme";
 import { Redirect, Stack, useSegments } from "expo-router";
 
-export default function StackLayout() {
+export default function CommerceLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const segments = useSegments() as string[];
   const currentRoute = segments[1];

@@ -112,7 +112,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
 
         {isSearching && (
           <Touchable
-            onPress={() => router.push("/(stack)/cart")}
+            onPress={() => router.push("/(commerce)/cart")}
             style={{
               height: exactScale(60),
               width: exactScale(60),

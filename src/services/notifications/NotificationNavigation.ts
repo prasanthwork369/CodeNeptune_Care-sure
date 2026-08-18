@@ -167,12 +167,12 @@ export const NotificationNavigation = {
 
       // --- Coupons ---
       case NotificationType.COUPON:
-        router.push("/(stack)/coupons");
+        router.push("/(commerce)/coupons");
         break;
 
       // --- Cart ---
       case NotificationType.CART_REMINDER:
-        router.push("/(stack)/cart");
+        router.push("/(commerce)/cart");
         break;
 
       // --- Wallet ---
