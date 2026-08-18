@@ -11,7 +11,7 @@ import {
   PRESCRIPTION_STATUS,
   PRESCRIPTION_STATUS_LABELS,
 } from "@/src/features/prescription/constants/prescription-status";
-import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
+import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState, useMemo, useCallback } from "react";
 import { Text, View } from "react-native";

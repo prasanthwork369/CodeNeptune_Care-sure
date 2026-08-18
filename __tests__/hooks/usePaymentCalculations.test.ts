@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react-native";
 import { usePaymentCalculations } from "@/src/features/checkout/hooks/usePaymentCalculations";
-import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
+import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
@@ -24,7 +24,7 @@ jest.mock("@/src/hooks/useNav", () => ({
   useNav: jest.fn(),
 }));
 
-jest.mock("@/src/hooks/queries/useCart", () => ({
+jest.mock("@/src/features/cart/hooks/useCart", () => ({
   useCart: jest.fn(() => ({
     items: [
       {
@@ -38,11 +38,11 @@ jest.mock("@/src/hooks/queries/useCart", () => ({
   })),
 }));
 
-jest.mock("@/src/hooks/mutations/useCreateOrder", () => ({
+jest.mock("@/src/features/orders/hooks/useCreateOrder", () => ({
   useCreateOrder: jest.fn(),
 }));
 
-jest.mock("@/src/hooks/useDeliveryAddress", () => ({
+jest.mock("@/src/features/location/hooks/useDeliveryAddress", () => ({
   useDeliveryAddress: jest.fn(),
 }));
 

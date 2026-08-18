@@ -4,7 +4,7 @@ import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
+import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import type { FamilyMember } from "../types";
 import { getAge } from "@/src/utils/patient";
 import { useNav } from "@/src/hooks/useNav";

@@ -5,7 +5,7 @@ import type {
 } from "@/src/features/categories/types";
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
-import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { LinearGradient } from "expo-linear-gradient";

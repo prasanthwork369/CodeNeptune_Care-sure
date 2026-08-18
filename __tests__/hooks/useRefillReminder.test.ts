@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { Alert } from "react-native";
-import { useRefillReminder } from "@/src/hooks/useRefillReminder";
+import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillReminder";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 
 jest.mock("@/src/features/prescription/services/prescription.service", () => ({

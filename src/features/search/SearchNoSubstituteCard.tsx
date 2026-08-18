@@ -3,7 +3,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { useSubstituteRequest } from "@/src/hooks/queries/useSubstituteRequest";
+import { useSubstituteRequest } from "@/src/features/search/hooks/useSubstituteRequest";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   cartCounterStyles as cc,

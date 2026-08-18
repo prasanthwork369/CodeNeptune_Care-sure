@@ -1,6 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { icons } from "@/src/constants/icons";
-import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
+import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import type { FamilyMemberInput } from "../types";
 import {

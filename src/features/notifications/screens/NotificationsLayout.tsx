@@ -6,10 +6,10 @@ import {
   useDismissAllNotifications,
   useDismissNotification,
   useMarkNotificationRead,
-} from "@/src/hooks/mutations/useNotificationMutations";
-import { useNotifications } from "@/src/hooks/queries/useNotifications";
-import { usePrefetchOrder } from "@/src/hooks/queries/useOrderById";
-import { usePrefetchWallet } from "@/src/hooks/queries/useWallet";
+} from "@/src/features/notifications/hooks/useNotificationMutations";
+import { useNotifications } from "@/src/features/notifications/hooks/useNotifications";
+import { usePrefetchOrder } from "@/src/features/orders/hooks/useOrderById";
+import { usePrefetchWallet } from "@/src/features/wallet/hooks/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useToastStore } from "@/src/store/toastStore";

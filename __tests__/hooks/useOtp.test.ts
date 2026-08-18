@@ -1,7 +1,7 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react-native";
 import { useOtp } from "@/src/features/auth/hooks/useOtp";
-import { useAuth } from "@/src/hooks/mutations/useAuth";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { cartApi } from "@/src/features/cart/api/cart.api";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
@@ -21,7 +21,7 @@ jest.mock("@/src/hooks/useNav", () => ({
   useNav: jest.fn(),
 }));
 
-jest.mock("@/src/hooks/mutations/useAuth", () => ({
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   useAuth: jest.fn(),
 }));
 

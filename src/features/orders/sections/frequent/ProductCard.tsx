@@ -4,7 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { cartMutations } from "@/src/features/cart/services/cart.mutations";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import { Image } from "expo-image";

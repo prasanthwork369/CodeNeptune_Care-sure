@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { apiCache, useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useAuthStore } from "@/src/store/authStore";

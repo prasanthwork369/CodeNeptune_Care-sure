@@ -7,8 +7,8 @@ import {
   ProductGrid,
 } from "@/src/features/categories/products/sections";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
-import { useAllFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
+import { useAllFeaturedMedicines } from "@/src/features/product/hooks/useFeaturedMedicines";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryProduct } from "@/src/features/categories/types";

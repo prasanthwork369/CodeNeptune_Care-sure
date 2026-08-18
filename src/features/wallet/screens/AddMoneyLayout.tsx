@@ -5,7 +5,7 @@ import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { icons } from "@/src/constants/icons";
 import { ANIMATIONS } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
-import { useAddMoney, useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useAddMoney, useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";

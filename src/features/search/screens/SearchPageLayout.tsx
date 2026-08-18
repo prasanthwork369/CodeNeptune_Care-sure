@@ -8,13 +8,13 @@ import { SearchResultsList } from "@/src/features/search/sections/SearchResultsL
 import { SearchSuggestionsBar } from "@/src/features/search/sections/SearchSuggestionsBar";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { resolveAssetUrl } from "@/src/utils/urls";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import {
   useSearch,
   useSearchHistory,
   useSearchSuggestions,
   useTrendingSearches,
-} from "@/src/hooks/queries/useSearch";
+} from "@/src/features/search/hooks/useSearch";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";

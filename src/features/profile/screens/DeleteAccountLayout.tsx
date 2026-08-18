@@ -3,7 +3,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { useAuth } from "@/src/hooks/mutations/useAuth";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";

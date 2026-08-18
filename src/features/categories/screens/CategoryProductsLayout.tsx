@@ -5,8 +5,8 @@ import {
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
-import { useCategoryProducts } from "@/src/hooks/queries/useCategories";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
+import { useCategoryProducts } from "@/src/features/categories/hooks/useCategories";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryProduct } from "@/src/features/categories/types";

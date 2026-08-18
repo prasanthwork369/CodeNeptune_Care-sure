@@ -5,8 +5,8 @@ import type {
   FamilyMemberInput,
 } from "@/src/features/profile/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useAuthStore } from "../../store/authStore";
-import { useCachedSeed, withSqliteCache } from "../../lib/sqlite/cache";
+import { useAuthStore } from "@/src/store/authStore";
+import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 export const useFamilyMembers = () => {
   const queryClient = useQueryClient();

@@ -7,7 +7,7 @@ import type {
   ApiCategoryFamily,
   CategoryProduct,
 } from "@/src/features/categories/types";
-import { resolveAssetUrl } from "../../utils/urls";
+import { resolveAssetUrl } from "@/src/utils/urls";
 import type { CategoryCard, CategoryTab } from "@/src/features/home/types";
 
 const CARD_BG_COLORS = [

@@ -1,4 +1,4 @@
-import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
+import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
 
 /**
  * Resolves the prescription id for the medicine-comparison screen. Some entry

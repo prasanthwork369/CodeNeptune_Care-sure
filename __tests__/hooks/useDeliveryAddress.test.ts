@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react-native";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useLocationStore } from "@/src/store/locationStore";
 
-jest.mock("@/src/hooks/queries/useAddress", () => ({
+jest.mock("@/src/features/profile/hooks/useAddress", () => ({
   useAddress: jest.fn(),
 }));
 

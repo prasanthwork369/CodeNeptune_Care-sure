@@ -1,4 +1,4 @@
-import { getOrderRefetchInterval } from "@/src/hooks/queries/useOrderById";
+import { getOrderRefetchInterval } from "@/src/features/orders/hooks/useOrderById";
 
 describe("getOrderRefetchInterval — order tracking live polling", () => {
   it("stops polling once the order is cancelled", () => {

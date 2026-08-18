@@ -1,4 +1,4 @@
-import { useAuth } from "@/src/hooks/mutations/useAuth";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import {
   getPhoneNumberHint,

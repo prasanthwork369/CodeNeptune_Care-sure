@@ -3,7 +3,7 @@ import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useState, useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useWebsiteContent } from "@/src/hooks/queries/useWebsiteContent";
+import { useWebsiteContent } from "@/src/features/home/hooks/useWebsiteContent";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
 

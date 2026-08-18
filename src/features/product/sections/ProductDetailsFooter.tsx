@@ -2,7 +2,7 @@ import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { ProductDetailsFooterProps } from "@/src/features/product/types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";

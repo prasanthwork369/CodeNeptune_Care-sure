@@ -24,12 +24,12 @@ import { UpdateReadyBanner } from "@/src/components/common/UpdateReadyBanner";
 import DevPreviewToggler from "@/src/components/dev/DevPreviewToggler";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { SignupBonusPopup } from "@/src/features/auth/components/SignupBonusPopup";
-import { useAppGate } from "@/src/hooks/ui/useAppGate";
-import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
-import { useOtaUpdate } from "@/src/hooks/ui/useOtaUpdate";
-import { usePushNotifications } from "@/src/hooks/ui/usePushNotifications";
-import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
-import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
+import { useAppGate } from "@/src/hooks/system/useAppGate";
+import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
+import { useOtaUpdate } from "@/src/hooks/system/useOtaUpdate";
+import { usePushNotifications } from "@/src/hooks/system/usePushNotifications";
+import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
+import { useCartSocketSync } from "@/src/features/cart/hooks/useCartSocketSync";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { initDb } from "@/src/lib/sqlite/db";
 import {

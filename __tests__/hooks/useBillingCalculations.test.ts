@@ -1,13 +1,13 @@
-import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
-import { useProfile } from "@/src/hooks/queries/useProfile";
-import { useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
+import { useProfile } from "@/src/features/profile/hooks/useProfile";
+import { useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 
-jest.mock("@/src/hooks/queries/useProfile", () => ({
+jest.mock("@/src/features/profile/hooks/useProfile", () => ({
   useProfile: jest.fn(),
 }));
 
-jest.mock("@/src/hooks/queries/useWallet", () => ({
+jest.mock("@/src/features/wallet/hooks/useWallet", () => ({
   useWalletBalance: jest.fn(),
 }));
 

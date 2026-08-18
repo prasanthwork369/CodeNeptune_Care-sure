@@ -4,7 +4,7 @@ import {
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
 import { SearchPageLayout } from "@/src/features/search/screens/SearchPageLayout";
-import { useSearch } from "@/src/hooks/queries/useSearch";
+import { useSearch } from "@/src/features/search/hooks/useSearch";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 
 jest.mock("@/src/hooks/useNav", () => ({
@@ -17,7 +17,7 @@ jest.mock("@/src/hooks/ui/useBottomInset", () => ({
 
 jest.mock("@/src/hooks/ui/useIsOffline");
 
-jest.mock("@/src/hooks/queries/useCart", () => ({
+jest.mock("@/src/features/cart/hooks/useCart", () => ({
   useCart: () => ({ totalItems: 0 }),
 }));
 
@@ -56,7 +56,7 @@ jest.mock("@/src/features/search/sections/SearchResultsList", () => {
   };
 });
 
-jest.mock("@/src/hooks/queries/useSearch", () => ({
+jest.mock("@/src/features/search/hooks/useSearch", () => ({
   useSearch: jest.fn(),
   useSearchHistory: () => ({
     history: [],

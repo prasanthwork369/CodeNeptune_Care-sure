@@ -1,8 +1,8 @@
 import { AddPatientSheet } from "@/src/features/profile/components/AddPatientSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
-import { useCart } from "@/src/hooks/queries/useCart";
-import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
+import { useCart } from "@/src/features/cart/hooks/useCart";
+import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import type { FamilyMember } from "@/src/features/profile/types";

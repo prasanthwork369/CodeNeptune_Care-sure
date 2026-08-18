@@ -1,6 +1,6 @@
 import { HOME_IMAGES } from "@/src/constants/images";
-import { useProfile } from "@/src/hooks/queries/useProfile";
-import { useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useProfile } from "@/src/features/profile/hooks/useProfile";
+import { useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";

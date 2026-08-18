@@ -1,7 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
-import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import { moderateScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React, { useCallback } from "react";

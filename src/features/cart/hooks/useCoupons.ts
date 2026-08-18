@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { couponApi } from "@/src/features/cart/api/coupon.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
 
 export const useCoupons = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);

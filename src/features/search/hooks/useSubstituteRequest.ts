@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { substituteApi } from "@/src/features/search/api/substitute.api";
-import { useToastStore } from "../../store/toastStore";
-import { useAuthStore } from "../../store/authStore";
-import { useNav } from "../useNav";
+import { useToastStore } from "@/src/store/toastStore";
+import { useAuthStore } from "@/src/store/authStore";
+import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 
 export const useSubstituteRequest = () => {
@@ -22,6 +22,7 @@ export const useSubstituteRequest = () => {
         "success",
       );
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       const msg =
         err?.response?.data?.message ||

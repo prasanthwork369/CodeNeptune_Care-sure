@@ -13,13 +13,13 @@ import {
   CartCorporateCreditsSection,
 } from "@/src/features/cart/sections";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
-import { useRefillReminder } from "@/src/hooks/useRefillReminder";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
+import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillReminder";
 import { ReminderSheet } from "@/src/features/prescription/components/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { useAppliedCoupon } from "@/src/hooks/useAppliedCoupon";
-import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
-import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
+import { useAppliedCoupon } from "@/src/hooks/billing/useAppliedCoupon";
+import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
+import { useDeliveryCharges } from "@/src/features/cart/hooks/useDeliveryCharges";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -40,7 +40,7 @@ import {
 
 import { MedicineComparisonSkeleton } from "../components/MedicineComparisonSkeleton";
 import { useComparisonPrescriptionId } from "../hooks/useComparisonPrescriptionId";
-import { usePrescriptionOrderMedicines } from "@/src/hooks/queries/usePrescriptionOrderMedicines";
+import { usePrescriptionOrderMedicines } from "@/src/features/prescription/hooks/usePrescriptionOrderMedicines";
 import { useLocalSearchParams } from "expo-router";
 import { Touchable } from "@/src/components/ui/Touchable";
 

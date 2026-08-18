@@ -2,9 +2,9 @@ import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { ProductSkeleton } from "@/src/features/product/ProductSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
-import { useInCartVariantId } from "@/src/hooks/queries/useCartRead";
-import { useAppContent } from "@/src/hooks/queries/useHome";
-import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
+import { useInCartVariantId } from "@/src/features/cart/hooks/useCartRead";
+import { useAppContent } from "@/src/features/home/hooks/useHome";
+import { useProduct, getPackDivisor } from "@/src/features/product/hooks/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import {

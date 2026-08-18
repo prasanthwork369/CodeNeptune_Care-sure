@@ -3,8 +3,8 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { medicineApi } from "@/src/features/product/api/medicine.api";
-import { formatPackLabel } from "../../utils/packLabel";
-import { resolveAssetUrl } from "../../utils/urls";
+import { formatPackLabel } from "@/src/utils/packLabel";
+import { resolveAssetUrl } from "@/src/utils/urls";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 // Shared by the home row and the full listing so both show identical pricing.

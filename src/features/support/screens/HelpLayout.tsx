@@ -1,6 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { icons } from "@/src/constants/icons";
-import { useContactActions } from "@/src/hooks/ui/useContactActions";
+import { useContactActions } from "@/src/features/support/hooks/useContactActions";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import React from "react";

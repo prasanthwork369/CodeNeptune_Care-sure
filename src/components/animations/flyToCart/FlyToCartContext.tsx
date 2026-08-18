@@ -1,4 +1,4 @@
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCart } from "@/src/features/cart/hooks/useCart";
 import type { CartItem } from "@/src/features/cart/types";
 import type { ImageSource } from "expo-image";
 import React, {

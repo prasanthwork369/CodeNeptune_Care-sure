@@ -1,5 +1,5 @@
 import { renderWithProviders } from "@/__tests__/test-utils/renderWithProviders";
-import { useAppGate } from "@/src/hooks/ui/useAppGate";
+import { useAppGate } from "@/src/hooks/system/useAppGate";
 import React from "react";
 import { Text } from "react-native";
 

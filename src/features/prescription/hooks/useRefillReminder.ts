@@ -3,7 +3,7 @@ import { PrescriptionReminder, ReminderInput } from "@/src/features/prescription
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { useNav } from "./useNav";
+import { useNav } from "@/src/hooks/useNav";
 import { logger } from "@/src/utils/logger";
 
 interface UseRefillReminderOptions {

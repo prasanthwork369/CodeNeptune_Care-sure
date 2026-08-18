@@ -1,6 +1,6 @@
 import { OtpForm } from "@/src/features/auth/components/OtpForm";
 import { Touchable } from "@/src/components/ui/Touchable";
-import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
+import { useEmailVerification } from "@/src/features/profile/hooks/useEmailVerification";
 import { useOtpInput } from "@/src/hooks/ui/useOtpInput";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useState } from "react";

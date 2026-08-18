@@ -10,8 +10,8 @@ import { showProductOffer } from "../../services/notifications/productOfferNotif
 // Registers the __DEV__-only global testProductOffer() console trigger.
 import "../../services/notifications/devProductOfferTest";
 import { NotificationNavigation } from "../../services/notifications/NotificationNavigation";
-import { useAuthStore } from "../../store/authStore";
-import { useNotificationStore } from "../../store/notificationStore";
+import { useAuthStore } from "@/src/store/authStore";
+import { useNotificationStore } from "@/src/store/notificationStore";
 import {
   NotificationData,
   NotificationPayload,

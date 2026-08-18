@@ -1,7 +1,7 @@
 import type { Coupon } from "@/src/features/cart/types";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { useCart } from "@/src/hooks/queries/useCart";
-import { useCoupons } from "@/src/hooks/queries/useCoupons";
+import { useCart } from "@/src/features/cart/hooks/useCart";
+import { useCoupons } from "@/src/features/cart/hooks/useCoupons";
 import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
 import { useCouponSearch } from "@/src/features/cart/hooks/useCouponSearch";
 import { useNav } from "@/src/hooks/useNav";

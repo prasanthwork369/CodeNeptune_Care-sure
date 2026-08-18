@@ -2,7 +2,7 @@ import type { OrderListParams } from "@/src/features/orders/types";
 import { useQuery } from "@tanstack/react-query";
 import { orderApi } from "@/src/features/orders/api/order.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 
 type UseOrdersParams = OrderListParams;

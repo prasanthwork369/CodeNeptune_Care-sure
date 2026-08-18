@@ -1,5 +1,5 @@
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useOrders } from "@/src/hooks/queries/useOrders";
+import { useOrders } from "@/src/features/orders/hooks/useOrders";
 import {
   AddToCartInput,
   CartItem,

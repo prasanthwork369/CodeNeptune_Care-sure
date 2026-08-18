@@ -5,11 +5,11 @@ import type {
   CustomerProfile,
   UpdateProfilePayload,
 } from "@/src/features/profile/types";
-import { apiClient } from "../../api/client";
+import { apiClient } from "@/src/api/client";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
-import { API_ENDPOINTS } from "../../utils/urls";
-import { useAuthStore } from "../../store/authStore";
+import { API_ENDPOINTS } from "@/src/utils/urls";
+import { useAuthStore } from "@/src/store/authStore";
 
 export const useProfile = () => {
   const queryClient = useQueryClient();

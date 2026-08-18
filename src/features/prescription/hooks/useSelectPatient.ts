@@ -1,4 +1,4 @@
-import { useFamilyMembers } from "@/src/hooks/queries/useFamilyMembers";
+import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useSelectPatientImages } from "./useSelectPatientImages";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";

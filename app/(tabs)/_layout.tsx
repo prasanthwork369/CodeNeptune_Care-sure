@@ -1,6 +1,6 @@
 import LiquidTabBar from "@/src/components/navigation/LiquidTabBar";
 import { tabs as tabConfig } from "@/src/constants/data";
-import { useProfile } from "@/src/hooks/queries/useProfile";
+import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useAuthStore } from "@/src/store/authStore";
 import { Tabs, type BottomTabBarProps } from "expo-router/js-tabs";
 import React from "react";

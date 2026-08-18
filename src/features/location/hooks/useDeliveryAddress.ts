@@ -1,4 +1,4 @@
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useLocationStore } from "@/src/store/locationStore";
 import type { DeliveryLocation } from "@/src/features/home/types";
 import {

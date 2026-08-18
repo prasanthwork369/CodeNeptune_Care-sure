@@ -1,6 +1,6 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
-import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import type { SubstituteProduct } from "@/src/features/product/types";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";

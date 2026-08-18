@@ -3,7 +3,7 @@ import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { AddressType } from "@/src/types/address";

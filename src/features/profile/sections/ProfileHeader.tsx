@@ -4,7 +4,7 @@ import { View, Text, ActivityIndicator } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { AvatarPreviewModal } from "@/src/components/ui/AvatarPreviewModal";
 import { AvatarEditSheet } from "./AvatarEditSheet";
-import { useAvatarPreview } from "@/src/hooks/ui/useAvatarPreview";
+import { useAvatarPreview } from "@/src/features/profile/hooks/useAvatarPreview";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { icons } from "@/src/constants/icons";

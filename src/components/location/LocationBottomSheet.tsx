@@ -6,14 +6,14 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { typography } from "@/src/constants/typography";
-import { usePincode } from "@/src/hooks/mutations/usePincode";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { usePincode } from "@/src/features/location/hooks/usePincode";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import {
   LocationSuggestion,
   useLocationSearch,
-} from "@/src/hooks/queries/useLocationSearch";
+} from "@/src/features/location/hooks/useLocationSearch";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
 import { locationService } from "@/src/features/location/services/location.service";
 import { useLocationStore } from "@/src/store/locationStore";

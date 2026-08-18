@@ -1,5 +1,5 @@
 import { PRESCRIPTION_STATUS } from "@/src/features/prescription/constants/prescription-status";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";

@@ -30,13 +30,13 @@ import { useHomeOnboarding } from "@/src/features/home/hooks/useHomeOnboarding";
 import { useHomeScroll } from "@/src/features/home/hooks/useHomeScroll";
 import { useScrollToTop } from "@/src/features/home/hooks/useScrollToTop";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useContactActions } from "@/src/hooks/ui/useContactActions";
+import { useContactActions } from "@/src/features/support/hooks/useContactActions";
 import { useSettings } from "@/src/hooks/queries/useSettings";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
 import {
   PERF_TRACES,

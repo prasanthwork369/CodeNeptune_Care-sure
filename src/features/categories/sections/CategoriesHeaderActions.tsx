@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import { icons } from "@/src/constants/icons";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CategoriesHeaderActions: React.FC = () => {

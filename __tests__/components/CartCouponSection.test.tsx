@@ -5,13 +5,13 @@ import {
 } from "@/__tests__/test-utils/renderWithProviders";
 import { CartCouponSection } from "@/src/features/cart/sections/CartCouponSection";
 import { COUPON_DISCOUNT_TYPE } from "@/src/features/cart/constants/coupon";
-import { useCoupons } from "@/src/hooks/queries/useCoupons";
+import { useCoupons } from "@/src/features/cart/hooks/useCoupons";
 import { couponApi } from "@/src/features/cart/api/coupon.api";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import React from "react";
 
-jest.mock("@/src/hooks/queries/useCoupons");
+jest.mock("@/src/features/cart/hooks/useCoupons");
 jest.mock("@/src/features/cart/api/coupon.api");
 jest.mock("@/src/hooks/useNav", () => ({
   useNav: () => ({

@@ -5,7 +5,7 @@ import {
   ThumbnailItem,
   AnimatedCount,
 } from "@/src/components/animations/flyToCart";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCart } from "@/src/features/cart/hooks/useCart";
 import React, { useEffect, useRef } from "react";
 import { Text, View } from "react-native";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";

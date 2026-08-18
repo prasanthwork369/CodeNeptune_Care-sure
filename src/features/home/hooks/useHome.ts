@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { homeApi } from "../../features/home/api/home.api";
-import type { ApiAppContent } from "../../features/home/types";
+import { homeApi } from "@/src/features/home/api/home.api";
+import type { ApiAppContent } from "@/src/features/home/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
-import { useCategories } from "./useCategories";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 
 /**
  * Narrow subscription for app content (promise, banners, etc.) without subscribing to categories.

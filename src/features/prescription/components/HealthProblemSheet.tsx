@@ -4,7 +4,7 @@ import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { typography } from "@/src/constants/typography";
-import { useHealthProblems } from "@/src/hooks/queries/useHealthProblems";
+import { useHealthProblems } from "@/src/features/prescription/hooks/useHealthProblems";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { resolveAssetUrl } from "@/src/utils/urls";

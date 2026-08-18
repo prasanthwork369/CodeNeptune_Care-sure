@@ -5,10 +5,10 @@ import {
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
 import { EmailVerifyModal } from "@/src/features/profile/components/EmailVerifyModal";
-import { useEmailVerification } from "@/src/hooks/mutations/useEmailVerification";
+import { useEmailVerification } from "@/src/features/profile/hooks/useEmailVerification";
 import { useOtpInput } from "@/src/hooks/ui/useOtpInput";
 
-jest.mock("@/src/hooks/mutations/useEmailVerification");
+jest.mock("@/src/features/profile/hooks/useEmailVerification");
 jest.mock("@/src/hooks/ui/useOtpInput");
 
 const mockUseEmailVerification = useEmailVerification as jest.MockedFunction<

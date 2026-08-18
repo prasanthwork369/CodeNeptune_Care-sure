@@ -1,6 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { MedicineVariant } from "@/src/hooks/queries/useProduct";
+import { MedicineVariant } from "@/src/features/product/hooks/useProduct";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useCallback, useState } from "react";

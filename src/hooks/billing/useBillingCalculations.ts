@@ -1,5 +1,5 @@
-import { useProfile } from "@/src/hooks/queries/useProfile";
-import { useWalletBalance } from "@/src/hooks/queries/useWallet";
+import { useProfile } from "@/src/features/profile/hooks/useProfile";
+import { useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useCouponStore } from "@/src/store/couponStore";
 import { roundToPaise } from "@/src/utils/money";

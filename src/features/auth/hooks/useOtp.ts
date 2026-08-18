@@ -1,5 +1,5 @@
 import { cartApi } from "@/src/features/cart/api/cart.api";
-import { useAuth } from "@/src/hooks/mutations/useAuth";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { NotificationNavigation } from "@/src/services/notifications/NotificationNavigation";

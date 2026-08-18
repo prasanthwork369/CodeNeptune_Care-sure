@@ -5,7 +5,7 @@ import {
   waitFor,
 } from "@/__tests__/test-utils/renderWithProviders";
 import { AddAddressLayout } from "@/src/features/profile/screens/AddAddressLayout";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useAuthStore } from "@/src/store/authStore";
 
 jest.mock("@/src/components/ui/UnsavedChangesGuard", () => ({
@@ -23,7 +23,7 @@ jest.mock("expo-router", () => ({
   useLocalSearchParams: () => ({}),
 }));
 
-jest.mock("@/src/hooks/queries/useAddress");
+jest.mock("@/src/features/profile/hooks/useAddress");
 const mockUseAddress = useAddress as jest.MockedFunction<typeof useAddress>;
 
 describe("AddAddressLayout Component", () => {

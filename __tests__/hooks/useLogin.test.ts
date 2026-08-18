@@ -8,7 +8,7 @@ const mockResetError = jest.fn();
 // Mutable so a test can simulate a lingering request-otp failure.
 let mockAuthError: string | null = null;
 
-jest.mock("@/src/hooks/mutations/useAuth", () => ({
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   useAuth: () => ({
     requestOtp: mockRequestOtp,
     loading: false,

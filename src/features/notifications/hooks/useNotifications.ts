@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { inAppNotificationApi } from "@/src/features/notifications/api/in-app-notification.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
 
 export const useNotifications = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);

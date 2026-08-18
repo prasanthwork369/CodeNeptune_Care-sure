@@ -1,6 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
-import { useInfiniteWalletLogs } from "@/src/hooks/queries/useWallet";
+import { useInfiniteWalletLogs } from "@/src/features/wallet/hooks/useWallet";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
 import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";

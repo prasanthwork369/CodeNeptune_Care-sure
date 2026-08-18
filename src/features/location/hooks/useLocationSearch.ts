@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { locationApi } from "@/src/features/location/api/location.api";
 import type { LocationPrediction } from "@/src/features/location/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";

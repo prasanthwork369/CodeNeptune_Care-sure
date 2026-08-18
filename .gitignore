@@ -57,3 +57,6 @@ service-account.json
 # Jest coverage output
 coverage/
 
+# JVM crash logs
+hs_err_pid*.log
+replay_pid*.log

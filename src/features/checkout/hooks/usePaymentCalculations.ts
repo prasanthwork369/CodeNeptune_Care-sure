@@ -1,7 +1,7 @@
 import { asError } from "@/src/api/errors";
-import { useCart } from "@/src/hooks/queries/useCart";
-import { useCreateOrder } from "@/src/hooks/mutations/useCreateOrder";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
+import { useCart } from "@/src/features/cart/hooks/useCart";
+import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { orderNotification } from "@/src/services/notifications/orderNotification";
 import {
   analyticsService,

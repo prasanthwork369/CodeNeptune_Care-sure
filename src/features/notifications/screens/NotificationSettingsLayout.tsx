@@ -1,6 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { CustomSwitch } from "@/src/components/ui/CustomSwitch";
-import { useNotificationPreferences } from "@/src/hooks/queries/useNotificationPreferences";
+import { useNotificationPreferences } from "@/src/features/notifications/hooks/useNotificationPreferences";
 import type { UpdateNotificationPreferencesInput } from "../types";
 import React, { useState } from "react";
 import { ScrollView, Text, View } from "react-native";

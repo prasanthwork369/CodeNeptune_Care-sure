@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
 import { ApiPrescription } from "@/src/features/prescription/types";
 
 interface UsePrescriptionsParams {

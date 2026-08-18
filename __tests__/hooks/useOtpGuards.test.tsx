@@ -10,7 +10,7 @@ const mockReplace = jest.fn();
 
 let mockGuestCart: { items: { id: string; medicineId: string }[] } | null = null;
 
-jest.mock("@/src/hooks/mutations/useAuth", () => ({
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   useAuth: () => ({
     verifyOtp: mockVerifyOtp,
     requestOtp: mockRequestOtp,

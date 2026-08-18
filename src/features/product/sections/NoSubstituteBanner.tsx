@@ -2,7 +2,7 @@ import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { useSubstituteRequest } from "@/src/hooks/queries/useSubstituteRequest";
+import { useSubstituteRequest } from "@/src/features/search/hooks/useSubstituteRequest";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface NoSubstituteBannerProps {

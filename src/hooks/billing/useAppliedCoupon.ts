@@ -1,4 +1,4 @@
-import { useCoupons } from "@/src/hooks/queries/useCoupons";
+import { useCoupons } from "@/src/features/cart/hooks/useCoupons";
 import { COUPON_DISCOUNT_TYPE } from "@/src/features/cart/constants/coupon";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useEffect, useMemo } from "react";

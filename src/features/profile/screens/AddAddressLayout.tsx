@@ -3,7 +3,7 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
 import { icons } from "@/src/constants/icons";
-import { useAddress } from "@/src/hooks/queries/useAddress";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";

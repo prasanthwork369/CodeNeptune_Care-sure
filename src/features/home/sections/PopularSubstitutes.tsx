@@ -1,7 +1,7 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
-import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import type { Product } from "@/src/features/product/types";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";

@@ -5,7 +5,7 @@ import { CardOptionsMenu } from "@/src/components/ui/CardOptionsMenu";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
-import { useRefillReminder } from "@/src/hooks/useRefillReminder";
+import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillReminder";
 import { PrescriptionReminder } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import React, { useEffect, useRef, useState } from "react";

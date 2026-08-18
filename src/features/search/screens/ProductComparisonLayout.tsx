@@ -13,9 +13,9 @@ import { ProductHeader } from "@/src/features/search/comparison/components/Produ
 import { ComparisonBoard } from "@/src/features/search/comparison/components/ComparisonBoard";
 import { ProductDetailsSkeleton } from "@/src/features/search/comparison/components/ProductDetailsSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
-import { useCartRead } from "@/src/hooks/queries/useCartRead";
-import { useHome } from "@/src/hooks/queries/useHome";
-import { useProduct, getPackDivisor } from "@/src/hooks/queries/useProduct";
+import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
+import { useHome } from "@/src/features/home/hooks/useHome";
+import { useProduct, getPackDivisor } from "@/src/features/product/hooks/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";

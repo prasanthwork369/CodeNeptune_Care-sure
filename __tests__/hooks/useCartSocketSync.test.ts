@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { useCartSocketSync } from "@/src/hooks/useCartSocketSync";
+import { useCartSocketSync } from "@/src/features/cart/hooks/useCartSocketSync";
 
 const mockGetAccessToken = jest.fn();
 jest.mock("@/src/api/client", () => ({

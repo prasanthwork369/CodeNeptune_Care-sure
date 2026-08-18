@@ -1,6 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { RetryState } from "@/src/components/ui/RetryState";
-import { useCategories } from "@/src/hooks/queries/useCategories";
+import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 

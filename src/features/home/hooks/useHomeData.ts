@@ -1,8 +1,8 @@
 import { useFeaturedSubcategories } from "@/src/features/home/hooks/useFeaturedSubcategories";
-import { useAddress } from "@/src/hooks/queries/useAddress";
-import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
-import { useHome } from "@/src/hooks/queries/useHome";
-import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
+import { useAddress } from "@/src/features/profile/hooks/useAddress";
+import { useFeaturedMedicines } from "@/src/features/product/hooks/useFeaturedMedicines";
+import { useHome } from "@/src/features/home/hooks/useHome";
+import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import {

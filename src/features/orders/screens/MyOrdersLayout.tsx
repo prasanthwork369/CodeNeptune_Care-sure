@@ -1,6 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
-import { useCart } from "@/src/hooks/queries/useCart";
+import { useCart } from "@/src/features/cart/hooks/useCart";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
 import { AddToCartInput, UpdateCartItemInput } from "@/src/features/cart/types";
 import { OrderTabKey } from "../types";

@@ -4,7 +4,7 @@ import { icons } from "@/src/constants/icons";
 import {
   useAvatarPreviewAnimation,
   type PreviewRect,
-} from "@/src/hooks/ui/useAvatarPreviewAnimation";
+} from "@/src/features/profile/hooks/useAvatarPreviewAnimation";
 import { useZoomGesture } from "@/src/hooks/ui/useZoomGesture";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useMemo } from "react";

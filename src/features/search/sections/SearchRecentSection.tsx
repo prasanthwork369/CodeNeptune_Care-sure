@@ -1,7 +1,7 @@
 import { FrequentSubstitutes } from "@/src/features/home/sections";
 import { icons } from "@/src/constants/icons";
 import { ApiSearchHistoryItem } from "@/src/features/search/types";
-import { useFrequentlyOrdered } from "@/src/hooks/queries/useOrders";
+import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";

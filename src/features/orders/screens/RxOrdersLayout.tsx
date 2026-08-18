@@ -9,7 +9,7 @@ import {
   PRESCRIPTION_STATUS,
   PRESCRIPTION_STATUS_LABELS,
 } from "@/src/features/prescription/constants/prescription-status";
-import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
+import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
 import { FlashList } from "@shopify/flash-list";

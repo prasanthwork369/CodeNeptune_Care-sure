@@ -1,7 +1,7 @@
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import { PRESCRIPTION_STATUS } from "@/src/features/prescription/constants/prescription-status";
-import { useDismissPrescription } from "@/src/hooks/mutations/usePrescriptionMutations";
-import { usePrescriptions } from "@/src/hooks/queries/usePrescriptions";
+import { useDismissPrescription } from "@/src/features/prescription/hooks/usePrescriptionMutations";
+import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
 import { ApiPrescription } from "@/src/features/prescription/types";
 import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";

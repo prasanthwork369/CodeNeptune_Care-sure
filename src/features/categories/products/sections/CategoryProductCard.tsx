@@ -3,7 +3,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
-import { usePrefetchProduct } from "@/src/hooks/queries/useProduct";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import { CategoryProductCardProps } from "@/src/features/categories/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";

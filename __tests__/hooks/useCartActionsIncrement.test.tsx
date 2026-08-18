@@ -23,7 +23,7 @@ jest.mock("@/src/store/authStore", () => ({
     sel({ isAuthenticated: mockIsAuthenticated }),
 }));
 
-jest.mock("@/src/hooks/queries/useCartRead", () => ({
+jest.mock("@/src/features/cart/hooks/useCartRead", () => ({
   useCartRead: () => ({ items: [] }),
 }));
 

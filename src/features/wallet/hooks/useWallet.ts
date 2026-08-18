@@ -8,7 +8,7 @@ import {
 import { useCallback } from "react";
 import { walletApi } from "@/src/features/wallet/api/wallet.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
 import { WalletLog } from "@/src/features/wallet/types";
 
 const LOGS_PAGE_SIZE = 20;

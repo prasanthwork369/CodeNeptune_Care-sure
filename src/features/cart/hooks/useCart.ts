@@ -2,7 +2,7 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cartApi } from "@/src/features/cart/api/cart.api";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
 import {
   AddToCartInput,
   CheckoutInput,

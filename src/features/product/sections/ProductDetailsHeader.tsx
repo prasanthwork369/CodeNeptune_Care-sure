@@ -4,7 +4,7 @@ import { icons } from "@/src/constants/icons";
 import { productWebUrl } from "@/src/constants/urls";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { colors } from "@/src/theme";
-import { useCartCount } from "@/src/hooks/queries/useCartRead";
+import { useCartCount } from "@/src/features/cart/hooks/useCartRead";
 import { useNav } from "@/src/hooks/useNav";
 import { ProductDetailsHeaderProps } from "@/src/features/product/types";
 import React from "react";

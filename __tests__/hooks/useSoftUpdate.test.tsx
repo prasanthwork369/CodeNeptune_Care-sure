@@ -3,7 +3,7 @@ import {
   act,
   fireEvent,
 } from "@/__tests__/test-utils/renderWithProviders";
-import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
+import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { Text } from "react-native";

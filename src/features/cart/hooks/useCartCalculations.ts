@@ -1,10 +1,10 @@
-import { useCart } from "@/src/hooks/queries/useCart";
-import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
-import { useProfile } from "@/src/hooks/queries/useProfile";
-import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
-import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
-import { useAppliedCoupon } from "@/src/hooks/useAppliedCoupon";
-import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
+import { useCart } from "@/src/features/cart/hooks/useCart";
+import { useFeaturedMedicines } from "@/src/features/product/hooks/useFeaturedMedicines";
+import { useProfile } from "@/src/features/profile/hooks/useProfile";
+import { useDeliveryCharges } from "@/src/features/cart/hooks/useDeliveryCharges";
+import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
+import { useAppliedCoupon } from "@/src/hooks/billing/useAppliedCoupon";
+import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";

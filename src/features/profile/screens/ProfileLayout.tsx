@@ -1,7 +1,7 @@
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { components } from "@/src/constants/theme";
-import { useAuth } from "@/src/hooks/mutations/useAuth";
-import { useProfile } from "@/src/hooks/queries/useProfile";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useAuthStore } from "@/src/store/authStore";
@@ -22,8 +22,8 @@ import {
 import UploadBottomSheet from "../sections/UploadBottomSheet";
 import { LogoutConfirmModal } from "../components/LogoutConfirmModal";
 import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
-import { useSoftUpdate } from "@/src/hooks/ui/useSoftUpdate";
-import { useInAppUpdate } from "@/src/hooks/ui/useInAppUpdate";
+import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
+import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
 import { ProfileSkeleton } from "../components/ProfileSkeleton";
 
 export const ProfileLayout: React.FC = () => {
