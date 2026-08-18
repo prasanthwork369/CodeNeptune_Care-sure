@@ -42,7 +42,8 @@ export const useCategories = () => {
     () =>
       families.map((family) => {
         // `{ uri: undefined }` is truthy, so callers would render a blank icon.
-        const toSource = (url?: string) => (url ? { uri: url } : undefined);
+        const toSource = (url?: string) =>
+          url ? { uri: resolveAssetUrl(url) } : undefined;
         return {
           id: family.id,
           label: family.mobileShortName || family.name,

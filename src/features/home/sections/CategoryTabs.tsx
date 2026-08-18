@@ -67,6 +67,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
           paddingHorizontal: exactScale(16),
           paddingTop: exactScale(4),
           paddingBottom: 0,
+          alignItems: "flex-end",
         }}
       >
         {tabs.map((tab) => (

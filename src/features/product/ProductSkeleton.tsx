@@ -127,7 +127,7 @@ export const ProductSkeleton: React.FC<ProductSkeletonProps> = ({
       <View className="h-[1px] bg-[#F3F4F6] mt-4 mb-4" />
 
       {/* Variant Banner Mock */}
-      <View className="bg-[#FAF5FF] py-4 px-5 mb-6">
+      <View className="bg-[#F9FAFB] py-4 px-5 mb-6">
         <Skeleton width="40%" height={14} />
       </View>
 
@@ -162,20 +162,39 @@ export const ProductSkeleton: React.FC<ProductSkeletonProps> = ({
       </View>
 
       {/* Know Your Medicine Mock */}
-      <View className="px-5">
+      <View className="px-5 mb-6">
         <Skeleton
-          width={150}
-          height={18}
-          style={{ marginBottom: exactScale(12) }}
+          width={160}
+          height={20}
+          style={{ marginBottom: exactScale(16) }}
         />
-        {[1, 2, 3].map((i) => (
-          <Skeleton
-            key={i}
-            width="100%"
-            height={12}
-            style={{ marginBottom: exactScale(8) }}
-          />
-        ))}
+
+        <View className="bg-white rounded-[12px] px-5 py-6 border border-[#E5E7EB]">
+          {[1, 2, 3].map((i) => (
+            <View
+              key={i}
+              className={`flex-row items-center ${i !== 3 ? "mb-6" : ""}`}
+            >
+              <Skeleton
+                width={exactScale(48)}
+                height={exactScale(48)}
+                borderRadius={6}
+                style={{ marginRight: exactScale(16) }}
+              />
+              <View className="flex-1">
+                <Skeleton
+                  width={i === 1 ? "60%" : i === 2 ? "45%" : "55%"}
+                  height={15}
+                  style={{ marginBottom: exactScale(6) }}
+                />
+                <Skeleton
+                  width={i === 1 ? "50%" : i === 2 ? "35%" : "40%"}
+                  height={14}
+                />
+              </View>
+            </View>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );

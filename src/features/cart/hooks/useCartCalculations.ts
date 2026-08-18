@@ -1,12 +1,11 @@
 import { useCart } from "@/src/hooks/queries/useCart";
-import { useCoupons } from "@/src/hooks/queries/useCoupons";
 import { useFeaturedMedicines } from "@/src/hooks/queries/useFeaturedMedicines";
 import { useProfile } from "@/src/hooks/queries/useProfile";
 import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
+import { useAppliedCoupon } from "@/src/hooks/useAppliedCoupon";
 import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
-import { COUPON_DISCOUNT_TYPE } from "../constants/coupon";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -70,12 +69,8 @@ export function useCartCalculations() {
     });
   };
 
-  // Field selectors, or the whole cart re-renders on any write to these stores.
-  const appliedCoupon = useCouponStore((s) => s.applied);
-  const removeCoupon = useCouponStore((s) => s.remove);
   const justApplied = useCouponStore((s) => s.justApplied);
   const clearJustApplied = useCouponStore((s) => s.clearJustApplied);
-  const { data: coupons = [] } = useCoupons();
   const setBill = useCheckoutStore((s) => s.setBill);
   const { profile } = useProfile();
   const firstName = profile?.firstName ?? "You";
@@ -127,8 +122,10 @@ export function useCartCalculations() {
   } = useCart();
   const removeCartItemRef = useRef(removeCartItem);
   const updateCartItemRef = useRef(updateCartItem);
-  removeCartItemRef.current = removeCartItem;
-  updateCartItemRef.current = updateCartItem;
+  useEffect(() => {
+    removeCartItemRef.current = removeCartItem;
+    updateCartItemRef.current = updateCartItem;
+  });
 
   const removeItem = useCallback(
     (itemId: string) => removeCartItemRef.current(itemId),
@@ -196,36 +193,8 @@ export function useCartCalculations() {
     freeDeliveryProgress,
   } = useDeliveryCharges(subtotal);
 
-  // 1. Coupon — recomputed live from the coupon's own rule (not the frozen
-  // apply-time amount), so it tracks quantity changes in either direction.
-  const appliedCouponDef = appliedCoupon
-    ? coupons.find((c) => c.code === appliedCoupon.code)
-    : null;
-  const couponStillEligible =
-    !appliedCouponDef || subtotal >= appliedCouponDef.minOrderValue;
-
-  useEffect(() => {
-    if (appliedCoupon && appliedCouponDef && !couponStillEligible) {
-      removeCoupon();
-    }
-  }, [appliedCoupon, appliedCouponDef, couponStillEligible, removeCoupon]);
-
-  const COUPON_DISCOUNT =
-    appliedCoupon && couponStillEligible
-      ? Math.min(
-          appliedCouponDef
-            ? appliedCouponDef.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE
-              ? appliedCouponDef.maxDiscountAmount
-                ? Math.min(
-                    (subtotal * appliedCouponDef.discountValue) / 100,
-                    appliedCouponDef.maxDiscountAmount,
-                  )
-                : (subtotal * appliedCouponDef.discountValue) / 100
-              : appliedCouponDef.discountValue
-            : Number(appliedCoupon.discount) || 0,
-          subtotal,
-        )
-      : 0;
+  const { appliedCoupon, removeCoupon, couponDiscount: COUPON_DISCOUNT } =
+    useAppliedCoupon(subtotal);
 
   const {
     walletBalance,

@@ -154,6 +154,13 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     isExpanded.current = expand;
   };
 
+  const springConfig = {
+    damping: 22,
+    stiffness: 200,
+    mass: 0.8,
+    overshootClamping: true,
+  };
+
   const handleSwap = () => {
     isExpanded.current = !isExpanded.current;
 
@@ -168,7 +175,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
       useNativeDriver: true,
     }).start();
 
-    expandProgress.value = withSpring(isExpanded.current ? 1 : 0);
+    expandProgress.value = withSpring(isExpanded.current ? 1 : 0, springConfig);
   };
 
   // Mirrors the pre-migration PanResponder exactly: claims the gesture only
@@ -216,7 +223,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
       // Slow drag — snap to nearest side
       else expand = pos >= 0.5;
 
-      expandProgress.value = withSpring(expand ? 1 : 0);
+      expandProgress.value = withSpring(expand ? 1 : 0, springConfig);
       swapBtnOpacity.value = withTiming(expand ? 0 : 1, { duration: 180 });
       runOnJS(setIsExpandedFlag)(expand);
     })
@@ -225,7 +232,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
       // A normal release already handled everything in onEnd above.
       if (success) return;
       const expand = expandProgress.value >= 0.5;
-      expandProgress.value = withSpring(expand ? 1 : 0);
+      expandProgress.value = withSpring(expand ? 1 : 0, springConfig);
       swapBtnOpacity.value = withTiming(expand ? 0 : 1, { duration: 180 });
       runOnJS(setIsExpandedFlag)(expand);
     });
@@ -288,9 +295,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         >
           <View className="px-[12px] pt-[12px] pb-0 flex-1 flex-col justify-between">
             <View
-              onLayout={(event) =>
-                setSearchedTopHeight(event.nativeEvent.layout.height)
-              }
+              onLayout={(event) => {
+                const h = Math.ceil(event.nativeEvent.layout.height);
+                setSearchedTopHeight((prev) => (prev === h ? prev : h));
+              }}
             >
               <Text
                 className="font-inter-bold text-[#4B5563] uppercase tracking-[0.8px] mb-2"
@@ -353,9 +361,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
             <View
               style={{ marginTop: "auto" }}
-              onLayout={(event) =>
-                setSearchedBottomHeight(event.nativeEvent.layout.height)
-              }
+              onLayout={(event) => {
+                const h = Math.ceil(event.nativeEvent.layout.height);
+                setSearchedBottomHeight((prev) => (prev === h ? prev : h));
+              }}
             >
               {/* Spacer matching the savings badge height on the recommended card */}
               <View style={{ height: 30 }} />
@@ -427,8 +436,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 minHeight: Math.max(0, boardHeight - ADD_SECTION_HEIGHT),
               }}
               onLayout={(e) => {
-                const h = e.nativeEvent.layout.height + ADD_SECTION_HEIGHT;
-                setRecommendedHeight(h);
+                const h = Math.ceil(
+                  e.nativeEvent.layout.height + ADD_SECTION_HEIGHT,
+                );
+                setRecommendedHeight((prev) => (prev === h ? prev : h));
               }}
             >
               {/* TOP INNER ROW HOLDING COLUMNS */}
@@ -602,6 +613,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                         height: moderateScale(100),
                       }}
                       contentFit="contain"
+                      contentPosition="bottom left"
                       cachePolicy="memory-disk"
                     />
                     <View className="px-3 pt-3 z-10 w-[70%]">
@@ -616,13 +628,14 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                       source={HOME_IMAGES.doctor}
                       style={{
                         position: "absolute",
-                        bottom: -15,
-                        right: -25,
-                        width: "90%",
-                        height: "90%",
+                        bottom: 0,
+                        right: 0,
+                        width: "85%",
+                        height: "95%",
                         zIndex: 5,
                       }}
                       contentFit="contain"
+                      contentPosition="bottom right"
                       cachePolicy="memory-disk"
                     />
                   </View>

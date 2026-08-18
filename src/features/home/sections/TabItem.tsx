@@ -46,12 +46,17 @@ export const TabItem: React.FC<TabItemProps> = ({
       accessibilityRole="tab"
       accessibilityLabel={tab.label}
       accessibilityState={{ selected: isActive }}
-      className="items-center mx-4 pb-3 px-1"
+      className="items-center justify-end mx-4 pb-3 px-1"
     >
-      <Animated.View style={[animatedStyle, { alignItems: "center" }]}>
+      <Animated.View
+        style={[
+          animatedStyle,
+          { alignItems: "center", justifyContent: "flex-end" },
+        ]}
+      >
         {/* Skipped entirely when there is no icon, so no blank box is reserved. */}
         {iconSource || tab.emoji ? (
-          <View style={s.iconWrap} className="mb-1 justify-center items-center">
+          <View style={s.iconWrap}>
             {iconSource ? (
               <Image source={iconSource} style={s.icon} contentFit="contain" />
             ) : (

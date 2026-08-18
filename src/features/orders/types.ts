@@ -93,6 +93,11 @@ export interface OrderItem {
   mrp?: number | string;
   discountPercent?: number | string;
   discountPercentage?: number | string;
+  returnedQuantity?: number;
+  isReturnable?: boolean;
+  returnWindowDays?: number;
+  returnDeadline?: string;
+  isReturnEligibleNow?: boolean;
 }
 
 export interface StatusLog {
@@ -117,6 +122,8 @@ export interface Order {
   };
   deliveryType?: string;
   status: number;
+  // Corporate-billed orders are self-service-exempt — no customer Cancel/Return.
+  isCorporateGeneratedOrder?: boolean;
   deliveryAddress?: {
     name: string;
     phone: string;
@@ -143,7 +150,13 @@ export interface Order {
   shippedAt?: string;
   deliveredAt?: string;
   items?: OrderItem[];
-  returns?: { id: string; status: number }[];
+  returns?: {
+    id: string;
+    status: number;
+    refundAmount?: string;
+    createdAt?: string;
+    statusLogs?: { fromStatus: number | null; toStatus: number; createdAt: string }[];
+  }[];
   statusLogs?: StatusLog[];
   clinicalData?: ClinicalData;
   metadata?: OrderMetadata;
@@ -205,8 +218,9 @@ export const ORDER_STATUS: Record<
   1: { label: "PLACED", bg: "#FFFBE8", text: "#7A7600", border: "#FDE047" },
   2: { label: "CONFIRMED", bg: "#ECFDF5", text: "#16A34A", border: "#BBF7D0" },
   3: { label: "VERIFIED", bg: "#ECFDF5", text: "#16A34A", border: "#BBF7D0" },
+  // Raw 5 is CHECKED (internal warehouse step) — shown as PROCESSING, same as 4/9.
   4: { label: "PROCESSING", bg: "#FFFBE8", text: "#92600A", border: "#FFE998" },
-  5: { label: "PACKED", bg: "#FFFBE8", text: "#92600A", border: "#FFE998" },
+  5: { label: "PROCESSING", bg: "#FFFBE8", text: "#92600A", border: "#FFE998" },
   6: { label: "SHIPPED", bg: "#E8F5FF", text: "#005F99", border: "#99CCFF" },
   7: { label: "DELIVERED", bg: "#ECFDF5", text: "#00703C", border: "#16A34A" },
   8: {
@@ -222,4 +236,18 @@ export const ORDER_STATUS: Record<
     text: "#7C3AED",
     border: "#DDD6FE",
   },
+  11: {
+    label: "UNDER REVIEW",
+    bg: "#F5F3FF",
+    text: "#7C3AED",
+    border: "#DDD6FE",
+  },
+  12: {
+    label: "DISPATCH CANCELLED",
+    bg: "#FEF2F2",
+    text: "#DC2626",
+    border: "#FECACA",
+  },
+  // Raw 14 is the real PACKED status (raw 5 is the internal CHECKED step).
+  14: { label: "PACKED", bg: "#FFFBE8", text: "#92600A", border: "#FFE998" },
 };

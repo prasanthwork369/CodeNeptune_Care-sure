@@ -8,22 +8,15 @@ import {
 } from "react-native-reanimated";
 import { useUIStore } from "@/src/store/uiStore";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
-import { durations, easings } from "@/src/theme";
+import { easings } from "@/src/theme";
 
-// Scroll distance before a downward scroll is allowed to hide the bar.
+// Top clearance before downward scroll is allowed to hide the tab bar.
 const HIDE_AFTER = 40;
-// Ignores sub-pixel jitter so a resting finger can't flip-flop the bar.
-const MIN_DELTA = 5;
+// Finger scroll distance required for a complete 0 -> 1 or 1 -> 0 transition.
+const TRAVEL_DISTANCE = 65;
+// Snappy settle duration when snapping to 0 or 1 on touch/momentum end.
+const SETTLE_DURATION = 180;
 
-/**
- * Shows/hides the bottom tab bar and collapses the upload button based on
- * scroll direction.
- *
- * The animation is driven by writing `tabBarVisible` from this worklet, so it
- * starts on the same frame as the scroll event. The `runOnJS` call only
- * mirrors state into the store for non-animated consumers — nothing visual
- * waits on it, so a busy JS thread can't delay the bar.
- */
 export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
   const lastScrollY = useSharedValue(0);
   const isTabBarVisibleShared = useSharedValue(1);
@@ -36,52 +29,118 @@ export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
   }, []);
 
   const handleScroll = useAnimatedScrollHandler({
+    onBeginDrag: (event) => {
+      lastScrollY.value = event.contentOffset.y;
+    },
+
     onScroll: (event) => {
       const currentScrollY = event.contentOffset.y;
       if (scrollY) {
+        // eslint-disable-next-line react-hooks/immutability
         scrollY.value = currentScrollY;
       }
-      const isAtBottom =
-        currentScrollY + event.layoutMeasurement.height >=
-        event.contentSize.height - 24;
 
-      // Reaching the end of the scrollable content always reveals the
-      // tab bar, even if the user got there by scrolling down.
-      if (isAtBottom) {
+      // Reaching top of feed locks tab bar to fully visible.
+      if (currentScrollY <= 0) {
         lastScrollY.value = currentScrollY;
+        tabBarVisible.value = 1;
         if (isTabBarVisibleShared.value !== 1) {
           isTabBarVisibleShared.value = 1;
-          tabBarVisible.value = withTiming(1, {
-            duration: durations.tabBar,
-            easing: easings.standard,
-          });
           runOnJS(applyVisibility)(true);
         }
         return;
       }
 
-      const delta = currentScrollY - lastScrollY.value;
+      // Reaching the end of scrollable content reveals the tab bar.
+      const isAtBottom =
+        currentScrollY + event.layoutMeasurement.height >=
+        event.contentSize.height - 24;
 
-      if (Math.abs(delta) < MIN_DELTA) return;
-      lastScrollY.value = currentScrollY;
-
-      let nextVisible = isTabBarVisibleShared.value;
-      if (currentScrollY <= 0) {
-        nextVisible = 1;
-      } else if (delta > 0 && currentScrollY > HIDE_AFTER) {
-        nextVisible = 0;
-      } else if (delta < 0) {
-        nextVisible = 1;
+      if (isAtBottom) {
+        lastScrollY.value = currentScrollY;
+        tabBarVisible.value = 1;
+        if (isTabBarVisibleShared.value !== 1) {
+          isTabBarVisibleShared.value = 1;
+          runOnJS(applyVisibility)(true);
+        }
+        return;
       }
 
-      if (nextVisible !== isTabBarVisibleShared.value) {
-        isTabBarVisibleShared.value = nextVisible;
-        // Starts here on the UI thread, in the same frame as the scroll event.
-        tabBarVisible.value = withTiming(nextVisible, {
-          duration: durations.tabBar,
-          easing: easings.standard,
-        });
-        runOnJS(applyVisibility)(nextVisible === 1);
+      const deltaY = currentScrollY - lastScrollY.value;
+      lastScrollY.value = currentScrollY;
+
+      // Ignore sub-pixel noise to avoid jitter.
+      if (Math.abs(deltaY) < 0.5) return;
+
+      // Prevent accidental hiding within the top clearance area.
+      if (currentScrollY <= HIDE_AFTER && deltaY > 0) {
+        tabBarVisible.value = 1;
+        if (isTabBarVisibleShared.value !== 1) {
+          isTabBarVisibleShared.value = 1;
+          runOnJS(applyVisibility)(true);
+        }
+        return;
+      }
+
+      // 1:1 Continuous scroll tracking on UI thread.
+      const nextProgress = Math.min(
+        1,
+        Math.max(0, tabBarVisible.value - deltaY / TRAVEL_DISTANCE),
+      );
+      tabBarVisible.value = nextProgress;
+    },
+
+    onEndDrag: (event) => {
+      // If drag finishes without momentum, settle immediately to nearest state.
+      const hasVelocity = Math.abs(event.velocity?.y ?? 0) > 0.1;
+      if (!hasVelocity) {
+        const target =
+          lastScrollY.value <= HIDE_AFTER
+            ? 1
+            : tabBarVisible.value >= 0.5
+              ? 1
+              : 0;
+
+        if (tabBarVisible.value !== target) {
+          tabBarVisible.value = withTiming(
+            target,
+            { duration: SETTLE_DURATION, easing: easings.standard },
+            (finished) => {
+              if (finished && isTabBarVisibleShared.value !== target) {
+                isTabBarVisibleShared.value = target;
+                runOnJS(applyVisibility)(target === 1);
+              }
+            },
+          );
+        } else if (isTabBarVisibleShared.value !== target) {
+          isTabBarVisibleShared.value = target;
+          runOnJS(applyVisibility)(target === 1);
+        }
+      }
+    },
+
+    onMomentumEnd: () => {
+      const target =
+        lastScrollY.value <= HIDE_AFTER
+          ? 1
+          : tabBarVisible.value >= 0.5
+            ? 1
+            : 0;
+
+      if (tabBarVisible.value !== target) {
+        tabBarVisible.value = withTiming(
+          target,
+          { duration: SETTLE_DURATION, easing: easings.standard },
+          (finished) => {
+            if (finished && isTabBarVisibleShared.value !== target) {
+              isTabBarVisibleShared.value = target;
+              runOnJS(applyVisibility)(target === 1);
+            }
+          },
+        );
+      } else if (isTabBarVisibleShared.value !== target) {
+        isTabBarVisibleShared.value = target;
+        runOnJS(applyVisibility)(target === 1);
       }
     },
   });

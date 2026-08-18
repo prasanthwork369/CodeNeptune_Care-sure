@@ -62,9 +62,11 @@ export const useBillingCalculations = ({
     : 0;
 
   // Amount owed after product discounts + charges; the credits→wallet waterfall applies to this.
-  const subtotalBeforeCredits = Math.max(
-    subtotal - COUPON_DISCOUNT - COINS_DISCOUNT + deliveryFee + handlingCharge,
-    0,
+  const subtotalBeforeCredits = roundToPaise(
+    Math.max(
+      subtotal - COUPON_DISCOUNT - COINS_DISCOUNT + deliveryFee + handlingCharge,
+      0,
+    ),
   );
 
   // 4. Corporate Credits — applied first so company money is spent before the customer's own wallet.
@@ -94,9 +96,11 @@ export const useBillingCalculations = ({
   // independent of corporateCreditsOn, since subtotalBeforeCredits already
   // excludes it. If Coins + Wallet alone already cover the bill, there's
   // nothing left for Corporate Credits to offset, so it should be un-toggleable.
-  const remainingWithoutCorporateCredits = walletOn
-    ? Math.max(subtotalBeforeCredits - walletBalance, 0)
-    : subtotalBeforeCredits;
+  const remainingWithoutCorporateCredits = roundToPaise(
+    walletOn
+      ? Math.max(subtotalBeforeCredits - walletBalance, 0)
+      : subtotalBeforeCredits,
+  );
   const corporateCreditsHasRemainingAmount =
     remainingWithoutCorporateCredits > 0;
   const CORPORATE_CREDITS_DISCOUNT =
@@ -111,9 +115,11 @@ export const useBillingCalculations = ({
       : 0;
 
   // 5. Wallet — applied to whatever remains after corporate credits.
-  const subtotalBeforeWallet = Math.max(
-    subtotalBeforeCredits - CORPORATE_CREDITS_DISCOUNT,
-    0,
+  const subtotalBeforeWallet = roundToPaise(
+    Math.max(
+      subtotalBeforeCredits - CORPORATE_CREDITS_DISCOUNT,
+      0,
+    ),
   );
   const WALLET_DISCOUNT = walletOn
     ? roundToPaise(Math.min(walletBalance, subtotalBeforeWallet))
@@ -127,27 +133,33 @@ export const useBillingCalculations = ({
   // (Corporate Credits, then Wallet, at their current on/off state) against
   // the larger amount left over without Coins. If those alone already cover
   // it, Coins has nothing left to offset either.
-  const afterCouponWithoutCoins = Math.max(
-    subtotal - COUPON_DISCOUNT + deliveryFee + handlingCharge,
-    0,
+  const afterCouponWithoutCoins = roundToPaise(
+    Math.max(
+      subtotal - COUPON_DISCOUNT + deliveryFee + handlingCharge,
+      0,
+    ),
   );
   const corporateCoverWithoutCoins =
     corporateCreditsOn && corporateCreditsEligible
-      ? Math.min(
-          corporateCreditsBalance,
-          corporateCreditsMaxDiscount,
-          afterCouponWithoutCoins,
+      ? roundToPaise(
+          Math.min(
+            corporateCreditsBalance,
+            corporateCreditsMaxDiscount,
+            afterCouponWithoutCoins,
+          ),
         )
       : 0;
-  const afterCorporateWithoutCoins = Math.max(
-    afterCouponWithoutCoins - corporateCoverWithoutCoins,
-    0,
+  const afterCorporateWithoutCoins = roundToPaise(
+    Math.max(
+      afterCouponWithoutCoins - corporateCoverWithoutCoins,
+      0,
+    ),
   );
   const walletCoverWithoutCoins = walletOn
-    ? Math.min(walletBalance, afterCorporateWithoutCoins)
+    ? roundToPaise(Math.min(walletBalance, afterCorporateWithoutCoins))
     : 0;
   const coinsHasRemainingAmount =
-    afterCorporateWithoutCoins - walletCoverWithoutCoins > 0;
+    roundToPaise(afterCorporateWithoutCoins - walletCoverWithoutCoins) > 0;
 
   const toPay = roundToPaise(
     Math.max(subtotalBeforeWallet - WALLET_DISCOUNT, 0),

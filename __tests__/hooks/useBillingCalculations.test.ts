@@ -265,4 +265,47 @@ describe("useBillingCalculations — Billing & Discount Engine", () => {
 
     expect(result.toPay).toBe(0);
   });
+
+  it("sets walletHasRemainingAmount to false when Corporate Credits covers 100% of payable", () => {
+    (useProfile as jest.Mock).mockReturnValue({
+      profile: { isCorporateUser: true },
+    });
+    (useWalletBalance as jest.Mock).mockReturnValue({
+      balance: {
+        walletBalance: 200,
+        coinsBalance: 50,
+        corporateCredits: 500,
+        minOrderValueForDiscount: 0,
+        maxDiscountPerOrder: 0,
+      },
+    });
+
+    // 1. Corporate ON covers entire ₹300 subtotal -> toPay is 0, walletHasRemainingAmount is false
+    const corporateOnResult = useBillingCalculations({
+      subtotal: 300,
+      mrpTotal: 300,
+      walletOn: false,
+      coinsOn: false,
+      corporateCreditsOn: true,
+    });
+
+    expect(corporateOnResult.CORPORATE_CREDITS_DISCOUNT).toBe(300);
+    expect(corporateOnResult.toPay).toBe(0);
+    expect(corporateOnResult.walletHasRemainingAmount).toBe(false);
+    expect(corporateOnResult.coinsHasRemainingAmount).toBe(false);
+
+    // 2. Corporate toggled OFF -> walletHasRemainingAmount immediately recovers to true
+    const corporateOffResult = useBillingCalculations({
+      subtotal: 300,
+      mrpTotal: 300,
+      walletOn: false,
+      coinsOn: false,
+      corporateCreditsOn: false,
+    });
+
+    expect(corporateOffResult.CORPORATE_CREDITS_DISCOUNT).toBe(0);
+    expect(corporateOffResult.toPay).toBe(300);
+    expect(corporateOffResult.walletHasRemainingAmount).toBe(true);
+    expect(corporateOffResult.coinsHasRemainingAmount).toBe(true);
+  });
 });

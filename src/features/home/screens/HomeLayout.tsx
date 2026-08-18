@@ -462,7 +462,7 @@ const HomeContent: React.FC = () => {
 
         case "categories":
           return (
-            <View style={{ marginTop: exactScale(20) }}>
+            <View style={{ marginTop: exactScale(10) }}>
               <ShopByCategories
                 tabs={tabs}
                 cards={cards}

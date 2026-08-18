@@ -17,16 +17,16 @@ import { useDeliveryAddress } from "@/src/hooks/useDeliveryAddress";
 import { useRefillReminder } from "@/src/hooks/useRefillReminder";
 import { ReminderSheet } from "@/src/features/prescription/components/ReminderSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { useAppliedCoupon } from "@/src/hooks/useAppliedCoupon";
 import { useBillingCalculations } from "@/src/hooks/useBillingCalculations";
 import { useDeliveryCharges } from "@/src/hooks/useDeliveryCharges";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
-import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
+import { Text, View, useWindowDimensions } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
@@ -42,7 +42,6 @@ import { MedicineComparisonSkeleton } from "../components/MedicineComparisonSkel
 import { useComparisonPrescriptionId } from "../hooks/useComparisonPrescriptionId";
 import { usePrescriptionOrderMedicines } from "@/src/hooks/queries/usePrescriptionOrderMedicines";
 import { useLocalSearchParams } from "expo-router";
-import { Text } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 
 import { ComparisonMedicine } from "../medicine-comparison.types";
@@ -143,10 +142,6 @@ export const MedicineComparisonLayout: React.FC<
     displayLocation?.label ?? defaultAddress?.label ?? "Address";
   const deliveryDescription = displayLocation?.city ?? "No address saved";
 
-  // Coupon
-  const appliedCoupon = useCouponStore((s) => s.applied);
-  const removeCoupon = useCouponStore((s) => s.remove);
-
   // Merge duplicate entries for the same recommended medicine, summing quantities
   const mergedMedicines = useMemo(() => {
     const map = new Map<string, ComparisonMedicine>();
@@ -183,6 +178,11 @@ export const MedicineComparisonLayout: React.FC<
     handlingCharge,
   } = useDeliveryCharges(subtotal);
 
+  // Coupon — recomputed live from the coupon's own rule (not the frozen
+  // apply-time amount), sharing the exact same hook as Cart.
+  const { appliedCoupon, removeCoupon, couponDiscount: COUPON_DISCOUNT } =
+    useAppliedCoupon(subtotal);
+
   // Use reusable calculations hook
   const {
     walletBalance,
@@ -191,7 +191,6 @@ export const MedicineComparisonLayout: React.FC<
     maxCoinsUsable,
     coinValue,
     coinsHasRemainingAmount,
-    COUPON_DISCOUNT,
     COINS_DISCOUNT,
     WALLET_DISCOUNT,
     CORPORATE_CREDITS_DISCOUNT,
@@ -211,6 +210,7 @@ export const MedicineComparisonLayout: React.FC<
     corporateCreditsOn,
     deliveryFee,
     handlingCharge,
+    couponDiscount: COUPON_DISCOUNT,
   });
 
   const handleProceed = () => {
@@ -407,18 +407,20 @@ export const MedicineComparisonLayout: React.FC<
         )}
 
         {/* Coins */}
-        <CartCoinsSection
-          value={coinsOn}
-          availableCoins={availableCoins}
-          redeemedCoins={coinsOn ? Math.floor(maxCoinsUsable) : 0}
-          onToggle={handleCoinsToggle}
-          onInfoPress={() => setShowCoinsSheet(true)}
-          hasRemainingAmount={coinsHasRemainingAmount}
-        />
+        {availableCoins > 0 && (
+          <CartCoinsSection
+            value={coinsOn}
+            availableCoins={availableCoins}
+            redeemedCoins={coinsOn ? Math.floor(maxCoinsUsable) : 0}
+            onToggle={handleCoinsToggle}
+            onInfoPress={() => setShowCoinsSheet(true)}
+            hasRemainingAmount={coinsHasRemainingAmount}
+          />
+        )}
 
         {/* Total Bill */}
         <CartBillSummary
-          mrpTotal={mrpTotal}
+          mrpTotal={mrpTotal + deliveryFee + handlingCharge}
           toPay={toPay}
           onPress={() => setShowBillDetails(true)}
         />

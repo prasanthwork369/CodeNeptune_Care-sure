@@ -9,6 +9,12 @@ import { useOrderById } from "@/src/hooks/queries/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useOrderTrackingSteps } from "../hooks/useOrderTrackingSteps";
+import { useReturnEligibility } from "../hooks/useReturnEligibility";
+import {
+  CANCELLED_STATUSES,
+  ORDER_STATUS_CODE,
+  TERMINAL_OR_CANCELLED_STATUSES,
+} from "../constants/order-status";
 import { ORDER_STATUS, TrackingStep } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
@@ -250,6 +256,9 @@ export const OrderTrackLayout: React.FC = () => {
   const [rxModalVisible, setRxModalVisible] = useState(false);
   const [billSheetVisible, setBillSheetVisible] = useState(false);
   const [animTriggered, setAnimTriggered] = useState(false);
+  const [orderSeenForAnim, setOrderSeenForAnim] = useState<
+    typeof order | undefined
+  >(undefined);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
   const [isProceeding, setIsProceeding] = useState(false);
   const [invoiceModalVisible, setInvoiceModalVisible] = useState(false);
@@ -319,9 +328,12 @@ export const OrderTrackLayout: React.FC = () => {
     }
   };
 
-  useEffect(() => {
+  // Adjusted during render, not in an effect, to avoid a setState-in-effect
+  // cascade — latches the entrance animation on once order data arrives.
+  if (order !== orderSeenForAnim) {
+    setOrderSeenForAnim(order);
     if (order && !animTriggered) setAnimTriggered(true);
-  }, [order]);
+  }
 
   // Bundled into one memo keyed on `order` — this screen polls every 30s and
   // also re-renders on every local UI toggle (modals/sheets/isProceeding),
@@ -344,6 +356,7 @@ export const OrderTrackLayout: React.FC = () => {
     cancellationReason,
     showExpectedDelivery,
     deliveredLogTime,
+    isCancellable,
   } = useMemo(() => {
     const statusInfo = (order?.status != null
       ? ORDER_STATUS[order.status]
@@ -375,12 +388,24 @@ export const OrderTrackLayout: React.FC = () => {
           handlingCharge;
 
     const isInvoiceAvailable =
-      order?.status != null && order.status >= 5 && order.status <= 7;
+      order?.status != null &&
+      ([
+        ORDER_STATUS_CODE.PACKED,
+        ORDER_STATUS_CODE.SHIPPED,
+        ORDER_STATUS_CODE.DELIVERED,
+      ] as number[]).includes(order.status);
 
     const isDelayed = isOrderDelayed(order);
     const cancellationReason = getCancellationReason(order);
     const showExpectedDelivery =
-      !!order?.estimatedDelivery && order.status !== 0 && order.status !== 7;
+      !!order?.estimatedDelivery &&
+      order.status !== ORDER_STATUS_CODE.DELIVERED &&
+      !CANCELLED_STATUSES.includes(order?.status ?? -1);
+
+    const isCancellable =
+      order?.status != null &&
+      !TERMINAL_OR_CANCELLED_STATUSES.includes(order.status) &&
+      order?.isCorporateGeneratedOrder !== true;
 
     // Same "toStatus → timestamp" lookup the tracking steps use, needed here
     // to show the precise "Delivered on" date in the header above.
@@ -408,10 +433,17 @@ export const OrderTrackLayout: React.FC = () => {
       cancellationReason,
       showExpectedDelivery,
       deliveredLogTime,
+      isCancellable,
     };
   }, [order]);
 
   const trackingSteps = useOrderTrackingSteps(order);
+  const {
+    hasActiveReturnRequest,
+    showRequestReturnButton,
+    showWindowExpiredMessage,
+    returnDeadlineLabel,
+  } = useReturnEligibility(order);
 
   if (loading) {
     return (
@@ -564,14 +596,20 @@ export const OrderTrackLayout: React.FC = () => {
           )}
         </SectionCard>
 
-        <ReturnStatusSection returns={order?.returns} />
+        <ReturnStatusSection
+          returns={order?.returns}
+          showWindowExpiredMessage={showWindowExpiredMessage}
+        />
 
         <ItemsOrderedSection
           items={items}
           orderId={orderId}
-          orderStatus={order?.status}
           priceEstimateRatio={mrpTotal > 0 ? subtotal / mrpTotal : 1}
           actionsDisabled={isPlaceholderData}
+          showReturnButton={showRequestReturnButton}
+          returnDeadlineLabel={returnDeadlineLabel}
+          hasActiveReturnRequest={hasActiveReturnRequest}
+          isCancellable={isCancellable}
         />
 
         <SectionCard>

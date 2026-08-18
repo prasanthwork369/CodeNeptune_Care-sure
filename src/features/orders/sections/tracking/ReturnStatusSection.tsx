@@ -7,10 +7,14 @@ import { SectionCard } from "./SectionCard";
 
 interface ReturnStatusSectionProps {
   returns: Order["returns"];
+  showWindowExpiredMessage?: boolean;
 }
 
-export function ReturnStatusSection({ returns }: ReturnStatusSectionProps) {
-  if (!returns?.length) return null;
+export function ReturnStatusSection({
+  returns,
+  showWindowExpiredMessage,
+}: ReturnStatusSectionProps) {
+  if (!returns?.length && !showWindowExpiredMessage) return null;
 
   return (
     <SectionCard
@@ -19,14 +23,16 @@ export function ReturnStatusSection({ returns }: ReturnStatusSectionProps) {
         paddingVertical: exactScale(16),
       }}
     >
-      <Text
-        className="font-inter-semibold text-brand-text"
-        style={{ fontSize: moderateScale(14), marginBottom: exactScale(10) }}
-      >
-        Return Status
-      </Text>
+      {!!returns?.length && (
+        <Text
+          className="font-inter-semibold text-brand-text"
+          style={{ fontSize: moderateScale(14), marginBottom: exactScale(10) }}
+        >
+          Return Status
+        </Text>
+      )}
       <View style={{ gap: exactScale(8) }}>
-        {returns.map((r) => {
+        {returns?.map((r) => {
           const info = RETURN_STATUS_LABELS[r.status] ?? {
             label: "Return",
             bg: "#F3F4F6",
@@ -55,6 +61,14 @@ export function ReturnStatusSection({ returns }: ReturnStatusSectionProps) {
           );
         })}
       </View>
+      {showWindowExpiredMessage && (
+        <Text
+          className="font-inter-medium text-brand-subtext"
+          style={{ fontSize: moderateScale(12) }}
+        >
+          The return window for this order has expired.
+        </Text>
+      )}
     </SectionCard>
   );
 }

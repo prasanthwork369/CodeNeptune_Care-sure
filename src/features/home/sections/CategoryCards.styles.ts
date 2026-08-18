@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: exactScale(16),
-    marginTop: exactScale(20),
+    marginTop: exactScale(14),
     rowGap: exactScale(12),
   },
   cardLabel: {

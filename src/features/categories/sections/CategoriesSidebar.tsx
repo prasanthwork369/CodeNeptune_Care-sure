@@ -188,8 +188,8 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                   }}
                 >
                   <Image
-                    source={tab.imageActive}
-                    style={{ width: exactScale(28), height: exactScale(28) }}
+                    source={tab.imageActive ?? tab.image}
+                    style={{ width: exactScale(40), height: exactScale(40) }}
                     contentFit="contain"
                   />
                 </LinearGradient>
@@ -208,8 +208,8 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                   }}
                 >
                   <Image
-                    source={tab.imageInactive}
-                    style={{ width: exactScale(28), height: exactScale(28) }}
+                    source={tab.imageInactive ?? tab.image}
+                    style={{ width: exactScale(40), height: exactScale(40) }}
                     contentFit="contain"
                   />
                 </View>

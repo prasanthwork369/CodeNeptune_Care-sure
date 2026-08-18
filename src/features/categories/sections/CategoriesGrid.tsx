@@ -127,12 +127,12 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                         borderRadius: 12,
                         alignItems: "center",
                         justifyContent: "center",
-                        padding: 4,
+                        padding: 2,
                       }}
                     >
                       <Image
                         source={card.image}
-                        style={{ width: "82%", height: "82%" }}
+                        style={{ width: "92%", height: "92%" }}
                         contentFit="contain"
                       />
                     </View>

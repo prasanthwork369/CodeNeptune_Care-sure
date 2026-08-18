@@ -13,21 +13,34 @@ import { SectionCard } from "./SectionCard";
 interface ItemsOrderedSectionProps {
   items: OrderItem[];
   orderId: string | undefined;
-  orderStatus?: number;
   // paid itemTotal / MRP total; used only to estimate a missing selling price.
   // It must never be displayed as an individual item's discount percentage.
   priceEstimateRatio?: number;
   // True while `order` is placeholder data seeded from the orders list —
   // Cancel/Return must wait for the real detail fetch before they're offered.
   actionsDisabled?: boolean;
+  // Delivered alone isn't enough — also requires no active return request
+  // and an unexpired return window (see useReturnEligibility).
+  showReturnButton?: boolean;
+  // Formatted earliest return deadline, shown as a countdown under the
+  // Return button. Null when unknown (legacy orders) or not applicable.
+  returnDeadlineLabel?: string | null;
+  // Replaces the Return button with an "already requested" indicator.
+  hasActiveReturnRequest?: boolean;
+  // Not yet delivered/cancelled, and not a corporate-billed order (see
+  // isCancellable in OrderTrackingLayout).
+  isCancellable?: boolean;
 }
 
 export function ItemsOrderedSection({
   items,
   orderId,
-  orderStatus,
   priceEstimateRatio,
   actionsDisabled,
+  showReturnButton,
+  returnDeadlineLabel,
+  hasActiveReturnRequest,
+  isCancellable,
 }: ItemsOrderedSectionProps) {
   const router = useNav();
 
@@ -45,8 +58,49 @@ export function ItemsOrderedSection({
           Items Ordered ({items.length})
         </Text>
         <View className="flex-row" style={{ gap: exactScale(8) }}>
-          {orderStatus === 7 && !actionsDisabled && (
-            <Touchable
+          {showReturnButton && !actionsDisabled && (
+            <View className="items-end" style={{ gap: exactScale(4) }}>
+              <Touchable
+                className="flex-row items-center"
+                style={{
+                  borderWidth: exactScale(1.33),
+                  borderColor: "#FDE047",
+                  backgroundColor: "#FEF9C3",
+                  borderRadius: exactScale(20),
+                  paddingHorizontal: exactScale(12),
+                  paddingVertical: exactScale(4),
+                }}
+                activeOpacity={0.7}
+                onPress={() =>
+                  router.push({
+                    pathname: "/profile/orders/return",
+                    params: { orderId },
+                  })
+                }
+              >
+                <icons.return_pack
+                  width={exactScale(14)}
+                  height={exactScale(14)}
+                />
+                <Text
+                  style={[s.labelSm, { marginLeft: exactScale(6) }]}
+                  className="font-inter-semibold text-brand-text"
+                >
+                  Return
+                </Text>
+              </Touchable>
+              {!!returnDeadlineLabel && (
+                <Text
+                  style={s.statusBadge}
+                  className="font-inter-medium text-brand-subtext"
+                >
+                  Returnable until {returnDeadlineLabel}
+                </Text>
+              )}
+            </View>
+          )}
+          {hasActiveReturnRequest && !actionsDisabled && (
+            <View
               className="flex-row items-center"
               style={{
                 borderWidth: exactScale(1.33),
@@ -56,27 +110,17 @@ export function ItemsOrderedSection({
                 paddingHorizontal: exactScale(12),
                 paddingVertical: exactScale(4),
               }}
-              activeOpacity={0.7}
-              onPress={() =>
-                router.push({
-                  pathname: "/profile/orders/return",
-                  params: { orderId },
-                })
-              }
             >
-              <icons.return_pack
-                width={exactScale(14)}
-                height={exactScale(14)}
-              />
+              <icons.check_circle width={exactScale(14)} height={exactScale(14)} />
               <Text
                 style={[s.labelSm, { marginLeft: exactScale(6) }]}
                 className="font-inter-semibold text-brand-text"
               >
-                Return
+                Return Request Already Exists
               </Text>
-            </Touchable>
+            </View>
           )}
-          {orderStatus !== 7 && orderStatus !== 0 && !actionsDisabled && (
+          {isCancellable && !actionsDisabled && (
             <Touchable
               className="flex-row items-center"
               style={{
