@@ -8,18 +8,9 @@ import expo.modules.nativenotifications.offers.ProductOfferData
 import expo.modules.nativenotifications.offers.ProductOfferRenderer
 import java.util.concurrent.Executors
 
-/**
- * Owns CareSure's custom native (RemoteViews) notification designs. Product
- * offers today; order updates / refill reminders / coupons are expected to
- * land here later as their own renderer, same shape as offers/.
- *
- * Called from the JS FCM dispatch (foreground onMessage + headless background
- * handler). Each display method resolves only after the render completes, so
- * the caller's headless task stays alive through the image download.
- */
+/** Custom native notification designs wrapper for marketing and transactional notifications. */
 class NativeNotificationsModule : Module() {
-    // Single background thread: marketing pushes are rare; serial is plenty and
-    // keeps image downloads off the main + JS threads.
+    // Single background thread for image downloads and display
     private val executor = Executors.newSingleThreadExecutor()
 
     override fun definition() = ModuleDefinition {

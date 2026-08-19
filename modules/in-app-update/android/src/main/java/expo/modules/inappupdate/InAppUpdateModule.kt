@@ -15,7 +15,7 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
 private const val TAG = "InAppUpdate"
-// Distinct from PhoneNumberHintModule's 11994.
+// Request code distinct from other local modules
 private const val REQUEST_CODE = 11995
 private const val EVENT_STATE = "InAppUpdate:state"
 
@@ -25,17 +25,7 @@ private const val RESULT_FAILED = "failed"
 private const val RESULT_UNAVAILABLE = "unavailable"
 private const val RESULT_IN_PROGRESS = "in_progress"
 
-/**
- * Google Play In-App Updates.
- *
- * Play decides and renders the update UI; this module only asks for FLEXIBLE or
- * IMMEDIATE and reports back. Nothing here draws Google-looking chrome.
- *
- * Every failure path resolves rather than rejects. The flow is unavailable on a
- * sideloaded build, an emulator without Play, or a debug install — all normal
- * during development — and JS must be able to fall back to the store link
- * without a crash or an unhandled rejection.
- */
+/** Google Play In-App Updates wrapper. Gracefully resolves error paths to support dev emulators and sideloaded builds without crashes. */
 class InAppUpdateModule : Module() {
     private val appUpdateManager: AppUpdateManager by lazy {
         AppUpdateManagerFactory.create(
@@ -43,7 +33,7 @@ class InAppUpdateModule : Module() {
         )
     }
 
-    /** Stops a second Play dialog stacking on the first. */
+    /** Prevents duplicate dialog triggers */
     @Volatile
     private var isFlowInProgress = false
 
@@ -56,7 +46,7 @@ class InAppUpdateModule : Module() {
             state.bytesDownloaded(),
             state.totalBytesToDownload(),
         )
-        // A terminal state releases the guard so a later attempt can start.
+        // Reset progress lock on terminal status
         when (state.installStatus()) {
             InstallStatus.DOWNLOADED,
             InstallStatus.INSTALLED,
@@ -71,16 +61,13 @@ class InAppUpdateModule : Module() {
 
         Events(EVENT_STATE)
 
-        /**
-         * Reports what Play offers for this install. Resolves `available: false`
-         * whenever the flow cannot be used, so callers need no error handling.
-         */
+        /** Checks for update availability from Google Play */
         AsyncFunction("checkUpdateAvailability") { promise: Promise ->
             try {
                 appUpdateManager.appUpdateInfo
                     .addOnSuccessListener { info -> promise.resolve(availabilityPayload(info)) }
                     .addOnFailureListener { e ->
-                        // Thrown on sideloaded/debug installs — expected, not an error.
+                        // Expected failure on debug/sideloaded builds
                         Log.w(TAG, "appUpdateInfo unavailable: ${e.message}")
                         promise.resolve(unavailablePayload())
                     }
@@ -90,17 +77,17 @@ class InAppUpdateModule : Module() {
             }
         }
 
-        /** Download in the background; the user keeps using the app. */
+        /** Starts flexible background update */
         AsyncFunction("startFlexibleUpdate") { promise: Promise ->
             startUpdate(AppUpdateType.FLEXIBLE, promise)
         }
 
-        /** Play blocks the app until the update completes. */
+        /** Starts immediate foreground update */
         AsyncFunction("startImmediateUpdate") { promise: Promise ->
             startUpdate(AppUpdateType.IMMEDIATE, promise)
         }
 
-        /** Installs an already-downloaded flexible update and restarts the app. */
+        /** Installs downloaded update and restarts */
         AsyncFunction("completeFlexibleUpdate") { promise: Promise ->
             try {
                 appUpdateManager.completeUpdate()

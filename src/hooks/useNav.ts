@@ -3,16 +3,7 @@ import { useNavigation, useRouter } from "expo-router";
 
 const HOME_ROUTE = "/(tabs)" as const;
 
-/**
- * Drop-in for useRouter().
- * Uses navigation.isFocused() — the React Navigation standard guard.
- * Once a push begins the current screen loses focus, so any rapid
- * follow-up press finds isFocused()=false and is silently dropped.
- *
- * `back` is safe for routes opened as navigation roots (for example a cold
- * deep link). It pops normal history when available and replaces an orphaned
- * route with Home when no previous route exists.
- */
+/** Drop-in wrapper for useRouter. Uses navigation.isFocused() as a guard to prevent duplicate screen pushes on double taps. */
 export function useNav() {
   const router = useRouter();
   const navigation = useNavigation();
@@ -35,25 +26,17 @@ export function useNav() {
       return;
     }
 
-    // Replace rather than push so an orphaned deep-link destination is removed
-    // and Home becomes the root. The next Android Back therefore exits the app.
+    // Replace route with Home to prevent back button loops on orphaned links
     router.replace(HOME_ROUTE);
   };
 
-  // Pops every screen above the given route in one go — for flows entered
-  // through a variable number of intermediate screens (e.g. picking an
-  // existing prescription pushes prescription-history + the viewer on top
-  // of choose-method), so "leaving" always lands cleanly on the real origin
-  // instead of a single back() peeling off just one of those layers.
+  // Pops every screen above target route to clear intermediate flows
   const dismissTo = (...args: Parameters<typeof router.dismissTo>) => {
     if (!navigation.isFocused()) return;
     router.dismissTo(...args);
   };
 
-  // Pops the current nested stack all the way to its own root — no route-name
-  // matching involved, so nothing for params/getId to mismatch on. Use this
-  // (then replace at the root) when dismissTo's name lookup isn't reliably
-  // finding an existing screen further up the same stack.
+  // Pops the current nested stack all the way to its root
   const dismissAll = () => {
     if (!navigation.isFocused()) return;
     router.dismissAll();

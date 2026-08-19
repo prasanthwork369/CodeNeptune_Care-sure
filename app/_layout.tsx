@@ -45,12 +45,7 @@ import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
 import "../global.css";
 
-/**
- * Expo Router uses this anchor only when it builds a navigation state from an
- * initial deep link. This gives every cold-start destination a real Home route
- * beneath it, while normal in-app and warm-start navigation keep their existing
- * history unchanged.
- */
+/** Expo Router setting to ensure a cold-started deep link has the home route in its navigation stack history. */
 export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
@@ -68,22 +63,18 @@ const PushNotificationProvider = () => {
   return null;
 };
 
-// Its own component so the settings query runs inside QueryClientProvider —
-// RootLayout renders that provider, so a hook there would sit outside it.
+// Wrapped component to run queries within QueryClientProvider
 const AppGate = () => {
   const { reason, maintenanceMessage } = useAppGate();
   const soft = useSoftUpdate();
   const update = useInAppUpdate();
-  // JS-only fixes via EAS Update — a separate lane from the native Play
-  // flow above, for changes that don't need a new binary at all.
   const ota = useOtaUpdate();
-  // Update calls onUpdate then onDismiss; this stops that pair being counted
-  // as a decline as well as an acceptance.
+  // Prevent double analytics logging on update events
   const acceptedRef = useRef(false);
-  // Only after a Play attempt has failed does the button become a retry.
+  // Toggle button label to Retry on update failure
   const [immediateFailed, setImmediateFailed] = useState(false);
 
-  // Reported once per transition, not per render, so the counts stay truthful.
+  // Log block state transitions exactly once
   useEffect(() => {
     if (reason) analyticsService.logAppBlocked(reason);
   }, [reason]);
@@ -92,22 +83,18 @@ const AppGate = () => {
     if (soft.shouldPrompt) analyticsService.logSoftUpdatePrompt("shown");
   }, [soft.shouldPrompt]);
 
-  // Forced path: ask Play for an immediate update as soon as the block appears.
-  // Guarded inside the hook, so a re-render cannot relaunch the dialog.
+  // Request immediate Play Store update when blocked
   useEffect(() => {
     if (reason !== "update" || !update.isSupported) return;
     update.runImmediateUpdate().then((ok) => setImmediateFailed(!ok));
   }, [reason, update.isSupported]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // A block always wins: the optional prompt must never sit on top of a screen
-  // telling the user the app cannot run.
+  // Priority: block screens overlay soft updates
   if (reason) {
     return (
       <AppGateScreen
         reason={reason}
         maintenanceMessage={maintenanceMessage}
-        // Play's own UI covers this screen when the flow starts; this stays as
-        // the fallback for when it cannot, and becomes Retry once it has failed.
         onUpdatePress={
           update.isSupported
             ? () => {
@@ -127,7 +114,6 @@ const AppGate = () => {
       <SoftUpdateModal
         visible={soft.shouldPrompt}
         latestVersion={soft.latestVersion}
-        // Fires for Later and Android back; Update reports itself below first.
         onDismiss={() => {
           if (!acceptedRef.current) {
             analyticsService.logSoftUpdatePrompt("dismissed");
@@ -138,12 +124,11 @@ const AppGate = () => {
         onUpdate={() => {
           acceptedRef.current = true;
           analyticsService.logSoftUpdatePrompt("accepted");
-          // Flexible downloads in the background; the app stays usable.
+          // Start flexible background update
           update.runFlexibleUpdate();
         }}
       />
-      {/* Shared banner for whichever lane has something ready — native Play
-          update takes priority in the unlikely case both land at once. */}
+      {/* Update ready banner for Play Store or OTA updates */}
       <UpdateReadyBanner
         visible={update.isDownloaded || ota.isDownloaded}
         onRestart={
@@ -179,18 +164,14 @@ export default function RootLayout() {
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
 
-  // Tracks whether the JS animated splash has finished playing.
-  // Auth loading and the animation run in parallel — the app only
-  // shows once BOTH are done, whichever takes longer.
+  // Auth load and splash animation run in parallel; app reveals when both finish
   const [isAnimationDone, setIsAnimationDone] = useState(false);
 
   useEffect(() => {
     initialize();
   }, []);
 
-  // Expo Router keeps a single Android Activity, so native automatic screen
-  // reporting cannot distinguish route changes. Track an allow-listed screen
-  // name only; never include route params, ids, search terms, or URLs.
+  // Track custom mapped screen names to prevent sending sensitive route params to analytics
   useEffect(() => {
     analyticsService.logScreenView(screenNameForPath(pathname));
   }, [pathname]);
@@ -206,10 +187,7 @@ export default function RootLayout() {
     return () => unsubscribe();
   }, []);
 
-  // Bridges RN's AppState to React Query's focusManager, so queries that opt
-  // into refetchOnWindowFocus refresh when the app returns from background.
-  // The global default stays refetchOnWindowFocus: false, so this alone
-  // changes nothing until a query explicitly opts in.
+  // Bridge AppState to React Query focus manager for optional focus refetching
   useEffect(() => {
     const onAppStateChange = (status: AppStateStatus) => {
       focusManager.setFocused(status === "active");
@@ -226,16 +204,12 @@ export default function RootLayout() {
     });
   }, []);
 
-  // Hide native splash immediately so our animated JS splash takes over —
-  // Android's Inter fonts are natively embedded (see app.config.ts), so
-  // nothing here waits on a runtime font load anymore.
+  // Hide native splash immediately; JS splash takes over
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
-  // Splash acts as a curtain over the fully-mounted app tree.
-  // The app renders and initialises underneath while the splash plays —
-  // so when the curtain lifts the home screen is already ready, no white flash.
+  // Render app tree underneath the splash curtain to avoid white mount flashes
   const showSplash = !isAnimationDone || !isAuthLoaded;
 
   usePerformanceTrace({
@@ -243,7 +217,7 @@ export default function RootLayout() {
     isLoading: showSplash,
   });
 
-  // Prompting under the curtain gets auto-denied with no dialog on some ROMs.
+  // Prevent permission dialog bugs under the splash curtain
   useEffect(() => {
     if (!showSplash) useUIStore.getState().setAppRevealed(true);
   }, [showSplash]);
@@ -255,13 +229,8 @@ export default function RootLayout() {
           <KeyboardProvider>
             <SafeAreaProvider>
               <View style={{ flex: 1, backgroundColor: "#fff" }}>
-                {/* Edge-to-edge is mandatory as of SDK 55+, so the status bar is
-                    always translucent — translucent/backgroundColor props were
-                    removed from expo-status-bar's API. */}
                 <StatusBar style="dark" />
 
-                {/* Android's Inter fonts are natively embedded (app.config.ts), so
-                    the tree mounts immediately — no runtime font-load gate. */}
                 <BottomSheetModalProvider>
                   <Stack
                     screenOptions={{
@@ -270,7 +239,7 @@ export default function RootLayout() {
                     }}
                   >
                     <Stack.Screen name="index" options={screenTransitions.fade} />
-                    {/* Every auth guard redirects here, so entering it must not read as a push */}
+                    {/* Auth stack has no push animation to prevent loops */}
                     <Stack.Screen
                       name="(auth)"
                       options={screenTransitions.none}
@@ -301,7 +270,6 @@ export default function RootLayout() {
 
                 {__DEV__ && <DevPreviewToggler />}
 
-                {/* Splash curtain over the app tree; the tree still mounts and lays out beneath it, so there is no white flash. */}
                 {showSplash && (
                   <View
                     style={StyleSheet.absoluteFill}
@@ -314,8 +282,7 @@ export default function RootLayout() {
                   </View>
                 )}
 
-                {/* Last sibling so it paints above the splash too — a blocked app
-                    must never flash its content. Fail-open: an absent setting renders nothing. */}
+                {/* Render gate modal above all screens */}
                 <AppGate />
               </View>
             </SafeAreaProvider>

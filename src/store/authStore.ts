@@ -16,7 +16,7 @@ import { useCartPendingStore } from "./cartStore";
 
 interface AuthState {
   isAuthenticated: boolean;
-  isGuest: boolean; // User skipped login — browse as guest, prompt to login at checkout
+  isGuest: boolean; // True if browsing as guest
   isLoaded: boolean; // Initial hydration check
   token: string | null;
   user: CustomerProfile | null;
@@ -40,8 +40,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (token) {
         setAccessToken(token);
 
-        // Load from SQLite cache for instant first paint and offline support.
-        // React Query's useProfile handles background network refresh.
+        // Load from SQLite cache for instant paint; refreshed in background
         const cachedProfile = apiCache.get<CustomerProfile>("customer_profile");
         set({
           token,
@@ -63,8 +62,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const expiresAt = Date.now() + expiresIn * 1000;
     setAccessToken(token); // set in-memory immediately
     set({ isAuthenticated: true, isGuest: false, token });
-    // Independent SecureStore/AsyncStorage keys — run concurrently instead
-    // of one round-trip after another so login doesn't wait on their sum.
+    // Concurrently persist tokens and clear guest state
     await Promise.all([
       tokenStorage.set(token),
       tokenStorage.setExpiresAt(expiresAt),
@@ -94,8 +92,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useCartPendingStore.getState().clearGuestCart();
     useCheckoutDraftStore.getState().clearDraft();
     queryClient.clear();
-    // Whole cache, not just the profile: frequently_ordered is user-specific
-    // too, and withSqliteCache serves stale entries whenever a fetch fails.
+    // Clear entire user cache on logout
     apiCache.clear();
 
     await tokenStorage.clear();

@@ -13,9 +13,7 @@ interface ReturnDraftState {
   clearReturnDraft: () => void;
 }
 
-// Mirrors the web's returnSlice (Redux) -- an in-memory draft of confirmed
-// return items that survives the reason modal opening/closing, but resets
-// when the user switches to a different order's return flow.
+// In-memory draft of confirmed return items that resets when switching orders
 export const useReturnDraftStore = create<ReturnDraftState>((set, get) => ({
   orderId: null,
   items: [],

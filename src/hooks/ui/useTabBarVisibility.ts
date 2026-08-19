@@ -10,11 +10,11 @@ import { useUIStore } from "@/src/store/uiStore";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { easings } from "@/src/theme";
 
-// Top clearance before downward scroll is allowed to hide the tab bar.
+// Clearance before tab bar can hide
 const HIDE_AFTER = 40;
-// Finger scroll distance required for a complete 0 -> 1 or 1 -> 0 transition.
+// Scroll transition distance
 const TRAVEL_DISTANCE = 65;
-// Snappy settle duration when snapping to 0 or 1 on touch/momentum end.
+// Settle animation duration
 const SETTLE_DURATION = 180;
 
 export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
@@ -40,7 +40,7 @@ export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
         scrollY.value = currentScrollY;
       }
 
-      // Reaching top of feed locks tab bar to fully visible.
+      // Locked to visible at top of scroll
       if (currentScrollY <= 0) {
         lastScrollY.value = currentScrollY;
         tabBarVisible.value = 1;
@@ -51,7 +51,7 @@ export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
         return;
       }
 
-      // Reaching the end of scrollable content reveals the tab bar.
+      // Reveal tab bar at scroll bottom
       const isAtBottom =
         currentScrollY + event.layoutMeasurement.height >=
         event.contentSize.height - 24;
@@ -69,10 +69,10 @@ export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
       const deltaY = currentScrollY - lastScrollY.value;
       lastScrollY.value = currentScrollY;
 
-      // Ignore sub-pixel noise to avoid jitter.
+      // Ignore jitter
       if (Math.abs(deltaY) < 0.5) return;
 
-      // Prevent accidental hiding within the top clearance area.
+      // Prevent hiding in top clearance area
       if (currentScrollY <= HIDE_AFTER && deltaY > 0) {
         tabBarVisible.value = 1;
         if (isTabBarVisibleShared.value !== 1) {
@@ -82,7 +82,7 @@ export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
         return;
       }
 
-      // 1:1 Continuous scroll tracking on UI thread.
+      // Continuous tracking on UI thread
       const nextProgress = Math.min(
         1,
         Math.max(0, tabBarVisible.value - deltaY / TRAVEL_DISTANCE),
@@ -91,7 +91,7 @@ export const useTabBarVisibility = (scrollY?: SharedValue<number>) => {
     },
 
     onEndDrag: (event) => {
-      // If drag finishes without momentum, settle immediately to nearest state.
+      // Settle if no momentum remains
       const hasVelocity = Math.abs(event.velocity?.y ?? 0) > 0.1;
       if (!hasVelocity) {
         const target =

@@ -16,9 +16,7 @@ export interface BillBreakdown {
 
 interface CheckoutState {
   bill: BillBreakdown | null;
-  // The cart lines `bill` was actually calculated from, frozen at the same
-  // moment — lets final submit refuse a stale bill if the live cart drifts
-  // from what was priced, instead of trusting it blindly (see cartSnapshot.ts).
+  // Frozen cart snapshot to prevent checkout billing price drift
   cartSnapshot: CartSnapshotLine[];
   walletUsed: boolean;
   coinsUsed: boolean;

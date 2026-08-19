@@ -3,18 +3,7 @@ const {
   withAndroidColorsNight,
 } = require("expo/config-plugins");
 
-/**
- * expo-image-picker's crop screen renders its "CROP" action invisible in light
- * mode: the activity is declared with `Base.Theme.AppCompat` (always dark) while
- * its colors come from values/ vs values-night/ following the SYSTEM theme. On a
- * light-themed device that means black text on the dark activity.
- *
- * App resources win over library resources during resource merging, so pinning
- * these five to the dark-mode palette in BOTH buckets makes the screen readable
- * whatever the system theme is — matching the activity's fixed dark theme.
- *
- * Remove this once expo-image-picker themes that activity correctly.
- */
+/** Fixes invisible "CROP" action on expo-image-picker crop screen in light mode by pinning toolbar colors to dark-mode. */
 const CROP_COLORS = {
   expoCropToolbarColor: "#000000",
   expoCropToolbarIconColor: "#FFFFFF",
@@ -23,7 +12,7 @@ const CROP_COLORS = {
   expoCropBackgroundColor: "#000000",
 };
 
-/** Upserts our values into a parsed colors.xml resource object. */
+/** Upserts custom colors into resource object */
 const applyColors = (colors) => {
   colors.resources = colors.resources ?? {};
   colors.resources.color = colors.resources.color ?? [];

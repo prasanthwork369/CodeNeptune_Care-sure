@@ -4,8 +4,7 @@ import { moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
 
-// Green check + "Verified" label shown inside a form field's right slot.
-// Not interactive: lets taps near it fall through to the input.
+// Non-interactive verified badge indicator
 export const VerifiedBadge: React.FC = () => (
   <View
     pointerEvents="none"

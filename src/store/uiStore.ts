@@ -22,19 +22,13 @@ interface UIState {
   isUploadButtonCollapsed: boolean;
   hasJustUploadedPrescription: boolean;
   isRxFromCartFlow: boolean;
-  /** True while the home feed is being scrolled/flung. Kept in the store (not
-   * HomeLayout state) so toggling it only re-renders the few components that
-   * subscribe to it (banner autoplays) instead of the whole feed list. */
+  /** True when the home feed is scrolling. Store-driven to prevent full feed re-renders. */
   isFeedScrolling: boolean;
-  /** True while the Home tab is the focused screen. Kept here (not HomeLayout
-   * state) so focus changes don't invalidate the feed's renderItem and
-   * re-render every mounted cell — only the carousels that pause on blur. */
+  /** True when the Home tab is focused. Prevents re-rendering all feed item cells. */
   isHomeFocused: boolean;
-  /** True once the splash curtain lifts; permission prompts wait for it. */
+  /** True after the splash curtain hides */
   isAppRevealed: boolean;
-  /** True once the home onboarding permission flow (location → notification)
-   * has finished. The SignupBonusPopup waits for this so it never overlaps a
-   * permission dialog. */
+  /** True after the home onboarding permission dialog flow completes */
   permissionFlowComplete: boolean;
   setTabBarVisible: (visible: boolean) => void;
   setUploadButtonCollapsed: (collapsed: boolean) => void;
@@ -57,9 +51,7 @@ export const useUIStore = create<UIState>((set) => ({
   isHomeFocused: true,
   isAppRevealed: false,
   permissionFlowComplete: false,
-  // Also drives the shared value, since that — not this flag — is what the bar
-  // animates from. The scroll worklet writes the shared value itself and calls
-  // setState directly, so it never round-trips through here.
+  // Update shared value directly to trigger tab bar animation
   setTabBarVisible: (visible) => {
     tabBarVisible.value = withTiming(visible ? 1 : 0, {
       duration: durations.tabBar,
@@ -72,8 +64,7 @@ export const useUIStore = create<UIState>((set) => ({
   setHasJustUploadedPrescription: (uploaded) =>
     set({ hasJustUploadedPrescription: uploaded }),
   setIsRxFromCartFlow: (value) => set({ isRxFromCartFlow: value }),
-  // Drives the shared value too — that, not this flag, is what the decorative
-  // shimmers read, so pausing them costs no re-render.
+  // Update shared value directly to trigger animation pauses
   setFeedScrolling: (value) => {
     feedScrolling.value = value;
     set({ isFeedScrolling: value });

@@ -12,7 +12,7 @@ import { getCanonicalType, getNotificationHandler } from "./registry";
 
 const ANDROID_PACKAGE = "com.codeneptune.caresure";
 
-// Sensitive types that strictly require authentication/login
+// Protected notification types requiring login
 const AUTH_REQUIRED_TYPES = new Set<NotificationType>([
   NotificationType.ORDER_PLACED,
   NotificationType.ORDER_CONFIRMED,
@@ -74,7 +74,7 @@ export const NotificationNavigation = {
         `[NotificationNavigation] User isAuthenticated status: ${isAuthenticated}`,
       );
 
-    // Authentication Guard
+    // Auth guard
     if (AUTH_REQUIRED_TYPES.has(payload.type) && !isAuthenticated) {
       if (__DEV__)
         logger.debug(
@@ -97,7 +97,7 @@ export const NotificationNavigation = {
         JSON.stringify(data, null, 2),
       );
 
-    // Look up in the Registry first using normalized canonical type
+    // Resolve type handler from registry
     const canonicalType = getCanonicalType(data as NotificationData) || type;
     const handler = getNotificationHandler(canonicalType);
     if (handler && handler.getTapDestination) {
@@ -124,7 +124,7 @@ export const NotificationNavigation = {
               prescriptionId: data.prescriptionId,
               status: data.status || "",
               imageUrls: data.imageUrls || "[]",
-              // Lets the viewer fetch the order id the payload cannot carry.
+              // Allow fetching order details via fallback
               source: "notification",
             },
           });
@@ -137,7 +137,7 @@ export const NotificationNavigation = {
       case NotificationType.PRODUCT:
       case NotificationType.PRODUCT_BACK_IN_STOCK:
       case NotificationType.PRICE_DROP: {
-        // Bound to a const so the guard narrows away `undefined`.
+        // Narrow type to prevent undefined warnings
         const productId = data.productId || data.id;
         if (productId) {
           router.push({ pathname: "/product/[id]", params: { id: productId } });
@@ -203,7 +203,7 @@ export const NotificationNavigation = {
         router.push("/profile/support/help");
         break;
 
-      // --- App update: opens the store listing, not an in-app screen ---
+      // Open Play Store/App Store update page
       case NotificationType.APP_UPDATE:
         if (Platform.OS === "android") {
           Linking.openURL(`market://details?id=${ANDROID_PACKAGE}`).catch(() =>
@@ -212,7 +212,7 @@ export const NotificationNavigation = {
             ),
           );
         } else if (__DEV__) {
-          // TODO: wire up the App Store numeric ID once the app is published on iOS.
+          // TODO: Add iOS App Store ID when published
           console.warn(
             "[NotificationNavigation] APP_UPDATE tapped on iOS but no App Store ID is configured yet.",
           );

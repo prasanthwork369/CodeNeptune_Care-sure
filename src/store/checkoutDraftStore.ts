@@ -18,10 +18,7 @@ interface CheckoutDraftState {
   clearDraft: () => void;
 }
 
-// Survives an app kill mid-checkout so patient, symptoms, health problem,
-// coupon and payment method can be pre-filled the next time the user reaches
-// the relevant screen. The selected address already persists separately via
-// locationStore.
+// Persists mid-checkout draft fields (patient, symptoms, payments) across restarts
 export const useCheckoutDraftStore = create<CheckoutDraftState>()(
   persist(
     (set) => ({

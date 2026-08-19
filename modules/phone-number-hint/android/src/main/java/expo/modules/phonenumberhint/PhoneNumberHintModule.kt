@@ -12,28 +12,15 @@ import expo.modules.kotlin.modules.ModuleDefinition
 private const val TAG = "PhoneNumberHint"
 private const val PHONE_HINT_REQUEST_CODE = 11994
 
-/**
- * Native module that surfaces the Android "Sign in with" phone number picker.
- *
- * Uses the Google Identity Phone Number Hint API
- * (com.google.android.gms.auth.api.identity) which is part of
- * play-services-auth and requires zero runtime permissions.
- *
- * This is the exact mechanism used by Blinkit, Swiggy, GPay, and PhonePe.
- */
+/** Native module surfacing the Android Google Play Services Phone Number Hint picker (requires zero runtime permissions). */
 class PhoneNumberHintModule : Module() {
-    // Holds the pending promise while we wait for the picker result.
+    // Active pending promise for picker result
     private var pendingPromise: Promise? = null
 
     override fun definition() = ModuleDefinition {
         Name("PhoneNumberHint")
 
-        /**
-         * Launches the native phone number hint picker.
-         * Resolves with the selected phone string (e.g. "+919876543210") or null.
-         * Never rejects — errors are swallowed and resolved as null to keep the
-         * login UX clean (fall back to manual entry).
-         */
+        /** Launches the phone hint picker, resolving with the phone number string or null. */
         AsyncFunction("getPhoneNumberHint") { promise: Promise ->
             val activity = appContext.currentActivity
             if (activity == null) {
@@ -43,7 +30,7 @@ class PhoneNumberHintModule : Module() {
             }
 
             if (pendingPromise != null) {
-                // A picker is already in flight — don't stack a second one
+                // Prevent stacking multiple picker requests
                 Log.w(TAG, "Hint already in progress — resolving null")
                 promise.resolve(null)
                 return@AsyncFunction
@@ -90,7 +77,7 @@ class PhoneNumberHintModule : Module() {
             pendingPromise = null
 
             if (resultCode != Activity.RESULT_OK || data == null) {
-                // User dismissed "None of the above" or back-pressed — resolve null, don't reject
+                // Resolve null on dismissal/cancellation
                 promise.resolve(null)
                 return@OnActivityResult
             }

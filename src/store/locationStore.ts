@@ -15,10 +15,9 @@ interface LocationState {
   selectedAddressId: string | null;
   pincode: string | null;
   reopenLocationSheet: boolean;
-  /** Drives the Home header's "delivered here" hint after picking an address.
-   * Session-only UI state, like reopenLocationSheet — never persisted. */
+  /** Temporary UI flag to trigger the Home header's delivery hint toast */
   justConfirmedLocation: boolean;
-  /** False until the persisted pick has been read back from AsyncStorage. */
+  /** Store hydration complete status */
   hasHydrated: boolean;
   setLocation: (
     location: DeliveryLocation,
@@ -62,8 +61,7 @@ export const useLocationStore = create<LocationState>()(
     {
       name: "caresure-location",
       storage: createJSONStorage(() => AsyncStorage),
-      // The user's address pick must survive a restart. `reopenLocationSheet`
-      // is per-session UI state, and coords are re-fetched, so neither is kept.
+      // Persist chosen location details; skip transient state keys
       partialize: (state) => ({
         location: state.location,
         selectedAddressId: state.selectedAddressId,
@@ -76,14 +74,7 @@ export const useLocationStore = create<LocationState>()(
   ),
 );
 
-/**
- * Resolves once the persisted address pick has been read back from storage.
- *
- * Anything that writes a location during startup must await this first. The
- * persist middleware saves on every `set`, so a write that lands before the
- * initial read can overwrite the stored pick with a fresh value and lose the
- * user's choice for good.
- */
+/** Resolves when location store hydration completes to prevent early startup writes overwriting persisted choices. */
 export const waitForLocationHydration = (): Promise<void> => {
   if (useLocationStore.persist.hasHydrated()) return Promise.resolve();
   return new Promise((resolve) => {

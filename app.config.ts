@@ -14,8 +14,7 @@ try {
   // fallback if unparseable
 }
 
-// Single source of truth — reused for both `extra.eas.projectId` and the
-// EAS Update URL below, so the two can never drift apart.
+// Single EAS Project ID source of truth to prevent configuration drift
 const easProjectId = "6e53d32b-6a5b-458e-9082-bbc1737ea34c";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -28,19 +27,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/icon.png",
   scheme: "caresure",
   userInterfaceStyle: "automatic",
-  // "fingerprint" (not "appVersion") because this app has custom native
-  // modules and config plugins — it auto-detects when native code/config
-  // actually changed and refuses to serve an OTA update to a binary it's
-  // incompatible with, instead of blindly matching on the version string.
+  // Use fingerprint policy to prevent incompatible OTA updates on custom native/plugin changes
   runtimeVersion: {
     policy: "fingerprint",
   },
   updates: {
     url: `https://u.expo.dev/${easProjectId}`,
   },
-  // New Architecture is the only architecture as of this RN version (the
-  // config key was removed) — this project already opted in, so no behavior
-  // change, just no longer a configurable option.
   ios: {
     bundleIdentifier: "com.codeneptune.caresure",
     supportsTablet: true,
@@ -55,8 +48,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: "#FFFFFF",
     },
     softwareKeyboardLayoutMode: "resize",
-    // Edge-to-edge is mandatory as of SDK 55 (no longer configurable) — the
-    // explicit opt-in this project already had is now just default behavior.
     predictiveBackGestureEnabled: false,
     intentFilters: [
       {
@@ -66,15 +57,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         category: ["BROWSABLE", "DEFAULT"],
       },
     ],
-    // Only what the app actually needs. CAMERA covers capture, the prescription
-    // scanner, and avatars; location powers nearby pharmacies + delivery.
+    // Required camera permission for prescription scans and avatars
     permissions: ["android.permission.INTERNET", "android.permission.CAMERA"],
-    // Strip broad permissions that libraries (e.g. expo-image-picker) inject but
-    // we don't need: the photo/PDF pickers use the system Photo Picker / Storage
-    // Access Framework (no media-read permission), and SYSTEM_ALERT_WINDOW is unused.
-    // Removing READ_MEDIA_IMAGES/READ_EXTERNAL_STORAGE avoids the Play Store
-    // "Photos and videos" permission declaration. WRITE_EXTERNAL_STORAGE is kept
-    // for PDF downloads on Android 9 and below.
+    // Strip unused permissions injected by libraries to avoid Play Store permission declarations
     blockedPermissions: [
       "android.permission.READ_MEDIA_IMAGES",
       "android.permission.READ_EXTERNAL_STORAGE",
@@ -86,27 +71,22 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
-    // Resolves the manifest-merger clash between expo-notifications and
-    // @react-native-firebase/messaging over default_notification_color.
+    // Resolve notification color clash between expo-notifications and firebase
     "./plugins/withFirebaseNotificationColorFix",
-    // Default Gradle JVM heap OOM'd during R8 minification on this project's
-    // dependency graph — must run before the build, not just tune R8 itself.
+    // Increase JVM heap size to prevent OOM during R8 build minification
     "./plugins/withGradleJvmHeap",
-    // R8 is off by default in the React Native template, which left ~50MB of
-    // unshrunk dex — and ART roughly doubles that again on disk at install.
     [
       "expo-build-properties",
       {
         android: {
           enableMinifyInReleaseBuilds: true,
           enableShrinkResourcesInReleaseBuilds: true,
-          // Intercepts every request in dev builds; we use Flipper-free debugging.
           networkInspector: false,
           extraProguardRules: [
-            "# Custom native modules are constructed reflectively via their ReactPackage.",
+            "# Keep custom native modules",
             "-keep class com.codeneptune.caresure.** { *; }",
             "",
-            "# React Native resolves TurboModules, view managers and JNI targets by name.",
+            "# Keep React Native native JNI classes",
             "-keep class com.facebook.react.** { *; }",
             "-keep class com.facebook.jni.** { *; }",
             "-keep class com.facebook.hermes.** { *; }",
@@ -114,15 +94,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
             "-keepclassmembers class * { @com.facebook.proguard.annotations.DoNotStrip *; }",
             "-keepclassmembers class * { @com.facebook.react.bridge.ReactMethod <methods>; }",
             "",
-            "# Expo's module registry looks modules up by class name at runtime.",
+            "# Keep Expo modules",
             "-keep class expo.modules.** { *; }",
             "",
-            "# Firebase/GMS reflect over model classes; Crashlytics needs these for readable traces.",
+            "# Keep Firebase and Play Services classes for Crashlytics tracking",
             "-keep class com.google.firebase.** { *; }",
             "-keep class com.google.android.gms.** { *; }",
             "-keepattributes SourceFile,LineNumberTable,Signature,*Annotation*",
             "",
-            "# notifee, reanimated worklets, PDF and ML Kit scanner natives.",
+            "# Keep Notifee, Reanimated, PDF, and ML Kit scanner native classes",
             "-keep class app.notifee.** { *; }",
             "-keep class com.swmansion.** { *; }",
             "-keep class com.shockwave.** { *; }",
@@ -135,15 +115,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     "expo-asset",
-    // Android-only: natively embeds the exact 5 Inter weights patchText.ts maps
-    // every Text to, so they're registered with the OS font manager before the
-    // JS bundle even runs — removing the runtime useFonts() wait this currently
-    // costs on Android. No top-level/`ios` fonts key, so iOS is untouched and
-    // keeps rendering system SF Pro exactly as before. Each entry's fontFamily
-    // is registered verbatim via ReactFontManager.addCustomFont, so these names
-    // reach JS unchanged — patchText.ts's family map needs no change.
-    // Runtime gate (useAndroidInterFonts / app/_layout.tsx) is intentionally
-    // still in place until this has been verified on a real Android build.
+    // Embed custom Inter fonts natively on Android to avoid runtime font loading delay
     [
       "expo-font",
       {
@@ -224,14 +196,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     "@react-native-community/datetimepicker",
-    // NOTE: After any change to this plugin config, run: npx expo prebuild
+    // NOTE: Run npx expo prebuild after editing plugin configurations
     [
       "expo-notifications",
       {
-        // Android masks the status-bar icon to a single color using its alpha,
-        // so this MUST be a transparent white silhouette (not the full-colour
-        // icon.png, which renders as a solid square). White CareSure logo on
-        // real transparency.
+        // Android notification icon must be a transparent white silhouette
         icon: "./assets/images/notification-icon.png",
         color: "#FFFFFF",
         sounds: [],
@@ -239,11 +208,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         androidCollapsedTitle: "Caresure",
       },
     ],
-    // Registers notifee's local Maven repo (its native AAR lives in node_modules).
     "./plugins/withNotifeeRepo",
-    // Keeps expo-image-picker's crop toolbar readable on light-themed devices.
+    // Fix expo-image-picker crop toolbar visibility on light themes
     "./plugins/withCropScreenColors",
-    // Lets Android Studio Profiler attach to release builds without debuggable=true.
+    // Enable Android Studio profiling in release builds
     "./plugins/withProfileable",
     [
       "react-native-document-scanner-plugin",

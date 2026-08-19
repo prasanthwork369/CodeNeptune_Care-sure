@@ -4,18 +4,12 @@ import { NotificationData } from "../../types/notification";
 import { isExpoGo } from "../../utils/environment";
 import { handleNotificationAction } from "./notificationActions";
 
-// CareSure branded notification visuals. `notification_icon` is the white
-// silhouette drawable the expo-notifications plugin generates from
-// notification-icon.png; the large icon is the full-colour logo.
+// Configured brand assets for Android notification icon templates
 const BRAND_COLOR = "#FFFFFF";
 const SMALL_ICON = "notification_icon";
-// Large icon = the filled green-gradient tile (white logo on a gradient), so it
-// reads big and branded in the shade like other apps' notifications, rather than
-// a small floating mark.
 const LARGE_ICON = require("../../../assets/images/notification-tile.png");
 
-// notifee is a native module (absent in Expo Go) — lazy-require after the guard,
-// mirroring how firebase messaging is loaded elsewhere.
+// Lazy-load notifee only outside Expo Go environment
 const getNotifee = () => require("@notifee/react-native");
 
 type RemoteLike = {
@@ -27,7 +21,7 @@ type RemoteLike = {
   data?: Record<string, unknown>;
 };
 
-// Channels are Android-only and idempotent; create once per session.
+// Idempotent Android-only channel registration
 let channelsReady = false;
 async function ensureChannels(): Promise<void> {
   if (channelsReady) return;
@@ -52,11 +46,7 @@ async function ensureChannels(): Promise<void> {
 }
 
 export const notifeeService = {
-  /**
-   * Displays an FCM message via notifee with the CareSure branded large + small
-   * icons — the only way to get a full-colour logo in the notification on every
-   * Android version/skin (expo-notifications / OS-display can't set a large icon).
-   */
+  /** Displays custom branded notifications via Notifee */
   displayBranded: async (remoteMessage: RemoteLike): Promise<void> => {
     if (isExpoGo) return;
     const notifee = getNotifee().default;
@@ -81,21 +71,14 @@ export const notifeeService = {
         smallIcon: SMALL_ICON,
         largeIcon: LARGE_ICON,
         color: BRAND_COLOR,
-        // BigText style makes the notification expandable (shows the chevron)
-        // and reveals the full message instead of a single truncated line.
+        // Expandable BigText style for full body text
         style: { type: AndroidStyle.BIGTEXT, text: body },
-        // A press action makes the whole notification tappable and delivers a
-        // PRESS event we can route on.
         pressAction: { id: "default" },
       },
     });
   },
 
-  /**
-   * Cold-start tap: the app was killed and launched by tapping a notifee
-   * notification. Returns the tap data + a de-dup id, or null. (OS-displayed FCM
-   * notifications are handled by messaging().getInitialNotification instead.)
-   */
+  /** Retrieves the tap event data that cold-started the app */
   getInitialTap: async (): Promise<{
     data: NotificationData;
     tapId: string;
@@ -112,11 +95,7 @@ export const notifeeService = {
     return { data, tapId };
   },
 
-  /**
-   * Registers a foreground tap listener for notifee-displayed notifications.
-   * Returns an unsubscribe function. (Background/killed taps route through the
-   * existing Firebase handlers.)
-   */
+  /** Registers foreground notification tap listeners */
   addForegroundPressListener: (
     onPress: (data: NotificationData, tapId: string) => void,
   ): (() => void) => {
@@ -128,8 +107,7 @@ export const notifeeService = {
         const n = detail.notification;
         if (!n) return;
 
-        // A button whose pressAction is "default" means "open the app here" —
-        // route it like a tap. Any other id is a real action.
+        // Route default press actions like a standard tap
         if (type === EventType.ACTION_PRESS) {
           const actionId = detail.pressAction?.id;
           if (actionId && actionId !== "default") {

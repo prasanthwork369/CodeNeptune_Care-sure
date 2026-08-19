@@ -23,16 +23,13 @@ class TextInputFilterModule : Module() {
             attemptApplyFilter(reactTag, maxLength, 0, MODE_DIGITS)
         }
 
-        // English-only input. Rejecting at the native level avoids the controlled-input desync
-        // a JS strip causes: React skips the native update when the stripped text is unchanged.
+        // English-only input. Native-level rejection avoids controlled-input desyncs.
         Function("applyAsciiOnly") { reactTag: Int ->
             attemptApplyFilter(reactTag, 0, 0, MODE_ASCII)
         }
     }
 
-    // appContext.reactContext is typed as the platform-agnostic Context, but on
-    // Android it's always backed by a real ReactContext — UIManagerHelper needs
-    // that specific type, the same as the original ReactContextBaseJavaModule.
+    // ReactContext cast for UIManagerHelper
     private val reactContext: ReactContext
         get() = appContext.reactContext as? ReactContext ?: throw Exceptions.ReactContextLost()
 
@@ -43,7 +40,7 @@ class TextInputFilterModule : Module() {
                 val c = source[i]
                 if (c.code in 0x20..0x7E || c == '\n' || c == '\t') kept.append(c)
             }
-            // null keeps the input untouched (the typing fast path).
+            // null keeps input untouched
             if (kept.length == end - start) null else kept.toString()
         }
     }
@@ -66,18 +63,14 @@ class TextInputFilterModule : Module() {
                         for (i in start until end) {
                             if (Character.isDigit(source[i])) digits.append(source[i])
                         }
-                        // Cap typed input at maxLength so the extra digit never renders.
-                        // Multi-char inserts (paste/autofill) skip the cap: JS sanitize
-                        // must see the full "+91…" string to strip the country code first.
+                        // Cap single typed digits at maxLength. Pasted text skips this to allow country-code stripping.
                         if (maxLength > 0 && end - start <= 1) {
                             val kept = dest.length - (dend - dstart)
                             if (kept + digits.length > maxLength) {
                                 return@InputFilter digits.substring(0, maxOf(0, maxLength - kept))
                             }
                         }
-                        // null keeps the input untouched (the typing fast path).
-                        // Otherwise return just the digits, so pasting "+91 93859 02366"
-                        // yields the number instead of being dropped wholesale.
+                        // null keeps input untouched; copy-paste extracts digits only
                         if (digits.length == end - start) null else digits.toString()
                     }
                     val currentFilters = view.filters ?: emptyArray()

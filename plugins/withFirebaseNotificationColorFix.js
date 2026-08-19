@@ -2,18 +2,7 @@ const { withAndroidManifest } = require("expo/config-plugins");
 
 const META_NAME = "com.google.firebase.messaging.default_notification_color";
 
-/**
- * Both `expo-notifications` and `@react-native-firebase/messaging` declare a
- * `com.google.firebase.messaging.default_notification_color` meta-data with
- * different values, which makes the Android manifest merger fail.
- *
- * This adds `tools:replace="android:resource"` to that meta-data so our color wins.
- *
- * IMPORTANT: keep this plugin listed FIRST in app.config.ts `plugins`. Manifest
- * mods run in reverse of listing order, so listing it first makes it run LAST —
- * after expo-notifications has injected the meta-data. Listed later, it would run
- * before that meta-data exists and silently tag nothing.
- */
+/** Resolves default_notification_color manifest merge clash between expo-notifications and firebase-messaging. Runs last (runs in reverse order) by listing it first in app.config.ts. */
 module.exports = function withFirebaseNotificationColorFix(config) {
   return withAndroidManifest(config, (cfg) => {
     const application = cfg.modResults.manifest.application?.[0];

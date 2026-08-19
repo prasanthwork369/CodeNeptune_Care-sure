@@ -32,15 +32,11 @@ data class ProductOfferData(
     val imageUrl: String?,
     val buttonText: String,
     val deepLink: String,
-    /** Optional header line (e.g. "Shop Now on CareSure") shown in the system decoration. */
+    /** Optional header line shown in the system decoration. */
     val subText: String?,
 )
 
-/**
- * Builds and posts the custom RemoteViews product-offer notification
- * (collapsed + expanded) using DecoratedCustomViewStyle so Android keeps the
- * system header. Marketing-only — transactional notifications are untouched.
- */
+/** Builds and posts the custom RemoteViews product-offer notification (collapsed + expanded). */
 object ProductOfferRenderer {
 
     private const val TAG = "ProductOfferNotif"
@@ -58,12 +54,11 @@ object ProductOfferRenderer {
 
         // Never log product/user details — id only.
         val bitmap = data.imageUrl?.let { downloadBitmap(it) }
-        // Stable per-product id: same product updates in place, different products coexist.
+        // Stable per-product hash ID
         val notificationId = "product_offer_${data.productId}".hashCode()
         val tapIntent = buildTapIntent(context, data.deepLink, notificationId)
         if (tapIntent == null) {
-            // No launcher activity resolved — shouldn't happen while the app is
-            // running, but a notification with no tap action is worse than none.
+            // Skip if launcher activity is unresolved
             Log.e(TAG, "No launcher activity found; skipping display")
             return
         }
@@ -82,18 +77,17 @@ object ProductOfferRenderer {
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        // Myntra-style header line next to the app name ("Shop Now on …").
         if (!data.subText.isNullOrBlank()) builder.setSubText(data.subText)
 
         try {
             NotificationManagerCompat.from(context).notify(notificationId, builder.build())
         } catch (e: SecurityException) {
-            // POST_NOTIFICATIONS revoked between the check and notify — never crash.
+            // Handle POST_NOTIFICATIONS runtime revocation
             Log.w(TAG, "notify blocked: ${e.message}")
         }
     }
 
-    /** Shared collapsed/expanded population — optional fields collapse cleanly via GONE. */
+    /** Populate view elements and handle conditional visibilities */
     private fun populate(
         views: RemoteViews,
         data: ProductOfferData,
@@ -102,7 +96,7 @@ object ProductOfferRenderer {
     ) {
         views.setTextViewText(R.id.notif_title, data.title)
 
-        // Strike-through MRP via SpannableString — native styling, no HTML.
+        // Apply strike-through to MRP
         setTextOrHide(views, R.id.notif_mrp, data.mrp?.let {
             SpannableString(it).apply {
                 setSpan(StrikethroughSpan(), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -115,7 +109,7 @@ object ProductOfferRenderer {
         views.setTextViewText(R.id.notif_action_btn, data.buttonText)
         views.setOnClickPendingIntent(R.id.notif_action_btn, tapIntent)
 
-        // No broken placeholder: image view disappears entirely when download failed.
+        // Hide image view if download fails
         if (bitmap != null) {
             views.setImageViewBitmap(R.id.notif_image, bitmap)
         } else {
@@ -132,18 +126,7 @@ object ProductOfferRenderer {
         }
     }
 
-    /**
-     * Deep-link straight into the app's launcher activity so expo-router's
-     * Linking handles navigation — Firebase/notifee tap listeners never fire
-     * for it, which makes duplicate navigation impossible by construction.
-     * requestCode = notification id so each product's PendingIntent stays
-     * distinct.
-     *
-     * Resolved via PackageManager instead of a static MainActivity reference:
-     * this is a library module the app depends on, so it can't import back
-     * into the app module. Same target component, same navigation contract —
-     * only how the class is found changed, not what gets launched.
-     */
+    /** Creates a PendingIntent launching the app with a deep link, resolved dynamically to avoid circular dependencies. */
     private fun buildTapIntent(context: Context, deepLink: String, requestCode: Int): PendingIntent? {
         val launcherComponent = context.packageManager
             .getLaunchIntentForPackage(context.packageName)
@@ -164,7 +147,7 @@ object ProductOfferRenderer {
         )
     }
 
-    /** Blocking download + downsample; caller is already off the main thread. */
+    /** Downloads and downsamples notification image */
     private fun downloadBitmap(url: String): Bitmap? {
         var connection: HttpURLConnection? = null
         return try {
@@ -175,8 +158,7 @@ object ProductOfferRenderer {
             }
             val bytes = connection.inputStream.use { it.readBytes() }
 
-            // Two-pass decode: bounds first, then downsample to <= MAX_IMAGE_PX
-            // so oversized CDN images can't OOM the notification process.
+            // Two-pass decode to downsample large images and prevent OOMs
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
             var sample = 1
@@ -186,7 +168,7 @@ object ProductOfferRenderer {
             val opts = BitmapFactory.Options().apply { inSampleSize = sample }
             BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
         } catch (e: Exception) {
-            // Notification still shows without the image; never log the URL (may carry tokens).
+            // Fail gracefully without logging the URL
             Log.w(TAG, "Image download failed: ${e.javaClass.simpleName}")
             null
         } finally {
@@ -194,13 +176,13 @@ object ProductOfferRenderer {
         }
     }
 
-    /** White silhouette generated by the expo-notifications plugin; app icon fallback. */
+    /** Resolves the status bar small icon */
     private fun smallIconRes(context: Context): Int {
         val res = context.resources.getIdentifier("notification_icon", "drawable", context.packageName)
         return if (res != 0) res else context.applicationInfo.icon
     }
 
-    /** Idempotent; mirrors the JS-created "offers" channel so ids never diverge. */
+    /** Idempotently creates the offers notification channel */
     private fun ensureChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

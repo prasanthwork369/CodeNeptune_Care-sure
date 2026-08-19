@@ -4,15 +4,14 @@ const path = require("path");
 
 const config = getDefaultConfig(__dirname);
 
-// Explicit alias resolution for @/ → project root
+// Resolve alias @/ to project root
 config.resolver.extraNodeModules = {
   ...config.resolver.extraNodeModules,
   "@": path.resolve(__dirname),
   "crypto-js/sha1": path.resolve(__dirname, "node_modules/crypto-js/sha1.js"),
 };
 
-// SVG Component support
-// Requires: npx expo install react-native-svg react-native-svg-transformer
+// Support SVG component imports
 try {
   const { transformer, resolver } = config;
   config.transformer = {
@@ -55,13 +54,10 @@ config.serializer = {
 };
 
 const PATCH_TEXT_PATH = path.resolve(__dirname, "src/utils/patchText.ts");
-// Matches node_modules/react-native/Libraries/Text/Text.js regardless of how it was required
-// (deep import like 'react-native/Libraries/Text/Text', or the relative require inside
-// react-native's own index.js, e.g. require('./Libraries/Text/Text')).
+// Match React Native's Text component source file
 const RN_TEXT_FILE = /[\\/]react-native[\\/]Libraries[\\/]Text[\\/]Text\.js$/;
 
-// Same treatment for TextInput so plain <TextInput> is patched app-wide too
-// (the runtime monkey-patch alone doesn't reliably reach every import).
+// Match React Native's TextInput component source file
 const PATCH_TEXTINPUT_PATH = path.resolve(
   __dirname,
   "src/utils/patchTextInput.ts",
@@ -70,10 +66,7 @@ const RN_TEXTINPUT_FILE =
   /[\\/]react-native[\\/]Libraries[\\/]Components[\\/]TextInput[\\/]TextInput\.js$/;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
-  // If the request is coming from our patch utility itself, do NOT redirect it!
-  // This breaks the loop when the utility imports the original Text component.
-  // Normalize to forward slashes first -- on Windows originModulePath uses backslashes,
-  // which would silently never match a forward-slash literal.
+  // Avoid recursive resolver loops when patch files import React Native components
   const origin = context.originModulePath
     ? context.originModulePath.replace(/\\/g, "/")
     : "";
@@ -83,13 +76,12 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 
   const result = context.resolveRequest(context, moduleName, platform);
 
-  // Redirect any resolution that lands on react-native's Text.js directly to our patch file,
-  // no matter whether the original request was a deep absolute import or a relative require.
+  // Redirect Text imports to our patch file
   if (result.type === "sourceFile" && RN_TEXT_FILE.test(result.filePath)) {
     return context.resolveRequest(context, PATCH_TEXT_PATH, platform);
   }
 
-  // Same redirect for TextInput.js → our TextInput patch.
+  // Redirect TextInput imports to our patch file
   if (result.type === "sourceFile" && RN_TEXTINPUT_FILE.test(result.filePath)) {
     return context.resolveRequest(context, PATCH_TEXTINPUT_PATH, platform);
   }

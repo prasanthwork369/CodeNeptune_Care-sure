@@ -97,10 +97,7 @@ export const syncService = {
 
       const { components } = response.data;
 
-      // Each block seeds the query cache with the payload it just fetched.
-      // Invalidating instead would refetch the same data over the network and
-      // re-write it to SQLite through withSqliteCache — two round trips and two
-      // blocking writes for data already in hand.
+      // Seed query cache directly to prevent redundant network fetches and SQLite writes
 
       // 1. appContents
       if (components.appContents?.needsSync) {
@@ -181,8 +178,7 @@ export const syncService = {
             "frequentlyOrdered",
             components.frequentlyOrdered.latestServerTimestamp,
           );
-          // setQueriesData, not setQueryData: this key carries the caller's
-          // params object, so match on the prefix instead of guessing it.
+          // Use setQueriesData to prefix-match dynamic query parameters
           queryClient.setQueriesData(
             { queryKey: ["frequently-ordered"] },
             data,

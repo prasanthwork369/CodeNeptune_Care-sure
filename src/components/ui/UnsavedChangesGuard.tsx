@@ -10,7 +10,7 @@ interface UnsavedChangesGuardProps {
   hasUnsavedChanges: boolean;
 }
 
-/** Guards every navigation exit: header back, Android back, and swipe-back. */
+/** Modal confirmation guard for unsaved changes on navigation exit */
 export const UnsavedChangesGuard: React.FC<UnsavedChangesGuardProps> = ({
   hasUnsavedChanges,
 }) => {

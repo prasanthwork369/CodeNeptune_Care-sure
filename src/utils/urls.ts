@@ -1,5 +1,4 @@
-// Backend URLs live in .env.local (gitignored), not in source -- see .env.example.
-// Resolved from EXPO_PUBLIC_APP_ENV so a build can never disagree with its EAS profile; app.config.ts reads the same switch.
+// Resolved from EXPO_PUBLIC_APP_ENV to align with the EAS profile
 const APP_ENV = process.env.EXPO_PUBLIC_APP_ENV ?? "development";
 const IS_PRODUCTION = APP_ENV === "production";
 
@@ -8,7 +7,7 @@ const QA_URL = process.env.EXPO_PUBLIC_API_BASE_URL_QA;
 const PROD_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_PROD;
 const QA_WEB_URL = process.env.EXPO_PUBLIC_WEB_BASE_URL_QA;
 
-// Crash at startup rather than let a production build quietly serve customers from QA.
+// Validate URL is HTTPS in production to prevent fallback leaks
 const requireProdUrl = (value: string | undefined, name: string) => {
   if (!value || !value.startsWith("https://")) {
     throw new Error(
@@ -29,20 +28,18 @@ if (!resolvedBaseUrl) {
 }
 
 export const API_BASE_URL = resolvedBaseUrl;
-// Exposed so auth can refuse QA-only conveniences (OTP prefill) when pointed at the live API.
+// Check if pointed at production API
 export const IS_LIVE_API = IS_PRODUCTION;
 export const API_TIMEOUT = __DEV__ ? 60_000 : 15_000;
-// File uploads stream megabytes over the user's mobile connection, so the JSON
-// timeout above is far too short for them and aborts large files mid-transfer.
+// Increased timeout for large file uploads
 export const UPLOAD_TIMEOUT = 60_000;
 
-// Share links follow the same switch as the API, so a production build can never emit QA links.
-// The QA fallback keeps local dev zero-config; production has no fallback by design.
+// Web link base URL mapped to environment
 export const WEB_BASE_URL = IS_PRODUCTION
   ? requireProdUrl(PROD_WEB_URL, "EXPO_PUBLIC_WEB_BASE_URL_PROD")
   : (QA_WEB_URL ?? "https://qa-caresure.codeneptune.com");
 
-/** Prefixes a relative backend path (e.g. "/uploads/icon.png") with the API base URL. */
+/** Prefixes relative backend paths with the API base URL */
 export const resolveAssetUrl = (path: string) =>
   path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
 
@@ -61,10 +58,7 @@ export const API_ENDPOINTS = {
   AUTH_LOGOUT: "/api/v1/customers/auth/logout",
 
   // ── Customer ─────────────────────────────────────────────────────────────
-  // Account deletion is a DELETE on this same profile endpoint.
   CUSTOMER_PROFILE: "/api/v1/customers/profile",
-  // Email verification: request sends an OTP to the given email, verify
-  // confirms the OTP. Both are scoped to the logged-in customer (Bearer auth).
   CUSTOMER_EMAIL_REQUEST_VERIFY:
     "/api/v1/customers/profile/email/request-verify",
   CUSTOMER_EMAIL_VERIFY: "/api/v1/customers/profile/email/verify",

@@ -33,9 +33,7 @@ class RequestQueue {
     resolve: QueuedRequest["resolve"],
     reject: QueuedRequest["reject"],
   ): Promise<void> {
-    // Same method + URL + body already queued (e.g. a duplicate offline tap
-    // on the same notification) — fold this caller into that entry instead
-    // of queueing a second identical write.
+    // Fold duplicate requests with the same method/URL/body to prevent double writes
     const duplicate = this.queue.find(
       (r) =>
         r.config.method === config.method &&
@@ -64,7 +62,7 @@ class RequestQueue {
     await this._persist();
   }
 
-  // Takes just the callable shape it uses, so an AxiosInstance fits and so does a stub.
+  // Accepts callable AxiosInstance or mock stub
   async process(
     axiosInstance: (config: AxiosRequestConfig) => Promise<AxiosResponse>,
   ): Promise<void> {
@@ -98,7 +96,7 @@ class RequestQueue {
       const configs = this.queue.map((r) => r.config);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
     } catch {
-      // Storage write failure — non-fatal
+      // Non-fatal persistence error
     }
   }
 }
