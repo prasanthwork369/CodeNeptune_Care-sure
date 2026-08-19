@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
-    marginVertical: verticalScale(12),
+    marginVertical: verticalScale(10),
     marginHorizontal: scale(2),
     width: "100%",
     alignSelf: "center",
@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
     fontSize: moderateScale(13),
     fontWeight: "500",
     color: "#637381",
-    paddingVertical: verticalScale(8),
+    paddingVertical: verticalScale(4),
   },
   resendHighlight: { color: "#0F7635", fontWeight: "700" },
   resendBtn: {
@@ -109,8 +109,8 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0F7635",
-    marginVertical: verticalScale(12),
+    backgroundColor: colors.primary,
+    marginBottom: verticalScale(8),
   },
   btnText: {
     fontSize: moderateScale(16),

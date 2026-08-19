@@ -44,14 +44,16 @@ export const Toast: React.FC = () => {
   const visible = useToastStore((s) => s.visible);
   const message = useToastStore((s) => s.message);
   const type = useToastStore((s) => s.type);
+  const position = useToastStore((s) => s.position);
   const hide = useToastStore((s) => s.hide);
   const insets = useSafeAreaInsets();
   const adjustedBottom = useAdjustedBottomInset();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const dockedToTop = position === "auto" && keyboardVisible;
   // Hidden resting position: below the screen when anchored to the bottom,
   // above it when anchored to the top (keyboard open) — so the slide
   // direction always matches which edge the toast is docked to.
-  const offScreenY = keyboardVisible ? -120 : 120;
+  const offScreenY = dockedToTop ? -120 : 120;
   const translateY = useRef(new Animated.Value(offScreenY)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -124,7 +126,7 @@ export const Toast: React.FC = () => {
       pointerEvents="box-none"
       style={{
         position: "absolute",
-        ...(keyboardVisible
+        ...(dockedToTop
           ? { top: insets.top + 12 }
           : { bottom: adjustedBottom + 100 }),
         left: 0,

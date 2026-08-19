@@ -27,6 +27,10 @@ export const styles = StyleSheet.create({
   inputWrapIdle: { borderColor: colors.border },
   inputWrapFocused: { borderColor: colors.primary },
   inputWrapError: { borderColor: FIELD_ERROR },
+  // Press feedback for the hint shield (no android_ripple — that combo with
+  // an absolutely-positioned overlay was swallowing the tap on Android
+  // instead of forwarding it to the native phone-number-hint call).
+  shieldPressed: { backgroundColor: "rgba(15, 118, 53, 0.08)" },
   prefix: {
     fontSize: moderateScale(17),
     fontWeight: "500",

@@ -107,7 +107,6 @@ export const OtpLayout: React.FC = () => {
               </>
             )}
           </Touchable>
-          <View style={s.spacer} />
           <AuthFooter />
         </View>
       }

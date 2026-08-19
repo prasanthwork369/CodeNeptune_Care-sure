@@ -29,11 +29,12 @@ class PhoneNumberHintModule : Module() {
                 return@AsyncFunction
             }
 
-            if (pendingPromise != null) {
-                // Prevent stacking multiple picker requests
-                Log.w(TAG, "Hint already in progress — resolving null")
-                promise.resolve(null)
-                return@AsyncFunction
+            // A previous call can be left stranded here forever (activity backgrounded/
+            // destroyed before its OnActivityResult ever arrived) — self-heal by
+            // resolving the stale promise instead of permanently blocking every future tap.
+            pendingPromise?.let {
+                Log.w(TAG, "Stale hint request found — resolving it null and continuing")
+                it.resolve(null)
             }
 
             pendingPromise = promise

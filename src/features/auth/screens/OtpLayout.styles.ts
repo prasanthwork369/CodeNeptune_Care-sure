@@ -41,5 +41,4 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: verticalScale(8),
   },
-  spacer: { height: verticalScale(24) },
 });

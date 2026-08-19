@@ -10,7 +10,7 @@ import { StyleSheet } from "react-native";
 const UNDERLINE_GAP = verticalScale(1);
 
 export const styles = StyleSheet.create({
-  wrap: { paddingBottom: verticalScale(16) },
+  wrap: { paddingBottom: verticalScale(0) },
   icon: { width: scale(15), height: scale(15) },
   secureText: {
     fontSize: moderateScale(13),

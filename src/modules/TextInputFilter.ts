@@ -6,9 +6,16 @@ import { requireOptionalNativeModule } from "expo-modules-core";
 // modules/text-input-filter/expo-module.config.json), so it's absent on iOS
 // and in Expo Go — requireOptionalNativeModule returns null there instead of
 // throwing, matching the old NativeModules bridge lookup's `undefined`.
+// `addListener` is intentionally optional, not assumed: requireOptionalNativeModule
+// can resolve to a legacy bridge proxy that carries the exported functions but
+// never inherits EventEmitter (see src/modules/InAppUpdate.ts for the full story).
 const TextInputFilter = requireOptionalNativeModule<{
   applyAsciiOnly: (reactTag: number) => void;
   applyDigitsOnly: (reactTag: number, maxLength: number) => void;
+  addListener?: (
+    eventName: "TextInputFilter:limitReached",
+    listener: () => void,
+  ) => { remove: () => void };
 }>("TextInputFilter");
 
 /**
@@ -55,3 +62,23 @@ export const applyDigitsOnlyFilter = (
     }
   }
 };
+
+/**
+ * Fires whenever a digits-only field (see applyDigitsOnlyFilter) rejects a
+ * typed digit for exceeding its maxLength. Returns a no-op unsubscribe on
+ * iOS or if the native listener API is unavailable.
+ */
+export function addDigitsOnlyLimitListener(handler: () => void): () => void {
+  if (Platform.OS !== "android" || !TextInputFilter?.addListener) {
+    return () => {};
+  }
+  try {
+    const sub = TextInputFilter.addListener(
+      "TextInputFilter:limitReached",
+      handler,
+    );
+    return () => sub.remove();
+  } catch {
+    return () => {};
+  }
+}

@@ -37,21 +37,17 @@ export function useLogin() {
   const hintRequested = useRef(false);
 
   /**
-   * Sanitizes input to numeric only and performs real-time validation checks.
+   * Sanitizes input to numeric only. Validation only runs on submit
+   * (handleGetOtp) — flagging an incomplete number while the user is still
+   * mid-type reads as an error for perfectly normal typing.
    */
   const handleChangeText = (text: string) => {
     // Typed overflow: already 10 digits and new text only appends — ignore it.
     if (phoneNumber.length === 10 && text.startsWith(phoneNumber)) return;
-    // A fresh attempt — drop the old error or it resurfaces when phoneError clears.
+    // A fresh attempt — drop any submit-time error so it doesn't linger while editing.
     if (error) resetError();
-    const cleaned = sanitize.phone(text);
-    setPhoneNumber(cleaned);
-    if (cleaned.length > 0) {
-      const result = validate.phone(cleaned);
-      setPhoneError(result.valid ? "" : result.message);
-    } else {
-      setPhoneError("");
-    }
+    if (phoneError) setPhoneError("");
+    setPhoneNumber(sanitize.phone(text));
   };
 
   /** Shows the SIM picker on the first tap; the shield keeps the keyboard shut. */

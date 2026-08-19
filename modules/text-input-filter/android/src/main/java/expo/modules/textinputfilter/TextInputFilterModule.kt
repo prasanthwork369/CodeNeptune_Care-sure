@@ -14,10 +14,13 @@ import expo.modules.kotlin.modules.ModuleDefinition
 private const val TAG = "TextInputFilter"
 private const val MODE_DIGITS = 0
 private const val MODE_ASCII = 1
+private const val EVENT_LIMIT_REACHED = "TextInputFilter:limitReached"
 
 class TextInputFilterModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("TextInputFilter")
+
+        Events(EVENT_LIMIT_REACHED)
 
         Function("applyDigitsOnly") { reactTag: Int, maxLength: Int ->
             attemptApplyFilter(reactTag, maxLength, 0, MODE_DIGITS)
@@ -26,6 +29,15 @@ class TextInputFilterModule : Module() {
         // English-only input. Native-level rejection avoids controlled-input desyncs.
         Function("applyAsciiOnly") { reactTag: Int ->
             attemptApplyFilter(reactTag, 0, 0, MODE_ASCII)
+        }
+    }
+
+    // Best-effort UI signal only — a dropped event just means one missed toast.
+    private fun emitLimitReached() {
+        try {
+            sendEvent(EVENT_LIMIT_REACHED)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to emit limit-reached event", e)
         }
     }
 
@@ -67,6 +79,7 @@ class TextInputFilterModule : Module() {
                         if (maxLength > 0 && end - start <= 1) {
                             val kept = dest.length - (dend - dstart)
                             if (kept + digits.length > maxLength) {
+                                if (digits.isNotEmpty()) emitLimitReached()
                                 return@InputFilter digits.substring(0, maxOf(0, maxLength - kept))
                             }
                         }

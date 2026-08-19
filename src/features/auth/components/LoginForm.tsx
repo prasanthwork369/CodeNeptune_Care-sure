@@ -1,9 +1,12 @@
+import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { colors } from "@/src/theme";
 import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { LoginFormProps } from "../types";
 import { styles as s } from "./LoginForm.styles";
+import { PhoneLimitToast } from "./PhoneLimitToast";
 
 const MAX_PHONE_DIGITS = 10;
 
@@ -64,12 +67,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           onBlur={() => setIsFocused(false)}
         />
 
+        {phoneNumber.length > 0 && (
+          <Touchable
+            testID="phone-clear-btn"
+            onPress={() => onPhoneChange("")}
+            accessibilityRole="button"
+            accessibilityLabel="Clear mobile number"
+          >
+            <icons.close_dark width={12} height={12} fill={colors.subtext} />
+          </Touchable>
+        )}
+
         {/* Spends the first tap on the hint so the field never focuses. */}
         {hintShieldVisible ? (
           <Pressable
             style={StyleSheet.absoluteFill}
             onPress={onHintPress}
-            accessibilityRole="button"
+            accessibilityRole="none"
             accessibilityLabel="Mobile number"
           />
         ) : null}
@@ -80,6 +94,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {phoneError || error}
         </Text>
       ) : null}
+
+      <PhoneLimitToast />
     </View>
   );
 };
