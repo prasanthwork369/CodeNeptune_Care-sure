@@ -111,4 +111,29 @@ describe("InAppUpdate wrapper", () => {
     expect(m.isInAppUpdateSupported()).toBe(false);
     expect(await m.startImmediateUpdate()).toBe("unavailable");
   });
+
+  // Reproduces the legacy-bridge-proxy fallback: requireOptionalNativeModule
+  // can resolve to a plain object that carries the exported async functions
+  // but never inherited EventEmitter.addListener, which used to crash with
+  // "InAppUpdate.addListener is not a function".
+  it("reports unsupported and never crashes when addListener is missing from the resolved module", async () => {
+    jest.resetModules();
+    jest.doMock("expo-modules-core", () => ({
+      requireOptionalNativeModule: () => ({
+        checkUpdateAvailability: jest.fn(),
+        startFlexibleUpdate: jest.fn(),
+        startImmediateUpdate: jest.fn(),
+        completeFlexibleUpdate: jest.fn(),
+        // no addListener — mirrors the bridge proxy shape
+      }),
+    }));
+    jest.doMock("react-native", () => ({
+      Platform: { OS: "android" },
+    }));
+    const m = require("@/src/modules/InAppUpdate");
+
+    expect(m.isInAppUpdateSupported()).toBe(false);
+    expect(() => m.addInstallStateListener(jest.fn())()).not.toThrow();
+    expect(await m.startImmediateUpdate()).toBe("unavailable");
+  });
 });

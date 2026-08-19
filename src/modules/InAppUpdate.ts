@@ -34,14 +34,20 @@ export interface InstallStateEvent {
 
 // Optional: Android-only (see modules/in-app-update/expo-module.config.json),
 // so it's absent on iOS/Expo Go — this returns null there instead of throwing.
-// Expo native modules that declare events get addListener/removeListeners
-// for free, replacing the old NativeEventEmitter(InAppUpdate) wrapper below.
+// `addListener` is NOT guaranteed just because the module resolved: when the
+// real JSI-installed module (globalThis.expo.modules.InAppUpdate, which
+// extends expo-modules-core's EventEmitter) isn't ready yet at import time,
+// requireOptionalNativeModule falls back to the legacy bridge proxy
+// (NativeModulesProxy), a plain object that only carries the explicitly
+// exported async functions and never inherits EventEmitter — so it has
+// checkUpdateAvailability etc. but no addListener. Treat addListener as
+// optional and probe for it explicitly instead of assuming it's always there.
 const InAppUpdate = requireOptionalNativeModule<{
   checkUpdateAvailability: () => Promise<UpdateAvailability>;
   startFlexibleUpdate: () => Promise<UpdateFlowResult>;
   startImmediateUpdate: () => Promise<UpdateFlowResult>;
   completeFlexibleUpdate: () => Promise<boolean>;
-  addListener: (
+  addListener?: (
     eventName: "InAppUpdate:state",
     listener: (event: InstallStateEvent) => void,
   ) => { remove: () => void };
@@ -56,11 +62,15 @@ const UNAVAILABLE: UpdateAvailability = {
 };
 
 /**
- * True only on Android with the native module present. iOS and any build
- * without the module fall straight through to the store link.
+ * True only on Android with the native module present *and* its listener API
+ * usable. `checkUpdateAvailability` alone isn't enough: the legacy bridge
+ * proxy fallback (see the comment above) exposes it too, but has no
+ * `addListener`, so both are checked explicitly.
  */
 export const isInAppUpdateSupported = (): boolean =>
-  Platform.OS === "android" && !!InAppUpdate?.checkUpdateAvailability;
+  Platform.OS === "android" &&
+  !!InAppUpdate?.checkUpdateAvailability &&
+  typeof InAppUpdate?.addListener === "function";
 
 export async function checkUpdateAvailability(): Promise<UpdateAvailability> {
   if (!isInAppUpdateSupported()) return UNAVAILABLE;
@@ -106,7 +116,11 @@ export async function completeFlexibleUpdate(): Promise<boolean> {
 export function addInstallStateListener(
   handler: (event: InstallStateEvent) => void,
 ): () => void {
-  if (!isInAppUpdateSupported()) return () => {};
-  const sub = InAppUpdate!.addListener("InAppUpdate:state", handler);
-  return () => sub.remove();
+  if (!isInAppUpdateSupported() || !InAppUpdate?.addListener) return () => {};
+  try {
+    const sub = InAppUpdate.addListener("InAppUpdate:state", handler);
+    return () => sub.remove();
+  } catch {
+    return () => {};
+  }
 }
