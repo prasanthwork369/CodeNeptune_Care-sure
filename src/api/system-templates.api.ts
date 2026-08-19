@@ -1,8 +1,4 @@
-/**
- * @module src/api/system-templates.api
- * API functions for fetching public system document templates (invoices, receipts, etc.)
- * These endpoints are public and do not require authentication.
- */
+/** Fetch public system document templates (invoices, receipts, etc.) */
 
 import { apiClient } from "@/src/api/client";
 
@@ -23,10 +19,7 @@ interface SystemTemplateResponse {
 }
 
 export const systemTemplatesApi = {
-  /**
-   * Fetches a single active system template by its unique (event, channel) key.
-   * No authentication required — public endpoint.
-   */
+  /** Fetch active template by event and channel */
   getPublicTemplate: async (
     event: string,
     channel = "DOCUMENT",

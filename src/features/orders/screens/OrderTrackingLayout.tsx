@@ -1,25 +1,16 @@
-import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
-import { AlreadyHaveItemsModal } from "@/src/features/orders/components/AlreadyHaveItemsModal";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
 import { useCart } from "@/src/features/cart/hooks/useCart";
+import { AlreadyHaveItemsModal } from "@/src/features/orders/components/AlreadyHaveItemsModal";
 import { useOrderById } from "@/src/features/orders/hooks/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
-import { useOrderTrackingSteps } from "../hooks/useOrderTrackingSteps";
-import { useReturnEligibility } from "../hooks/useReturnEligibility";
-import {
-  CANCELLED_STATUSES,
-  ORDER_STATUS_CODE,
-  TERMINAL_OR_CANCELLED_STATUSES,
-} from "../constants/order-status";
-import { ORDER_STATUS, TrackingStep } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
-import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
-import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
+import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
@@ -32,9 +23,16 @@ import Animated, {
 } from "react-native-reanimated";
 import { DigitalPrescriptionModal } from "../components/DigitalPrescriptionModal";
 import { InvoiceModal } from "../components/InvoiceModal";
-import { orderStyles as s } from "../orders.styles";
 import { OrderTrackingModal } from "../components/OrderTrackingModal";
 import { OrderTrackingSkeleton } from "../components/OrderTrackingSkeleton";
+import {
+  CANCELLED_STATUSES,
+  ORDER_STATUS_CODE,
+  TERMINAL_OR_CANCELLED_STATUSES,
+} from "../constants/order-status";
+import { useOrderTrackingSteps } from "../hooks/useOrderTrackingSteps";
+import { useReturnEligibility } from "../hooks/useReturnEligibility";
+import { orderStyles as s } from "../orders.styles";
 import {
   DeliveryAddressSection,
   ItemsOrderedSection,
@@ -45,6 +43,8 @@ import {
   SectionCard,
   TrackingStatusBanner,
 } from "../sections/tracking";
+import { ORDER_STATUS, TrackingStep } from "../types";
+import { buildCartInputs } from "../utils/reorderCart";
 
 const EASE_OUT = Easing.out(Easing.cubic);
 
@@ -389,11 +389,13 @@ export const OrderTrackLayout: React.FC = () => {
 
     const isInvoiceAvailable =
       order?.status != null &&
-      ([
-        ORDER_STATUS_CODE.PACKED,
-        ORDER_STATUS_CODE.SHIPPED,
-        ORDER_STATUS_CODE.DELIVERED,
-      ] as number[]).includes(order.status);
+      (
+        [
+          ORDER_STATUS_CODE.PACKED,
+          ORDER_STATUS_CODE.SHIPPED,
+          ORDER_STATUS_CODE.DELIVERED,
+        ] as number[]
+      ).includes(order.status);
 
     const isDelayed = isOrderDelayed(order);
     const cancellationReason = getCancellationReason(order);
@@ -444,6 +446,54 @@ export const OrderTrackLayout: React.FC = () => {
     showWindowExpiredMessage,
     returnDeadlineLabel,
   } = useReturnEligibility(order);
+
+  const [showReturnToast, setShowReturnToast] = useState(false);
+  const toastOpacity = useSharedValue(0);
+  const toastTranslate = useSharedValue(15);
+
+  useEffect(() => {
+    let fadeOutTimer: NodeJS.Timeout;
+    let hideTimer: NodeJS.Timeout;
+
+    if (hasActiveReturnRequest && !isPlaceholderData) {
+      setShowReturnToast(true);
+      toastOpacity.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      toastTranslate.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+
+      fadeOutTimer = setTimeout(() => {
+        toastOpacity.value = withTiming(0, {
+          duration: 300,
+          easing: Easing.in(Easing.ease),
+        });
+        toastTranslate.value = withTiming(15, {
+          duration: 300,
+          easing: Easing.in(Easing.ease),
+        });
+
+        hideTimer = setTimeout(() => {
+          setShowReturnToast(false);
+        }, 300);
+      }, 4000);
+    }
+
+    return () => {
+      clearTimeout(fadeOutTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [hasActiveReturnRequest, isPlaceholderData, toastOpacity, toastTranslate]);
+
+  const animatedToastStyle = useAnimatedStyle(() => {
+    return {
+      opacity: toastOpacity.value,
+      transform: [{ translateY: toastTranslate.value }],
+    };
+  });
 
   if (loading) {
     return (
@@ -694,6 +744,38 @@ export const OrderTrackLayout: React.FC = () => {
           <PrescriptionSection onViewRx={() => setRxModalVisible(true)} />
         )}
       </ScrollView>
+
+      {showReturnToast && (
+        <Animated.View
+          className="flex-row items-center bg-[#FEF9C3] border border-[#FDE047] shadow-sm"
+          style={[
+            {
+              position: "absolute",
+              left: exactScale(16),
+              right: exactScale(16),
+              bottom: adjustedBottom + exactScale(78) + exactScale(12),
+              borderRadius: exactScale(8),
+              paddingHorizontal: exactScale(16),
+              paddingVertical: exactScale(12),
+              zIndex: 99,
+              elevation: 5,
+            },
+            animatedToastStyle,
+          ]}
+        >
+          <icons.check_circle
+            width={exactScale(14)}
+            height={exactScale(14)}
+            fill="#0F7635"
+          />
+          <Text
+            style={[s.labelSm, { marginLeft: exactScale(8), flex: 1 }]}
+            className="font-inter-semibold text-brand-text"
+          >
+            Return Status
+          </Text>
+        </Animated.View>
+      )}
 
       <View
         className="bg-white border-t border-[#919EAB33]"

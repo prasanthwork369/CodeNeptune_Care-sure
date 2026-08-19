@@ -1,41 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Expanded product-offer notification: large image left, details + action right.
-     Mirrors the Myntra-style reference within the ~256dp expanded limit. -->
+<!-- Expanded product-offer notification: title/details top, large image middle, CTA button bottom.
+     Mirrors the Myntra-style reference within the ~256dp expanded limit DecoratedCustomViewStyle allows. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingStart="4dp"
-    android:paddingEnd="4dp"
+    android:orientation="vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
-    <ImageView
-        android:id="@+id/notif_image"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="@null" />
-
+    <!-- Top Text Details Area -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginStart="16dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/notif_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary"
             android:maxLines="2"
             android:ellipsize="end" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -46,58 +38,71 @@
                 android:id="@+id/notif_mrp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 android:textColor="?android:attr/textColorSecondary"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/notif_offer_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:textSize="15sp"
+                android:layout_marginStart="6dp"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="#F05423"
-                android:maxLines="1" />
-        </LinearLayout>
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-        <TextView
-            android:id="@+id/notif_discount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/notif_discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#0F7635"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/notif_coupon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorSecondary"
             android:maxLines="1"
             android:ellipsize="end"
             android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/notif_action_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:background="@drawable/bg_notification_action_btn"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:maxLines="1" />
     </LinearLayout>
+
+    <!-- Middle Promotional Image (Full Width) -->
+    <ImageView
+        android:id="@+id/notif_image"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
+
+    <!-- Bottom Action Button / CTA -->
+    <TextView
+        android:id="@+id/notif_action_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@drawable/bg_notification_action_btn"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:maxLines="1" />
+
 </LinearLayout>

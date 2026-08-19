@@ -12,24 +12,17 @@ import { StyleSheet, Text, View } from "react-native";
 interface AppGateScreenProps {
   reason: Exclude<AppGateReason, null>;
   maintenanceMessage?: string;
-  /**
-   * What the update action does. Defaults to the store link so the screen still
-   * works standalone; the gate passes the Play in-app update flow instead.
-   */
+  /** Action trigger for update button */
   onUpdatePress?: () => void;
-  /** Label swaps to Retry once an update attempt has already failed. */
+  /** Button label overrides */
   updateLabel?: string;
 }
 
-// Curly apostrophe, matching the design copy exactly.
+// Custom update description copy
 const UPDATE_BODY =
   "We’ve made some exciting improvements to CareSure. Update now to enjoy the latest features and performance upgrades!";
 
-/**
- * Full-screen block for a forced update or planned downtime. Deliberately has
- * no dismiss action — it is only ever shown when the backend has explicitly
- * said the app must not continue.
- */
+/** Full screen block for forced updates or downtime (no close button) */
 export const AppGateScreen: React.FC<AppGateScreenProps> = ({
   reason,
   maintenanceMessage,
@@ -69,7 +62,7 @@ export const AppGateScreen: React.FC<AppGateScreenProps> = ({
             <Text style={styles.buttonLabel}>
               {updateLabel ?? "Update Now"}
             </Text>
-            {/* Pre-coloured white variant — these SVGs cannot be re-tinted via fill. */}
+            {/* Arrow icon */}
             <icons.arrow_up_white
               width={exactScale(16)}
               height={exactScale(16)}
@@ -90,12 +83,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: exactScale(24),
   },
   content: { alignItems: "center", width: "100%" },
-  // Figma: 105 x 97.46 — not square, so the height must not be rounded to match.
+  // Logo dimensions
   logo: { width: exactScale(105), height: exactScale(97.46) },
-  // Figma: Inter SemiBold 22 / line-height 100% / letter-spacing 0 / centered.
-  // No lineHeight set on purpose: Figma's "100%" is the font's natural line
-  // height, not 1.0x the size. Writing lineHeight: 22 here would clip the
-  // descender on the "p" in "Update".
+  // Title typography styles
   title: {
     marginTop: exactScale(16),
     fontSize: moderateScale(22),
@@ -104,12 +94,10 @@ const styles = StyleSheet.create({
     color: "#1A1C1E",
     textAlign: "center",
   },
-  // Figma: Inter Medium 16 / line-height 26 / letter-spacing 0 / centered.
-  // 26 is an explicit value here, not "100%", so it is used as given.
+  // Body typography styles
   body: {
     marginTop: exactScale(14),
-    // Caps the measure so the copy wraps like the design instead of stretching
-    // to the full width on a wider device.
+    // Wrap constraint for better readability
     maxWidth: exactScale(310),
     fontSize: moderateScale(16),
     lineHeight: moderateScale(26),
@@ -118,7 +106,7 @@ const styles = StyleSheet.create({
     color: "#6A6A6A",
     textAlign: "center",
   },
-  // Figma: 160 x 46, radius 48, padding 10/16, gap 8.
+  // Update button styles
   button: {
     marginTop: exactScale(26),
     width: exactScale(160),
@@ -132,7 +120,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: exactScale(8),
   },
-  // Figma: Inter SemiBold 16 / line-height 26 / letter-spacing 0.
+  // Button label typography
   buttonLabel: {
     color: "#FFFFFF",
     fontSize: moderateScale(16),

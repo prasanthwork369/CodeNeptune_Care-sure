@@ -24,7 +24,7 @@ export interface CartWalletSettings {
     isCoinsBonusActive: boolean;
     coinValueInRupees: number;
     coinUsagePercentage: number;
-    /** Per-transaction top-up cap. Optional — not served yet. */
+    /** Maximum single top-up amount */
     maxTopUpAmount?: number;
   };
 }
@@ -34,18 +34,11 @@ export interface Settings {
   contactPhone?: string;
   contactEmail?: string;
   mapsApiKey?: string;
-  /**
-   * Lowest app version allowed to keep running, e.g. "1.4.0". Optional and not
-   * served by the backend yet — while it is absent the gate stays open, so
-   * shipping this ahead of the API can never lock anyone out.
-   */
+  /** Minimum required app version */
   minSupportedVersion?: string;
-  /**
-   * Newest published version, e.g. "1.4.0". Below this the app still works, so
-   * the user only gets a dismissible prompt — never a block.
-   */
+  /** Newest available app version */
   latestVersion?: string;
-  /** Blocks the app with a notice during planned backend downtime. */
+  /** Maintenance mode flag and message */
   maintenanceMode?: boolean;
   maintenanceMessage?: string;
 }
@@ -56,15 +49,15 @@ export interface PaymentSettings {
   [key: string]: unknown;
 }
 
-/** Backend-owned prescription upload rules. */
+/** Prescription upload settings */
 export interface UploadConfig {
   maxFileSizeMb: number;
   prescriptionValidityMonths: number;
-  /** Files per upload. Optional — not served yet; the app clamps and defaults. */
+  /** Maximum file upload count */
   maxFiles?: number;
 }
 
-// Public axios instance — no auth headers, used for endpoints accessible without login
+// Public axios instance for unauthenticated endpoints
 const publicAxios = axios.create({
   baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json", "x-panel-id": "customer" },
@@ -89,7 +82,7 @@ export const settingsApi = {
       API_ENDPOINTS.SETTINGS_MOBILE_APP_LINKS,
     );
     const d = response.data.data ?? response.data ?? {};
-    // Normalise snake_case → camelCase in case the backend returns snake_case
+    // Standardize response keys
     return {
       termsLink: d.termsLink ?? d.terms_link ?? d.terms ?? "",
       refundLink: d.refundLink ?? d.refund_link ?? d.refund ?? "",

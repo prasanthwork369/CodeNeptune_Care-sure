@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Collapsed product-offer notification: title + prices | thumbnail | action button.
      RemoteViews whitelist only (LinearLayout/TextView/ImageView). Heights stay
-     inside the ~48dp collapsed content area DecoratedCustomViewStyle allows. -->
+     inside the ~64dp collapsed content area DecoratedCustomViewStyle allows. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingStart="4dp"
-    android:paddingEnd="4dp"
-    android:paddingTop="2dp"
-    android:paddingBottom="2dp">
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
 
         <TextView
             android:id="@+id/notif_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary"
             android:maxLines="1"
@@ -33,26 +34,28 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="4dp">
+            android:layout_marginTop="2dp">
 
             <!-- Strike-through applied in code via StrikethroughSpan (no HTML) -->
             <TextView
                 android:id="@+id/notif_mrp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textColor="?android:attr/textColorSecondary"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/notif_offer_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:textSize="14sp"
+                android:layout_marginStart="6dp"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="#F05423"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
     </LinearLayout>
 
@@ -60,7 +63,9 @@
         android:id="@+id/notif_image"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_gravity="center_vertical"
         android:scaleType="centerCrop"
         android:contentDescription="@null" />
 
@@ -68,13 +73,13 @@
         android:id="@+id/notif_action_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:layout_gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:background="@drawable/bg_notification_action_btn"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:maxLines="1" />

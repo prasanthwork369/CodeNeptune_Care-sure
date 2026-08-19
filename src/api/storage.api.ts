@@ -8,7 +8,7 @@ export interface UploadFile {
   type: string;
 }
 
-/** An uploaded asset: `url` for display, `path` (bucket-relative key) for deletion. */
+/** Uploaded asset detail */
 export interface UploadedImage {
   url: string;
   path: string;
@@ -17,8 +17,7 @@ export interface UploadedImage {
 const sanitizeFileName = (name: string): string =>
   name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
 
-// Falls back to the URL's path when the backend doesn't return an explicit
-// path/key, so deletion still has a best-effort key to work with.
+// Extract path key from URL as fallback if not returned
 export const deriveKeyFromUrl = (url: string): string => {
   try {
     return new URL(url).pathname.replace(/^\/+/, "");
@@ -28,12 +27,10 @@ export const deriveKeyFromUrl = (url: string): string => {
 };
 
 export const storageApi = {
-  // Returns both the display URL and the bucket-relative `path`. Mirrors the
-  // web ImageUpload, which stores `path` (the delete key) and previews `url`.
+  // Uploads a single file to storage
   upload: async (
     file: UploadFile,
     folder: string,
-    // Optional so every existing caller keeps working untouched.
     options?: {
       onProgress?: (percent: number) => void;
       signal?: AbortSignal;
@@ -44,7 +41,7 @@ export const storageApi = {
       uri: file.uri,
       name: sanitizeFileName(file.name),
       type: file.type,
-      // RN's FormData takes a file descriptor object; the DOM typings only allow Blob.
+      // React Native FormData requires file descriptor cast
     } as unknown as Blob);
     form.append("folder", folder);
     const response = await apiClient.post<{
@@ -52,7 +49,7 @@ export const storageApi = {
       data: { url: string; path?: string; key?: string };
     }>(API_ENDPOINTS.STORAGE_UPLOAD, form, {
       headers: { "Content-Type": "multipart/form-data" },
-      // The shared JSON timeout aborts multi-megabyte files mid-transfer.
+      // Longer timeout for larger file uploads
       timeout: UPLOAD_TIMEOUT,
       signal: options?.signal,
       onUploadProgress: options?.onProgress
@@ -63,8 +60,7 @@ export const storageApi = {
         : undefined,
     });
     const data = response.data.data;
-    // TEMP: confirm the exact field the backend returns for the delete key
-    // (doc calls it the "path returned in upload response metadata").
+    // Log response and extract deletion key
     if (__DEV__)
       logger.debug(
         "[storageApi.upload] raw response.data:",
@@ -76,7 +72,7 @@ export const storageApi = {
     };
   },
 
-  // Deletes a previously uploaded asset by its bucket-relative path/key.
+  // Deletes file by path key
   delete: async (path: string): Promise<void> => {
     await apiClient.delete(API_ENDPOINTS.STORAGE_DELETE, {
       data: { key: path },
@@ -93,7 +89,7 @@ export const storageApi = {
         uri: file.uri,
         name: sanitizeFileName(file.name),
         type: file.type,
-        // RN's FormData takes a file descriptor object; the DOM typings only allow Blob.
+        // React Native FormData requires file descriptor cast
       } as unknown as Blob);
     });
     form.append("folder", folder);

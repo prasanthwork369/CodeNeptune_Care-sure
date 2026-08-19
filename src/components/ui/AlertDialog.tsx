@@ -6,8 +6,7 @@ import React, { useRef } from "react";
 import { Image, Modal, Text, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
 
-type IconVariant =
-  "package" | "check" | "check-green" | "delete" | "pdf" | "no_internet";
+type IconVariant ="package" | "check" | "check-green" | "delete" | "pdf" | "no_internet";
 type ButtonVariant = "green" | "red" | "outline";
 
 export interface AlertButton {

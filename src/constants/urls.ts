@@ -1,23 +1,14 @@
-/**
- * @module constants/urls
- * Centralised URL constants for the app.
- * Update these when switching between environments (dev / qa / prod).
- */
+/** Centralized URL constants and builders for the app. */
 
-// Web store origin, resolved from the LIVE flag / env in one place so QA and
-// prod can't diverge. Imported for local use below and re-exported to keep the
-// existing "@/src/constants/urls" import path stable.
+// Web store base URL imported from central utility
 import { WEB_BASE_URL } from "@/src/utils/urls";
 import { PRODUCT_TYPE } from "./product-type";
 export { WEB_BASE_URL };
 
-/** Custom deep-link scheme registered in app.config.ts */
+/** Custom deep-link scheme */
 export const APP_SCHEME = "caresure";
 
-// The web PDP route is /[productType]/[slug]/[id], and productType must be one
-// of these exact slugs or the page 404s. Mirrors the web's PRODUCT_TYPE_CONFIG
-// (1=Medicine, 2=OTC, 3=FMCG). Unknown/absent type falls back to "medicines"
-// like the web's own getProductUrl helper.
+// Map product type ID to web URL path slug
 const PRODUCT_TYPE_SLUG: Record<number, string> = {
   [PRODUCT_TYPE.MEDICINE]: "medicines",
   [PRODUCT_TYPE.OTC]: "otc",
@@ -26,14 +17,7 @@ const PRODUCT_TYPE_SLUG: Record<number, string> = {
 
 // ─── Builders ──────────────────────────────────────────────────────────────
 
-/**
- * Canonical web URL for a product, matching the web PDP route exactly:
- *   https://.../fmcg/herbal-zinc-defense-lozenge-pack/CS-0173
- *
- * The old /product/{id} shape does NOT exist on the web and 404s when shared —
- * the web only serves /{productType}/{slug}/{id}. The slug is cosmetic there
- * (the page fetches by id), so a missing slug still resolves.
- */
+/** Generates product page web URL (format: /typeSlug/slug/productId) */
 export const productWebUrl = (
   productId: string,
   productType?: number,
@@ -44,9 +28,6 @@ export const productWebUrl = (
   return `${WEB_BASE_URL}/${typeSlug}/${slug || "item"}/${productId}`;
 };
 
-/**
- * Returns the app deep-link URL for a product page.
- * e.g. caresure://product/abc-123
- */
+/** Generates product page deep-link URL (format: caresure://product/productId) */
 export const productAppUrl = (productId: string) =>
   `${APP_SCHEME}://product/${productId}`;

@@ -18,9 +18,6 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withRepeat,
-  withSequence,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
@@ -58,9 +55,9 @@ export const SplashAnimationScreen: React.FC<Props> = ({
   const screenOpacity = useSharedValue(1);
   const markOpacity = useSharedValue(0);
   const markScale = useSharedValue(0.86);
-  const copyOpacity = useSharedValue(0);
-  const copyOffset = useSharedValue(8);
-  const loaderOffset = useSharedValue(-56);
+  const copyOpacity = useSharedValue(1);
+  const copyOffset = useSharedValue(0);
+  const loaderOffset = useSharedValue(0);
 
   useEffect(() => {
     let active = true;
@@ -101,9 +98,6 @@ export const SplashAnimationScreen: React.FC<Props> = ({
     if (reduceMotion) {
       markOpacity.value = 1;
       markScale.value = 1;
-      copyOpacity.value = 1;
-      copyOffset.value = 0;
-      loaderOffset.value = 0;
       return;
     }
 
@@ -116,26 +110,7 @@ export const SplashAnimationScreen: React.FC<Props> = ({
       stiffness: 150,
       mass: 0.8,
     });
-    copyOpacity.value = withDelay(
-      180,
-      withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) }),
-    );
-    copyOffset.value = withDelay(
-      180,
-      withTiming(0, { duration: 420, easing: Easing.out(Easing.cubic) }),
-    );
-    loaderOffset.value = withRepeat(
-      withSequence(
-        withTiming(56, { duration: 850, easing: Easing.inOut(Easing.ease) }),
-        withTiming(-56, { duration: 0 }),
-      ),
-      -1,
-      false,
-    );
   }, [
-    copyOffset,
-    copyOpacity,
-    loaderOffset,
     markOpacity,
     markScale,
     reduceMotion,
@@ -179,14 +154,8 @@ export const SplashAnimationScreen: React.FC<Props> = ({
       cancelAnimation(screenOpacity);
       cancelAnimation(markOpacity);
       cancelAnimation(markScale);
-      cancelAnimation(copyOpacity);
-      cancelAnimation(copyOffset);
-      cancelAnimation(loaderOffset);
     },
     [
-      copyOffset,
-      copyOpacity,
-      loaderOffset,
       markOpacity,
       markScale,
       screenOpacity,

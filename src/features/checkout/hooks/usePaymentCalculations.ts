@@ -2,7 +2,7 @@ import { asError } from "@/src/api/errors";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
-import { orderNotification } from "@/src/services/notifications/orderNotification";
+import { orderNotification } from "@/src/services/notifications";
 import {
   analyticsService,
   PERF_TRACES,
@@ -257,7 +257,7 @@ export function usePaymentCalculations() {
             imageUrl: orderItems[0]?.medicineSnapshot?.image,
             itemCount: orderItems.length,
           })
-          .catch((e) => {
+          .catch((e: any) => {
             if (__DEV__) logger.debug("[OrderNotification] failed:", e);
           });
       }

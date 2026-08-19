@@ -3,7 +3,7 @@ import { usePaymentCalculations } from "@/src/features/checkout/hooks/usePayment
 import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
-import { orderNotification } from "@/src/services/notifications/orderNotification";
+import { orderNotification } from "@/src/services/notifications";
 import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { buildCartSnapshot } from "@/src/utils/cartSnapshot";

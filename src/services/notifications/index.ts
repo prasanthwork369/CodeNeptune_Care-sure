@@ -4,8 +4,8 @@
  * imports in index.js, before anything else loads.
  */
 export { NotificationNavigation } from "./NotificationNavigation";
-export { orderNotification } from "./orderNotification";
-export type { OrderPlacedInput } from "./orderNotification";
+export { orderNotification } from "../../features/orders/notifications/orderTimelineNotification";
+export type { OrderPlacedInput } from "../../features/orders/notifications/orderTimelineNotification";
 export { messagingService as notificationService } from "@/src/services/firebase";
 export { notifeeService } from "./notifeeService";
 export {

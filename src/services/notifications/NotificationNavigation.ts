@@ -1,12 +1,14 @@
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 import { Linking, Platform } from "react-native";
 import {
+  NotificationData,
   NotificationPayload,
   NotificationType,
 } from "../../types/notification";
 import { useAuthStore } from "../../store/authStore";
 import { useNotificationNavigationStore } from "../../store/notificationNavigationStore";
 import { logger } from "@/src/utils/logger";
+import { getCanonicalType, getNotificationHandler } from "./registry";
 
 const ANDROID_PACKAGE = "com.codeneptune.caresure";
 
@@ -95,27 +97,21 @@ export const NotificationNavigation = {
         JSON.stringify(data, null, 2),
       );
 
+    // Look up in the Registry first using normalized canonical type
+    const canonicalType = getCanonicalType(data as NotificationData) || type;
+    const handler = getNotificationHandler(canonicalType);
+    if (handler && handler.getTapDestination) {
+      const destination = handler.getTapDestination(data as NotificationData);
+      if (destination) {
+        router.push({
+          pathname: destination.pathname,
+          params: destination.params,
+        } as unknown as Href);
+        return;
+      }
+    }
+
     switch (type) {
-      // --- Order Detail/Tracking ---
-      case NotificationType.ORDER_PLACED:
-      case NotificationType.ORDER_CONFIRMED:
-      case NotificationType.ORDER_PACKED:
-      case NotificationType.ORDER_DELIVERED:
-      case NotificationType.ORDER_CANCELLED:
-      case NotificationType.ORDER_SHIPPED:
-      case NotificationType.OUT_FOR_DELIVERY:
-      case NotificationType.RETURN_REQUESTED:
-      case NotificationType.REFUND_INITIATED:
-      case NotificationType.REFUND_COMPLETED:
-        if (data.orderId) {
-          router.push({
-            pathname: "/profile/orders/track",
-            params: { orderId: data.orderId },
-          });
-        } else {
-          router.push("/profile/orders");
-        }
-        break;
 
       // --- Prescription Detail ---
       case NotificationType.PRESCRIPTION_UPLOADED:

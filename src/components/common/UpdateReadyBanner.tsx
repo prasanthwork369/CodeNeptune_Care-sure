@@ -9,11 +9,7 @@ interface UpdateReadyBannerProps {
   onRestart: () => void;
 }
 
-/**
- * Shown when a flexible update has finished downloading in the background.
- * Deliberately a banner, not a modal: the download was optional, so it must not
- * interrupt whatever the user is doing.
- */
+/** Banner shown when a background update is downloaded and ready to install */
 export const UpdateReadyBanner: React.FC<UpdateReadyBannerProps> = ({
   visible,
   onRestart,

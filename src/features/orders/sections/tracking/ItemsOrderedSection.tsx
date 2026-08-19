@@ -99,27 +99,6 @@ export function ItemsOrderedSection({
               )}
             </View>
           )}
-          {hasActiveReturnRequest && !actionsDisabled && (
-            <View
-              className="flex-row items-center"
-              style={{
-                borderWidth: exactScale(1.33),
-                borderColor: "#FDE047",
-                backgroundColor: "#FEF9C3",
-                borderRadius: exactScale(20),
-                paddingHorizontal: exactScale(12),
-                paddingVertical: exactScale(4),
-              }}
-            >
-              <icons.check_circle width={exactScale(14)} height={exactScale(14)} />
-              <Text
-                style={[s.labelSm, { marginLeft: exactScale(6) }]}
-                className="font-inter-semibold text-brand-text"
-              >
-                Return Request Already Exists
-              </Text>
-            </View>
-          )}
           {isCancellable && !actionsDisabled && (
             <Touchable
               className="flex-row items-center"

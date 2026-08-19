@@ -18,7 +18,7 @@ export const RETURN_STATUS_LABELS: Record<
   { label: string; bg: string; text: string; border: string }
 > = {
   [RETURN_STATUS.REQUESTED]: {
-    label: "Return Requested",
+    label: "Return already requested",
     bg: "#FFFBE8",
     text: "#92600A",
     border: "#FFE998",

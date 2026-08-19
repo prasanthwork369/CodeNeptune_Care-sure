@@ -20,7 +20,7 @@ const NetworkToast = () => {
   const adjustedBottom = useAdjustedBottomInset();
 
   const [isLoading, setIsLoading] = useState(false);
-  const translateY = useRef(new Animated.Value(300)).current;
+  const [translateY] = useState(() => new Animated.Value(300));
   const [signalStep, setSignalStep] = useState(1);
 
   const showToast = isConnected === false || isInternetReachable === false;

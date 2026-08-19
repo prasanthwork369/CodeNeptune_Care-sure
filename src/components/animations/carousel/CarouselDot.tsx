@@ -17,16 +17,16 @@ export const CarouselDot: React.FC<CarouselDotProps> = React.memo(
     const style = useAnimatedStyle(() => {
       const norm = ((progress.value % total) + total) % total;
 
-      // Looping wrap-around distance math
+      // Wrap-around looping distance math
       let dist = Math.abs(norm - index);
       if (dist > total / 2) {
         dist = total - dist;
       }
 
-      // Interpolate width: 16 when active (dist === 0), 6 when inactive (dist >= 1)
+      // Active width (16px) vs inactive width (6px)
       const widthVal = interpolate(dist, [0, 1], [16, 6], "clamp");
 
-      // Interpolate color: '#008097' (active) to '#D1D5DB' (inactive)
+      // Active color vs inactive color
       const colorVal = interpolateColor(dist, [0, 1], ["#008097", "#D1D5DB"]);
 
       return {

@@ -8,9 +8,7 @@ import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { asError, toAppError } from "./errors";
 
-// Safe, idempotent writes only — never orders/payments/prescriptions/auth/
-// address/patient/coupon/cart mutations. See docs/offline-handling-audit.md.
-// Queued instead of rejected when offline, replayed automatically on reconnect.
+// Checks if a request is safe to queue offline (e.g. read notifications, search history)
 const isQueueableRequest = (config: AxiosRequestConfig): boolean => {
   const method = (config.method ?? "").toLowerCase();
   const url = config.url ?? "";
@@ -33,8 +31,7 @@ const isQueueableRequest = (config: AxiosRequestConfig): boolean => {
   return false;
 };
 
-// In-memory token — mirrors window.__ACCESS_TOKEN__ from web client
-// Synchronous access avoids async race conditions in the request interceptor
+// In-memory access token to avoid async storage lookup on every request
 let _accessToken: string | null = null;
 
 export function setAccessToken(token: string | null) {
@@ -56,9 +53,7 @@ let failedQueue: {
   reject: (e: unknown) => void;
 }[] = [];
 
-// After a non-auth refresh failure (5xx/network), back off for a short
-// window instead of re-attempting refresh on every subsequent 401 — avoids
-// hammering a struggling refresh endpoint with a burst of retries.
+// Backoff cooldown if token refresh fails due to network/server errors
 const REFRESH_COOLDOWN_MS = 5000;
 let refreshCooldownUntil = 0;
 
@@ -77,7 +72,7 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Synchronous request interceptor — reads from in-memory token (no async)
+// Request interceptor: attaches auth header and checks offline status
 apiClient.interceptors.request.use((config) => {
   // if (__DEV__) {
   //   if (config.data !== undefined) {
@@ -86,15 +81,9 @@ apiClient.interceptors.request.use((config) => {
   //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
   //   }
   // }
-  // Reject fast so nothing hangs, and report through the feedback layer as a
-  // backstop — a call site that forgets requireInternet still can't fail
-  // silently. Repeats collapse, so this never doubles a screen's own message.
   if (isOffline()) {
     if (isQueueableRequest(config)) {
-      // A handful of safe, idempotent writes are queued instead of rejected —
-      // the response interceptor below hands this off to requestQueue and
-      // replays it on reconnect. No banner: this is a quiet success path, not
-      // a blocked action.
+      // Queue safe offline requests, reject others immediately
       return Promise.reject(
         Object.assign(new Error("Network offline — queued for replay"), {
           code: "NETWORK_OFFLINE_QUEUEABLE",
@@ -119,16 +108,14 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
-    // Hand safe, queueable writes to requestQueue instead of failing them —
-    // this resolves/rejects once the request actually replays on reconnect,
-    // exactly like the 401-retry branch below returns a deferred apiClient(...).
+    // Queue safe offline request when connection drops
     if (err.code === "NETWORK_OFFLINE_QUEUEABLE" && err.config) {
       return new Promise<AxiosResponse>((resolve, reject) => {
         requestQueue.add(err.config, resolve, reject);
       });
     }
 
-    // A request that left before the drop was noticed still reads as offline.
+    // Reject immediately if connection lost during transaction
     const isNetworkError =
       !err.response &&
       err.code !== "ECONNABORTED" &&
@@ -200,8 +187,7 @@ apiClient.interceptors.response.use(
       } catch (e) {
         if (__DEV__) console.error("[apiClient] Background refresh FAILED:", e);
         processQueue(e, null);
-        // Only force logout if the refresh itself returned 401/403 (invalid/expired refresh token)
-        // A 5xx server error should not log the user out
+        // Logout only on 401/403 (expired session); keep logged in on 5xx server errors
         const refreshStatus = asError(e).response?.status;
         if (refreshStatus === 401 || refreshStatus === 403) {
           _accessToken = null;

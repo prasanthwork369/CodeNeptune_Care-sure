@@ -1,23 +1,17 @@
 import { AxiosError } from "axios";
-// messages.ts imports only the AppErrorKind *type* back, so this stays a
-// type-only cycle and never becomes a runtime one.
+// Type-only import to avoid circular dependency
 import { OFFLINE_MESSAGE } from "@/src/utils/offline/messages";
 
 export type AppErrorKind =
-  // Device has no usable connection — the request never left.
   | "offline"
-  // The request left but the connection failed (DNS, reset, unreachable host).
   | "network"
   | "timeout"
-  // Aborted by us (debounce, unmount, replaced request) — never user-facing.
   | "cancelled"
   | "unauthorized"
   | "forbidden"
   | "not_found"
   | "validation"
-  // Server asked us to slow down. Retrying only makes it worse.
   | "rate_limited"
-  // The request conflicts with current server state (duplicate, stale version).
   | "conflict"
   | "server"
   | "unknown";
@@ -26,7 +20,7 @@ export class AppError extends Error {
   kind: AppErrorKind;
   status?: number;
   data?: unknown;
-  /** Seconds the server asked us to wait; only ever set for `rate_limited`. */
+  /** Wait duration in seconds; only set on rate_limited errors. */
   retryAfterSeconds?: number;
 
   constructor(
@@ -45,11 +39,7 @@ export class AppError extends Error {
   }
 }
 
-/**
- * Parses a `Retry-After` header. Accepts both documented forms — delay in
- * seconds, or an HTTP date — and returns undefined for anything unparseable,
- * so a malformed header can never throw or produce a nonsense wait.
- */
+/** Parses 'Retry-After' header (delays in seconds or HTTP date strings) */
 export function parseRetryAfter(
   raw: unknown,
   now: number = Date.now(),
@@ -71,7 +61,7 @@ export function parseRetryAfter(
   return Math.max(0, Math.round((at - now) / 1000));
 }
 
-/** The fields catch blocks actually read off a thrown value. */
+/** Fields read from caught error objects */
 export type CaughtError = {
   message?: string;
   name?: string;
@@ -85,7 +75,7 @@ export type CaughtError = {
   };
 };
 
-/** Views an `unknown` catch variable through CaughtError — every field stays optional. */
+/** Cast helper for caught error variables */
 export const asError = (err: unknown): CaughtError =>
   (err ?? {}) as CaughtError;
 
@@ -118,7 +108,7 @@ export function toAppError(err: unknown): AppError {
     return new AppError("offline", OFFLINE_MESSAGE);
   }
 
-  // Axios aborts (ERR_CANCELED) and manual AbortController signals both land here.
+  // Aborted requests (cancelled manually or on component unmount)
   if (
     code === "ERR_CANCELED" ||
     (err as { name?: string } | null)?.name === "CanceledError"
@@ -133,7 +123,7 @@ export function toAppError(err: unknown): AppError {
         "Request timed out. Please try again.",
       );
     }
-    // No response covers DNS failure, connection reset and unreachable host.
+    // Network connectivity failure (DNS reset, unreachable host)
     if (!err.response) {
       return new AppError(
         "network",

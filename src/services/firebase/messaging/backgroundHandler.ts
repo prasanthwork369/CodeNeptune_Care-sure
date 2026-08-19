@@ -30,19 +30,10 @@ if (!isExpoGo) {
       if (__DEV__)
         logger.debug("[BackgroundMessage]", JSON.stringify(remoteMessage));
       if (!remoteMessage?.notification) {
-        // Marketing product offers get the custom RemoteViews layout; anything
-        // else (or a native failure) falls through to the branded notification.
         const {
-          showProductOffer,
-        } = require("../../notifications/productOfferNotification");
-        const shown = await showProductOffer(remoteMessage?.data).catch(
-          () => false,
-        );
-        if (shown) return;
-        const {
-          notifeeService,
-        } = require("../../notifications/notifeeService");
-        await notifeeService.displayBranded(remoteMessage).catch(() => {});
+          notificationService,
+        } = require("../../notifications/notificationService");
+        await notificationService.handleIncomingMessage(remoteMessage).catch(() => {});
       }
     },
   );

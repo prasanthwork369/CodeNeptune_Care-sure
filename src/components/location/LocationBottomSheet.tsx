@@ -216,29 +216,25 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
 
     const handleUseCurrentLocation = async () => {
       if (isLocating) return;
-      // GPS itself works offline but resolveCoords does not, so gate before the
-      // spinner — otherwise it fetches coords for seconds only to fail at the end.
+      // Internet connection required to resolve coordinates to address
       if (!requireInternet()) return;
       setIsLocating(true);
       try {
-        // This is a user-initiated action so allow the OS dialog to appear.
+        // Request user permission for location access
         const { granted, canAskAgain } =
           await locationService.requestPermission({
             interactive: true,
           });
         if (!granted) {
           if (!canAskAgain) {
-            // Permission is permanently denied at the app level (this is the
-            // app's location permission, NOT device GPS). Explain that before
-            // sending the user to Settings so it doesn't feel like a random
-            // redirect when GPS itself is already on.
+            // Handle permanently denied permission (guide user to Settings)
             Alert.alert(
               "Location permission is off",
               "Location access for CareSure is turned off. Open Settings to allow it and auto-detect your address.",
               [
                 { text: "Cancel", style: "cancel" },
                 {
-                  // App permission issue → app's permission page, not GPS toggle.
+                  // Direct link to App Settings
                   text: "Open Settings",
                   onPress: () => openAppSettings(),
                 },
@@ -255,8 +251,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
         }
         const { coords, error } = await locationService.getCurrentCoords();
         if (!coords) {
-          // If the underlying failure indicates services are disabled,
-          // show the Enable GPS alert. Otherwise show a generic failure.
+          // Show GPS configuration alert if disabled, else show generic error
           if (error?.code === "SERVICES_DISABLED") {
             Alert.alert(
               "Location services are off",
@@ -276,8 +271,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           return;
         }
 
-        // The backend turns raw coordinates into a pincode and tells us whether
-        // we deliver there, so the address form never opens on a dead pincode.
+        // Resolve location coordinates to pincode via backend API
         const resolved = await locationApi.resolveCoords(
           coords.latitude,
           coords.longitude,

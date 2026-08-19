@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { messagingService as notificationService } from "../../services/firebase";
 import { notifeeService } from "../../services/notifications/notifeeService";
-import { showProductOffer } from "../../services/notifications/productOfferNotification";
+import { notificationService as pushDisplayService } from "../../services/notifications/notificationService";
 // Registers the __DEV__-only global testProductOffer() console trigger.
 import "../../services/notifications/devProductOfferTest";
 import { NotificationNavigation } from "../../services/notifications/NotificationNavigation";
@@ -144,18 +144,9 @@ export const usePushNotifications = () => {
             "[PushNotificationHook] Foreground FCM message:",
             JSON.stringify(remoteMessage, null, 2),
           );
-        // Marketing product offers use the custom RemoteViews layout; a
-        // native failure falls through to the branded path so nothing is
-        // dropped.
         const data = (remoteMessage?.data ?? {}) as NotificationData;
-        const shownAsOffer = await showProductOffer(data).catch(() => false);
-        // Present via notifee so the CareSure colour large icon shows.
-        // notifee notifications don't fire expo's
-        // addNotificationReceivedListener, so we save to the store here
-        // directly (single path, no duplicate).
-        if (!shownAsOffer) {
-          await notifeeService.displayBranded(remoteMessage).catch(() => {});
-        }
+        // Let pushDisplayService process custom and standard display rules
+        await pushDisplayService.handleIncomingMessage(remoteMessage).catch(() => {});
         addNotification({
           title:
             remoteMessage?.notification?.title ?? data.title ?? "Notification",

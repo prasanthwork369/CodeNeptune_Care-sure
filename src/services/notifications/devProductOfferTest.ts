@@ -1,7 +1,8 @@
 import { Image } from "react-native";
 import { HOME_IMAGES } from "../../constants/images";
-import { showProductOffer } from "./productOfferNotification";
+import { ProductOfferNotification } from "../../features/product/notifications/productOfferNotification";
 import { logger } from "@/src/utils/logger";
+import { NotificationData } from "../../types/notification";
 
 /**
  * DEV-ONLY test trigger for the custom product-offer notification — no FCM
@@ -33,7 +34,7 @@ if (__DEV__) {
   (globalThis as Record<string, unknown>).testProductOffer = (
     overrides: Record<string, string> = {},
   ) =>
-    showProductOffer({ ...basePayload, ...overrides }).then((shown) =>
+    ProductOfferNotification.display({ ...basePayload, ...overrides } as unknown as NotificationData).then((shown: boolean) =>
       logger.debug(`[DevProductOffer] shown natively: ${shown}`),
     );
 }

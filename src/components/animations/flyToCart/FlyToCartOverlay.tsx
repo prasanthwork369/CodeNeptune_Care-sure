@@ -15,8 +15,7 @@ import { useFlyToCart, ActiveAnimation } from "./FlyToCartContext";
 
 const IMAGE_SIZE = 64;
 
-// Must beat the cart banners' own zIndex (50, and 100 in the Home carousel),
-// or the flying image passes behind them instead of landing on top.
+// High zIndex to render above all other UI components during animation
 const OVERLAY_Z_INDEX = 200;
 
 interface FloatingItemProps {
@@ -49,18 +48,17 @@ const FloatingItem: React.FC<FloatingItemProps> = ({
   const animatedStyle = useAnimatedStyle(() => {
     const t = progress.value;
 
-    // Read live: on the first add the banner isn't mounted yet, so it reports
-    // its real position a frame or two after launch and the path re-aims.
+    // Live target coordinates
     const { x: endX, y: endY } = destination.value;
 
-    // Straight line: top to bottom
+    // Linear path calculation
     const x = startX + t * (endX - startX);
     const y = startY + t * (endY - startY);
 
-    // Shrinks as it travels down to the banner
+    // Shrinks size along travel path
     const scale = interpolate(t, [0, 0.8, 1.0], [1.0, 0.6, 0.3]);
 
-    // Appears instantly, fades at landing
+    // Fade in at start, fade out on landing
     const opacity = interpolate(t, [0, 0.04, 0.85, 1.0], [0, 1.0, 1.0, 0.0]);
 
     return {
@@ -78,8 +76,7 @@ const FloatingItem: React.FC<FloatingItemProps> = ({
     };
   });
 
-  // Normalised to a plain {uri} because this is RN's Image, not expo-image's.
-  // Undefined when absent — flyToCart never fires without an image anyway.
+  // Normalize image source URI
   const uri =
     typeof item.imageUrl === "string" ? item.imageUrl : item.imageUrl?.uri;
   const imageSource = uri ? { uri } : undefined;
