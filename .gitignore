@@ -51,6 +51,10 @@ app-example
 /ios
 /android
 
+# Gradle build output for local Expo module packages
+modules/*/android/build/
+modules/*/android/.cxx/
+
 # Firebase service account (SECRET - never commit)
 service-account.json
 
