@@ -15,6 +15,7 @@ import type { CategoryCard } from "@/src/features/home/types";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import { moderateScale } from "@/src/utils/exactScale";
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { usePrefetchCategoryProducts } from "@/src/features/categories/hooks/useCategories";
 
 interface CategoriesGridProps {
   cards: CategoryCard[];
@@ -34,6 +35,7 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   isLoading,
 }) => {
   const router = useNav();
+  const prefetchCategory = usePrefetchCategoryProducts();
   // cardImage's left/width/height in categories.styles.ts were authored
   // against the fixed CARD_WIDTH design value — since cardWidth is now
   // computed dynamically to fill the grid, scale those proportionally too
@@ -110,6 +112,12 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                           familySlug: card.familySlug,
                           name: card.label.replace("\n", " "),
                         },
+                      })
+                    }
+                    onPressIn={() =>
+                      prefetchCategory({
+                        categorySlug: card.familySlug || card.slug,
+                        subCategorySlug: card.familySlug ? card.slug : undefined,
                       })
                     }
                     style={{

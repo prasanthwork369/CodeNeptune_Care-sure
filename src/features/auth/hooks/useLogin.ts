@@ -46,8 +46,15 @@ export function useLogin() {
     if (phoneNumber.length === 10 && text.startsWith(phoneNumber)) return;
     // A fresh attempt — drop any submit-time error so it doesn't linger while editing.
     if (error) resetError();
-    if (phoneError) setPhoneError("");
-    setPhoneNumber(sanitize.phone(text));
+    const cleaned = sanitize.phone(text);
+    setPhoneNumber(cleaned);
+
+    if (cleaned.length === 10) {
+      const res = validate.phone(cleaned);
+      setPhoneError(res.valid ? "" : res.message);
+    } else if (phoneError) {
+      setPhoneError("");
+    }
   };
 
   /** Shows the SIM picker on the first tap; the shield keeps the keyboard shut. */

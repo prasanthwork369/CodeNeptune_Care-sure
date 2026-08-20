@@ -91,13 +91,23 @@ describe("useLogin phone input", () => {
 
     act(() => result.current.handleChangeText("9876543210"));
     expect(result.current.isValid).toBe(true);
+    expect(result.current.phoneError).toBe("");
 
     act(() => result.current.handleChangeText("987654321"));
 
     expect(result.current.phoneNumber).toBe("987654321");
     expect(result.current.isValid).toBe(false);
+    expect(result.current.phoneError).toBe("");
+  });
+
+  it("shows error immediately when an invalid 10-digit number is entered", () => {
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("1234567890"));
+    expect(result.current.phoneNumber).toBe("1234567890");
+    expect(result.current.isValid).toBe(false);
     expect(result.current.phoneError).toBe(
-      "Please enter a valid 10-digit mobile number",
+      "Mobile number must start with 6, 7, 8, or 9",
     );
   });
 

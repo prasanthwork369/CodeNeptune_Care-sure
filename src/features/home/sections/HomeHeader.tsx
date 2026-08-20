@@ -2,13 +2,13 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
+import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
+import type { DeliveryLocation } from "@/src/features/home/types";
 import { useNotifications } from "@/src/features/notifications/hooks/useNotifications";
 import { useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
-import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
-import type { DeliveryLocation } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import React, { useEffect } from "react";
@@ -59,7 +59,7 @@ const DeliveryLocationHint: React.FC = () => {
         position: "absolute",
         top: "100%",
         left: 0,
-        marginTop: exactScale(1),
+        marginTop: exactScale(-10),
         zIndex: 20,
       }}
     >
@@ -125,7 +125,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
       <View
         className="flex-row justify-between items-center px-5 pb-2"
         // Keep controls below the status bar/notch with only a compact visual gap.
-        style={{ paddingTop: insets.top + exactScale(2) }}
+        style={{ paddingTop: insets.top }}
       >
         {/* Left: Delivery Location */}
         <View style={{ flex: 1, minWidth: 0, position: "relative" }}>
@@ -140,7 +140,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
             onPress={onPressLocation}
             accessibilityRole="button"
             accessibilityLabel={`Change delivery location, current ${location.shortCity || location.city}`}
-            className="flex-row items-center mt-1.5"
+            className="flex-row items-center mt-1"
             style={{ minWidth: 0 }}
           >
             {/* City only — serviceability is already enforced when picking a location. */}

@@ -1,5 +1,16 @@
+import React from "react";
 import { act, renderHook } from "@testing-library/react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
 
 const mockRequireInternet = jest.fn(() => true);
 const mockAddItem = jest.fn();
@@ -30,12 +41,24 @@ jest.mock("@/src/features/cart/hooks/useCartRead", () => ({
 jest.mock("@/src/store/cartStore", () => ({
   useCartPendingStore: Object.assign(
     (sel: (s: Record<string, unknown>) => unknown) =>
-      sel({ pendingIds: {}, setPending: jest.fn() }),
-    { getState: () => ({ pendingIds: {}, setPending: jest.fn() }) },
+      sel({
+        pendingIds: {},
+        setPending: jest.fn(),
+        guestCart: { items: [] },
+      }),
+    {
+      getState: () => ({
+        pendingIds: {},
+        setPending: jest.fn(),
+        guestCart: { items: [] },
+      }),
+    },
   ),
 }));
 
-jest.mock("@/src/utils/cartError", () => ({ notifyCartError: jest.fn() }));
+jest.mock("@/src/features/cart/utils/cartError", () => ({
+  notifyCartError: jest.fn(),
+}));
 jest.mock("@/src/services/firebase", () => ({
   analyticsService: { logAddToCart: jest.fn() },
 }));
@@ -58,7 +81,7 @@ describe("useCartActions.increment result contract", () => {
   });
 
   it("resolves true when the item reaches the cart", async () => {
-    const { result } = renderHook(() => useCartActions(product as never));
+    const { result } = renderHook(() => useCartActions(product as never), { wrapper: createWrapper() });
 
     let added: boolean | undefined;
     await act(async () => {
@@ -73,7 +96,7 @@ describe("useCartActions.increment result contract", () => {
   // know, so the fly-to-cart animation ran and the badge counted up anyway.
   it("resolves false offline and never calls the API", async () => {
     mockRequireInternet.mockReturnValue(false);
-    const { result } = renderHook(() => useCartActions(product as never));
+    const { result } = renderHook(() => useCartActions(product as never), { wrapper: createWrapper() });
 
     let added: boolean | undefined;
     await act(async () => {
@@ -89,7 +112,7 @@ describe("useCartActions.increment result contract", () => {
   it("still succeeds offline for a guest", async () => {
     mockIsAuthenticated = false;
     mockRequireInternet.mockReturnValue(false);
-    const { result } = renderHook(() => useCartActions(product as never));
+    const { result } = renderHook(() => useCartActions(product as never), { wrapper: createWrapper() });
 
     let added: boolean | undefined;
     await act(async () => {
@@ -102,7 +125,7 @@ describe("useCartActions.increment result contract", () => {
 
   it("resolves false when the write fails", async () => {
     mockAddItem.mockRejectedValue(new Error("500"));
-    const { result } = renderHook(() => useCartActions(product as never));
+    const { result } = renderHook(() => useCartActions(product as never), { wrapper: createWrapper() });
 
     let added: boolean | undefined;
     await act(async () => {
@@ -113,8 +136,9 @@ describe("useCartActions.increment result contract", () => {
   });
 
   it("resolves false for an unusable product", async () => {
-    const { result } = renderHook(() =>
-      useCartActions({ ...product, medicineId: "", price: 0 } as never),
+    const { result } = renderHook(
+      () => useCartActions({ ...product, medicineId: "", price: 0 } as never),
+      { wrapper: createWrapper() },
     );
 
     let added: boolean | undefined;
@@ -124,5 +148,12 @@ describe("useCartActions.increment result contract", () => {
 
     expect(added).toBe(false);
     expect(mockAddItem).not.toHaveBeenCalled();
+  });
+
+  it("keeps opacity permanently visible (opacity value 1)", () => {
+    const { result } = renderHook(() => useCartActions(product as never), { wrapper: createWrapper() });
+    expect(result.current.animations.opacityAnim).toBeDefined();
+    // @ts-expect-error testing internal value
+    expect(result.current.animations.opacityAnim._value).toBe(1);
   });
 });

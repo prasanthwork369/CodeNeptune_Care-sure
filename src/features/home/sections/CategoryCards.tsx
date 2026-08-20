@@ -9,6 +9,8 @@ import { Skeleton } from "@/src/components/ui/Skeleton";
 import { exactScale } from "@/src/utils/exactScale";
 import { useResponsiveTier } from "@/src/hooks/ui/useResponsiveTier";
 
+import { usePrefetchCategoryProducts } from "@/src/features/categories/hooks/useCategories";
+
 interface CategoryCardsProps {
   cards: CategoryCard[];
   // Passes the whole card so the handler does not have to look it up again.
@@ -21,6 +23,7 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({
   onCardPress,
   isLoading,
 }) => {
+  const prefetchCategory = usePrefetchCategoryProducts();
   const { width, pick } = useResponsiveTier();
   const numColumns = pick(2, 3, 4);
   const scaledGap = exactScale(8);
@@ -54,6 +57,12 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({
           key={card.id}
           activeOpacity={0.5}
           onPress={() => onCardPress?.(card)}
+          onPressIn={() =>
+            prefetchCategory({
+              categorySlug: card.familySlug || card.slug,
+              subCategorySlug: card.familySlug ? card.slug : undefined,
+            })
+          }
           accessibilityRole="button"
           accessibilityLabel={card.label}
           style={{

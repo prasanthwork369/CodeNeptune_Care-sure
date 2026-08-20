@@ -7,6 +7,7 @@ import { Text, View } from "react-native";
 interface ViewAllCardProps {
   width: number;
   onPress: () => void;
+  onPressIn?: () => void;
   /** Measured row height, so the card stands level with the product cards. */
   height?: number;
   /** Section theme colour — matches the product cards beside it. */
@@ -22,12 +23,14 @@ const DEFAULT_ACCENT = "#0F7635";
 export const ViewAllCard: React.FC<ViewAllCardProps> = ({
   width,
   onPress,
+  onPressIn,
   height,
   accentColor = DEFAULT_ACCENT,
   totalCount,
 }) => (
   <Touchable
     onPress={onPress}
+    onPressIn={onPressIn}
     activeOpacity={0.85}
     accessibilityRole="button"
     className="bg-white rounded-[12px] items-center justify-center"

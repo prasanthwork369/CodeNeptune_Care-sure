@@ -86,9 +86,11 @@ export const styles = StyleSheet.create({
     width: exactScale(10),
     height: exactScale(10),
     backgroundColor: "#1A1C1E",
+    borderRadius: 0,
     transform: [{ rotate: "45deg" }],
     marginLeft: exactScale(14),
-    marginBottom: -exactScale(5),
+    marginBottom: -exactScale(7),
+    zIndex: 1,
   },
   locationHintBubble: {
     backgroundColor: "#1A1C1E",
@@ -101,6 +103,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 10,
     elevation: 6,
+    zIndex: 2,
   },
   locationHintText: {
     fontSize: moderateScale(12),

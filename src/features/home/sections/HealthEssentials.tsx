@@ -6,6 +6,7 @@ import type {
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
+import { usePrefetchCategoryProducts } from "@/src/features/categories/hooks/useCategories";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { LinearGradient } from "expo-linear-gradient";
@@ -347,6 +348,7 @@ interface HealthEssentialsSectionProps {
 // row (see HomeLayout) instead of mounting every row at once.
 export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
   React.memo(({ subcategory, themeIndex, onProductPress, onViewAll }) => {
+    const prefetchCategory = usePrefetchCategoryProducts();
     const { width } = useWindowDimensions();
     const meta: ApiFeaturedSubcategoryMetadata | null =
       subcategory.featuredMetadata;
@@ -482,6 +484,9 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
                     // Same accent the row's product cards use.
                     accentColor={lineColor}
                     onPress={() => onViewAll(subcategory)}
+                    onPressIn={() =>
+                      prefetchCategory({ categorySlug: subcategory.slug })
+                    }
                   />
                 </View>
               )}

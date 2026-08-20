@@ -1,7 +1,7 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { categoryApi } from "@/src/features/categories/api/category.api";
 import type {
   ApiCategoryFamily,
@@ -146,3 +146,27 @@ export const useCategoryProducts = (params: {
     refetch,
   };
 };
+
+/**
+ * Warms the CATEGORY_PRODUCTS query cache so that tapping a category card on Home
+ * has the products list already loading/cached when CategoryProductsLayout opens.
+ */
+export const usePrefetchCategoryProducts = () => {
+  const queryClient = useQueryClient();
+  return useCallback(
+    (params: { categorySlug: string; subCategorySlug?: string }) => {
+      if (!params.categorySlug) return;
+      const key = params.subCategorySlug || params.categorySlug;
+      void queryClient
+        .prefetchQuery({
+          queryKey: QUERY_KEYS.CATALOG.CATEGORY_PRODUCTS(key),
+          queryFn: () =>
+            categoryApi.getCategoryProducts({ page: 1, limit: 40, ...params }),
+          staleTime: 60_000,
+        })
+        .catch(() => {});
+    },
+    [queryClient],
+  );
+};
+

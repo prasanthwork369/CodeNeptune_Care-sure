@@ -78,7 +78,7 @@ export const useCartActions = (product: CartActionProduct) => {
   const guestCartItem = useCartPendingStore((s) =>
     isAuthenticated
       ? undefined
-      : s.guestCart.items.find((i) => matchesCartItem(i, product)),
+      : s.guestCart?.items?.find((i) => matchesCartItem(i, product)),
   );
 
   const cartItem = isAuthenticated ? authCartItem : guestCartItem;
@@ -99,34 +99,13 @@ export const useCartActions = (product: CartActionProduct) => {
   // the latter still constructs (and discards) a new Animated.Value on every
   // render since useRef's argument is evaluated unconditionally; useState's
   // initializer function is guaranteed to run exactly once.
+  // Stable animation values (kept permanently visible & centered at 0)
   const [slideAnim] = useState(() => new Animated.Value(0));
   const [opacityAnim] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
-    if (count !== prevCountRef.current) {
-      if (prevIsPendingRef.current) {
-        slideAnim.setValue(0);
-        opacityAnim.setValue(1);
-      } else {
-        const isIncrement = count > prevCountRef.current;
-        slideAnim.setValue(isIncrement ? 15 : -15);
-        opacityAnim.setValue(0);
-        Animated.parallel([
-          Animated.timing(slideAnim, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacityAnim, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      }
-    }
     prevCountRef.current = count;
-  }, [count, opacityAnim, slideAnim]);
+  }, [count]);
 
   useEffect(() => {
     prevIsPendingRef.current = isPending;

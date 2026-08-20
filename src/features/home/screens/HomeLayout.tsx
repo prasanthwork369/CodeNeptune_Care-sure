@@ -9,7 +9,7 @@ import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { SearchBar } from "@/src/components/ui/SearchBar";
-import { DELIVERY_LOCATION, QUICK_ACTIONS } from "@/src/constants/data";
+import { DELIVERY_LOCATION, QUICK_ACTIONS } from "../constants/data";
 import { icons } from "@/src/constants/icons";
 import {
   BannerCarousel,
@@ -28,6 +28,7 @@ import {
 import { useHomeData } from "@/src/features/home/hooks/useHomeData";
 import { useHomeOnboarding } from "@/src/features/home/hooks/useHomeOnboarding";
 import { useHomeScroll } from "@/src/features/home/hooks/useHomeScroll";
+import { usePrefetchSearch } from "@/src/features/search/hooks/useSearch";
 import { useScrollToTop } from "@/src/features/home/hooks/useScrollToTop";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
@@ -158,6 +159,8 @@ const HomeContent: React.FC = () => {
   const { start: startScrollJank, stop: stopScrollJank } = useScrollJankTrace(
     PERF_TRACES.HOME_SCROLL,
   );
+
+  const prefetchSearch = usePrefetchSearch();
 
   // Settles the "scrolling" flag back to false shortly after the last scroll
   // event so a single drag→fling doesn't flip it true/false/true/false.
@@ -437,6 +440,7 @@ const HomeContent: React.FC = () => {
                   placeholder="Search medicines & health products"
                   useHomeCycler
                   onPress={goToSearch}
+                  onPressIn={prefetchSearch}
                   rightSlot={searchRightSlot}
                 />
               </Animated.View>
@@ -644,6 +648,7 @@ const HomeContent: React.FC = () => {
       <StickySearchHeader
         visible={stickySearchVisible}
         onPressSearch={goToSearch}
+        onPressInSearch={prefetchSearch}
         onPressUpload={goToUpload}
       />
 

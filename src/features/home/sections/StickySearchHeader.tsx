@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 interface StickySearchHeaderProps {
   visible: SharedValue<number>;
   onPressSearch: () => void;
+  onPressInSearch?: () => void;
   onPressUpload: () => void;
 }
 
@@ -26,7 +27,7 @@ interface StickySearchHeaderProps {
  * stickyHeaderIndices section can't host cleanly.
  */
 export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
-  ({ visible, onPressSearch, onPressUpload }) => {
+  ({ visible, onPressSearch, onPressInSearch, onPressUpload }) => {
     const insets = useSafeAreaInsets();
     const [interactive, setInteractive] = useState(false);
     const [rendered, setRendered] = useState(false);
@@ -118,6 +119,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
 
             <Touchable
               onPress={onPressSearch}
+              onPressIn={onPressInSearch}
               activeOpacity={1}
               style={{
                 flex: 1,

@@ -1,24 +1,24 @@
-import type {
-  ApiPrescription,
-  PrescriptionHistoryItemData,
-} from "@/src/features/prescription/types";
+import { RetryState } from "@/src/components/ui/RetryState";
+import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SearchBar } from "@/src/components/ui/SearchBar";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
-import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { RetryState } from "@/src/components/ui/RetryState";
 import { Touchable } from "@/src/components/ui/Touchable";
 import {
   PRESCRIPTION_STATUS,
   PRESCRIPTION_STATUS_LABELS,
 } from "@/src/features/prescription/constants/prescription-status";
 import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
-import { useLocalSearchParams } from "expo-router";
-import React, { useState, useMemo, useCallback } from "react";
-import { Text, View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
+import type {
+  ApiPrescription,
+  PrescriptionHistoryItemData,
+} from "@/src/features/prescription/types";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
+import { FlashList } from "@shopify/flash-list";
+import { useLocalSearchParams } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
+import { Text, View } from "react-native";
 import { PrescriptionHistoryItem } from "../sections/history";
 
 // Status options for the filter sheet. `null` = show all.

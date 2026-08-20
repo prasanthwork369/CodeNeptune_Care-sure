@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { useSubstituteRequest } from "@/src/features/search/hooks/useSubstituteRequest";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   cartCounterStyles as cc,
@@ -29,6 +30,12 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
 }) => {
   const router = useNav();
   const { requestSubstitute, isPending, isSuccess } = useSubstituteRequest();
+  const prefetchProduct = usePrefetchProduct();
+
+  const handlePrefetch = useCallback(() => {
+    const productId = data.productId ?? data.id;
+    if (productId) prefetchProduct(productId);
+  }, [prefetchProduct, data.productId, data.id]);
 
   const handleCardPress = () => {
     router.push({
@@ -50,6 +57,7 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
     <Touchable
       activeOpacity={0.5}
       onPress={handleCardPress}
+      onPressIn={handlePrefetch}
       style={{ borderWidth: 1, borderColor: "#919EAB33" }}
       className="w-full rounded-[12px] bg-white overflow-hidden mb-5"
     >

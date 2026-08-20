@@ -24,6 +24,7 @@ export const categoryCardStyles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: moderateScale(14),
     fontWeight: "700",
+    textAlign: "center",
   },
   price: { color: "#FFFFFF", fontSize: moderateScale(13), fontWeight: "700" },
   mrp: {

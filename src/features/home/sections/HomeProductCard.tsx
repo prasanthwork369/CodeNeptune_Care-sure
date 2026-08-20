@@ -3,6 +3,7 @@ import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
+import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import type { Product } from "@/src/features/product/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
@@ -36,6 +37,13 @@ export const HomeProductCard: React.FC<Props> = React.memo(
     onPress,
     disableCart = false,
   }) => {
+    const prefetchProduct = usePrefetchProduct();
+
+    const handlePrefetch = useCallback(() => {
+      const targetId = item.productId || item.id;
+      if (targetId) prefetchProduct(targetId);
+    }, [prefetchProduct, item.productId, item.id]);
+
     const handleCardPress = useCallback(() => {
       if (!onPress) return;
       onPress(item.id);
@@ -74,6 +82,7 @@ export const HomeProductCard: React.FC<Props> = React.memo(
         <Touchable
           activeOpacity={0.85}
           onPress={handleCardPress}
+          onPressIn={handlePrefetch}
           style={{ flex: 1 }}
         >
           {/* Image */}

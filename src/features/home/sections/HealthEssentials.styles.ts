@@ -53,7 +53,7 @@ export const styles = StyleSheet.create({
     verticalAlign: "middle",
   },
   counter: { fontSize: moderateScale(20) },
-  counterVal: { fontSize: moderateScale(14) },
+  counterVal: { fontSize: moderateScale(14), textAlign: "center" },
   sectionTitle: {
     fontWeight: "600",
     fontSize: moderateScale(16),

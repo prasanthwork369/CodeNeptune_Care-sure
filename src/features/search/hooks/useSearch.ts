@@ -246,3 +246,32 @@ export const useTrendingSearches = (limit = 6) => {
 
   return { trending: data ?? [], isLoading };
 };
+
+/**
+ * Warms trending searches and search history cache before navigating to /search.
+ */
+export const usePrefetchSearch = () => {
+  const queryClient = useQueryClient();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  return useCallback(() => {
+    void queryClient
+      .prefetchQuery({
+        queryKey: QUERY_KEYS.SEARCH.TRENDING(6),
+        queryFn: () => searchApi.getTrending(6),
+        staleTime: 30 * 60_000,
+      })
+      .catch(() => {});
+
+    if (isAuthenticated) {
+      void queryClient
+        .prefetchQuery({
+          queryKey: QUERY_KEYS.SEARCH.HISTORY({ limit: 10, offset: 0 }),
+          queryFn: () => searchApi.getHistory(10, 0),
+          staleTime: 5 * 60_000,
+        })
+        .catch(() => {});
+    }
+  }, [queryClient, isAuthenticated]);
+};
+

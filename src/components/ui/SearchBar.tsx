@@ -16,6 +16,7 @@ interface SearchBarProps {
   useHomeCycler?: boolean;
   onSearch?: (text: string) => void;
   onPress?: () => void;
+  onPressIn?: () => void;
   rightSlot?: React.ReactNode;
 }
 
@@ -35,6 +36,7 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
     useHomeCycler = false,
     onSearch,
     onPress,
+    onPressIn,
     rightSlot,
   }) => {
     const [isPressed, setIsPressed] = useState(false);
@@ -45,7 +47,10 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
         <Touchable
           testID="home-search-bar"
           onPress={onPress}
-          onPressIn={() => setIsPressed(true)}
+          onPressIn={() => {
+            setIsPressed(true);
+            onPressIn?.();
+          }}
           onPressOut={() => setIsPressed(false)}
           activeOpacity={1}
           accessibilityRole="search"

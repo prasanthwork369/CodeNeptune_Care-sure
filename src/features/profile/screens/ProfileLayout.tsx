@@ -2,7 +2,6 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { components } from "@/src/constants/theme";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useAuthStore } from "@/src/store/authStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
@@ -28,7 +27,6 @@ import { ProfileSkeleton } from "../components/ProfileSkeleton";
 
 export const ProfileLayout: React.FC = () => {
   const insets = useSafeAreaInsets();
-  const adjustedBottom = useAdjustedBottomInset();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { logout, loading: isLoggingOut } = useAuth();
   const {
@@ -153,7 +151,7 @@ export const ProfileLayout: React.FC = () => {
         contentContainerStyle={{
           backgroundColor: "#F5F6FB",
           flexGrow: 1,
-          paddingBottom: tabBarHeight + adjustedBottom + 32,
+          paddingBottom: tabBarHeight + 16,
         }}
         refreshControl={
           <RefreshControl
