@@ -93,6 +93,33 @@ export const useFeaturedMedicines = () => {
   return { products, isLoading, error, refetch };
 };
 
+/** Admin-curated cards shown for Search's idle state and the empty-cart nudge. */
+export const useLastMinuteBuy = () => {
+  const cachedLmb = useCachedSeed<ApiFeaturedMedicine[]>("last_minute_buy");
+
+  const {
+    data: medicines = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: QUERY_KEYS.CATALOG.LAST_MINUTE_BUY,
+    queryFn: withSqliteCache("last_minute_buy", () =>
+      medicineApi.getLastMinuteBuyCards(),
+    ),
+    initialData: () => cachedLmb?.data,
+    initialDataUpdatedAt: () => cachedLmb?.updatedAt ?? 0,
+    staleTime: 5 * 60_000,
+  });
+
+  const products: Product[] = useMemo(
+    () => medicines.map(mapFeaturedMedicine),
+    [medicines],
+  );
+
+  return { products, isLoading, error, refetch };
+};
+
 /**
  * Full featured list for the View All page. Kept off the SQLite cache — that
  * key holds the home row's 10, and a larger page would overwrite it.
@@ -110,7 +137,11 @@ export const useAllFeaturedMedicines = (limit = 50) => {
     staleTime: 5 * 60_000,
   });
 
-  const products: Product[] = medicines.map(mapFeaturedMedicine);
+  // Memoized, or a fresh array each render defeats React.memo on the row.
+  const products: Product[] = useMemo(
+    () => medicines.map(mapFeaturedMedicine),
+    [medicines],
+  );
 
   return { products, isLoading, isRefetching, error, refetch };
 };

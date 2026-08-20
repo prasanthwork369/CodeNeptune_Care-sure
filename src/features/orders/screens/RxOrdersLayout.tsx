@@ -1,4 +1,5 @@
 import type { ApiPrescription } from "@/src/features/prescription/types";
+import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { RxOrdersSkeleton } from "../components/PrescriptionSkeleton";
 import {
   Prescription,
@@ -42,7 +43,7 @@ function mapItem(item: ApiPrescription): Prescription {
       .join(" ")
       .trim(),
     doctor: item.doctorName ?? "",
-    imageUrls: item.imageUrls ?? [],
+    imageUrls: getPrescriptionImageUrls(item),
     rejectionReasons: item.ocrData?.rejectionReasons ?? [],
     reviewNotes: item.reviewNotes ?? null,
     // Keep undefined as-is: undefined = "list didn't include it, fetch it";

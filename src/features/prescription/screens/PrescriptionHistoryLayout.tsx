@@ -12,6 +12,7 @@ import type {
   ApiPrescription,
   PrescriptionHistoryItemData,
 } from "@/src/features/prescription/types";
+import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
@@ -68,7 +69,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
         .trim(),
     doctorName: item.doctorName ?? "",
     uploadedDate: formatDate(item.createdAt),
-    image: item.imageUrls ?? [],
+    image: getPrescriptionImageUrls(item),
     source: source ?? undefined,
     toPay: toPay ?? undefined,
     prescriptionOrderId: item.prescriptionOrderId ?? null,

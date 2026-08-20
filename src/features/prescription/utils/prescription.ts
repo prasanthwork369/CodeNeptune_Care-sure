@@ -1,9 +1,23 @@
 import { File, Paths } from "expo-file-system";
-import { PrescriptionItem } from "@/src/features/prescription/types";
+import {
+  ApiPrescription,
+  PrescriptionItem,
+} from "@/src/features/prescription/types";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { CapturedAsset } from "../scanner";
 import { logger } from "@/src/utils/logger";
+
+/**
+ * Prefers `imageUrls`; falls back to `fileData[].url` for API responses that
+ * only send `fileData` (the two shapes GET /prescriptions has returned).
+ */
+export function getPrescriptionImageUrls(item: ApiPrescription): string[] {
+  if (item.imageUrls?.length) return item.imageUrls;
+  return (item.fileData ?? [])
+    .map((f) => f.url)
+    .filter((url): url is string => !!url);
+}
 
 /**
  * Last-resort fallbacks, NOT the real limits.
