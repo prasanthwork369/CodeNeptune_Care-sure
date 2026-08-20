@@ -73,6 +73,9 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
     const carouselRef = useRef<ICarouselInstance>(null);
     const progressShared = useSharedValue(0);
     const appActiveRef = useRef(true);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const isInteractingRef = useRef(false);
+
     // Both subscribed here (not passed as props) so the home feed doesn't
     // re-render on scroll start/stop or on focus changes — only this carousel
     // reacts, to pause autoplay.
@@ -80,20 +83,53 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
     const isHomeFocused = useUIStore((s) => s.isHomeFocused);
     const autoplayActive = isHomeFocused && !isFeedScrolling;
 
-    // Manual autoplay — bypasses the unreliable autoPlay prop in v4
+    const stopAutoplay = useCallback(() => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }, []);
+
+    const startAutoplay = useCallback(() => {
+      stopAutoplay();
+      if (banners.length <= 1 || !autoplayActive || isInteractingRef.current) return;
+      timerRef.current = setInterval(() => {
+        if (appActiveRef.current && !isInteractingRef.current) {
+          carouselRef.current?.next();
+        }
+      }, 3500);
+    }, [banners.length, autoplayActive, stopAutoplay]);
+
+    // Manual autoplay — pauses during drag, unmount, focus loss, and background
     useEffect(() => {
-      if (banners.length <= 1 || !autoplayActive) return;
+      if (banners.length <= 1 || !autoplayActive) {
+        stopAutoplay();
+        return;
+      }
       const sub = AppState.addEventListener("change", (s: AppStateStatus) => {
         appActiveRef.current = s === "active";
+        if (s === "active") {
+          startAutoplay();
+        } else {
+          stopAutoplay();
+        }
       });
-      const timer = setInterval(() => {
-        if (appActiveRef.current) carouselRef.current?.next();
-      }, 3500);
+      startAutoplay();
       return () => {
-        clearInterval(timer);
+        stopAutoplay();
         sub.remove();
       };
-    }, [banners.length, autoplayActive]);
+    }, [banners.length, autoplayActive, startAutoplay, stopAutoplay]);
+
+    const handleScrollStart = useCallback(() => {
+      isInteractingRef.current = true;
+      stopAutoplay();
+    }, [stopAutoplay]);
+
+    const handleScrollEnd = useCallback(() => {
+      isInteractingRef.current = false;
+      startAutoplay();
+    }, [startAutoplay]);
 
     const handlePress = useCallback(
       (rawLink: string) => {
@@ -184,6 +220,8 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
           scrollAnimationDuration={500}
           data={banners}
           onProgressChange={progressShared}
+          onScrollStart={handleScrollStart}
+          onScrollEnd={handleScrollEnd}
           renderItem={renderItem}
           onConfigurePanGesture={(gesture) => {
             gesture.activeOffsetX([-10, 10]);

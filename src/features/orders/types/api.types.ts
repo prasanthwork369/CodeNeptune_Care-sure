@@ -11,6 +11,7 @@ export interface MedicineSnapshot {
   discountPercent?: number;
   discountPercentage?: number;
   requiresPrescription?: boolean;
+  isReturnable?: boolean;
 }
 
 export interface OrderMetadata {

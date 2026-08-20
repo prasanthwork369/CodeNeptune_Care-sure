@@ -10,6 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { icons } from "@/src/constants/icons";
 import { format } from "@/src/utils/validation";
 import type { CustomerProfile } from "../types";
+import { exactScale } from "@/src/utils/exactScale";
 
 interface ProfileHeaderProps {
   profile?: CustomerProfile | null;
@@ -56,16 +57,28 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   return (
-    <LinearGradient
-      colors={["#C8EADA", "#F9FAFB"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={{
-        alignItems: "center",
-        paddingTop: safeAreaTop + 8,
-        paddingBottom: 60,
-      }}
-    >
+    <View style={{ position: "relative" }}>
+      {/* Top bleed background for overscroll stretch so pulling down reveals the top mint color #C8EADA */}
+      <View
+        style={{
+          position: "absolute",
+          top: -exactScale(400),
+          left: 0,
+          right: 0,
+          height: exactScale(400),
+          backgroundColor: "#C8EADA",
+        }}
+      />
+      <LinearGradient
+        colors={["#C8EADA", "#F9FAFB"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{
+          alignItems: "center",
+          paddingTop: safeAreaTop + 8,
+          paddingBottom: 60,
+        }}
+      >
       <View className="relative">
         {/* Tapping the photo opens the full-screen preview; the placeholder does not. */}
         <Touchable
@@ -164,5 +177,6 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         />
       </AvatarPreviewModal>
     </LinearGradient>
-  );
+  </View>
+);
 };

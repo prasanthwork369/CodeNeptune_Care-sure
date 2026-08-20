@@ -190,7 +190,12 @@ export const ProductComparisonLayout: React.FC<
                 />
               )}
 
-              <KnowYourMedicine manufacturer={manufacturer} />
+              <KnowYourMedicine
+                manufacturer={manufacturer}
+                returnPolicy={
+                  product?.isReturnable ? "Returnable" : "Not Returnable"
+                }
+              />
               <View style={{ backgroundColor: "#FFFFFF" }}>
                 <WhyFamiliesTrustUs
                   promise={appContent?.promise}

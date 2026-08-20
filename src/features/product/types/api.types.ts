@@ -78,6 +78,7 @@ export interface ApiProductDetail {
   discountPercentage: string;
   mrp: string | null;
   requiresPrescription: boolean;
+  is_returnable?: boolean;
   thumbnailUrl: string;
   description: string | null;
   shortDescription: string | null;

@@ -93,6 +93,7 @@ export const MyOrdersSkeleton: React.FC = () => {
     <ScrollView
       showsVerticalScrollIndicator={false}
       scrollEnabled={false}
+      style={{ flex: 1, backgroundColor: "#F5F6FB" }}
       contentContainerStyle={{
         paddingTop: 20,
         paddingBottom: adjustedBottom + 24,

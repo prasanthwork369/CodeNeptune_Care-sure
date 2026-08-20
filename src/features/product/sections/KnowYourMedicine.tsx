@@ -8,13 +8,13 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 interface KnowYourMedicineProps {
   manufacturer: string;
   consumeType?: string;
-  returnPolicy?: string;
+  returnPolicy: string;
 }
 
 export const KnowYourMedicine: React.FC<KnowYourMedicineProps> = ({
   manufacturer,
   consumeType = "Oral",
-  returnPolicy = "Not Returnable",
+  returnPolicy,
 }) => {
   return (
     <LinearGradient

@@ -54,7 +54,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   const keyExtractor = useCallback((item: Order) => item.id, []);
 
   return (
-    <View style={{ width }}>
+    <View style={{ width, flex: 1, backgroundColor: "#F5F6FB" }}>
       {loading ? (
         <MyOrdersSkeleton />
       ) : error && orders.length === 0 ? (

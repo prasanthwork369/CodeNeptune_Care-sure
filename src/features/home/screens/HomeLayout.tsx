@@ -401,6 +401,16 @@ const HomeContent: React.FC = () => {
                 heroHeightShared.value = e.nativeEvent.layout.height;
               }}
             >
+              <View
+                style={{
+                  position: "absolute",
+                  top: -(insets.top + exactScale(400)),
+                  left: 0,
+                  right: 0,
+                  height: exactScale(400),
+                  backgroundColor: "#DEF5B0",
+                }}
+              />
               <LinearGradient
                 colors={["#DEF5B0", "#EAF9D1", "#F6FDF0", "#FFFFFF"]}
                 start={{ x: 0, y: 0 }}

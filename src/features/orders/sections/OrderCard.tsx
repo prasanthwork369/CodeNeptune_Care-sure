@@ -11,8 +11,9 @@ import {
 import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { Image } from "expo-image";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { usePrefetchOrder } from "@/src/features/orders/hooks/useOrderById";
 import { orderStyles as s } from "../orders.styles";
 
 export interface OrderCardProps {
@@ -75,6 +76,7 @@ export const OrderCard = React.memo(function OrderCard({
   clearCart,
 }: OrderCardProps) {
   const router = useNav();
+  const prefetchOrder = usePrefetchOrder();
   const items = order.items ?? [];
   const thumbs = items.slice(0, 4);
   const extraCount = Math.max(0, items.length - 4);
@@ -82,6 +84,12 @@ export const OrderCard = React.memo(function OrderCard({
 
   const [isProceeding, setIsProceeding] = useState(false);
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
+
+  const handlePrefetch = useCallback(() => {
+    if (order?.id) {
+      prefetchOrder(order.id);
+    }
+  }, [prefetchOrder, order.id]);
 
   const addItemsToCart = async (replace: boolean) => {
     if (!items.length) return;
@@ -140,6 +148,7 @@ export const OrderCard = React.memo(function OrderCard({
             params: { orderId: order.id },
           })
         }
+        onPressIn={handlePrefetch}
       >
         {/* Top: dates + badge */}
         <View
@@ -305,6 +314,7 @@ export const OrderCard = React.memo(function OrderCard({
                   params: { orderId: order.id },
                 })
               }
+              onPressIn={handlePrefetch}
             >
               <Text
                 style={s.labelMd}

@@ -1,10 +1,17 @@
+/* eslint-disable react-hooks/immutability, react-hooks/set-state-in-effect */
 import { PRESCRIPTION_STATUS } from "@/src/features/prescription/constants/prescription-status";
 import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { usePrescriptionBanner } from "@/src/features/home/hooks/usePrescriptionBanner";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import {
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
@@ -125,6 +132,7 @@ export const FloatingBannersCarousel = () => {
   );
   const scrollViewRef = useRef<ScrollView>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isInteractingRef = useRef(false);
   const currentScrollX = useRef(bothActive ? width : 0);
 
   // Horizontal transition progress for the carousel
@@ -141,47 +149,49 @@ export const FloatingBannersCarousel = () => {
     stopAutoplay();
     // Foreground check kept out of `focused` on purpose: folding it in there
     // would also reset the banner index on background and jump on resume.
-    if (bothActive && focused && !isCartInteracting && isAppForeground) {
+    if (
+      bothActive &&
+      focused &&
+      !isCartInteracting &&
+      isAppForeground &&
+      !isInteractingRef.current
+    ) {
       timerRef.current = setInterval(() => {
+        if (isInteractingRef.current) return;
         setActiveBannerIndex((prev) => (prev === 2 ? 1 : 2));
       }, 4000);
     }
   }, [bothActive, focused, isCartInteracting, isAppForeground, stopAutoplay]);
 
-  // Auto-switch between banners when both are active
+  // Initial placement when active banner count changes
   useEffect(() => {
-    if (bothActive && focused) {
+    if (bothActive) {
       setActiveBannerIndex(1);
       currentScrollX.current = 1 * width;
       progress.value = 1;
       scrollViewRef.current?.scrollTo({ x: width, animated: false });
+    } else {
+      if (isCartActive) setActiveBannerIndex(0);
+      else if (isRxActive) setActiveBannerIndex(1);
+    }
+  }, [bothActive, isCartActive, isRxActive, width, progress]);
+
+  // Autoplay timer controller: starts/pauses on focus, app foreground, and cart bottom sheet interaction
+  useEffect(() => {
+    if (bothActive && focused && !isCartInteracting && isAppForeground) {
       startAutoplay();
     } else {
       stopAutoplay();
-      if (isCartActive) setActiveBannerIndex(0);
-      else if (isRxActive) setActiveBannerIndex(1);
     }
     return () => stopAutoplay();
   }, [
     bothActive,
-    isCartActive,
-    isRxActive,
-    width,
     focused,
-    progress,
+    isCartInteracting,
+    isAppForeground,
     startAutoplay,
     stopAutoplay,
   ]);
-
-  // Pause autoplay when user is interacting (revealing or tapping Remove)
-  useEffect(() => {
-    if (isCartInteracting) {
-      stopAutoplay();
-    } else {
-      startAutoplay();
-    }
-    return () => stopAutoplay();
-  }, [isCartInteracting, startAutoplay, stopAutoplay]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -190,6 +200,7 @@ export const FloatingBannersCarousel = () => {
   });
 
   useEffect(() => {
+    if (isInteractingRef.current) return;
     if (bothActive) {
       const targetX = activeBannerIndex * width;
       if (Math.abs(currentScrollX.current - targetX) > 5) {
@@ -289,26 +300,54 @@ export const FloatingBannersCarousel = () => {
     }
   };
 
-  const handleScrollEnd = (offsetX: number) => {
-    let pageIndex = Math.round(offsetX / width);
+  const handleScrollEnd = useCallback(
+    (offsetX: number) => {
+      isInteractingRef.current = false;
+      let pageIndex = Math.round(offsetX / width);
 
-    if (pageIndex === 0) {
-      pageIndex = 2;
-      scrollViewRef.current?.scrollTo({ x: 2 * width, animated: false });
-      currentScrollX.current = 2 * width;
-      progress.value = 2;
-    } else if (pageIndex === 3) {
-      pageIndex = 1;
-      scrollViewRef.current?.scrollTo({ x: 1 * width, animated: false });
-      currentScrollX.current = 1 * width;
-      progress.value = 1;
-    } else {
-      currentScrollX.current = pageIndex * width;
-    }
+      if (pageIndex === 0) {
+        pageIndex = 2;
+        scrollViewRef.current?.scrollTo({ x: 2 * width, animated: false });
+        currentScrollX.current = 2 * width;
+        progress.value = 2;
+      } else if (pageIndex === 3) {
+        pageIndex = 1;
+        scrollViewRef.current?.scrollTo({ x: 1 * width, animated: false });
+        currentScrollX.current = 1 * width;
+        progress.value = 1;
+      } else {
+        currentScrollX.current = pageIndex * width;
+      }
 
-    setActiveBannerIndex(pageIndex);
-    startAutoplay();
-  };
+      setActiveBannerIndex(pageIndex);
+      startAutoplay();
+    },
+    [width, progress, startAutoplay],
+  );
+
+  const handleScrollBeginDrag = useCallback(() => {
+    isInteractingRef.current = true;
+    stopAutoplay();
+  }, [stopAutoplay]);
+
+  const handleScrollEndDrag = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      // If velocity is present, momentum scrolling is underway and onMomentumScrollEnd
+      // will handle the authoritative settlement once deceleration completes.
+      const hasVelocity = Math.abs(e.nativeEvent.velocity?.x ?? 0) > 0.01;
+      if (!hasVelocity) {
+        handleScrollEnd(e.nativeEvent.contentOffset.x);
+      }
+    },
+    [handleScrollEnd],
+  );
+
+  const handleMomentumScrollEnd = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      handleScrollEnd(e.nativeEvent.contentOffset.x);
+    },
+    [handleScrollEnd],
+  );
 
   if (!isCartActive && !isRxActive) return null;
 
@@ -355,13 +394,9 @@ export const FloatingBannersCarousel = () => {
               bounces={false}
               scrollEventThrottle={16}
               onScroll={scrollHandler}
-              onScrollBeginDrag={() => stopAutoplay()}
-              onScrollEndDrag={(e) => {
-                handleScrollEnd(e.nativeEvent.contentOffset.x);
-              }}
-              onMomentumScrollEnd={(e) => {
-                handleScrollEnd(e.nativeEvent.contentOffset.x);
-              }}
+              onScrollBeginDrag={handleScrollBeginDrag}
+              onScrollEndDrag={handleScrollEndDrag}
+              onMomentumScrollEnd={handleMomentumScrollEnd}
               style={{ width: width, height: "100%" }}
               contentContainerStyle={{
                 width: width * 4,

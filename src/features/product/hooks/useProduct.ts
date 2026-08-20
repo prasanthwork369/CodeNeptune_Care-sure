@@ -92,6 +92,7 @@ export const useProduct = (productId: string) => {
             // web PDP fetches by id and only needs a valid type slug.
             productType: data.sourceType,
             requiresPrescription: data.requiresPrescription,
+            isReturnable: data.is_returnable ?? false,
             manufacturer: data.manufacturer?.name ?? data.brand?.name ?? "",
             brandName: data.brand?.name ?? "",
             description:

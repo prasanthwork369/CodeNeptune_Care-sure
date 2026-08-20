@@ -32,6 +32,7 @@ export interface Product {
   discountPercent?: number;
   image: ImageSource | null;
   requiresPrescription?: boolean;
+  isReturnable?: boolean;
   defaultVariant?: DefaultVariant;
   packSize?: string;
   unit?: string;

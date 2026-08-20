@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { Dimensions } from "react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import type Animated from "react-native-reanimated";
 import {
@@ -15,10 +16,13 @@ import {
  * Tab presses scroll the pager, and swipes move the indicator, so the two can
  * never disagree — the scroll offset is the only source of truth.
  */
-export function usePagerTabs<T extends string>(keys: readonly T[]) {
+export function usePagerTabs<T extends string>(
+  keys: readonly T[],
+  initialWidth = Dimensions.get("window").width,
+) {
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollX = useSharedValue(0);
-  const [pageWidth, setPageWidth] = useState(0);
+  const [pageWidth, setPageWidth] = useState(initialWidth);
   const [activeKey, setActiveKey] = useState<T>(keys[0]);
   // Pages mount only once reached, so unopened tabs never fetch.
   const [visitedKeys, setVisitedKeys] = useState<T[]>([keys[0]]);

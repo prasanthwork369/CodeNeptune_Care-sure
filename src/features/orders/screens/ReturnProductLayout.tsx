@@ -17,8 +17,7 @@ import { useOrderById } from "@/src/features/orders/hooks/useOrderById";
 import { usePaymentSettings } from "@/src/hooks/queries/useSettings";
 import { useNav } from "@/src/hooks/useNav";
 import { useReturnDraftStore } from "@/src/store/returnDraftStore";
-import { OrderItem } from "../types";
-import { CreateReturnRequest, ReturnItemImages } from "../types";
+import { CreateReturnRequest, OrderItem, ReturnItemImages } from "../types";
 import { Image } from "expo-image";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -128,6 +127,12 @@ function RadioOption({
   );
 }
 
+function isItemReturnable(item: OrderItem): boolean {
+  if (item.medicineSnapshot?.isReturnable === false) return false;
+  if (item.isReturnable === false) return false;
+  return true;
+}
+
 export const ReturnProductLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
@@ -214,6 +219,7 @@ export const ReturnProductLayout: React.FC = () => {
   }
 
   function toggleItem(item: OrderItem) {
+    if (!isItemReturnable(item)) return;
     const isConfirmed = !!getDraftItem(item.id);
     if (isConfirmed) {
       removeConfirmedItem(item.id);
@@ -224,6 +230,7 @@ export const ReturnProductLayout: React.FC = () => {
   }
 
   function updateQty(item: OrderItem, delta: number) {
+    if (!isItemReturnable(item)) return;
     const max = item.quantity;
     setQuantities((prev) => ({
       ...prev,
@@ -309,10 +316,16 @@ export const ReturnProductLayout: React.FC = () => {
       );
       return;
     }
-    if (draftItems.length === 0) {
+    // Defensive check: only allow confirmed items that are strictly returnable
+    const validReturnItems = draftItems.filter((draft) => {
+      const originalItem = items.find((it) => it.id === draft.orderItemId);
+      return originalItem ? isItemReturnable(originalItem) : true;
+    });
+
+    if (validReturnItems.length === 0) {
       Alert.alert(
         "Select items",
-        "Please select and confirm at least one item to return.",
+        "Please select and confirm at least one returnable item to return.",
       );
       return;
     }
@@ -328,7 +341,7 @@ export const ReturnProductLayout: React.FC = () => {
       const payload: CreateReturnRequest = {
         orderId: order!.orderId,
         refundMethod,
-        items: draftItems.map((item) => ({
+        items: validReturnItems.map((item) => ({
           orderItemId: item.orderItemId,
           medicineId: item.medicineId,
           quantity: item.quantity,
@@ -338,7 +351,7 @@ export const ReturnProductLayout: React.FC = () => {
         })),
       };
 
-      await createReturn(payload);
+      await createReturn({ data: payload, orderUuid: order!.id });
       clearReturnDraft();
       setIsSuccessModalVisible(true);
     } catch (e) {
@@ -473,15 +486,19 @@ export const ReturnProductLayout: React.FC = () => {
             Selected Items ({draftItems.length}/{items.length})
           </Text>
           {items.map((item, index) => {
+            const isReturnable = isItemReturnable(item);
             const reasonData = getDraftItem(item.id);
             const isChecked = !!reasonData;
             const snap = item.medicineSnapshot;
             return (
-              <View key={item.id}>
+              <View
+                key={item.id}
+                style={{ opacity: isReturnable ? 1 : 0.6 }}
+              >
                 <View className="flex-row items-start px-4 py-3">
                   <Touchable
-                    onPress={() => toggleItem(item)}
-                    activeOpacity={0.7}
+                    onPress={isReturnable ? () => toggleItem(item) : undefined}
+                    activeOpacity={isReturnable ? 0.7 : 1}
                     className="flex-1 flex-row items-start"
                   >
                     <View className="w-14 h-14 rounded-sm border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center mr-3 overflow-hidden">
@@ -499,7 +516,13 @@ export const ReturnProductLayout: React.FC = () => {
                       <Text
                         style={[
                           s.labelSm,
-                          { color: isChecked ? "#222222" : "#9CA3AF" },
+                          {
+                            color: !isReturnable
+                              ? "#6A6A6A"
+                              : isChecked
+                                ? "#222222"
+                                : "#9CA3AF",
+                          },
                         ]}
                         className="font-inter-semibold"
                         numberOfLines={2}
@@ -509,7 +532,13 @@ export const ReturnProductLayout: React.FC = () => {
                       <Text
                         style={[
                           s.labelSm,
-                          { color: isChecked ? "#6A6A6A" : "#9CA3AF" },
+                          {
+                            color: !isReturnable
+                              ? "#9CA3AF"
+                              : isChecked
+                                ? "#6A6A6A"
+                                : "#9CA3AF",
+                          },
                         ]}
                         className="font-inter-medium mt-0.5"
                       >
@@ -518,16 +547,24 @@ export const ReturnProductLayout: React.FC = () => {
                     </View>
                   </Touchable>
                   <Touchable
-                    onPress={() => toggleItem(item)}
-                    activeOpacity={0.7}
+                    onPress={isReturnable ? () => toggleItem(item) : undefined}
+                    activeOpacity={isReturnable ? 0.7 : 1}
                     className="ml-2 mt-0.5 w-6 h-6 rounded items-center justify-center"
                     style={{
                       borderWidth: 1.5,
-                      borderColor: isChecked ? "#0F7635" : "#9CA3AF",
-                      backgroundColor: isChecked ? "#0F7635" : "transparent",
+                      borderColor: !isReturnable
+                        ? "#D1D5DB"
+                        : isChecked
+                          ? "#0F7635"
+                          : "#9CA3AF",
+                      backgroundColor: !isReturnable
+                        ? "#F3F4F6"
+                        : isChecked
+                          ? "#0F7635"
+                          : "transparent",
                     }}
                   >
-                    {isChecked && (
+                    {isChecked && isReturnable && (
                       <Text
                         style={{
                           color: "#FFFFFF",
@@ -542,55 +579,80 @@ export const ReturnProductLayout: React.FC = () => {
                   </Touchable>
                 </View>
 
-                {/* Separately clickable quantity selector positioned under product details */}
+                {/* Non-returnable badge OR quantity selector */}
                 <View style={{ paddingLeft: 72, paddingBottom: 12 }}>
-                  <View
-                    className="flex-row items-center px-3 py-1 gap-3"
-                    style={{
-                      borderWidth: 1,
-                      borderColor: "#919EAB33",
-                      borderRadius: 6,
-                      alignSelf: "flex-start",
-                    }}
-                  >
-                    <Touchable
-                      onPress={() => updateQty(item, -1)}
-                      activeOpacity={0.7}
+                  {!isReturnable ? (
+                    <View
+                      style={{
+                        backgroundColor: "#FEF2F2",
+                        borderColor: "#FECACA",
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        paddingHorizontal: 8,
+                        paddingVertical: 3,
+                        alignSelf: "flex-start",
+                      }}
                     >
                       <Text
-                        style={[
-                          s.labelXl,
-                          { color: isChecked ? "#222222" : "#9CA3AF" },
-                        ]}
-                        className="font-inter-medium leading-none"
+                        style={{
+                          color: "#DC2626",
+                          fontSize: moderateScale(11),
+                          fontWeight: "700",
+                          letterSpacing: 0.2,
+                        }}
                       >
-                        −
+                        Non-Returnable Item
                       </Text>
-                    </Touchable>
-                    <Text
-                      style={[
-                        s.labelSm,
-                        { color: isChecked ? "#222222" : "#9CA3AF" },
-                      ]}
-                      className="font-inter-bold min-w-[14px] text-center"
+                    </View>
+                  ) : (
+                    <View
+                      className="flex-row items-center px-3 py-1 gap-3"
+                      style={{
+                        borderWidth: 1,
+                        borderColor: "#919EAB33",
+                        borderRadius: 6,
+                        alignSelf: "flex-start",
+                      }}
                     >
-                      {getQty(item)}
-                    </Text>
-                    <Touchable
-                      onPress={() => updateQty(item, 1)}
-                      activeOpacity={0.7}
-                    >
+                      <Touchable
+                        onPress={() => updateQty(item, -1)}
+                        activeOpacity={0.7}
+                      >
+                        <Text
+                          style={[
+                            s.labelXl,
+                            { color: isChecked ? "#222222" : "#9CA3AF" },
+                          ]}
+                          className="font-inter-medium leading-none"
+                        >
+                          −
+                        </Text>
+                      </Touchable>
                       <Text
                         style={[
-                          s.labelXl,
+                          s.labelSm,
                           { color: isChecked ? "#222222" : "#9CA3AF" },
                         ]}
-                        className="font-inter-medium leading-none"
+                        className="font-inter-bold min-w-[14px] text-center"
                       >
-                        +
+                        {getQty(item)}
                       </Text>
-                    </Touchable>
-                  </View>
+                      <Touchable
+                        onPress={() => updateQty(item, 1)}
+                        activeOpacity={0.7}
+                      >
+                        <Text
+                          style={[
+                            s.labelXl,
+                            { color: isChecked ? "#222222" : "#9CA3AF" },
+                          ]}
+                          className="font-inter-medium leading-none"
+                        >
+                          +
+                        </Text>
+                      </Touchable>
+                    </View>
+                  )}
                 </View>
                 {isChecked && reasonData && (
                   <View className="px-4 pb-4">

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/features/cart/hooks/useCart";
@@ -76,8 +77,11 @@ export const MyOrdersLayout: React.FC = () => {
       />
 
       <View
-        style={{ flex: 1 }}
-        onLayout={(e) => setPageWidth(e.nativeEvent.layout.width)}
+        style={{ flex: 1, backgroundColor: "#F5F6FB" }}
+        onLayout={(e) => {
+          const w = e.nativeEvent.layout.width;
+          if (w > 0 && w !== pageWidth) setPageWidth(w);
+        }}
       >
         {pageWidth > 0 && (
           <Animated.ScrollView
@@ -92,6 +96,8 @@ export const MyOrdersLayout: React.FC = () => {
             decelerationRate="fast"
             directionalLockEnabled
             disableIntervalMomentum
+            style={{ flex: 1, backgroundColor: "#F5F6FB" }}
+            contentContainerStyle={{ backgroundColor: "#F5F6FB" }}
           >
             {TABS.map((tab) =>
               visitedKeys.includes(tab.key) ? (
@@ -106,7 +112,10 @@ export const MyOrdersLayout: React.FC = () => {
                   clearCart={clearCart}
                 />
               ) : (
-                <View key={tab.key} style={{ width: pageWidth }} />
+                <View
+                  key={tab.key}
+                  style={{ width: pageWidth, flex: 1, backgroundColor: "#F5F6FB" }}
+                />
               ),
             )}
           </Animated.ScrollView>

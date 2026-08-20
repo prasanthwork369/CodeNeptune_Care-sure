@@ -245,7 +245,14 @@ export const ProductDetailsLayout: React.FC = () => {
                     />
                   )}
 
-                  <KnowYourMedicine manufacturer={manufacturer} />
+                  <KnowYourMedicine
+                    manufacturer={manufacturer}
+                    returnPolicy={
+                      activeProduct?.isReturnable
+                        ? "Returnable"
+                        : "Not Returnable"
+                    }
+                  />
 
                   <WhyFamiliesTrustUs
                     promise={appContent?.promise}
