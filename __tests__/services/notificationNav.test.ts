@@ -74,4 +74,40 @@ describe("NotificationNavigation — Route Resolution & Tap Deduplication", () =
       params: { id: "prod-456" },
     });
   });
+
+  it("routes a plain CART_REMINDER (no product/category/route data) to the cart, not the rich-campaign fallback", () => {
+    const payload = {
+      type: NotificationType.CART_REMINDER,
+      data: { type: "CART_REMINDER" },
+    };
+
+    NotificationNavigation.handleTap(payload);
+
+    expect(router.push).toHaveBeenCalledWith("/(commerce)/cart");
+  });
+
+  it("still routes a CART_REMINDER carrying a productId to the product screen via the rich-campaign handler", () => {
+    const payload = {
+      type: NotificationType.CART_REMINDER,
+      data: { type: "CART_REMINDER", productId: "prod-999" },
+    };
+
+    NotificationNavigation.handleTap(payload);
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: "/product/[id]",
+      params: { id: "prod-999" },
+    });
+  });
+
+  it("falls back a data-less PROMOTION rich-campaign tap to the notifications screen", () => {
+    const payload = {
+      type: "PROMOTION" as NotificationType,
+      data: { type: "PROMOTION" },
+    };
+
+    NotificationNavigation.handleTap(payload);
+
+    expect(router.push).toHaveBeenCalledWith("/notifications");
+  });
 });

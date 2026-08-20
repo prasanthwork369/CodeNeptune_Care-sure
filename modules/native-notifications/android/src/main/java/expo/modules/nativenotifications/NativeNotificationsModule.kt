@@ -4,6 +4,8 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.nativenotifications.campaign.RichCampaignData
+import expo.modules.nativenotifications.campaign.RichCampaignRenderer
 import expo.modules.nativenotifications.offers.ProductOfferData
 import expo.modules.nativenotifications.offers.ProductOfferRenderer
 import java.util.concurrent.Executors
@@ -42,6 +44,41 @@ class NativeNotificationsModule : Module() {
             executor.execute {
                 try {
                     ProductOfferRenderer.display(context, data)
+                    promise.resolve(true)
+                } catch (e: Exception) {
+                    promise.reject("E_DISPLAY_FAILED", e.javaClass.simpleName, e)
+                }
+            }
+        }
+
+        AsyncFunction("displayRichNotification") { payload: Map<String, Any?>, promise: Promise ->
+            val title = payload.getStringSafe("title")
+            if (title.isNullOrBlank()) {
+                promise.reject("E_INVALID_PAYLOAD", "title is required", null)
+                return@AsyncFunction
+            }
+
+            val expiresAtLong = (payload["expiresAt"] as? Number)?.toLong()
+                ?: payload.getStringSafe("expiresAt")?.toLongOrNull()
+
+            val data = RichCampaignData(
+                notificationId = payload.getStringSafe("notificationId")
+                    ?: payload.getStringSafe("id")
+                    ?: "rich_${System.currentTimeMillis()}",
+                title = title.take(120),
+                body = payload.getStringSafe("body") ?: "",
+                imageUrl = payload.getStringSafe("imageUrl"),
+                expiresAt = expiresAtLong,
+                actionLabel = payload.getStringSafe("actionLabel") ?: "Check Now",
+                deepLink = payload.getStringSafe("deepLink") ?: "caresure://notifications",
+                campaignId = payload.getStringSafe("campaignId"),
+                subText = payload.getStringSafe("subText"),
+            )
+
+            val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
+            executor.execute {
+                try {
+                    RichCampaignRenderer.display(context, data)
                     promise.resolve(true)
                 } catch (e: Exception) {
                     promise.reject("E_DISPLAY_FAILED", e.javaClass.simpleName, e)

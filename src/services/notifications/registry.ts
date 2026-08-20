@@ -1,6 +1,7 @@
 import { NotificationData } from "../../types/notification";
 import { NotificationHandler } from "./types";
 import { ProductOfferNotification } from "../../features/product/notifications/productOfferNotification";
+import { RichCampaignHandler } from "./handlers/richCampaignNotification";
 import { OrderTimelineHandler } from "../../features/orders/notifications/orderTimelineNotification";
 
 /**
@@ -10,7 +11,10 @@ import { OrderTimelineHandler } from "../../features/orders/notifications/orderT
 export function getCanonicalType(data: NotificationData | undefined): string | null {
   if (!data) return null;
 
-  // Custom marketing layout identifier
+  // Custom marketing layout identifiers
+  if (data.notificationType === "rich_campaign") {
+    return "RICH_CAMPAIGN";
+  }
   if (data.notificationType === "product_offer") {
     return "PRODUCT_OFFER";
   }
@@ -22,6 +26,12 @@ export function getCanonicalType(data: NotificationData | undefined): string | n
 
 // Registry mapping canonical uppercase type strings to feature handlers
 const notificationHandlers: Record<string, NotificationHandler> = {
+  RICH_CAMPAIGN: RichCampaignHandler,
+  PROMOTION: RichCampaignHandler,
+  OFFER: RichCampaignHandler,
+  CAMPAIGN: RichCampaignHandler,
+  REORDER: RichCampaignHandler,
+  CART_REMINDER: RichCampaignHandler,
   PRODUCT_OFFER: ProductOfferNotification,
   ORDER_PLACED: OrderTimelineHandler,
   ORDER_CONFIRMED: OrderTimelineHandler,

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.text.SpannableString
@@ -70,6 +71,7 @@ object ProductOfferRenderer {
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(smallIconRes(context))
+            .setColor(Color.WHITE)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(collapsed)
             .setCustomBigContentView(expanded)

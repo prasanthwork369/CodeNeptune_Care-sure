@@ -80,3 +80,46 @@ export interface ProductOfferNotificationData {
   /** Header line next to the app name in the system decoration. */
   subText?: string;
 }
+
+/**
+ * Normalized data block for CareSure Apollo-style Rich Campaign Notifications.
+ */
+export interface RichCampaignNotificationData {
+  notificationType?: "rich_campaign" | string;
+  notificationId?: string;
+  id?: string;
+  title: string;
+  body?: string;
+  imageUrl?: string;
+  expiresAt?: number | string; // Unix epoch ms
+  actionLabel?: string;
+  deepLink?: string;
+  campaignId?: string;
+  subText?: string;
+  [key: string]: unknown;
+}
+
+export type CareSureNotificationPayload = {
+  id?: string;
+  type?:
+    | "promotion"
+    | "reorder"
+    | "cart_reminder"
+    | "prescription"
+    | "order"
+    | "general"
+    | string;
+  title: string;
+  body: string;
+  imageUrl?: string;
+  expiresAt?: number | string;
+  action?: {
+    label?: string;
+    route?: string;
+    url?: string;
+  };
+  actionLabel?: string;
+  deepLink?: string;
+  campaignId?: string;
+  subText?: string;
+};

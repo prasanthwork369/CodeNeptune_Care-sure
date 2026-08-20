@@ -7,8 +7,9 @@ import { Platform } from "react-native";
 import { messagingService as notificationService } from "../../services/firebase";
 import { notifeeService } from "../../services/notifications/notifeeService";
 import { notificationService as pushDisplayService } from "../../services/notifications/notificationService";
-// Registers the __DEV__-only global testProductOffer() console trigger.
+// Registers the __DEV__-only global testProductOffer() & testRichNotification() console triggers.
 import "../../services/notifications/devProductOfferTest";
+import "../../services/notifications/devRichNotificationTest";
 import { NotificationNavigation } from "../../services/notifications/NotificationNavigation";
 import { useAuthStore } from "@/src/store/authStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
