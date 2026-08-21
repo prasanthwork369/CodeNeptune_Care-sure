@@ -7,7 +7,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { FlashList } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { ProductCard } from "../sections/frequent";
@@ -259,7 +259,7 @@ export const FrequentOrdersLayout: React.FC = () => {
           </Text>
         </View>
       ) : (
-        <FlashList
+        <AppFlashList
           data={filtered}
           renderItem={renderProduct}
           keyExtractor={keyExtractor}

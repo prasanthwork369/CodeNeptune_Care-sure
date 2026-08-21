@@ -38,7 +38,7 @@ const toComparisonMedicines = (
       prescribed: {
         name: prescribed?.name || item.originalName || "Added Medicine",
         manufacturer: prescribed?.brand || "",
-        packSize: prescribed ? `${prescribed.form}` : "",
+        packagingDetail: prescribed?.packagingDetail || prescribed?.form || "",
         image: prescribed?.image ? { uri: prescribed.image } : null,
         mrp: prescribed ? parseFloat(String(prescribed.mrp)) : 0,
       },
@@ -48,7 +48,7 @@ const toComparisonMedicines = (
         slug: recommended.slug,
         name: recommended.name,
         manufacturer: recommended.brand,
-        packSize: `${recommended.form}`,
+        packagingDetail: recommended.packagingDetail || recommended.form,
         image: { uri: recommended.image },
         price: recommended.sellingPrice || parseFloat(String(recommended.mrp)),
         mrp: parseFloat(String(recommended.mrp)),

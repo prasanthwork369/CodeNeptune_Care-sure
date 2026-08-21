@@ -108,15 +108,22 @@ describe("SearchPageLayout — Related Search show/hide behaviour", () => {
   });
 
   it("shows suggestions while typing, hides them on submit, and brings them back on edit", async () => {
-    const { getByTestId, getByText, queryByText } = render(<SearchPageLayout />);
+    const { getByTestId, getByText } = render(<SearchPageLayout />);
     const input = getByTestId("search-input");
 
     fireEvent.changeText(input, "para");
     await waitFor(() => expect(getByText("suggestion for para")).toBeTruthy());
+    expect(getByTestId("search-suggestions-bar").props.pointerEvents).toBe(
+      "auto",
+    );
 
     fireEvent(input, "submitEditing");
+    // The bar collapses via animation rather than unmounting, so assert on
+    // the visible-driven pointerEvents flag instead of the node disappearing.
     await waitFor(() =>
-      expect(queryByText("suggestion for para")).toBeNull(),
+      expect(getByTestId("search-suggestions-bar").props.pointerEvents).toBe(
+        "none",
+      ),
     );
     expect(mockRecordHistory).toHaveBeenCalledWith("para");
 
@@ -124,10 +131,13 @@ describe("SearchPageLayout — Related Search show/hide behaviour", () => {
     await waitFor(() =>
       expect(getByText("suggestion for parace")).toBeTruthy(),
     );
+    expect(getByTestId("search-suggestions-bar").props.pointerEvents).toBe(
+      "auto",
+    );
   });
 
   it("tapping a suggestion runs the search and hides the suggestions", async () => {
-    const { getByTestId, getByText, queryByText } = render(<SearchPageLayout />);
+    const { getByTestId, getByText } = render(<SearchPageLayout />);
     const input = getByTestId("search-input");
 
     fireEvent.changeText(input, "para");
@@ -137,7 +147,9 @@ describe("SearchPageLayout — Related Search show/hide behaviour", () => {
 
     expect(mockRecordHistory).toHaveBeenCalledWith("suggestion for para");
     await waitFor(() =>
-      expect(queryByText("suggestion for para")).toBeNull(),
+      expect(getByTestId("search-suggestions-bar").props.pointerEvents).toBe(
+        "none",
+      ),
     );
   });
 });

@@ -5,7 +5,7 @@ import { SearchSuggestionsBar } from "@/src/features/search/sections/SearchSugge
 describe("SearchSuggestionsBar — simple vertical suggestion list", () => {
   it("renders nothing when there are no suggestions", () => {
     const { toJSON } = render(
-      <SearchSuggestionsBar suggestions={[]} onSelect={jest.fn()} />,
+      <SearchSuggestionsBar suggestions={[]} visible onSelect={jest.fn()} />,
     );
 
     expect(toJSON()).toBeNull();
@@ -15,6 +15,7 @@ describe("SearchSuggestionsBar — simple vertical suggestion list", () => {
     const { getByText, queryByText } = render(
       <SearchSuggestionsBar
         suggestions={["paracetamol", "paracetamol 650", "azithromycin"]}
+        visible
         onSelect={jest.fn()}
       />,
     );
@@ -31,6 +32,7 @@ describe("SearchSuggestionsBar — simple vertical suggestion list", () => {
     const { getByText } = render(
       <SearchSuggestionsBar
         suggestions={["paracetamol"]}
+        visible
         onSelect={onSelect}
       />,
     );

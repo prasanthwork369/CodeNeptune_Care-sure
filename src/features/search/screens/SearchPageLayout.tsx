@@ -247,6 +247,18 @@ export const SearchPageLayout = () => {
     }
   }, [query, recordHistory]);
 
+  // Re-focusing the input (no retyping needed) should bring suggestions back too.
+  const handleInputFocus = useCallback(() => {
+    setSuggestionsDismissed(false);
+  }, []);
+
+  // Fires once at drag start, not per onScroll frame — an intentional scroll
+  // of the results should tuck suggestions away and free up the keyboard.
+  const handleResultsScrollStart = useCallback(() => {
+    Keyboard.dismiss();
+    setSuggestionsDismissed(true);
+  }, []);
+
   const handleTermPress = useCallback(
     (term: string) => {
       Keyboard.dismiss();
@@ -263,7 +275,11 @@ export const SearchPageLayout = () => {
       previewName?: string,
       previewImage?: string,
       previewBrand?: string,
-    ) =>
+    ) => {
+      // Dismiss so coming back from Product Details lands on the results
+      // list, not the keyboard/suggestions state the user left mid-search.
+      Keyboard.dismiss();
+      setSuggestionsDismissed(true);
       router.push({
         pathname: "/product/[id]",
         params: {
@@ -272,7 +288,8 @@ export const SearchPageLayout = () => {
           previewImage: previewImage || undefined,
           previewBrand: previewBrand || undefined,
         },
-      }),
+      });
+    },
     [router],
   );
 
@@ -294,6 +311,7 @@ export const SearchPageLayout = () => {
         query={query}
         onQueryChange={handleQueryChange}
         onSubmit={handleSubmit}
+        onFocus={handleInputFocus}
         isSearching={isSearching}
       />
 
@@ -312,9 +330,10 @@ export const SearchPageLayout = () => {
         />
       ) : (
         <View className="flex-1">
-          {!suggestionsDismissed && query.trim().length >= 2 && (
+          {query.trim().length >= 2 && (
             <SearchSuggestionsBar
               suggestions={suggestions}
+              visible={!suggestionsDismissed}
               onSelect={handleTermPress}
             />
           )}
@@ -341,6 +360,7 @@ export const SearchPageLayout = () => {
               onRecommendPress={handleProductPress}
               onEndReached={handleEndReached}
               isFetchingNextPage={isFetchingNextPage}
+              onScrollBeginDrag={handleResultsScrollStart}
             />
           )}
         </View>

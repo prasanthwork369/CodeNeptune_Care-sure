@@ -6,7 +6,7 @@ import {
   UpdateCartItemInput,
 } from "@/src/features/cart/types";
 import { Order, OrderTabKey } from "../types";
-import { FlashList } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback } from "react";
 import { RefreshControl, Text, View } from "react-native";
 import { MyOrdersSkeleton } from "../components/MyOrdersSkeleton";
@@ -64,7 +64,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
           retrying={refreshing}
         />
       ) : (
-        <FlashList
+        <AppFlashList
           data={orders}
           keyExtractor={keyExtractor}
           renderItem={renderItem}

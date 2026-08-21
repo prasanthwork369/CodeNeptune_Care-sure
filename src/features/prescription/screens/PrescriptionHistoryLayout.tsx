@@ -16,7 +16,7 @@ import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/pres
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
-import { FlashList } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
@@ -158,7 +158,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           retrying={refreshing}
         />
       ) : (
-        <FlashList
+        <AppFlashList
           data={items}
           // rawId, not the display id — formatOrderId keeps only 6 chars and two can collide
           keyExtractor={(item) => item.rawId}

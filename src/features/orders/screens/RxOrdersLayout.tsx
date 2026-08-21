@@ -13,7 +13,7 @@ import {
 import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
-import { FlashList } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo } from "react";
 import { Text, View } from "react-native";
 import { orderStyles as s } from "../orders.styles";
@@ -61,18 +61,19 @@ export const RxOrdersLayout: React.FC = () => {
 
   const keyExtractor = useCallback((item: Prescription) => item.id, []);
 
+  // Stable across every row/render — downloads fetch over the network, so
+  // gate before starting one. Kept out of renderItem so PrescriptionCard's
+  // memo isn't defeated by a fresh function identity on every row render.
+  const handleDownloadPress = useCallback((url: string, fileName: string) => {
+    if (!requireInternet()) return;
+    downloadFile(url, fileName);
+  }, []);
+
   const renderItem = useCallback(
     ({ item }: { item: Prescription }) => (
-      <PrescriptionCard
-        item={item}
-        // Downloads fetch over the network, so gate before starting one.
-        onDownloadPress={(url, fileName) => {
-          if (!requireInternet()) return;
-          downloadFile(url, fileName);
-        }}
-      />
+      <PrescriptionCard item={item} onDownloadPress={handleDownloadPress} />
     ),
-    [],
+    [handleDownloadPress],
   );
 
   return (
@@ -81,7 +82,7 @@ export const RxOrdersLayout: React.FC = () => {
       {loading ? (
         <RxOrdersSkeleton />
       ) : (
-        <FlashList
+        <AppFlashList
           data={data}
           keyExtractor={keyExtractor}
           renderItem={renderItem}

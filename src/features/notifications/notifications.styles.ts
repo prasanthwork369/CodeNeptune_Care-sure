@@ -24,6 +24,12 @@ export const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: exactScale(15),
+    // Android's RecyclerView-backed FlashList can promote to a hardware layer
+    // during fast scroll/overscroll; without its own opaque background here,
+    // that layer's default (black) briefly shows through instead of the
+    // screen's white. WalletHistoryPage's contentContainerStyle already sets
+    // this for the same reason — Notifications never got it.
+    backgroundColor: "#FFFFFF",
   },
   section: {
     marginTop: exactScale(16),

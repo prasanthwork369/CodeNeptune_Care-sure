@@ -1,5 +1,12 @@
+import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
+import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
+import { useDeliveryCharges } from "@/src/features/cart/hooks/useDeliveryCharges";
+import {
+  CartCorporateCreditsSection,
+  CartWalletSection,
+} from "@/src/features/cart/sections";
 import { CartBillSummary } from "@/src/features/cart/sections/CartBillSummary";
 import { CartCoinsSection } from "@/src/features/cart/sections/CartCoinsSection";
 import { CartConfetti } from "@/src/features/cart/sections/CartConfetti";
@@ -8,22 +15,15 @@ import { CartDeliveringTo } from "@/src/features/cart/sections/CartDeliveringTo"
 import { CartFooter } from "@/src/features/cart/sections/CartFooter";
 import { CartSavingsBreakdown } from "@/src/features/cart/sections/CartSavingsBreakdown";
 import { CartTerms } from "@/src/features/cart/sections/CartTerms";
-import {
-  CartWalletSection,
-  CartCorporateCreditsSection,
-} from "@/src/features/cart/sections";
-import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
-import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillReminder";
 import { ReminderSheet } from "@/src/features/prescription/components/ReminderSheet";
-import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillReminder";
 import { useAppliedCoupon } from "@/src/hooks/billing/useAppliedCoupon";
 import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
-import { useDeliveryCharges } from "@/src/features/cart/hooks/useDeliveryCharges";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
 import { Text, View, useWindowDimensions } from "react-native";
@@ -38,11 +38,11 @@ import {
   SavingsBanner,
 } from "../sections/medicine-comparison";
 
-import { MedicineComparisonSkeleton } from "../components/MedicineComparisonSkeleton";
-import { useComparisonPrescriptionId } from "../hooks/useComparisonPrescriptionId";
+import { Touchable } from "@/src/components/ui/Touchable";
 import { usePrescriptionOrderMedicines } from "@/src/features/prescription/hooks/usePrescriptionOrderMedicines";
 import { useLocalSearchParams } from "expo-router";
-import { Touchable } from "@/src/components/ui/Touchable";
+import { MedicineComparisonSkeleton } from "../components/MedicineComparisonSkeleton";
+import { useComparisonPrescriptionId } from "../hooks/useComparisonPrescriptionId";
 
 import type { ComparisonMedicine } from "../types";
 
@@ -180,8 +180,11 @@ export const MedicineComparisonLayout: React.FC<
 
   // Coupon — recomputed live from the coupon's own rule (not the frozen
   // apply-time amount), sharing the exact same hook as Cart.
-  const { appliedCoupon, removeCoupon, couponDiscount: COUPON_DISCOUNT } =
-    useAppliedCoupon(subtotal);
+  const {
+    appliedCoupon,
+    removeCoupon,
+    couponDiscount: COUPON_DISCOUNT,
+  } = useAppliedCoupon(subtotal);
 
   // Use reusable calculations hook
   const {
@@ -316,7 +319,10 @@ export const MedicineComparisonLayout: React.FC<
       <Animated.ScrollView
         style={{ flex: 1, backgroundColor: "#F9FAFB" }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: exactScale(24) }}
+        contentContainerStyle={{
+          paddingBottom: exactScale(24),
+          borderWidth: 0,
+        }}
         stickyHeaderIndices={totalSavings > 0 ? [2] : [1]}
         // A fast fling to the top triggers Android's stretch overscroll, which
         // pulls the banner away from the header and shows this ScrollView's grey

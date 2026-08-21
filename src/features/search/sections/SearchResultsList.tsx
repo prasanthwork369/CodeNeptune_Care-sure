@@ -3,7 +3,7 @@ import { SearchNoSubstituteCard } from "@/src/features/search/SearchNoSubstitute
 import { SearchProductCard } from "@/src/features/search/SearchProductCard";
 import { SearchRecommendCard } from "@/src/features/search/SearchRecommendCard";
 import { SOURCE_TYPE } from "@/src/constants/source-type";
-import { FlashList } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { SearchColumnHeaders } from "./SearchColumnHeaders";
@@ -18,6 +18,20 @@ const ListFooter = () => (
 
 const keyExtractor = (item: ApiSearchMedicine) => item.id;
 
+type SearchDataItem = { type: "comparison-header" } | ApiSearchMedicine;
+
+// Single source of truth for cell shape — used for both FlashList's recycling
+// (getItemType) and renderItem's branching, so the two can't drift out of sync.
+const resolveItemType = (
+  item: SearchDataItem,
+): "header" | "comparison" | "no-substitute" | "recommend" => {
+  if ("type" in item) return "header";
+  if (item.sourceType === SOURCE_TYPE.COMPARABLE) {
+    return item.recommendation ? "comparison" : "no-substitute";
+  }
+  return "recommend";
+};
+
 export const SearchResultsList = React.memo(
   ({
     results,
@@ -29,6 +43,7 @@ export const SearchResultsList = React.memo(
     onRecommendPress,
     onEndReached,
     isFetchingNextPage,
+    onScrollBeginDrag,
   }: {
     results: ApiSearchMedicine[];
     colWidth: number;
@@ -46,9 +61,11 @@ export const SearchResultsList = React.memo(
     onRecommendPress: (productId: string) => void;
     onEndReached: () => void;
     isFetchingNextPage: boolean;
+    // Fired once when the user's finger starts dragging the list — not on
+    // every onScroll frame, and not for a tap (RN's own touch-slop already
+    // filters those out before this fires).
+    onScrollBeginDrag?: () => void;
   }) => {
-    type SearchDataItem = { type: "comparison-header" } | ApiSearchMedicine;
-
     const hasComparisonRows = useMemo(
       () =>
         results.some(
@@ -68,26 +85,35 @@ export const SearchResultsList = React.memo(
 
     const renderItem = useCallback(
       ({ item }: { item: SearchDataItem }) => {
+        // Narrows item to ApiSearchMedicine for everything below — the same
+        // check resolveItemType uses internally to decide "header".
         if ("type" in item) {
           return <SearchColumnHeaders colWidth={colWidth} />;
         }
 
-        return (
-          <View className="px-4">
-            {item.sourceType === SOURCE_TYPE.COMPARABLE ? (
-              item.recommendation ? (
+        switch (resolveItemType(item)) {
+          case "comparison":
+            return (
+              <View className="px-4">
                 <SearchProductCard data={toComparisonData(item)} />
-              ) : (
+              </View>
+            );
+          case "no-substitute":
+            return (
+              <View className="px-4">
                 <SearchNoSubstituteCard data={toSearchedOnlyData(item)} />
-              )
-            ) : (
-              <SearchRecommendCard
-                data={toRecommendData(item)}
-                onPress={onRecommendPress}
-              />
-            )}
-          </View>
-        );
+              </View>
+            );
+          default:
+            return (
+              <View className="px-4">
+                <SearchRecommendCard
+                  data={toRecommendData(item)}
+                  onPress={onRecommendPress}
+                />
+              </View>
+            );
+        }
       },
       [
         colWidth,
@@ -104,7 +130,7 @@ export const SearchResultsList = React.memo(
     );
 
     return (
-      <FlashList
+      <AppFlashList
         data={data}
         keyExtractor={(item) =>
           "type" in item ? "comparison-header" : keyExtractor(item)
@@ -116,7 +142,12 @@ export const SearchResultsList = React.memo(
         contentContainerStyle={contentStyle}
         className="flex-1"
         stickyHeaderIndices={hasComparisonRows ? [0] : undefined}
+        getItemType={resolveItemType}
+        // Wider pre-render buffer beyond the viewport (default 250) so cells
+        // are already measured/mounted before a fast fling reaches them.
+        drawDistance={1200}
         renderItem={renderItem}
+        onScrollBeginDrag={onScrollBeginDrag}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.4}
         ListFooterComponent={isFetchingNextPage ? ListFooter : null}

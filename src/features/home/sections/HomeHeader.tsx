@@ -123,7 +123,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
     // A signed-in user with no balance yet (cold start, no in-memory cache)
     // gets a skeleton instead — never a false ₹0 while the real value is
     // still unknown.
-    const isBalancePending = isAuthenticated && (balanceLoading || balance == null);
+    const isBalancePending =
+      isAuthenticated && (balanceLoading || balance == null);
     const walletDisplay =
       balance != null
         ? `₹${Number(balance.walletBalance) % 1 === 0 ? Number(balance.walletBalance).toFixed(0) : Number(balance.walletBalance).toFixed(2)}`
@@ -133,7 +134,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
       <View
         className="flex-row justify-between items-center px-5 pb-2"
         // Keep controls below the status bar/notch with only a compact visual gap.
-        style={{ paddingTop: insets.top }}
+        style={{ paddingTop: insets.top + 10 }}
       >
         {/* Left: Delivery Location */}
         <View style={{ flex: 1, minWidth: 0, position: "relative" }}>

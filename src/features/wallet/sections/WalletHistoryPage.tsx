@@ -3,7 +3,8 @@ import { Transaction } from "../types";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React, { useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import { ListRenderItem } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import { TxRow } from "./TxRow";
 
 interface WalletHistoryPageProps {
@@ -74,7 +75,7 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
 
   return (
     <View style={{ width, flex: 1 }}>
-      <FlashList
+      <AppFlashList
         data={transactions}
         keyExtractor={keyExtractor}
         renderItem={renderItem}

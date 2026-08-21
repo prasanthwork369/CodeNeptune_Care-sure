@@ -47,16 +47,13 @@ export function usePrescriptionUploadService({
     if (runningRef.current) return;
     runningRef.current = true;
     try {
-      const { status, canAskAgain } =
-        await ImagePicker.requestCameraPermissionsAsync();
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
       if (status !== "granted") {
-        if (!canAskAgain) {
-          showPermissionAlert(
-            "Camera Access Required",
-            "CareSure needs access to your camera to take a photo of your prescription. Please allow Camera access in Settings to continue.",
-          );
-        }
+        showPermissionAlert(
+          "Camera Access Required",
+          "CareSure needs access to your camera to take a photo of your prescription. Please allow Camera access in Settings to continue.",
+        );
         return;
       }
 

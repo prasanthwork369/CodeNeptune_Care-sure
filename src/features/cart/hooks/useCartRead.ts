@@ -89,6 +89,34 @@ export const useCartCount = (): number => {
 };
 
 /**
+ * Narrow, per-row cart-item lookup for callers whose matching rules don't fit
+ * useCartActions' fixed CartActionProduct shape (e.g. legacy multi-field
+ * fallback matching). Subscribes only to the matched item — same mechanism
+ * as useCartActions: react-query/Zustand compare the *found item* between
+ * updates, so a row only re-renders when ITS OWN match changes, not on every
+ * unrelated add/remove elsewhere in the cart.
+ */
+export const useMatchingCartItem = (
+  predicate: (item: CartItem) => boolean,
+): CartItem | undefined => {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  const { data: authMatch } = useQuery({
+    queryKey: QUERY_KEYS.CUSTOMER.CART,
+    queryFn: cartApi.getCart,
+    enabled: isAuthenticated,
+    staleTime: 10_000,
+    select: (cart) => cart.items.find(predicate),
+  });
+
+  const guestMatch = useCartPendingStore((s) =>
+    isAuthenticated ? undefined : s.guestCart.items.find(predicate),
+  );
+
+  return isAuthenticated ? authMatch : guestMatch;
+};
+
+/**
  * Selects only the matching variant ID from cart for variant preselection.
  * Returns a primitive string, preventing parent re-renders on cart quantity changes.
  */

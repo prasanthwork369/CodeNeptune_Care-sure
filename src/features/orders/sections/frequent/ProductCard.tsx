@@ -4,13 +4,18 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
-import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
+import { useMatchingCartItem } from "@/src/features/cart/hooks/useCartRead";
 import { cartMutations } from "@/src/features/cart/services/cart.mutations";
+import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import type { Cart } from "@/src/features/cart/types";
+import { useCartPendingStore } from "@/src/store/cartStore";
+import { useAuthStore } from "@/src/store/authStore";
 import { resolveUUID } from "@/src/utils/resolveUUID";
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import { logger } from "@/src/utils/logger";
 
 function formatDate(dateStr?: string | null) {
@@ -43,14 +48,17 @@ export const ProductCard = React.memo(function ProductCard({
 }) {
   const isStepperVariant = variant === "preAddStepper";
   const router = useNav();
-  const { items: cartItems } = useCartRead();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
   const [manualQty, setManualQty] = useState(1);
 
   const productId = item.productId || item.id;
   const historyQty = item.lastQty ?? 1;
   const qty = isStepperVariant ? manualQty : historyQty;
-  const cartItem = cartItems.find(
+  // Narrow subscription: only re-renders when THIS row's matching cart item
+  // changes, not on every add/remove elsewhere in the cart.
+  const cartItem = useMatchingCartItem(
     (c) =>
       c.medicineId === productId ||
       c.metadata?.productId === productId ||
@@ -73,7 +81,13 @@ export const ProductCard = React.memo(function ProductCard({
   const handleAddToCart = async () => {
     setIsAdding(true);
     try {
-      const existing = cartItems.find(
+      // Snapshot read at click time — same predicate as before, just no
+      // longer a reactive subscription to the whole cart array.
+      const snapshotItems = isAuthenticated
+        ? (queryClient.getQueryData<Cart>(QUERY_KEYS.CUSTOMER.CART)?.items ??
+          [])
+        : useCartPendingStore.getState().guestCart.items;
+      const existing = snapshotItems.find(
         (c) =>
           c.medicineId === productId || c.metadata?.productId === productId,
       );

@@ -139,13 +139,13 @@ const optionTextStyle = {
   marginLeft: 12,
 };
 
-export const PrescriptionCard = ({
+export const PrescriptionCard = React.memo(function PrescriptionCard({
   item,
   onDownloadPress,
 }: {
   item: Prescription;
   onDownloadPress: (url: string, fileName: string) => void;
-}) => {
+}) {
   const router = useNav();
   // Server-backed refill reminder; undefined lets the hook fetch it when the
   // list response didn't include the reminder field.
@@ -482,4 +482,4 @@ export const PrescriptionCard = ({
       )}
     </View>
   );
-};
+});

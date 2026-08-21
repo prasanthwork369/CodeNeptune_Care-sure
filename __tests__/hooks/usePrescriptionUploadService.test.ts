@@ -89,6 +89,26 @@ describe("usePrescriptionUploadService permission messages", () => {
     );
   });
 
+  it("shows the camera message when camera permission is denied but can be asked again", async () => {
+    imagePicker.requestCameraPermissionsAsync.mockResolvedValue({
+      status: "denied",
+      canAskAgain: true,
+    } as never);
+    const { result } = renderHook(() =>
+      usePrescriptionUploadService({ onAssetsReady: jest.fn() }),
+    );
+
+    await act(async () => {
+      await result.current.takePhoto();
+    });
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Camera Access Required",
+      "CareSure needs access to your camera to take a photo of your prescription. Please allow Camera access in Settings to continue.",
+      expect.any(Array),
+    );
+  });
+
   it("still shows the photo message when gallery permission is denied", async () => {
     imagePicker.requestMediaLibraryPermissionsAsync.mockResolvedValue({
       status: "denied",

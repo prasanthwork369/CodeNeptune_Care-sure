@@ -1,19 +1,19 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
+import { searchHeaderStyles as hs } from "@/src/features/search/search.styles";
 import { useNav } from "@/src/hooks/useNav";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useRef } from "react";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import React, { useRef } from "react";
 import { Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { searchHeaderStyles as hs } from "@/src/features/search/search.styles";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 interface ProductHeaderProps {
   cartCount?: number;
   query?: string;
   onQueryChange?: (text: string) => void;
   onSubmit?: () => void;
+  onFocus?: () => void;
   isSearching?: boolean;
   onBack?: () => void;
 }
@@ -23,6 +23,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   query,
   onQueryChange,
   onSubmit,
+  onFocus,
   isSearching = false,
   onBack,
 }) => {
@@ -30,17 +31,6 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
   const inputRef = useRef<TextInput>(null);
-
-  // autoFocus only fires on mount, and returning from the product page doesn't
-  // remount this screen — refocus so the keyboard comes back with it.
-  useFocusEffect(
-    useCallback(() => {
-      if (!onQueryChange) return;
-      // Android drops a focus() issued mid-transition, so wait a frame or two.
-      const t = setTimeout(() => inputRef.current?.focus(), 80);
-      return () => clearTimeout(t);
-    }, [onQueryChange]),
-  );
 
   return (
     <View
@@ -69,6 +59,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 value={query}
                 onChangeText={onQueryChange}
                 onSubmitEditing={onSubmit}
+                onFocus={onFocus}
                 placeholder="Search medicines & health products"
                 placeholderTextColor="#6A6A6A"
                 style={hs.inputText}

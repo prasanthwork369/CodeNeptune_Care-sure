@@ -8,7 +8,7 @@ export interface ComparisonMedicine {
   prescribed: {
     name: string;
     manufacturer: string;
-    packSize: string;
+    packagingDetail: string;
     image: ImageSource | null;
     mrp: number;
   };
@@ -18,7 +18,7 @@ export interface ComparisonMedicine {
     slug: string;
     name: string;
     manufacturer: string;
-    packSize: string;
+    packagingDetail: string;
     image: ImageSource | null;
     price: number;
     mrp: number;

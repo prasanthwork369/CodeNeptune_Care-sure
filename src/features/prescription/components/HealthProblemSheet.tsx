@@ -9,9 +9,19 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { SafeBottomSheetInput } from "@/src/components/ui/SafeBottomSheetInput";
+
+const OTHER_OPTION: HealthProblem = {
+  id: "other",
+  slug: "other",
+  label: "Other",
+  icon: "➕",
+  description: null,
+  sortOrder: 9999,
+  isActive: true,
+};
 
 interface HealthProblemSheetProps {
   isVisible: boolean;
@@ -34,35 +44,99 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
     isActive: true,
   });
 
-  const OTHER_OPTION: HealthProblem = {
-    id: "other",
-    slug: "other",
-    label: "Other",
-    icon: "➕",
-    description: null,
-    sortOrder: 9999,
-    isActive: true,
-  };
+  const activeProblems = useMemo(
+    () => (healthProblems ? [...healthProblems, OTHER_OPTION] : [OTHER_OPTION]),
+    [healthProblems],
+  );
 
-  const activeProblems = healthProblems
-    ? [...healthProblems, OTHER_OPTION]
-    : [OTHER_OPTION];
+  const filtered = useMemo(
+    () =>
+      query.trim()
+        ? activeProblems.filter((p) =>
+            p.label.toLowerCase().includes(query.toLowerCase()),
+          )
+        : activeProblems,
+    [query, activeProblems],
+  );
 
-  const filtered = query.trim()
-    ? activeProblems.filter((p) =>
-        p.label.toLowerCase().includes(query.toLowerCase()),
-      )
-    : activeProblems;
+  const handleSelect = useCallback(
+    (item: HealthProblem) => {
+      if (item.id === "other") {
+        setIsCustomMode(true);
+        return;
+      }
+      onSelect(item);
+      setQuery("");
+      onClose();
+    },
+    [onSelect, onClose],
+  );
 
-  const handleSelect = (item: HealthProblem) => {
-    if (item.id === "other") {
-      setIsCustomMode(true);
-      return;
-    }
-    onSelect(item);
-    setQuery("");
-    onClose();
-  };
+  const renderProblemItem = useCallback(
+    ({ item }: { item: HealthProblem }) => {
+      const isSelected = selected?.id === item.id;
+      return (
+        <Touchable
+          activeOpacity={0.8}
+          onPress={() => handleSelect(item)}
+          style={{
+            flex: 1,
+            borderRadius: exactScale(14),
+            alignItems: "center",
+            paddingVertical: exactScale(12),
+            paddingHorizontal: exactScale(8),
+            gap: exactScale(8),
+            borderWidth: isSelected ? 1.5 : 1,
+            borderColor: isSelected ? "#0F7635" : "#E5E7EB",
+            backgroundColor: isSelected ? "#F0FFF6" : "#fff",
+          }}
+        >
+          <View style={{ position: "relative" }}>
+            <View
+              style={{
+                width: exactScale(44),
+                height: exactScale(44),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {item.icon &&
+              (item.icon.startsWith("http") ||
+                item.icon.startsWith("/") ||
+                item.icon.includes(".")) ? (
+                <RemoteIcon
+                  uri={resolveAssetUrl(item.icon)}
+                  size={exactScale(44)}
+                />
+              ) : (
+                <Text
+                  style={{
+                    fontSize: typography.h2.fontSize,
+                    lineHeight: typography.h2.lineHeight,
+                  }}
+                >
+                  {item.icon}
+                </Text>
+              )}
+            </View>
+          </View>
+          <Text
+            numberOfLines={2}
+            style={{
+              fontSize: moderateScale(13),
+              textAlign: "center",
+              lineHeight: moderateScale(16),
+              fontWeight: isSelected ? "600" : "500",
+              color: isSelected ? "#0F7635" : "#1A1C1E",
+            }}
+          >
+            {item.label}
+          </Text>
+        </Touchable>
+      );
+    },
+    [selected, handleSelect],
+  );
 
   const handleCustomSubmit = () => {
     if (customText.trim()) {
@@ -269,68 +343,7 @@ export const HealthProblemSheet: React.FC<HealthProblemSheetProps> = ({
                 }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                renderItem={({ item }) => {
-                  const isSelected = selected?.id === item.id;
-                  return (
-                    <Touchable
-                      activeOpacity={0.8}
-                      onPress={() => handleSelect(item)}
-                      style={{
-                        flex: 1,
-                        borderRadius: exactScale(14),
-                        alignItems: "center",
-                        paddingVertical: exactScale(12),
-                        paddingHorizontal: exactScale(8),
-                        gap: exactScale(8),
-                        borderWidth: isSelected ? 1.5 : 1,
-                        borderColor: isSelected ? "#0F7635" : "#E5E7EB",
-                        backgroundColor: isSelected ? "#F0FFF6" : "#fff",
-                      }}
-                    >
-                      <View style={{ position: "relative" }}>
-                        <View
-                          style={{
-                            width: exactScale(44),
-                            height: exactScale(44),
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {item.icon &&
-                          (item.icon.startsWith("http") ||
-                            item.icon.startsWith("/") ||
-                            item.icon.includes(".")) ? (
-                            <RemoteIcon
-                              uri={resolveAssetUrl(item.icon)}
-                              size={exactScale(44)}
-                            />
-                          ) : (
-                            <Text
-                              style={{
-                                fontSize: typography.h2.fontSize,
-                                lineHeight: typography.h2.lineHeight,
-                              }}
-                            >
-                              {item.icon}
-                            </Text>
-                          )}
-                        </View>
-                      </View>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          fontSize: moderateScale(13),
-                          textAlign: "center",
-                          lineHeight: moderateScale(16),
-                          fontWeight: isSelected ? "600" : "500",
-                          color: isSelected ? "#0F7635" : "#1A1C1E",
-                        }}
-                      >
-                        {item.label}
-                      </Text>
-                    </Touchable>
-                  );
-                }}
+                renderItem={renderProblemItem}
               />
             )}
           </>

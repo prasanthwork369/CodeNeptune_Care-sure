@@ -49,9 +49,9 @@ const getStatusConfig = (status: string) =>
     description: "",
   };
 
-export const PrescriptionHistoryItem: React.FC<
-  PrescriptionHistoryItemProps
-> = ({ item }) => {
+export const PrescriptionHistoryItem = React.memo(function PrescriptionHistoryItem({
+  item,
+}: PrescriptionHistoryItemProps) {
   const router = useNav();
   const [showReasons, setShowReasons] = useState(false);
   const statusConfig = getStatusConfig(item.status);
@@ -242,4 +242,4 @@ export const PrescriptionHistoryItem: React.FC<
       />
     </View>
   );
-};
+});

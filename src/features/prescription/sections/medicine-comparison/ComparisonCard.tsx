@@ -220,12 +220,12 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           <Row
             left={
               <Text style={packSizeStyle} numberOfLines={1}>
-                {item.prescribed.packSize}
+                {item.prescribed.packagingDetail}
               </Text>
             }
             right={
               <Text style={packSizeStyle} numberOfLines={1}>
-                {item.recommended.packSize}
+                {item.recommended.packagingDetail}
               </Text>
             }
           />

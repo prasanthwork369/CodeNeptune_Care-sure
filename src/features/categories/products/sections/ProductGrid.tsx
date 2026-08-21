@@ -1,7 +1,7 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import type { CategoryProduct } from "@/src/features/categories/types";
 import { moderateScale } from "@/src/utils/exactScale";
-import { FlashList } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo } from "react";
 import {
   RefreshControl,
@@ -112,7 +112,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   }
 
   return (
-    <FlashList
+    <AppFlashList
       data={products}
       numColumns={2}
       keyExtractor={keyExtractor}

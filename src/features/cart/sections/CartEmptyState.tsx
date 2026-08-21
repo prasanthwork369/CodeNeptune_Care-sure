@@ -64,7 +64,7 @@ export const CartEmptyState: React.FC<CartEmptyStateProps> = ({
         </Text>
         <Touchable
           activeOpacity={0.85}
-          onPress={() => router.replace("/(tabs)")}
+          onPress={() => router.push("/search")}
           className="bg-brand-primary items-center justify-center"
           style={{
             width: exactScale(152),

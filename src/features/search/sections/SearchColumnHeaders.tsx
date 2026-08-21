@@ -23,7 +23,7 @@ export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
           YOU SEARCHED
         </Text>
       </View>
-      <View className="flex-1 items-center justify-center pb-3">
+      <View className="flex-1 items-center justify-center py-3">
         <Svg height={14} width={safeColWidth}>
           <Defs>
             <SvgLinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">

@@ -18,7 +18,8 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import { RefreshControl, Text, View } from "react-native";
-import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import { ListRenderItem } from "@shopify/flash-list";
+import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import {
   NotificationRow,
   SECTION_ORDER,
@@ -233,6 +234,13 @@ export const NotificationsLayout: React.FC = () => {
       }
       return (
         <NotificationRow
+          // FlashList recycles the row's component instance across different
+          // notifications in the same slot; without a key tied to the
+          // notification's own identity, local state (expand/collapse,
+          // swipe-delete, options menu) survives into the next notification
+          // shown there — corrupting row height and causing the jump/overlap/
+          // blank-row symptoms. The key forces a clean remount per identity.
+          key={item.notification.id}
           notification={item.notification}
           section={item.section}
           isLast={item.isLast}
@@ -348,12 +356,23 @@ export const NotificationsLayout: React.FC = () => {
       {shouldShowInitialShimmer ? (
         <NotificationsSkeleton />
       ) : (
-        <FlashList
+        <AppFlashList
           data={rows}
           keyExtractor={keyExtractor}
           getItemType={getItemType}
           renderItem={renderItem}
           className="flex-1"
+          // Explicit on the list itself, not just the ancestor View — the
+          // native scroll surface needs its own opaque background so a
+          // hardware-layer/overscroll frame can't reveal black underneath it.
+          style={{ backgroundColor: "#FFFFFF" }}
+          // Rows carry a gesture-handler-wrapped swipeable + variable-height
+          // text, so the library's default 250dp pre-render buffer can't keep
+          // up with a fast fling in either direction — cells genuinely
+          // haven't drawn yet, showing through as black. Same fix already
+          // proven on Search Results' heavier cards, scaled to this screen's
+          // lighter (~90-110dp) rows.
+          drawDistance={800}
           overScrollMode="auto"
           contentContainerStyle={contentContainerStyle}
           showsVerticalScrollIndicator={false}

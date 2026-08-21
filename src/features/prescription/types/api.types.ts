@@ -93,6 +93,7 @@ export interface ApiPrescriptionMedicine {
   image: string;
   salts: ApiSalt[];
   slug: string;
+  packagingDetail?: string | null;
 }
 
 export interface ApiPrescriptionOrderItem {
