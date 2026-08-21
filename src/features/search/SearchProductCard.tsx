@@ -40,12 +40,17 @@ interface SearchRowProps {
       unit?: string;
     };
   };
+  // Called right before navigating to Product Details — lets the search
+  // screen tear down its keyboard/suggestions state first, since this card
+  // pushes to its own route directly rather than through a results-list callback.
+  onBeforeNavigate?: () => void;
 }
 
-export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
+export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchRowProps) => {
   const router = useNav();
 
   const handleCardPress = useCallback(() => {
+    onBeforeNavigate?.();
     const previewImage =
       typeof data.recommended.image === "string"
         ? data.recommended.image
@@ -59,7 +64,7 @@ export const SearchProductCard = React.memo(({ data }: SearchRowProps) => {
         previewBrand: data.recommended.manufacturer || undefined,
       },
     });
-  }, [data, router]);
+  }, [data, router, onBeforeNavigate]);
 
   const prefetchProduct = usePrefetchProduct();
   const handlePrefetch = useCallback(() => {

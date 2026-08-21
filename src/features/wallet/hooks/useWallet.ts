@@ -17,7 +17,7 @@ const LOGS_PAGE_SIZE = 20;
 export const useWalletBalance = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const { data, isLoading, isRefetching, refetch } = useQuery({
+  const { data, isLoading, isRefetching, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.WALLET.BALANCE,
     queryFn: () => walletApi.getBalance(),
     enabled: isAuthenticated,
@@ -32,6 +32,7 @@ export const useWalletBalance = () => {
     balance: data ?? null,
     loading: isLoading,
     refreshing: isRefetching,
+    error,
     refetch,
   };
 };
@@ -62,7 +63,7 @@ export const useAddMoney = () => {
 export const useWalletLogs = (limit: number = 20, offset: number = 0) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const { data, isLoading, isRefetching, refetch } = useQuery({
+  const { data, isLoading, isRefetching, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.WALLET.LOGS({ limit, offset }),
     queryFn: () => walletApi.getLogs(limit, offset),
     enabled: isAuthenticated,
@@ -75,6 +76,7 @@ export const useWalletLogs = (limit: number = 20, offset: number = 0) => {
     logs: data ?? [],
     loading: isLoading,
     refreshing: isRefetching,
+    error,
     refetch,
   };
 };
@@ -127,6 +129,7 @@ export const useInfiniteWalletLogs = () => {
     logs: query.data?.pages.flat() ?? [],
     loading: query.isLoading,
     refreshing: query.isRefetching,
+    error: query.error,
     fetchNextPage: query.fetchNextPage,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,

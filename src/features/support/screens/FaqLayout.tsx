@@ -1,9 +1,12 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useState, useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useFaqs } from "@/src/features/home/hooks/useWebsiteContent";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
 import type { Faq } from "@/src/features/support/types";
@@ -49,7 +52,8 @@ const FaqSkeleton = () => (
 );
 
 export const FaqLayout: React.FC = () => {
-  const { data: cmsFaqs, isLoading } = useFaqs();
+  const { data: cmsFaqs, isLoading, isFetching, error, refetch } = useFaqs();
+  const errorState = useQueryErrorState(error);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const faqs: Faq[] = useMemo(
@@ -62,6 +66,17 @@ export const FaqLayout: React.FC = () => {
       <ScreenHeader title="FAQs" backgroundColor="#FFFFFF" />
       {isLoading ? (
         <FaqSkeleton />
+      ) : errorState === "offline" && faqs.length === 0 ? (
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={isFetching}
+        />
+      ) : errorState && faqs.length === 0 ? (
+        <RetryState
+          title="Couldn't load FAQs"
+          onRetry={() => void refetch()}
+          retrying={isFetching}
+        />
       ) : faqs.length === 0 ? (
         <View className="flex-1 items-center justify-center p-8">
           <Text

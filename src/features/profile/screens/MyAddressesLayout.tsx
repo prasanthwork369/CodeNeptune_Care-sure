@@ -1,10 +1,13 @@
 import { Address } from "@/src/types/address";
 import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { AddressType } from "@/src/types/address";
 import React, { useRef, useState } from "react";
@@ -135,7 +138,20 @@ const AddressCard = ({
 export const MyAddressesLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const router = useNav();
-  const { addresses, loading, error, deleting, deleteAddress } = useAddress();
+  const {
+    addresses,
+    loading,
+    refreshing,
+    error,
+    listError,
+    deleting,
+    deleteAddress,
+    refetch,
+  } = useAddress();
+  // The list fetch's failure, not the mutation error above — "No saved
+  // addresses yet" must stay a statement about the account, not about the
+  // network. Cached addresses from the SQLite seed keep rendering regardless.
+  const listErrorState = useQueryErrorState(listError);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const shouldShowInitialShimmer = loading && addresses.length === 0;
   // Ref, not state, so a rapid double-tap on the confirm dialog's button
@@ -216,14 +232,26 @@ export const MyAddressesLayout: React.FC = () => {
                 deleting={deleting}
               />
             ))}
-            {addresses.length === 0 && (
-              <Text
-                style={s.addrLabel}
-                className="font-inter-medium text-brand-subtext text-center mt-10"
-              >
-                No saved addresses yet
-              </Text>
-            )}
+            {addresses.length === 0 &&
+              (listErrorState === "offline" ? (
+                <NoInternetState
+                  onRetry={() => void refetch()}
+                  retrying={refreshing}
+                />
+              ) : listErrorState ? (
+                <RetryState
+                  title="Couldn't load your addresses"
+                  onRetry={() => void refetch()}
+                  retrying={refreshing}
+                />
+              ) : (
+                <Text
+                  style={s.addrLabel}
+                  className="font-inter-medium text-brand-subtext text-center mt-10"
+                >
+                  No saved addresses yet
+                </Text>
+              ))}
           </>
         )}
       </ScrollView>

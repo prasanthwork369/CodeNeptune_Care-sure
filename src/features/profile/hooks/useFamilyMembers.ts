@@ -17,6 +17,8 @@ export const useFamilyMembers = () => {
     data: rawData,
     isLoading,
     isRefetching,
+    error: listError,
+    refetch,
   } = useQuery<FamilyMember[]>({
     queryKey: QUERY_KEYS.CUSTOMER.MEMBERS,
     queryFn: withSqliteCache("family_members", familyMemberApi.getMembers),
@@ -62,6 +64,13 @@ export const useFamilyMembers = () => {
     error:
       (addMutation.error ?? updateMutation.error ?? deleteMutation.error)
         ?.message ?? null,
+    /**
+     * The list fetch's own failure, kept separate from the mutation `error`
+     * string above: an empty `members` after this is set means the list could
+     * not be read, not that the account has no patients.
+     */
+    listError,
+    refetch,
     addMember: (payload: FamilyMemberInput) => addMutation.mutateAsync(payload),
     updateMember: (id: string, payload: Partial<FamilyMemberInput>) =>
       updateMutation.mutateAsync({ id, payload }),

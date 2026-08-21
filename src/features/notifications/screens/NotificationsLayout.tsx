@@ -1,4 +1,6 @@
 import type { NotificationLog } from "../types";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -11,6 +13,7 @@ import { useNotifications } from "@/src/features/notifications/hooks/useNotifica
 import { usePrefetchOrder } from "@/src/features/orders/hooks/useOrderById";
 import { usePrefetchWallet } from "@/src/features/wallet/hooks/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale } from "@/src/utils/exactScale";
@@ -48,8 +51,9 @@ export const NotificationsLayout: React.FC = () => {
   const openSwipeableRef = useRef<SwipeableMethods | null>(null);
   const touchStartRef = useRef({ x: 0, y: 0 });
 
-  const { notifications, isLoading, isRefetching, isError, refetch } =
+  const { notifications, isLoading, isRefetching, isError, error, refetch } =
     useNotifications();
+  const errorState = useQueryErrorState(error);
   const { mutate: dismiss, mutateAsync: dismissAsync } =
     useDismissNotification();
   const { mutate: markRead } = useMarkNotificationRead();
@@ -290,22 +294,18 @@ export const NotificationsLayout: React.FC = () => {
   );
 
   const listEmptyComponent = showError ? (
-    <View
-      className="flex-1 items-center justify-center"
-      style={{ paddingHorizontal: exactScale(24) }}
-    >
-      <Text style={s.errorTitle}>Unable to load notifications</Text>
-      <Text style={s.errorSub}>
-        Please check your connection and try again.
-      </Text>
-      <Touchable
-        onPress={() => void refetch()}
-        style={s.retryButton}
-        accessibilityLabel="Retry loading notifications"
-      >
-        <Text style={s.retryText}>Try Again</Text>
-      </Touchable>
-    </View>
+    errorState === "offline" ? (
+      <NoInternetState
+        onRetry={() => void refetch()}
+        retrying={isRefetching}
+      />
+    ) : (
+      <RetryState
+        title="Unable to load notifications"
+        onRetry={() => void refetch()}
+        retrying={isRefetching}
+      />
+    )
   ) : showEmpty ? (
     <View className="flex-1 items-center justify-center">
       <icons.notification

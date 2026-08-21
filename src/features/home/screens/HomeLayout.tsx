@@ -7,6 +7,7 @@ import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { BAR_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { SearchBar } from "@/src/components/ui/SearchBar";
 import { DELIVERY_LOCATION, QUICK_ACTIONS } from "../constants/data";
@@ -35,6 +36,7 @@ import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/features/support/hooks/useContactActions";
 import { useSettings } from "@/src/hooks/queries/useSettings";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
@@ -135,6 +137,7 @@ const HomeContent: React.FC = () => {
     isRefreshing,
     onRefresh,
   } = useHomeData();
+  const errorState = useQueryErrorState(error);
 
   const { data: settings } = useSettings();
   const { callSupport, whatsappOrder } = useContactActions({
@@ -613,14 +616,24 @@ const HomeContent: React.FC = () => {
     featuredProducts.length === 0 &&
     featuredSubcategories.length === 0;
 
-  if (error && hasNoHomeContent && !isHomeLoading) {
+  // Only when the SQLite seed left nothing to show either — a failed refresh
+  // over cached sections keeps them on screen, with the global banner explaining
+  // why they are stale.
+  if (errorState && hasNoHomeContent && !isHomeLoading) {
     return (
       <View className="flex-1 bg-white">
-        <RetryState
-          title="Couldn't load home"
-          onRetry={() => void onRefresh()}
-          retrying={isRefreshing}
-        />
+        {errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void onRefresh()}
+            retrying={isRefreshing}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load home"
+            onRetry={() => void onRefresh()}
+            retrying={isRefreshing}
+          />
+        )}
       </View>
     );
   }

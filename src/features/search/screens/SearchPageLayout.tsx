@@ -2,10 +2,10 @@ import { ApiSearchMedicine } from "@/src/features/search/types";
 import { SearchSkeleton } from "@/src/features/search/SearchSkeleton";
 import { ProductHeader } from "@/src/features/search/comparison/components/ProductHeader";
 import { SearchEmptyState } from "@/src/features/search/sections/SearchEmptyState";
-import { SearchOfflineState } from "@/src/features/search/sections/SearchOfflineState";
 import { SearchRecentSection } from "@/src/features/search/sections/SearchRecentSection";
 import { SearchResultsList } from "@/src/features/search/sections/SearchResultsList";
 import { SearchSuggestionsBar } from "@/src/features/search/sections/SearchSuggestionsBar";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
@@ -16,7 +16,7 @@ import {
   useTrendingSearches,
 } from "@/src/features/search/hooks/useSearch";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import {
   analyticsService,
@@ -166,7 +166,6 @@ export const SearchPageLayout = () => {
   const { width } = useWindowDimensions();
   const colWidth = (width - 32) / 2;
 
-  const isOffline = useIsOffline();
   const { totalItems: cartCount } = useCartRead();
   const {
     query,
@@ -181,6 +180,7 @@ export const SearchPageLayout = () => {
     refetch,
     debouncedQuery,
   } = useSearch();
+  const errorState = useQueryErrorState(error);
 
   // Cached results skip tracing because they do not represent network load.
   const { start: startSearchTrace, stop: stopSearchTrace } =
@@ -269,6 +269,16 @@ export const SearchPageLayout = () => {
     [recordHistory, setQuery],
   );
 
+  // Shared by every path off the results list — including the cards
+  // (SearchProductCard, SearchNoSubstituteCard) that push straight to their
+  // own product route instead of going through handleProductPress below.
+  // Without this, coming back from Product Details reveals whatever
+  // keyboard/suggestions state was left over from before the tap.
+  const dismissSearchUI = useCallback(() => {
+    Keyboard.dismiss();
+    setSuggestionsDismissed(true);
+  }, []);
+
   const handleProductPress = useCallback(
     (
       id: string,
@@ -276,10 +286,7 @@ export const SearchPageLayout = () => {
       previewImage?: string,
       previewBrand?: string,
     ) => {
-      // Dismiss so coming back from Product Details lands on the results
-      // list, not the keyboard/suggestions state the user left mid-search.
-      Keyboard.dismiss();
-      setSuggestionsDismissed(true);
+      dismissSearchUI();
       router.push({
         pathname: "/product/[id]",
         params: {
@@ -290,7 +297,7 @@ export const SearchPageLayout = () => {
         },
       });
     },
-    [router],
+    [router, dismissSearchUI],
   );
 
   const handleEndReached = useCallback(() => {
@@ -315,9 +322,7 @@ export const SearchPageLayout = () => {
         isSearching={isSearching}
       />
 
-      {isOffline ? (
-        <SearchOfflineState />
-      ) : !query.trim() ? (
+      {!query.trim() ? (
         <SearchRecentSection
           key="idle"
           history={history}
@@ -340,7 +345,12 @@ export const SearchPageLayout = () => {
 
           {isLoading ? (
             <SearchSkeleton />
-          ) : error && results.length === 0 ? (
+          ) : errorState === "offline" && results.length === 0 ? (
+            <NoInternetState
+              onRetry={() => void refetch()}
+              retrying={isFetching}
+            />
+          ) : errorState && results.length === 0 ? (
             <RetryState
               title="Search unavailable"
               message="We couldn't load search results. Please try again."
@@ -358,6 +368,7 @@ export const SearchPageLayout = () => {
               toSearchedOnlyData={toSearchedOnlyData}
               toRecommendData={toRecommendData}
               onRecommendPress={handleProductPress}
+              onBeforeProductNavigate={dismissSearchUI}
               onEndReached={handleEndReached}
               isFetchingNextPage={isFetchingNextPage}
               onScrollBeginDrag={handleResultsScrollStart}

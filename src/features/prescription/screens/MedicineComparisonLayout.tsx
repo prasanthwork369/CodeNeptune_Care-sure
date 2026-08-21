@@ -1,4 +1,6 @@
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
@@ -21,6 +23,7 @@ import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillRe
 import { useAppliedCoupon } from "@/src/hooks/billing/useAppliedCoupon";
 import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -73,10 +76,15 @@ export const MedicineComparisonLayout: React.FC<
   const {
     medicines: queryMedicines,
     isLoading,
+    isFetching,
+    error,
     refetch,
   } = usePrescriptionOrderMedicines(
     propsMedicines ? "" : (prescriptionOrderId ?? ""),
   );
+  // The message below claims the comparison isn't ready yet — a claim about the
+  // prescription, which a failed fetch must not make on its behalf.
+  const errorState = useQueryErrorState(error);
 
   const resolvedPrescriptionId = useComparisonPrescriptionId(
     rawPrescriptionId,
@@ -270,6 +278,26 @@ export const MedicineComparisonLayout: React.FC<
 
   if (!propsMedicines && isLoading) {
     return <MedicineComparisonSkeleton />;
+  }
+
+  if (!propsMedicines && medicines.length === 0 && errorState) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+        <ScreenHeader title="Medicine Comparison" showBorder />
+        {errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load the comparison"
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        )}
+      </View>
+    );
   }
 
   if (!propsMedicines && medicines.length === 0) {

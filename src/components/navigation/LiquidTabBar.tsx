@@ -224,8 +224,14 @@ interface TabItemProps {
   icon: AnimatedTabIcon;
   activeIcon?: AnimatedTabIcon;
   index: number;
-  isActive: boolean;
   label: string;
+  // Single source of truth for "is this tab the active one" — set
+  // synchronously on press (see tapGesture/panGesture below) and
+  // re-synced from the confirmed route once navigation settles. Icon/label
+  // color read this directly instead of the pill's own trailing position,
+  // so they switch the instant a tab is pressed rather than lagging behind
+  // (or briefly lighting up a tab the pill is only passing through).
+  activeIndex: SharedValue<number>;
   followerX: SharedValue<number>;
   pillOpacity: SharedValue<number>;
 }
@@ -235,34 +241,27 @@ const TabItem = React.memo(
     icon: Icon,
     activeIcon: ActiveIcon,
     index,
-    isActive,
     label,
+    activeIndex,
     followerX,
     pillOpacity,
   }: TabItemProps) => {
     const activeIconStyle = useAnimatedStyle(() => {
       "worklet";
-      const dist = Math.abs(followerX.value - index);
       return {
-        opacity:
-          dist < 0.3
-            ? interpolate(dist, [0, 0.2], [1, 0], Extrapolation.CLAMP) *
-              pillOpacity.value
-            : 0,
+        opacity: activeIndex.value === index ? pillOpacity.value : 0,
       };
     });
 
     const normalIconStyle = useAnimatedStyle(() => {
       "worklet";
-      const dist = Math.abs(followerX.value - index);
-      const a =
-        dist < 0.3
-          ? interpolate(dist, [0, 0.2], [1, 0], Extrapolation.CLAMP) *
-            pillOpacity.value
-          : 0;
+      const a = activeIndex.value === index ? pillOpacity.value : 0;
       return { opacity: 1 - a, position: ActiveIcon ? "absolute" : "relative" };
     });
 
+    // Purely cosmetic — the icon pulses as the pill's own trailing position
+    // sweeps past it. Left tied to followerX; it doesn't gate the active
+    // color/opacity above, so it can't cause the wrong tab to look selected.
     const zoomStyle = useAnimatedStyle(() => {
       "worklet";
       const dist = Math.abs(followerX.value - index);
@@ -272,16 +271,17 @@ const TabItem = React.memo(
 
     const animatedTextStyle = useAnimatedStyle(() => {
       "worklet";
-      const dist = Math.abs(followerX.value - index);
-      const w =
-        interpolate(dist, [0, 0.2], [1, 0], Extrapolation.CLAMP) *
-        pillOpacity.value;
+      const w = (activeIndex.value === index ? 1 : 0) * pillOpacity.value;
       return {
         color: interpolateColor(
           w,
           [0, 1],
           [INACTIVE_ICON_COLOR, ACTIVE_ICON_COLOR],
         ),
+        // Bundled into the same worklet/source of truth as color so weight
+        // and color always flip on the same frame instead of one trailing
+        // the other.
+        fontWeight: activeIndex.value === index ? "700" : "500",
         fontSize: tabStyles.tabLabel.fontSize,
         marginTop: TAB_LABEL_MARGIN_TOP,
         textAlign: "center",
@@ -329,11 +329,8 @@ const TabItem = React.memo(
           </Animated.View>
         </Animated.View>
         <AnimatedText
-          style={[
-            animatedTextStyle,
-            // fontFamily is intentionally omitted here — patchText.sanitizeStyle
-            { fontWeight: isActive ? "700" : "500" },
-          ]}
+          // fontFamily is intentionally omitted here — patchText.sanitizeStyle
+          style={animatedTextStyle}
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.7}
@@ -402,9 +399,17 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const leaderX = useSharedValue(initialPillIndex);
   const followerX = useSharedValue(initialPillIndex);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
+  // Single source of truth for which tab's icon/label render as active.
+  // Set instantly (no spring) inside the gesture worklets below so a press
+  // shows its result on the same frame, before navigation has even
+  // resolved. This effect is the fallback sync for everything that changes
+  // the route WITHOUT going through those gestures — Android back, deep
+  // links, a programmatic navigation call elsewhere in the app.
+  const activeIndex = useSharedValue(initialPillIndex);
 
   useEffect(() => {
     if (activePillIndex !== -1) {
+      activeIndex.value = activePillIndex;
       pillOpacity.value = withSpring(1, SNAP_SPRING);
       leaderX.value = withSpring(activePillIndex, SNAP_SPRING);
       followerX.value = withSpring(activePillIndex, TRAIL_SPRING);
@@ -444,6 +449,10 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
           );
           leaderX.value = clamped;
           followerX.value = withSpring(clamped, TRAIL_SPRING);
+          // Snap the active color to whichever tab is currently nearest the
+          // finger, live — otherwise the icon/label sit frozen on the tab
+          // the drag started from while the pill visually slides away from it.
+          activeIndex.value = Math.round(clamped);
         })
         .onEnd(() => {
           "worklet";
@@ -451,6 +460,9 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
             pillRoutes.length - 1,
             Math.max(0, Math.round(leaderX.value)),
           );
+          // Instant, unanimated — the icon/label must show the result
+          // immediately, not lag behind the pill's own trailing spring.
+          activeIndex.value = final;
           leaderX.value = withSpring(final, SNAP_SPRING);
           followerX.value = withSpring(final, TRAIL_SPRING);
           runOnJS(navigateToTab)(final);
@@ -470,6 +482,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
             pillRoutes.length - 1,
             Math.max(0, Math.floor(e.x / tw)),
           );
+          activeIndex.value = final;
           leaderX.value = withSpring(final, SNAP_SPRING);
           followerX.value = withSpring(final, TRAIL_SPRING);
           runOnJS(navigateToTab)(final);
@@ -655,7 +668,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
                 <TabItem
                   key={route.key}
                   index={index}
-                  isActive={activePillIndex === index}
+                  activeIndex={activeIndex}
                   icon={tab!.icon}
                   activeIcon={tab!.activeIcon}
                   label={tab!.title}

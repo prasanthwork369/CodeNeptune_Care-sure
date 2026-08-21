@@ -54,6 +54,9 @@ export const useOrderById = (
 ): {
   order: Order | undefined;
   loading: boolean;
+  isFetching: boolean;
+  error: unknown;
+  refetch: () => void;
   isPlaceholderData: boolean;
 } => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -62,6 +65,9 @@ export const useOrderById = (
   const {
     data: order,
     isLoading,
+    isFetching,
+    error,
+    refetch,
     isPlaceholderData,
   } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId!),
@@ -92,5 +98,5 @@ export const useOrderById = (
     },
   });
 
-  return { order, loading: isLoading, isPlaceholderData };
+  return { order, loading: isLoading, isFetching, error, refetch, isPlaceholderData };
 };

@@ -4,14 +4,33 @@ import {
   QueryClient,
   onlineManager,
 } from "@tanstack/react-query";
-import NetInfo from "@react-native-community/netinfo";
 import { AppError } from "@/src/api/errors";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
+import { isOffline } from "@/src/utils/offline/networkState";
 import { reportActionError } from "@/src/utils/offline/networkFeedback";
 
+/**
+ * React Query's connectivity, driven by the same store — and the same
+ * isOffline() predicate — every other part of the app reads.
+ *
+ * This used to be its own NetInfo listener reading `state.isConnected` alone,
+ * which disagreed with isOffline() in exactly the case that matters most:
+ * connected-but-unreachable (captive portal, router with no WAN, data saver,
+ * a VPN with no route). There the app shows its offline banner and offline
+ * states while onlineManager still reads "online" — so when the connection
+ * came back, isConnected had never changed, no offline→online transition
+ * fired, queryCache.onOnline() never ran, and nothing refetched. The screen
+ * sat on NoInternetState until the user pressed Retry.
+ *
+ * Subscribing to the store instead of NetInfo also means every writer reaches
+ * React Query, not just NetInfo: initNetworkListener, NetworkToast's manual
+ * Refresh, and reachability learned from real request outcomes
+ * (markReachable/markUnreachable). setOnline only notifies on an actual
+ * change, so the extra store updates this sees are free no-ops.
+ */
 onlineManager.setEventListener((setOnline) => {
-  return NetInfo.addEventListener((state) => {
-    setOnline(!!state.isConnected);
-  });
+  setOnline(!isOffline());
+  return useNetworkStore.subscribe(() => setOnline(!isOffline()));
 });
 
 // Nothing is gained by retrying these: the outcome is already decided.

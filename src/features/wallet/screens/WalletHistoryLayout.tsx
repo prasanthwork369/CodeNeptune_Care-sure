@@ -1,3 +1,5 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useInfiniteWalletLogs } from "@/src/features/wallet/hooks/useWallet";
@@ -6,6 +8,7 @@ import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { exactScale } from "@/src/utils/exactScale";
 import { WalletHistoryPage } from "../sections/WalletHistoryPage";
 import {
@@ -37,8 +40,17 @@ export const WalletHistoryLayout: React.FC = () => {
   } = usePagerTabs(TAB_KEYS);
 
   // One query for every page — tabs only filter what is already fetched.
-  const { logs, loading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteWalletLogs();
+  const {
+    logs,
+    loading,
+    refreshing,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteWalletLogs();
+  const errorState = useQueryErrorState(error);
 
   const all = useMemo(() => logs.flatMap(logToTransactions), [logs]);
 
@@ -54,6 +66,38 @@ export const WalletHistoryLayout: React.FC = () => {
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Full-screen, above the tabs — one query backs all three, so with nothing
+  // cached there is no tab worth showing and no page to swipe to. Anything in
+  // `all` (including the first page seeded from Wallet home) keeps the normal
+  // screen, and a tab that filters down to nothing keeps its own empty state.
+  //
+  // The hook stays mounted here while the pager below is gone, so the query
+  // keeps an observer and onlineManager's reconnect refetch restores the
+  // screen on its own.
+  if (!loading && errorState && all.length === 0) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+        <ScreenHeader
+          title="Transaction History"
+          backgroundColor="#FFFFFF"
+          showBorder
+        />
+        {errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load transactions"
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>

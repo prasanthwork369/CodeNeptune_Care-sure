@@ -1,7 +1,10 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import type { CategoryProduct } from "@/src/features/categories/types";
 import { moderateScale } from "@/src/utils/exactScale";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import React, { useCallback, useMemo } from "react";
 import {
   RefreshControl,
@@ -24,6 +27,12 @@ interface ProductGridProps {
   onRefresh: () => void;
   onProductPress: (product: CategoryProduct) => void;
   paddingBottom: number;
+  /**
+   * The list query's error, if it failed. Only consulted when there are no
+   * products to show — a failed background refresh must never replace a grid
+   * the user is already looking at.
+   */
+  error?: unknown;
 }
 
 /** Two-column product grid shared by the category and featured screens. */
@@ -34,8 +43,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onRefresh,
   onProductPress,
   paddingBottom,
+  error,
 }) => {
   const { width } = useWindowDimensions();
+  const errorState = useQueryErrorState(error);
   const cardWidth = (width - GRID_PADDING * 2 - GRID_GAP) / 2;
 
   // Guards against a second pull-to-refresh firing while one is already in
@@ -72,6 +83,17 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   );
 
   const keyExtractor = useCallback((item: CategoryProduct) => item.id, []);
+
+  // Ahead of the skeleton: an offline retry keeps isLoading true while it is
+  // in flight, and swapping back to a full-screen skeleton would hide the
+  // Retry button the user just pressed.
+  if (products.length === 0 && errorState === "offline") {
+    return <NoInternetState onRetry={onRefresh} retrying={isRefreshing} />;
+  }
+
+  if (products.length === 0 && errorState === "server") {
+    return <RetryState onRetry={onRefresh} retrying={isRefreshing} />;
+  }
 
   if (isLoading) {
     return (

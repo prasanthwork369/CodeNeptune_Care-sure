@@ -61,7 +61,7 @@ export const getPackDivisor = (
 };
 
 export const useProduct = (productId: string) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CATALOG.PRODUCT_BY_ID(productId),
     queryFn: () => medicineApi.getProductById(productId),
     enabled: !!productId,
@@ -189,6 +189,8 @@ export const useProduct = (productId: string) => {
     variants,
     raw: data,
     isLoading,
+    isFetching,
     error,
+    refetch,
   };
 };

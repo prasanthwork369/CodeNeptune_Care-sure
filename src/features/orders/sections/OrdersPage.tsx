@@ -10,7 +10,9 @@ import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback } from "react";
 import { RefreshControl, Text, View } from "react-native";
 import { MyOrdersSkeleton } from "../components/MyOrdersSkeleton";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { orderStyles as s } from "../orders.styles";
 import { OrderCard } from "./OrderCard";
 
@@ -38,6 +40,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
 }) => {
   const adjustedBottom = useAdjustedBottomInset();
   const { orders, loading, refreshing, error, refetch } = useOrders(params);
+  const errorState = useQueryErrorState(error);
 
   const renderItem = useCallback(
     ({ item }: { item: Order }) => (
@@ -57,7 +60,12 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
     <View style={{ width, flex: 1, backgroundColor: "#F5F6FB" }}>
       {loading ? (
         <MyOrdersSkeleton />
-      ) : error && orders.length === 0 ? (
+      ) : errorState === "offline" && orders.length === 0 ? (
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
+      ) : errorState && orders.length === 0 ? (
         <RetryState
           title="Couldn't load orders"
           onRetry={() => void refetch()}

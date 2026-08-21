@@ -1,3 +1,4 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SearchBar } from "@/src/components/ui/SearchBar";
@@ -14,6 +15,7 @@ import type {
 } from "@/src/features/prescription/types";
 import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
@@ -50,6 +52,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     usePrescriptions({
       category: 2,
     });
+  const errorState = useQueryErrorState(error);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
@@ -151,7 +154,12 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           <ShimmerBlock height={exactScale(110)} borderRadius={12} />
           <ShimmerBlock height={exactScale(110)} borderRadius={12} />
         </View>
-      ) : error && prescriptions.length === 0 ? (
+      ) : errorState === "offline" && prescriptions.length === 0 ? (
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
+      ) : errorState && prescriptions.length === 0 ? (
         <RetryState
           title="Couldn't load prescriptions"
           onRetry={() => void refetch()}

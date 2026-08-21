@@ -8,6 +8,7 @@ import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useAddMoney, useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { requireInternet } from "@/src/utils/offline";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -71,6 +72,11 @@ export const AddMoneyLayout: React.FC = () => {
 
   const handleProceed = async () => {
     if (!numericAmount || numericAmount > MAX_TOPUP) return;
+    // Money movement, so it takes the acknowledged-offline treatment the order
+    // and prescription-payment flows use. Without this the mutation still fired
+    // and failed at the request interceptor, surfacing as a generic "Failed"
+    // alert instead of saying the connection is the reason.
+    if (!requireInternet({ critical: true })) return;
     try {
       await addMoney(numericAmount);
       confettiRef.current?.play();

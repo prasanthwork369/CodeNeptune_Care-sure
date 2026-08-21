@@ -1,4 +1,6 @@
 import type { FrequentOrderItem } from "@/src/features/orders/types";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -7,6 +9,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
@@ -17,7 +20,14 @@ export const FrequentOrdersLayout: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { totalItems } = useCart();
-  const { data: frequentlyOrdered = [], isLoading } = useFrequentlyOrdered();
+  const {
+    data: frequentlyOrdered = [],
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useFrequentlyOrdered();
+  const errorState = useQueryErrorState(error);
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -222,6 +232,17 @@ export const FrequentOrdersLayout: React.FC = () => {
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
         </View>
+      ) : errorState === "offline" && frequentlyOrdered.length === 0 ? (
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={isFetching}
+        />
+      ) : errorState && frequentlyOrdered.length === 0 ? (
+        <RetryState
+          title="Couldn't load your products"
+          onRetry={() => void refetch()}
+          retrying={isFetching}
+        />
       ) : filtered.length === 0 ? (
         <View
           style={{

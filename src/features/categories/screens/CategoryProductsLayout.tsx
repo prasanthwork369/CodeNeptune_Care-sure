@@ -30,10 +30,11 @@ const CategoryProductsContent: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { totalItems } = useCartRead();
 
-  const { products, isLoading, isRefetching, refetch } = useCategoryProducts({
-    categorySlug: familySlug || slug,
-    subCategorySlug: familySlug ? slug : undefined,
-  });
+  const { products, isLoading, isRefetching, error, refetch } =
+    useCategoryProducts({
+      categorySlug: familySlug || slug,
+      subCategorySlug: familySlug ? slug : undefined,
+    });
 
   usePerformanceTrace({
     traceName: PERF_TRACES.PRODUCT_LIST_LOAD,
@@ -103,6 +104,7 @@ const CategoryProductsContent: React.FC = () => {
         isRefreshing={isRefetching}
         onRefresh={handleRefresh}
         onProductPress={handleProductPress}
+        error={error}
         paddingBottom={
           totalItems > 0 ? adjustedBottom + 90 : adjustedBottom + 24
         }

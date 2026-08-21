@@ -34,8 +34,16 @@ export function useSelectPatient() {
   const images = useSelectPatientImages(files, imageUrls);
   const prescriptionItems = images.items;
 
-  const { members, loading, addMember, updateMember, deleteMember } =
-    useFamilyMembers();
+  const {
+    members,
+    loading,
+    refreshing,
+    listError,
+    refetch,
+    addMember,
+    updateMember,
+    deleteMember,
+  } = useFamilyMembers();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
     null,
   );
@@ -69,7 +77,9 @@ export function useSelectPatient() {
     null,
   );
 
-  const showEmptyState = !loading && members.length === 0;
+  // A failed fetch is not "this account has no patients" — the screen shows
+  // the load failure instead, so keep it out of the empty state.
+  const showEmptyState = !loading && !listError && members.length === 0;
 
   // Keep the edit field to 10 digits only; country code shown separately as a fixed +91.
   const handlePhoneChange = (text: string) => {
@@ -177,6 +187,9 @@ export function useSelectPatient() {
     removeImage: images.removeImage,
     members,
     loading,
+    refreshing,
+    listError,
+    refetch,
     selectedPatientId,
     setSelectedPatientId,
     selectedPatient,

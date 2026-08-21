@@ -3,12 +3,15 @@ import { AddPatientSheet } from "@/src/features/profile/components/AddPatientShe
 import { PatientChipSkeleton } from "@/src/features/profile/components/PatientSkeleton";
 import { PatientEmptyState } from "../sections/select-patient";
 import { AppButton } from "@/src/components/ui/AppButton";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
 import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useSelectPatient } from "@/src/features/prescription/hooks/useSelectPatient";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { getAge } from "@/src/utils/patient";
@@ -41,6 +44,9 @@ export const SelectPatientLayout: React.FC = () => {
     removeImage,
     members,
     loading,
+    refreshing,
+    listError,
+    refetch,
     setSelectedPatientId,
     selectedPatient,
     symptoms,
@@ -68,6 +74,7 @@ export const SelectPatientLayout: React.FC = () => {
     handleProceed,
   } = useSelectPatient();
   const adjustedBottom = useAdjustedBottomInset();
+  const listErrorState = useQueryErrorState(listError);
   const [isUploadSheetVisible, setIsUploadSheetVisible] = React.useState(false);
 
   const handleViewPrescription = React.useCallback(
@@ -119,7 +126,22 @@ export const SelectPatientLayout: React.FC = () => {
         }
       />
 
-      {showEmptyState ? (
+      {!loading && listErrorState && members.length === 0 ? (
+        // Ahead of the form: with no patients the whole flow is unusable, and
+        // the empty state below would claim the account has none.
+        listErrorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load patients"
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        )
+      ) : showEmptyState ? (
         <PatientEmptyState
           onAddPress={() => {
             setEditingPatient(null);

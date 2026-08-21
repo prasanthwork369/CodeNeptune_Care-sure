@@ -1,5 +1,7 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
@@ -31,7 +33,9 @@ export const CategoriesLayout: React.FC = () => {
   const cardWidth = Math.floor(availableGridWidth / 3);
   const cardHeight = cardWidth + exactScale(34);
 
-  const { tabs, cards, isLoading, error, refetch } = useCategories();
+  const { tabs, cards, isLoading, isFetching, error, refetch } =
+    useCategories();
+  const errorState = useQueryErrorState(error);
 
   useEffect(() => {
     if (tabs.length > 0 && !activeTabId) {
@@ -49,8 +53,15 @@ export const CategoriesLayout: React.FC = () => {
         rightSlot={<CategoriesHeaderActions />}
       />
 
-      {error && tabs.length === 0 ? (
-        <RetryState onRetry={() => void refetch()} />
+      {errorState && tabs.length === 0 ? (
+        errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        ) : (
+          <RetryState onRetry={() => void refetch()} retrying={isFetching} />
+        )
       ) : (
         <View className="flex-1 flex-row">
           <CategoriesSidebar

@@ -19,6 +19,7 @@ export const useAddress = () => {
     isLoading,
     isRefetching,
     isSuccess,
+    error: listError,
     refetch,
   } = useQuery<Address[]>({
     queryKey: QUERY_KEYS.CUSTOMER.ADDRESSES,
@@ -77,6 +78,12 @@ export const useAddress = () => {
     error:
       (addMutation.error ?? updateMutation.error ?? deleteMutation.error)
         ?.message ?? null,
+    /**
+     * The list fetch's own failure, kept separate from the mutation `error`
+     * string above: an empty `addresses` after this is set means the list could
+     * not be read, not that the user has none saved.
+     */
+    listError,
     addAddress: (payload: CreateAddressPayload) =>
       addMutation.mutateAsync(payload),
     updateAddress: (payload: UpdateAddressPayload) =>

@@ -41,6 +41,7 @@ export const SearchResultsList = React.memo(
     toSearchedOnlyData,
     toRecommendData,
     onRecommendPress,
+    onBeforeProductNavigate,
     onEndReached,
     isFetchingNextPage,
     onScrollBeginDrag,
@@ -59,6 +60,11 @@ export const SearchResultsList = React.memo(
       item: ApiSearchMedicine,
     ) => React.ComponentProps<typeof SearchRecommendCard>["data"];
     onRecommendPress: (productId: string) => void;
+    // SearchProductCard and SearchNoSubstituteCard push to their own product
+    // route directly instead of going through onRecommendPress — this runs
+    // right before that push so the keyboard/suggestions get torn down the
+    // same way for every card type.
+    onBeforeProductNavigate?: () => void;
     onEndReached: () => void;
     isFetchingNextPage: boolean;
     // Fired once when the user's finger starts dragging the list — not on
@@ -95,13 +101,19 @@ export const SearchResultsList = React.memo(
           case "comparison":
             return (
               <View className="px-4">
-                <SearchProductCard data={toComparisonData(item)} />
+                <SearchProductCard
+                  data={toComparisonData(item)}
+                  onBeforeNavigate={onBeforeProductNavigate}
+                />
               </View>
             );
           case "no-substitute":
             return (
               <View className="px-4">
-                <SearchNoSubstituteCard data={toSearchedOnlyData(item)} />
+                <SearchNoSubstituteCard
+                  data={toSearchedOnlyData(item)}
+                  onBeforeNavigate={onBeforeProductNavigate}
+                />
               </View>
             );
           default:
@@ -121,6 +133,7 @@ export const SearchResultsList = React.memo(
         toSearchedOnlyData,
         toRecommendData,
         onRecommendPress,
+        onBeforeProductNavigate,
       ],
     );
 

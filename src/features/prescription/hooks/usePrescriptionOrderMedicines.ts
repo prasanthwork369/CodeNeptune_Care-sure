@@ -64,7 +64,7 @@ const toComparisonMedicines = (
 };
 
 export const usePrescriptionOrderMedicines = (orderId: string) => {
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ["prescription-order-medicines", orderId],
     queryFn: () => prescriptionOrderApi.getMedicines(orderId),
     enabled: !!orderId,
@@ -74,6 +74,7 @@ export const usePrescriptionOrderMedicines = (orderId: string) => {
   return {
     medicines: toComparisonMedicines(Array.isArray(data) ? data : []),
     isLoading,
+    isFetching,
     error,
     refetch,
   };

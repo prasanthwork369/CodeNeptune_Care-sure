@@ -45,7 +45,7 @@ const FeaturedProductsContent: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { totalItems } = useCartRead();
-  const { products, isLoading, isRefetching, refetch } =
+  const { products, isLoading, isRefetching, error, refetch } =
     useAllFeaturedMedicines(FEATURED_LIMIT);
 
   const gridProducts = useMemo(
@@ -89,6 +89,7 @@ const FeaturedProductsContent: React.FC = () => {
         isRefreshing={isRefetching}
         onRefresh={handleRefresh}
         onProductPress={handleProductPress}
+        error={error}
         paddingBottom={adjustedBottom + 100}
       />
 

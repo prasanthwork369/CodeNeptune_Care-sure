@@ -29,6 +29,7 @@ export const useCategories = () => {
   const {
     data: families = [],
     isLoading,
+    isFetching,
     error,
     refetch,
   } = useQuery({
@@ -83,7 +84,7 @@ export const useCategories = () => {
     );
   }, [families]);
 
-  return { tabs, cards, isLoading, error, refetch };
+  return { tabs, cards, isLoading, isFetching, error, refetch };
 };
 
 export const useCategoryProducts = (params: {

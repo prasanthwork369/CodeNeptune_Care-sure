@@ -1,8 +1,12 @@
 /* eslint-disable react-hooks/refs */
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/features/cart/hooks/useCart";
+import { useOrders } from "@/src/features/orders/hooks/useOrders";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { AddToCartInput, UpdateCartItemInput } from "@/src/features/cart/types";
 import { OrderTabKey } from "../types";
 import React, { useCallback, useRef } from "react";
@@ -55,6 +59,48 @@ export const MyOrdersLayout: React.FC = () => {
     [],
   );
   const clearCart = useCallback(() => cartRef.current.clearCart(), []);
+
+  // The All tab's query, read here as the screen-level signal for "is there any
+  // order data at all". Same query key the All page uses, so React Query serves
+  // both observers from one cache entry — no extra request. Holding an observer
+  // at this level is also what lets the screen recover on its own: it keeps the
+  // query subscribed while the pages below are unmounted, so onlineManager's
+  // reconnect refetch has something to refetch.
+  const {
+    orders: allOrders,
+    loading: allLoading,
+    refreshing: allRefreshing,
+    error: allError,
+    refetch: refetchAll,
+  } = useOrders(TABS[0].params);
+  const errorState = useQueryErrorState(allError);
+
+  // Full-screen only when the screen has nothing to show. With orders already
+  // cached the tabs stay up and each page keeps its own per-tab error handling,
+  // since one failed status filter says nothing about the others.
+  if (!allLoading && errorState && allOrders.length === 0) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+        <ScreenHeader
+          title="My Orders"
+          showBorder={true}
+          backgroundColor="#FFFFFF"
+        />
+        {errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetchAll()}
+            retrying={allRefreshing}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load orders"
+            onRetry={() => void refetchAll()}
+            retrying={allRefreshing}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>

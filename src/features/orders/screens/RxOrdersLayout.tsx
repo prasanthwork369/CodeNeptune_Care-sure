@@ -5,12 +5,15 @@ import {
   Prescription,
   PrescriptionCard,
 } from "../sections/PrescriptionCard";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import {
   PRESCRIPTION_STATUS,
   PRESCRIPTION_STATUS_LABELS,
 } from "@/src/features/prescription/constants/prescription-status";
 import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
@@ -53,9 +56,11 @@ function mapItem(item: ApiPrescription): Prescription {
 }
 
 export const RxOrdersLayout: React.FC = () => {
-  const { prescriptions, loading, refreshing, refetch } = usePrescriptions({
-    category: 2,
-  });
+  const { prescriptions, loading, refreshing, error, refetch } =
+    usePrescriptions({
+      category: 2,
+    });
+  const errorState = useQueryErrorState(error);
 
   const data = useMemo(() => prescriptions.map(mapItem), [prescriptions]);
 
@@ -81,6 +86,17 @@ export const RxOrdersLayout: React.FC = () => {
       <ScreenHeader title="My Prescriptions" backgroundColor="#FFFFFF" />
       {loading ? (
         <RxOrdersSkeleton />
+      ) : errorState === "offline" && data.length === 0 ? (
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
+      ) : errorState && data.length === 0 ? (
+        <RetryState
+          title="Couldn't load prescriptions"
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
       ) : (
         <AppFlashList
           data={data}

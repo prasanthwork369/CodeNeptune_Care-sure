@@ -23,10 +23,15 @@ interface SearchNoSubstituteCardProps {
       status: string;
     };
   };
+  // Called right before navigating to Product Details — lets the search
+  // screen tear down its keyboard/suggestions state first, since this card
+  // pushes to its own route directly rather than through a results-list callback.
+  onBeforeNavigate?: () => void;
 }
 
 export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
   data,
+  onBeforeNavigate,
 }) => {
   const router = useNav();
   const { requestSubstitute, isPending, isSuccess } = useSubstituteRequest();
@@ -38,6 +43,7 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
   }, [prefetchProduct, data.productId, data.id]);
 
   const handleCardPress = () => {
+    onBeforeNavigate?.();
     router.push({
       pathname: "/product/[id]",
       params: {

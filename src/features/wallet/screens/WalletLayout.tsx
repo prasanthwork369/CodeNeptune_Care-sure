@@ -1,3 +1,5 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -5,7 +7,9 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useWalletBalance, useWalletLogs } from "@/src/features/wallet/hooks/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
+import { requireInternet } from "@/src/utils/offline";
 import { Transaction, TxIconType } from "../types";
 import { logToTransactions } from "../walletTransactions";
 import React, { useEffect, useState } from "react";
@@ -51,6 +55,32 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
     </View>
   );
 };
+
+/**
+ * The balance figure while the screen is showing at all: still loading, or a
+ * real amount. The unavailable case never reaches here — the screen replaces
+ * itself with a full-screen state before rendering any card, since a wallet
+ * with an unknown balance has nothing safe to act on.
+ */
+const BalanceValue = ({
+  pending,
+  value,
+  shimmerWidth = 120,
+}: {
+  pending: boolean;
+  value: string;
+  shimmerWidth?: number;
+}) =>
+  pending ? (
+    <ShimmerBlock
+      width={shimmerWidth}
+      height={28}
+      borderRadius={6}
+      style={{ marginVertical: 4 }}
+    />
+  ) : (
+    <Text style={cardStyles.cardValue}>{value}</Text>
+  );
 
 /**
  * WalletLayout Component
@@ -111,14 +141,62 @@ export const WalletLayout: React.FC = () => {
   // plus useWalletBalance's own refetchOnWindowFocus — rather than a forced
   // refetch on every screen focus, which refetched even when data was
   // already fresh and caused a loading-state flash on every re-visit.
-  const { balance, loading: balanceLoading } = useWalletBalance();
+  const {
+    balance,
+    loading: balanceLoading,
+    refreshing: balanceRefreshing,
+    error: balanceError,
+    refetch: refetchBalance,
+  } = useWalletBalance();
+  const balanceErrorState = useQueryErrorState(balanceError);
 
-  // A null balance with active loading=false still denotes a loading/pre-auth state.
-  const isBalancePending = balanceLoading || balance == null;
-  const { logs, loading: logsLoading } = useWalletLogs(20, 0);
+  // A null balance with loading=false is still a pre-auth/pending state — but
+  // only while nothing has failed. Without that second clause a failed balance
+  // fetch left the shimmer running forever, indistinguishable from a slow one
+  // and with no way to retry.
+  const isBalancePending =
+    balanceLoading || (balance == null && !balanceErrorState);
+  const {
+    logs,
+    loading: logsLoading,
+    refreshing: logsRefreshing,
+    error: logsError,
+    refetch: refetchLogs,
+  } = useWalletLogs(20, 0);
+  // "No transactions yet" is a statement about the account, so a failed fetch
+  // must not borrow it.
+  const logsErrorState = useQueryErrorState(logsError);
 
   const transactions: Transaction[] = logs.flatMap(logToTransactions);
   const previewTxs = transactions.slice(0, 5);
+
+  // Wallet is transactional: every card, tab and Add Money below is an offer to
+  // act on a balance. With no balance to act on there is nothing safe to show,
+  // so the whole screen becomes the failure state rather than a set of cards
+  // standing in for numbers nobody has. A cached balance keeps the normal
+  // screen — a real ₹0 is data, and only `balance == null` is the absence of it.
+  if (!balanceLoading && balance == null && balanceErrorState) {
+    return (
+      <View style={cardStyles.container}>
+        <ScreenHeader
+          title="My Wallet / CareSure Coins"
+          backgroundColor="#FFFFFF"
+        />
+        {balanceErrorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetchBalance()}
+            retrying={balanceRefreshing}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load your wallet"
+            onRetry={() => void refetchBalance()}
+            retrying={balanceRefreshing}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={cardStyles.container}>
@@ -219,24 +297,23 @@ export const WalletLayout: React.FC = () => {
             <View style={cardStyles.cardContent}>
               <View style={cardStyles.cardInfoSection}>
                 <Text style={cardStyles.cardLabel}>WALLET BALANCE</Text>
-                {isBalancePending ? (
-                  <ShimmerBlock
-                    width={120}
-                    height={28}
-                    borderRadius={6}
-                    style={{ marginVertical: 4 }}
-                  />
-                ) : (
-                  <Text style={cardStyles.cardValue}>
-                    ₹{Number(balance?.walletBalance ?? 0).toLocaleString()}
-                  </Text>
-                )}
+                <BalanceValue
+                  pending={isBalancePending}
+                  value={`₹${Number(balance?.walletBalance ?? 0).toLocaleString()}`}
+                />
                 <Text style={cardStyles.cardSub}>
                   Use wallet balance to pay for your healthcare needs
                 </Text>
               </View>
               <Touchable
-                onPress={() => router.push("/profile/wallet/add-money")}
+                // Reachable only with a cached balance on screen (the failure
+                // state above hides it otherwise), and topping up is a wallet
+                // mutation — so it goes through the standard gate rather than
+                // opening a flow that cannot complete.
+                onPress={() => {
+                  if (!requireInternet()) return;
+                  router.push("/profile/wallet/add-money");
+                }}
                 activeOpacity={0.85}
                 style={cardStyles.addMoneyBtn}
               >
@@ -255,18 +332,10 @@ export const WalletLayout: React.FC = () => {
             <View style={cardStyles.cardContent}>
               <View style={cardStyles.cardInfoSection}>
                 <Text style={cardStyles.cardLabel}>CORPORATE CREDITS</Text>
-                {isBalancePending ? (
-                  <ShimmerBlock
-                    width={120}
-                    height={28}
-                    borderRadius={6}
-                    style={{ marginVertical: 4 }}
-                  />
-                ) : (
-                  <Text style={cardStyles.cardValue}>
-                    ₹{Number(balance?.corporateCredits ?? 0).toLocaleString()}
-                  </Text>
-                )}
+                <BalanceValue
+                  pending={isBalancePending}
+                  value={`₹${Number(balance?.corporateCredits ?? 0).toLocaleString()}`}
+                />
                 <Text style={cardStyles.cardSub}>
                   Use employer-provided benefits for your healthcare needs
                 </Text>
@@ -285,18 +354,11 @@ export const WalletLayout: React.FC = () => {
                     style={cardStyles.cardCoinIcon}
                     resizeMode="contain"
                   />
-                  {isBalancePending ? (
-                    <ShimmerBlock
-                      width={80}
-                      height={28}
-                      borderRadius={6}
-                      style={{ marginVertical: 4 }}
-                    />
-                  ) : (
-                    <Text style={cardStyles.cardValue}>
-                      {balance?.coinsBalance ?? 0}
-                    </Text>
-                  )}
+                  <BalanceValue
+                    pending={isBalancePending}
+                    shimmerWidth={80}
+                    value={String(balance?.coinsBalance ?? 0)}
+                  />
                 </View>
                 <Text style={cardStyles.cardSub}>
                   Use employer-provided benefits for your healthcare needs
@@ -332,6 +394,17 @@ export const WalletLayout: React.FC = () => {
               <ShimmerBlock height={48} borderRadius={8} />
               <ShimmerBlock height={48} borderRadius={8} />
             </View>
+          ) : logsErrorState === "offline" && previewTxs.length === 0 ? (
+            <NoInternetState
+              onRetry={() => void refetchLogs()}
+              retrying={logsRefreshing}
+            />
+          ) : logsErrorState && previewTxs.length === 0 ? (
+            <RetryState
+              title="Couldn't load transactions"
+              onRetry={() => void refetchLogs()}
+              retrying={logsRefreshing}
+            />
           ) : previewTxs.length === 0 ? (
             <Text
               style={s.walletLabel}

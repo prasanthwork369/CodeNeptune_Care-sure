@@ -1,5 +1,7 @@
 import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import {
   KnowYourMedicine,
   LogisticsBar,
@@ -17,6 +19,7 @@ import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { useHome } from "@/src/features/home/hooks/useHome";
 import { useProduct, getPackDivisor } from "@/src/features/product/hooks/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
@@ -38,8 +41,19 @@ export const ProductComparisonLayout: React.FC<
   const mainScrollRef = React.useRef<ScrollView>(null);
   const goBack = useCallback(() => router.back(), [router]);
 
-  const { product, recommendation, saltComposition, raw, isLoading } =
-    useProduct(id);
+  const {
+    product,
+    recommendation,
+    saltComposition,
+    raw,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useProduct(id);
+  // A failed load must not read as "no substitute exists" — that is the same
+  // claim this screen makes when the catalogue genuinely has nothing cheaper.
+  const errorState = useQueryErrorState(error);
   const { appContent, isLoading: isHomeLoading } = useHome();
   const { items: cartItems, totalItems: cartCount } = useCartRead();
   const storePincode = useLocationStore((s) => s.pincode);
@@ -123,6 +137,13 @@ export const ProductComparisonLayout: React.FC<
 
         {isLoading ? (
           <ProductDetailsSkeleton />
+        ) : !product && errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        ) : !product && errorState === "server" ? (
+          <RetryState onRetry={() => void refetch()} retrying={isFetching} />
         ) : !searched || !recommended ? (
           <View
             style={{

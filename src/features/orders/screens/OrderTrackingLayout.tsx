@@ -1,4 +1,6 @@
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
@@ -7,6 +9,7 @@ import { useCart } from "@/src/features/cart/hooks/useCart";
 import { AlreadyHaveItemsModal } from "@/src/features/orders/components/AlreadyHaveItemsModal";
 import { useOrderById } from "@/src/features/orders/hooks/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
@@ -251,7 +254,9 @@ export const OrderTrackLayout: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
-  const { order, loading, isPlaceholderData } = useOrderById(orderId);
+  const { order, loading, isFetching, error, refetch, isPlaceholderData } =
+    useOrderById(orderId);
+  const errorState = useQueryErrorState(error);
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [rxModalVisible, setRxModalVisible] = useState(false);
   const [billSheetVisible, setBillSheetVisible] = useState(false);
@@ -500,6 +505,29 @@ export const OrderTrackLayout: React.FC = () => {
       <View className="flex-1 bg-[#F5F6FB]">
         <ScreenHeader title="Order Details" showBorder />
         <OrderTrackingSkeleton />
+      </View>
+    );
+  }
+
+  // Without an order the screen below renders its whole timeline against
+  // defaults — an empty shell that reads as a real, contentless order. The
+  // placeholder row from the orders-list cache still counts as usable data.
+  if (!order && errorState) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Order Details" showBorder />
+        {errorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load this order"
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        )}
       </View>
     );
   }

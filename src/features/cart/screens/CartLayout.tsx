@@ -1,8 +1,11 @@
 import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
 import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useCartPendingStore } from "@/src/store/cartStore";
@@ -102,7 +105,13 @@ export const CartLayout: React.FC = () => {
     removeItem,
     firstName,
     isCartLoading,
+    isCartFetching,
+    cartError,
+    refetchCart,
   } = useCartCalculations();
+  // "Your cart is empty" is a claim about the server's state, so it must not be
+  // what a failed load looks like.
+  const cartErrorState = useQueryErrorState(cartError);
 
   const addressActionLabel = hasSavedAddress ? "Change" : "Add Address";
   const hasRxItem = lines.some((line) => line.rx);
@@ -129,6 +138,33 @@ export const CartLayout: React.FC = () => {
       <View className="flex-1 bg-[#F5F6FB]">
         <ScreenHeader title="Cart" showBorder={true} />
         <CartInitialSkeleton />
+      </View>
+    );
+  }
+
+  // Only when the cart could not be read at all — a failed refresh with lines
+  // already restored keeps showing them, and the global banner explains why.
+  if (lines.length === 0 && cartErrorState === "offline") {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Cart" showBorder={true} />
+        <NoInternetState
+          onRetry={() => void refetchCart()}
+          retrying={isCartFetching}
+        />
+      </View>
+    );
+  }
+
+  if (lines.length === 0 && cartErrorState === "server") {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Cart" showBorder={true} />
+        <RetryState
+          title="Couldn't load your cart"
+          onRetry={() => void refetchCart()}
+          retrying={isCartFetching}
+        />
       </View>
     );
   }

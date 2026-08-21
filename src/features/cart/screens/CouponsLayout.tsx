@@ -1,9 +1,12 @@
 import type { Coupon } from "@/src/features/cart/types";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useCoupons } from "@/src/features/cart/hooks/useCoupons";
 import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
 import { useCouponSearch } from "@/src/features/cart/hooks/useCouponSearch";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { couponApi } from "../api/coupon.api";
 import { useCouponStore } from "@/src/store/couponStore";
@@ -37,7 +40,14 @@ export const CouponsLayout: React.FC = () => {
   const router = useNav();
   const { height: screenHeight } = useWindowDimensions();
   const { totalPrice: subtotal, isLoading: isCartLoading } = useCart();
-  const { data: rawCoupons, isLoading } = useCoupons();
+  const {
+    data: rawCoupons,
+    isLoading,
+    isFetching: isCouponsFetching,
+    error: couponsError,
+    refetch: refetchCoupons,
+  } = useCoupons();
+  const couponsErrorState = useQueryErrorState(couponsError);
   const coupons = rawCoupons ?? EMPTY_COUPONS;
   const unavailable = useCouponAvailability(coupons);
   const visibleCoupons = useCouponSearch(coupons, couponCode);
@@ -158,6 +168,17 @@ export const CouponsLayout: React.FC = () => {
           Array.from({ length: skeletonCount }, (_, i) => (
             <CouponCardSkeleton key={i} />
           ))
+        ) : couponsErrorState === "offline" && coupons.length === 0 ? (
+          <NoInternetState
+            onRetry={() => void refetchCoupons()}
+            retrying={isCouponsFetching}
+          />
+        ) : couponsErrorState && coupons.length === 0 ? (
+          <RetryState
+            title="Couldn't load coupons"
+            onRetry={() => void refetchCoupons()}
+            retrying={isCouponsFetching}
+          />
         ) : visibleCoupons.length === 0 ? (
           <Text
             className="font-inter-medium text-brand-subtext text-center mt-4"

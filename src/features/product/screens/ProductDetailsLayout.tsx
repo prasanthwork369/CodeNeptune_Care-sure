@@ -1,11 +1,14 @@
 import { WhyFamiliesTrustUs } from "@/src/components/common/WhyFamiliesTrustUs";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ProductSkeleton } from "@/src/features/product/ProductSkeleton";
 import { useMoreAboutScrollNavigation } from "@/src/features/product/hooks/useMoreAboutScrollNavigation";
 import { useInCartVariantId } from "@/src/features/cart/hooks/useCartRead";
 import { useAppContent } from "@/src/features/home/hooks/useHome";
 import { useProduct, getPackDivisor } from "@/src/features/product/hooks/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import {
   analyticsService,
@@ -53,8 +56,20 @@ export const ProductDetailsLayout: React.FC = () => {
   const showNoSubstituteBanner = fromNoSubstitute === "true";
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { product, recommendation, saltComposition, variants, raw, isLoading } =
-    useProduct(id);
+  const {
+    product,
+    recommendation,
+    saltComposition,
+    variants,
+    raw,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useProduct(id);
+  // Shared classification — "offline" already accounts for the device's own
+  // connectivity, so this screen needs no NetInfo subscription of its own.
+  const errorState = useQueryErrorState(error);
   const inCartVariantId = useInCartVariantId(variants);
   const { data: appContent, isLoading: isContentLoading } = useAppContent();
 
@@ -182,6 +197,13 @@ export const ProductDetailsLayout: React.FC = () => {
               previewImage={previewImage}
               previewBrand={previewBrand}
             />
+          ) : !product && errorState === "offline" ? (
+            <NoInternetState
+              onRetry={() => void refetch()}
+              retrying={isFetching}
+            />
+          ) : !product && errorState === "server" ? (
+            <RetryState onRetry={() => void refetch()} retrying={isFetching} />
           ) : !product ? (
             <View
               style={{

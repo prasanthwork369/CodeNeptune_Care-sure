@@ -119,6 +119,9 @@ export function useCartCalculations() {
     removeItem: removeCartItem,
     updateItem: updateCartItem,
     isLoading: isCartLoading,
+    isFetching: isCartFetching,
+    error: cartError,
+    refetch: refetchCart,
   } = useCart();
   const removeCartItemRef = useRef(removeCartItem);
   const updateCartItemRef = useRef(updateCartItem);
@@ -360,5 +363,8 @@ export function useCartCalculations() {
     removeItem,
     firstName,
     isCartLoading,
+    isCartFetching,
+    cartError,
+    refetchCart,
   };
 }

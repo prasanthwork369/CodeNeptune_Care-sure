@@ -18,7 +18,13 @@ export const useCart = () => {
   const removeGuestItem = useCartPendingStore((s) => s.removeGuestItem);
   const clearGuestCart = useCartPendingStore((s) => s.clearGuestCart);
 
-  const { data: cart, isLoading } = useQuery({
+  const {
+    data: cart,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
     enabled: isAuthenticated,
@@ -80,6 +86,11 @@ export const useCart = () => {
     totalItems,
     totalPrice,
     isLoading: isAuthenticated ? isLoading : false,
+    // The guest cart lives in the store and cannot fail to load, so a signed-out
+    // user never has a fetch error to report.
+    isFetching: isAuthenticated ? isFetching : false,
+    error: isAuthenticated ? error : null,
+    refetch,
 
     addItem: (input: AddToCartInput) =>
       isAuthenticated
