@@ -1,3 +1,4 @@
+import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
@@ -7,6 +8,7 @@ import type { DeliveryLocation } from "@/src/features/home/types";
 import { useNotifications } from "@/src/features/notifications/hooks/useNotifications";
 import { useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { useNav } from "@/src/hooks/useNav";
+import { useAuthStore } from "@/src/store/authStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useNotificationStore } from "@/src/store/notificationStore";
 import { exactScale } from "@/src/utils/exactScale";
@@ -100,7 +102,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
   ({ location, onPressLocation }) => {
     const router = useNav();
     const insets = useSafeAreaInsets();
-    const { balance } = useWalletBalance();
+    const { balance, loading: balanceLoading } = useWalletBalance();
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
     const { latestPrescription, hasPendingPrescription } =
       usePrescriptionBanner();
 
@@ -116,6 +119,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
         String(latestPrescription.status) !== lastSeenRxStatus);
     const unreadCount = apiUnreadCount + (isRxUnread ? 1 : 0);
 
+    // Guests have no wallet at all, so ₹0 is their real value, not a guess.
+    // A signed-in user with no balance yet (cold start, no in-memory cache)
+    // gets a skeleton instead — never a false ₹0 while the real value is
+    // still unknown.
+    const isBalancePending = isAuthenticated && (balanceLoading || balance == null);
     const walletDisplay =
       balance != null
         ? `₹${Number(balance.walletBalance) % 1 === 0 ? Number(balance.walletBalance).toFixed(0) : Number(balance.walletBalance).toFixed(2)}`
@@ -166,7 +174,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
             onPress={() => router.push("/profile/wallet")}
             className="items-center"
             accessibilityRole="button"
-            accessibilityLabel={`Wallet, balance ${walletDisplay}`}
+            accessibilityLabel={
+              isBalancePending
+                ? "Wallet, balance loading"
+                : `Wallet, balance ${walletDisplay}`
+            }
           >
             <View
               style={s.iconBtn}
@@ -179,9 +191,17 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
               />
             </View>
             <View style={[s.walletBadgeWrap, { marginTop: -exactScale(14) }]}>
-              <Text style={s.walletBadgeText} className="font-inter-bold">
-                {walletDisplay}
-              </Text>
+              {isBalancePending ? (
+                <ShimmerBlock
+                  width={exactScale(28)}
+                  height={exactScale(10)}
+                  borderRadius={4}
+                />
+              ) : (
+                <Text style={s.walletBadgeText} className="font-inter-bold">
+                  {walletDisplay}
+                </Text>
+              )}
             </View>
           </Touchable>
 

@@ -79,6 +79,7 @@ export const API_ENDPOINTS = {
 
   // ── Medicines ────────────────────────────────────────────────────────────
   MEDICINES_FEATURED_CARDS: "/api/v1/medicines/featured/cards",
+  MEDICINES_LAST_MINUTE_BUY_CARDS: "/api/v1/medicines/last-minute-buy/cards",
 
   // ── Search ───────────────────────────────────────────────────────────────
   SEARCH_MEDICINES: "/api/v1/search/medicines",
@@ -160,4 +161,7 @@ export const API_ENDPOINTS = {
 
   // ── Sync ─────────────────────────────────────────────────────────────────
   SYNC_CHECK: "/api/v1/sync/check",
+
+  // ── Website Contents ─────────────────────────────────────────────────────
+  WEBSITE_CONTENTS_FAQS_ACTIVE: "/api/v1/website-contents/faqs/active",
 };

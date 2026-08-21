@@ -197,8 +197,11 @@ export function usePaymentCalculations() {
     let traceStatus = "failed";
     try {
       if (!effectivePrescriptionId && parsedImageUrls.length > 0) {
+        // This flow only carries forward hosted urls (no original file name/size
+        // survives the Preview → Select Patient route-param relay), so those
+        // fields are left off — the backend accepts fileData entries without them.
         const rx = await prescriptionService.upload({
-          imageUrls: parsedImageUrls,
+          fileData: parsedImageUrls.map((url) => ({ url })),
           category: parsedCategory,
         });
         if (!rx.success) {

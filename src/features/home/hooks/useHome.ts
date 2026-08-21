@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { homeApi } from "@/src/features/home/api/home.api";
 import type { ApiAppContent } from "@/src/features/home/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 
@@ -17,6 +18,10 @@ export const useAppContent = () => {
     initialData: () => cachedContent?.data,
     initialDataUpdatedAt: () => cachedContent?.updatedAt ?? 0,
     staleTime: 10 * 60_000,
+    // The SQLite seed above covers the common case; this only matters on a
+    // brand-new install with no seed yet, where a 401 shouldn't toast on top
+    // of whatever the auth interceptor's refresh/logout flow already does.
+    meta: BACKGROUND_QUERY_META,
   });
 };
 

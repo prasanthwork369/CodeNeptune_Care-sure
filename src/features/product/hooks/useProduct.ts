@@ -3,6 +3,7 @@ import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { medicineApi } from "@/src/features/product/api/medicine.api";
 import type { MedicineVariant } from "@/src/features/product/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { resolveAssetUrl } from "@/src/utils/urls";
 
@@ -21,6 +22,7 @@ const prefetchProduct = (queryClient: QueryClient, productId: string): void => {
     .prefetchQuery({
       queryKey: QUERY_KEYS.CATALOG.PRODUCT_BY_ID(productId),
       queryFn: () => medicineApi.getProductById(productId),
+      meta: BACKGROUND_QUERY_META,
     })
     .catch(() => {});
 };

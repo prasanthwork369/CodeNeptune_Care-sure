@@ -68,6 +68,7 @@ export const QUERY_KEYS = {
     PRODUCT_BY_ID: (id: string) => ["catalog", "product", id] as const,
     FEATURED_MEDICINES: ["catalog", "featured-medicines"] as const,
     FEATURED_SUBCATEGORIES: ["catalog", "featured-subcategories"] as const,
+    LAST_MINUTE_BUY: ["catalog", "last-minute-buy"] as const,
   },
   APP: {
     CONTENTS: ["app", "contents"] as const,

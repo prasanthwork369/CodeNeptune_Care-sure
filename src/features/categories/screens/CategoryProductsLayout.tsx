@@ -53,6 +53,7 @@ const CategoryProductsContent: React.FC = () => {
           id: product.productId,
           previewName: product.name,
           previewImage: previewImage || undefined,
+          previewBrand: product.brand || undefined,
         },
       });
     },

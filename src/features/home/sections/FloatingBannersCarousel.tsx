@@ -29,6 +29,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsAppForeground } from "@/src/hooks/ui/useVisibleInterval";
 import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
+import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { exactScale } from "@/src/utils/exactScale";
 
 interface DotProps {
@@ -257,7 +258,7 @@ export const FloatingBannersCarousel = () => {
         pathname: "/(prescription)/prescription-viewer",
         params: {
           prescriptionId: latestPrescription.id,
-          imageUrls: JSON.stringify(latestPrescription.imageUrls ?? []),
+          imageUrls: JSON.stringify(getPrescriptionImageUrls(latestPrescription)),
           doctorName: latestPrescription.doctorName ?? "",
           patientName: latestPrescription.ocrData?.patientName ?? "",
           uploadedDate: latestPrescription.createdAt ?? "",
@@ -286,7 +287,7 @@ export const FloatingBannersCarousel = () => {
           pathname: "/(prescription)/prescription-viewer",
           params: {
             prescriptionId: latestPrescription.id,
-            imageUrls: JSON.stringify(latestPrescription.imageUrls ?? []),
+            imageUrls: JSON.stringify(getPrescriptionImageUrls(latestPrescription)),
             doctorName: latestPrescription.doctorName ?? "",
             patientName: latestPrescription.ocrData?.patientName ?? "",
             uploadedDate: latestPrescription.createdAt ?? "",

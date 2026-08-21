@@ -14,8 +14,8 @@ export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
   const safeColWidth = Math.max(0, colWidth || 0);
 
   return (
-    <View style={{ backgroundColor: "#fff" }} className="flex-row mx-4">
-      <View className="flex-1 items-center justify-center pb-3">
+    <View style={{ backgroundColor: "#FBFBFB" }} className="flex-row mx-4">
+      <View className="flex-1 items-center justify-center py-3">
         <Text
           style={{ letterSpacing: 0.5, fontSize: moderateScale(11) }}
           className="font-inter-bold text-brand-subtext uppercase"

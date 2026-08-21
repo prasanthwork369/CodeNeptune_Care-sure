@@ -24,8 +24,8 @@ import {
   usePerformanceTrace,
 } from "@/src/services/firebase";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { useWindowDimensions, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Keyboard, useWindowDimensions, View } from "react-native";
 
 const toComparisonData = (item: ApiSearchMedicine) => {
   const rec = item.recommendation!;
@@ -218,25 +218,39 @@ export const SearchPageLayout = () => {
     isClearingHistory,
     deleteHistoryItem,
   } = useSearchHistory(5);
-  const { suggestions, isLoading: suggestionsLoading } = useSearchSuggestions(
-    query,
-    6,
-  );
+  const { suggestions } = useSearchSuggestions(query, 6);
   const { trending } = useTrendingSearches(5);
 
   const trendingTerms = useMemo(() => trending.map((t) => t.query), [trending]);
 
   const isSearching = debouncedQuery.length >= 1;
-  const isTyping = query.trim().length >= 1 && !isSearching;
+
+  // Related Search hides once the user has committed to a query (submit or a
+  // suggestion tap) and reappears the moment they edit the query again.
+  const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
+
+  const handleQueryChange = useCallback(
+    (text: string) => {
+      setQuery(text);
+      setSuggestionsDismissed(false);
+    },
+    [setQuery],
+  );
 
   // Stable handlers keep the results list and its rows out of the per-keystroke render.
   const handleSubmit = useCallback(() => {
     const term = query.trim();
-    if (term.length >= 1) recordHistory(term);
+    if (term.length >= 1) {
+      Keyboard.dismiss();
+      setSuggestionsDismissed(true);
+      recordHistory(term);
+    }
   }, [query, recordHistory]);
 
   const handleTermPress = useCallback(
     (term: string) => {
+      Keyboard.dismiss();
+      setSuggestionsDismissed(true);
       recordHistory(term);
       setQuery(term);
     },
@@ -262,11 +276,6 @@ export const SearchPageLayout = () => {
     [router],
   );
 
-  const handleViewAllFrequent = useCallback(
-    () => router.push("/profile/orders/frequent"),
-    [router],
-  );
-
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -283,7 +292,7 @@ export const SearchPageLayout = () => {
       <ProductHeader
         cartCount={cartCount}
         query={query}
-        onQueryChange={setQuery}
+        onQueryChange={handleQueryChange}
         onSubmit={handleSubmit}
         isSearching={isSearching}
       />
@@ -300,21 +309,17 @@ export const SearchPageLayout = () => {
           isClearing={isClearingHistory}
           onDeleteHistoryItem={deleteHistoryItem}
           onProductPress={handleProductPress}
-          onViewAllFrequent={handleViewAllFrequent}
         />
       ) : (
         <View className="flex-1">
-          {query.trim().length >= 2 && (
+          {!suggestionsDismissed && query.trim().length >= 2 && (
             <SearchSuggestionsBar
               suggestions={suggestions}
-              isLoading={suggestionsLoading}
               onSelect={handleTermPress}
             />
           )}
 
-          {isTyping ? (
-            <SearchSkeleton />
-          ) : isLoading ? (
+          {isLoading ? (
             <SearchSkeleton />
           ) : error && results.length === 0 ? (
             <RetryState
@@ -323,7 +328,7 @@ export const SearchPageLayout = () => {
               onRetry={() => void refetch()}
               retrying={isFetching}
             />
-          ) : results.length === 0 ? (
+          ) : !isSearching ? null : results.length === 0 ? (
             <SearchEmptyState query={debouncedQuery} />
           ) : (
             <SearchResultsList

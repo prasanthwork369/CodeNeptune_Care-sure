@@ -6,6 +6,7 @@ import {
 import { useCallback } from "react";
 import { orderApi } from "@/src/features/orders/api/order.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 import { useAuthStore } from "@/src/store/authStore";
 import { Order } from "@/src/features/orders/types";
 
@@ -25,6 +26,7 @@ const prefetchOrder = (queryClient: QueryClient, orderId: string): void => {
     .prefetchQuery({
       queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderId),
       queryFn: () => orderApi.getOrderById(orderId),
+      meta: BACKGROUND_QUERY_META,
     })
     .catch(() => {});
 };

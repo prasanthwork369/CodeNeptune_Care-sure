@@ -77,6 +77,7 @@ interface ProductCardProps {
   onPress: (id: string, name?: string, image?: string, brand?: string) => void;
   packSize?: string;
   unit?: string;
+  brand?: string;
   onLayout?: (e: LayoutChangeEvent) => void;
 }
 
@@ -96,6 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     onPress,
     packSize,
     unit,
+    brand,
     onLayout,
   }) => {
     // Image area height is tied to card width; the details area below it
@@ -162,7 +164,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             const previewImage = thumbnailUrl
               ? resolveAssetUrl(thumbnailUrl)
               : undefined;
-            onPress(productId, name, previewImage);
+            onPress(productId, name, previewImage, brand);
           }}
           onPressIn={handlePrefetch}
           style={{
@@ -396,6 +398,7 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
             onPress={onProductPress}
             packSize={String(p.packSize ?? "")}
             unit={p.unit}
+            brand={p.brandName}
             // Measure one real card; the View All card then matches it.
             onLayout={
               index === 0

@@ -7,6 +7,7 @@ import {
   ReturnRecord,
 } from "@/src/features/orders/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 
 export interface CreateReturnMutationArgs {
   data: CreateReturnRequest;
@@ -63,6 +64,7 @@ export const useCreateReturn = () => {
             queryKey: QUERY_KEYS.CUSTOMER.ORDERS.BY_ID(orderUuid),
             queryFn: () => orderApi.getOrderById(orderUuid),
             staleTime: 0,
+            meta: BACKGROUND_QUERY_META,
           })
           .catch(() => {});
       }
@@ -92,6 +94,7 @@ export const useCreateReturn = () => {
           queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST(DEFAULT_ORDERS_PARAMS),
           queryFn: () => orderApi.listOrders(DEFAULT_ORDERS_PARAMS),
           staleTime: 0,
+          meta: BACKGROUND_QUERY_META,
         })
         .catch(() => {});
     },

@@ -1,5 +1,5 @@
 import { useCart } from "@/src/features/cart/hooks/useCart";
-import { useFeaturedMedicines } from "@/src/features/product/hooks/useFeaturedMedicines";
+import { useLastMinuteBuy } from "@/src/features/product/hooks/useFeaturedMedicines";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useDeliveryCharges } from "@/src/features/cart/hooks/useDeliveryCharges";
 import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
@@ -136,7 +136,9 @@ export function useCartCalculations() {
       updateCartItemRef.current(itemId, input),
     [],
   );
-  const { products: featuredProducts } = useFeaturedMedicines();
+  // "Before you go" row on the empty-cart screen — admin-curated Last Minute
+  // Buy picks, not the Home featured row.
+  const { products: featuredProducts } = useLastMinuteBuy();
 
   // Memoized, or a fresh identity re-renders the whole item list every time.
   const lines: CartLine[] = useMemo(

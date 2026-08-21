@@ -13,6 +13,7 @@ export interface CategoryProduct {
   discountPercent?: number;
   packSize?: string;
   unit?: string;
+  brand?: string;
 }
 
 export interface CategoryProductCardProps {

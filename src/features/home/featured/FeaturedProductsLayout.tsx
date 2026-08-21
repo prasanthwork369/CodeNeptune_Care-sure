@@ -38,6 +38,7 @@ const toCategoryProduct = (p: Product): CategoryProduct => ({
   discountPercent: p.discountPercent,
   packSize: p.packSize,
   unit: p.unit,
+  brand: p.brand,
 });
 
 const FeaturedProductsContent: React.FC = () => {
@@ -67,6 +68,7 @@ const FeaturedProductsContent: React.FC = () => {
           id: product.productId,
           previewName: product.name,
           previewImage: previewImage || undefined,
+          previewBrand: product.brand || undefined,
         },
       });
     },

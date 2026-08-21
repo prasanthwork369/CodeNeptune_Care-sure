@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 import { apiCache, useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useAuthStore } from "@/src/store/authStore";
 import {
@@ -118,7 +119,13 @@ export const useSearchSuggestions = (query: string, limit = 8) => {
     staleTime: 0,
   });
 
-  return { suggestions: data ?? [], isLoading: isFetching };
+  // Suppressed until the debounce has caught up to the latest keystroke and
+  // that query's fetch has landed — otherwise the previous query's results
+  // would flash on screen while the current one is still in flight.
+  const isCurrent = debouncedSuggestionQuery === query.trim();
+  const suggestions = isCurrent && !isFetching ? (data ?? []) : [];
+
+  return { suggestions, isLoading: isFetching };
 };
 
 export const useSearchHistory = (limit = 10, offset = 0) => {
@@ -260,6 +267,7 @@ export const usePrefetchSearch = () => {
         queryKey: QUERY_KEYS.SEARCH.TRENDING(6),
         queryFn: () => searchApi.getTrending(6),
         staleTime: 30 * 60_000,
+        meta: BACKGROUND_QUERY_META,
       })
       .catch(() => {});
 
@@ -269,6 +277,7 @@ export const usePrefetchSearch = () => {
           queryKey: QUERY_KEYS.SEARCH.HISTORY({ limit: 10, offset: 0 }),
           queryFn: () => searchApi.getHistory(10, 0),
           staleTime: 5 * 60_000,
+          meta: BACKGROUND_QUERY_META,
         })
         .catch(() => {});
     }

@@ -154,6 +154,8 @@ export const ProductComparisonLayout: React.FC<
               removeClippedSubviews={false}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
+                // Without this, the comparison cards sit flush against the
+                // search bar above whenever there's no salt composition banner.
                 paddingBottom: isRecommendedInCart
                   ? adjustedBottom + 100
                   : adjustedBottom + 24,

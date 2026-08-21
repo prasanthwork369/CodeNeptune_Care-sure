@@ -1,4 +1,5 @@
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 import { useCachedSeed, withSqliteCache } from "@/src/lib/sqlite/cache";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
@@ -39,6 +40,8 @@ export const useCategories = () => {
     initialData: () => cachedFamilies?.data,
     initialDataUpdatedAt: () => cachedFamilies?.updatedAt ?? 0,
     staleTime: 5 * 60_000,
+    // See useAppContent — same brand-new-install edge case.
+    meta: BACKGROUND_QUERY_META,
   });
 
   const tabs: CategoryTab[] = useMemo(
@@ -133,6 +136,7 @@ export const useCategoryProducts = (params: {
             : null,
           packSize: String(item.packSize ?? ""),
           unit: item.unit ?? "",
+          brand: item.brandName || undefined,
         };
       });
   }, [data?.items]);
@@ -163,6 +167,7 @@ export const usePrefetchCategoryProducts = () => {
           queryFn: () =>
             categoryApi.getCategoryProducts({ page: 1, limit: 40, ...params }),
           staleTime: 60_000,
+          meta: BACKGROUND_QUERY_META,
         })
         .catch(() => {});
     },

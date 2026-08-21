@@ -1,12 +1,12 @@
-import { FrequentSubstitutes } from "@/src/features/home/sections";
-import { icons } from "@/src/constants/icons";
-import { ApiSearchHistoryItem } from "@/src/features/search/types";
-import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { Touchable } from "@/src/components/ui/Touchable";
+import { icons } from "@/src/constants/icons";
+import { FrequentSubstitutes } from "@/src/features/home/sections";
+import { useLastMinuteBuy } from "@/src/features/product/hooks/useFeaturedMedicines";
+import { ApiSearchHistoryItem } from "@/src/features/search/types";
+import { moderateScale, verticalScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { searchRecentStyles as s } from "../search.styles";
-import { moderateScale, verticalScale } from "@/src/utils/exactScale";
 
 const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
   <Touchable
@@ -49,7 +49,6 @@ export const SearchRecentSection = React.memo(
     isClearing = false,
     onDeleteHistoryItem,
     onProductPress,
-    onViewAllFrequent,
     showFrequent = true,
   }: {
     history: ApiSearchHistoryItem[];
@@ -59,10 +58,9 @@ export const SearchRecentSection = React.memo(
     isClearing?: boolean;
     onDeleteHistoryItem: (id: string) => void;
     onProductPress: (id: string) => void;
-    onViewAllFrequent?: () => void;
     showFrequent?: boolean;
   }) => {
-    const { data: frequentlyOrdered = [] } = useFrequentlyOrdered({ limit: 5 });
+    const { products: lastMinuteBuy = [] } = useLastMinuteBuy();
     const [hiddenTrending, setHiddenTrending] = useState<Set<string>>(
       new Set(),
     );
@@ -173,11 +171,11 @@ export const SearchRecentSection = React.memo(
         )}
 
         <View style={{ paddingTop: verticalScale(30) }}>
-          {showFrequent && frequentlyOrdered.length > 0 && (
+          {showFrequent && lastMinuteBuy.length > 0 && (
             <FrequentSubstitutes
-              substitutes={frequentlyOrdered}
+              substitutes={lastMinuteBuy}
+              title="Before you go"
               onProductPress={onProductPress}
-              onViewAll={onViewAllFrequent}
             />
           )}
         </View>

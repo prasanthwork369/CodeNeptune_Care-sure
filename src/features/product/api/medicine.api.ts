@@ -17,6 +17,17 @@ export const medicineApi = {
     );
     return response.data?.data ?? [];
   },
+  // Same lightweight card shape as getFeaturedCards, curated by admins rather
+  // than derived from featured flags. Also has no paging — same `limit` shape.
+  getLastMinuteBuyCards: async (limit = 10): Promise<ApiFeaturedMedicine[]> => {
+    const response = await apiClient.get(
+      API_ENDPOINTS.MEDICINES_LAST_MINUTE_BUY_CARDS,
+      {
+        params: { limit },
+      },
+    );
+    return response.data?.data ?? [];
+  },
   getProductById: async (productId: string): Promise<ApiProductDetail> => {
     try {
       const response = await apiClient.get(

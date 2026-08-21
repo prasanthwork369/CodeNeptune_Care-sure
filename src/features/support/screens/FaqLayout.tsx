@@ -3,14 +3,13 @@ import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React, { useState, useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useWebsiteContent } from "@/src/features/home/hooks/useWebsiteContent";
+import { useFaqs } from "@/src/features/home/hooks/useWebsiteContent";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
+import type { Faq } from "@/src/features/support/types";
 
-type Faq = { question: string; answer: string };
-
-// The CMS returns FAQs under three different shapes; each candidate row is
-// validated through this guard rather than trusted.
+// Each row is validated rather than trusted, in case the CMS returns a
+// malformed entry.
 const isFaq = (item: unknown): item is Faq =>
   !!item &&
   typeof (item as Faq).question === "string" &&
@@ -50,42 +49,13 @@ const FaqSkeleton = () => (
 );
 
 export const FaqLayout: React.FC = () => {
-  const { data: cmsFaqs, isLoading } = useWebsiteContent("faqs");
+  const { data: cmsFaqs, isLoading } = useFaqs();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const faqs: Faq[] = useMemo(() => {
-    if (!cmsFaqs) return [];
-
-    // Try direct array
-    if (Array.isArray(cmsFaqs)) {
-      const valid = cmsFaqs.filter(isFaq);
-      if (valid.length > 0) return valid;
-    }
-
-    // Try value field
-    if (cmsFaqs.value) {
-      let val = cmsFaqs.value;
-      if (typeof val === "string") {
-        try {
-          val = JSON.parse(val);
-        } catch {
-          // ignore
-        }
-      }
-      if (Array.isArray(val)) {
-        const valid = val.filter(isFaq);
-        if (valid.length > 0) return valid;
-      }
-    }
-
-    // Try faqs field
-    if (Array.isArray(cmsFaqs.faqs)) {
-      const valid = cmsFaqs.faqs.filter(isFaq);
-      if (valid.length > 0) return valid;
-    }
-
-    return [];
-  }, [cmsFaqs]);
+  const faqs: Faq[] = useMemo(
+    () => (cmsFaqs ?? []).filter(isFaq),
+    [cmsFaqs],
+  );
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">

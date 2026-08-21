@@ -34,17 +34,40 @@ const NON_RETRYABLE: AppError["kind"][] = [
  * `silentError` opts a mutation out of the global error toast — for screens that
  * render their own inline error (auth OTP, profile form) so the user isn't told
  * twice.
+ * `background` marks a prefetch/cache-warm/unattended refresh that nothing on
+ * screen is waiting on (see BACKGROUND_QUERY_META below).
  */
 export interface CareSureMeta extends Record<string, unknown> {
   silentError?: boolean;
+  background?: boolean;
 }
+
+/**
+ * Attach to `meta` on a prefetchQuery/useQuery call that runs unattended
+ * (nothing on screen shows its loading state) — e.g. warming a cache ahead of
+ * navigation. A 401 there already ran the apiClient interceptor's
+ * refresh/logout flow; a generic toast on top would just repeat "you're
+ * logged out" for something the user never asked to see.
+ */
+export const BACKGROUND_QUERY_META: CareSureMeta = { background: true };
+
+// A background query's 401 is redundant with the interceptor's own
+// refresh/logout handling (see apiClient.ts) — everything else (5xx, network)
+// still falls through to the normal rules below.
+const isSilentBackgroundAuthError = (
+  error: unknown,
+  meta: CareSureMeta | undefined,
+): boolean =>
+  !!meta?.background && error instanceof AppError && error.kind === "unauthorized";
 
 export const queryClient = new QueryClient({
   // One handler covers every mutation in the app, so no screen needs its own
   // catch just to tell the user something failed.
   mutationCache: new MutationCache({
     onError: (error, _vars, _ctx, mutation) => {
-      if ((mutation.meta as CareSureMeta | undefined)?.silentError) return;
+      const meta = mutation.meta as CareSureMeta | undefined;
+      if (meta?.silentError) return;
+      if (isSilentBackgroundAuthError(error, meta)) return;
       reportActionError(error);
     },
   }),
@@ -53,7 +76,9 @@ export const queryClient = new QueryClient({
   // cache leaves the user with nothing, so that one gets reported.
   queryCache: new QueryCache({
     onError: (error, query) => {
-      if ((query.meta as CareSureMeta | undefined)?.silentError) return;
+      const meta = query.meta as CareSureMeta | undefined;
+      if (meta?.silentError) return;
+      if (isSilentBackgroundAuthError(error, meta)) return;
       if (query.state.data !== undefined) return;
       reportActionError(error);
     },

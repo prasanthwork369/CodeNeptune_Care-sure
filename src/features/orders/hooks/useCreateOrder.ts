@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { orderApi } from "@/src/features/orders/api/order.api";
 import { Order, CreateOrderRequest } from "@/src/features/orders/types";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
@@ -45,6 +46,7 @@ export const useCreateOrder = () => {
           queryKey: canonicalKey,
           queryFn: () => orderApi.listOrders({}),
           staleTime: 0,
+          meta: BACKGROUND_QUERY_META,
         })
         .catch(() => {});
 

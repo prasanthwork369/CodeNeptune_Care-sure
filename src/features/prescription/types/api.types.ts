@@ -33,6 +33,7 @@ export interface ApiPrescription {
   isPurchased: boolean;
   prescriptionOrderId?: string | null;
   imageUrls?: string[];
+  fileData?: FileData[];
   doctorName?: string | null;
   customer?: { firstName?: string; lastName?: string } | null;
   ocrData?: {
@@ -57,8 +58,14 @@ export interface PrescriptionListParams {
   sortOrder?: "asc" | "desc";
 }
 
+export interface FileData {
+  name?: string;
+  size?: string;
+  url?: string;
+}
+
 export interface PrescriptionUploadInput {
-  imageUrls: string[];
+  fileData?: FileData[];
   category?: number;
   orderId?: string;
   doctorName?: string;

@@ -8,6 +8,7 @@ import {
 import { useCallback } from "react";
 import { walletApi } from "@/src/features/wallet/api/wallet.api";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
+import { BACKGROUND_QUERY_META } from "@/src/lib/react-query/queryClient";
 import { useAuthStore } from "@/src/store/authStore";
 import { WalletLog } from "@/src/features/wallet/types";
 
@@ -146,12 +147,14 @@ const prefetchWallet = (queryClient: QueryClient): void => {
     .prefetchQuery({
       queryKey: QUERY_KEYS.CUSTOMER.WALLET.BALANCE,
       queryFn: () => walletApi.getBalance(),
+      meta: BACKGROUND_QUERY_META,
     })
     .catch(() => {});
   void queryClient
     .prefetchQuery({
       queryKey: firstPageKey,
       queryFn: () => walletApi.getLogs(LOGS_PAGE_SIZE, 0),
+      meta: BACKGROUND_QUERY_META,
     })
     .catch(() => {});
 };

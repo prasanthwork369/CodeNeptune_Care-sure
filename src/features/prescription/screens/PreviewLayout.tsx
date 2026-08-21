@@ -282,9 +282,16 @@ export const PreviewLayout: React.FC = () => {
       }
 
       // Standalone "upload & notify" flow has no payment step, so it must
-      // create the prescription record now.
+      // create the prescription record now. uploadAll() resolves urls in the
+      // same order as uploadedSnapshot.current, so zipping by index pairs each
+      // hosted url back up with the original file's name/size.
+      const fileData = uploadedSnapshot.current.map((item, i) => ({
+        url: uploadedUrls[i],
+        name: item.name,
+        size: item.size != null ? String(item.size) : undefined,
+      }));
       const result = await prescriptionService.upload({
-        imageUrls: uploadedUrls,
+        fileData,
         category: PRESCRIPTION_CATEGORY.ORDER,
       });
       if (!result.success) {

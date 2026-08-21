@@ -21,16 +21,16 @@ describe("prescriptionService — Payload & Exception Handling", () => {
     const mockRx = {
       id: "rx-55",
       category: 1,
-      imageUrls: ["https://img.com/1.jpg"],
+      fileData: [{ url: "https://img.com/1.jpg", name: null, size: null }],
     } as any;
     (prescriptionApi.upload as jest.Mock).mockResolvedValueOnce(mockRx);
 
     const result = await prescriptionService.upload({
-      imageUrls: ["https://img.com/1.jpg"],
+      fileData: [{ url: "https://img.com/1.jpg" }],
     });
 
     expect(prescriptionApi.upload).toHaveBeenCalledWith({
-      imageUrls: ["https://img.com/1.jpg"],
+      fileData: [{ url: "https://img.com/1.jpg" }],
       category: PRESCRIPTION_CATEGORY.ORDER,
     });
     expect(result).toEqual({ success: true, data: mockRx });
@@ -42,7 +42,7 @@ describe("prescriptionService — Payload & Exception Handling", () => {
     );
 
     const result = await prescriptionService.upload({
-      imageUrls: ["invalid.txt"],
+      fileData: [{ url: "invalid.txt" }],
     });
 
     expect(result).toEqual({ success: false, error: "Invalid image format" });

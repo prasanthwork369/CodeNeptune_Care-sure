@@ -1,5 +1,6 @@
 import { getAccessToken } from "@/src/api/client";
 import type { Cart, Coupon } from "@/src/features/cart/types";
+import { useIsAppForeground } from "@/src/hooks/ui/useVisibleInterval";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { tokenStorage } from "@/src/lib/storage";
 import { useAuthStore } from "@/src/store/authStore";
@@ -13,11 +14,18 @@ import { logger } from "@/src/utils/logger";
 export const useCartSocketSync = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  // Same AppState primitive already used by useOtaUpdate/useAppGate/useVisibleInterval —
+  // reusing it here instead of a second raw AppState subscription.
+  const isForeground = useIsAppForeground();
   const setCart = useCartPendingStore((s) => s.setCart);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Backgrounded or logged out: no socket should be open. Re-running this
+    // effect on every foreground/background flip (via the isForeground
+    // dependency below) is what disconnects on background and reconnects
+    // once on the next active transition.
+    if (!isAuthenticated || !isForeground) {
       socketRef.current?.disconnect();
       socketRef.current = null;
       return;
@@ -26,8 +34,14 @@ export const useCartSocketSync = () => {
     let mounted = true;
 
     const connect = async () => {
+      // Already connected (e.g. effect re-ran for an unrelated dependency
+      // while foreground+authenticated stayed true): never open a second socket.
+      if (socketRef.current) return;
+
       const token = await tokenStorage.get();
-      if (!token || !mounted) return;
+      // Re-check after the await: a background flip or logout during the
+      // token read must not let a stale connect() attempt slip a socket through.
+      if (!token || !mounted || socketRef.current) return;
 
       // Kept as one mutable object (not replaced) — engine.io reads
       // `extraHeaders` fresh from this same reference on every reconnect
@@ -128,5 +142,5 @@ export const useCartSocketSync = () => {
       socketRef.current?.disconnect();
       socketRef.current = null;
     };
-  }, [isAuthenticated, queryClient, setCart]);
+  }, [isAuthenticated, isForeground, queryClient, setCart]);
 };

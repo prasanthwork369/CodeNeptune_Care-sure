@@ -15,3 +15,13 @@ export function useWebsiteContent(category: string) {
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 }
+
+export function useFaqs() {
+  return useQuery({
+    queryKey: websiteContentsKeys.category("faqs-active"),
+    queryFn: () => websiteContentsApi.getActiveFaqs(),
+    staleTime: 10 * 60 * 1000, // 10 minutes stale time
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+  });
+}

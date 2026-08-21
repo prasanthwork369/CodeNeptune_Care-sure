@@ -12,6 +12,7 @@ import { exactScale } from "@/src/utils/exactScale";
 
 interface FrequentSubstitutesProps {
   substitutes: SubstituteProduct[];
+  title?: string;
   isLoading?: boolean;
   onProductPress?: (
     id: string,
@@ -301,35 +302,45 @@ const FrequentItem = React.memo(
 FrequentItem.displayName = "FrequentItem";
 
 export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> =
-  React.memo(({ substitutes, onProductPress, onViewAll, disableCart }) => {
-    const visibleSubstitutes = useMemo(
-      () => substitutes.slice(0, HOME_PREVIEW_LIMIT),
-      [substitutes],
-    );
+  React.memo(
+    ({
+      substitutes,
+      title = "Frequently Ordered Products",
+      onProductPress,
+      onViewAll,
+      disableCart,
+    }) => {
+      const visibleSubstitutes = useMemo(
+        () => substitutes.slice(0, HOME_PREVIEW_LIMIT),
+        [substitutes],
+      );
 
-    return (
-      <View className="px-4">
-        <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-lg font-inter-bold text-brand-text">
-            Frequently Ordered Products
-          </Text>
-          <Touchable onPress={onViewAll} accessibilityRole="button">
-            <Text className="text-base font-inter-semibold text-brand-primary">
-              View All
+      return (
+        <View className="px-4">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-inter-bold text-brand-text">
+              {title}
             </Text>
-          </Touchable>
+            {!!onViewAll && (
+              <Touchable onPress={onViewAll} accessibilityRole="button">
+                <Text className="text-base font-inter-semibold text-brand-primary">
+                  View All
+                </Text>
+              </Touchable>
+            )}
+          </View>
+          <View className="gap-y-4">
+            {visibleSubstitutes.map((item, index) => (
+              <FrequentItem
+                key={`${item.productId ?? item.id}-${index}`}
+                item={item}
+                onProductPress={onProductPress}
+                disableCart={disableCart}
+              />
+            ))}
+          </View>
         </View>
-        <View className="gap-y-4">
-          {visibleSubstitutes.map((item, index) => (
-            <FrequentItem
-              key={`${item.productId ?? item.id}-${index}`}
-              item={item}
-              onProductPress={onProductPress}
-              disableCart={disableCart}
-            />
-          ))}
-        </View>
-      </View>
-    );
-  });
+      );
+    },
+  );
 FrequentSubstitutes.displayName = "FrequentSubstitutes";
