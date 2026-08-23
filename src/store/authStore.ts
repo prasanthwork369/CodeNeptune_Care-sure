@@ -5,6 +5,7 @@ import { setAccessToken } from "../api/client";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { apiCache } from "@/src/lib/sqlite/cache";
 import { usePrescriptionDraftStore } from "./prescriptionDraftStore";
+import { useLastRouteStore } from "./lastRouteStore";
 import { useCheckoutDraftStore } from "./checkoutDraftStore";
 import { useCouponStore } from "./couponStore";
 import { useNotificationStore } from "./notificationStore";
@@ -91,6 +92,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     usePrescriptionOrderStore.getState().clear();
     useCartPendingStore.getState().clearGuestCart();
     useCheckoutDraftStore.getState().clearDraft();
+    useLastRouteStore.getState().clear();
     queryClient.clear();
     // Clear entire user cache on logout
     apiCache.clear();

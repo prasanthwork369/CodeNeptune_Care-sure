@@ -1,7 +1,7 @@
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { focusManager, QueryClientProvider } from "@tanstack/react-query";
 import * as NavigationBar from "expo-navigation-bar";
-import { Stack, usePathname } from "expo-router";
+import { Stack, usePathname, useGlobalSearchParams } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
@@ -39,6 +39,7 @@ import {
   usePerformanceTrace,
 } from "@/src/services/firebase";
 import { useAuthStore } from "@/src/store/authStore";
+import { isSafeRoute, useLastRouteStore } from "@/src/store/lastRouteStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
@@ -161,6 +162,7 @@ const screenNameForPath = (pathname: string) => {
 
 export default function RootLayout() {
   const pathname = usePathname();
+  const searchParams = useGlobalSearchParams();
   const isAuthLoaded = useAuthStore((s) => s.isLoaded);
   const initialize = useAuthStore((s) => s.initialize);
 
@@ -175,6 +177,20 @@ export default function RootLayout() {
   useEffect(() => {
     analyticsService.logScreenView(screenNameForPath(pathname));
   }, [pathname]);
+
+  // Remember the last safe screen so a process recreation (e.g. the user
+  // backgrounded the app to flip a permission in Settings) can restore it
+  // instead of always landing on Home — see app/index.tsx. Gated on
+  // isAuthLoaded so early splash-time pathnames are never captured.
+  useEffect(() => {
+    if (!isAuthLoaded || !pathname || !isSafeRoute(pathname)) return;
+    const params: Record<string, string> = {};
+    for (const [key, value] of Object.entries(searchParams)) {
+      if (typeof value === "string") params[key] = value;
+      else if (Array.isArray(value)) params[key] = value[0] ?? "";
+    }
+    useLastRouteStore.getState().setRoute(pathname, params);
+  }, [pathname, searchParams, isAuthLoaded]);
 
   useEffect(() => {
     if (Platform.OS === "android") {

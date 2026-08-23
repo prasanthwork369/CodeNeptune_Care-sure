@@ -265,6 +265,16 @@ export const useHomeOnboarding = () => {
           isFetching.current = false;
         }
       } catch {}
+
+      // Silent notification recheck — mirrors the location check above: never
+      // prompts, just registers the token if the user granted the permission
+      // from Settings (e.g. after being sent there mid-flow) since we last saw it.
+      try {
+        if (!isExpoGo) {
+          const granted = await notificationService.hasPermission();
+          if (granted) await notificationService.registerWithBackend();
+        }
+      } catch {}
     });
 
     return () => {

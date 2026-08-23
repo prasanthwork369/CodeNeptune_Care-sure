@@ -1,8 +1,10 @@
-import { Alert, Linking } from "react-native";
+import { Alert, AppState, Linking } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ScannerService } from "./scanner.service";
+
+type PendingPermissionAction = "camera" | "gallery" | "pdf" | "document";
 
 export interface CapturedAsset {
   uri: string;
@@ -23,6 +25,11 @@ export function usePrescriptionUploadService({
   // Ref, not state, so a rapid double-tap in the same tick can't launch a
   // second native picker/scanner activity before the first one has opened.
   const runningRef = useRef(false);
+  // Set when the user is sent to Settings from a permission alert below, so
+  // the AppState effect can silently re-check that one permission on return
+  // and resume the action the user actually asked for, instead of requiring
+  // a second tap.
+  const pendingActionRef = useRef<PendingPermissionAction | null>(null);
 
   const showErr = (title: string, message: string) => {
     if (onError) {
@@ -35,10 +42,20 @@ export function usePrescriptionUploadService({
   // Permission denials always need the same actionable dialog — a friendly
   // title plus a direct path to Settings — regardless of which screen hosts
   // this hook, so this bypasses the generic onError/InfoModal plumbing above.
-  const showPermissionAlert = (title: string, message: string) => {
+  const showPermissionAlert = (
+    title: string,
+    message: string,
+    action: PendingPermissionAction,
+  ) => {
     Alert.alert(title, message, [
       { text: "Cancel", style: "cancel" },
-      { text: "Open Settings", onPress: () => void Linking.openSettings() },
+      {
+        text: "Open Settings",
+        onPress: () => {
+          pendingActionRef.current = action;
+          void Linking.openSettings();
+        },
+      },
     ]);
   };
 
@@ -53,6 +70,7 @@ export function usePrescriptionUploadService({
         showPermissionAlert(
           "Camera Access Required",
           "CareSure needs access to your camera to take a photo of your prescription. Please allow Camera access in Settings to continue.",
+          "camera",
         );
         return;
       }
@@ -91,6 +109,7 @@ export function usePrescriptionUploadService({
         showPermissionAlert(
           "Photo Access Required",
           "CareSure needs access to your photos to upload a prescription. Please allow Photo access in Settings to continue.",
+          "gallery",
         );
         return;
       }
@@ -128,6 +147,7 @@ export function usePrescriptionUploadService({
         showPermissionAlert(
           "File Access Required",
           "CareSure needs access to your files to upload a prescription PDF. Please allow Storage access in Settings to continue.",
+          "pdf",
         );
         return;
       }
@@ -163,6 +183,7 @@ export function usePrescriptionUploadService({
         showPermissionAlert(
           "Photo Access Required",
           "CareSure needs access to your photos to upload a prescription. Please allow Photo access in Settings to continue.",
+          "document",
         );
         return;
       }
@@ -188,6 +209,44 @@ export function usePrescriptionUploadService({
       runningRef.current = false;
     }
   };
+
+  // Kept current every render so the mount-once effect below never calls a
+  // stale closure (these actions capture onAssetsReady/onError from props).
+  const actionsRef = useRef({ takePhoto, chooseFromGallery, pickPdf, pickDocument });
+  useEffect(() => {
+    actionsRef.current = { takePhoto, chooseFromGallery, pickPdf, pickDocument };
+  });
+
+  // Silently re-checks the permission that sent the user to Settings, and
+  // resumes the action they originally asked for if it's now granted — so
+  // returning from a permission change doesn't require a second tap. Never
+  // shows a dialog itself; if still denied, the user just retries manually.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", async (next) => {
+      if (next !== "active") return;
+      const action = pendingActionRef.current;
+      if (!action) return;
+      pendingActionRef.current = null;
+
+      try {
+        if (action === "camera") {
+          const { status } = await ImagePicker.getCameraPermissionsAsync();
+          if (status === "granted") await actionsRef.current.takePhoto();
+        } else {
+          const { status } =
+            await ImagePicker.getMediaLibraryPermissionsAsync();
+          if (status !== "granted") return;
+          if (action === "gallery") await actionsRef.current.chooseFromGallery();
+          else if (action === "pdf") await actionsRef.current.pickPdf();
+          else await actionsRef.current.pickDocument();
+        }
+      } catch {
+        // Best-effort resume only — a failure here just leaves the user
+        // where a manual retry already works.
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   return {
     takePhoto,
