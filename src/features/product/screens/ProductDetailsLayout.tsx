@@ -8,7 +8,7 @@ import { useInCartVariantId } from "@/src/features/cart/hooks/useCartRead";
 import { useAppContent } from "@/src/features/home/hooks/useHome";
 import { useProduct, getPackDivisor } from "@/src/features/product/hooks/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
 import {
   analyticsService,
@@ -67,9 +67,13 @@ export const ProductDetailsLayout: React.FC = () => {
     error,
     refetch,
   } = useProduct(id);
-  // Shared classification — "offline" already accounts for the device's own
-  // connectivity, so this screen needs no NetInfo subscription of its own.
-  const errorState = useQueryErrorState(error);
+  // Price, pack and add-to-cart are all live server state the user acts on, so
+  // offline replaces the screen instead of quoting a cached price.
+  const liveState = useLiveScreenState({
+    error,
+    hasData: !!product,
+    loading: isLoading,
+  });
   const inCartVariantId = useInCartVariantId(variants);
   const { data: appContent, isLoading: isContentLoading } = useAppContent();
 
@@ -173,6 +177,28 @@ export const ProductDetailsLayout: React.FC = () => {
       ).toFixed(2)
     : undefined;
 
+  // Early return, not a branch inside the tree below: the sticky
+  // ProductDetailsFooter (add-to-cart) and the header's price/pack are siblings
+  // of that branch, so gating only the middle left a live buy button and a
+  // cached price floating over the offline state.
+  if (liveState) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        {/* Title and back only — no price or pack, which are the stale values
+            this screen is refusing to show. */}
+        <ProductDetailsHeader title={medicineName} onBack={goBack} />
+        {liveState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        ) : (
+          <RetryState onRetry={() => void refetch()} retrying={isFetching} />
+        )}
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -197,13 +223,6 @@ export const ProductDetailsLayout: React.FC = () => {
               previewImage={previewImage}
               previewBrand={previewBrand}
             />
-          ) : !product && errorState === "offline" ? (
-            <NoInternetState
-              onRetry={() => void refetch()}
-              retrying={isFetching}
-            />
-          ) : !product && errorState === "server" ? (
-            <RetryState onRetry={() => void refetch()} retrying={isFetching} />
           ) : !product ? (
             <View
               style={{

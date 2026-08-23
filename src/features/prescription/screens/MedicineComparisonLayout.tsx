@@ -23,7 +23,7 @@ import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillRe
 import { useAppliedCoupon } from "@/src/hooks/billing/useAppliedCoupon";
 import { useBillingCalculations } from "@/src/hooks/billing/useBillingCalculations";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
@@ -82,9 +82,15 @@ export const MedicineComparisonLayout: React.FC<
   } = usePrescriptionOrderMedicines(
     propsMedicines ? "" : (prescriptionOrderId ?? ""),
   );
-  // The message below claims the comparison isn't ready yet — a claim about the
-  // prescription, which a failed fetch must not make on its behalf.
-  const errorState = useQueryErrorState(error);
+  // Priced comparison the user proceeds to payment from, so offline replaces it
+  // rather than quoting cached prices. Medicines handed in as props are already
+  // in memory and server-independent, so that path stays live-exempt.
+  const liveState = useLiveScreenState({
+    error,
+    hasData: queryMedicines.length > 0,
+    loading: isLoading,
+    live: !propsMedicines,
+  });
 
   const resolvedPrescriptionId = useComparisonPrescriptionId(
     rawPrescriptionId,
@@ -280,11 +286,11 @@ export const MedicineComparisonLayout: React.FC<
     return <MedicineComparisonSkeleton />;
   }
 
-  if (!propsMedicines && medicines.length === 0 && errorState) {
+  if (liveState) {
     return (
       <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
         <ScreenHeader title="Medicine Comparison" showBorder />
-        {errorState === "offline" ? (
+        {liveState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetch()}
             retrying={isFetching}

@@ -8,7 +8,7 @@ import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { exactScale } from "@/src/utils/exactScale";
 import { WalletHistoryPage } from "../sections/WalletHistoryPage";
 import {
@@ -50,7 +50,11 @@ export const WalletHistoryLayout: React.FC = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteWalletLogs();
-  const errorState = useQueryErrorState(error);
+  const liveState = useLiveScreenState({
+    error,
+    hasData: logs.length > 0,
+    loading,
+  });
 
   const all = useMemo(() => logs.flatMap(logToTransactions), [logs]);
 
@@ -67,15 +71,16 @@ export const WalletHistoryLayout: React.FC = () => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Full-screen, above the tabs — one query backs all three, so with nothing
-  // cached there is no tab worth showing and no page to swipe to. Anything in
-  // `all` (including the first page seeded from Wallet home) keeps the normal
-  // screen, and a tab that filters down to nothing keeps its own empty state.
+  // Full-screen, above the tabs — one query backs all three, so there is no tab
+  // worth showing and no page to swipe to. Offline triggers this regardless of
+  // what is cached: these are wallet movements, and a stale ledger is not one
+  // to reason about. Online it fires only with nothing to show, and a tab that
+  // filters down to nothing still keeps its own empty state.
   //
   // The hook stays mounted here while the pager below is gone, so the query
   // keeps an observer and onlineManager's reconnect refetch restores the
   // screen on its own.
-  if (!loading && errorState && all.length === 0) {
+  if (liveState) {
     return (
       <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
         <ScreenHeader
@@ -83,7 +88,7 @@ export const WalletHistoryLayout: React.FC = () => {
           backgroundColor="#FFFFFF"
           showBorder
         />
-        {errorState === "offline" ? (
+        {liveState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetch()}
             retrying={refreshing}

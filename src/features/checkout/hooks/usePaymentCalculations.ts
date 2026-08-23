@@ -132,7 +132,7 @@ export function usePaymentCalculations() {
   // highlights. Display and payload both read it, so what the screen shows is
   // what the order ships to.
   const { address: defaultAddress, displayLocation } = useDeliveryAddress();
-  const { items: cartItems } = useCart();
+  const { items: cartItems, refetch: refetchCart } = useCart();
   const { createOrder, loading: ordering } = useCreateOrder();
 
   const deliveryLabel = displayLocation?.label ?? defaultAddress?.label ?? null;
@@ -315,5 +315,8 @@ export function usePaymentCalculations() {
     defaultAddress,
     ordering: placingOrder || ordering,
     handlePlaceOrder,
+    // For the screen's offline state to retry against: the cart is the server
+    // state this bill was built from, and it is already subscribed here.
+    refetchCart,
   };
 }

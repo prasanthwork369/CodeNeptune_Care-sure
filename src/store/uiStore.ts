@@ -40,6 +40,8 @@ interface UIState {
   setPermissionFlowComplete: (value: boolean) => void;
   globalAlert: GlobalAlertConfig | null;
   setGlobalAlert: (alert: GlobalAlertConfig | null) => void;
+  suppressNetworkToast: boolean;
+  setSuppressNetworkToast: (value: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -74,4 +76,6 @@ export const useUIStore = create<UIState>((set) => ({
   setPermissionFlowComplete: (value) => set({ permissionFlowComplete: value }),
   globalAlert: null,
   setGlobalAlert: (alert) => set({ globalAlert: alert }),
+  suppressNetworkToast: false,
+  setSuppressNetworkToast: (value) => set({ suppressNetworkToast: value }),
 }));

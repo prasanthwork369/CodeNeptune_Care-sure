@@ -1,6 +1,8 @@
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { icons } from "@/src/constants/icons";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { usePaymentCalculations } from "../hooks/usePaymentCalculations";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
@@ -44,8 +46,26 @@ export const PaymentLayout: React.FC = () => {
     hasAddress,
     ordering,
     handlePlaceOrder,
+    refetchCart,
   } = usePaymentCalculations();
   const adjustedBottom = useAdjustedBottomInset();
+
+  // Checkout is the most transactional screen there is: the total, the address
+  // and the payment methods below all exist to be committed. The bill itself is
+  // local, so there is no failed query to classify — being offline is the whole
+  // condition, and placing an order is separately gated in handlePlaceOrder.
+  const liveState = useLiveScreenState({ error: null, hasData: true });
+
+  if (liveState === "offline") {
+    return (
+      <View
+        style={{ flex: 1, backgroundColor: "#F8F9FC", paddingTop: insets.top }}
+      >
+        <PaymentHeader onBack={() => router.back()} title="Checkout" />
+        <NoInternetState onRetry={() => void refetchCart()} />
+      </View>
+    );
+  }
 
   return (
     <View

@@ -1,7 +1,7 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import React, { useEffect, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
@@ -35,7 +35,11 @@ export const CategoriesLayout: React.FC = () => {
 
   const { tabs, cards, isLoading, isFetching, error, refetch } =
     useCategories();
-  const errorState = useQueryErrorState(error);
+  const liveState = useLiveScreenState({
+    error,
+    hasData: tabs.length > 0,
+    loading: isLoading,
+  });
 
   useEffect(() => {
     if (tabs.length > 0 && !activeTabId) {
@@ -53,8 +57,8 @@ export const CategoriesLayout: React.FC = () => {
         rightSlot={<CategoriesHeaderActions />}
       />
 
-      {errorState && tabs.length === 0 ? (
-        errorState === "offline" ? (
+      {liveState ? (
+        liveState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetch()}
             retrying={isFetching}

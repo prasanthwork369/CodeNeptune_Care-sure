@@ -9,7 +9,7 @@ import { useCart } from "@/src/features/cart/hooks/useCart";
 import { AlreadyHaveItemsModal } from "@/src/features/orders/components/AlreadyHaveItemsModal";
 import { useOrderById } from "@/src/features/orders/hooks/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
@@ -256,7 +256,11 @@ export const OrderTrackLayout: React.FC = () => {
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const { order, loading, isFetching, error, refetch, isPlaceholderData } =
     useOrderById(orderId);
-  const errorState = useQueryErrorState(error);
+  const liveState = useLiveScreenState({
+    error,
+    hasData: !!order,
+    loading,
+  });
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [rxModalVisible, setRxModalVisible] = useState(false);
   const [billSheetVisible, setBillSheetVisible] = useState(false);
@@ -500,23 +504,13 @@ export const OrderTrackLayout: React.FC = () => {
     };
   });
 
-  if (loading) {
+  // Ahead of the skeleton: a tracked order's status is live server state, so
+  // offline shows that rather than a timeline that may already be wrong.
+  if (liveState) {
     return (
       <View className="flex-1 bg-[#F5F6FB]">
         <ScreenHeader title="Order Details" showBorder />
-        <OrderTrackingSkeleton />
-      </View>
-    );
-  }
-
-  // Without an order the screen below renders its whole timeline against
-  // defaults — an empty shell that reads as a real, contentless order. The
-  // placeholder row from the orders-list cache still counts as usable data.
-  if (!order && errorState) {
-    return (
-      <View className="flex-1 bg-[#F5F6FB]">
-        <ScreenHeader title="Order Details" showBorder />
-        {errorState === "offline" ? (
+        {liveState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetch()}
             retrying={isFetching}
@@ -531,6 +525,16 @@ export const OrderTrackLayout: React.FC = () => {
       </View>
     );
   }
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Order Details" showBorder />
+        <OrderTrackingSkeleton />
+      </View>
+    );
+  }
+
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">

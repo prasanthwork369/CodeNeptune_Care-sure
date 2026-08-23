@@ -6,7 +6,7 @@ import { SlidingTabs } from "@/src/components/ui/SlidingTabs";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useOrders } from "@/src/features/orders/hooks/useOrders";
 import { usePagerTabs } from "@/src/hooks/ui/usePagerTabs";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { AddToCartInput, UpdateCartItemInput } from "@/src/features/cart/types";
 import { OrderTabKey } from "../types";
 import React, { useCallback, useRef } from "react";
@@ -73,12 +73,17 @@ export const MyOrdersLayout: React.FC = () => {
     error: allError,
     refetch: refetchAll,
   } = useOrders(TABS[0].params);
-  const errorState = useQueryErrorState(allError);
+  const liveState = useLiveScreenState({
+    error: allError,
+    hasData: allOrders.length > 0,
+    loading: allLoading,
+  });
 
-  // Full-screen only when the screen has nothing to show. With orders already
-  // cached the tabs stay up and each page keeps its own per-tab error handling,
-  // since one failed status filter says nothing about the others.
-  if (!allLoading && errorState && allOrders.length === 0) {
+  // Orders is live: statuses move server-side, so offline replaces the screen
+  // rather than showing a cached list that may already be wrong. Online, this
+  // fires only with nothing to show — a per-tab failure still belongs to that
+  // tab, since one failed status filter says nothing about the others.
+  if (liveState) {
     return (
       <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
         <ScreenHeader
@@ -86,7 +91,7 @@ export const MyOrdersLayout: React.FC = () => {
           showBorder={true}
           backgroundColor="#FFFFFF"
         />
-        {errorState === "offline" ? (
+        {liveState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetchAll()}
             retrying={allRefreshing}

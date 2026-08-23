@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
+import { useUIStore } from "@/src/store/uiStore";
 
 const NetworkToast = () => {
   // Mounted app-wide, so it selects fields rather than the whole store.
@@ -18,6 +19,7 @@ const NetworkToast = () => {
   const offlineAlertVisible = useNetworkStore((s) => s.offlineAlertVisible);
   const hideOfflineAlert = useNetworkStore((s) => s.hideOfflineAlert);
   const adjustedBottom = useAdjustedBottomInset();
+  const suppressNetworkToast = useUIStore((s) => s.suppressNetworkToast);
 
   const [isLoading, setIsLoading] = useState(false);
   const [translateY] = useState(() => new Animated.Value(300));
@@ -103,8 +105,10 @@ const NetworkToast = () => {
 
   return (
     <>
-      <AlertDialog
-        visible={offlineAlertVisible}
+      {!suppressNetworkToast && (
+        <>
+          <AlertDialog
+            visible={offlineAlertVisible}
         onClose={hideOfflineAlert}
         icon="no_internet"
         title={
@@ -167,6 +171,8 @@ const NetworkToast = () => {
           )}
         </View>
       </Animated.View>
+        </>
+      )}
     </>
   );
 };

@@ -9,7 +9,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
@@ -27,7 +27,11 @@ export const FrequentOrdersLayout: React.FC = () => {
     error,
     refetch,
   } = useFrequentlyOrdered();
-  const errorState = useQueryErrorState(error);
+  const liveState = useLiveScreenState({
+    error,
+    hasData: frequentlyOrdered.length > 0,
+    loading: isLoading,
+  });
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -117,8 +121,9 @@ export const FrequentOrdersLayout: React.FC = () => {
         }
       />
 
-      {/* Search bar */}
-      {frequentlyOrdered.length > 0 && (
+      {/* Search bar — hidden alongside the list it filters, or the offline
+          state sits under controls for content that isn't there. */}
+      {!liveState && frequentlyOrdered.length > 0 && (
         <View
           style={{
             paddingHorizontal: exactScale(16),
@@ -220,7 +225,12 @@ export const FrequentOrdersLayout: React.FC = () => {
 
       <View style={{ height: 1, backgroundColor: "#F0F1F3" }} />
 
-      {isLoading ? (
+      {liveState === "offline" ? (
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={isFetching}
+        />
+      ) : isLoading ? (
         <View
           style={{
             paddingHorizontal: exactScale(16),
@@ -232,12 +242,7 @@ export const FrequentOrdersLayout: React.FC = () => {
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
         </View>
-      ) : errorState === "offline" && frequentlyOrdered.length === 0 ? (
-        <NoInternetState
-          onRetry={() => void refetch()}
-          retrying={isFetching}
-        />
-      ) : errorState && frequentlyOrdered.length === 0 ? (
+      ) : liveState === "error" ? (
         <RetryState
           title="Couldn't load your products"
           onRetry={() => void refetch()}

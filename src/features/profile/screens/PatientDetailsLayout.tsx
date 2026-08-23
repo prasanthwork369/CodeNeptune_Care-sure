@@ -1,13 +1,17 @@
 import { PatientSkeleton } from "../components/PatientSkeleton";
 import { profileStyles as s } from "../profile.styles";
 import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import type { FamilyMember } from "../types";
 import { getAge } from "@/src/utils/patient";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
+import { requireInternet } from "@/src/utils/offline";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
@@ -132,12 +136,24 @@ const PatientCard = ({
 
 export const PatientDetailsLayout: React.FC = () => {
   const router = useNav();
-  const { members, loading, deleteMember } = useFamilyMembers();
+  const {
+    members,
+    loading,
+    refreshing,
+    listError,
+    refetch,
+    deleteMember,
+  } = useFamilyMembers();
+  // Cached-content, like Select Patient and My Addresses: patient records are
+  // personal reference data, not priced or transactional, and the list is
+  // SQLite-seeded. Only the mutations need the network.
+  const listErrorState = useQueryErrorState(listError);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDeleteConfirm = async () => {
     if (!confirmDeleteId) return;
+    if (!requireInternet()) return;
     const id = confirmDeleteId;
     setConfirmDeleteId(null);
     setDeletingId(id);
@@ -186,6 +202,17 @@ export const PatientDetailsLayout: React.FC = () => {
         </Text>
         {loading ? (
           <PatientSkeleton />
+        ) : members.length === 0 && listErrorState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        ) : members.length === 0 && listErrorState ? (
+          <RetryState
+            title="Couldn't load patients"
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
         ) : members.length === 0 ? (
           <Text
             style={s.patientValue}

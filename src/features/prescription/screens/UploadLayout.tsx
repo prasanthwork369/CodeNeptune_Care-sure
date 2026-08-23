@@ -5,7 +5,10 @@ import {
   InfoModal,
 } from "@/src/features/prescription/sections/preview";
 import { components } from "@/src/constants/theme";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { RetryState } from "@/src/components/ui/RetryState";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { usePrescriptionUpload } from "../hooks/usePrescriptionUpload";
 import { useAuthStore } from "@/src/store/authStore";
 import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
@@ -32,7 +35,11 @@ export const UploadLayout: React.FC = () => {
     onDismiss?: () => void;
   } | null>(null);
   const [tooLargeSizeMB, setTooLargeSizeMB] = useState<string | null>(null);
-  const { maxSizeLabel } = useUploadConfig();
+  const {
+    maxSizeLabel,
+    isFetching: isConfigFetching,
+    refetch: refetchConfig,
+  } = useUploadConfig();
   const [duplicateFile, setDuplicateFile] = useState<{
     name: string;
     size?: number;
@@ -51,6 +58,12 @@ export const UploadLayout: React.FC = () => {
     (name, size, proceed) => setDuplicateFile({ name, size, proceed }),
   );
 
+  // The screen's own content is static, but every action on it leads straight
+  // into a server upload, so it follows the same live-screen rule as the rest
+  // of that flow. "error" stays unreachable in practice — the upload config is
+  // SQLite-seeded — but the gate is uniform.
+  const liveState = useLiveScreenState({ error: null, hasData: true });
+
   // Clears picked files when the user leaves this screen without
   // continuing — header back button, hardware back, swipe-back gesture,
   // or switching tabs. Skipped when `isProceeding` is set, i.e. the blur
@@ -65,6 +78,29 @@ export const UploadLayout: React.FC = () => {
   );
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+
+  // Everything on this screen exists to start an upload, and the upload itself
+  // is gated in PreviewLayout. Without this the user picks a file, lands on
+  // Preview and only then gets told there is no connection — so the dead end is
+  // moved to the front, where the choice is still cheap to abandon.
+  if (liveState) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Upload Prescription" />
+        {liveState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetchConfig()}
+            retrying={isConfigFetching}
+          />
+        ) : (
+          <RetryState
+            onRetry={() => void refetchConfig()}
+            retrying={isConfigFetching}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">

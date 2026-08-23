@@ -1,8 +1,10 @@
 import { AnimatedImage } from "@/src/components/ui/AnimatedImage";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { PdfViewer } from "@/src/components/ui/PdfViewer";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useZoomGesture } from "@/src/hooks/ui/useZoomGesture";
 import { useLocalSearchParams } from "expo-router";
 import { icons } from "@/src/constants/icons";
@@ -92,6 +94,13 @@ export const PrescriptionViewerLayout: React.FC = () => {
   const [pageIndex, setPageIndex] = useState(0);
   const currentUrl = urls[pageIndex] ?? "";
   const isPdf = currentUrl.toLowerCase().endsWith(".pdf");
+  // Locally picked files still render offline; only a remote page can't be
+  // fetched, and that is what would otherwise show as a blank frame.
+  const isRemotePage = /^https?:/i.test(currentUrl);
+  const isDeviceOffline = useIsOffline();
+  const cannotLoadPage = isDeviceOffline && isRemotePage;
+  // Bumped by Retry so the image/PDF remounts and requests again.
+  const [reloadKey, setReloadKey] = useState(0);
   const hasPages = urls.length > 1;
   const hasFooter = showVerifiedCard || showSelect;
 
@@ -127,9 +136,14 @@ export const PrescriptionViewerLayout: React.FC = () => {
       <ScreenHeader title="Prescription" />
 
       <View className="flex-1" onLayout={onContainerLayout}>
-        {containerHeight > 0 &&
+        {cannotLoadPage && (
+          <NoInternetState onRetry={() => setReloadKey((n) => n + 1)} />
+        )}
+        {!cannotLoadPage &&
+          containerHeight > 0 &&
           (isPdf ? (
             <PdfViewer
+              key={reloadKey}
               uri={currentUrl}
               style={{
                 width,
@@ -149,6 +163,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
                 }}
               >
                 <AnimatedImage
+                  key={reloadKey}
                   source={{ uri: currentUrl }}
                   style={[{ width, height: containerHeight }, animatedStyle]}
                   contentFit="contain"
@@ -157,7 +172,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
             </GestureDetector>
           ))}
 
-        {hasPages && (
+        {hasPages && !cannotLoadPage && (
           <>
             <Touchable
               activeOpacity={0.8}
@@ -220,7 +235,8 @@ export const PrescriptionViewerLayout: React.FC = () => {
         )}
       </View>
 
-      {showVerifiedCard ? (
+      {/* Both footer actions lead into server flows, so they go with the page. */}
+      {cannotLoadPage ? null : showVerifiedCard ? (
         <View
           style={{ paddingBottom: adjustedBottom + 12 }}
           className="px-5 pt-4 bg-white border-t border-[#EEEFF1]"

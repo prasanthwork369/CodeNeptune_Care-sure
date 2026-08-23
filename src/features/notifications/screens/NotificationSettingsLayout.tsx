@@ -7,6 +7,7 @@ import { ScrollView, Text, View } from "react-native";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { requireInternet } from "@/src/utils/offline";
 
 // Only the boolean preference fields are togglable keys.
 type PreferenceKey = keyof UpdateNotificationPreferencesInput;
@@ -147,6 +148,9 @@ export const NotificationSettingsLayout: React.FC = () => {
 
   const handleToggle = async (key: PreferenceKey, value: boolean) => {
     if (pendingKeys.has(key)) return;
+    // Gate before the pending flag: the switch renders from `preferences`, so
+    // returning here leaves it where it was instead of flipping and snapping back.
+    if (!requireInternet()) return;
     setPendingKeys((current) => new Set(current).add(key));
     try {
       await updatePreferences({ [key]: value });

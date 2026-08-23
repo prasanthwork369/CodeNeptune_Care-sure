@@ -10,7 +10,6 @@ import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback } from "react";
 import { RefreshControl, Text, View } from "react-native";
 import { MyOrdersSkeleton } from "../components/MyOrdersSkeleton";
-import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { orderStyles as s } from "../orders.styles";
@@ -60,12 +59,11 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
     <View style={{ width, flex: 1, backgroundColor: "#F5F6FB" }}>
       {loading ? (
         <MyOrdersSkeleton />
-      ) : errorState === "offline" && orders.length === 0 ? (
-        <NoInternetState
-          onRetry={() => void refetch()}
-          retrying={refreshing}
-        />
       ) : errorState && orders.length === 0 ? (
+        // Offline never reaches here — MyOrdersLayout replaces the whole screen
+        // for that — so this is one status filter failing server-side while the
+        // All tab that gates the screen loaded fine.
+
         <RetryState
           title="Couldn't load orders"
           onRetry={() => void refetch()}

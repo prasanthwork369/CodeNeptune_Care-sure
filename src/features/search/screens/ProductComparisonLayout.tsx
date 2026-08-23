@@ -19,7 +19,7 @@ import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { useHome } from "@/src/features/home/hooks/useHome";
 import { useProduct, getPackDivisor } from "@/src/features/product/hooks/useProduct";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
@@ -51,9 +51,14 @@ export const ProductComparisonLayout: React.FC<
     error,
     refetch,
   } = useProduct(id);
-  // A failed load must not read as "no substitute exists" — that is the same
-  // claim this screen makes when the catalogue genuinely has nothing cheaper.
-  const errorState = useQueryErrorState(error);
+  // Same as Product Details: this screen compares live prices and leads to the
+  // cart, so offline replaces it rather than comparing cached ones. A failed
+  // load must also never read as "no substitute exists".
+  const liveState = useLiveScreenState({
+    error,
+    hasData: !!product,
+    loading: isLoading,
+  });
   const { appContent, isLoading: isHomeLoading } = useHome();
   const { items: cartItems, totalItems: cartCount } = useCartRead();
   const storePincode = useLocationStore((s) => s.pincode);
@@ -123,6 +128,30 @@ export const ProductComparisonLayout: React.FC<
       ).toFixed(2)
     : undefined;
 
+  // Early return for the same reason as ProductDetailsLayout: the sticky
+  // ProductDetailsFooter is a sibling of the branch below, so gating only the
+  // middle left a live cart footer over the offline state.
+  if (liveState) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <ProductHeader
+          query={raw?.name ?? ""}
+          cartCount={cartCount}
+          isSearching={true}
+          onBack={goBack}
+        />
+        {liveState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        ) : (
+          <RetryState onRetry={() => void refetch()} retrying={isFetching} />
+        )}
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -137,13 +166,6 @@ export const ProductComparisonLayout: React.FC<
 
         {isLoading ? (
           <ProductDetailsSkeleton />
-        ) : !product && errorState === "offline" ? (
-          <NoInternetState
-            onRetry={() => void refetch()}
-            retrying={isFetching}
-          />
-        ) : !product && errorState === "server" ? (
-          <RetryState onRetry={() => void refetch()} retrying={isFetching} />
         ) : !searched || !recommended ? (
           <View
             style={{

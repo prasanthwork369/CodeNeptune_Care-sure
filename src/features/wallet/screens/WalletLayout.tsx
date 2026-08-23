@@ -7,6 +7,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useWalletBalance, useWalletLogs } from "@/src/features/wallet/hooks/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { requireInternet } from "@/src/utils/offline";
@@ -148,14 +149,17 @@ export const WalletLayout: React.FC = () => {
     error: balanceError,
     refetch: refetchBalance,
   } = useWalletBalance();
-  const balanceErrorState = useQueryErrorState(balanceError);
+  const balanceLiveState = useLiveScreenState({
+    error: balanceError,
+    hasData: balance != null,
+    loading: balanceLoading,
+  });
 
   // A null balance with loading=false is still a pre-auth/pending state — but
   // only while nothing has failed. Without that second clause a failed balance
   // fetch left the shimmer running forever, indistinguishable from a slow one
   // and with no way to retry.
-  const isBalancePending =
-    balanceLoading || (balance == null && !balanceErrorState);
+  const isBalancePending = balanceLoading || balance == null;
   const {
     logs,
     loading: logsLoading,
@@ -175,14 +179,14 @@ export const WalletLayout: React.FC = () => {
   // so the whole screen becomes the failure state rather than a set of cards
   // standing in for numbers nobody has. A cached balance keeps the normal
   // screen — a real ₹0 is data, and only `balance == null` is the absence of it.
-  if (!balanceLoading && balance == null && balanceErrorState) {
+  if (balanceLiveState) {
     return (
       <View style={cardStyles.container}>
         <ScreenHeader
           title="My Wallet / CareSure Coins"
           backgroundColor="#FFFFFF"
         />
-        {balanceErrorState === "offline" ? (
+        {balanceLiveState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetchBalance()}
             retrying={balanceRefreshing}
@@ -394,12 +398,10 @@ export const WalletLayout: React.FC = () => {
               <ShimmerBlock height={48} borderRadius={8} />
               <ShimmerBlock height={48} borderRadius={8} />
             </View>
-          ) : logsErrorState === "offline" && previewTxs.length === 0 ? (
-            <NoInternetState
-              onRetry={() => void refetchLogs()}
-              retrying={logsRefreshing}
-            />
           ) : logsErrorState && previewTxs.length === 0 ? (
+            // Offline never reaches here — the screen-level gate above owns that
+            // case — so this is a server-side failure of the logs alone, with
+            // the balance above it having loaded fine.
             <RetryState
               title="Couldn't load transactions"
               onRetry={() => void refetchLogs()}

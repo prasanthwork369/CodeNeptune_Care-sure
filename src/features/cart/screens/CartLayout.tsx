@@ -5,9 +5,10 @@ import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
+import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
@@ -109,9 +110,17 @@ export const CartLayout: React.FC = () => {
     cartError,
     refetchCart,
   } = useCartCalculations();
-  // "Your cart is empty" is a claim about the server's state, so it must not be
-  // what a failed load looks like.
-  const cartErrorState = useQueryErrorState(cartError);
+  // Cart is transactional: prices, stock and totals below are all server state
+  // the user is about to act on, so offline replaces the screen rather than
+  // showing a cached bill. A signed-out cart lives in the local store and the
+  // network was never going to supply it, so it stays visible.
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const liveState = useLiveScreenState({
+    error: cartError,
+    hasData: lines.length > 0,
+    loading: isCartLoading,
+    live: isAuthenticated,
+  });
 
   const addressActionLabel = hasSavedAddress ? "Change" : "Add Address";
   const hasRxItem = lines.some((line) => line.rx);
@@ -131,20 +140,9 @@ export const CartLayout: React.FC = () => {
     isLoading: isCartLoading,
   });
 
-  // React Query's isLoading is initial-load only. Do not replace an already
-  // restored cart during mutations or background work.
-  if (isCartLoading && lines.length === 0) {
-    return (
-      <View className="flex-1 bg-[#F5F6FB]">
-        <ScreenHeader title="Cart" showBorder={true} />
-        <CartInitialSkeleton />
-      </View>
-    );
-  }
-
-  // Only when the cart could not be read at all — a failed refresh with lines
-  // already restored keeps showing them, and the global banner explains why.
-  if (lines.length === 0 && cartErrorState === "offline") {
+  // Ahead of the skeleton: offline is known from device state, so there is no
+  // fetch worth waiting on before saying so.
+  if (liveState === "offline") {
     return (
       <View className="flex-1 bg-[#F5F6FB]">
         <ScreenHeader title="Cart" showBorder={true} />
@@ -156,7 +154,18 @@ export const CartLayout: React.FC = () => {
     );
   }
 
-  if (lines.length === 0 && cartErrorState === "server") {
+  // React Query's isLoading is initial-load only. Do not replace an already
+  // restored cart during mutations or background work.
+  if (isCartLoading && lines.length === 0) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Cart" showBorder={true} />
+        <CartInitialSkeleton />
+      </View>
+    );
+  }
+
+  if (liveState === "error") {
     return (
       <View className="flex-1 bg-[#F5F6FB]">
         <ScreenHeader title="Cart" showBorder={true} />

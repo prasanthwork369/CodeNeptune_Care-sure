@@ -6,6 +6,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { requireInternet } from "@/src/utils/offline";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -46,6 +47,9 @@ export const DeleteAccountLayout: React.FC = () => {
 
   const handleDelete = async () => {
     if (deletingAccount) return;
+    // Irreversible, so it takes the same acknowledged-offline notice as placing
+    // an order rather than failing into a generic alert.
+    if (!requireInternet({ critical: true })) return;
     setShowConfirm(false);
     try {
       await deleteAccount();
