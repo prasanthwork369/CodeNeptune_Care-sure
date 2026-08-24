@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability, react-hooks/exhaustive-deps */
 import { tabs } from "@/src/constants/data";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
@@ -47,7 +48,6 @@ import {
 import { TabBarFadeGradient } from "./TabBarFadeGradient";
 import {
   ActivePillGlass,
-  GLASS_TINT,
   TabBarGlass,
   UploadButtonGlass,
 } from "./TabBarGlass";
@@ -552,12 +552,7 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     ],
   }));
 
-  // The fade gradient is anchored to the screen bottom, so sliding it would
-  // push its solid end off-screen and collapse the fade band into a hard edge.
-  // It dissolves in place instead, finishing exactly as the pill lands.
-  const animatedGradientStyle = useAnimatedStyle(() => ({
-    opacity: tabBarVisible.value,
-  }));
+
 
   const tabItems = useMemo(
     () =>
@@ -594,19 +589,13 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       onLayout={handleLayout}
     >
       <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          // Screen content (including Home's floating cart/prescription banner)
-          // cannot out-zIndex the tab navigator. Always dissolve this overlay
-          // with the bar so it does not wash out those banners while hiding.
-          animatedGradientStyle,
-        ]}
+        style={[StyleSheet.absoluteFill, animatedTabBarContainerStyle]}
         pointerEvents="none"
       >
         <TabBarFadeGradient
           visibleHeight={
             useFullHeightGradient
-              ? BAR_HEIGHT + adjustedBottom + extraGap
+              ? PILL_HEIGHT + adjustedBottom + extraGap
               : undefined
           }
         />
@@ -626,8 +615,8 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
             marginRight: BAR_MARGIN_RIGHT,
             height: PILL_HEIGHT,
             borderRadius: PILL_HEIGHT / 2,
-            backgroundColor: GLASS_TINT,
-            boxShadow: "0px 0px 20px 0px #00000026",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0px 0px 20px 0px #00000014",
           }}
         >
           <GestureDetector gesture={gesture}>

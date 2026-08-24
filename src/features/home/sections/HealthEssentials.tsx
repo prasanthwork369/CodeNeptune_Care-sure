@@ -1,5 +1,4 @@
 import type {
-  ApiCategoryProductItem,
   ApiFeaturedSubcategory,
   ApiFeaturedSubcategoryMetadata,
 } from "@/src/features/categories/types";
@@ -352,6 +351,7 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
   React.memo(({ subcategory, themeIndex, onProductPress, onViewAll }) => {
     const prefetchCategory = usePrefetchCategoryProducts();
     const { width } = useWindowDimensions();
+
     const meta: ApiFeaturedSubcategoryMetadata | null =
       subcategory.featuredMetadata;
     const fallback = FALLBACK_THEMES[themeIndex % FALLBACK_THEMES.length];
@@ -487,9 +487,14 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
                     // Same accent the row's product cards use.
                     accentColor={lineColor}
                     onPress={() => onViewAll(subcategory)}
-                    onPressIn={() =>
-                      prefetchCategory({ categorySlug: subcategory.slug })
-                    }
+                    onPressIn={() => {
+                      if (subcategory.familySlug) {
+                        prefetchCategory({
+                          categorySlug: subcategory.familySlug,
+                          subCategorySlug: subcategory.slug,
+                        });
+                      }
+                    }}
                   />
                 </View>
               )}

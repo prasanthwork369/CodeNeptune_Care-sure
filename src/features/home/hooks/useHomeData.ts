@@ -9,7 +9,7 @@ import {
   addressToLocation,
   pickDefaultAddress,
 } from "@/src/utils/addressLocation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { InteractionManager } from "react-native";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { syncService } from "@/src/services/sync.service";
@@ -41,6 +41,7 @@ export function useHomeData() {
   }, [isAuthenticated]);
 
   const {
+    families,
     tabs,
     cards,
     appContent,
@@ -138,14 +139,30 @@ export function useHomeData() {
     refetchFrequentlyOrdered,
   ]);
 
+  // Attaches familySlug once upstream so downstream UI and navigation can read it directly.
+  const enrichedFeaturedSubcategories = useMemo(() => {
+    return featuredSubcategories.map((sub) => {
+      const family = families.find(
+        (f) =>
+          f.id === sub.categoryId ||
+          f.subCategories?.some((s) => s.id === sub.id || s.slug === sub.slug),
+      );
+      return {
+        ...sub,
+        familySlug: family?.slug,
+      };
+    });
+  }, [featuredSubcategories, families]);
+
   return {
+    families,
     tabs,
     cards,
     appContent,
     isHomeLoading,
     featuredProducts,
     isFeaturedLoading,
-    featuredSubcategories,
+    featuredSubcategories: enrichedFeaturedSubcategories,
     isSubcategoriesLoading,
     addresses,
     frequentlyOrdered,

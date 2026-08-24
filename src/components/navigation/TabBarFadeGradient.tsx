@@ -48,7 +48,7 @@ export const TabBarFadeGradient: React.FC<TabBarFadeGradientProps> = ({
     <LinearGradient
       colors={[
         "rgba(255,255,255,0)",
-        "rgba(255,255,255,0.90)",
+        "rgba(255,255,255,0.75)",
         "#FFFFFF",
         "#FFFFFF",
       ]}

@@ -129,6 +129,7 @@ export const PrescriptionFloatingBanner = ({
     paddingRight: interpolate(tabBarAnim.value, [0, 1], [exact77, exact12]),
     transform: [{ translateY: slideY.value }],
     opacity: opacity.value,
+    zIndex: 10,
   }));
 
   // Inline progress pill: fills a dynamic track width based on expansion state.

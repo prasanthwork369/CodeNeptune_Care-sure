@@ -95,6 +95,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
                 style={{ width: "100%", height: "100%" }}
                 contentFit="contain"
                 cachePolicy="memory-disk"
+                recyclingKey={product.id}
               />
             ) : (
               <icons.placeholder width="78%" height="68%" />

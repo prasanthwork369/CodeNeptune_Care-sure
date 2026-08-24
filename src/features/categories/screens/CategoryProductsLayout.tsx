@@ -6,7 +6,10 @@ import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
-import { useCategoryProducts } from "@/src/features/categories/hooks/useCategories";
+import {
+  useCategories,
+  useCategoryProducts,
+} from "@/src/features/categories/hooks/useCategories";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryProduct } from "@/src/features/categories/types";
@@ -21,7 +24,8 @@ import {
 } from "@/src/features/categories/products/sections";
 
 const CategoryProductsContent: React.FC = () => {
-  const { slug, name, familySlug } = useLocalSearchParams<{
+  const { id, slug, name, familySlug } = useLocalSearchParams<{
+    id?: string;
     slug: string;
     name: string;
     familySlug?: string;
@@ -29,11 +33,24 @@ const CategoryProductsContent: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
   const { totalItems } = useCartRead();
+  const { families } = useCategories();
+
+  // If familySlug was not passed directly, look it up from the category map.
+  const resolvedFamilySlug =
+    familySlug ||
+    families.find(
+      (f) =>
+        f.slug === slug ||
+        f.subCategories?.some((s) => s.slug === slug || (id && s.id === id)),
+    )?.slug ||
+    slug;
+  const resolvedSubCategorySlug =
+    resolvedFamilySlug !== slug ? slug : undefined;
 
   const { products, isLoading, isRefetching, error, refetch } =
     useCategoryProducts({
-      categorySlug: familySlug || slug,
-      subCategorySlug: familySlug ? slug : undefined,
+      categorySlug: resolvedFamilySlug,
+      subCategorySlug: resolvedSubCategorySlug,
     });
 
   usePerformanceTrace({

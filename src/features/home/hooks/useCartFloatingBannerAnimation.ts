@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability, react-hooks/exhaustive-deps */
 import { useEffect, useCallback } from "react";
 import {
   useSharedValue,
@@ -7,7 +8,7 @@ import {
   Easing,
   interpolate,
 } from "react-native-reanimated";
-import { exactScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 
 interface UseCartFloatingBannerAnimationProps {
@@ -98,60 +99,53 @@ export const useCartFloatingBannerAnimation = ({
     paddingRight: interpolate(tabBarAnim.value, [0, 1], [exact77, exact12]),
     transform: [{ translateY: slideY.value }],
     opacity: opacity.value,
+    zIndex: 10,
   }));
 
-  // Button chrome: padding shrank/grew 10→14 and 5→7 — the same ratio on both
-  // axes — so a fixed box scaled via transform replaces two per-frame layout
-  // properties with one compositor-only value, avoiding a reflow every scroll tick.
-  const BUTTON_PAD_H = 14;
-  const BUTTON_PAD_V = 7;
-  const BUTTON_SCALE_COLLAPSED = 10 / BUTTON_PAD_H; // matches old ratio (== 5/7)
+  // Button padding and text sizes scale smoothly with the tab bar visibility.
+  const exactPadH = exactScale(14);
+  const exactPadHCollapsed = exactScale(10);
+  const exactPadV = exactScale(7);
+  const exactPadVCollapsed = exactScale(5);
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    paddingHorizontal: BUTTON_PAD_H,
-    paddingVertical: BUTTON_PAD_V,
-    transform: [
-      {
-        scale: interpolate(
-          tabBarAnim.value,
-          [0, 1],
-          [BUTTON_SCALE_COLLAPSED, 1],
-        ),
-      },
-    ],
+    paddingHorizontal: interpolate(
+      tabBarAnim.value,
+      [0, 1],
+      [exactPadHCollapsed, exactPadH],
+    ),
+    paddingVertical: interpolate(
+      tabBarAnim.value,
+      [0, 1],
+      [exactPadVCollapsed, exactPadV],
+    ),
   }));
 
-  // Text lives inside the scaled button above, so its own scale must cancel
-  // the parent's scale first, then apply its own (smaller) size change —
-  // net effect matches the old fontSize interpolation exactly at both ends.
-  const BUTTON_TEXT_SIZE = 13;
-  const ITEM_COUNT_SIZE = 11;
-
-  const buttonTextAnimatedStyle = useAnimatedStyle(() => {
-    const parentScale = interpolate(
+  const buttonTextAnimatedStyle = useAnimatedStyle(() => ({
+    fontSize: interpolate(
       tabBarAnim.value,
       [0, 1],
-      [BUTTON_SCALE_COLLAPSED, 1],
-    );
-    const ownScale = interpolate(tabBarAnim.value, [0, 1], [12 / BUTTON_TEXT_SIZE, 1]);
-    return {
-      fontSize: BUTTON_TEXT_SIZE,
-      transform: [{ scale: ownScale / parentScale }],
-    };
-  });
-
-  const itemCountAnimatedStyle = useAnimatedStyle(() => {
-    const parentScale = interpolate(
+      [moderateScale(11.5), moderateScale(13)],
+    ),
+    lineHeight: interpolate(
       tabBarAnim.value,
       [0, 1],
-      [BUTTON_SCALE_COLLAPSED, 1],
-    );
-    const ownScale = interpolate(tabBarAnim.value, [0, 1], [10 / ITEM_COUNT_SIZE, 1]);
-    return {
-      fontSize: ITEM_COUNT_SIZE,
-      transform: [{ scale: ownScale / parentScale }],
-    };
-  });
+      [moderateScale(15), moderateScale(17)],
+    ),
+  }));
+
+  const itemCountAnimatedStyle = useAnimatedStyle(() => ({
+    fontSize: interpolate(
+      tabBarAnim.value,
+      [0, 1],
+      [moderateScale(9.5), moderateScale(11)],
+    ),
+    lineHeight: interpolate(
+      tabBarAnim.value,
+      [0, 1],
+      [moderateScale(12), moderateScale(14)],
+    ),
+  }));
 
   return {
     isSlid,

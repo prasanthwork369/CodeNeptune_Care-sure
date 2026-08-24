@@ -45,19 +45,23 @@ const SHADOW_ROOM = exactScale(24);
 // How far the banners drop when the tab bar hides.
 const BANNER_HIDE_OFFSET = exactScale(73);
 
-// `extraBottom` lets a caller that shifted its own container back down cancel
-// that shift here, so the fade lands on the same pixels either way.
-const BannerFadeGradient = ({ extraBottom = 0 }: { extraBottom?: number }) => (
+// Sits strictly behind the banner with an overhang extending through the Android system navigation bar.
+const BannerBottomFade = ({ extraBottom = 0 }: { extraBottom?: number }) => (
   <LinearGradient
-    colors={["rgba(255,255,255,0)", "rgba(255,255,255,0.95)", "#FFFFFF"]}
-    locations={[0.05, 0.3, 1]}
+    colors={[
+      "rgba(255,255,255,0)",
+      "rgba(255,255,255,0.75)",
+      "#FFFFFF",
+      "#FFFFFF",
+    ]}
+    locations={[0, 0.35, 0.65, 1]}
     pointerEvents="none"
     style={{
       position: "absolute",
-      bottom: -exactScale(100) + extraBottom,
+      bottom: -exactScale(120) + extraBottom,
       left: 0,
       right: 0,
-      height: exactScale(150),
+      height: exactScale(200),
       zIndex: -1,
     }}
   />
@@ -377,7 +381,7 @@ export const FloatingBannersCarousel = () => {
             animatedContainerStyle,
           ]}
         >
-          <BannerFadeGradient extraBottom={SHADOW_ROOM} />
+          <BannerBottomFade extraBottom={SHADOW_ROOM} />
           {/* Slides Container */}
           <View
             pointerEvents="box-none"
@@ -385,6 +389,7 @@ export const FloatingBannersCarousel = () => {
               width: "100%",
               height: exactScale(82) + SHADOW_ROOM,
               overflow: "hidden",
+              zIndex: 10,
             }}
           >
             <Animated.ScrollView
@@ -525,17 +530,19 @@ export const FloatingBannersCarousel = () => {
                 animatedContainerStyle,
               ]}
             >
-              <BannerFadeGradient />
-              <PrescriptionFloatingBanner
-                visible={isRxActive}
-                status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
-                onPress={handleRxPress}
-                onClose={
-                  latestPrescription?.status === PRESCRIPTION_STATUS.CANCELLED
-                    ? dismissBanner
-                    : undefined
-                }
-              />
+              <BannerBottomFade />
+              <View pointerEvents="box-none" style={{ zIndex: 10, width: "100%" }}>
+                <PrescriptionFloatingBanner
+                  visible={isRxActive}
+                  status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
+                  onPress={handleRxPress}
+                  onClose={
+                    latestPrescription?.status === PRESCRIPTION_STATUS.CANCELLED
+                      ? dismissBanner
+                      : undefined
+                  }
+                />
+              </View>
             </Animated.View>
           )}
 
@@ -553,12 +560,14 @@ export const FloatingBannersCarousel = () => {
                 animatedContainerStyle,
               ]}
             >
-              <BannerFadeGradient />
-              <CartFloatingBanner
-                visible={isCartActive}
-                onViewCart={() => router.push("/(commerce)/cart")}
-                onInteractionChange={setIsCartInteracting}
-              />
+              <BannerBottomFade />
+              <View pointerEvents="box-none" style={{ zIndex: 10, width: "100%" }}>
+                <CartFloatingBanner
+                  visible={isCartActive}
+                  onViewCart={() => router.push("/(commerce)/cart")}
+                  onInteractionChange={setIsCartInteracting}
+                />
+              </View>
             </Animated.View>
           )}
         </>

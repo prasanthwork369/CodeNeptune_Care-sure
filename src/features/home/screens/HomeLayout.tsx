@@ -275,23 +275,20 @@ const HomeContent: React.FC = () => {
     router.push("/(catalog)/featured");
   }, [router]);
 
-  // Each Health Essentials row is one subcategory. The featured API returns no
-  // parent slug, so match it to a card (cards are subcategories carrying their
-  // familySlug) and reuse the same navigation the category cards already use.
+  // Directly passes the upstream-resolved familySlug to CategoryProductsLayout.
   const handleViewAllSubcategory = useCallback(
     (sub: ApiFeaturedSubcategory) => {
-      const card = cards.find((c) => c.id === sub.id || c.slug === sub.slug);
-      if (card) {
-        handleCardPress(card);
-        return;
-      }
-      // Not in the family map — open by slug alone rather than going nowhere.
       router.push({
         pathname: "/category/[id]",
-        params: { id: sub.id, slug: sub.slug, name: sub.name },
+        params: {
+          id: sub.id,
+          slug: sub.slug,
+          familySlug: sub.familySlug || undefined,
+          name: sub.name,
+        },
       });
     },
-    [cards, handleCardPress, router],
+    [router],
   );
 
   const handleScrollStart = useCallback(() => {

@@ -20,6 +20,9 @@ const GRID_GAP = 10;
 // Half the gap lives on each cell, so the outer edge still lands on GRID_PADDING.
 const CELL_GAP = GRID_GAP / 2;
 
+const keyExtractor = (item: CategoryProduct) => item.id;
+const getItemType = () => "product";
+
 interface ProductGridProps {
   products: CategoryProduct[];
   isLoading: boolean;
@@ -82,8 +85,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     [cardWidth, onProductPress],
   );
 
-  const keyExtractor = useCallback((item: CategoryProduct) => item.id, []);
-
   // Ahead of the skeleton: an offline retry keeps isLoading true while it is
   // in flight, and swapping back to a full-screen skeleton would hide the
   // Retry button the user just pressed.
@@ -138,6 +139,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       data={products}
       numColumns={2}
       keyExtractor={keyExtractor}
+      getItemType={getItemType}
+      drawDistance={1200}
       renderItem={renderItem}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
