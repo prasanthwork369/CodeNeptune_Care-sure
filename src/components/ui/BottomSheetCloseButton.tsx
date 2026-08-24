@@ -26,6 +26,9 @@ type BottomSheetCloseButtonProps = Pick<
       }
   );
 
+const BUTTON_SIZE = 40;
+const BUTTON_BOTTOM_GAP = 12;
+
 export const BottomSheetCloseButton: React.FC<BottomSheetCloseButtonProps> = ({
   animatedIndex,
   animatedPosition,
@@ -41,7 +44,17 @@ export const BottomSheetCloseButton: React.FC<BottomSheetCloseButtonProps> = ({
     );
 
     if (animatedPosition) {
-      return { opacity, height: animatedPosition.value };
+      // Old version animated `height` + flex-end to sit just above the sheet's
+      // moving top edge — same result, but translateY skips the layout pass.
+      return {
+        opacity,
+        transform: [
+          {
+            translateY:
+              animatedPosition.value - BUTTON_SIZE - BUTTON_BOTTOM_GAP,
+          },
+        ],
+      };
     }
 
     return { opacity };
@@ -53,9 +66,7 @@ export const BottomSheetCloseButton: React.FC<BottomSheetCloseButtonProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        justifyContent: "flex-end" as const,
         alignItems: "center" as const,
-        paddingBottom: 12,
       }
     : {
         position: "absolute" as const,
@@ -63,7 +74,7 @@ export const BottomSheetCloseButton: React.FC<BottomSheetCloseButtonProps> = ({
         right: 0,
         bottom: bottomOffset,
         alignItems: "center" as const,
-        paddingBottom: 12,
+        paddingBottom: BUTTON_BOTTOM_GAP,
       };
 
   return (
@@ -75,9 +86,9 @@ export const BottomSheetCloseButton: React.FC<BottomSheetCloseButtonProps> = ({
         onPress={onPress}
         activeOpacity={0.7}
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
+          width: BUTTON_SIZE,
+          height: BUTTON_SIZE,
+          borderRadius: BUTTON_SIZE / 2,
           backgroundColor: "#424242",
           alignItems: "center",
           justifyContent: "center",

@@ -122,6 +122,8 @@ export const PrescriptionFloatingBanner = ({
   // one value drives the whole reshape. Deriving it from a second, JS-driven
   // value would run the shrink on two clocks and read as a broken two-stage
   // animation.
+  // paddingRight reserves real space for the FAB, so it stays a true layout
+  // property — a transform would move the pill instead of resizing it.
   const containerStyle = useAnimatedStyle(() => ({
     paddingLeft: exact12,
     paddingRight: interpolate(tabBarAnim.value, [0, 1], [exact77, exact12]),
@@ -129,7 +131,9 @@ export const PrescriptionFloatingBanner = ({
     opacity: opacity.value,
   }));
 
-  // Inline progress pill: fills a dynamic track width based on expansion state
+  // Inline progress pill: fills a dynamic track width based on expansion state.
+  // Stays a real width (not a transform) because the subtitle text next to it
+  // depends on that width via flex to know how much room it has to truncate into.
   const trackWidthStyle = useAnimatedStyle(() => {
     const trackWidth = interpolate(tabBarAnim.value, [0, 1], [48, 90]);
     return {
@@ -137,12 +141,13 @@ export const PrescriptionFloatingBanner = ({
     };
   });
 
-  const progressBarStyle = useAnimatedStyle(() => {
-    const trackWidth = interpolate(tabBarAnim.value, [0, 1], [48, 90]);
-    return {
-      width: progressAnim.value * trackWidth,
-    };
-  });
+  // Fill tracks the track's own (still layout-driven) width via 100%, then
+  // scales in from the left — keeps the continuous 10s loop off layout entirely.
+  const progressBarStyle = useAnimatedStyle(() => ({
+    width: "100%",
+    transformOrigin: "0% 50%",
+    transform: [{ scaleX: progressAnim.value }],
+  }));
 
   const subtitleText = config.subtitle;
 

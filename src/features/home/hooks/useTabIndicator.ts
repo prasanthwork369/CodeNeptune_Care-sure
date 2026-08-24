@@ -13,6 +13,10 @@ interface TabMeasuredLayout {
   width: number;
 }
 
+// Wider, more prominent bar to match image style — always this width, so it
+// doesn't need its own animated shared value.
+const STATIC_WIDTH = 84;
+
 export const useTabIndicator = (activeId: string) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [tabLayouts, setTabLayouts] = useState<
@@ -20,20 +24,18 @@ export const useTabIndicator = (activeId: string) => {
   >({});
 
   const indicatorX = useSharedValue(0);
-  const indicatorWidth = useSharedValue(0);
   const opacity = useSharedValue(0);
 
+  const activeLayout = tabLayouts[activeId];
+
+  // Depend on the active tab's own x/width, not the whole tabLayouts map —
+  // otherwise an unrelated tab reporting its layout restarts this animation.
   useEffect(() => {
-    if (activeId && tabLayouts[activeId]) {
-      const { x, width } = tabLayouts[activeId];
-      const STATIC_WIDTH = 84; // Wider, more prominent bar to match image style
+    if (activeId && activeLayout) {
+      const { x, width } = activeLayout;
       const targetX = x + (width - STATIC_WIDTH) / 2;
 
       indicatorX.value = withTiming(targetX, {
-        duration: 220,
-        easing: Easing.out(Easing.quad),
-      });
-      indicatorWidth.value = withTiming(STATIC_WIDTH, {
         duration: 220,
         easing: Easing.out(Easing.quad),
       });
@@ -49,11 +51,11 @@ export const useTabIndicator = (activeId: string) => {
         });
       }, 50);
     }
-  }, [activeId, tabLayouts]);
+  }, [activeId, activeLayout?.x, activeLayout?.width]);
 
   const animatedIndicatorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: indicatorX.value }],
-    width: indicatorWidth.value,
+    width: STATIC_WIDTH,
     opacity: opacity.value,
   }));
 

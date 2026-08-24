@@ -159,36 +159,44 @@ const AnimatedUploadButton = React.memo(
     }));
 
     return (
-      <Pressable onPress={onPress} style={{ height: PILL_HEIGHT }}>
-        <Animated.View style={animatedButtonStyle}>
-          <LinearGradient
-            colors={["#CB391C", "#F88004"]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={{
-              width: "100%",
-              height: "100%",
-              borderTopLeftRadius: PILL_HEIGHT,
-              borderBottomLeftRadius: PILL_HEIGHT,
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-          >
-            <UploadButtonGlass radius={PILL_HEIGHT} />
-            <Animated.View style={[{ position: "absolute" }, iconStyle]}>
-              <Image
-                source={HOME_IMAGES.upload_png}
-                style={{ width: UPLOAD_ICON, height: UPLOAD_ICON }}
-                resizeMode="contain"
-              />
-            </Animated.View>
-            <Animated.View style={[{ position: "absolute" }, labelStyle]}>
-              <Text style={tabStyles.uploadText}>Upload{"\n"}Prescription</Text>
-            </Animated.View>
-          </LinearGradient>
-        </Animated.View>
-      </Pressable>
+      // Fixed box so the flex-row tab pill bar next to it never reflows as
+      // this collapses/expands — only the shell below still resizes, and
+      // that resize no longer touches anything outside this component.
+      <View style={{ width: FAB_WIDTH, height: PILL_HEIGHT }}>
+        <Pressable
+          onPress={onPress}
+          style={{ position: "absolute", right: 0, top: 0, bottom: 0 }}
+        >
+          <Animated.View style={animatedButtonStyle}>
+            <LinearGradient
+              colors={["#CB391C", "#F88004"]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={{
+                width: "100%",
+                height: "100%",
+                borderTopLeftRadius: PILL_HEIGHT,
+                borderBottomLeftRadius: PILL_HEIGHT,
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
+              <UploadButtonGlass radius={PILL_HEIGHT} />
+              <Animated.View style={[{ position: "absolute" }, iconStyle]}>
+                <Image
+                  source={HOME_IMAGES.upload_png}
+                  style={{ width: UPLOAD_ICON, height: UPLOAD_ICON }}
+                  resizeMode="contain"
+                />
+              </Animated.View>
+              <Animated.View style={[{ position: "absolute" }, labelStyle]}>
+                <Text style={tabStyles.uploadText}>Upload{"\n"}Prescription</Text>
+              </Animated.View>
+            </LinearGradient>
+          </Animated.View>
+        </Pressable>
+      </View>
     );
   },
 );
@@ -377,16 +385,11 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     return pillRoutes.findIndex((r) => r.name === activeRoute.name);
   }, [state.index, pillRoutes]);
 
-  // Derived, not measured — onLayout would fire a setState on every frame of the collapse
+  // Derived, not measured — onLayout would fire a setState on every frame of the collapse.
+  // Upload button's flex-row footprint is now fixed at FAB_WIDTH (see
+  // AnimatedUploadButton), so this no longer needs to track tabBarVisible.
   const tabWidthShared = useDerivedValue(() => {
-    const uploadWidth = interpolate(
-      tabBarVisible.value,
-      [0, 1],
-      [PILL_HEIGHT, FAB_WIDTH],
-      Extrapolation.CLAMP,
-    );
-    const inner =
-      screenWidth - BAR_PADDING_LEFT - BAR_MARGIN_RIGHT - uploadWidth;
+    const inner = screenWidth - BAR_PADDING_LEFT - BAR_MARGIN_RIGHT - FAB_WIDTH;
     return inner / Math.max(1, pillRoutes.length);
   }, [screenWidth, pillRoutes.length]);
 

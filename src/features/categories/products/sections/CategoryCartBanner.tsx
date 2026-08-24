@@ -75,6 +75,8 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
       // Step 2: fly lands at 750ms → image visible in circle
       // Step 3: after 200ms pause (user sees image in circle), expand to pill
       if (expansionTimer.current) clearTimeout(expansionTimer.current);
+      // Clear a pending reset from a just-reversed removal, or it fires mid-expansion and collapses the banner.
+      if (resetTimer.current) clearTimeout(resetTimer.current);
       expansionTimer.current = setTimeout(() => {
         bannerWidth.value = withSpring(PILL_W, WIDTH_SPRING);
         setIsExpanded(true);

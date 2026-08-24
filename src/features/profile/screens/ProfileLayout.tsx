@@ -1,29 +1,30 @@
-import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
-import { components } from "@/src/constants/theme";
+import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
+import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
+import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useAuthStore } from "@/src/store/authStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Linking, RefreshControl, ScrollView, View } from "react-native";
-import Animated, { useSharedValue } from "react-native-reanimated";
+import { Alert, Linking, RefreshControl, View } from "react-native";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LogoutConfirmModal } from "../components/LogoutConfirmModal";
+import { ProfileSkeleton } from "../components/ProfileSkeleton";
 import {
   ProfileCoinsCard,
   ProfileHeader,
   ProfileInfoList,
-  ProfileUpdateCard,
   ProfileQuickTiles,
+  ProfileUpdateCard,
 } from "../sections";
 import UploadBottomSheet from "../sections/UploadBottomSheet";
-import { LogoutConfirmModal } from "../components/LogoutConfirmModal";
-import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
-import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
-import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
-import { ProfileSkeleton } from "../components/ProfileSkeleton";
 
 export const ProfileLayout: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -48,12 +49,14 @@ export const ProfileLayout: React.FC = () => {
   const headerHeightShared = useSharedValue(0);
   const { safeAreaBgStyle } = useScrollStatusBar(scrollY, headerHeightShared);
   const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
+  // Runs on the UI thread so the status-bar fade never lags behind a fast fling.
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (e) => {
+      scrollY.value = e.contentOffset.y;
+    },
+  });
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    scrollY.value = event.nativeEvent.contentOffset.y;
-  };
 
   const uploadUri = async (uri: string) => {
     setLocalAvatar(uri);
@@ -142,11 +145,11 @@ export const ProfileLayout: React.FC = () => {
         style={[safeAreaBgStyle, { backgroundColor: "#F5F6FB" }]}
       />
 
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
         style={{ flex: 1, backgroundColor: "#F5F6FB" }}
-        onScroll={handleScroll}
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
         contentContainerStyle={{
           backgroundColor: "#F5F6FB",
@@ -191,7 +194,7 @@ export const ProfileLayout: React.FC = () => {
         />
 
         <ProfileInfoList onLogout={() => setShowLogoutModal(true)} />
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Same prompt the app shows automatically; opening it from the row
           reuses one component rather than a second update UI. */}

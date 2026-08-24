@@ -33,11 +33,28 @@ export function useZoomGesture({
   const savedTranslateX = useSharedValue(0);
   const savedTranslateY = useSharedValue(0);
 
+  // Unchanged — used externally when the viewer swaps to new/unrelated
+  // content (page change, modal open), left as-is since that's outside
+  // today's scope and other screens already rely on this exact behavior.
   const resetZoom = () => {
     "worklet";
     scale.value = withTiming(1, { duration: 200 });
     translateX.value = 0;
     translateY.value = 0;
+    savedScale.value = 1;
+    savedTranslateX.value = 0;
+    savedTranslateY.value = 0;
+  };
+
+  // Eased — used when a live pinch/double-tap settles back to 1x.
+  // translateX/Y used to snap instantly while scale eased, so a pan-then-
+  // reset jumped to center before shrinking; easing all three together
+  // reads as one smooth zoom-out instead.
+  const resetZoomSmooth = () => {
+    "worklet";
+    scale.value = withTiming(1, { duration: 200 });
+    translateX.value = withTiming(0, { duration: 200 });
+    translateY.value = withTiming(0, { duration: 200 });
     savedScale.value = 1;
     savedTranslateX.value = 0;
     savedTranslateY.value = 0;
@@ -51,7 +68,7 @@ export function useZoomGesture({
     .onEnd(() => {
       "worklet";
       if (scale.value <= 1) {
-        resetZoom();
+        resetZoomSmooth();
       } else {
         savedScale.value = scale.value;
       }
@@ -103,7 +120,7 @@ export function useZoomGesture({
     .onEnd(() => {
       "worklet";
       if (scale.value > 1) {
-        resetZoom();
+        resetZoomSmooth();
       } else {
         scale.value = withTiming(2.5, { duration: 250 });
         savedScale.value = 2.5;

@@ -34,47 +34,64 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
   );
 };
 
-export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
+// Memoized — rendered inside a virtualized list, and props (tx, isLast) are
+// stable across re-renders so this correctly skips unrelated parent updates.
+export const TxRow = React.memo(function TxRow({
   tx,
   isLast,
-}) => (
-  <View>
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: exactScale(24),
-        paddingVertical: exactScale(15),
-      }}
-    >
-      <TransactionIcon type={tx.iconType} />
-      <View style={{ flex: 1, marginLeft: exactScale(16) }}>
-        <Text
-          style={{
-            fontSize: moderateScale(15),
-            fontWeight: "600",
-            color: "#111827",
-          }}
-        >
-          {tx.title}
-        </Text>
-        <Text
-          style={{
-            fontSize: moderateScale(13),
-            color: "#6B7280",
-            marginTop: exactScale(2),
-          }}
-        >
-          {tx.date}
-        </Text>
-      </View>
-      {tx.isCoin ? (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <Image
-            source={HOME_IMAGES.dollarCoins}
-            style={{ width: exactScale(16), height: exactScale(16) }}
-            resizeMode="contain"
-          />
+}: {
+  tx: Transaction;
+  isLast: boolean;
+}) {
+  return (
+    <View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: exactScale(24),
+          paddingVertical: exactScale(15),
+        }}
+      >
+        <TransactionIcon type={tx.iconType} />
+        <View style={{ flex: 1, marginLeft: exactScale(16) }}>
+          <Text
+            style={{
+              fontSize: moderateScale(15),
+              fontWeight: "600",
+              color: "#111827",
+            }}
+          >
+            {tx.title}
+          </Text>
+          <Text
+            style={{
+              fontSize: moderateScale(13),
+              color: "#6B7280",
+              marginTop: exactScale(2),
+            }}
+          >
+            {tx.date}
+          </Text>
+        </View>
+        {tx.isCoin ? (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Image
+              source={HOME_IMAGES.dollarCoins}
+              style={{ width: exactScale(16), height: exactScale(16) }}
+              resizeMode="contain"
+            />
+            <Text
+              style={{
+                fontSize: moderateScale(15),
+                fontWeight: "700",
+                color: tx.amountColor,
+              }}
+            >
+              {tx.amount}
+            </Text>
+          </View>
+        ) : (
           <Text
             style={{
               fontSize: moderateScale(15),
@@ -84,27 +101,17 @@ export const TxRow: React.FC<{ tx: Transaction; isLast: boolean }> = ({
           >
             {tx.amount}
           </Text>
-        </View>
-      ) : (
-        <Text
+        )}
+      </View>
+      {!isLast && (
+        <View
           style={{
-            fontSize: moderateScale(15),
-            fontWeight: "700",
-            color: tx.amountColor,
+            height: 1,
+            backgroundColor: "#E5E7EB",
+            marginHorizontal: exactScale(16),
           }}
-        >
-          {tx.amount}
-        </Text>
+        />
       )}
     </View>
-    {!isLast && (
-      <View
-        style={{
-          height: 1,
-          backgroundColor: "#E5E7EB",
-          marginHorizontal: exactScale(16),
-        }}
-      />
-    )}
-  </View>
-);
+  );
+});

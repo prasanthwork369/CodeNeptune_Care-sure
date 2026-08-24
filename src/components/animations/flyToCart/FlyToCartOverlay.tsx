@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { colors } from "@/src/constants/theme";
 import Animated, {
   SharedValue,
@@ -83,7 +84,12 @@ const FloatingItem: React.FC<FloatingItemProps> = ({
 
   return (
     <Animated.View style={[animatedStyle, styles.shadow]} pointerEvents="none">
-      <Image source={imageSource} style={styles.image} resizeMode="contain" />
+      <Image
+        source={imageSource}
+        style={styles.image}
+        contentFit="contain"
+        cachePolicy="memory-disk"
+      />
     </Animated.View>
   );
 };

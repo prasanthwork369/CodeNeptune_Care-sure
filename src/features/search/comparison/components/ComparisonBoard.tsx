@@ -246,6 +246,9 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   // calculation every frame for no visual change. It is simply a constant.
   const recBgColor = "#FEFFF9";
 
+  // Drives the decorative shell only (see below) — kept as real left/width/
+  // paddingLeft so its rounded corner still self-terminates at every drag
+  // position. It's a childless box now, so resizing it is cheap.
   const expandableSectionStyle = useAnimatedStyle(() => ({
     left: interpolate(expandProgress.value, [0, 1], [cardWidth / 2, 0]),
     width: interpolate(
@@ -254,6 +257,15 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
       [cardWidth / 2, cardWidth],
     ),
     paddingLeft: interpolate(expandProgress.value, [0, 1], [4, 0]),
+  }));
+
+  // Content clip is fixed at full card width; this translateX reproduces the
+  // shell's left edge exactly (X(t) + paddingLeft(t) above) without resizing
+  // the heavy image/text subtree on every drag frame.
+  const contentRevealStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: (cardWidth / 2 + 4) * (1 - expandProgress.value) },
+    ],
   }));
 
   const rightColAnimatedStyle = useAnimatedStyle(() => ({
@@ -404,7 +416,9 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         </View>
       </View>
 
-      {/* EXPANDABLE WE RECOMMENDED SECTION */}
+      {/* EXPANDABLE WE RECOMMENDED SECTION — decorative shell only. Still
+          real left/width/paddingLeft so the border stays rounded on every
+          edge while dragging; cheap because it has no children. */}
       <ReAnimated.View
         style={[
           {
@@ -418,15 +432,125 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
           expandableSectionStyle,
         ]}
       >
-        <Animated.View
+        <View
           style={{
             flex: 1,
             backgroundColor: recBgColor,
             borderWidth: 1.25,
             borderColor: "#DBF6A080",
             borderRadius: 16,
-            overflow: "hidden",
           }}
+        >
+          {/* ADD BUTTON — lives on the shell (still real, animated width) so
+              it resizes smoothly with the card instead of being clipped by
+              the fixed-width content layer below. */}
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              paddingHorizontal: 12,
+              paddingBottom: ADD_BTN_PAD_BOTTOM,
+              paddingTop: ADD_BTN_PAD_TOP,
+            }}
+          >
+            {count === 0 ? (
+              <AppButton
+                title="ADD"
+                onPress={handleIncrement}
+                disabled={isPending}
+                loading={isPending}
+                accessibilityRole="button"
+                accessibilityLabel={`Add ${recommended.name} to cart`}
+                accessibilityState={{ disabled: isPending }}
+                textClassName="font-inter-bold"
+              />
+            ) : (
+              <View
+                className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white"
+                style={{
+                  height: ADD_BTN_HEIGHT,
+                  opacity: isPending ? 0.55 : 1,
+                }}
+              >
+                <Touchable
+                  onPress={handleDecrement}
+                  disabled={isPending}
+                  accessibilityRole="button"
+                  accessibilityLabel="Decrease quantity"
+                  accessibilityState={{ disabled: isPending }}
+                  className="flex-1 items-center justify-center h-full"
+                >
+                  <Text
+                    className="font-inter-semibold text-brand-text"
+                    style={{ fontSize: moderateScale(24) }}
+                  >
+                    −
+                  </Text>
+                </Touchable>
+                <View
+                  style={{
+                    width: 32,
+                    height: 24,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {isPending ? (
+                    <ActivityIndicator size="small" color="#0F7635" />
+                  ) : (
+                    <Animated.Text
+                      style={{
+                        transform: [{ translateY: slideAnim }],
+                        opacity: opacityAnim,
+                        fontSize: moderateScale(16),
+                      }}
+                      className="font-inter-bold text-brand-text text-center px-2"
+                    >
+                      {count}
+                    </Animated.Text>
+                  )}
+                </View>
+                <Touchable
+                  onPress={handleIncrement}
+                  disabled={isPending}
+                  accessibilityRole="button"
+                  accessibilityLabel="Increase quantity"
+                  accessibilityState={{ disabled: isPending }}
+                  className="flex-1 items-center justify-center h-full"
+                >
+                  <Text
+                    className="font-inter-semibold text-brand-text"
+                    style={{ fontSize: moderateScale(22) }}
+                  >
+                    +
+                  </Text>
+                </Touchable>
+              </View>
+            )}
+          </View>
+        </View>
+      </ReAnimated.View>
+
+      {/* Content: fixed-size clip, reveal is a pure translateX — keeps the
+          image/text subtree off the drag's per-frame layout pass. Nothing in
+          here is touchable, so box-none lets taps reach the Add button on
+          the shell below (it sits higher in z-order to stay above the shell). */}
+      <ReAnimated.View
+        pointerEvents="box-none"
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          width: cardWidth,
+          overflow: "hidden",
+          zIndex: 11,
+        }}
+      >
+        <ReAnimated.View
+          style={[{ width: cardWidth, flex: 1 }, contentRevealStyle]}
         >
           <View className="flex-1 flex-col justify-between">
             {/* WRAPPER FOR MEASUREMENT */}
@@ -657,92 +781,8 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 </ReAnimated.View>
               </View>
             </View>
-
-            {/* ADD BUTTON CONTAINER AT THE BOTTOM */}
-            <View
-              style={{
-                paddingHorizontal: 12,
-                paddingBottom: ADD_BTN_PAD_BOTTOM,
-                paddingTop: ADD_BTN_PAD_TOP,
-              }}
-            >
-              {count === 0 ? (
-                <AppButton
-                  title="ADD"
-                  onPress={handleIncrement}
-                  disabled={isPending}
-                  loading={isPending}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Add ${recommended.name} to cart`}
-                  accessibilityState={{ disabled: isPending }}
-                  textClassName="font-inter-bold"
-                />
-              ) : (
-                <View
-                  className="flex-row items-center border-[1.5px] border-[#E5E7EB] rounded-[10px] bg-white"
-                  style={{
-                    height: ADD_BTN_HEIGHT,
-                    opacity: isPending ? 0.55 : 1,
-                  }}
-                >
-                  <Touchable
-                    onPress={handleDecrement}
-                    disabled={isPending}
-                    accessibilityRole="button"
-                    accessibilityLabel="Decrease quantity"
-                    accessibilityState={{ disabled: isPending }}
-                    className="flex-1 items-center justify-center h-full"
-                  >
-                    <Text
-                      className="font-inter-semibold text-brand-text"
-                      style={{ fontSize: moderateScale(24) }}
-                    >
-                      −
-                    </Text>
-                  </Touchable>
-                  <View
-                    style={{
-                      width: 32,
-                      height: 24,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {isPending ? (
-                      <ActivityIndicator size="small" color="#0F7635" />
-                    ) : (
-                      <Animated.Text
-                        style={{
-                          transform: [{ translateY: slideAnim }],
-                          opacity: opacityAnim,
-                          fontSize: moderateScale(16),
-                        }}
-                        className="font-inter-bold text-brand-text text-center px-2"
-                      >
-                        {count}
-                      </Animated.Text>
-                    )}
-                  </View>
-                  <Touchable
-                    onPress={handleIncrement}
-                    disabled={isPending}
-                    accessibilityRole="button"
-                    accessibilityLabel="Increase quantity"
-                    accessibilityState={{ disabled: isPending }}
-                    className="flex-1 items-center justify-center h-full"
-                  >
-                    <Text
-                      className="font-inter-semibold text-brand-text"
-                      style={{ fontSize: moderateScale(22) }}
-                    >
-                      +
-                    </Text>
-                  </Touchable>
-                </View>
-              )}
-            </View>
           </View>
-        </Animated.View>
+        </ReAnimated.View>
       </ReAnimated.View>
 
       {/* FLOATING SWAP BUTTON — Reanimated UI-thread opacity, zero blink */}

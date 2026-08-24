@@ -1,13 +1,16 @@
 import { MEDICINE_COLUMNS } from "@/src/constants/images";
 import { colors } from "@/src/constants/theme";
+import { useIsVisible } from "@/src/hooks/ui/useVisibleInterval";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, ImageSourcePropType, View } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
 
@@ -31,16 +34,35 @@ const ScrollingColumn = ({
     transform: [{ translateY: translateY.value }],
   }));
 
+  const isVisible = useIsVisible();
+
   React.useEffect(() => {
-    translateY.value = withRepeat(
+    // An infinite withRepeat keeps the UI thread working forever, so it must
+    // stop when this screen isn't focused or the app is backgrounded.
+    if (!isVisible) {
+      cancelAnimation(translateY);
+      return;
+    }
+    // Finish the current leg at the same speed instead of the full duration,
+    // so resuming from a paused mid-scroll position doesn't look slower.
+    const remaining = cycleHeight + translateY.value;
+    const remainingDuration = duration * (remaining / cycleHeight);
+    translateY.value = withSequence(
       withTiming(-cycleHeight, {
-        duration,
+        duration: remainingDuration,
         easing: Easing.linear,
       }),
-      -1,
-      false,
+      withTiming(0, { duration: 0 }),
+      withRepeat(
+        withSequence(
+          withTiming(-cycleHeight, { duration, easing: Easing.linear }),
+          withTiming(0, { duration: 0 }),
+        ),
+        -1,
+        false,
+      ),
     );
-  }, [cycleHeight, duration, translateY]);
+  }, [cycleHeight, duration, translateY, isVisible]);
 
   return (
     <Animated.View style={animatedStyle} className="mx-2">
