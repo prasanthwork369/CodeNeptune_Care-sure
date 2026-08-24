@@ -16,6 +16,7 @@ import {
   useTrendingSearches,
 } from "@/src/features/search/hooks/useSearch";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import {
@@ -181,6 +182,9 @@ export const SearchPageLayout = () => {
     debouncedQuery,
   } = useSearch();
   const errorState = useQueryErrorState(error);
+  // Device state, not query state — shown immediately on open/typing instead
+  // of waiting for a query that requires a term to fire and fail first.
+  const isOffline = useIsOffline();
 
   // Cached results skip tracing because they do not represent network load.
   const { start: startSearchTrace, stop: stopSearchTrace } =
@@ -217,6 +221,7 @@ export const SearchPageLayout = () => {
     clearHistory,
     isClearingHistory,
     deleteHistoryItem,
+    refetch: refetchHistory,
   } = useSearchHistory(5);
   const { suggestions } = useSearchSuggestions(query, 6);
   const { trending } = useTrendingSearches(5);
@@ -322,7 +327,15 @@ export const SearchPageLayout = () => {
         isSearching={isSearching}
       />
 
-      {!query.trim() ? (
+      {isOffline ? (
+        // Device state, checked before idle/search-result rendering — recent,
+        // trending and results all need the network or a query that already
+        // ran, so none of them are worth showing over this.
+        <NoInternetState
+          onRetry={() => void refetchHistory()}
+          retrying={false}
+        />
+      ) : !query.trim() ? (
         <SearchRecentSection
           key="idle"
           history={history}
@@ -345,7 +358,8 @@ export const SearchPageLayout = () => {
 
           {isLoading ? (
             <SearchSkeleton />
-          ) : errorState === "offline" && results.length === 0 ? (
+          ) : (isOffline || errorState === "offline") &&
+            results.length === 0 ? (
             <NoInternetState
               onRetry={() => void refetch()}
               retrying={isFetching}

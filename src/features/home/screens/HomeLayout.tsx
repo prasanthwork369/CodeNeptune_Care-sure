@@ -275,7 +275,6 @@ const HomeContent: React.FC = () => {
     router.push("/(catalog)/featured");
   }, [router]);
 
-  // Directly passes the upstream-resolved familySlug to CategoryProductsLayout.
   const handleViewAllSubcategory = useCallback(
     (sub: ApiFeaturedSubcategory) => {
       router.push({

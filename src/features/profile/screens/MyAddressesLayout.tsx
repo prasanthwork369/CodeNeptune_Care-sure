@@ -7,6 +7,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { AddressType } from "@/src/types/address";
@@ -148,10 +149,15 @@ export const MyAddressesLayout: React.FC = () => {
     deleteAddress,
     refetch,
   } = useAddress();
-  // The list fetch's failure, not the mutation error above — "No saved
-  // addresses yet" must stay a statement about the account, not about the
-  // network. Cached addresses from the SQLite seed keep rendering regardless.
+  // The list fetch's failure, not the mutation error above — used only to
+  // distinguish "couldn't load" from "no saved addresses" once online.
   const listErrorState = useQueryErrorState(listError);
+  // Addresses are the delivery target for checkout, so offline must win over
+  // cached data, not layer under it: adding, editing or deleting an address
+  // while offline is unsafe, so the whole screen goes offline-first like
+  // Cart/Payment do. Device state is known immediately, so there's no fetch
+  // worth waiting on before saying so.
+  const isOffline = useIsOffline();
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const shouldShowInitialShimmer = loading && addresses.length === 0;
   // Ref, not state, so a rapid double-tap on the confirm dialog's button
@@ -169,6 +175,17 @@ export const MyAddressesLayout: React.FC = () => {
       deletingRef.current = false;
     }
   };
+
+  // Offline: show only the offline state, even with cached addresses —
+  // Add New Address, Edit and Delete all assume a live connection.
+  if (isOffline) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="My Addresses" backgroundColor="#FFFFFF" />
+        <NoInternetState onRetry={() => void refetch()} retrying={refreshing} />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -233,12 +250,7 @@ export const MyAddressesLayout: React.FC = () => {
               />
             ))}
             {addresses.length === 0 &&
-              (listErrorState === "offline" ? (
-                <NoInternetState
-                  onRetry={() => void refetch()}
-                  retrying={refreshing}
-                />
-              ) : listErrorState ? (
+              (listErrorState ? (
                 <RetryState
                   title="Couldn't load your addresses"
                   onRetry={() => void refetch()}

@@ -63,11 +63,28 @@ export const FrequentOrdersLayout: React.FC = () => {
     [],
   );
 
-  const keyExtractor = useCallback(
-    (item: FrequentOrderItem, index: number) =>
-      `${item.productId ?? item.id}-${index}`,
-    [],
-  );
+  // id is required and unique per row; productId is optional and not
+  // guaranteed unique, so it's not a safe key on its own.
+  const keyExtractor = useCallback((item: FrequentOrderItem) => item.id, []);
+
+  // Category chips, search and the list are live filters over server data —
+  // gating only the list left them floating over the offline/error state.
+  if (liveState) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+        <ScreenHeader title="Frequently Ordered List" backgroundColor="#FFFFFF" />
+        {liveState === "offline" ? (
+          <NoInternetState onRetry={() => void refetch()} retrying={isFetching} />
+        ) : (
+          <RetryState
+            title="Couldn't load your products"
+            onRetry={() => void refetch()}
+            retrying={isFetching}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
@@ -121,9 +138,9 @@ export const FrequentOrdersLayout: React.FC = () => {
         }
       />
 
-      {/* Search bar — hidden alongside the list it filters, or the offline
-          state sits under controls for content that isn't there. */}
-      {!liveState && frequentlyOrdered.length > 0 && (
+      {/* Search bar — hidden alongside the list it filters (offline/error
+          already returned above), or it sits over content that isn't there. */}
+      {frequentlyOrdered.length > 0 && (
         <View
           style={{
             paddingHorizontal: exactScale(16),
@@ -225,12 +242,7 @@ export const FrequentOrdersLayout: React.FC = () => {
 
       <View style={{ height: 1, backgroundColor: "#F0F1F3" }} />
 
-      {liveState === "offline" ? (
-        <NoInternetState
-          onRetry={() => void refetch()}
-          retrying={isFetching}
-        />
-      ) : isLoading ? (
+      {isLoading ? (
         <View
           style={{
             paddingHorizontal: exactScale(16),
@@ -242,12 +254,6 @@ export const FrequentOrdersLayout: React.FC = () => {
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
         </View>
-      ) : liveState === "error" ? (
-        <RetryState
-          title="Couldn't load your products"
-          onRetry={() => void refetch()}
-          retrying={isFetching}
-        />
       ) : filtered.length === 0 ? (
         <View
           style={{

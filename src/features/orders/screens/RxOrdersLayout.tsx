@@ -13,7 +13,7 @@ import {
   PRESCRIPTION_STATUS_LABELS,
 } from "@/src/features/prescription/constants/prescription-status";
 import { usePrescriptions } from "@/src/features/prescription/hooks/usePrescriptions";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
@@ -60,9 +60,17 @@ export const RxOrdersLayout: React.FC = () => {
     usePrescriptions({
       category: 2,
     });
-  const errorState = useQueryErrorState(error);
 
   const data = useMemo(() => prescriptions.map(mapItem), [prescriptions]);
+
+  // Live, like My Orders: status (pending/verified/rejected) moves
+  // server-side, so offline replaces the screen rather than showing a cached
+  // list whose status may already be wrong.
+  const liveState = useLiveScreenState({
+    error,
+    hasData: data.length > 0,
+    loading,
+  });
 
   const keyExtractor = useCallback((item: Prescription) => item.id, []);
 
@@ -81,22 +89,31 @@ export const RxOrdersLayout: React.FC = () => {
     [handleDownloadPress],
   );
 
+  if (liveState) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="My Prescriptions" backgroundColor="#FFFFFF" />
+        {liveState === "offline" ? (
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        ) : (
+          <RetryState
+            title="Couldn't load prescriptions"
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        )}
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-[#F5F6FB]">
       <ScreenHeader title="My Prescriptions" backgroundColor="#FFFFFF" />
       {loading ? (
         <RxOrdersSkeleton />
-      ) : errorState === "offline" && data.length === 0 ? (
-        <NoInternetState
-          onRetry={() => void refetch()}
-          retrying={refreshing}
-        />
-      ) : errorState && data.length === 0 ? (
-        <RetryState
-          title="Couldn't load prescriptions"
-          onRetry={() => void refetch()}
-          retrying={refreshing}
-        />
       ) : (
         <AppFlashList
           data={data}

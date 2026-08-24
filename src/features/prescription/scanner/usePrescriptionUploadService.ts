@@ -2,6 +2,7 @@ import { Alert, AppState, Linking } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef } from "react";
+import { armSettingsReturn } from "@/src/store/lastRouteStore";
 import { ScannerService } from "./scanner.service";
 
 type PendingPermissionAction = "camera" | "gallery" | "pdf" | "document";
@@ -53,6 +54,7 @@ export function usePrescriptionUploadService({
         text: "Open Settings",
         onPress: () => {
           pendingActionRef.current = action;
+          armSettingsReturn();
           void Linking.openSettings();
         },
       },

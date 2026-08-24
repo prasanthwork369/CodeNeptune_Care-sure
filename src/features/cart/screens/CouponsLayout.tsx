@@ -117,16 +117,36 @@ export const CouponsLayout: React.FC = () => {
     }
   };
 
+  const screenHeaderProps = {
+    title: "Apply Coupon",
+    // Same defer as applyCode below: this screen's coupon/cart queries can
+    // still be mid-render (skeleton -> list swap) when back is tapped —
+    // starting the pop transition in that same tick is the Fabric
+    // re-parent crash this file already had to fix once.
+    onBack: () => requestAnimationFrame(() => router.back()),
+  };
+
+  // No cached coupons and offline: there's nothing to apply, so hide the
+  // input/list instead of showing a coupon field that can't do anything.
+  if (
+    !shouldShowInitialShimmer &&
+    coupons.length === 0 &&
+    couponsErrorState === "offline"
+  ) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader {...screenHeaderProps} />
+        <NoInternetState
+          onRetry={() => void refetchCoupons()}
+          retrying={isCouponsFetching}
+        />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-[#F5F6FB]">
-      <ScreenHeader
-        title="Apply Coupon"
-        // Same defer as applyCode below: this screen's coupon/cart queries can
-        // still be mid-render (skeleton -> list swap) when back is tapped —
-        // starting the pop transition in that same tick is the Fabric
-        // re-parent crash this file already had to fix once.
-        onBack={() => requestAnimationFrame(() => router.back())}
-      />
+      <ScreenHeader {...screenHeaderProps} />
 
       {/* Fixed search bar — stays pinned while only the coupon list scrolls */}
       <View
@@ -168,11 +188,6 @@ export const CouponsLayout: React.FC = () => {
           Array.from({ length: skeletonCount }, (_, i) => (
             <CouponCardSkeleton key={i} />
           ))
-        ) : couponsErrorState === "offline" && coupons.length === 0 ? (
-          <NoInternetState
-            onRetry={() => void refetchCoupons()}
-            retrying={isCouponsFetching}
-          />
         ) : couponsErrorState && coupons.length === 0 ? (
           <RetryState
             title="Couldn't load coupons"

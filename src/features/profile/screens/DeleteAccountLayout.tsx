@@ -45,6 +45,15 @@ export const DeleteAccountLayout: React.FC = () => {
   // the destructive delete requires one more deliberate tap.
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const handleDeletePress = () => {
+    if (deletingAccount) return;
+    // Check before opening the popup, not just before the confirm tap inside
+    // it — offline shouldn't be able to pop up a confirmation for an action
+    // that can't go through.
+    if (!requireInternet({ critical: true })) return;
+    setShowConfirm(true);
+  };
+
   const handleDelete = async () => {
     if (deletingAccount) return;
     // Irreversible, so it takes the same acknowledged-offline notice as placing
@@ -201,7 +210,7 @@ export const DeleteAccountLayout: React.FC = () => {
         }}
       >
         <Touchable
-          onPress={() => setShowConfirm(true)}
+          onPress={handleDeletePress}
           disabled={deletingAccount}
           activeOpacity={0.85}
           style={{

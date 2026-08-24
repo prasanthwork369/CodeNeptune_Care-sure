@@ -11,7 +11,12 @@ export const useNotificationPreferences = () => {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const { data: preferences, isLoading } = useQuery({
+  const {
+    data: preferences,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.NOTIFICATION_PREFERENCES,
     queryFn: notificationPreferencesApi.getPreferences,
     enabled: isAuthenticated,
@@ -50,6 +55,8 @@ export const useNotificationPreferences = () => {
   return {
     preferences,
     isLoading,
+    isRefetching,
+    refetch,
     updating: updateMutation.isPending,
     updatePreferences: (payload: UpdateNotificationPreferencesInput) =>
       updateMutation.mutateAsync(payload),

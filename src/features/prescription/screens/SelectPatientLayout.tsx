@@ -107,7 +107,9 @@ export const SelectPatientLayout: React.FC = () => {
       <ScreenHeader
         title="Select Patient"
         rightSlot={
-          showEmptyState ? undefined : (
+          // showEmptyState excludes the error case on purpose (see the hook),
+          // so it alone doesn't hide this when there's nothing to add to yet.
+          showEmptyState || (!loading && listErrorState && members.length === 0) ? undefined : (
             <Touchable
               onPress={() => {
                 setEditingPatient(null);

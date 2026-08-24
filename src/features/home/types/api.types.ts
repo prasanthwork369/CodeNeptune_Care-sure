@@ -35,7 +35,7 @@ export interface ApiFooter {
 }
 
 export interface ApiAppContent {
-  hero: ApiHero;
+  hero?: ApiHero;
   banners: ApiBanner[];
   promise: ApiPromise;
   footer: ApiFooter;

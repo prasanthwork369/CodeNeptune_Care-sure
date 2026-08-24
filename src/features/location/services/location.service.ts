@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { Linking, Platform } from "react-native";
+import { armSettingsReturn } from "@/src/store/lastRouteStore";
 
 /** A device location reverse-geocoded into address fields the app uses. */
 export interface ParsedPlace {
@@ -332,6 +333,7 @@ export const locationService = {
 
   /** Opens device location settings (tries Android Location settings first). */
   openLocationSettings: async (): Promise<void> => {
+    armSettingsReturn();
     try {
       if (Platform.OS === "android" && Linking.sendIntent) {
         try {

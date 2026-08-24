@@ -68,7 +68,7 @@ export const validate = {
     if (value.length < 10)
       return fail("Please enter a valid 10-digit mobile number");
     if (!REGEX.indianMobile.test(value))
-      return fail("Mobile number must start with 6, 7, 8, or 9");
+      return fail("Please enter a valid 10-digit mobile number");
     return ok();
   },
 

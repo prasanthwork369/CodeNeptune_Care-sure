@@ -15,7 +15,7 @@ import type {
 } from "@/src/features/prescription/types";
 import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
@@ -52,7 +52,14 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     usePrescriptions({
       category: 2,
     });
-  const errorState = useQueryErrorState(error);
+  // Live, like My Orders: statuses (pending/verified/rejected) move
+  // server-side, so offline replaces the screen rather than showing a cached
+  // list whose status may already be wrong.
+  const liveState = useLiveScreenState({
+    error,
+    hasData: prescriptions.length > 0,
+    loading,
+  });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
@@ -102,6 +109,26 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     ),
     [],
   );
+
+  // Search and filter chips are live controls over server data — gating only
+  // the list left them (and a cached, possibly-stale list) floating over the
+  // offline/error state.
+  if (liveState) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="My Prescriptions" />
+        {liveState === "offline" ? (
+          <NoInternetState onRetry={() => void refetch()} retrying={refreshing} />
+        ) : (
+          <RetryState
+            title="Couldn't load prescriptions"
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -154,17 +181,6 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           <ShimmerBlock height={exactScale(110)} borderRadius={12} />
           <ShimmerBlock height={exactScale(110)} borderRadius={12} />
         </View>
-      ) : errorState === "offline" && prescriptions.length === 0 ? (
-        <NoInternetState
-          onRetry={() => void refetch()}
-          retrying={refreshing}
-        />
-      ) : errorState && prescriptions.length === 0 ? (
-        <RetryState
-          title="Couldn't load prescriptions"
-          onRetry={() => void refetch()}
-          retrying={refreshing}
-        />
       ) : (
         <AppFlashList
           data={items}

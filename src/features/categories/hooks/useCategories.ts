@@ -84,7 +84,7 @@ export const useCategories = () => {
     );
   }, [families]);
 
-  return { tabs, cards, isLoading, isFetching, error, refetch };
+  return { families, tabs, cards, isLoading, isFetching, error, refetch };
 };
 
 export const useCategoryProducts = (params: {

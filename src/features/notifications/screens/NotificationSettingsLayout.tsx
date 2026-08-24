@@ -1,5 +1,6 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { CustomSwitch } from "@/src/components/ui/CustomSwitch";
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { useNotificationPreferences } from "@/src/features/notifications/hooks/useNotificationPreferences";
 import type { UpdateNotificationPreferencesInput } from "../types";
 import React, { useState } from "react";
@@ -7,6 +8,7 @@ import { ScrollView, Text, View } from "react-native";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { moderateScale } from "@/src/utils/exactScale";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { requireInternet } from "@/src/utils/offline";
 
 // Only the boolean preference fields are togglable keys.
@@ -139,12 +141,16 @@ const NotificationSkeleton = () => (
 );
 
 export const NotificationSettingsLayout: React.FC = () => {
-  const { preferences, isLoading, updatePreferences } =
+  const { preferences, isLoading, isRefetching, refetch, updatePreferences } =
     useNotificationPreferences();
   const adjustedBottom = useAdjustedBottomInset();
   const [pendingKeys, setPendingKeys] = useState<Set<PreferenceKey>>(
     () => new Set(),
   );
+  // Every toggle is a live mutation (see handleToggle's requireInternet
+  // guard), so offline replaces the screen rather than showing switches that
+  // will just bounce back when tapped.
+  const isOffline = useIsOffline();
 
   const handleToggle = async (key: PreferenceKey, value: boolean) => {
     if (pendingKeys.has(key)) return;
@@ -162,6 +168,15 @@ export const NotificationSettingsLayout: React.FC = () => {
       });
     }
   };
+
+  if (isOffline) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <ScreenHeader title="Notification" showBorder backgroundColor="#FFFFFF" />
+        <NoInternetState onRetry={() => void refetch()} retrying={isRefetching} />
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>

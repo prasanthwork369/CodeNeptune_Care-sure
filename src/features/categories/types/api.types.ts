@@ -46,9 +46,9 @@ export interface ApiFeaturedSubcategoryMetadata {
 export interface ApiFeaturedSubcategory {
   id: string;
   categoryId: string;
-  familySlug?: string;
   name: string;
   slug: string;
+  familySlug?: string;
   description: string;
   imageUrl: string;
   icon: string;

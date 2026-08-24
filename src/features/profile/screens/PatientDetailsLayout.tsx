@@ -10,6 +10,7 @@ import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers"
 import type { FamilyMember } from "../types";
 import { getAge } from "@/src/utils/patient";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
 import { requireInternet } from "@/src/utils/offline";
 import React, { useState } from "react";
@@ -144,12 +145,14 @@ export const PatientDetailsLayout: React.FC = () => {
     refetch,
     deleteMember,
   } = useFamilyMembers();
-  // Cached-content, like Select Patient and My Addresses: patient records are
-  // personal reference data, not priced or transactional, and the list is
-  // SQLite-seeded. Only the mutations need the network.
   const listErrorState = useQueryErrorState(listError);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Offline: show only the offline state, even with cached patients — Add
+  // Patient, Edit and Delete all assume a live connection, same as My
+  // Addresses. Device state is known immediately, so there's no fetch worth
+  // waiting on before saying so.
+  const isOffline = useIsOffline();
 
   const handleDeleteConfirm = async () => {
     if (!confirmDeleteId) return;
@@ -163,6 +166,18 @@ export const PatientDetailsLayout: React.FC = () => {
       setDeletingId(null);
     }
   };
+
+  if (isOffline) {
+    return (
+      <View className="flex-1 bg-[#F5F6FB]">
+        <ScreenHeader title="Patient Details" />
+        <NoInternetState
+          onRetry={() => void refetch()}
+          retrying={refreshing}
+        />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -202,11 +217,6 @@ export const PatientDetailsLayout: React.FC = () => {
         </Text>
         {loading ? (
           <PatientSkeleton />
-        ) : members.length === 0 && listErrorState === "offline" ? (
-          <NoInternetState
-            onRetry={() => void refetch()}
-            retrying={refreshing}
-          />
         ) : members.length === 0 && listErrorState ? (
           <RetryState
             title="Couldn't load patients"

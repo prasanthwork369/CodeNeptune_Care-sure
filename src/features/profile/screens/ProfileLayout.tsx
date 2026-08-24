@@ -5,6 +5,7 @@ import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
 import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useAuthStore } from "@/src/store/authStore";
+import { armSettingsReturn } from "@/src/store/lastRouteStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect } from "expo-router";
@@ -71,7 +72,13 @@ export const ProfileLayout: React.FC = () => {
   const showPermissionAlert = (title: string, message: string) => {
     Alert.alert(title, message, [
       { text: "Cancel", style: "cancel" },
-      { text: "Open Settings", onPress: () => void Linking.openSettings() },
+      {
+        text: "Open Settings",
+        onPress: () => {
+          armSettingsReturn();
+          void Linking.openSettings();
+        },
+      },
     ]);
   };
 

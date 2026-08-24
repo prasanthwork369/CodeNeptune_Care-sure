@@ -5,25 +5,31 @@ import { createJSONStorage, persist } from "zustand/middleware";
 interface LastRouteState {
   pathname: string | null;
   params: Record<string, string> | null;
-  savedAt: number | null;
+  // Only true while we're mid round-trip to Android Settings for a
+  // permission change — the sole condition under which index.tsx restores.
+  pendingRestore: boolean;
   hasHydrated: boolean;
   setRoute: (pathname: string, params: Record<string, string>) => void;
+  armPendingRestore: () => void;
+  clearPendingRestore: () => void;
   clear: () => void;
   setHasHydrated: (value: boolean) => void;
 }
 
 // Persists the last non-sensitive screen visited, so a process recreation
-// (e.g. Android kills the app while the user is in system Settings changing
-// a permission) can restore it instead of always landing back on Home.
+// caused by an intentional trip to system Settings (changing a permission)
+// can restore it instead of landing back on Home.
 export const useLastRouteStore = create<LastRouteState>()(
   persist(
     (set) => ({
       pathname: null,
       params: null,
-      savedAt: null,
+      pendingRestore: false,
       hasHydrated: false,
-      setRoute: (pathname, params) => set({ pathname, params, savedAt: Date.now() }),
-      clear: () => set({ pathname: null, params: null, savedAt: null }),
+      setRoute: (pathname, params) => set({ pathname, params }),
+      armPendingRestore: () => set({ pendingRestore: true }),
+      clearPendingRestore: () => set({ pendingRestore: false }),
+      clear: () => set({ pathname: null, params: null, pendingRestore: false }),
       setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {
@@ -32,7 +38,7 @@ export const useLastRouteStore = create<LastRouteState>()(
       partialize: (state) => ({
         pathname: state.pathname,
         params: state.params,
-        savedAt: state.savedAt,
+        pendingRestore: state.pendingRestore,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
@@ -59,9 +65,11 @@ const RESTORE_DENYLIST = ["/", "/login", "/otp", "/payment"];
 export const isSafeRoute = (pathname: string): boolean =>
   !RESTORE_DENYLIST.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-// A restored route older than this reads as a genuine fresh launch (user closed
-// the app hours ago), not a bounce back from Settings — falls back to Home.
-const RESTORE_TTL_MS = 10 * 60 * 1000;
-
-export const isRouteFresh = (savedAt: number | null): boolean =>
-  savedAt != null && Date.now() - savedAt < RESTORE_TTL_MS;
+/**
+ * Call right before Linking.openSettings() (or an intent that lands the user
+ * in system Settings) for a permission change. Arms a one-shot restore for
+ * the process recreation that trip can cause — never for an ordinary launch.
+ */
+export const armSettingsReturn = (): void => {
+  useLastRouteStore.getState().armPendingRestore();
+};

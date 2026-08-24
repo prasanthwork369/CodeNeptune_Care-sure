@@ -488,10 +488,13 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
                     accentColor={lineColor}
                     onPress={() => onViewAll(subcategory)}
                     onPressIn={() => {
-                      if (subcategory.familySlug) {
+                      if (subcategory.slug) {
                         prefetchCategory({
-                          categorySlug: subcategory.familySlug,
-                          subCategorySlug: subcategory.slug,
+                          categorySlug:
+                            subcategory.familySlug || subcategory.slug,
+                          subCategorySlug: subcategory.familySlug
+                            ? subcategory.slug
+                            : undefined,
                         });
                       }
                     }}

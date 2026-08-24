@@ -139,7 +139,7 @@ export function useHomeData() {
     refetchFrequentlyOrdered,
   ]);
 
-  // Attaches familySlug once upstream so downstream UI and navigation can read it directly.
+  // Resolves parent family slug once upstream for downstream View All navigation and prefetch.
   const enrichedFeaturedSubcategories = useMemo(() => {
     return featuredSubcategories.map((sub) => {
       const family = families.find(

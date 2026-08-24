@@ -35,7 +35,6 @@ const CategoryProductsContent: React.FC = () => {
   const { totalItems } = useCartRead();
   const { families } = useCategories();
 
-  // If familySlug was not passed directly, look it up from the category map.
   const resolvedFamilySlug =
     familySlug ||
     families.find(

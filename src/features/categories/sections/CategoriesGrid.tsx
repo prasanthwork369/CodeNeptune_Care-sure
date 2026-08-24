@@ -117,7 +117,9 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                     onPressIn={() =>
                       prefetchCategory({
                         categorySlug: card.familySlug || card.slug,
-                        subCategorySlug: card.familySlug ? card.slug : undefined,
+                        subCategorySlug: card.familySlug
+                          ? card.slug
+                          : undefined,
                       })
                     }
                     style={{
