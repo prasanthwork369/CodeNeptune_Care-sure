@@ -60,7 +60,13 @@ export const styles = StyleSheet.create({
   },
   walletBadgeWrap: {
     minWidth: exactScale(54),
-    minHeight: exactScale(12),
+    // Fixed, not minHeight: the shimmer (10px) is shorter than the loaded
+    // text's own box (13 lineHeight + 2 padding = 15px). A content-driven
+    // height let the badge — and the whole header row above it — grow by a
+    // few px the moment the balance loaded. This is sized to the text's
+    // natural height so the loaded state is unchanged, only the shimmer now
+    // matches it instead of the other way around.
+    height: exactScale(19),
     paddingTop: exactScale(2),
     paddingRight: exactScale(9),
     paddingBottom: exactScale(2),

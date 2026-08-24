@@ -199,7 +199,12 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
                   borderRadius={4}
                 />
               ) : (
-                <Text style={s.walletBadgeText} className="font-inter-bold">
+                // Single line — the wrap's fixed height assumes one text row.
+                <Text
+                  style={s.walletBadgeText}
+                  className="font-inter-bold"
+                  numberOfLines={1}
+                >
                   {walletDisplay}
                 </Text>
               )}
