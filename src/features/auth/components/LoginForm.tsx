@@ -6,7 +6,6 @@ import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { LoginFormProps } from "../types";
 import { styles as s } from "./LoginForm.styles";
-import { PhoneLimitToast } from "./PhoneLimitToast";
 
 const MAX_PHONE_DIGITS = 10;
 
@@ -94,8 +93,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {phoneError || error}
         </Text>
       ) : null}
-
-      <PhoneLimitToast />
     </View>
   );
 };

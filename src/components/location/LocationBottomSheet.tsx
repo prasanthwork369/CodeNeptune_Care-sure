@@ -16,6 +16,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { useNav } from "@/src/hooks/useNav";
 import { locationService } from "@/src/features/location/services/location.service";
+import { armSettingsReturn } from "@/src/store/lastRouteStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { addressToLocation } from "@/src/utils/addressLocation";
@@ -87,7 +88,6 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     const [inputValue, setInputValue] = useState("");
     // Resolving a tapped suggestion — separate from the search spinner.
     const [isResolving, setIsResolving] = useState(false);
-    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const { addresses, loading: addressesLoading, refetch } = useAddress();
     const { checkServiceability } = usePincode();
     const { predictions, isSearching } = useLocationSearch(inputValue);
@@ -103,7 +103,6 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
       bottomSheetRef.current?.dismiss();
       inputRef.current?.clear();
       setInputValue("");
-      setIsSearchFocused(false);
     };
 
     // The sheet has to dismiss before navigating, or the push lands under it.
@@ -158,6 +157,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     // Opens the system LOCATION toggle page (GPS on/off). Use this when the
     // device's location services are disabled.
     const openLocationSettings = async () => {
+      armSettingsReturn();
       try {
         if (Platform.OS === "android" && Linking.sendIntent) {
           // Open the Android Location source settings directly.
@@ -181,6 +181,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     // maps to ACTION_APPLICATION_DETAILS_SETTINGS on Android and the app's
     // settings pane on iOS.
     const openAppSettings = async () => {
+      armSettingsReturn();
       try {
         await Linking.openSettings();
       } catch {}
@@ -407,10 +408,6 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
                   includeFontPadding: false,
                   textAlignVertical: "center",
                 }}
-                onFocus={() => {
-                  setIsSearchFocused(true);
-                }}
-                onBlur={() => setIsSearchFocused(false)}
               />
               {!!inputValue && (
                 <Touchable
@@ -435,8 +432,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
             </View>
           </View>
 
-          {/* Current location + Add new — hidden while searching or focused */}
-          {!inputValue && !isSearchFocused && (
+          {/* Current location + Add new — hidden only once actual search results are showing, not just on focus/typing */}
+          {!showPredictions && (
             <View
               className="flex-row"
               style={{ gap: exactScale(12), marginBottom: exactScale(8) }}

@@ -1,13 +1,11 @@
+import { useNav } from "@/src/hooks/useNav";
 import { useAuthStore } from "@/src/store/authStore";
-import {
-  isRouteFresh,
-  useLastRouteStore,
-  waitForLastRouteHydration,
-} from "@/src/store/lastRouteStore";
-import { Href, Redirect } from "expo-router";
-import { useEffect, useState } from "react";
+import { useLastRouteStore, waitForLastRouteHydration } from "@/src/store/lastRouteStore";
+import { Href, Redirect, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function Index() {
+  const router = useNav();
   // Field selectors: a whole-store subscription re-rendered this and every
   // navigator layout on each setUser call during startup.
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -22,21 +20,45 @@ export default function Index() {
     waitForLastRouteHydration().then(() => setIsRouteLoaded(true));
   }, [isRouteLoaded]);
 
+  // Only set when the app itself sent the user to Settings for a permission
+  // change — a normal kill/reopen must still land on Home. getState() (not a
+  // selector) so this can't flip on the clear below and re-decide mid-flight.
+  const restoreTarget = useMemo(() => {
+    if (!isRouteLoaded) return null;
+    const { pathname, params, pendingRestore } = useLastRouteStore.getState();
+    return pendingRestore && pathname
+      ? { pathname, params: params ?? undefined }
+      : null;
+  }, [isRouteLoaded]);
+
+  // One-shot: consume the flag now so it can't restore again on a later launch.
+  useEffect(() => {
+    if (isRouteLoaded) useLastRouteStore.getState().clearPendingRestore();
+  }, [isRouteLoaded]);
+
+  // unstable_settings.initialRouteName already seeds "(tabs)" into this
+  // stack's history below "index" (so deep links keep Home in their back
+  // history). A plain <Redirect> here uses replace(), which doesn't know
+  // about that seeded entry and pushes a second, separately-mounted
+  // "(tabs)" — dismissTo pops back to the existing one instead.
+  const goHome = !isLoaded || !isRouteLoaded
+    ? false
+    : (isAuthenticated || isGuest) && !restoreTarget;
+  useFocusEffect(
+    useCallback(() => {
+      if (goHome) router.dismissTo("/(tabs)");
+    }, [goHome, router]),
+  );
+
   if (!isLoaded || !isRouteLoaded) return null;
 
   if (!(isAuthenticated || isGuest)) {
     return <Redirect href="/(auth)/login" />;
   }
 
-  // Restore the last safe screen after a process recreation (e.g. the user
-  // backgrounded the app to change a permission in Settings and came back),
-  // as long as it's recent enough to be that, not a genuine fresh launch.
-  const { pathname, params, savedAt } = useLastRouteStore.getState();
-  if (pathname && isRouteFresh(savedAt)) {
-    return (
-      <Redirect href={{ pathname, params: params ?? undefined } as unknown as Href} />
-    );
+  if (restoreTarget) {
+    return <Redirect href={restoreTarget as unknown as Href} />;
   }
 
-  return <Redirect href="/(tabs)" />;
+  return null;
 }

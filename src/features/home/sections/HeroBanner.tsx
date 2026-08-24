@@ -5,8 +5,14 @@ import { ApiHero } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect } from "react";
-import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  AppState,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -68,6 +74,76 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
     // Hooks must be called before any early return
     const leftAnim = useSlideUp(200);
     const rightAnim = useSlideUp(400);
+
+    // FlashList's initial layout pass can tear down and remount the first
+    // cell before it settles, cancelling this Image mid-load — and
+    // expo-image never retries a cancelled/failed load on its own. Reload
+    // once (bounded) on error so a cold-start hiccup doesn't leave the
+    // avatar blank until the user pulls to refresh.
+    //
+    // Gated on avatarLoaded: expo-image can fire onError for a background
+    // revalidation blip on a URL that already loaded and is still on
+    // screen. Remounting (key bump) in that case would tear down a
+    // perfectly good image and show blank — so only retry a load that
+    // never succeeded in the first place.
+    const [avatarReloadKey, setAvatarReloadKey] = useState(0);
+    const avatarRetries = useRef(0);
+    const avatarLoaded = useRef(false);
+    const avatarUrl = content?.image;
+    useEffect(() => {
+      if (__DEV__) console.log("[HeroBanner] avatarUrl ->", avatarUrl);
+      avatarRetries.current = 0;
+      avatarLoaded.current = false;
+    }, [avatarUrl]);
+    useEffect(() => {
+      if (!__DEV__) return;
+      console.log("[HeroBanner] mounted");
+      return () => console.log("[HeroBanner] unmounted");
+    }, []);
+    const handleAvatarLoad = () => {
+      if (__DEV__) console.log("[HeroBanner] avatar onLoad", avatarUrl);
+      avatarLoaded.current = true;
+    };
+    const handleAvatarError = () => {
+      if (__DEV__)
+        console.log(
+          "[HeroBanner] avatar onError",
+          avatarUrl,
+          "alreadyLoaded:",
+          avatarLoaded.current,
+        );
+      if (avatarLoaded.current) return;
+      if (avatarRetries.current >= 2) return;
+      avatarRetries.current += 1;
+      setAvatarReloadKey((k) => k + 1);
+    };
+
+    // A system dialog (location/notification permission prompt) pauses and
+    // resumes the host Activity — on some OEM skins the absolutely-positioned,
+    // layered avatar Image doesn't get redrawn on resume even though nothing
+    // in JS changed, leaving it blank with no error/data event to react to.
+    // Force one remount on the first real resume after backgrounding.
+    useEffect(() => {
+      let skippedInitial = false;
+      const sub = AppState.addEventListener("change", (state) => {
+        if (state !== "active") return;
+        if (!skippedInitial) {
+          skippedInitial = true;
+          return;
+        }
+        if (__DEV__) console.log("[HeroBanner] resumed — reloading avatar");
+        setAvatarReloadKey((k) => k + 1);
+      });
+      return () => sub.remove();
+    }, []);
+
+    // Catches the case the mount/unmount log can't: HeroBanner itself stays
+    // mounted but flips back to the skeleton branch, swapping the real
+    // Image out for a shimmer placeholder — that looks like the avatar
+    // "disappearing" with no unmount ever logged.
+    if (__DEV__) {
+      console.log("[HeroBanner] render branch ->", isLoading ? "skeleton" : !content ? "skeleton(no content)" : "loaded", "isLoading:", isLoading, "image:", content?.image);
+    }
 
     if (isLoading || !content) {
       return (
@@ -191,10 +267,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
         {/* ── Right: Person image (positioned absolute, sibling to allow overflow) ── */}
         <Animated.View style={[styles.avatar, dStyles.avatar, rightAnim]}>
           <Image
+            key={avatarReloadKey}
             source={mainImage}
             style={{ width: "100%", height: "100%" }}
             contentFit="contain"
             contentPosition="bottom center"
+            cachePolicy="memory-disk"
+            onLoad={handleAvatarLoad}
+            onError={handleAvatarError}
           />
         </Animated.View>
 

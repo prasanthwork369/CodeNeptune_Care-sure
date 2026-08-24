@@ -38,10 +38,17 @@ export const useCartSocketSync = () => {
       // while foreground+authenticated stayed true): never open a second socket.
       if (socketRef.current) return;
 
-      const token = await tokenStorage.get();
-      // Re-check after the await: a background flip or logout during the
-      // token read must not let a stale connect() attempt slip a socket through.
-      if (!token || !mounted || socketRef.current) return;
+      // In-memory token, not the persisted one — apiClient's refresh flow
+      // keeps this current, while tokenStorage can still hold the expired
+      // token for a moment after a refresh (server would reject it).
+      let token = getAccessToken();
+      if (!token) {
+        token = await tokenStorage.get();
+        // Re-check after the await: a background flip or logout during the
+        // token read must not let a stale connect() attempt slip a socket through.
+        if (!mounted || socketRef.current) return;
+      }
+      if (!token) return;
 
       // Kept as one mutable object (not replaced) — engine.io reads
       // `extraHeaders` fresh from this same reference on every reconnect
