@@ -134,7 +134,6 @@ export function usePrescriptionUpload(
     chooseFromGallery: pickImage,
     pickPdf,
     pickDocument,
-    isOpening,
   } = usePrescriptionUploadService({
     onAssetsReady: async (assets) => {
       const { validated, hadTooLarge } = await processAssets(assets);
@@ -151,6 +150,5 @@ export function usePrescriptionUpload(
     proceedAfterTooLarge,
     discardPendingTooLarge,
     isProceeding,
-    isOpening,
   };
 }

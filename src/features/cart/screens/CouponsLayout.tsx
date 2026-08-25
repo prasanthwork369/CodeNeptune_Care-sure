@@ -88,6 +88,9 @@ export const CouponsLayout: React.FC = () => {
     // Gate before the loader: an offline tap must look inert, not busy.
     if (!requireInternet()) return;
     setValidatingCode(trimmed);
+    // Set once we're actually navigating, so the finally below only clears
+    // the card's loading spinner early for the stay-on-screen (toast) path.
+    let navigating = false;
     try {
       const result = await couponApi.validateCoupon(trimmed, subtotal);
       if (result.valid) {
@@ -96,8 +99,12 @@ export const CouponsLayout: React.FC = () => {
           discount: Number(result.discount) || 0,
           description: result.message ?? "",
         });
+        navigating = true;
         // transition makes Fabric re-parent views and crash.
-        requestAnimationFrame(() => router.back());
+        requestAnimationFrame(() => {
+          router.back();
+          setValidatingCode(null);
+        });
       } else {
         showToast(
           result.message ?? "This coupon is not valid or has expired.",
@@ -113,7 +120,7 @@ export const CouponsLayout: React.FC = () => {
         "error",
       );
     } finally {
-      setValidatingCode(null);
+      if (!navigating) setValidatingCode(null);
     }
   };
 

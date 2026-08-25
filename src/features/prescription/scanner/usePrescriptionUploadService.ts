@@ -1,7 +1,7 @@
 import { Alert, AppState, Linking } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { armSettingsReturn } from "@/src/store/lastRouteStore";
 import { ScannerService } from "./scanner.service";
 
@@ -31,28 +31,6 @@ export function usePrescriptionUploadService({
   // and resume the action the user actually asked for, instead of requiring
   // a second tap.
   const pendingActionRef = useRef<PendingPermissionAction | null>(null);
-  // True from the moment the picker/scanner returns valid assets until the
-  // local validate+copy work (and whatever it triggers) finishes — covers
-  // Gallery, Camera/Scanner, PDF, and Document, since they all funnel here.
-  const [isOpening, setIsOpening] = useState(false);
-  const isMountedRef = useRef(true);
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  const runOnAssetsReady = async (assets: CapturedAsset[]) => {
-    if (isMountedRef.current) setIsOpening(true);
-    // The file copy/stat calls inside onAssetsReady can block the JS thread,
-    // so wait one frame first to let the overlay actually paint.
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    try {
-      await onAssetsReady(assets);
-    } finally {
-      if (isMountedRef.current) setIsOpening(false);
-    }
-  };
 
   const showErr = (title: string, message: string) => {
     if (onError) {
@@ -114,7 +92,7 @@ export function usePrescriptionUploadService({
         };
       });
 
-      await runOnAssetsReady(assets);
+      await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to take photo. Please try again.");
     } finally {
@@ -151,7 +129,7 @@ export function usePrescriptionUploadService({
         mimeType: "image/jpeg",
       }));
 
-      await runOnAssetsReady(assets);
+      await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to pick images. Please try again.");
     } finally {
@@ -188,7 +166,7 @@ export function usePrescriptionUploadService({
         fileName: a.name,
         mimeType: "application/pdf",
       }));
-      await runOnAssetsReady(assets);
+      await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to pick PDF. Please try again.");
     } finally {
@@ -226,7 +204,7 @@ export function usePrescriptionUploadService({
           ? "application/pdf"
           : "image/jpeg",
       }));
-      await runOnAssetsReady(assets);
+      await onAssetsReady(assets);
     } catch {
       showErr("Error", "Failed to pick document. Please try again.");
     } finally {
@@ -277,6 +255,5 @@ export function usePrescriptionUploadService({
     chooseFromGallery,
     pickPdf,
     pickDocument,
-    isOpening,
   };
 }

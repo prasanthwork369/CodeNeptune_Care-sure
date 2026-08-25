@@ -318,10 +318,13 @@ export const OrderTrackLayout: React.FC = () => {
         }
       }
       setIsCartModalVisible(false);
-      setIsProceeding(false);
+      // isProceeding stays true (button keeps its "Adding to cart..." state)
+      // until this same timeout fires — clearing it earlier would flip the
+      // button back to "Re Order" while this screen is still visible.
       cartNavTimer.current = setTimeout(() => {
         cartNavTimer.current = null;
         router.push("/(commerce)/cart");
+        setIsProceeding(false);
       }, 100);
     } catch (err) {
       if (__DEV__) console.error("[ReOrder]", err);

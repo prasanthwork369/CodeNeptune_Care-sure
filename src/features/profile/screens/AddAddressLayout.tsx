@@ -223,7 +223,9 @@ export const AddAddressLayout: React.FC = () => {
         }
       }
       setSaveCompleted(true);
-      setTimeout(() => router.back(), 0);
+      // Wait a frame so the button's saved/disabled state actually paints
+      // before back() starts tearing this screen down.
+      requestAnimationFrame(() => router.back());
     } catch (err) {
       if (__DEV__) console.error("[Address Save Error]", err);
     }
@@ -541,11 +543,16 @@ export const AddAddressLayout: React.FC = () => {
           <Touchable
             activeOpacity={0.85}
             onPress={handleSave}
-            disabled={submitting || !isValid || isOffline}
+            disabled={submitting || saveCompleted || !isValid || isOffline}
             className="bg-brand-primary rounded-md py-4 flex-row items-center justify-center gap-x-2"
-            style={{ opacity: submitting || !isValid || isOffline ? 0.5 : 1 }}
+            style={{
+              opacity:
+                submitting || saveCompleted || !isValid || isOffline
+                  ? 0.5
+                  : 1,
+            }}
           >
-            {submitting ? (
+            {submitting || saveCompleted ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
               <Text

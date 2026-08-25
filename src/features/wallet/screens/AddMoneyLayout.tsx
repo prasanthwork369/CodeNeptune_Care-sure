@@ -38,6 +38,9 @@ export const AddMoneyLayout: React.FC = () => {
   // can briefly be null with loading=false — treat that as still pending too.
   const isBalancePending = balanceLoading || balance == null;
   const { addMoney, loading } = useAddMoney();
+  // Stays true through the confetti/back() delay so the button doesn't
+  // re-enable while this screen is still visible after a successful top-up.
+  const [isSuccess, setIsSuccess] = useState(false);
   // Clamped so a bad admin value cannot block top-ups entirely or invite an
   // amount the payment provider will reject.
   const { data: walletSettings } = useCartWalletSettings();
@@ -79,6 +82,7 @@ export const AddMoneyLayout: React.FC = () => {
     if (!requireInternet({ critical: true })) return;
     try {
       await addMoney(numericAmount);
+      setIsSuccess(true);
       confettiRef.current?.play();
       backTimer.current = setTimeout(() => {
         backTimer.current = null;
@@ -289,7 +293,7 @@ export const AddMoneyLayout: React.FC = () => {
         >
           <Touchable
             onPress={handleProceed}
-            disabled={loading || !numericAmount || hasError}
+            disabled={loading || isSuccess || !numericAmount || hasError}
             activeOpacity={0.85}
             style={{
               backgroundColor: "#0F7635",
@@ -299,10 +303,11 @@ export const AddMoneyLayout: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              opacity: loading || !numericAmount || hasError ? 0.5 : 1,
+              opacity:
+                loading || isSuccess || !numericAmount || hasError ? 0.5 : 1,
             }}
           >
-            {loading ? (
+            {loading || isSuccess ? (
               <ActivityIndicator color="#FFFFFF" size="small" />
             ) : (
               <>

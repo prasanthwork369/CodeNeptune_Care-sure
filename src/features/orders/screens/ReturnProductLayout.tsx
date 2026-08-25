@@ -179,6 +179,7 @@ export const ReturnProductLayout: React.FC = () => {
   }, [paymentSettings, refundMethod]);
 
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
 
   // Leaving this screen without submitting would silently drop confirmed
   // items/reasons/photos -- warn first, same pattern as the prescription
@@ -853,7 +854,8 @@ export const ReturnProductLayout: React.FC = () => {
         isVisible={isSuccessModalVisible}
         onClose={() => setIsSuccessModalVisible(false)}
         onGoHome={() => {
-          setIsSuccessModalVisible(false);
+          // Stays open (unmounts with the screen) — closing it here would
+          // expose this already-submitted screen underneath mid-transition.
           router.replace("/(tabs)");
         }}
       />
@@ -867,10 +869,22 @@ export const ReturnProductLayout: React.FC = () => {
         confirmBg="#E02D5B"
         cancelLabel="Continue"
         confirmLabel="Leave"
+        confirmLoading={isLeaving}
+        confirmLoadingLabel="Leaving..."
         onConfirm={() => {
-          setShowLeaveConfirm(false);
-          clearReturnDraft();
-          router.back();
+          if (isLeaving) return;
+          setIsLeaving(true);
+          // Same reasoning as the prescription Preview Leave button: wait a
+          // frame so the spinner paints before back() starts tearing this
+          // screen down, and keep the modal open until unmount.
+          requestAnimationFrame(() => {
+            try {
+              clearReturnDraft();
+              router.back();
+            } catch {
+              setIsLeaving(false);
+            }
+          });
         }}
         onCancel={() => setShowLeaveConfirm(false)}
       />

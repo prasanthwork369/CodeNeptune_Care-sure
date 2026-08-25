@@ -103,7 +103,6 @@ export function usePrescriptionPicker(
     takePhoto: _takePhoto,
     chooseFromGallery: _pickImages,
     pickPdf: _pickPdf,
-    isOpening,
   } = usePrescriptionUploadService({
     onAssetsReady: async (assets) => {
       const validated = await processAssets(assets);
@@ -123,5 +122,5 @@ export function usePrescriptionPicker(
 
   const takePhoto = _takePhoto;
 
-  return { pickImages, pickPdf, takePhoto, isOpening };
+  return { pickImages, pickPdf, takePhoto };
 }

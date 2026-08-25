@@ -106,10 +106,17 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
     };
 
     // The sheet has to dismiss before navigating, or the push lands under it.
-    const goToAddAddress = (params: Record<string, string>) => {
+    // onNavigate (e.g. clearing a loading flag) fires with the push, not
+    // before — clearing it earlier flips the tile back to normal while the
+    // sheet is still visibly closing.
+    const goToAddAddress = (
+      params: Record<string, string>,
+      onNavigate?: () => void,
+    ) => {
       handleClose();
       setTimeout(() => {
         router.push({ pathname: "/profile/addresses/add", params });
+        onNavigate?.();
       }, 500);
     };
 
@@ -117,6 +124,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
       // Gate before the spinner: an offline tap must look inert, not busy.
       if (!requireInternet()) return;
       setIsResolving(true);
+      // Set once we're actually navigating, so the finally below only
+      // resets early for the stay-on-screen (toast/error) paths.
+      let navigating = false;
       try {
         const resolved = await locationApi.resolvePlace(prediction.placeId);
 
@@ -135,23 +145,23 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           return;
         }
 
-        goToAddAddress(toPrefillParams(resolved, prediction.mainText));
+        navigating = true;
+        goToAddAddress(
+          toPrefillParams(resolved, prediction.mainText),
+          () => setIsResolving(false),
+        );
       } catch (err) {
         // Connection failures go to the banner; everything else gets this toast.
         reportActionError(err, {
           message: "Failed to get location details. Please try again.",
         });
       } finally {
-        setIsResolving(false);
+        if (!navigating) setIsResolving(false);
       }
     };
 
     const handleAddNewAddress = () => {
-      handleClose();
-      router.push({
-        pathname: "/profile/addresses/add",
-        params: { from_location_sheet: "1" },
-      });
+      goToAddAddress({ from_location_sheet: "1" });
     };
 
     // Opens the system LOCATION toggle page (GPS on/off). Use this when the
@@ -220,6 +230,9 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
       // Internet connection required to resolve coordinates to address
       if (!requireInternet()) return;
       setIsLocating(true);
+      // Set once we're actually navigating, so the finally below only
+      // resets early for the stay-on-screen (alert/toast) paths.
+      let navigating = false;
       try {
         // Request user permission for location access
         const { granted, canAskAgain } =
@@ -313,7 +326,8 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           } catch {}
         } catch {}
 
-        goToAddAddress(toPrefillParams(resolved));
+        navigating = true;
+        goToAddAddress(toPrefillParams(resolved), () => setIsLocating(false));
       } catch (err) {
         // GPS problems are already handled above, so anything landing here is the
         // resolveCoords call — never blame location services for a network failure.
@@ -321,7 +335,7 @@ export const LocationBottomSheet: React.FC<LocationBottomSheetProps> =
           message: "Could not fetch location. Please try again.",
         });
       } finally {
-        setIsLocating(false);
+        if (!navigating) setIsLocating(false);
       }
     };
 

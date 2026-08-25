@@ -210,6 +210,9 @@ export function usePaymentCalculations() {
             "Upload Failed",
             rx.error ?? "Could not save prescription. Please try again.",
           );
+          // Failure, not navigating away — button must re-enable.
+          placingOrderRef.current = false;
+          setPlacingOrder(false);
           return;
         }
         effectivePrescriptionId = rx.data?.id ?? "";
@@ -246,10 +249,6 @@ export function usePaymentCalculations() {
           orderItems.length,
         );
       }
-      removeCoupon();
-      clearCheckout();
-      clearPrescriptionOrder();
-      clearCheckoutDraft();
       // Fire-and-forget: a notification failure must never block the success
       // screen. Logged in dev so a silent failure is still visible.
       if (order?.id) {
@@ -271,6 +270,15 @@ export function usePaymentCalculations() {
           total: String(Number(billBreakdown.toPay).toFixed(2)),
         },
       });
+      // After navigating — clearing first would reset the payment method
+      // radio and other draft-driven UI while this screen is still visible
+      // mid-transition.
+      removeCoupon();
+      clearCheckout();
+      clearPrescriptionOrder();
+      clearCheckoutDraft();
+      // Not reset here: the screen is leaving, and flipping the Confirm
+      // Order button back to enabled would be visible during that exit.
     } catch (e) {
       const err = asError(e);
       // Redacted on purpose: the payload carries the delivery address and patient phone.
@@ -287,9 +295,9 @@ export function usePaymentCalculations() {
       }
       reportError(err, "placeOrder:cart");
       Alert.alert("Order Failed", orderErrorMessage(err));
-    } finally {
       placingOrderRef.current = false;
       setPlacingOrder(false);
+    } finally {
       stopCheckoutTrace(
         { status: traceStatus },
         { item_count: orderItems.length },

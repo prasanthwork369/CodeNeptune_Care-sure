@@ -111,8 +111,13 @@ export const OrderCard = React.memo(function OrderCard({
         }
       }
       setIsCartModalVisible(false);
-      setIsProceeding(false);
-      setTimeout(() => router.push("/(commerce)/cart"), 100);
+      // isProceeding stays true (button keeps its "Adding..." state) until
+      // this same timeout fires — clearing it earlier would flip the button
+      // back to "Order Again" while this screen is still visible.
+      setTimeout(() => {
+        router.push("/(commerce)/cart");
+        setIsProceeding(false);
+      }, 100);
     } catch (err) {
       if (__DEV__) console.error("[OrderAgain]", err);
       setIsProceeding(false);
