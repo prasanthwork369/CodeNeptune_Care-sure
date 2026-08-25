@@ -773,7 +773,10 @@ export const OrderTrackLayout: React.FC = () => {
 
         <DeliveryAddressSection address={order?.deliveryAddress} />
 
-        <PaymentMethodSection order={order} />
+        {/* Corporate-billed orders have no customer payment method to show. */}
+        {order?.isCorporateGeneratedOrder !== true && (
+          <PaymentMethodSection order={order} />
+        )}
 
         {order?.clinicalData && order?.status === 7 && (
           <PrescriptionSection onViewRx={() => setRxModalVisible(true)} />

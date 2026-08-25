@@ -44,6 +44,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
   onBoxPress,
   onOtpChange,
   onResend,
+  onSubmitEditing,
   inputRef,
 }) => {
   const [focused, setFocused] = useState(false);
@@ -107,6 +108,8 @@ export const OtpForm: React.FC<OtpFormProps> = ({
           ref={setInputRef}
           value={inputValue}
           onChangeText={onOtpChange}
+          onSubmitEditing={onSubmitEditing}
+          returnKeyType="done"
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           keyboardType="number-pad"

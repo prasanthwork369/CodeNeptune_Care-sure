@@ -111,6 +111,9 @@ export const HOME_IMAGES = {
   noPatient: require("../../assets/images/prescription/no-patient.webp"),
   splashIcon: require("../../assets/images/splash-icon.png"),
 
+  // Orders
+  corporateOrderBadge: require("../../assets/images/orders/corporate-order-badge.png"),
+
   // Delete Account
   deleteAccount: require("../../assets/images/icons/delete-account.webp"),
 } as const;

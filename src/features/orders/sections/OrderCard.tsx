@@ -11,10 +11,39 @@ import {
 import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { Image } from "expo-image";
+import { HOME_IMAGES } from "@/src/constants/images";
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, ImageBackground, Text, View } from "react-native";
 import { usePrefetchOrder } from "@/src/features/orders/hooks/useOrderById";
 import { orderStyles as s } from "../orders.styles";
+
+function CorporateOrderBadge() {
+  return (
+    <ImageBackground
+      source={HOME_IMAGES.corporateOrderBadge}
+      style={{
+        paddingLeft: 18,
+        paddingRight: 12,
+        paddingVertical: 5.5,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      resizeMode="stretch"
+    >
+      <Text
+        className="font-inter-bold uppercase"
+        style={{
+          fontSize: 11,
+          letterSpacing: 0.4,
+          fontWeight: "700",
+          color: "#FFFFFF",
+        }}
+      >
+        CORPORATE ORDER
+      </Text>
+    </ImageBackground>
+  );
+}
 
 export interface OrderCardProps {
   order: Order;
@@ -281,21 +310,36 @@ export const OrderCard = React.memo(function OrderCard({
           </View>
         )}
 
-        {/* Delivery date */}
-        {order.estimatedDelivery && (
-          <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
-            <Text
-              className="font-inter-medium text-[#6A6A6A] uppercase"
-              style={[s.labelXs, labelStyle]}
-            >
-              Delivery On
-            </Text>
-            <Text
-              className="font-inter-bold text-[#222222]"
-              style={[s.labelSm, valueStyle]}
-            >
-              {formatDate(order.estimatedDelivery)}
-            </Text>
+        {/* Delivery date + corporate badge */}
+        {(order.estimatedDelivery || order.isCorporateGeneratedOrder) && (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              paddingHorizontal: 16,
+              paddingBottom: 14,
+            }}
+          >
+            {order.estimatedDelivery ? (
+              <View>
+                <Text
+                  className="font-inter-semibold text-[#6A6A6A] uppercase"
+                  style={[s.labelXs, labelStyle]}
+                >
+                  Delivery On
+                </Text>
+                <Text
+                  className="font-inter-bold text-[#222222]"
+                  style={[s.labelSm, valueStyle]}
+                >
+                  {formatDate(order.estimatedDelivery)}
+                </Text>
+              </View>
+            ) : (
+              <View />
+            )}
+            {order.isCorporateGeneratedOrder && <CorporateOrderBadge />}
           </View>
         )}
       </Touchable>

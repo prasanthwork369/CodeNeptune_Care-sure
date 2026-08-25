@@ -14,6 +14,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   phoneError,
   error,
   onPhoneChange,
+  onSubmitEditing,
   inputRef,
   hintShieldVisible,
   onHintPress,
@@ -52,6 +53,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           // symbol keys (, . * Pause Wait N) that QA flagged as enterable at the
           // keyboard UI layer.
           keyboardType="number-pad"
+          returnKeyType="done"
           textContentType="telephoneNumber"
           autoComplete="tel"
           accessibilityLabel="Mobile number"
@@ -62,6 +64,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           value={phoneNumber}
           // Forward raw text — useLogin owns sanitization and overflow rejection.
           onChangeText={onPhoneChange}
+          onSubmitEditing={onSubmitEditing}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />

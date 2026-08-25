@@ -25,6 +25,7 @@ export const LoginLayout: React.FC = () => {
     handleChangeText,
     handleHintPress,
     handleGetOtp,
+    handleSubmitEditing,
   } = useLogin();
 
   // Expo Router's initial-deep-link anchor (unstable_settings in
@@ -66,6 +67,7 @@ export const LoginLayout: React.FC = () => {
             phoneError={phoneError}
             error={error}
             onPhoneChange={handleChangeText}
+            onSubmitEditing={handleSubmitEditing}
             inputRef={phoneInputRef}
             hintShieldVisible={hintShieldVisible}
             onHintPress={handleHintPress}

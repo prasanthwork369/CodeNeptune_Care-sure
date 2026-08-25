@@ -5,6 +5,7 @@ export interface LoginFormProps {
   phoneError: string;
   error: string | null;
   onPhoneChange: (text: string) => void;
+  onSubmitEditing?: () => void;
   inputRef?: React.RefObject<TextInput | null>;
   /** Transparent overlay that spends the first tap on the number hint. */
   hintShieldVisible?: boolean;
@@ -30,6 +31,7 @@ export interface OtpFormProps {
   onBoxPress: (index: number) => void;
   onOtpChange: (value: string) => void;
   onResend: () => void;
+  onSubmitEditing?: () => void;
   inputRef: React.Ref<TextInput>;
 }
 

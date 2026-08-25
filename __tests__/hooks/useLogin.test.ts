@@ -5,13 +5,13 @@ import { getPhoneNumberHint } from "@/src/modules/PhoneNumberHint";
 
 const mockRequestOtp = jest.fn();
 const mockResetError = jest.fn();
-// Mutable so a test can simulate a lingering request-otp failure.
 let mockAuthError: string | null = null;
+let mockAuthLoading = false;
 
 jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   useAuth: () => ({
     requestOtp: mockRequestOtp,
-    loading: false,
+    loading: mockAuthLoading,
     error: mockAuthError,
     resetError: mockResetError,
   }),
@@ -54,6 +54,7 @@ describe("useLogin phone input", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockAuthError = null;
+    mockAuthLoading = false;
   });
 
   it("becomes valid at 10 digits and ignores appended overflow digits", () => {
@@ -107,7 +108,7 @@ describe("useLogin phone input", () => {
     expect(result.current.phoneNumber).toBe("1234567890");
     expect(result.current.isValid).toBe(false);
     expect(result.current.phoneError).toBe(
-      "Mobile number must start with 6, 7, 8, or 9",
+      "Please enter a valid 10-digit mobile number",
     );
   });
 
@@ -195,5 +196,63 @@ describe("useLogin phone input", () => {
     });
 
     expect(getPhoneNumberHint).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not trigger API on handleSubmitEditing when phone has fewer than 10 digits", async () => {
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("987654321")); // 9 digits
+    expect(result.current.phoneNumber).toBe("987654321");
+
+    await act(async () => {
+      result.current.handleSubmitEditing();
+    });
+
+    expect(mockRequestOtp).not.toHaveBeenCalled();
+  });
+
+  it("does not call API on entering 10th digit, only calls when handleSubmitEditing is triggered", async () => {
+    mockRequestOtp.mockResolvedValue({ data: { otp: "123456" } });
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("9876543210"));
+    expect(result.current.phoneNumber).toBe("9876543210");
+    expect(mockRequestOtp).not.toHaveBeenCalled();
+
+    await act(async () => {
+      result.current.handleSubmitEditing();
+    });
+
+    expect(mockRequestOtp).toHaveBeenCalledTimes(1);
+    expect(mockRequestOtp).toHaveBeenCalledWith("+919876543210");
+  });
+
+  it("passes updated number when number changes and Done is pressed again", async () => {
+    mockRequestOtp.mockResolvedValue({ data: { otp: "123456" } });
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("9876543210"));
+    await act(async () => {
+      result.current.handleSubmitEditing();
+    });
+    expect(mockRequestOtp).toHaveBeenCalledWith("+919876543210");
+
+    act(() => result.current.handleChangeText("9123456789"));
+    await act(async () => {
+      result.current.handleSubmitEditing();
+    });
+    expect(mockRequestOtp).toHaveBeenCalledWith("+919123456789");
+  });
+
+  it("prevents duplicate API calls when Done is pressed while loading is true", async () => {
+    mockAuthLoading = true;
+    const { result } = renderHook(() => useLogin());
+
+    act(() => result.current.handleChangeText("9876543210"));
+    await act(async () => {
+      result.current.handleSubmitEditing();
+    });
+
+    expect(mockRequestOtp).not.toHaveBeenCalled();
   });
 });

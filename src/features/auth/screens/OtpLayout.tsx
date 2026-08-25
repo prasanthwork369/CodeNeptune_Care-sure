@@ -74,6 +74,7 @@ export const OtpLayout: React.FC = () => {
             onBoxPress={handleBoxPress}
             onOtpChange={handleOtpChange}
             onResend={handleResend}
+            onSubmitEditing={() => handleVerify()}
             inputRef={inputRef}
           />
 

@@ -65,4 +65,14 @@ describe("LoginForm Component", () => {
     // Focus is visual state only now — the hint is requested on screen mount.
     expect(() => fireEvent(getByTestId("phone-input"), "focus")).not.toThrow();
   });
+
+  it("calls onSubmitEditing when user presses Done / Enter on keyboard", () => {
+    const onSubmitEditing = jest.fn();
+    const { getByTestId } = renderWithProviders(
+      <LoginForm {...defaultProps} onSubmitEditing={onSubmitEditing} />,
+    );
+
+    fireEvent(getByTestId("phone-input"), "submitEditing");
+    expect(onSubmitEditing).toHaveBeenCalledTimes(1);
+  });
 });

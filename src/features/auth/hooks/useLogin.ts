@@ -78,6 +78,7 @@ export function useLogin() {
    * Submits the sanitized phone number to the API, then routes to the OTP verification screen.
    */
   const handleGetOtp = async () => {
+    if (loading) return;
     if (!requireInternet()) return;
     const result = validate.phone(phoneNumber);
     if (!result.valid) {
@@ -106,6 +107,16 @@ export function useLogin() {
     }
   };
 
+  /**
+   * Triggered when keyboard Done / Tick / ✓ button is pressed.
+   * Calls API only when exactly 10 digits are entered and not already loading.
+   */
+  const handleSubmitEditing = () => {
+    if (phoneNumber.length === 10 && !loading) {
+      void handleGetOtp();
+    }
+  };
+
   const isValid = validate.phone(phoneNumber).valid;
 
   return {
@@ -119,5 +130,6 @@ export function useLogin() {
     handleChangeText,
     handleHintPress,
     handleGetOtp,
+    handleSubmitEditing,
   };
 }
