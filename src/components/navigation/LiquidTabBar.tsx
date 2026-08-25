@@ -417,6 +417,10 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       leaderX.value = withSpring(activePillIndex, SNAP_SPRING);
       followerX.value = withSpring(activePillIndex, TRAIL_SPRING);
     } else {
+      // No pill tab is active here (e.g. on Upload) — clear it instead of
+      // leaving the previous tab's index behind, so nothing can still read
+      // as active once a pill tab becomes current again.
+      activeIndex.value = -1;
       pillOpacity.value = withTiming(0, { duration: 150 });
     }
   }, [activePillIndex]);

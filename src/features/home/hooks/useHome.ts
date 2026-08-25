@@ -32,6 +32,16 @@ export const useAppContent = () => {
     () => cachedContent?.data?.hero,
   );
   if (query.data?.hero?.image && query.data.hero !== lastGoodHero) {
+    // TEMP DEBUG — proves whether the hero object identity actually changes
+    // (vs. HeroBanner just re-rendering with the same data).
+    if (__DEV__)
+      console.log(
+        `[useHome ${new Date().toISOString()}] lastGoodHero updated`,
+        "image:",
+        query.data.hero.image,
+        "wasSameImage:",
+        query.data.hero.image === lastGoodHero?.image,
+      );
     setLastGoodHero(query.data.hero);
   }
 

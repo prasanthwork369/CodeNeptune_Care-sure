@@ -32,6 +32,9 @@ export type CartOrderLine = {
 };
 
 export type OrderDeliveryAddress = {
+  // The saved address's backend id — sent as top-level addressId, separate
+  // from the snapshot fields below.
+  id: string;
   name: string;
   phone: string;
   line1: string;
@@ -125,6 +128,7 @@ export const buildOrderPayload = ({
   symptoms,
 }: BuildOrderPayloadArgs): CreateOrderRequest => ({
   items,
+  addressId: address.id,
   deliveryAddress: {
     name: address.name,
     phone: address.phone,

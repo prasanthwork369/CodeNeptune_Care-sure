@@ -5,6 +5,7 @@ import { ApiHero } from "@/src/features/home/types";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useIsFocused } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   AppState,
@@ -15,6 +16,8 @@ import {
 } from "react-native";
 import Animated, {
   Easing,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -30,7 +33,12 @@ const HERO_GRADIENT = ["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"] as const;
 const GRADIENT_START = { x: 0.5, y: 0 } as const;
 const GRADIENT_END = { x: 0.5, y: 1 } as const;
 
-function useSlideUp(delayMs: number) {
+// TEMP DEBUG — remove once the avatar-disappears cause is confirmed.
+const debugLog = (...args: unknown[]) => {
+  if (__DEV__) console.log(`[HeroBanner ${new Date().toISOString()}]`, ...args);
+};
+
+function useSlideUp(delayMs: number, debugLabel?: string) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(22);
 
@@ -45,6 +53,20 @@ function useSlideUp(delayMs: number) {
     );
   }, [delayMs, opacity, translateY]);
 
+  // TEMP DEBUG — proves whether the avatar's own opacity/translateY ever
+  // gets reset (e.g. by a remount replaying useSlideUp's mount effect).
+  useAnimatedReaction(
+    () => ({ o: opacity.value, t: translateY.value }),
+    (cur, prev) => {
+      if (!__DEV__ || !debugLabel || !prev) return;
+      if (cur.o !== prev.o || cur.t !== prev.t) {
+        runOnJS(debugLog)(
+          `anim[${debugLabel}] opacity ${prev.o.toFixed(2)}->${cur.o.toFixed(2)} translateY ${prev.t.toFixed(1)}->${cur.t.toFixed(1)}`,
+        );
+      }
+    },
+  );
+
   return useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [{ translateY: translateY.value }],
@@ -56,8 +78,14 @@ interface HeroBannerProps {
   isLoading?: boolean;
 }
 
+// TEMP DEBUG — distinguishes a genuine remount (new id) from a re-render
+// of the same instance in the logs below.
+let heroInstanceCounter = 0;
+
 export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
   ({ content, isLoading }) => {
+    const [instanceId] = useState(() => ++heroInstanceCounter);
+    const isFocused = useIsFocused();
     const { width } = useWindowDimensions();
 
     const bannerWidth = width - exactScale(32);
@@ -72,8 +100,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
     const dynamicBadgeIconHeight = exactScale(20.5) * scale;
 
     // Hooks must be called before any early return
-    const leftAnim = useSlideUp(200);
-    const rightAnim = useSlideUp(400);
+    const leftAnim = useSlideUp(200, "left");
+    const rightAnim = useSlideUp(400, "avatar");
 
     // FlashList's initial layout pass can tear down and remount the first
     // cell before it settles, cancelling this Image mid-load — and
@@ -91,27 +119,36 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
     const avatarLoaded = useRef(false);
     const avatarUrl = content?.image;
     useEffect(() => {
-      if (__DEV__) console.log("[HeroBanner] avatarUrl ->", avatarUrl);
+      debugLog(`#${instanceId} avatarUrl ->`, avatarUrl);
       avatarRetries.current = 0;
       avatarLoaded.current = false;
-    }, [avatarUrl]);
+    }, [instanceId, avatarUrl]);
     useEffect(() => {
-      if (!__DEV__) return;
-      console.log("[HeroBanner] mounted");
-      return () => console.log("[HeroBanner] unmounted");
-    }, []);
+      debugLog(`#${instanceId} mounted`);
+      return () => debugLog(`#${instanceId} unmounted`);
+    }, [instanceId]);
+    useEffect(() => {
+      debugLog(`#${instanceId} route focus ->`, isFocused);
+    }, [instanceId, isFocused]);
+    const handleAvatarLoadStart = () => {
+      debugLog(`#${instanceId} avatar onLoadStart`, avatarUrl, "key:", avatarReloadKey);
+    };
     const handleAvatarLoad = () => {
-      if (__DEV__) console.log("[HeroBanner] avatar onLoad", avatarUrl);
+      debugLog(`#${instanceId} avatar onLoad`, avatarUrl, "key:", avatarReloadKey);
       avatarLoaded.current = true;
     };
+    const handleAvatarDisplay = () => {
+      debugLog(`#${instanceId} avatar onDisplay`, avatarUrl, "key:", avatarReloadKey);
+    };
     const handleAvatarError = () => {
-      if (__DEV__)
-        console.log(
-          "[HeroBanner] avatar onError",
-          avatarUrl,
-          "alreadyLoaded:",
-          avatarLoaded.current,
-        );
+      debugLog(
+        `#${instanceId} avatar onError`,
+        avatarUrl,
+        "alreadyLoaded:",
+        avatarLoaded.current,
+        "key:",
+        avatarReloadKey,
+      );
       if (avatarLoaded.current) return;
       if (avatarRetries.current >= 2) return;
       avatarRetries.current += 1;
@@ -123,27 +160,44 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
     // layered avatar Image doesn't get redrawn on resume even though nothing
     // in JS changed, leaving it blank with no error/data event to react to.
     // Force one remount on the first real resume after backgrounding.
+    //
+    // Only when the avatar hasn't actually loaded yet: the same "active"
+    // transition also fires for in-app permission prompts (see
+    // useHomeOnboarding) where the image is already fine on screen —
+    // remounting it there is what was blanking it.
     useEffect(() => {
       let skippedInitial = false;
       const sub = AppState.addEventListener("change", (state) => {
+        debugLog(`#${instanceId} AppState ->`, state, "avatarLoaded:", avatarLoaded.current);
         if (state !== "active") return;
         if (!skippedInitial) {
           skippedInitial = true;
           return;
         }
-        if (__DEV__) console.log("[HeroBanner] resumed — reloading avatar");
+        if (avatarLoaded.current) {
+          debugLog(`#${instanceId} resume ignored — avatar already loaded`);
+          return;
+        }
+        debugLog(`#${instanceId} resumed — reloading avatar`);
         setAvatarReloadKey((k) => k + 1);
       });
       return () => sub.remove();
-    }, []);
+    }, [instanceId]);
 
     // Catches the case the mount/unmount log can't: HeroBanner itself stays
     // mounted but flips back to the skeleton branch, swapping the real
     // Image out for a shimmer placeholder — that looks like the avatar
     // "disappearing" with no unmount ever logged.
-    if (__DEV__) {
-      console.log("[HeroBanner] render branch ->", isLoading ? "skeleton" : !content ? "skeleton(no content)" : "loaded", "isLoading:", isLoading, "image:", content?.image);
-    }
+    debugLog(
+      `#${instanceId} render branch ->`,
+      isLoading ? "skeleton" : !content ? "skeleton(no content)" : "loaded",
+      "isLoading:",
+      isLoading,
+      "image:",
+      content?.image,
+      "key:",
+      avatarReloadKey,
+    );
 
     if (isLoading || !content) {
       return (
@@ -273,7 +327,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
             contentFit="contain"
             contentPosition="bottom center"
             cachePolicy="memory-disk"
+            onLoadStart={handleAvatarLoadStart}
             onLoad={handleAvatarLoad}
+            onDisplay={handleAvatarDisplay}
             onError={handleAvatarError}
           />
         </Animated.View>

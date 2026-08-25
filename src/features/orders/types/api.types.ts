@@ -63,6 +63,9 @@ export interface CreateOrderRequest {
     country: string;
     landmark?: string;
   };
+  // The saved address's own backend id — separate from the deliveryAddress
+  // snapshot above, which the backend keeps even if that address is later edited.
+  addressId?: string;
   subtotal: string;
   deliveryCharge?: string;
   taxAmount?: string;

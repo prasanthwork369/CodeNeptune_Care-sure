@@ -22,6 +22,7 @@ const bill = (over: Partial<OrderBillBreakdown> = {}): OrderBillBreakdown => ({
 });
 
 const address = {
+  id: "addr-1",
   name: "Asha",
   phone: "9999999999",
   line1: "12 MG Road",
@@ -174,6 +175,10 @@ describe("buildOrderPayload", () => {
 
   it("defaults country to IN", () => {
     expect(buildOrderPayload(base).deliveryAddress.country).toBe("IN");
+  });
+
+  it("sends the selected address's own id as addressId", () => {
+    expect(buildOrderPayload(base).addressId).toBe("addr-1");
   });
 
   it("omits patientMemberIds when there is no patient", () => {
