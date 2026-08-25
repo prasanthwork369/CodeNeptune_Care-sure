@@ -11,6 +11,7 @@ import { colors } from "@/src/constants/theme";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { usePrescriptionPicker } from "../hooks/usePrescriptionPicker";
+import { PrescriptionLoadingOverlay } from "./PrescriptionLoadingOverlay";
 import { useNav } from "@/src/hooks/useNav";
 import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -36,6 +37,9 @@ interface UploadPrescriptionSheetProps {
   onTakePhoto?: () => void;
   onUploadPdf?: () => void;
   onSelectExisting?: () => void;
+  // Set when this sheet is the Preview screen's "+ Add More" sheet, so
+  // History/Viewer know to return to that Preview instead of opening a new one.
+  fromPreview?: boolean;
 }
 
 const VALID_ITEMS = [
@@ -62,6 +66,7 @@ export const UploadPrescriptionSheet: React.FC<
   onTakePhoto,
   onUploadPdf,
   onSelectExisting,
+  fromPreview,
 }) => {
   const router = useNav();
   const [infoModal, setInfoModal] = useState<{
@@ -76,7 +81,7 @@ export const UploadPrescriptionSheet: React.FC<
     size?: number;
     proceed: () => void;
   } | null>(null);
-  const { pickImages, pickPdf, takePhoto } = usePrescriptionPicker(
+  const { pickImages, pickPdf, takePhoto, isOpening } = usePrescriptionPicker(
     onClose,
     toPay,
     patientMemberId,
@@ -159,6 +164,10 @@ export const UploadPrescriptionSheet: React.FC<
 
   return (
     <>
+      {/* Rendered here, not inside the sheet — this component stays mounted
+          after the sheet closes, and the picker launches right after. */}
+      <PrescriptionLoadingOverlay visible={isOpening} />
+
       {infoModal && (
         <InfoModal
           title={infoModal.title}
@@ -357,9 +366,14 @@ export const UploadPrescriptionSheet: React.FC<
             onPress={() => {
               onClose();
               if (onSelectExisting) onSelectExisting();
-              router.replace({
+              // push, not replace — Preview (when this sheet is its "+ Add
+              // More" sheet) must stay on the stack so Select can return to it.
+              router.push({
                 pathname: "/prescription-history",
-                params: toPay ? { toPay, source: "cart" } : {},
+                params: {
+                  ...(toPay ? { toPay, source: "cart" } : {}),
+                  ...(fromPreview ? { fromPreview: "true" } : {}),
+                },
               });
             }}
             activeOpacity={0.85}

@@ -62,6 +62,12 @@ export const NotificationsLayout: React.FC = () => {
   const prefetchOrder = usePrefetchOrder();
   const prefetchWallet = usePrefetchWallet();
   const [isEntryLoading, setIsEntryLoading] = useState(true);
+  // Lifted out of the row: FlashList unmounts rows scrolled out of the
+  // render window, so local "View More" state there resets back to
+  // collapsed on scroll-away/back. Keyed by id here so it survives that.
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -220,6 +226,15 @@ export const NotificationsLayout: React.FC = () => {
     [dismissAsync, showToast],
   );
 
+  const handleToggleExpand = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
   const keyExtractor = useCallback((item: NotificationListRow) => item.key, []);
 
   const getItemType = useCallback(
@@ -240,10 +255,12 @@ export const NotificationsLayout: React.FC = () => {
         <NotificationRow
           // FlashList recycles the row's component instance across different
           // notifications in the same slot; without a key tied to the
-          // notification's own identity, local state (expand/collapse,
-          // swipe-delete, options menu) survives into the next notification
-          // shown there — corrupting row height and causing the jump/overlap/
-          // blank-row symptoms. The key forces a clean remount per identity.
+          // notification's own identity, local state (swipe-delete, options
+          // menu) survives into the next notification shown there —
+          // corrupting row height and causing the jump/overlap/blank-row
+          // symptoms. The key forces a clean remount per identity. Expand
+          // state is lifted to expandedIds above specifically so it isn't
+          // lost on that same remount when scrolling away and back.
           key={item.notification.id}
           notification={item.notification}
           section={item.section}
@@ -255,6 +272,8 @@ export const NotificationsLayout: React.FC = () => {
           onInteraction={closeOpenRow}
           onWillOpen={handleRowWillOpen}
           onDidClose={handleRowDidClose}
+          isExpanded={expandedIds.has(item.notification.id)}
+          onToggleExpand={handleToggleExpand}
         />
       );
     },
@@ -266,6 +285,8 @@ export const NotificationsLayout: React.FC = () => {
       closeOpenRow,
       handleRowWillOpen,
       handleRowDidClose,
+      expandedIds,
+      handleToggleExpand,
     ],
   );
 

@@ -85,6 +85,9 @@ export interface PrescriptionHistoryItemData {
   image: string[]; // prescription page URLs, in order
   source?: string;
   toPay?: string;
+  // True when this history list was opened from an in-progress cart Preview
+  // ("+ Add More"), so Select must return there instead of pushing a new one.
+  fromPreview?: string;
   prescriptionOrderId?: string | null;
   reviewNotes?: string | null;
   rejectionReasons?: string[];

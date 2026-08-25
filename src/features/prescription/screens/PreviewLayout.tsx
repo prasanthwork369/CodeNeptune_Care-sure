@@ -118,6 +118,7 @@ export const PreviewLayout: React.FC = () => {
   } | null>(null);
   const [showRemoveModal, setShowRemoveModal] = useState<number | null>(null);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
   const showInfo = (title: string, message: string) =>
     setInfoModal({ title, message });
   const uploadedSnapshot = useRef<PrescriptionItem[]>([]);
@@ -162,6 +163,7 @@ export const PreviewLayout: React.FC = () => {
   }, [items, uploader.states]);
 
   const exitFlow = useCallback(() => {
+    if (__DEV__) logger.debug("[Leave] exitFlow start");
     clearItems();
     const isFromCart =
       source === "cart" || useUIStore.getState().isRxFromCartFlow;
@@ -172,12 +174,27 @@ export const PreviewLayout: React.FC = () => {
       // pop the whole (prescription) stack down to its root unconditionally,
       // then land on a fresh choose-method — guarantees nothing is left
       // dangling regardless of entry path.
+      if (__DEV__) logger.debug("[Leave] navigation call: dismissAll + choose-method");
       router.dismissAll();
       router.replace("/(prescription)/choose-method");
     } else {
+      if (__DEV__) logger.debug("[Leave] navigation call: replace upload");
       router.replace("/(tabs)/upload");
     }
   }, [clearItems, router, source]);
+
+  // Confirms the isLeaving render actually committed — fires only once
+  // React has painted this frame, not when setIsLeaving was merely called.
+  useEffect(() => {
+    if (__DEV__ && isLeaving) logger.debug("[Leave] isLeaving render committed");
+  }, [isLeaving]);
+
+  // Proves whether the screen unmounted (and when) relative to the logs above.
+  useEffect(() => {
+    return () => {
+      if (__DEV__) logger.debug("[Leave] Preview unmount");
+    };
+  }, []);
 
   // useFocusEffect requires a memoized callback — it invokes it immediately
   // when the screen is already focused, not just on future focus events, so
@@ -385,6 +402,8 @@ export const PreviewLayout: React.FC = () => {
           setShowAddSheet(false);
           setTimeout(pickPdfs, 300);
         }}
+        toPay={toPay}
+        fromPreview
       />
 
       {infoModal && (
@@ -418,9 +437,27 @@ export const PreviewLayout: React.FC = () => {
         confirmBg="#E02D5B"
         cancelLabel="Continue"
         confirmLabel="Leave"
+        confirmLoading={isLeaving}
+        confirmLoadingLabel="Leaving..."
         onConfirm={() => {
-          setShowLeaveConfirm(false);
-          exitFlow();
+          if (isLeaving) return;
+          if (__DEV__) logger.debug("[Leave] pressed");
+          setIsLeaving(true);
+          // Modal stays open (now showing the spinner) until exitFlow's
+          // navigation unmounts this screen — closing it here would flash
+          // the page underneath before the screen transition finishes.
+          //
+          // exitFlow's dismissAll/replace start tearing this screen down
+          // synchronously, so calling it in the same tick as setIsLeaving
+          // never gives React a frame to actually paint the spinner first.
+          // Wait for a real frame boundary before starting that navigation.
+          requestAnimationFrame(() => {
+            try {
+              exitFlow();
+            } catch {
+              setIsLeaving(false);
+            }
+          });
         }}
         onCancel={() => setShowLeaveConfirm(false)}
       />

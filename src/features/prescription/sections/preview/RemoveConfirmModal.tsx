@@ -14,6 +14,8 @@ interface RemoveConfirmModalProps {
   icon?: ImageSource;
   iconBg?: string;
   confirmBg?: string;
+  confirmLoading?: boolean;
+  confirmLoadingLabel?: string;
 }
 
 export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
@@ -27,6 +29,8 @@ export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
   icon,
   iconBg = "#FDEAEA",
   confirmBg = "#C22923",
+  confirmLoading,
+  confirmLoadingLabel,
 }) => (
   <ConfirmModal
     visible={visible}
@@ -39,5 +43,7 @@ export const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({
     icon={icon}
     iconBg={iconBg}
     confirmBg={confirmBg}
+    confirmLoading={confirmLoading}
+    confirmLoadingLabel={confirmLoadingLabel}
   />
 );

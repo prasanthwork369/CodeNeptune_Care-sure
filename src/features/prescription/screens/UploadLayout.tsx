@@ -4,6 +4,7 @@ import {
   FileTooLargeModal,
   InfoModal,
 } from "@/src/features/prescription/sections/preview";
+import { PrescriptionLoadingOverlay } from "../components/PrescriptionLoadingOverlay";
 import { components } from "@/src/constants/theme";
 import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
@@ -52,6 +53,7 @@ export const UploadLayout: React.FC = () => {
     proceedAfterTooLarge,
     discardPendingTooLarge,
     isProceeding,
+    isOpening,
   } = usePrescriptionUpload(
     (title, message, onDismiss) => setInfoModal({ title, message, onDismiss }),
     setTooLargeSizeMB,
@@ -104,6 +106,8 @@ export const UploadLayout: React.FC = () => {
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
+      <PrescriptionLoadingOverlay visible={isOpening} />
+
       {infoModal && (
         <InfoModal
           title={infoModal.title}

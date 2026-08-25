@@ -2,7 +2,7 @@ import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { Image, type ImageSource } from "expo-image";
 import React from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import { moderateScale } from "@/src/utils/exactScale";
 
 /** Generic reusable confirm modal. No domain-specific defaults. */
@@ -18,6 +18,10 @@ export interface ConfirmModalProps {
   iconBg?: string;
   confirmBg?: string;
   showConfirmIcon?: boolean;
+  // Swaps the confirm button into a spinner + confirmLoadingLabel, and
+  // blocks repeat taps. Caller owns the state — this only renders it.
+  confirmLoading?: boolean;
+  confirmLoadingLabel?: string;
 }
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -32,6 +36,8 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   iconBg = "#FDEAEA",
   confirmBg = "#C22923",
   showConfirmIcon = true,
+  confirmLoading = false,
+  confirmLoadingLabel,
 }) => (
   <Modal
     visible={visible}
@@ -95,18 +101,23 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             </Touchable>
             <Touchable
               activeOpacity={0.85}
+              disabled={confirmLoading}
               className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-lg"
               style={{ backgroundColor: confirmBg }}
               onPress={onConfirm}
             >
-              {!icon && showConfirmIcon && (
-                <icons.delete_white width={16} height={16} fill="#FFFFFF" />
+              {confirmLoading ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                !icon && showConfirmIcon && (
+                  <icons.delete_white width={16} height={16} fill="#FFFFFF" />
+                )
               )}
               <Text
                 className="font-inter-semibold text-white"
                 style={{ fontSize: moderateScale(14) }}
               >
-                {confirmLabel}
+                {confirmLoading ? (confirmLoadingLabel ?? confirmLabel) : confirmLabel}
               </Text>
             </Touchable>
           </View>

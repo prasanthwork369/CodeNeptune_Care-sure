@@ -44,9 +44,10 @@ const formatDate = (iso: string) => {
 
 export const PrescriptionHistoryLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
-  const { source, toPay } = useLocalSearchParams<{
+  const { source, toPay, fromPreview } = useLocalSearchParams<{
     source?: string;
     toPay?: string;
+    fromPreview?: string;
   }>();
   const { prescriptions, loading, refreshing, error, refetch } =
     usePrescriptions({
@@ -82,6 +83,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     image: getPrescriptionImageUrls(item),
     source: source ?? undefined,
     toPay: toPay ?? undefined,
+    fromPreview: fromPreview ?? undefined,
     prescriptionOrderId: item.prescriptionOrderId ?? null,
     reviewNotes: item.reviewNotes ?? null,
     rejectionReasons: item.ocrData?.rejectionReasons ?? [],
@@ -101,7 +103,7 @@ export const PrescriptionHistoryLayout: React.FC = () => {
           item.doctorName.toLowerCase().includes(query)
         );
       });
-  }, [prescriptions, query, source, toPay, statusFilter]);
+  }, [prescriptions, query, source, toPay, fromPreview, statusFilter]);
 
   const renderItem = useCallback(
     ({ item }: { item: PrescriptionHistoryItemData }) => (

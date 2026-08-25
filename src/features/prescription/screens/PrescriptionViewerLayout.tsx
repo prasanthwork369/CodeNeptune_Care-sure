@@ -10,6 +10,7 @@ import { useLocalSearchParams } from "expo-router";
 import { icons } from "@/src/constants/icons";
 import { PRESCRIPTION_STATUS_LABELS } from "@/src/features/prescription/constants/prescription-status";
 import { prescriptionService } from "../services/prescription.service";
+import { usePrescriptionDraftStore } from "@/src/store/prescriptionDraftStore";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   LayoutChangeEvent,
@@ -41,6 +42,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
     prescriptionOrderId,
     prescriptionId,
     toPay,
+    fromPreview,
   } = useLocalSearchParams<{
     prescriptionId: string;
     imageUrls: string;
@@ -51,6 +53,7 @@ export const PrescriptionViewerLayout: React.FC = () => {
     source?: string;
     status?: string;
     prescriptionOrderId?: string;
+    fromPreview?: string;
   }>();
 
   // The push payload carries no order id, so resolve it before the footer decides.
@@ -121,6 +124,16 @@ export const PrescriptionViewerLayout: React.FC = () => {
       name: u.split("/").pop() ?? "prescription",
       type: u.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg",
     }));
+
+    if (fromPreview === "true") {
+      // Came from Preview's "+ Add More" — merge into the same draft and
+      // pop History + this Viewer to land back on that original Preview,
+      // instead of pushing a second one.
+      usePrescriptionDraftStore.getState().addItems(filesPayload);
+      router.dismiss(2);
+      return;
+    }
+
     router.replace({
       pathname: "/(prescription)/preview",
       params: {

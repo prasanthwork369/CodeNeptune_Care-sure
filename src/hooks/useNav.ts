@@ -42,5 +42,11 @@ export function useNav() {
     router.dismissAll();
   };
 
-  return { push, replace, back, canGoBack, dismissTo, dismissAll };
+  // Pops a fixed number of screens off the stack
+  const dismiss = (...args: Parameters<typeof router.dismiss>) => {
+    if (!navigation.isFocused()) return;
+    router.dismiss(...args);
+  };
+
+  return { push, replace, back, canGoBack, dismissTo, dismissAll, dismiss };
 }

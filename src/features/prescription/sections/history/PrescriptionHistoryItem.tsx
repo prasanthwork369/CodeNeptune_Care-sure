@@ -84,6 +84,7 @@ export const PrescriptionHistoryItem = React.memo(function PrescriptionHistoryIt
         uploadedDate: item.uploadedDate,
         source: item.source,
         toPay: item.toPay,
+        fromPreview: item.fromPreview,
         // Pass status and order ID to the viewer page so it can show the verified banner
         status: item.status,
         prescriptionOrderId: item.prescriptionOrderId ?? "",

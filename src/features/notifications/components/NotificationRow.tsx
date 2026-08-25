@@ -241,6 +241,8 @@ interface NotificationRowItemProps {
   onDismiss: () => void;
   onMarkRead: () => void;
   onInteraction: () => void;
+  expanded: boolean;
+  onToggleExpand: () => void;
 }
 
 const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
@@ -250,9 +252,10 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
   onDismiss,
   onMarkRead,
   onInteraction,
+  expanded,
+  onToggleExpand,
 }) => {
   const [menuAnchor, setMenuAnchor] = useState<{ top: number } | null>(null);
-  const [expanded, setExpanded] = useState(false);
   const triggerRef = useRef<View>(null);
   const visual = getNotificationVisual(notification);
   const body = stripHtml(notification.body);
@@ -292,7 +295,7 @@ const NotificationRowItem: React.FC<NotificationRowItemProps> = ({
             <Text
               onPress={(e) => {
                 e.stopPropagation?.();
-                setExpanded(true);
+                onToggleExpand();
               }}
               style={{ color: "#0F7635", fontWeight: "600" }}
             >
@@ -403,6 +406,8 @@ interface NotificationRowProps {
   onInteraction: () => void;
   onWillOpen: (methods: SwipeableMethods) => void;
   onDidClose: (methods: SwipeableMethods) => void;
+  isExpanded: boolean;
+  onToggleExpand: (id: string) => void;
 }
 
 /**
@@ -421,6 +426,8 @@ const NotificationRowBase: React.FC<NotificationRowProps> = ({
   onInteraction,
   onWillOpen,
   onDidClose,
+  isExpanded,
+  onToggleExpand,
 }) => {
   const handlePress = useCallback(
     () => onPress(notification),
@@ -438,6 +445,10 @@ const NotificationRowBase: React.FC<NotificationRowProps> = ({
     () => onDelete(notification.id),
     [onDelete, notification.id],
   );
+  const handleToggleExpand = useCallback(
+    () => onToggleExpand(notification.id),
+    [onToggleExpand, notification.id],
+  );
 
   return (
     <SwipeableNotificationRow
@@ -453,6 +464,8 @@ const NotificationRowBase: React.FC<NotificationRowProps> = ({
         onDismiss={handleDismiss}
         onMarkRead={handleMarkRead}
         onInteraction={onInteraction}
+        expanded={isExpanded}
+        onToggleExpand={handleToggleExpand}
       />
     </SwipeableNotificationRow>
   );

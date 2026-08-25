@@ -42,7 +42,9 @@ export function usePrescriptionPicker(
     const goToPreview = () => {
       if (accepted.length === 0) return;
       addItems(accepted);
-      router.replace({
+      // push, not replace — Choose Method must stay on the stack under
+      // Preview so Cart/Choose Method survive the round trip back.
+      router.push({
         pathname: "/(prescription)/preview",
         params: {
           toPay: toPay ?? "0",
@@ -101,6 +103,7 @@ export function usePrescriptionPicker(
     takePhoto: _takePhoto,
     chooseFromGallery: _pickImages,
     pickPdf: _pickPdf,
+    isOpening,
   } = usePrescriptionUploadService({
     onAssetsReady: async (assets) => {
       const validated = await processAssets(assets);
@@ -120,5 +123,5 @@ export function usePrescriptionPicker(
 
   const takePhoto = _takePhoto;
 
-  return { pickImages, pickPdf, takePhoto };
+  return { pickImages, pickPdf, takePhoto, isOpening };
 }
