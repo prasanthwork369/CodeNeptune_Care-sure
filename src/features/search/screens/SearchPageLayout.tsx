@@ -167,7 +167,7 @@ export const SearchPageLayout = () => {
   const { width } = useWindowDimensions();
   const colWidth = (width - 32) / 2;
 
-  const { totalItems: cartCount } = useCartRead();
+  const { cartLineCount: cartCount } = useCartRead();
   const {
     query,
     setQuery,

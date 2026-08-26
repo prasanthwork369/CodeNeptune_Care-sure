@@ -72,6 +72,9 @@ export const useCart = () => {
   const activeCart = isAuthenticated ? cart : guestCart;
   const items = activeCart?.items ?? [];
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  // Each entry in `items` is already a unique cart line (one per
+  // medicine+variant), so this is the unique cart-line/variant count.
+  const cartLineCount = items.length;
   const totalPrice = items.reduce((sum, item) => {
     const mrp = parseFloat(String(item.unitPrice));
     const discountPct =
@@ -84,6 +87,7 @@ export const useCart = () => {
     cart: activeCart,
     items,
     totalItems,
+    cartLineCount,
     totalPrice,
     isLoading: isAuthenticated ? isLoading : false,
     // The guest cart lives in the store and cannot fail to load, so a signed-out

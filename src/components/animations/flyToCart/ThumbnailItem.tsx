@@ -1,7 +1,6 @@
 import { Image } from "expo-image";
 import React from "react";
 import { View } from "react-native";
-import { colors } from "@/src/constants/theme";
 import Animated from "react-native-reanimated";
 import { SmokePuff } from "./SmokePuff";
 import type { FlyImage } from "./FlyToCartContext";
@@ -31,7 +30,7 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
         width: 36,
         height: 36,
         marginLeft: index > 0 ? -12 : 0,
-        zIndex: 10 - index,
+        zIndex: index + 1,
         position: "relative",
       }}
     >
@@ -50,11 +49,6 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
             borderColor: "#fff",
             alignItems: "center",
             justifyContent: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.12,
-            shadowRadius: 3,
-            elevation: 3,
             overflow: "hidden",
             position: "absolute",
             top: 0,
@@ -68,6 +62,8 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
             {
               width: 28,
               height: 28,
+              borderRadius: 14,
+              overflow: "hidden",
               alignItems: "center",
               justifyContent: "center",
             },
@@ -76,12 +72,12 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
         >
           <Image
             source={imgUrl}
-            style={{ width: 28, height: 28 }}
+            style={{ width: 28, height: 28, borderRadius: 14 }}
             contentFit="contain"
           />
         </Animated.View>
 
-        {/* Absolute Mask Overlay (Green matching the banner background) */}
+        {/* White mask overlay so the image dissolves into the circle's white interior */}
         <Animated.View
           style={[
             maskStyle,
@@ -90,7 +86,7 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: colors.primary,
+              backgroundColor: "#FFFFFF",
               top: 0,
               left: 0,
             },

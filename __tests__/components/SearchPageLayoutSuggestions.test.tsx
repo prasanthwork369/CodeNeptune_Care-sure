@@ -17,7 +17,7 @@ jest.mock("@/src/hooks/ui/useIsOffline", () => ({
 }));
 
 jest.mock("@/src/features/cart/hooks/useCartRead", () => ({
-  useCartRead: () => ({ totalItems: 0 }),
+  useCartRead: () => ({ totalItems: 0, cartLineCount: 0 }),
 }));
 
 jest.mock("@/src/services/firebase", () => ({

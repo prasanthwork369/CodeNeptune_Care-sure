@@ -60,7 +60,7 @@ export const ProductComparisonLayout: React.FC<
     loading: isLoading,
   });
   const { appContent, isLoading: isHomeLoading } = useHome();
-  const { items: cartItems, totalItems: cartCount } = useCartRead();
+  const { items: cartItems, cartLineCount: cartCount } = useCartRead();
   const storePincode = useLocationStore((s) => s.pincode);
 
   const recMedicineId = recommendation?.id ?? raw?.id;

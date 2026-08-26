@@ -47,17 +47,24 @@ export const useCartRead = () => {
     return { totalItems: count, totalPrice: price };
   }, [items]);
 
+  // Each entry in `items` is already a unique cart line (one per
+  // medicine+variant — add-to-cart merges into the matching line instead of
+  // duplicating it), so the line/variant count is just how many there are.
+  const cartLineCount = items.length;
+
   return {
     cart: activeCart,
     items,
     totalItems,
+    cartLineCount,
     totalPrice,
     isLoading: isAuthenticated ? isLoading : false,
   };
 };
 
 /**
- * Selects only the total item count from the cart for header badge display.
+ * Selects only the unique cart-line/variant count for header badge display
+ * (one per medicine+variant, not total unit quantity).
  */
 export const useCartCount = (): number => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -67,23 +74,12 @@ export const useCartCount = (): number => {
     queryFn: cartApi.getCart,
     enabled: isAuthenticated,
     staleTime: 10_000,
-    select: (cart) => {
-      let count = 0;
-      for (const item of cart?.items ?? []) {
-        count += item.quantity;
-      }
-      return count;
-    },
+    select: (cart) => cart?.items.length ?? 0,
   });
 
-  const guestCount = useCartPendingStore((s) => {
-    if (isAuthenticated) return 0;
-    let count = 0;
-    for (const item of s.guestCart.items) {
-      count += item.quantity;
-    }
-    return count;
-  });
+  const guestCount = useCartPendingStore((s) =>
+    isAuthenticated ? 0 : s.guestCart.items.length,
+  );
 
   return (isAuthenticated ? authCount : guestCount) ?? 0;
 };

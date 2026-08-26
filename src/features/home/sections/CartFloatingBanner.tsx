@@ -50,7 +50,7 @@ export const CartFloatingBanner = ({
   onInteractionChange,
 }: CartFloatingBannerProps) => {
   const [isClearing, setIsClearing] = useState(false);
-  const { totalItems: cartItems, items, clearCart } = useCart();
+  const { totalItems: cartItems, cartLineCount, items, clearCart } = useCart();
   const flyCtx = useFlyToCartSafe();
 
   // cartMutations writes the cart query cache via setQueryData the instant
@@ -128,22 +128,17 @@ export const CartFloatingBanner = ({
   // Sourced from the provider (not the cart) so the circles carry the
   // isRemoving/isPending flags that drive the puff and the fly landing.
   const visualCartImages = flyCtx?.visualCartImages ?? [];
-  const backThumb =
-    visualCartImages.length > 1
-      ? visualCartImages[visualCartImages.length - 2]
-      : null;
+  const hasMultipleImages = visualCartImages.length > 1;
+  const backThumb = hasMultipleImages
+    ? visualCartImages[visualCartImages.length - 2]
+    : null;
   const frontThumb = visualCartImages[visualCartImages.length - 1] ?? null;
-
-  // Quantity says two circles but only one product has a thumbnail (e.g. the
-  // same item bumped to qty 2) — repeat its image so the back slot reads as a
-  // stack instead of sitting empty.
-  const backImage = backThumb?.image ?? frontThumb?.image;
 
   // The pill clips its children, so the puff is drawn over it instead. Only one
   // thumbnail animates out at a time — find which slot it sits in.
   const isExiting = (t: VisualCartImage | null) =>
     !!t && (t.isRemoving || t.isBehindRemoving);
-  const frontOffset = totalItems > 1 ? exactScale(8) : 0;
+  const frontOffset = hasMultipleImages ? exactScale(8) : 0;
   const puffOffsetLeft = isExiting(frontThumb)
     ? frontOffset
     : isExiting(backThumb)
@@ -224,20 +219,18 @@ export const CartFloatingBanner = ({
                   onLayout={reportDestination}
                   className="justify-center"
                   style={{
-                    width: totalItems > 1 ? exactScale(52) : exactScale(44),
+                    width: hasMultipleImages ? exactScale(52) : exactScale(44),
                     height: exactScale(48),
                     marginRight: exactScale(12),
                   }}
                 >
-                  {/* Mirrors the category banner's ThumbnailItem: a thumbnail
-                      in flight stays hidden and reveals itself on landing. */}
-                  {totalItems > 1 && (
+                  {hasMultipleImages && backThumb && (
                     <CartBannerThumbnail
-                      key={backThumb?.id ?? "back-stacked"}
-                      image={backImage}
-                      isPending={backThumb?.isPending}
-                      isRemoving={backThumb?.isRemoving}
-                      isBehindRemoving={backThumb?.isBehindRemoving}
+                      key={backThumb.id}
+                      image={backThumb.image}
+                      isPending={backThumb.isPending}
+                      isRemoving={backThumb.isRemoving}
+                      isBehindRemoving={backThumb.isBehindRemoving}
                       absolute
                     />
                   )}
@@ -247,7 +240,7 @@ export const CartFloatingBanner = ({
                     isPending={frontThumb?.isPending}
                     isRemoving={frontThumb?.isRemoving}
                     isBehindRemoving={frontThumb?.isBehindRemoving}
-                    absolute={totalItems > 1}
+                    absolute={hasMultipleImages}
                     offsetLeft={frontOffset}
                   />
                 </View>
@@ -300,7 +293,8 @@ export const CartFloatingBanner = ({
                           itemCountAnimatedStyle,
                         ]}
                       >
-                        {totalItems} {totalItems === 1 ? "item" : "items"}
+                        {/* Unique cart lines, not summed quantity — matches the cart badge. */}
+                        {cartLineCount} {cartLineCount === 1 ? "item" : "items"}
                       </AnimatedText>
                     </Animated.View>
                   </Touchable>
@@ -367,7 +361,8 @@ export const CartFloatingBanner = ({
           <SmokePuff
             active
             center={CART_THUMB_SIZE / 2}
-            secondColor="#94A3B8"
+            firstColor="#22C55E"
+            secondColor="#86EFAC"
           />
         </View>
       )}

@@ -19,7 +19,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 export const FrequentOrdersLayout: React.FC = () => {
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { totalItems } = useCart();
+  const { cartLineCount } = useCart();
   const {
     data: frequentlyOrdered = [],
     isLoading,
@@ -108,7 +108,7 @@ export const FrequentOrdersLayout: React.FC = () => {
             >
               <icons.cart_svg width={24} height={24} fill="#222222" />
             </Touchable>
-            {totalItems > 0 && (
+            {cartLineCount > 0 && (
               <View
                 pointerEvents="none"
                 style={{
@@ -130,7 +130,7 @@ export const FrequentOrdersLayout: React.FC = () => {
                     color: "#fff",
                   }}
                 >
-                  {totalItems}
+                  {cartLineCount}
                 </Text>
               </View>
             )}

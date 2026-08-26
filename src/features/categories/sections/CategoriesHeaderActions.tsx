@@ -8,7 +8,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const CategoriesHeaderActions: React.FC = () => {
   const router = useNav();
-  const { totalItems } = useCartRead();
+  const { cartLineCount } = useCartRead();
 
   return (
     <View className="flex-row items-center" style={{ gap: exactScale(8) }}>
@@ -27,13 +27,13 @@ export const CategoriesHeaderActions: React.FC = () => {
         >
           <icons.cart_outline width={22} height={22} />
         </Touchable>
-        {totalItems > 0 && (
+        {cartLineCount > 0 && (
           <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C22923] items-center justify-center">
             <Text
               className="font-inter-bold text-white"
               style={{ fontSize: moderateScale(10) }}
             >
-              {totalItems}
+              {cartLineCount}
             </Text>
           </View>
         )}

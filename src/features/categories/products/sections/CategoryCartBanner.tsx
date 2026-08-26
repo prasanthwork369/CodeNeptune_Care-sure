@@ -35,9 +35,9 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
   const PILL_W = 250;
 
   // visualCartCount only drives the fly-animation timing (circle → pill
-  // expansion) — the displayed number always trusts the real cart total,
-  // same as CartFloatingBanner, so it can't drift or get stuck.
-  const { totalItems } = useCart();
+  // expansion) — the displayed number always trusts the real unique cart-line
+  // count, same as CartFloatingBanner, so it can't drift or get stuck.
+  const { cartLineCount } = useCart();
   const visualCartCount = ctx?.visualCartCount ?? 0;
   const visualCartImages = ctx?.visualCartImages ?? [];
   const bounceSharedValue = ctx?.bounceSharedValue ?? null;
@@ -48,10 +48,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
   const bannerWidth = useSharedValue(60); // starts as circle (60px)
   const textOpacity = useSharedValue(0);
   const chevronOpacity = useSharedValue(0);
-
-  // Only the most recently added item's thumbnail shows while the banner
-  // is still a circle; the full stack appears once it expands to a pill.
-  const [isExpanded, setIsExpanded] = React.useState(false);
 
   const wasVisible = useRef(false);
   const bannerRef = useRef<View>(null);
@@ -69,7 +65,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
       bannerWidth.value = 60;
       textOpacity.value = 0;
       chevronOpacity.value = 0;
-      setIsExpanded(false);
       opacity.value = withTiming(1, { duration: 160 });
 
       // Step 2: fly lands at 750ms → image visible in circle
@@ -79,7 +74,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
       if (resetTimer.current) clearTimeout(resetTimer.current);
       expansionTimer.current = setTimeout(() => {
         bannerWidth.value = withSpring(PILL_W, WIDTH_SPRING);
-        setIsExpanded(true);
         // Step 4: text fades in mid-expansion
         textOpacity.value = withDelay(240, withTiming(1, { duration: 200 }));
         // Step 5: chevron fades in last
@@ -106,7 +100,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
         bannerWidth.value = 60;
         textOpacity.value = 0;
         chevronOpacity.value = 0;
-        setIsExpanded(false);
       }, 700);
     }
   }, [visualCartCount, PILL_W]);
@@ -183,20 +176,16 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
         style={[
           pillStyle,
           {
-            height: 60,
+            height: exactScale(52),
             backgroundColor: "#0F7635",
             borderRadius: 999,
             overflow: "hidden",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.22,
-            shadowRadius: 8,
-            elevation: 6,
+            boxShadow: "0px 4px 16px 0px rgba(0, 0, 0, 0.2)",
           },
         ]}
       >
         <Touchable
-          activeOpacity={0.7}
+          activeOpacity={1}
           onPress={onPress}
           style={{
             width: "100%",
@@ -210,18 +199,16 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
           {/* Thumbnails — visible from the moment circle appears */}
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             {visualCartImages.length > 0 ? (
-              (isExpanded ? visualCartImages : visualCartImages.slice(-1)).map(
-                (item, index) => (
-                  <ThumbnailItem
-                    key={item.id}
-                    imgUrl={item.image}
-                    index={index}
-                    isPending={item.isPending}
-                    isRemoving={item.isRemoving}
-                    isBehindRemoving={item.isBehindRemoving}
-                  />
-                ),
-              )
+              visualCartImages.map((item, index) => (
+                <ThumbnailItem
+                  key={item.id}
+                  imgUrl={item.image}
+                  index={index}
+                  isPending={item.isPending}
+                  isRemoving={item.isRemoving}
+                  isBehindRemoving={item.isBehindRemoving}
+                />
+              ))
             ) : visualCartCount > 0 ? (
               <View
                 style={{
@@ -257,7 +244,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
             >
               View cart
             </Text>
-            <AnimatedCount count={totalItems} />
+            <AnimatedCount count={cartLineCount} />
           </Animated.View>
 
           {/* Chevron — fades in last */}

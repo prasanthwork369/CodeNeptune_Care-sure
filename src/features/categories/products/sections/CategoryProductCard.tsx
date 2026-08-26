@@ -52,7 +52,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
     if (product.productId) prefetchProduct(product.productId);
   }, [prefetchProduct, product.productId]);
 
-  const handleIncrement = async () => {
+  const handleAdd = async () => {
     // Only animate on a confirmed add: offline the increment refuses and a
     // fly-in would falsely show the item landing in the cart.
     const added = await increment();
@@ -108,7 +108,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
           {count === 0 ? (
             <Touchable
               activeOpacity={0.8}
-              onPress={handleIncrement}
+              onPress={handleAdd}
               disabled={isPending}
               style={{
                 width: CARD_BTN_W,
@@ -177,7 +177,7 @@ const CategoryProductCardBase: React.FC<CategoryProductCardProps> = ({
               </View>
 
               <Touchable
-                onPress={handleIncrement}
+                onPress={increment}
                 disabled={isPending}
                 style={{
                   width: CARD_BTN_SW,

@@ -32,7 +32,7 @@ const CategoryProductsContent: React.FC = () => {
   }>();
   const router = useNav();
   const adjustedBottom = useAdjustedBottomInset();
-  const { totalItems } = useCartRead();
+  const { totalItems, cartLineCount } = useCartRead();
   const { families } = useCategories();
 
   const resolvedFamilySlug =
@@ -100,13 +100,13 @@ const CategoryProductsContent: React.FC = () => {
               >
                 <icons.cart_outline width={22} height={22} />
               </Touchable>
-              {totalItems > 0 && (
+              {cartLineCount > 0 && (
                 <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C22923] items-center justify-center">
                   <Text
                     className="font-inter-bold text-white"
                     style={{ fontSize: moderateScale(10) }}
                   >
-                    {totalItems}
+                    {cartLineCount}
                   </Text>
                 </View>
               )}

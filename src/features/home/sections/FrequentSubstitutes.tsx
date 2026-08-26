@@ -276,7 +276,7 @@ const FrequentItem = React.memo(
               )}
             </View>
             <Touchable
-              onPress={disableCart ? undefined : handleAdd}
+              onPress={disableCart ? undefined : increment}
               disabled={isPending || disableCart}
               activeOpacity={0.7}
               style={{

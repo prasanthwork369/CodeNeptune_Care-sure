@@ -14,7 +14,7 @@ export const SmokePuff: React.FC<SmokePuffProps> = ({
   active,
   center = 18,
   firstColor = "#22C55E",
-  secondColor = "#F1F5F9",
+  secondColor = "#86EFAC",
 }) => {
   if (!active) return null;
 

@@ -287,7 +287,7 @@ const ProductCard = React.memo(
                   )}
                 </View>
                 <Touchable
-                  onPress={handleAdd}
+                  onPress={increment}
                   disabled={isPending}
                   activeOpacity={0.7}
                   className="w-9 h-9 items-center justify-center"

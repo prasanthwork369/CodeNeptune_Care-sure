@@ -38,7 +38,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> =
       requiresPrescription: product.requiresPrescription,
     },
   );
-  const { totalItems, totalPrice } = useCartRead();
+  const { cartLineCount, totalPrice } = useCartRead();
   const { slideAnim, opacityAnim } = animations;
   // Shared global CTA height for the counter and View Cart action.
   const FOOTER_CONTROL_HEIGHT = exactScale(50);
@@ -228,7 +228,7 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> =
                   { color: "rgba(255,255,255,0.75)" },
                 ]}
               >
-                {totalItems} Item{totalItems !== 1 ? "s" : ""}
+                {cartLineCount} Item{cartLineCount !== 1 ? "s" : ""}
               </Text>
             </View>
 
