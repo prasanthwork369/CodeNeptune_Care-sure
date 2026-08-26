@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { asError } from "@/src/api/errors";
 import { UpdateProfilePayload } from "../types";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
@@ -28,14 +29,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmailVerifyModal } from "../components/EmailVerifyModal";
-
-// Label shown to the user vs. value sent to the backend (kept in sync with
-// AddPatientLayout — "Prefer not to say" maps to the "OTHER" gender value).
-const GENDERS = [
-  { label: "Male", value: "MALE" },
-  { label: "Female", value: "FEMALE" },
-  { label: "Prefer not to say", value: "OTHER" },
-];
+import { GENDERS } from "../utils/profileForm.utils";
+import { useProfileFormState } from "../hooks/useProfileFormState";
 
 type ProfileEditFieldProps = {
   label: string;
@@ -165,13 +160,31 @@ export const MyProfileLayout: React.FC = () => {
     ? `${String(dob.getDate()).padStart(2, "0")}-${String(dob.getMonth() + 1).padStart(2, "0")}-${dob.getFullYear()}`
     : "";
 
+  const {
+    normalizedFirstName,
+    normalizedLastName,
+    normalizedEmail,
+    normalizedGender,
+    hasChanges,
+    isSaveDisabled,
+  } = useProfileFormState({
+    firstName,
+    lastName,
+    email,
+    gender,
+    dob,
+    profile,
+    updating,
+    isOffline,
+  });
+
   // Show the "Verified" badge only while the field still holds the exact
   // address that was verified. Once the user edits the email it's a new,
   // unverified address, so the Verify button must re-enable.
   const isCurrentEmailVerified =
     !!profile?.isEmailVerified &&
-    !!email.trim() &&
-    email.trim().toLowerCase() === (profile.email ?? "").trim().toLowerCase();
+    !!normalizedEmail &&
+    normalizedEmail.toLowerCase() === (profile.email ?? "").trim().toLowerCase();
 
   // Dismiss the keyboard first so it doesn't stay open over the gender sheet
   // when a text field (name/email) was focused.
@@ -181,12 +194,13 @@ export const MyProfileLayout: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (isSaveDisabled) return;
     try {
       const payload: UpdateProfilePayload = {};
-      if (firstName.trim()) payload.firstName = firstName.trim();
-      if (lastName.trim()) payload.lastName = lastName.trim();
-      payload.email = email.trim();
-      if (gender) payload.gender = gender;
+      if (normalizedFirstName) payload.firstName = normalizedFirstName;
+      if (normalizedLastName) payload.lastName = normalizedLastName;
+      payload.email = normalizedEmail;
+      if (normalizedGender) payload.gender = normalizedGender;
 
       if (dob) {
         const dobValidation = validateDob(dob.toISOString());
@@ -249,25 +263,9 @@ export const MyProfileLayout: React.FC = () => {
   // actual deletion (and the "lose access to" details from the design).
   const handleDeleteAccount = () => router.push("/profile/delete-account");
 
-  const profileGender = profile?.gender?.toUpperCase() ?? "";
-  const currentDob = dob ? dob.toISOString().slice(0, 10) : "";
-  const initialDob = profile?.dateOfBirth
-    ? new Date(profile.dateOfBirth).toISOString().slice(0, 10)
-    : "";
-  const isDirty =
-    !!profile &&
-    (firstName !== (profile.firstName ?? "") ||
-      lastName !== (profile.lastName ?? "") ||
-      email !== (profile.email ?? "") ||
-      gender !==
-        (GENDERS.some((item) => item.value === profileGender)
-          ? profileGender
-          : "") ||
-      currentDob !== initialDob);
-
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
-      <UnsavedChangesGuard hasUnsavedChanges={!saveCompleted && isDirty} />
+      <UnsavedChangesGuard hasUnsavedChanges={!saveCompleted && hasChanges} />
       <ScreenHeader title="My Profile" backgroundColor="#FFFFFF" showBorder />
 
       <ScrollView
@@ -515,8 +513,9 @@ export const MyProfileLayout: React.FC = () => {
           style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12 }}
         >
           <Touchable
+            testID="save-profile-btn"
             onPress={handleSave}
-            disabled={updating || isOffline}
+            disabled={isSaveDisabled}
             activeOpacity={0.85}
             style={{
               backgroundColor: "#0F7635",
@@ -524,7 +523,7 @@ export const MyProfileLayout: React.FC = () => {
               height: 52,
               alignItems: "center",
               justifyContent: "center",
-              opacity: updating || isOffline ? 0.5 : 1,
+              opacity: isSaveDisabled ? 0.5 : 1,
             }}
           >
             {updating ? (
@@ -569,7 +568,7 @@ export const MyProfileLayout: React.FC = () => {
           >
             Select Gender
           </Text>
-          {GENDERS.map((g, i) => (
+          {GENDERS.map((g) => (
             <Touchable
               key={g.value}
               onPress={() => {
@@ -582,8 +581,6 @@ export const MyProfileLayout: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 paddingVertical: 14,
-                borderBottomWidth: i < GENDERS.length - 1 ? 1 : 0,
-                borderBottomColor: "#F3F4F6",
               }}
             >
               <Text
