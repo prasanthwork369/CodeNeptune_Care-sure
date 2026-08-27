@@ -10,10 +10,14 @@ export interface NetworkStatus {
   isInternetReachable: boolean | null;
   /** Connected to a network that can't reach the internet. */
   isLowNetwork: boolean;
+  /** True once the initial NetInfo check resolves on cold launch. */
+  isInitialized: boolean;
+  /** True if this app process started offline and has not yet established a live connection. */
+  coldLaunchOffline: boolean;
 }
 
 /**
- * The React-facing view of connectivity. Selects the two primitives rather than
+ * The React-facing view of connectivity. Selects the primitives rather than
  * the store object, so a component only re-renders when connectivity flips.
  *
  * Use this for rendering (disabled buttons, offline states). For an action's
@@ -23,6 +27,8 @@ export interface NetworkStatus {
 export function useNetworkStatus(): NetworkStatus {
   const isConnected = useNetworkStore((s) => s.isConnected);
   const isInternetReachable = useNetworkStore((s) => s.isInternetReachable);
+  const isInitialized = useNetworkStore((s) => s.isInitialized);
+  const coldLaunchOffline = useNetworkStore((s) => s.coldLaunchOffline);
 
   return useMemo(() => {
     const offline = isConnected === false || isInternetReachable === false;
@@ -32,6 +38,8 @@ export function useNetworkStatus(): NetworkStatus {
       isConnected,
       isInternetReachable,
       isLowNetwork: isConnected === true && isInternetReachable === false,
+      isInitialized,
+      coldLaunchOffline,
     };
-  }, [isConnected, isInternetReachable]);
+  }, [isConnected, isInternetReachable, isInitialized, coldLaunchOffline]);
 }

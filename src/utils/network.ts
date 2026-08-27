@@ -10,6 +10,13 @@ import { requestQueue } from "./requestQueue";
 export const initNetworkListener = (axiosInstance: AxiosInstance) => {
   requestQueue.loadFromStorage();
 
+  // Eagerly resolve initial state so cold launch status is known immediately
+  NetInfo.fetch().then((state) => {
+    useNetworkStore
+      .getState()
+      .setIsConnected(state.isConnected, state.isInternetReachable);
+  });
+
   return NetInfo.addEventListener((state) => {
     const isConnected = state.isConnected;
     const isInternetReachable = state.isInternetReachable;

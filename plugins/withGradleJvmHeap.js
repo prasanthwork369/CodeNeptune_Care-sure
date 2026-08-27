@@ -20,6 +20,21 @@ module.exports = function withGradleJvmHeap(config) {
         value: JVM_ARGS_VALUE,
       });
     }
+
+    // Ensure Kotlin compiler compiles in-process to avoid daemon classloader NoClassDefFoundError
+    const kotlinStrategyKey = "kotlin.compiler.execution.strategy";
+    const existingStrategy = cfg.modResults.find(
+      (item) => item.type === "property" && item.key === kotlinStrategyKey,
+    );
+    if (existingStrategy) {
+      existingStrategy.value = "in-process";
+    } else {
+      cfg.modResults.push({
+        type: "property",
+        key: kotlinStrategyKey,
+        value: "in-process",
+      });
+    }
     return cfg;
   });
 };

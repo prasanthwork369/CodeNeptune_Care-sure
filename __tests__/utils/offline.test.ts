@@ -241,3 +241,70 @@ describe("toAppError — standardized transport failures", () => {
     ).toBe("network");
   });
 });
+
+describe("cold-launch vs runtime offline lifecycle", () => {
+  it("marks coldLaunchOffline true when initial NetInfo report is offline", () => {
+    useNetworkStore.setState({
+      isConnected: null,
+      isInternetReachable: null,
+      isInitialized: false,
+      coldLaunchOffline: false,
+    });
+
+    useNetworkStore.getState().setIsConnected(false, false);
+
+    expect(useNetworkStore.getState().isInitialized).toBe(true);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(true);
+  });
+
+  it("marks coldLaunchOffline false when initial NetInfo report is online", () => {
+    useNetworkStore.setState({
+      isConnected: null,
+      isInternetReachable: null,
+      isInitialized: false,
+      coldLaunchOffline: false,
+    });
+
+    useNetworkStore.getState().setIsConnected(true, true);
+
+    expect(useNetworkStore.getState().isInitialized).toBe(true);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(false);
+  });
+
+  it("retains coldLaunchOffline false when network disconnects at runtime", () => {
+    // App started online
+    useNetworkStore.setState({
+      isConnected: null,
+      isInternetReachable: null,
+      isInitialized: false,
+      coldLaunchOffline: false,
+    });
+    useNetworkStore.getState().setIsConnected(true, true);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(false);
+
+    // Later goes offline
+    useNetworkStore.getState().setIsConnected(false, false);
+    expect(useNetworkStore.getState().isInitialized).toBe(true);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(false);
+  });
+
+  it("clears coldLaunchOffline when device reconnects after a cold launch offline", () => {
+    // Started offline
+    useNetworkStore.setState({
+      isConnected: null,
+      isInternetReachable: null,
+      isInitialized: false,
+      coldLaunchOffline: false,
+    });
+    useNetworkStore.getState().setIsConnected(false, false);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(true);
+
+    // Reconnected
+    useNetworkStore.getState().setIsConnected(true, true);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(false);
+
+    // Then went offline again in the same session
+    useNetworkStore.getState().setIsConnected(false, false);
+    expect(useNetworkStore.getState().coldLaunchOffline).toBe(false);
+  });
+});

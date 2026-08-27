@@ -178,7 +178,9 @@ export const PreviewLayout: React.FC = () => {
       router.dismissAll();
       router.replace("/(prescription)/choose-method");
     } else {
-      router.replace("/(tabs)/upload");
+      // dismissTo pops back to the already-mounted (tabs) instance and its
+      // upload tab rather than replacing into a duplicate (tabs) root stack entry.
+      router.dismissTo("/(tabs)/upload");
     }
   }, [router, source]);
 
@@ -494,7 +496,7 @@ export const PreviewLayout: React.FC = () => {
         onNotify={() => {
           useUIStore.getState().setHasJustUploadedPrescription(true);
           useUIStore.getState().setIsRxFromCartFlow(false);
-          router.replace("/(tabs)");
+          router.dismissTo("/(tabs)");
           // Cleared after navigation for the same reason as the order flow above.
           clearItems();
         }}

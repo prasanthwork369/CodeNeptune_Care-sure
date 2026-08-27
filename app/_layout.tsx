@@ -44,6 +44,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
 import { requestQueue } from "@/src/utils/requestQueue";
+import { useNetworkStore } from "@/src/store/useNetworkStore";
 import "../global.css";
 
 /** Expo Router setting to ensure a cold-started deep link has the home route in its navigation stack history. */
@@ -225,8 +226,11 @@ export default function RootLayout() {
     SplashScreen.hideAsync();
   }, []);
 
+  const isNetworkInitialized = useNetworkStore((s) => s.isInitialized);
+
   // Render app tree underneath the splash curtain to avoid white mount flashes
-  const showSplash = !isAnimationDone || !isAuthLoaded;
+  const showSplash =
+    !isAnimationDone || !isAuthLoaded || !isNetworkInitialized;
 
   usePerformanceTrace({
     traceName: PERF_TRACES.APP_LAUNCH,
@@ -292,7 +296,7 @@ export default function RootLayout() {
                     pointerEvents="box-only"
                   >
                     <SplashAnimationScreen
-                      isAppReady={isAuthLoaded}
+                      isAppReady={isAuthLoaded && isNetworkInitialized}
                       onComplete={() => setIsAnimationDone(true)}
                     />
                   </View>

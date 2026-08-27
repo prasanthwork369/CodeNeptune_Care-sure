@@ -36,6 +36,7 @@ import { useCartRead } from "@/src/features/cart/hooks/useCartRead";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useContactActions } from "@/src/features/support/hooks/useContactActions";
 import { useSettings } from "@/src/hooks/queries/useSettings";
+import { useNetworkStatus } from "@/src/hooks/system/useNetworkStatus";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
 import { useSlideUp } from "@/src/hooks/ui/useSlideUp";
@@ -137,6 +138,7 @@ const HomeContent: React.FC = () => {
     isRefreshing,
     onRefresh,
   } = useHomeData();
+  const { isOffline, coldLaunchOffline } = useNetworkStatus();
   const errorState = useQueryErrorState(error);
 
   const { data: settings } = useSettings();
@@ -611,6 +613,18 @@ const HomeContent: React.FC = () => {
     !appContent &&
     featuredProducts.length === 0 &&
     featuredSubcategories.length === 0;
+
+  // Cold launch started offline: do not display stale cached content, show full NoInternetState
+  if (coldLaunchOffline && isOffline) {
+    return (
+      <View className="flex-1 bg-white">
+        <NoInternetState
+          onRetry={() => void onRefresh()}
+          retrying={isRefreshing}
+        />
+      </View>
+    );
+  }
 
   // Only when the SQLite seed left nothing to show either — a failed refresh
   // over cached sections keeps them on screen, with the global banner explaining
