@@ -1,21 +1,24 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
 import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
-import { useScrollStatusBar } from "@/src/hooks/ui/useScrollStatusBar";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useAuthStore } from "@/src/store/authStore";
-import { armSettingsReturn } from "@/src/store/lastRouteStore";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
+import { armSettingsReturn } from "@/src/store/lastRouteStore";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Linking, RefreshControl, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
+  useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { requireInternet } from "@/src/utils/offline";
 import { LogoutConfirmModal } from "../components/LogoutConfirmModal";
 import { ProfileSkeleton } from "../components/ProfileSkeleton";
 import {
@@ -28,8 +31,10 @@ import {
 import UploadBottomSheet from "../sections/UploadBottomSheet";
 
 export const ProfileLayout: React.FC = () => {
+  const isOffline = useIsOffline();
   const insets = useSafeAreaInsets();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
   const { logout, loading: isLoggingOut } = useAuth();
   const {
     profile,
@@ -48,8 +53,7 @@ export const ProfileLayout: React.FC = () => {
   const [localAvatar, setLocalAvatar] = useState<string | null>(null);
   const scrollY = useSharedValue(0);
   const headerHeightShared = useSharedValue(0);
-  const { safeAreaBgStyle } = useScrollStatusBar(scrollY, headerHeightShared);
-  const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
+
   // Runs on the UI thread so the status-bar fade never lags behind a fast fling.
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (e) => {
@@ -57,7 +61,32 @@ export const ProfileLayout: React.FC = () => {
     },
   });
 
+  const safeAreaBgStyle = useAnimatedStyle(() => {
+    const threshold = headerHeightShared.value > 0 ? headerHeightShared.value : 200;
+    const shouldShow = scrollY.value >= threshold;
+    return {
+      opacity: shouldShow ? 1 : 0,
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      height: insets.top + 8.5,
+      zIndex: 101,
+    };
+  });
+
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+
+  if (isOffline) {
+    return (
+      <View className="flex-1 bg-white">
+        <NoInternetState
+          onRetry={() => void refreshProfile()}
+          retrying={refreshing}
+        />
+      </View>
+    );
+  }
 
   const uploadUri = async (uri: string) => {
     setLocalAvatar(uri);
@@ -200,7 +229,12 @@ export const ProfileLayout: React.FC = () => {
           onPress={() => setShowUpdateSheet(true)}
         />
 
-        <ProfileInfoList onLogout={() => setShowLogoutModal(true)} />
+        <ProfileInfoList
+          onLogout={() => {
+            if (!requireInternet({ critical: true })) return;
+            setShowLogoutModal(true);
+          }}
+        />
       </Animated.ScrollView>
 
       {/* Same prompt the app shows automatically; opening it from the row
@@ -216,7 +250,13 @@ export const ProfileLayout: React.FC = () => {
         isVisible={showLogoutModal}
         isLoggingOut={isLoggingOut}
         onCancel={() => setShowLogoutModal(false)}
-        onConfirm={logout}
+        onConfirm={() => {
+          if (!requireInternet({ critical: true })) {
+            setShowLogoutModal(false);
+            return;
+          }
+          logout();
+        }}
       />
 
       <UploadBottomSheet

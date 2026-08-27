@@ -1,5 +1,7 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
@@ -25,6 +27,7 @@ const formatPhoneNumber = (rawPhone: string) => {
  * Delegates all lifecycle effects, timers, SMS integrations, and mutation actions to `useOtp`.
  */
 export const OtpLayout: React.FC = () => {
+  const isOffline = useIsOffline();
   const {
     router,
     phone,
@@ -42,6 +45,14 @@ export const OtpLayout: React.FC = () => {
     handleOtpChange,
     handleVerify,
   } = useOtp();
+
+  if (isOffline) {
+    return (
+      <View className="flex-1 bg-white">
+        <NoInternetState onRetry={() => {}} />
+      </View>
+    );
+  }
 
   return (
     // Skip is left to AuthScreenShell's default — it already replaces to /(tabs).

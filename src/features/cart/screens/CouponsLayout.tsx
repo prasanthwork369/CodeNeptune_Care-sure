@@ -215,13 +215,10 @@ export const CouponsLayout: React.FC = () => {
             const isApplied =
               applied?.code?.trim().toUpperCase() ===
               coupon.code?.trim().toUpperCase();
-            // Failed pre-validation despite meeting the min order
-            // (e.g. usage limit reached) → show inactive. The
-            // min-order case is already covered by `disabled`.
+            // Failed pre-validation (e.g. usage limit reached) → show inactive.
+            // Decoupled from subtotal so already-used coupons always read USED.
             const isUnavailable =
-              !isApplied &&
-              subtotal >= coupon.minOrderValue &&
-              unavailable.has(coupon.code);
+              !isApplied && unavailable.has(coupon.code);
             const isCardValidating =
               validatingCode !== null &&
               validatingCode === coupon.code.toUpperCase();

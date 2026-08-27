@@ -1,3 +1,5 @@
+import { NoInternetState } from "@/src/components/ui/NoInternetState";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useAuthStore } from "@/src/store/authStore";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
@@ -14,6 +16,7 @@ import { styles as s } from "./LoginLayout.styles";
  * Delegates all state, side effects, validation, and mutations to the `useLogin` hook.
  */
 export const LoginLayout: React.FC = () => {
+  const isOffline = useIsOffline();
   const {
     phoneNumber,
     phoneError,
@@ -48,6 +51,14 @@ export const LoginLayout: React.FC = () => {
       return () => subscription.remove();
     }, []),
   );
+
+  if (isOffline) {
+    return (
+      <View className="flex-1 bg-white">
+        <NoInternetState onRetry={() => {}} />
+      </View>
+    );
+  }
 
   return (
     // Skip is left to AuthScreenShell's default — it already replaces to /(tabs).

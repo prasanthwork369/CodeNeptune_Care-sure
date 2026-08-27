@@ -25,13 +25,13 @@ export const computeCouponDiscount = (coupon: Coupon, amount: number) => {
   return coupon.discountValue;
 };
 
-// Pre-validation runs at the current subtotal, so a coupon below its minimum fails for that reason
-// alone -- only trust the rejection once the minimum is actually met, exactly as the coupons screen does.
+// Codes the backend already rejected (usage limit reached, expired)
+// must never be recommended or upsold, regardless of the cart subtotal.
 const isRejected = (
   coupon: Coupon,
-  subtotal: number,
+  _subtotal: number,
   unavailableCodes?: ReadonlySet<string>,
-) => subtotal >= coupon.minOrderValue && !!unavailableCodes?.has(coupon.code);
+) => !!unavailableCodes?.has(coupon.code);
 
 // Picks the coupon worth showing on the cart for this exact subtotal.
 // Scoring each coupon at its own minOrderValue used to make the biggest locked coupon always win.

@@ -300,7 +300,7 @@ export const PreviewLayout: React.FC = () => {
       const fileData = uploadedSnapshot.current.map((item, i) => ({
         url: uploadedUrls[i],
         name: item.name,
-        size: item.size != null ? String(item.size) : undefined,
+        size: item.size,
       }));
       const result = await prescriptionService.upload({
         fileData,

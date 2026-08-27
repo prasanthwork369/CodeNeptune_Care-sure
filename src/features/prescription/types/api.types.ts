@@ -60,7 +60,7 @@ export interface PrescriptionListParams {
 
 export interface FileData {
   name?: string;
-  size?: string;
+  size?: number;
   url?: string;
 }
 

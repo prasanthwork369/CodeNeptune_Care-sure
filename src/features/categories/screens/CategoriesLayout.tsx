@@ -3,7 +3,7 @@ import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
@@ -13,10 +13,6 @@ import {
   CategoriesGrid,
   CategoriesHeaderActions,
 } from "@/src/features/categories/sections";
-import {
-  CARD_HEIGHT,
-  CARD_WIDTH,
-} from "@/src/features/categories/categories.styles";
 
 const SIDEBAR_WIDTH = exactScale(80);
 const GRID_PADDING = exactScale(12);
@@ -41,22 +37,11 @@ export const CategoriesLayout: React.FC = () => {
     loading: isLoading,
   });
 
-  useEffect(() => {
-    if (tabs.length > 0 && !activeTabId) {
-      setActiveTabId(tabs[0].id);
-    }
-  }, [tabs]);
-
-  const activeCards = cards.filter((card) => card.tabId === activeTabId);
+  const effectiveTabId = activeTabId || tabs[0]?.id || "";
+  const activeCards = cards.filter((card) => card.tabId === effectiveTabId);
 
   return (
     <View className="flex-1 bg-white">
-      <ScreenHeader
-        title="Categories"
-        showBorder
-        rightSlot={<CategoriesHeaderActions />}
-      />
-
       {liveState ? (
         liveState === "offline" ? (
           <NoInternetState
@@ -67,26 +52,33 @@ export const CategoriesLayout: React.FC = () => {
           <RetryState onRetry={() => void refetch()} retrying={isFetching} />
         )
       ) : (
-        <View className="flex-1 flex-row">
-          <CategoriesSidebar
-            tabs={tabs}
-            activeTabId={activeTabId}
-            onTabPress={setActiveTabId}
-            width={SIDEBAR_WIDTH}
-            safeAreaBottom={adjustedBottom}
-            isLoading={isLoading}
+        <>
+          <ScreenHeader
+            title="Categories"
+            showBorder
+            rightSlot={<CategoriesHeaderActions />}
           />
+          <View className="flex-1 flex-row">
+            <CategoriesSidebar
+              tabs={tabs}
+              activeTabId={effectiveTabId}
+              onTabPress={setActiveTabId}
+              width={SIDEBAR_WIDTH}
+              safeAreaBottom={adjustedBottom}
+              isLoading={isLoading}
+            />
 
-          <CategoriesGrid
-            key={activeTabId}
-            cards={activeCards}
-            cardWidth={cardWidth}
-            cardHeight={cardHeight}
-            padding={GRID_PADDING}
-            safeAreaBottom={adjustedBottom}
-            isLoading={isLoading}
-          />
-        </View>
+            <CategoriesGrid
+              key={effectiveTabId}
+              cards={activeCards}
+              cardWidth={cardWidth}
+              cardHeight={cardHeight}
+              padding={GRID_PADDING}
+              safeAreaBottom={adjustedBottom}
+              isLoading={isLoading}
+            />
+          </View>
+        </>
       )}
     </View>
   );

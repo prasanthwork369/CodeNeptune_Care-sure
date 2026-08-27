@@ -138,20 +138,28 @@ describe("selectCartCoupon", () => {
     expect(selectCartCoupon([a, b], 1000, new Set(["A", "B"]))).toBeNull();
   });
 
-  // Pre-validation runs at the current subtotal, so a below-minimum coupon always comes back
-  // invalid. Honouring that would hide every locked coupon -- the card showed then vanished.
-  it("keeps a below-minimum coupon even when pre-validation rejected it", () => {
-    const near = coupon({
-      code: "NEAR",
+  // A used-up coupon must be skipped across all subtotals, including below minimum.
+  it("skips a used-up coupon even when below its minimum and picks next eligible", () => {
+    const usedNear = coupon({
+      code: "USED_NEAR",
       discountValue: 30,
       minOrderValue: 300,
     });
+    const usableFar = coupon({
+      code: "USABLE_FAR",
+      discountValue: 50,
+      minOrderValue: 500,
+    });
 
-    const pick = selectCartCoupon([near], 250, new Set(["NEAR"]));
+    const pick = selectCartCoupon(
+      [usedNear, usableFar],
+      250,
+      new Set(["USED_NEAR"]),
+    );
 
-    expect(pick?.coupon.code).toBe("NEAR");
+    expect(pick?.coupon.code).toBe("USABLE_FAR");
     expect(pick?.isLocked).toBe(true);
-    expect(pick?.remaining).toBe(50);
+    expect(pick?.remaining).toBe(250);
   });
 
   it("prefers the lower threshold when savings tie", () => {
@@ -213,14 +221,16 @@ describe("selectNextCouponUpsell", () => {
     expect(selectNextCouponUpsell(all, 200, current)).toBeNull();
   });
 
-  // GET50 sits above the subtotal, so its rejection only means "minimum not met" and must be ignored.
-  it("still nudges toward a coupon rejected only for being below its minimum", () => {
+  // F. Used coupon below minimum must NOT be selected/recommended as an upsell.
+  it("never nudges toward a used-up coupon even when below its minimum", () => {
     const all = [applied, next, far];
     const current = selectCartCoupon(all, 200, new Set(["GET50"]));
 
     const up = selectNextCouponUpsell(all, 200, current, new Set(["GET50"]));
 
-    expect(up?.coupon.code).toBe("GET50");
+    // GET50 is used-up, so it must be skipped and GET200 recommended instead
+    expect(up?.coupon.code).toBe("GET200");
+    expect(up?.gap).toBe(700);
   });
 
   it("skips a coupon genuinely rejected at a met minimum", () => {
