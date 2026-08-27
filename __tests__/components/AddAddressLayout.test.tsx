@@ -7,6 +7,7 @@ import {
 import { AddAddressLayout } from "@/src/features/profile/screens/AddAddressLayout";
 import { useAddress } from "@/src/features/profile/hooks/useAddress";
 import { useAuthStore } from "@/src/store/authStore";
+import { useLocalSearchParams } from "expo-router";
 
 jest.mock("@/src/components/ui/UnsavedChangesGuard", () => ({
   UnsavedChangesGuard: () => null,
@@ -20,8 +21,9 @@ jest.mock("@/src/hooks/useNav", () => ({
 }));
 
 jest.mock("expo-router", () => ({
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: jest.fn(() => ({})),
 }));
+const mockUseLocalSearchParams = useLocalSearchParams as jest.Mock;
 
 jest.mock("@/src/features/profile/hooks/useAddress");
 const mockUseAddress = useAddress as jest.MockedFunction<typeof useAddress>;
@@ -32,6 +34,7 @@ describe("AddAddressLayout Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseLocalSearchParams.mockReturnValue({});
     useAuthStore.setState({
       user: {
         id: "user-1",
@@ -109,6 +112,54 @@ describe("AddAddressLayout Component", () => {
         }),
       );
       expect(mockBack).toHaveBeenCalled();
+    });
+  });
+
+  it("keeps Save Changes disabled in edit mode until a field actually changes", async () => {
+    mockUseLocalSearchParams.mockReturnValue({ id: "addr-1" });
+    mockUseAddress.mockReturnValue({
+      addresses: [
+        {
+          id: "addr-1",
+          label: "HOME",
+          name: "Jane Smith",
+          phone: "9876543210",
+          line1: "Flat 4B",
+          line2: "",
+          city: "Mumbai",
+          state: "Maharashtra",
+          pincode: "400001",
+          isDefault: true,
+        },
+      ],
+      addAddress: addAddressMock,
+      updateAddress: updateAddressMock.mockResolvedValue(undefined),
+      submitting: false,
+      error: null,
+    } as any);
+
+    const { getByPlaceholderText, getByText } = renderWithProviders(
+      <AddAddressLayout />,
+    );
+
+    const saveBtn = getByText("Save Changes  →");
+
+    // Untouched: nothing changed since load.
+    fireEvent.press(saveBtn);
+    expect(updateAddressMock).not.toHaveBeenCalled();
+
+    // Trimmed-equal edit: trailing whitespace isn't a real change.
+    fireEvent.changeText(getByPlaceholderText("Enter Full Name"), "Jane Smith ");
+    fireEvent.press(saveBtn);
+    expect(updateAddressMock).not.toHaveBeenCalled();
+
+    // A real change enables the button.
+    fireEvent.changeText(getByPlaceholderText("Enter Full Name"), "Jane Doe");
+    fireEvent.press(saveBtn);
+    await waitFor(() => {
+      expect(updateAddressMock).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "addr-1", name: "Jane Doe" }),
+      );
     });
   });
 });

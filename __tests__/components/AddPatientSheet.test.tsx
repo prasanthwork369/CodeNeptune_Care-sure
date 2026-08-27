@@ -87,3 +87,57 @@ describe("AddPatientSheet field sizing", () => {
     expect(style.height).toBe(52);
   });
 });
+
+describe("AddPatientSheet save gating", () => {
+  const editPatient = {
+    id: "member-1",
+    name: "Jane Smith",
+    phone: "+919876543210",
+    dateOfBirth: "1990-05-15",
+    relationship: "Wife",
+    gender: "FEMALE",
+  };
+
+  it("disables Add Patient until all required fields are filled", () => {
+    const onAdd = jest.fn().mockResolvedValue(undefined);
+    const { getByText, getByPlaceholderText } = renderWithProviders(
+      <AddPatientSheet isVisible onClose={jest.fn()} onAdd={onAdd} />,
+    );
+
+    const submitBtn = getByText("Add Patient");
+    fireEvent.press(submitBtn);
+    expect(onAdd).not.toHaveBeenCalled();
+
+    fireEvent.changeText(
+      getByPlaceholderText("Enter the name"),
+      "New Patient",
+    );
+    fireEvent.press(submitBtn);
+    expect(onAdd).not.toHaveBeenCalled();
+  });
+
+  it("keeps Save Changes disabled in edit mode until a field actually changes", async () => {
+    const onEdit = jest.fn().mockResolvedValue(undefined);
+    const { getByText, getByPlaceholderText } = renderWithProviders(
+      <AddPatientSheet
+        isVisible
+        onClose={jest.fn()}
+        onAdd={jest.fn()}
+        editPatient={editPatient as any}
+        onEdit={onEdit}
+      />,
+    );
+
+    const saveBtn = getByText("Save Changes");
+
+    fireEvent.press(saveBtn);
+    expect(onEdit).not.toHaveBeenCalled();
+
+    fireEvent.changeText(getByPlaceholderText("Enter the name"), "Jane Doe");
+    fireEvent.press(saveBtn);
+    expect(onEdit).toHaveBeenCalledWith(
+      "member-1",
+      expect.objectContaining({ name: "Jane Doe" }),
+    );
+  });
+});

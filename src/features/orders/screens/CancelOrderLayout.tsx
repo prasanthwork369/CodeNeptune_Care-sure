@@ -1,13 +1,13 @@
 import type { CancellationReason } from "@/src/features/orders/api/cancellation-reason.api";
 import { orderApi } from "@/src/features/orders/api/order.api";
 import { AlertDialog } from "@/src/components/ui/AlertDialog";
+import { ConfirmActionModal } from "@/src/features/profile/components/ConfirmActionModal";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { useCancellationReasons } from "@/src/features/orders/hooks/useCancellationReasons";
 import { useOrderById } from "@/src/features/orders/hooks/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { useNav } from "@/src/hooks/useNav";
 import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { useQueryClient } from "@tanstack/react-query";
@@ -42,7 +42,6 @@ type DisplayReason =
     };
 
 export function CancelOrderLayout() {
-  const router = useNav();
   const queryClient = useQueryClient();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const bottomInset = useAdjustedBottomInset();
@@ -59,11 +58,11 @@ export function CancelOrderLayout() {
   const [otherReason, setOtherReason] = useState("");
   const [error, setError] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [alertState, setAlertState] = useState<{
     visible: boolean;
     icon: "check-green" | "delete";
     title: string;
-    onClose?: () => void;
   }>({
     visible: false,
     icon: "check-green",
@@ -72,6 +71,9 @@ export function CancelOrderLayout() {
 
   const isOtherSelected = selectedReasonId === OTHER_OPTION;
   const selectedReason = reasons.find((r) => r.id === selectedReasonId);
+  const hasValidReason = isOtherSelected
+    ? !!otherReason.trim()
+    : !!selectedReason;
 
   const orderNumber = formatOrderId(order?.orderId || orderId);
   const itemsCount = order?.items?.length ?? 0;
@@ -86,12 +88,10 @@ export function CancelOrderLayout() {
   };
 
   const closeAlert = () => {
-    const onClose = alertState.onClose;
-    setAlertState((prev) => ({ ...prev, visible: false, onClose: undefined }));
-    onClose?.();
+    setAlertState((prev) => ({ ...prev, visible: false }));
   };
 
-  const handleConfirm = async () => {
+  const handleCancelPress = () => {
     const finalReason = isOtherSelected
       ? otherReason.trim()
       : selectedReason?.label;
@@ -104,7 +104,14 @@ export function CancelOrderLayout() {
       return;
     }
     setError("");
-    if (!orderId) return;
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirm = async () => {
+    const finalReason = isOtherSelected
+      ? otherReason.trim()
+      : selectedReason?.label;
+    if (!finalReason || !orderId) return;
     // Critical: a cancellation the user believes succeeded but never reached
     // the server is worse than a blocking notice.
     if (!requireInternet({ critical: true })) return;
@@ -122,9 +129,6 @@ export function CancelOrderLayout() {
         visible: true,
         icon: "check-green",
         title: "Order cancelled successfully!",
-        onClose: () => {
-          setTimeout(() => router.back(), 500);
-        },
       });
     } catch (err) {
       if (__DEV__) console.error("[CancelOrder]", err);
@@ -135,6 +139,7 @@ export function CancelOrderLayout() {
       });
     } finally {
       setIsCancelling(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -442,9 +447,10 @@ export function CancelOrderLayout() {
         }}
       >
         <Touchable
-          onPress={handleConfirm}
+          testID="cancel-order-submit"
+          onPress={handleCancelPress}
           activeOpacity={0.85}
-          disabled={isCancelling}
+          disabled={isCancelling || !hasValidReason}
           style={[
             {
               width: "100%",
@@ -454,7 +460,7 @@ export function CancelOrderLayout() {
               justifyContent: "center",
               backgroundColor: "#D32F2F", // brand/mockup red
             },
-            isCancelling && { opacity: 0.7 },
+            (isCancelling || !hasValidReason) && { opacity: 0.7 },
           ]}
         >
           <Text
@@ -491,6 +497,19 @@ export function CancelOrderLayout() {
           </Text>
         </View>
       </View>
+
+      <ConfirmActionModal
+        isVisible={showConfirmModal}
+        message="Confirm Cancellation"
+        description="Are you sure you want to cancel this order?"
+        icon={<icons.cancel_order_bag width={36} height={36} fill="#E11D48" />}
+        confirmLabel="Cancel"
+        cancelLabel="Keep"
+        confirmTestID="cancel-order-confirm"
+        isLoading={isCancelling}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirm}
+      />
 
       <AlertDialog
         visible={alertState.visible}

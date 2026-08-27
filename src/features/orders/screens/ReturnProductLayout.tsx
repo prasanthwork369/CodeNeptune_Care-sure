@@ -206,6 +206,12 @@ export const ReturnProductLayout: React.FC = () => {
 
   const items: OrderItem[] = order?.items ?? [];
 
+  // Only confirmed items that are still strictly returnable count toward a submittable return.
+  const validReturnItems = draftItems.filter((draft) => {
+    const originalItem = items.find((it) => it.id === draft.orderItemId);
+    return originalItem ? isItemReturnable(originalItem) : true;
+  });
+
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -317,12 +323,6 @@ export const ReturnProductLayout: React.FC = () => {
       );
       return;
     }
-    // Defensive check: only allow confirmed items that are strictly returnable
-    const validReturnItems = draftItems.filter((draft) => {
-      const originalItem = items.find((it) => it.id === draft.orderItemId);
-      return originalItem ? isItemReturnable(originalItem) : true;
-    });
-
     if (validReturnItems.length === 0) {
       Alert.alert(
         "Select items",
@@ -798,8 +798,20 @@ export const ReturnProductLayout: React.FC = () => {
           className="bg-[#0F7635] rounded-lg py-4 items-center"
           activeOpacity={0.85}
           onPress={handleSubmit}
-          disabled={submitting || uploadingImages}
-          style={submitting || uploadingImages ? { opacity: 0.7 } : undefined}
+          disabled={
+            submitting ||
+            uploadingImages ||
+            !pickupAddress ||
+            validReturnItems.length === 0
+          }
+          style={
+            submitting ||
+            uploadingImages ||
+            !pickupAddress ||
+            validReturnItems.length === 0
+              ? { opacity: 0.7 }
+              : undefined
+          }
         >
           {uploadingImages ? (
             <View className="flex-row items-center gap-2">

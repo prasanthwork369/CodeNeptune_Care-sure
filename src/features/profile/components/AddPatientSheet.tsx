@@ -7,12 +7,9 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import type { FamilyMember, FamilyMemberInput } from "../types";
-import {
-  formatDobDisplay,
-  getMaxDob,
-  getMinDob,
-  validateDob,
-} from "@/src/utils/patient";
+import { formatDobDisplay, getMaxDob, getMinDob } from "@/src/utils/patient";
+import { sanitize } from "@/src/utils/validation";
+import { RELATIONSHIPS, usePatientForm } from "../hooks/usePatientForm";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
@@ -31,8 +28,6 @@ interface AddPatientSheetProps {
   onEdit?: (id: string, patient: FamilyMemberInput) => Promise<void>;
   onDelete?: (id: string) => void;
 }
-
-const RELATIONSHIPS = ["Self", "Wife", "Husband", "Mother", "Father", "Other"];
 
 const GENDERS = [
   {
@@ -62,22 +57,6 @@ export function AddPatientSheet({
 }: AddPatientSheetProps) {
   const adjustedBottom = useAdjustedBottomInset();
   const snapPoints = useMemo(() => ["80%"], []);
-
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [dob, setDob] = useState("");
-  const [dobDate, setDobDate] = useState<Date>(new Date(2000, 0, 1));
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [relationship, setRelationship] = useState("");
-  const [otherRelationship, setOtherRelationship] = useState("");
-  const [gender, setGender] = useState("");
-  const [errors, setErrors] = useState<{
-    name?: string;
-    dob?: string;
-    relationship?: string;
-    mobile?: string;
-    gender?: string;
-  }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inFlight = useRef(false);
 
@@ -122,68 +101,48 @@ export function AddPatientSheet({
   const setMobileRef = (ref?: TextInput | null) => {
     mobileRef.current = ref;
     if (ref) {
-      applyDigitsOnlyFilter(ref);
+      applyDigitsOnlyFilter(ref, 10);
     }
   };
   const maxDob = getMaxDob();
   const minDob = getMinDob();
 
-  useEffect(() => {
-    if (isVisible && editPatient) {
-      setName(editPatient.name ?? "");
-      const rawPhone = editPatient.phone ?? "";
-      setMobile(rawPhone.startsWith("+91") ? rawPhone.slice(3) : rawPhone);
-      setDob(editPatient.dateOfBirth ?? "");
-      if (editPatient.dateOfBirth)
-        setDobDate(new Date(editPatient.dateOfBirth));
-      const rel = editPatient.relationship ?? "";
-      const isOther = !RELATIONSHIPS.slice(0, -1).includes(rel);
-      setRelationship(isOther && rel ? "Other" : rel);
-      setOtherRelationship(isOther ? rel : "");
-      setGender(editPatient.gender ?? "");
-      setErrors({});
-    } else if (isVisible && !editPatient) {
-      setName("");
-      setMobile("");
-      setDob("");
-      setDobDate(new Date(2000, 0, 1));
-      setRelationship("");
-      setOtherRelationship("");
-      setGender("");
-      setErrors({});
-    }
-  }, [isVisible, editPatient]);
+  const {
+    name,
+    setName,
+    mobile,
+    setMobile,
+    dob,
+    setDob,
+    dobDate,
+    setDobDate,
+    showDatePicker,
+    setShowDatePicker,
+    relationship,
+    setRelationship,
+    otherRelationship,
+    setOtherRelationship,
+    gender,
+    setGender,
+    errors,
+    setErrors,
+    isDirty,
+    isFormValid,
+    validate,
+    buildPayload,
+  } = usePatientForm(editPatient, isVisible);
+
+  const isSaveDisabled =
+    isSubmitting || !isFormValid || (isEditMode && !isDirty);
 
   const handleSubmit = async () => {
-    const newErrors: typeof errors = {};
-    if (!name.trim()) newErrors.name = "Name is required";
-    const dobValidation = validateDob(dob);
-    if (!dobValidation.valid) newErrors.dob = dobValidation.error;
-    if (!relationship) newErrors.relationship = "Please select a relationship";
-    else if (relationship === "Other" && !otherRelationship.trim())
-      newErrors.relationship = "Please specify the relationship";
-    if (!mobile) newErrors.mobile = "Mobile number is required";
-    else if (mobile.length !== 10)
-      newErrors.mobile = "Enter a valid 10-digit number";
-    if (!gender) newErrors.gender = "Please select a gender";
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    const payload: FamilyMemberInput = {
-      name: name.trim(),
-      relationship:
-        relationship === "Other" ? otherRelationship.trim() : relationship,
-      dateOfBirth: dob,
-      gender,
-      phone: `+91${mobile}`,
-    };
-
     if (inFlight.current) return;
+    if (!validate()) return;
+
     inFlight.current = true;
     setIsSubmitting(true);
     try {
+      const payload = buildPayload();
       if (isEditMode && editPatient && onEdit)
         await onEdit(editPatient.id, payload);
       else await onAdd(payload);
@@ -331,7 +290,6 @@ export function AddPatientSheet({
               placeholder="Enter The number"
               placeholderTextColor="#6A6A6A"
               keyboardType="number-pad"
-              maxLength={10}
               returnKeyType="done"
               style={{
                 flex: 1,
@@ -343,7 +301,8 @@ export function AddPatientSheet({
               }}
               value={mobile}
               onChangeText={(t: string) => {
-                const d = t.replace(/\D/g, "");
+                if (mobile.length === 10 && t.startsWith(mobile)) return;
+                const d = sanitize.phone(t);
                 setMobile(d);
                 setErrors((e) => (e.mobile ? { ...e, mobile: undefined } : e));
               }}
@@ -437,17 +396,19 @@ export function AddPatientSheet({
                   s.patientInput,
                   {
                     marginTop: exactScale(-10),
-                    marginBottom: errors.relationship
+                    marginBottom: errors.otherRelationship
                       ? exactScale(6)
                       : exactScale(18),
                   },
-                  errors.relationship ? { borderColor: "#EF4444" } : {},
+                  errors.otherRelationship ? { borderColor: "#EF4444" } : {},
                 ]}
                 value={otherRelationship}
                 onChangeText={(t: string) => {
                   setOtherRelationship(t);
                   setErrors((e) =>
-                    e.relationship ? { ...e, relationship: undefined } : e,
+                    e.otherRelationship
+                      ? { ...e, otherRelationship: undefined }
+                      : e,
                   );
                 }}
                 onLayout={(e) => {
@@ -464,7 +425,7 @@ export function AddPatientSheet({
                 autoCorrect={false}
                 autoFocus
               />
-              {errors.relationship && (
+              {errors.otherRelationship && (
                 <Text
                   style={{
                     color: "#EF4444",
@@ -472,7 +433,7 @@ export function AddPatientSheet({
                     marginBottom: exactScale(12),
                   }}
                 >
-                  {errors.relationship}
+                  {errors.otherRelationship}
                 </Text>
               )}
             </>
@@ -620,14 +581,14 @@ export function AddPatientSheet({
 
           <Touchable
             onPress={handleSubmit}
-            disabled={isSubmitting}
+            disabled={isSaveDisabled}
             activeOpacity={0.85}
             style={{
               backgroundColor: "#0F7635",
               borderRadius: exactScale(14),
               paddingVertical: exactScale(16),
               alignItems: "center",
-              opacity: isSubmitting ? 0.75 : 1,
+              opacity: isSaveDisabled ? 0.75 : 1,
             }}
           >
             {isSubmitting ? (

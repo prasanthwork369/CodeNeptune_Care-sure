@@ -66,7 +66,7 @@ export const AddAddressLayout: React.FC = () => {
   const setMobileRef = (ref: TextInput | null) => {
     mobileRef.current = ref;
     if (ref) {
-      applyDigitsOnlyFilter(ref);
+      applyDigitsOnlyFilter(ref, 10);
     }
   };
   const line1Ref = useRef<TextInput>(null);
@@ -232,6 +232,7 @@ export const AddAddressLayout: React.FC = () => {
   };
 
   const handleMobileChange = (text: string) => {
+    if (mobile.length === 10 && text.startsWith(mobile)) return;
     const c = sanitize.phone(text);
     setMobile(c);
     if (c.length > 0) {
@@ -257,13 +258,13 @@ export const AddAddressLayout: React.FC = () => {
     validate.pincode(pincode).valid;
   const isDirty = existing
     ? addressLabel !== ((existing.label as LabelType) ?? "HOME") ||
-      name !== (existing.name ?? "") ||
-      mobile !== (existing.phone ?? "") ||
-      line1 !== (existing.line1 ?? "") ||
-      line2 !== (existing.line2 ?? "") ||
-      city !== (existing.city ?? "") ||
-      state !== (existing.state ?? "") ||
-      pincode !== (existing.pincode ?? "") ||
+      name.trim() !== (existing.name ?? "").trim() ||
+      mobile.trim() !== (existing.phone ?? "").trim() ||
+      line1.trim() !== (existing.line1 ?? "").trim() ||
+      line2.trim() !== (existing.line2 ?? "").trim() ||
+      city.trim() !== (existing.city ?? "").trim() ||
+      state.trim() !== (existing.state ?? "").trim() ||
+      pincode.trim() !== (existing.pincode ?? "").trim() ||
       isDefault !== (existing.isDefault ?? false)
     : !!(
         addressLabel ||
@@ -543,11 +544,21 @@ export const AddAddressLayout: React.FC = () => {
           <Touchable
             activeOpacity={0.85}
             onPress={handleSave}
-            disabled={submitting || saveCompleted || !isValid || isOffline}
+            disabled={
+              submitting ||
+              saveCompleted ||
+              !isValid ||
+              isOffline ||
+              (isEdit && !isDirty)
+            }
             className="bg-brand-primary rounded-md py-4 flex-row items-center justify-center gap-x-2"
             style={{
               opacity:
-                submitting || saveCompleted || !isValid || isOffline
+                submitting ||
+                saveCompleted ||
+                !isValid ||
+                isOffline ||
+                (isEdit && !isDirty)
                   ? 0.5
                   : 1,
             }}

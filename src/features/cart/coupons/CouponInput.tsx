@@ -42,7 +42,7 @@ export const CouponInput: React.FC<CouponInputProps> = ({
       />
       <Touchable
         onPress={onApply}
-        disabled={loading}
+        disabled={loading || !value.trim()}
         style={{
           width: exactScale(55),
           height: exactScale(28),

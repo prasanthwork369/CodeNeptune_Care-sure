@@ -119,7 +119,7 @@ export const MyOrdersLayout: React.FC = () => {
         tabs={TABS}
         activeKey={activeKey}
         onTabPress={goToTab}
-        backgroundColor="#F5F6FB"
+        backgroundColor="#FFFFFF"
         borderColor="#919EAB33"
         indicatorInset={8}
         paddingVertical={18}

@@ -1,14 +1,13 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
 import { icons } from "@/src/constants/icons";
 import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
-import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
-import type { FamilyMemberInput } from "../types";
 import {
-  formatDobDisplay,
-  getMaxDob,
-  getMinDob,
-  validateDob,
-} from "@/src/utils/patient";
+  RELATIONSHIPS,
+  usePatientForm,
+} from "@/src/features/profile/hooks/usePatientForm";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
+import { formatDobDisplay, getMaxDob, getMinDob } from "@/src/utils/patient";
+import { sanitize } from "@/src/utils/validation";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { Touchable } from "@/src/components/ui/Touchable";
@@ -16,7 +15,7 @@ import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocalSearchParams } from "expo-router";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -28,7 +27,6 @@ import {
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { moderateScale } from "@/src/utils/exactScale";
 
-const RELATIONSHIPS = ["Self", "Wife", "Husband", "Mother", "Father", "Other"];
 const GENDERS = [
   { label: "Male", value: "MALE", icon: <icons.male width={16} height={16} /> },
   {
@@ -76,74 +74,42 @@ export const AddPatientLayout: React.FC = () => {
 
   const editPatient = id ? (members.find((m) => m.id === id) ?? null) : null;
   const isEditMode = !!editPatient;
-
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [dob, setDob] = useState("");
-  const [dobDate, setDobDate] = useState<Date>(new Date(2000, 0, 1));
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const maxDob = getMaxDob();
   const minDob = getMinDob();
-  const [relationship, setRelationship] = useState("");
-  const [otherRelationship, setOtherRelationship] = useState("");
-  const [gender, setGender] = useState("");
-  const [errors, setErrors] = useState<{
-    name?: string;
-    mobile?: string;
-    dob?: string;
-    relationship?: string;
-    otherRelationship?: string;
-    gender?: string;
-  }>({});
 
-  useEffect(() => {
-    if (editPatient) {
-      setName(editPatient.name ?? "");
-      const rawPhone = editPatient.phone ?? "";
-      setMobile(rawPhone.startsWith("+91") ? rawPhone.slice(3) : rawPhone);
-      setDob(editPatient.dateOfBirth ?? "");
-      if (editPatient.dateOfBirth)
-        setDobDate(new Date(editPatient.dateOfBirth));
-      const rel = editPatient.relationship ?? "";
-      if (RELATIONSHIPS.includes(rel)) {
-        setRelationship(rel);
-      } else {
-        setRelationship("Other");
-        setOtherRelationship(rel);
-      }
-      setGender(editPatient.gender ?? "");
-    }
-  }, [editPatient?.id]);
+  const {
+    name,
+    setName,
+    mobile,
+    setMobile,
+    dob,
+    dobDate,
+    setDobDate,
+    setDob,
+    showDatePicker,
+    setShowDatePicker,
+    relationship,
+    setRelationship,
+    otherRelationship,
+    setOtherRelationship,
+    gender,
+    setGender,
+    errors,
+    setErrors,
+    isDirty,
+    isFormValid,
+    validate,
+    buildPayload,
+  } = usePatientForm(editPatient);
 
   const handleSubmit = async () => {
     if (inFlight.current) return;
-    const newErrors: typeof errors = {};
-    if (!name.trim()) newErrors.name = "Name is required";
-    if (!mobile || mobile.length !== 10)
-      newErrors.mobile = "Enter a valid 10-digit number";
-    const dobValidation = validateDob(dob);
-    if (!dobValidation.valid) newErrors.dob = dobValidation.error;
-    if (!relationship) newErrors.relationship = "Please select a relationship";
-    if (relationship === "Other" && !otherRelationship.trim())
-      newErrors.otherRelationship = "Please specify relationship";
-    if (!gender) newErrors.gender = "Please select a gender";
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    if (!validate()) return;
 
     inFlight.current = true;
     setIsSubmitting(true);
     try {
-      const finalRelationship =
-        relationship === "Other" ? otherRelationship.trim() : relationship;
-      const payload: FamilyMemberInput = {
-        name: name.trim(),
-        relationship: finalRelationship,
-        dateOfBirth: dob,
-        gender,
-        phone: `+91${mobile}`,
-      };
+      const payload = buildPayload();
       if (isEditMode && editPatient)
         await updateMember(editPatient.id, payload);
       else await addMember(payload);
@@ -154,20 +120,6 @@ export const AddPatientLayout: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
-  const existingPhone = editPatient?.phone?.startsWith("+91")
-    ? editPatient.phone.slice(3)
-    : (editPatient?.phone ?? "");
-  const existingRelationship = editPatient?.relationship ?? "";
-  const currentRelationship =
-    relationship === "Other" ? otherRelationship : relationship;
-  const isDirty = editPatient
-    ? name !== (editPatient.name ?? "") ||
-      mobile !== existingPhone ||
-      dob !== (editPatient.dateOfBirth ?? "") ||
-      currentRelationship !== existingRelationship ||
-      gender !== (editPatient.gender ?? "")
-    : !!(name || mobile || dob || relationship || otherRelationship || gender);
 
   return (
     <View className="flex-1 bg-[#F5F6FB]">
@@ -232,14 +184,14 @@ export const AddPatientLayout: React.FC = () => {
               +91 |
             </Text>
             <TextInput
-              ref={applyDigitsOnlyFilter}
+              ref={(r) => applyDigitsOnlyFilter(r, 10)}
               placeholder="10 digit number"
               placeholderTextColor="#6A6A6A"
               keyboardType="number-pad"
-              maxLength={10}
               value={mobile}
               onChangeText={(t) => {
-                setMobile(t.replace(/\D/g, ""));
+                if (mobile.length === 10 && t.startsWith(mobile)) return;
+                setMobile(sanitize.phone(t));
                 setErrors((e) => ({ ...e, mobile: undefined }));
               }}
               style={{
@@ -447,13 +399,24 @@ export const AddPatientLayout: React.FC = () => {
           <Touchable
             activeOpacity={0.85}
             onPress={handleSubmit}
-            disabled={isSubmitting || isOffline}
+            disabled={
+              isSubmitting ||
+              isOffline ||
+              !isFormValid ||
+              (isEditMode && !isDirty)
+            }
             style={{
               backgroundColor: "#0F7635",
               borderRadius: 14,
               paddingVertical: 18,
               alignItems: "center",
-              opacity: isSubmitting || isOffline ? 0.5 : 1,
+              opacity:
+                isSubmitting ||
+                isOffline ||
+                !isFormValid ||
+                (isEditMode && !isDirty)
+                  ? 0.5
+                  : 1,
             }}
           >
             <Text

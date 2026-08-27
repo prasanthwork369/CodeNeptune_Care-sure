@@ -18,8 +18,9 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
   return (
     <ConfirmActionModal
       isVisible={isVisible}
-      message="Are you sure you want to logout"
+      message="Log out?"
       icon={<icons.logout width={36} height={36} fill="#CA2B25" />}
+      confirmLabel="Logout"
       isLoading={isLoggingOut}
       onCancel={onCancel}
       onConfirm={onConfirm}

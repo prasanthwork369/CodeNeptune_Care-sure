@@ -6,6 +6,8 @@ import { moderateScale } from "@/src/utils/exactScale";
 interface ConfirmActionModalProps {
   isVisible: boolean;
   message: string;
+  /** Optional secondary line below the message, for a title + detail layout. */
+  description?: string;
   /** Icon shown in the round pink badge. Receives width/height/fill. */
   icon: React.ReactNode;
   /** Copy for the destructive confirm button. Defaults to "Yes". */
@@ -15,6 +17,8 @@ interface ConfirmActionModalProps {
   isLoading?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
+  confirmTestID?: string;
+  cancelTestID?: string;
 }
 
 /**
@@ -25,12 +29,15 @@ interface ConfirmActionModalProps {
 export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
   isVisible,
   message,
+  description,
   icon,
   confirmLabel = "Yes",
   cancelLabel = "No",
   isLoading,
   onCancel,
   onConfirm,
+  confirmTestID,
+  cancelTestID,
 }) => {
   return (
     <Modal
@@ -69,14 +76,26 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
           {/* Message */}
           <Text
             className="font-inter-bold text-[#1A1C1E] text-center"
-            style={{ fontSize: moderateScale(16), marginBottom: 24 }}
+            style={{
+              fontSize: moderateScale(16),
+              marginBottom: description ? 8 : 24,
+            }}
           >
             {message}
           </Text>
+          {!!description && (
+            <Text
+              className="font-inter-medium text-[#6A6A6A] text-center"
+              style={{ fontSize: moderateScale(13), marginBottom: 24 }}
+            >
+              {description}
+            </Text>
+          )}
 
           {/* Buttons */}
           <View className="flex-row w-full" style={{ gap: 10 }}>
             <Touchable
+              testID={cancelTestID}
               onPress={onCancel}
               disabled={isLoading}
               activeOpacity={0.8}
@@ -100,6 +119,7 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
             </Touchable>
 
             <Touchable
+              testID={confirmTestID}
               onPress={onConfirm}
               disabled={isLoading}
               activeOpacity={0.8}
