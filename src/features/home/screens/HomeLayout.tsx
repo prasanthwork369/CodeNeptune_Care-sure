@@ -663,6 +663,7 @@ const HomeContent: React.FC = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderSection}
         getItemType={getSectionItemType}
+        drawDistance={800}
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
         decelerationRate="normal"
