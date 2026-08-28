@@ -111,13 +111,26 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
     const lastSeenRxId = useNotificationStore((s) => s.lastSeenRxId);
     const lastSeenRxStatus = useNotificationStore((s) => s.lastSeenRxStatus);
     const setLastSeenRx = useNotificationStore((s) => s.setLastSeenRx);
+    const syncRxUnread = useNotificationStore((s) => s.syncRxUnread);
+    const clearRxUnreadDisplay = useNotificationStore(
+      (s) => s.clearRxUnreadDisplay,
+    );
+    const displayedRxUnread = useNotificationStore((s) => s.displayedRxUnread);
     const { unreadCount: apiUnreadCount } = useNotifications();
     const isRxUnread =
       hasPendingPrescription &&
       latestPrescription &&
       (latestPrescription.id !== lastSeenRxId ||
         String(latestPrescription.status) !== lastSeenRxStatus);
-    const unreadCount = apiUnreadCount + (isRxUnread ? 1 : 0);
+
+    // A background prescription refetch (Home refocus) may only raise this
+    // bit; it drops only when the user opens notifications — see
+    // notificationStore.syncRxUnread.
+    useEffect(() => {
+      syncRxUnread(!!isRxUnread);
+    }, [isRxUnread, syncRxUnread]);
+
+    const unreadCount = apiUnreadCount + (displayedRxUnread ? 1 : 0);
 
     // Guests have no wallet at all, so ₹0 is their real value, not a guess.
     // A signed-in user with no balance yet (cold start, no in-memory cache)
@@ -219,6 +232,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
                   String(latestPrescription.status),
                 );
               }
+              clearRxUnreadDisplay();
               router.push("/notifications");
             }}
             accessibilityRole="button"

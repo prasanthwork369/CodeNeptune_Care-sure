@@ -15,6 +15,7 @@ import { usePrefetchWallet } from "@/src/features/wallet/hooks/useWallet";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
+import { useNotificationStore } from "@/src/store/notificationStore";
 import { useToastStore } from "@/src/store/toastStore";
 import { exactScale } from "@/src/utils/exactScale";
 import { useFocusEffect } from "expo-router";
@@ -72,6 +73,9 @@ export const NotificationsLayout: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       setIsEntryLoading(true);
+      // Actually viewing this screen is the explicit action that lets the
+      // Home badge's next sync reconcile down to the server's true count.
+      useNotificationStore.getState().permitUnreadCountDecrease();
       refetch().finally(() => setIsEntryLoading(false));
     }, [refetch]),
   );
