@@ -1,6 +1,7 @@
 export interface ApiHero {
   image: string;
   title: string;
+  subtitle: string;
   labelImage: string;
   status_text: string;
   highlighted_text: string[];

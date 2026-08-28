@@ -257,6 +257,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
     }
 
     const title = content.title;
+    const subtitle = content.subtitle;
     const badgeText = content.status_text;
     const mainImage = { uri: content.image };
     const highlights = content.highlighted_text ?? [];
@@ -288,17 +289,30 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
                   {title}
                   {title ? " " : ""}
                 </Text>
-                {highlights.length > 0 && (
-                  <TextCycler
-                    words={highlights}
-                    lineHeight={dStyles.titleText.lineHeight}
-                    style={StyleSheet.flatten([
-                      styles.titleText,
-                      dStyles.titleText,
-                    ])}
-                    className="text-brand-primary"
-                  />
-                )}
+                {/* Kept together, no-wrap: subtitle reads as one phrase with
+                    the cycling word ("for Your Medicine") and must never
+                    split onto separate lines from it. */}
+                <View className="flex-row items-center">
+                  {subtitle ? (
+                    <Text
+                      style={[styles.titleText, dStyles.titleText]}
+                      className="text-brand-text"
+                    >
+                      {subtitle}{" "}
+                    </Text>
+                  ) : null}
+                  {highlights.length > 0 && (
+                    <TextCycler
+                      words={highlights}
+                      lineHeight={dStyles.titleText.lineHeight}
+                      style={StyleSheet.flatten([
+                        styles.titleText,
+                        dStyles.titleText,
+                      ])}
+                      className="text-brand-primary"
+                    />
+                  )}
+                </View>
               </View>
             </View>
 
