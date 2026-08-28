@@ -2,14 +2,15 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { COUPON_DISCOUNT_TYPE } from "../constants/coupon";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
-import { CouponCardProps } from "@/src/features/cart/types";
+import type { CouponCardProps } from "@/src/features/cart/types";
 import {
   formatCouponExpiry,
   formatCouponTerms,
 } from "../utils/couponFormat";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { styles as s } from "./CouponCard.styles";
 
 export const CouponCard: React.FC<CouponCardProps> = ({
   coupon,
@@ -19,7 +20,6 @@ export const CouponCard: React.FC<CouponCardProps> = ({
   isUnavailable = false,
   loading = false,
 }) => {
-  // Both applied and limit-reached coupons read as inactive (faded).
   const inactive = isApplied || isUnavailable;
   const isPercentage = coupon.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE;
   const discountLabel = isPercentage
@@ -27,82 +27,37 @@ export const CouponCard: React.FC<CouponCardProps> = ({
     : `Save ${coupon.discountValue}`;
   const description = formatCouponTerms(coupon);
   const expiry = formatCouponExpiry(coupon.expiresAt);
+  const isButtonDisabled = disabled || inactive || loading;
 
   return (
     <View
-      style={{
-        marginBottom: exactScale(12),
-        position: "relative",
-        opacity: inactive ? 0.5 : 1,
-      }}
+      style={[
+        s.cardContainer,
+        inactive ? s.cardInactive : s.cardActive,
+      ]}
     >
       <Touchable
         activeOpacity={0.85}
-        disabled={disabled || inactive || loading}
+        disabled={isButtonDisabled}
         onPress={() => onApply(coupon.code)}
-        style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: exactScale(13),
-          borderWidth: 1,
-          borderColor: "#919EAB33",
-        }}
+        style={s.cardTouchable}
       >
-        <View
-          style={{
-            minHeight: exactScale(67),
-            paddingHorizontal: exactScale(16),
-            paddingVertical: exactScale(12),
-            flexDirection: "row",
-            alignItems: "center",
-            overflow: "hidden",
-            borderTopLeftRadius: exactScale(13),
-            borderTopRightRadius: exactScale(13),
-          }}
-        >
-          <View style={styles.iconWrapper}>
+        <View style={s.cardTop}>
+          <View style={s.iconWrapper}>
             <icons.percent_discount
               width={exactScale(22)}
               height={exactScale(22)}
               fill={colors.primary}
             />
           </View>
-          <View style={{ marginLeft: exactScale(12), flex: 1 }}>
-            <Text
-              style={{
-                fontSize: moderateScale(17),
-                lineHeight: moderateScale(22),
-                fontWeight: "700",
-                color: "#000000",
-              }}
-            >
-              {discountLabel}
-            </Text>
-            <Text
-              style={{
-                color: "#E53827",
-                fontSize: moderateScale(13),
-                lineHeight: moderateScale(17),
-                fontWeight: "500",
-                marginTop: exactScale(2),
-              }}
-            >
-              {description}
-            </Text>
+          <View style={s.infoCol}>
+            <Text style={s.discountText}>{discountLabel}</Text>
+            <Text style={s.descText}>{description}</Text>
             {expiry ? (
-              <Text
-                style={{
-                  fontSize: moderateScale(11),
-                  lineHeight: moderateScale(15),
-                  fontWeight: "500",
-                  color: "#6A6A6A",
-                  marginTop: exactScale(3),
-                }}
-              >
-                Expires {expiry}
-              </Text>
+              <Text style={s.expiryText}>Expires {expiry}</Text>
             ) : null}
           </View>
-          <View style={styles.fadedIconContainer}>
+          <View style={s.fadedIconContainer}>
             <icons.percent_discount
               width={exactScale(60)}
               height={exactScale(60)}
@@ -111,49 +66,20 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             />
           </View>
         </View>
-        <View style={styles.dashedDivider} />
-        <View
-          style={{
-            height: exactScale(46),
-            paddingHorizontal: exactScale(16),
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "#ffffff",
-            borderBottomLeftRadius: exactScale(13),
-            borderBottomRightRadius: exactScale(13),
-          }}
-        >
-          <Text
-            numberOfLines={1}
-            style={{
-              // Shrinks so a long code can't push the Apply button off the card.
-              flexShrink: 1,
-              marginRight: exactScale(8),
-              fontSize: moderateScale(14),
-              fontWeight: "700",
-              color: "#000000",
-              letterSpacing: 0.5,
-            }}
-          >
+
+        <View style={s.dashedDivider} />
+
+        <View style={s.cardBottom}>
+          <Text numberOfLines={1} style={s.couponCodeText}>
             {coupon.code}
           </Text>
           <Touchable
-            disabled={disabled || inactive || loading}
+            disabled={isButtonDisabled}
             onPress={() => onApply(coupon.code)}
-            style={{
-              backgroundColor:
-                disabled || inactive ? "#FFFFFF" : colors.primary,
-              borderWidth: disabled || inactive ? 1 : 0,
-              borderColor: disabled || inactive ? "#E4E7EC" : "transparent",
-              // minWidth, not width: "APPLIED" wrapped to a clipped second line.
-              minWidth: exactScale(55),
-              paddingHorizontal: exactScale(8),
-              height: exactScale(28),
-              borderRadius: exactScale(4),
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={[
+              s.applyBtn,
+              disabled || inactive ? s.applyBtnInactive : s.applyBtnActive,
+            ]}
           >
             {loading ? (
               <ActivityIndicator
@@ -163,12 +89,12 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             ) : (
               <Text
                 numberOfLines={1}
-                style={{
-                  color: disabled || inactive ? "#9CA3AF" : "#FFFFFF",
-                  fontSize: moderateScale(13),
-                  lineHeight: moderateScale(17),
-                  fontWeight: "700",
-                }}
+                style={[
+                  s.applyBtnText,
+                  disabled || inactive
+                    ? s.applyBtnTextInactive
+                    : s.applyBtnTextActive,
+                ]}
               >
                 {isApplied ? "APPLIED" : isUnavailable ? "USED" : "APPLY"}
               </Text>
@@ -176,83 +102,16 @@ export const CouponCard: React.FC<CouponCardProps> = ({
           </Touchable>
         </View>
       </Touchable>
-      {/* Left Notch Cutout (Clipped to show only inner semi-circle) */}
-      <View style={styles.leftNotchWrapper}>
-        <View style={styles.leftNotchCircle} />
+
+      {/* Left Notch Cutout */}
+      <View style={s.leftNotchWrapper}>
+        <View style={s.leftNotchCircle} />
       </View>
 
-      {/* Right Notch Cutout (Clipped to show only inner semi-circle) */}
-      <View style={styles.rightNotchWrapper}>
-        <View style={styles.rightNotchCircle} />
+      {/* Right Notch Cutout */}
+      <View style={s.rightNotchWrapper}>
+        <View style={s.rightNotchCircle} />
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  iconWrapper: {
-    width: exactScale(40),
-    height: exactScale(40),
-    borderRadius: exactScale(6),
-    borderWidth: 1,
-    borderColor: "#919EAB33",
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    opacity: 1,
-  },
-  fadedIconContainer: {
-    position: "absolute",
-    right: exactScale(-15),
-    top: exactScale(-10),
-    zIndex: -1,
-  },
-  dashedDivider: {
-    height: 1,
-    marginHorizontal: exactScale(10),
-    borderWidth: 1,
-    borderColor: "#919EAB33",
-    borderStyle: "dashed",
-    borderRadius: 1,
-  },
-  leftNotchWrapper: {
-    position: "absolute",
-    left: 0,
-    bottom: exactScale(36),
-    width: exactScale(10),
-    height: exactScale(20),
-    overflow: "hidden",
-    zIndex: 10,
-  },
-  leftNotchCircle: {
-    width: exactScale(20),
-    height: exactScale(20),
-    borderRadius: exactScale(10),
-    backgroundColor: "#F5F6FB",
-    borderWidth: 1,
-    borderColor: "#919EAB33",
-    position: "absolute",
-    left: exactScale(-10),
-    top: 0,
-  },
-  rightNotchWrapper: {
-    position: "absolute",
-    right: 0,
-    bottom: exactScale(36),
-    width: exactScale(10),
-    height: exactScale(20),
-    overflow: "hidden",
-    zIndex: 10,
-  },
-  rightNotchCircle: {
-    width: exactScale(20),
-    height: exactScale(20),
-    borderRadius: exactScale(10),
-    backgroundColor: "#F5F6FB",
-    borderWidth: 1,
-    borderColor: "#919EAB33",
-    position: "absolute",
-    right: exactScale(-10),
-    top: 0,
-  },
-});

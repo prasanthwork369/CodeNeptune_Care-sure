@@ -12,33 +12,20 @@ import { buildCartInputs } from "../utils/reorderCart";
 import { formatOrderId } from "@/src/utils/order";
 import { Image } from "expo-image";
 import { HOME_IMAGES } from "@/src/constants/images";
+import { usePrefetchOrder } from "@/src/features/orders/hooks/useOrderById";
+import { orderStyles } from "../orders.styles";
+import { styles as s } from "./OrderCard.styles";
 import React, { useCallback, useState } from "react";
 import { ActivityIndicator, ImageBackground, Text, View } from "react-native";
-import { usePrefetchOrder } from "@/src/features/orders/hooks/useOrderById";
-import { orderStyles as s } from "../orders.styles";
 
 function CorporateOrderBadge() {
   return (
     <ImageBackground
       source={HOME_IMAGES.corporateOrderBadge}
-      style={{
-        paddingLeft: 18,
-        paddingRight: 12,
-        paddingVertical: 5.5,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      style={s.corporateBadge}
       resizeMode="stretch"
     >
-      <Text
-        className="font-inter-bold uppercase"
-        style={{
-          fontSize: 11,
-          letterSpacing: 0.4,
-          fontWeight: "700",
-          color: "#FFFFFF",
-        }}
-      >
+      <Text style={s.corporateBadgeText}>
         CORPORATE ORDER
       </Text>
     </ImageBackground>
@@ -53,9 +40,6 @@ export interface OrderCardProps {
   clearCart: () => Promise<unknown>;
 }
 
-const labelStyle = { letterSpacing: 0.6 };
-const valueStyle = { marginTop: 3 };
-
 function StatusBadge({ status }: { status: number | undefined }) {
   const cfg = (status != null ? ORDER_STATUS[status] : undefined) ?? {
     label: "PENDING",
@@ -65,22 +49,19 @@ function StatusBadge({ status }: { status: number | undefined }) {
   };
   return (
     <View
-      style={{
-        borderRadius: 6,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        backgroundColor: cfg.bg,
-        borderWidth: 1,
-        borderColor: cfg.border,
-        position: "absolute",
-        top: 16,
-        right: 16,
-        zIndex: 10,
-      }}
+      style={[
+        s.statusBadgeWrap,
+        {
+          backgroundColor: cfg.bg,
+          borderColor: cfg.border,
+        },
+      ]}
     >
       <Text
-        className="font-inter-bold"
-        style={[s.statusBadge, { color: cfg.text, letterSpacing: 0.4 }]}
+        style={[
+          s.statusBadgeText,
+          { color: cfg.text },
+        ]}
       >
         {cfg.label}
       </Text>
@@ -140,9 +121,6 @@ export const OrderCard = React.memo(function OrderCard({
         }
       }
       setIsCartModalVisible(false);
-      // isProceeding stays true (button keeps its "Adding..." state) until
-      // this same timeout fires — clearing it earlier would flip the button
-      // back to "Order Again" while this screen is still visible.
       setTimeout(() => {
         router.push("/(commerce)/cart");
         setIsProceeding(false);
@@ -163,17 +141,7 @@ export const OrderCard = React.memo(function OrderCard({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: "#fff",
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: "#E3E6E8",
-        marginHorizontal: 16,
-        marginBottom: 20,
-        overflow: "hidden",
-      }}
-    >
+    <View style={s.card}>
       <Touchable
         activeOpacity={0.8}
         onPress={() =>
@@ -185,41 +153,22 @@ export const OrderCard = React.memo(function OrderCard({
         onPressIn={handlePrefetch}
       >
         {/* Top: dates + badge */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: 10,
-          }}
-        >
-          <View style={{ flexDirection: "row", gap: 20, paddingRight: 110 }}>
+        <View style={s.cardTop}>
+          <View style={s.metaColsWrap}>
             <View>
-              <Text
-                className="font-inter-semibold text-[#6A6A6A] uppercase"
-                style={[s.labelXs, labelStyle]}
-              >
+              <Text style={s.metaLabel}>
                 Order Created
               </Text>
-              <Text
-                className="font-inter-bold text-[#222222]"
-                style={[s.labelSm, valueStyle]}
-              >
+              <Text style={s.metaValue}>
                 {formatDate(order.createdAt)}
               </Text>
             </View>
             <View style={{ flexShrink: 1 }}>
-              <Text
-                className="font-inter-semibold text-[#6A6A6A] uppercase"
-                style={[s.labelXs, labelStyle]}
-              >
+              <Text style={s.metaLabel}>
                 Order ID
               </Text>
               <Text
-                className="font-inter-bold text-[#222222]"
-                style={[s.labelSm, valueStyle]}
+                style={s.metaValue}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
@@ -232,10 +181,7 @@ export const OrderCard = React.memo(function OrderCard({
         </View>
 
         {/* Items count */}
-        <Text
-          className="font-inter-semibold text-[#6A6A6A] uppercase px-4 mb-2.5"
-          style={[s.labelXs, labelStyle]}
-        >
+        <Text style={s.itemsCountText}>
           {items.length > 0
             ? `${items.length} Item${items.length > 1 ? "s" : ""}`
             : "—"}
@@ -243,34 +189,13 @@ export const OrderCard = React.memo(function OrderCard({
 
         {/* Thumbnails */}
         {thumbs.length > 0 && (
-          <View
-            style={{
-              flexDirection: "row",
-              paddingHorizontal: 16,
-              gap: 12,
-              marginBottom: 12,
-            }}
-          >
+          <View style={s.thumbsWrap}>
             {thumbs.map((item, i) => (
-              <View
-                key={i}
-                style={{
-                  flex: 1,
-                  aspectRatio: 1,
-                  maxWidth: 62,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: "#EEEFF1",
-                  backgroundColor: "#FAFAFA",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
+              <View key={i} style={s.thumbBox}>
                 {item.medicineSnapshot?.image ? (
                   <Image
                     source={{ uri: item.medicineSnapshot.image }}
-                    style={s.productImg52}
+                    style={orderStyles.productImg52}
                     contentFit="contain"
                     cachePolicy="memory-disk"
                   />
@@ -280,29 +205,8 @@ export const OrderCard = React.memo(function OrderCard({
               </View>
             ))}
             {extraCount > 0 && (
-              <View
-                style={{
-                  flex: 1,
-                  aspectRatio: 1,
-                  maxWidth: 62,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: "#EEEFF1",
-                  backgroundColor: "#fff",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={[
-                    s.labelMd,
-                    {
-                      fontSize: 18,
-                      fontWeight: "600",
-                      color: "#222222",
-                    },
-                  ]}
-                >
+              <View style={s.thumbExtraBox}>
+                <Text style={s.thumbExtraText}>
                   +{extraCount}
                 </Text>
               </View>
@@ -312,27 +216,13 @@ export const OrderCard = React.memo(function OrderCard({
 
         {/* Delivery date + corporate badge */}
         {(order.estimatedDelivery || order.isCorporateGeneratedOrder) && (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              paddingHorizontal: 16,
-              paddingBottom: 14,
-            }}
-          >
+          <View style={s.deliveryCorporateRow}>
             {order.estimatedDelivery ? (
               <View>
-                <Text
-                  className="font-inter-semibold text-[#6A6A6A] uppercase"
-                  style={[s.labelXs, labelStyle]}
-                >
+                <Text style={s.metaLabel}>
                   Delivery On
                 </Text>
-                <Text
-                  className="font-inter-bold text-[#222222]"
-                  style={[s.labelSm, valueStyle]}
-                >
+                <Text style={s.metaValue}>
                   {formatDate(order.estimatedDelivery)}
                 </Text>
               </View>
@@ -345,17 +235,12 @@ export const OrderCard = React.memo(function OrderCard({
       </Touchable>
 
       {/* Divider + Buttons */}
-      <View style={{ height: 1, backgroundColor: "#919EAB33" }} />
-      <View style={{ flexDirection: "row" }}>
+      <View style={s.dividerHorizontal} />
+      <View style={s.actionsRow}>
         {showDetails && (
           <>
             <Touchable
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingVertical: 14,
-              }}
+              style={s.actionBtn}
               activeOpacity={0.7}
               onPress={() =>
                 router.push({
@@ -365,44 +250,28 @@ export const OrderCard = React.memo(function OrderCard({
               }
               onPressIn={handlePrefetch}
             >
-              <Text
-                style={s.labelMd}
-                className="font-inter-bold text-brand-primary"
-              >
+              <Text style={s.actionBtnText}>
                 Order Details
               </Text>
             </Touchable>
-            <View style={{ width: 1, backgroundColor: "#919EAB33" }} />
+            <View style={s.dividerVertical} />
           </>
         )}
         <Touchable
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            paddingVertical: 14,
-          }}
+          style={s.actionBtn}
           activeOpacity={0.7}
           onPress={handleOrderAgain}
           disabled={isProceeding}
         >
           {isProceeding ? (
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-            >
+            <View style={s.addingRow}>
               <ActivityIndicator size="small" color="#0F7635" />
-              <Text
-                style={s.labelSm}
-                className="font-inter-semibold text-brand-primary"
-              >
+              <Text style={s.addingText}>
                 Adding...
               </Text>
             </View>
           ) : (
-            <Text
-              style={s.labelMd}
-              className="font-inter-bold text-brand-primary"
-            >
+            <Text style={s.actionBtnText}>
               Order Again
             </Text>
           )}

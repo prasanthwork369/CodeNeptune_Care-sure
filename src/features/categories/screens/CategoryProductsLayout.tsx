@@ -13,7 +13,7 @@ import {
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryProduct } from "@/src/features/categories/types";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { useLocalSearchParams } from "expo-router";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import React, { useCallback } from "react";
@@ -22,6 +22,7 @@ import {
   CategoryCartBanner,
   ProductGrid,
 } from "@/src/features/categories/products/sections";
+import { styles as s } from "./CategoryProductsLayout.styles";
 
 const CategoryProductsContent: React.FC = () => {
   const { id, slug, name, familySlug } = useLocalSearchParams<{
@@ -82,30 +83,27 @@ const CategoryProductsContent: React.FC = () => {
   }, [refetch]);
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader
         title={name || "Category"}
         rightSlot={
-          <View className="flex-row items-center gap-2.5">
+          <View style={s.headerRightRow}>
             <Touchable
               onPress={() => router.push("/search")}
-              className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center "
+              style={s.actionButton}
             >
-              <icons.search width={20} height={20} />
+              <icons.search width={exactScale(20)} height={exactScale(20)} />
             </Touchable>
-            <View className="relative">
+            <View style={s.cartWrap}>
               <Touchable
                 onPress={() => router.push("/(commerce)/cart")}
-                className="w-12 h-12 rounded-full bg-white border border-[#919EAB33] items-center justify-center "
+                style={s.actionButton}
               >
-                <icons.cart_outline width={22} height={22} />
+                <icons.cart_outline width={exactScale(22)} height={exactScale(22)} />
               </Touchable>
               {cartLineCount > 0 && (
-                <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C22923] items-center justify-center">
-                  <Text
-                    className="font-inter-bold text-white"
-                    style={{ fontSize: moderateScale(10) }}
-                  >
+                <View style={s.badge}>
+                  <Text style={s.badgeText}>
                     {cartLineCount}
                   </Text>
                 </View>
@@ -128,13 +126,12 @@ const CategoryProductsContent: React.FC = () => {
 
       <View
         pointerEvents={totalItems > 0 ? "box-none" : "none"}
-        style={{
-          position: "absolute",
-          bottom: adjustedBottom + 20,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-        }}
+        style={[
+          s.floatingBannerWrap,
+          {
+            bottom: adjustedBottom + exactScale(20),
+          },
+        ]}
       >
         <CategoryCartBanner onPress={() => router.push("/(commerce)/cart")} />
       </View>

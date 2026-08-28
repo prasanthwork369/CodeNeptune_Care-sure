@@ -12,8 +12,9 @@ import { OrderTabKey } from "../types";
 import React, { useCallback, useRef } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import { orderStyles as s } from "../orders.styles";
+import { orderStyles } from "../orders.styles";
 import { OrdersPage } from "../sections/OrdersPage";
+import { styles as s } from "./MyOrdersLayout.styles";
 
 const TABS: {
   key: OrderTabKey;
@@ -62,10 +63,7 @@ export const MyOrdersLayout: React.FC = () => {
 
   // The All tab's query, read here as the screen-level signal for "is there any
   // order data at all". Same query key the All page uses, so React Query serves
-  // both observers from one cache entry — no extra request. Holding an observer
-  // at this level is also what lets the screen recover on its own: it keeps the
-  // query subscribed while the pages below are unmounted, so onlineManager's
-  // reconnect refetch has something to refetch.
+  // both observers from one cache entry — no extra request.
   const {
     orders: allOrders,
     loading: allLoading,
@@ -79,13 +77,9 @@ export const MyOrdersLayout: React.FC = () => {
     loading: allLoading,
   });
 
-  // Orders is live: statuses move server-side, so offline replaces the screen
-  // rather than showing a cached list that may already be wrong. Online, this
-  // fires only with nothing to show — a per-tab failure still belongs to that
-  // tab, since one failed status filter says nothing about the others.
   if (liveState) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+      <View style={s.root}>
         <ScreenHeader
           title="My Orders"
           showBorder={true}
@@ -108,7 +102,7 @@ export const MyOrdersLayout: React.FC = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+    <View style={s.root}>
       <ScreenHeader
         title="My Orders"
         showBorder={true}
@@ -123,12 +117,12 @@ export const MyOrdersLayout: React.FC = () => {
         borderColor="#919EAB33"
         indicatorInset={8}
         paddingVertical={18}
-        labelStyle={[s.labelMd, { fontSize: 15 }]}
+        labelStyle={[orderStyles.labelMd, s.tabLabel]}
         progress={progress}
       />
 
       <View
-        style={{ flex: 1, backgroundColor: "#F5F6FB" }}
+        style={s.pagerContainer}
         onLayout={(e) => {
           const w = e.nativeEvent.layout.width;
           if (w > 0 && w !== pageWidth) setPageWidth(w);
@@ -147,8 +141,8 @@ export const MyOrdersLayout: React.FC = () => {
             decelerationRate="fast"
             directionalLockEnabled
             disableIntervalMomentum
-            style={{ flex: 1, backgroundColor: "#F5F6FB" }}
-            contentContainerStyle={{ backgroundColor: "#F5F6FB" }}
+            style={s.pagerContainer}
+            contentContainerStyle={s.scrollContent}
           >
             {TABS.map((tab) =>
               visitedKeys.includes(tab.key) ? (
@@ -165,7 +159,7 @@ export const MyOrdersLayout: React.FC = () => {
               ) : (
                 <View
                   key={tab.key}
-                  style={{ width: pageWidth, flex: 1, backgroundColor: "#F5F6FB" }}
+                  style={[s.pagePlaceholder, { width: pageWidth }]}
                 />
               ),
             )}

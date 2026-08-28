@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { styles as s } from "./HowItWorks.styles";
+import { styles as s } from "./upload.styles";
 
 const STEPS = [
   { n: "1", label: "Upload\nPrescription" },
@@ -10,31 +10,19 @@ const STEPS = [
 
 export const HowItWorks: React.FC = () => {
   return (
-    <View className="bg-white border border-[#919EAB33] rounded-[14px] p-4">
-      <Text
-        style={s.sectionTitle}
-        className="font-inter-semibold text-brand-text mb-4"
-      >
+    <View style={s.card}>
+      <Text style={s.howSectionTitle}>
         How it works
       </Text>
-      <View className="flex-row items-start justify-around">
+      <View style={s.stepsRow}>
         {STEPS.map((step) => (
-          <View key={step.n} className="items-center flex-1">
-            <View
-              style={[s.stepCircle, { backgroundColor: "#F1F5F9" }]}
-              className="rounded-full items-center justify-center"
-            >
-              <Text
-                style={s.stepNumber}
-                className="font-inter-semibold leading-none"
-              >
+          <View key={step.n} style={s.stepCol}>
+            <View style={s.stepCircle}>
+              <Text style={s.stepNumber}>
                 {step.n}
               </Text>
             </View>
-            <Text
-              style={s.stepLabel}
-              className="font-inter-medium text-brand-text text-center mt-2"
-            >
+            <Text style={s.stepLabel}>
               {step.label}
             </Text>
           </View>

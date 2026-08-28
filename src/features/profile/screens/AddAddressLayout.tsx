@@ -10,7 +10,7 @@ import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import { useLocationStore } from "@/src/store/locationStore";
 import { LABELS, LabelType } from "@/src/types/address";
 import { addressToLocation } from "@/src/utils/addressLocation";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -25,7 +25,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { profileStyles as s } from "../profile.styles";
+import { styles as s } from "./AddAddressLayout.styles";
 
 export const AddAddressLayout: React.FC = () => {
   const router = useNav();
@@ -47,7 +47,7 @@ export const AddAddressLayout: React.FC = () => {
     prefill_pincode?: string;
   }>();
   const isEdit = !!id;
-  const setLocation = useLocationStore((s) => s.setLocation);
+  const setLocation = useLocationStore((st) => st.setLocation);
   const {
     addresses,
     addAddress,
@@ -65,9 +65,7 @@ export const AddAddressLayout: React.FC = () => {
   const mobileRef = useRef<TextInput | null>(null);
   const setMobileRef = (ref: TextInput | null) => {
     mobileRef.current = ref;
-    if (ref) {
-      applyDigitsOnlyFilter(ref, 10);
-    }
+    if (ref) applyDigitsOnlyFilter(ref, 10);
   };
   const line1Ref = useRef<TextInput>(null);
   const line2Ref = useRef<TextInput>(null);
@@ -94,15 +92,11 @@ export const AddAddressLayout: React.FC = () => {
   useEffect(() => {
     const showSub = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e) => {
-        setKeyboardHeight(e.endCoordinates.height);
-      },
+      (e) => setKeyboardHeight(e.endCoordinates.height),
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        setKeyboardHeight(0);
-      },
+      () => setKeyboardHeight(0),
     );
     return () => {
       showSub.remove();
@@ -211,8 +205,6 @@ export const AddAddressLayout: React.FC = () => {
           prefill_state ||
           prefill_pincode
         );
-        // Coming from the location sheet means the user is picking where to
-        // deliver, so the address they just added becomes the selected one.
         if (cameFromLocationSheet && created?.id) {
           const {
             location,
@@ -223,8 +215,6 @@ export const AddAddressLayout: React.FC = () => {
         }
       }
       setSaveCompleted(true);
-      // Wait a frame so the button's saved/disabled state actually paints
-      // before back() starts tearing this screen down.
       requestAnimationFrame(() => router.back());
     } catch (err) {
       if (__DEV__) console.error("[Address Save Error]", err);
@@ -240,6 +230,7 @@ export const AddAddressLayout: React.FC = () => {
       setMobileError(r.valid ? "" : r.message);
     } else setMobileError("");
   };
+
   const handlePincodeChange = (text: string) => {
     const c = sanitize.pincode(text);
     setPincode(c);
@@ -248,6 +239,7 @@ export const AddAddressLayout: React.FC = () => {
       setPincodeError(r.valid ? "" : r.message);
     } else setPincodeError("");
   };
+
   const isValid =
     !!addressLabel &&
     name.trim() &&
@@ -256,6 +248,7 @@ export const AddAddressLayout: React.FC = () => {
     city.trim() &&
     state.trim() &&
     validate.pincode(pincode).valid;
+
   const isDirty = existing
     ? addressLabel !== ((existing.label as LabelType) ?? "HOME") ||
       name.trim() !== (existing.name ?? "").trim() ||
@@ -277,24 +270,36 @@ export const AddAddressLayout: React.FC = () => {
         pincode
       );
 
+  const isButtonDisabled =
+    submitting ||
+    saveCompleted ||
+    !isValid ||
+    isOffline ||
+    (isEdit && !isDirty);
+
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <UnsavedChangesGuard
         hasUnsavedChanges={!saveCompleted && isDirty && (!isEdit || !!existing)}
       />
       <ScreenHeader title={isEdit ? "Edit Address" : "Add New Address"} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
+        style={s.keyboardAvoid}
       >
         <ScrollView
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
           overScrollMode="auto"
-          contentContainerStyle={{
-            padding: 20,
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 2 : 30,
-          }}
+          contentContainerStyle={[
+            s.scrollContent,
+            {
+              paddingBottom:
+                keyboardHeight > 0
+                  ? keyboardHeight + exactScale(2)
+                  : exactScale(30),
+            },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
           <FormField
@@ -427,40 +432,48 @@ export const AddAddressLayout: React.FC = () => {
             }}
           />
 
-          <View className="mb-5">
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                fontWeight: "600",
-                color: "#222222",
-                marginBottom: 8,
-              }}
-            >
-              Address Type
-            </Text>
-            <View className="flex-row gap-x-2.5">
+          <View style={s.sectionWrap}>
+            <Text style={s.typeLabel}>Address Type</Text>
+            <View style={s.typeRow}>
               {LABELS.map((l) => {
                 const isActive = addressLabel === l;
                 const iconColor = isActive ? "#FFFFFF" : "#6A6A6A";
                 const icon =
                   l === "HOME" ? (
                     isActive ? (
-                      <icons.home_add_light width={14} height={14} />
+                      <icons.home_add_light
+                        width={exactScale(14)}
+                        height={exactScale(14)}
+                      />
                     ) : (
-                      <icons.home_add width={14} height={14} fill={iconColor} />
+                      <icons.home_add
+                        width={exactScale(14)}
+                        height={exactScale(14)}
+                        fill={iconColor}
+                      />
                     )
                   ) : l === "WORK" ? (
                     isActive ? (
-                      <icons.business_light width={14} height={14} />
+                      <icons.business_light
+                        width={exactScale(14)}
+                        height={exactScale(14)}
+                      />
                     ) : (
-                      <icons.business width={14} height={14} fill={iconColor} />
+                      <icons.business
+                        width={exactScale(14)}
+                        height={exactScale(14)}
+                        fill={iconColor}
+                      />
                     )
                   ) : isActive ? (
-                    <icons.location_pin_light width={14} height={14} />
+                    <icons.location_pin_light
+                      width={exactScale(14)}
+                      height={exactScale(14)}
+                    />
                   ) : (
                     <icons.location_pin
-                      width={14}
-                      height={14}
+                      width={exactScale(14)}
+                      height={exactScale(14)}
                       fill={iconColor}
                     />
                   );
@@ -470,16 +483,19 @@ export const AddAddressLayout: React.FC = () => {
                     onPress={() => setAddressLabel(l)}
                     activeOpacity={0.8}
                     throttleMs={0}
-                    className="flex-row items-center gap-x-1.5 px-[14px] py-2 rounded-md border"
-                    style={{
-                      backgroundColor: isActive ? "#0F7635" : "#FFFFFF",
-                      borderColor: isActive ? "#0F7635" : "#E8E8E8",
-                    }}
+                    style={[
+                      s.typeChip,
+                      isActive ? s.typeChipActive : s.typeChipInactive,
+                    ]}
                   >
                     {icon}
                     <Text
-                      className="font-inter-semibold"
-                      style={[s.addrAction, { color: iconColor }]}
+                      style={[
+                        s.typeChipText,
+                        isActive
+                          ? s.typeChipTextActive
+                          : s.typeChipTextInactive,
+                      ]}
                     >
                       {l}
                     </Text>
@@ -493,83 +509,50 @@ export const AddAddressLayout: React.FC = () => {
             <Touchable
               activeOpacity={0.8}
               onPress={() => setIsDefault(!isDefault)}
-              className="flex-row items-center mt-2 mb-6"
+              style={s.defaultToggleRow}
             >
               <View
-                style={{
-                  width: 44,
-                  height: 24,
-                  borderRadius: 12,
-                  backgroundColor: isDefault ? "#0F7635" : "#E0E0E0",
-                  padding: 2,
-                  justifyContent: "center",
-                  marginRight: 12,
-                }}
+                style={[
+                  s.toggleTrack,
+                  isDefault ? s.toggleTrackActive : s.toggleTrackInactive,
+                ]}
               >
                 <View
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
-                    backgroundColor: "#FFFFFF",
-                    transform: [{ translateX: isDefault ? 20 : 0 }],
-                    shadowColor: "#919EAB33",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 2,
-                    elevation: 2,
-                  }}
+                  style={[
+                    s.toggleThumb,
+                    {
+                      transform: [
+                        { translateX: isDefault ? exactScale(20) : 0 },
+                      ],
+                    },
+                  ]}
                 />
               </View>
-              <Text
-                style={s.addrLabel}
-                className="font-inter-semibold text-[#222222]"
-              >
-                Set as default address
-              </Text>
+              <Text style={s.defaultText}>Set as default address</Text>
             </Touchable>
           )}
+
           {validationError || apiError ? (
-            <Text
-              style={s.addrAction}
-              className="text-red-500 font-inter-medium mb-3"
-            >
-              {validationError || apiError}
-            </Text>
+            <Text style={s.errorText}>{validationError || apiError}</Text>
           ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
-      <SafeAreaView edges={["bottom"]} className="bg-[#F5F6FB]">
-        <View className="px-5 pt-3 pb-3">
+
+      <SafeAreaView edges={["bottom"]} style={s.bottomArea}>
+        <View style={s.bottomPadding}>
           <Touchable
             activeOpacity={0.85}
             onPress={handleSave}
-            disabled={
-              submitting ||
-              saveCompleted ||
-              !isValid ||
-              isOffline ||
-              (isEdit && !isDirty)
-            }
-            className="bg-brand-primary rounded-md py-4 flex-row items-center justify-center gap-x-2"
-            style={{
-              opacity:
-                submitting ||
-                saveCompleted ||
-                !isValid ||
-                isOffline ||
-                (isEdit && !isDirty)
-                  ? 0.5
-                  : 1,
-            }}
+            disabled={isButtonDisabled}
+            style={[
+              s.submitBtn,
+              isButtonDisabled ? s.submitBtnDisabled : s.submitBtnEnabled,
+            ]}
           >
             {submitting || saveCompleted ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text
-                style={s.addrAddBtn}
-                className="font-inter-semibold text-white"
-              >
+              <Text style={s.submitBtnText}>
                 {isEdit ? "Save Changes  →" : "Save Address →"}
               </Text>
             )}

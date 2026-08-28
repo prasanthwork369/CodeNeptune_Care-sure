@@ -7,6 +7,10 @@ jest.mock("@react-navigation/native", () => ({
   useIsFocused: () => true,
 }));
 
+jest.mock("expo-router", () => ({
+  useIsFocused: () => true,
+}));
+
 describe("HomeSearchCycler", () => {
   beforeEach(() => {
     jest.useFakeTimers();

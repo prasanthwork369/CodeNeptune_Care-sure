@@ -1,3 +1,4 @@
+import { AUTH_CONFIG } from "@/src/features/auth/constants/auth.constants";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useNav } from "@/src/hooks/useNav";
 import {
@@ -9,13 +10,13 @@ import { IS_LIVE_API } from "@/src/utils/urls";
 import { sanitize, validate } from "@/src/utils/validation";
 import { useRef, useState } from "react";
 import { Keyboard, Platform, TextInput } from "react-native";
-
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { logger } from "@/src/utils/logger";
 
+const { PHONE_DIGITS } = AUTH_CONFIG;
+
 /**
- * Custom hook managing the business logic for the Login screen.
- * Handles phone number sanitization, validation, native SIM suggestions, and triggering OTP request mutations.
+ * Manages phone input state, SIM hint picker, and OTP requests on the Login screen.
  */
 export function useLogin() {
   const router = useNav();
@@ -29,27 +30,18 @@ export function useLogin() {
   });
 
   const phoneInputRef = useRef<TextInput | null>(null);
-  // Spends the first tap so the field never focuses; iOS has no picker.
   const [hintShieldVisible, setHintShieldVisible] = useState(
     Platform.OS === "android",
   );
-  // Guards a double tap landing before the state update hides the shield.
   const hintRequested = useRef(false);
 
-  /**
-   * Sanitizes input to numeric only. Validation only runs on submit
-   * (handleGetOtp) — flagging an incomplete number while the user is still
-   * mid-type reads as an error for perfectly normal typing.
-   */
   const handleChangeText = (text: string) => {
-    // Typed overflow: already 10 digits and new text only appends — ignore it.
-    if (phoneNumber.length === 10 && text.startsWith(phoneNumber)) return;
-    // A fresh attempt — drop any submit-time error so it doesn't linger while editing.
+    if (phoneNumber.length === PHONE_DIGITS && text.startsWith(phoneNumber)) return;
     if (error) resetError();
     const cleaned = sanitize.phone(text);
     setPhoneNumber(cleaned);
 
-    if (cleaned.length === 10) {
+    if (cleaned.length === PHONE_DIGITS) {
       const res = validate.phone(cleaned);
       setPhoneError(res.valid ? "" : res.message);
     } else if (phoneError) {
@@ -57,16 +49,14 @@ export function useLogin() {
     }
   };
 
-  /** Shows the SIM picker on the first tap; the shield keeps the keyboard shut. */
   const handleHintPress = async () => {
     setHintShieldVisible(false);
     if (hintRequested.current) return;
     hintRequested.current = true;
 
-    // Null on cancel, missing Play Services, or any native error.
     const raw = await getPhoneNumberHint();
     const digits = raw ? normalizeIndianPhone(raw) : "";
-    if (digits.length === 10 && validate.phone(digits).valid) {
+    if (digits.length === PHONE_DIGITS && validate.phone(digits).valid) {
       handleChangeText(digits);
       return;
     }
@@ -74,9 +64,6 @@ export function useLogin() {
     phoneInputRef.current?.focus();
   };
 
-  /**
-   * Submits the sanitized phone number to the API, then routes to the OTP verification screen.
-   */
   const handleGetOtp = async () => {
     if (loading) return;
     if (!requireInternet()) return;
@@ -92,27 +79,23 @@ export function useLogin() {
       const formattedPhone = `+91${phoneNumber}`;
       const res = await requestOtp(formattedPhone);
       succeeded = true;
-      // DEV-only: the QA response contains the OTP — never log it in release.
       if (__DEV__) logger.debug("[Login] requestOtp response:", res);
-      // Never auto-fill against the live API — a leaked `otp` there would hand any number's account over.
+
+      // In non-live test environments, prefill returned OTP for convenience
       const prefillOtp = IS_LIVE_API ? "" : (res?.data?.otp ?? "");
       router.push({
         pathname: "/otp",
         params: { phone: formattedPhone, prefillOtp },
       });
     } catch {
-      // Error state is captured and handled by useAuth hook
+      // Error state captured by useAuth mutation
     } finally {
       stopLoginTrace({ status: succeeded ? "success" : "error" });
     }
   };
 
-  /**
-   * Triggered when keyboard Done / Tick / ✓ button is pressed.
-   * Calls API only when exactly 10 digits are entered and not already loading.
-   */
   const handleSubmitEditing = () => {
-    if (phoneNumber.length === 10 && !loading) {
+    if (phoneNumber.length === PHONE_DIGITS && !loading) {
       void handleGetOtp();
     }
   };

@@ -11,7 +11,10 @@ import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import React from "react";
 
-jest.mock("@/src/features/cart/hooks/useCoupons");
+jest.mock("@/src/features/cart/hooks/useCoupons", () => ({
+  ...jest.requireActual("@/src/features/cart/hooks/useCoupons"),
+  useCoupons: jest.fn(),
+}));
 jest.mock("@/src/features/cart/api/coupon.api");
 jest.mock("@/src/hooks/useNav", () => ({
   useNav: () => ({

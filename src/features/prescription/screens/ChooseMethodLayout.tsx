@@ -16,6 +16,7 @@ import {
   RequiresPrescriptionWarning,
   UploadMethodCard,
 } from "../sections/choose-method";
+import { styles as s } from "./ChooseMethodLayout.styles";
 
 export const ChooseMethodLayout: React.FC = () => {
   const router = useNav();
@@ -73,13 +74,13 @@ export const ChooseMethodLayout: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={s.root}>
       <ScreenHeader title="Upload Prescription" backgroundColor="#FFFFFF" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
-        className="flex-1 bg-[#F5F6FB]"
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        style={s.scrollView}
+        contentContainerStyle={s.scrollContent}
       >
         {hasRx && rxItems.length > 0 && (
           <RequiresPrescriptionWarning

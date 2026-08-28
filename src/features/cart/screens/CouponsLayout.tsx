@@ -1,17 +1,23 @@
-import type { Coupon } from "@/src/features/cart/types";
 import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import {
+  SKELETON_CARD_HEIGHT,
+  SKELETON_LIST_OFFSET,
+} from "@/src/features/cart/constants/cart.constants";
 import { useCart } from "@/src/features/cart/hooks/useCart";
-import { useCoupons } from "@/src/features/cart/hooks/useCoupons";
-import { useCouponAvailability } from "@/src/features/cart/hooks/useCouponAvailability";
-import { useCouponSearch } from "@/src/features/cart/hooks/useCouponSearch";
-import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
+import {
+  useCouponAvailability,
+  useCoupons,
+  useCouponSearch,
+} from "@/src/features/cart/hooks/useCoupons";
+import type { Coupon } from "@/src/features/cart/types";
 import { useNav } from "@/src/hooks/useNav";
-import { couponApi } from "../api/coupon.api";
+import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useCouponStore } from "@/src/store/couponStore";
 import { useToastStore } from "@/src/store/toastStore";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
+import { requireInternet } from "@/src/utils/offline";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -21,22 +27,18 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { couponApi } from "../api/coupon.api";
 import { CouponCard, CouponCardSkeleton, CouponInput } from "../coupons";
-import { requireInternet } from "@/src/utils/offline";
+import { styles as s } from "./CouponsLayout.styles";
 
 const EMPTY_COUPONS: Coupon[] = [];
-
-// One skeleton card: 115 body + 12 bottom margin
-const SKELETON_CARD_HEIGHT = 127;
-// Header, search input and section title sitting above the list
-const SKELETON_LIST_OFFSET = 260;
 
 export const CouponsLayout: React.FC = () => {
   const [couponCode, setCouponCode] = useState("");
   const [validatingCode, setValidatingCode] = useState<string | null>(null);
-  const apply = useCouponStore((s) => s.apply);
-  const applied = useCouponStore((s) => s.applied);
-  const showToast = useToastStore((s) => s.show);
+  const apply = useCouponStore((st) => st.apply);
+  const applied = useCouponStore((st) => st.applied);
+  const showToast = useToastStore((st) => st.show);
   const router = useNav();
   const { height: screenHeight } = useWindowDimensions();
   const { totalPrice: subtotal, isLoading: isCartLoading } = useCart();
@@ -52,12 +54,9 @@ export const CouponsLayout: React.FC = () => {
   const unavailable = useCouponAvailability(coupons);
   const visibleCoupons = useCouponSearch(coupons, couponCode);
 
-  // Subtotal drives every min-order state, so painting before the cart lands
-  // would show each coupon as eligible and then grey it out.
   const shouldShowInitialShimmer =
     (isLoading && coupons.length === 0) || isCartLoading;
 
-  // Fills the viewport so the placeholder reads as a full list rather than a short stub
   const skeletonCount = Math.max(
     3,
     Math.ceil(
@@ -66,9 +65,6 @@ export const CouponsLayout: React.FC = () => {
     ),
   );
 
-  // Same Fabric re-parent conflict as the header's back button (see onBack
-  // below) via the Android hardware back button instead — that pop isn't
-  // routed through onBack at all, so it needs its own defer.
   useFocusEffect(
     useCallback(() => {
       const subscription = BackHandler.addEventListener(
@@ -85,11 +81,8 @@ export const CouponsLayout: React.FC = () => {
   const applyCode = async (code: string) => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
-    // Gate before the loader: an offline tap must look inert, not busy.
     if (!requireInternet()) return;
     setValidatingCode(trimmed);
-    // Set once we're actually navigating, so the finally below only clears
-    // the card's loading spinner early for the stay-on-screen (toast) path.
     let navigating = false;
     try {
       const result = await couponApi.validateCoupon(trimmed, subtotal);
@@ -100,7 +93,6 @@ export const CouponsLayout: React.FC = () => {
           description: result.message ?? "",
         });
         navigating = true;
-        // transition makes Fabric re-parent views and crash.
         requestAnimationFrame(() => {
           router.back();
           setValidatingCode(null);
@@ -112,8 +104,6 @@ export const CouponsLayout: React.FC = () => {
         );
       }
     } catch (err) {
-      // Surface the backend's reason (e.g. "usage limit reached") when the
-      // coupon is rejected via a 4xx, instead of a generic fallback.
       const message = err instanceof Error ? err.message : "";
       showToast(
         message || "Could not validate coupon. Please try again.",
@@ -126,22 +116,16 @@ export const CouponsLayout: React.FC = () => {
 
   const screenHeaderProps = {
     title: "Apply Coupon",
-    // Same defer as applyCode below: this screen's coupon/cart queries can
-    // still be mid-render (skeleton -> list swap) when back is tapped —
-    // starting the pop transition in that same tick is the Fabric
-    // re-parent crash this file already had to fix once.
     onBack: () => requestAnimationFrame(() => router.back()),
   };
 
-  // No cached coupons and offline: there's nothing to apply, so hide the
-  // input/list instead of showing a coupon field that can't do anything.
   if (
     !shouldShowInitialShimmer &&
     coupons.length === 0 &&
     couponsErrorState === "offline"
   ) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader {...screenHeaderProps} />
         <NoInternetState
           onRetry={() => void refetchCoupons()}
@@ -152,16 +136,10 @@ export const CouponsLayout: React.FC = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader {...screenHeaderProps} />
 
-      {/* Fixed search bar — stays pinned while only the coupon list scrolls */}
-      <View
-        style={{
-          paddingHorizontal: exactScale(16),
-          paddingTop: exactScale(32),
-        }}
-      >
+      <View style={s.searchWrap}>
         <CouponInput
           value={couponCode}
           onChangeText={setCouponCode}
@@ -173,23 +151,10 @@ export const CouponsLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          paddingHorizontal: exactScale(16),
-          paddingTop: exactScale(18),
-          paddingBottom: exactScale(40),
-        }}
+        style={s.scroll}
+        contentContainerStyle={s.scrollContent}
       >
-        <Text
-          className="font-inter-bold text-brand-text"
-          style={{
-            fontSize: moderateScale(16),
-            lineHeight: moderateScale(21),
-            marginBottom: exactScale(14),
-          }}
-        >
-          Featured Coupons
-        </Text>
+        <Text style={s.sectionTitle}>Featured Coupons</Text>
 
         {shouldShowInitialShimmer ? (
           Array.from({ length: skeletonCount }, (_, i) => (
@@ -202,10 +167,7 @@ export const CouponsLayout: React.FC = () => {
             retrying={isCouponsFetching}
           />
         ) : visibleCoupons.length === 0 ? (
-          <Text
-            className="font-inter-medium text-brand-subtext text-center mt-4"
-            style={{ fontSize: moderateScale(13) }}
-          >
+          <Text style={s.emptyText}>
             {coupons.length === 0
               ? "No coupons available"
               : "No coupons match that code"}
@@ -215,8 +177,6 @@ export const CouponsLayout: React.FC = () => {
             const isApplied =
               applied?.code?.trim().toUpperCase() ===
               coupon.code?.trim().toUpperCase();
-            // Failed pre-validation (e.g. usage limit reached) → show inactive.
-            // Decoupled from subtotal so already-used coupons always read USED.
             const isUnavailable =
               !isApplied && unavailable.has(coupon.code);
             const isCardValidating =

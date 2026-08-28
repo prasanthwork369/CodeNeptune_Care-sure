@@ -5,30 +5,19 @@ import { OrderItem } from "../../types";
 import { exactScale } from "@/src/utils/exactScale";
 import { getOrderItemPricing } from "@/src/utils/order";
 import { Image } from "expo-image";
+import { SectionCard } from "./SectionCard";
+import { styles as s } from "./tracking.styles";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../../orders.styles";
-import { SectionCard } from "./SectionCard";
 
 interface ItemsOrderedSectionProps {
   items: OrderItem[];
   orderId: string | undefined;
-  // paid itemTotal / MRP total; used only to estimate a missing selling price.
-  // It must never be displayed as an individual item's discount percentage.
   priceEstimateRatio?: number;
-  // True while `order` is placeholder data seeded from the orders list —
-  // Cancel/Return must wait for the real detail fetch before they're offered.
   actionsDisabled?: boolean;
-  // Delivered alone isn't enough — also requires no active return request
-  // and an unexpired return window (see useReturnEligibility).
   showReturnButton?: boolean;
-  // Formatted earliest return deadline, shown as a countdown under the
-  // Return button. Null when unknown (legacy orders) or not applicable.
   returnDeadlineLabel?: string | null;
-  // Replaces the Return button with an "already requested" indicator.
   hasActiveReturnRequest?: boolean;
-  // Not yet delivered/cancelled, and not a corporate-billed order (see
-  // isCancellable in OrderTrackingLayout).
   isCancellable?: boolean;
 }
 
@@ -46,30 +35,22 @@ export function ItemsOrderedSection({
 
   return (
     <SectionCard>
-      <View
-        className="flex-row items-center justify-between"
-        style={{
-          paddingHorizontal: exactScale(16),
-          paddingTop: exactScale(16),
-          paddingBottom: exactScale(12),
-        }}
-      >
-        <Text style={s.labelMd} className="font-inter-bold text-brand-text">
+      <View style={s.itemsHeaderRow}>
+        <Text style={s.itemsHeaderTitle}>
           Items Ordered ({items.length})
         </Text>
-        <View className="flex-row" style={{ gap: exactScale(8) }}>
-          {showReturnButton && !actionsDisabled && (
-            <View className="items-end" style={{ gap: exactScale(4) }}>
+        <View style={s.actionBtnsRow}>
+          {hasActiveReturnRequest && !actionsDisabled && (
+            <View style={s.activeReturnPill}>
+              <Text style={s.activeReturnPillText}>
+                Return Request Already Exists
+              </Text>
+            </View>
+          )}
+          {showReturnButton && !actionsDisabled && !hasActiveReturnRequest && (
+            <View style={s.returnBtnCol}>
               <Touchable
-                className="flex-row items-center"
-                style={{
-                  borderWidth: exactScale(1.33),
-                  borderColor: "#FDE047",
-                  backgroundColor: "#FEF9C3",
-                  borderRadius: exactScale(20),
-                  paddingHorizontal: exactScale(12),
-                  paddingVertical: exactScale(4),
-                }}
+                style={s.returnBtn}
                 activeOpacity={0.7}
                 onPress={() =>
                   router.push({
@@ -82,18 +63,12 @@ export function ItemsOrderedSection({
                   width={exactScale(14)}
                   height={exactScale(14)}
                 />
-                <Text
-                  style={[s.labelSm, { marginLeft: exactScale(6) }]}
-                  className="font-inter-semibold text-brand-text"
-                >
+                <Text style={s.returnBtnText}>
                   Return
                 </Text>
               </Touchable>
               {!!returnDeadlineLabel && (
-                <Text
-                  style={s.statusBadge}
-                  className="font-inter-medium text-brand-subtext"
-                >
+                <Text style={s.returnDeadlineBadge}>
                   Returnable until {returnDeadlineLabel}
                 </Text>
               )}
@@ -101,19 +76,7 @@ export function ItemsOrderedSection({
           )}
           {isCancellable && !actionsDisabled && (
             <Touchable
-              className="flex-row items-center"
-              style={{
-                borderWidth: exactScale(1.33),
-                borderColor: "#515F0014",
-                backgroundColor: "#FFFFDC",
-                borderRadius: exactScale(20),
-                paddingHorizontal: exactScale(12),
-                paddingVertical: exactScale(4),
-                shadowColor: "#000000",
-                shadowOffset: { width: 0, height: exactScale(5.33) },
-                shadowOpacity: 0.05,
-                shadowRadius: exactScale(32),
-              }}
+              style={s.cancelBtn}
               activeOpacity={0.7}
               onPress={() =>
                 router.push({
@@ -122,10 +85,7 @@ export function ItemsOrderedSection({
                 })
               }
             >
-              <Text
-                style={[s.labelSm, { marginLeft: exactScale(6) }]}
-                className="font-inter-semibold text-brand-text"
-              >
+              <Text style={s.cancelBtnText}>
                 Cancel Order
               </Text>
             </Touchable>
@@ -133,7 +93,6 @@ export function ItemsOrderedSection({
         </View>
       </View>
       {items.map((item, index, arr) => {
-        // unitPrice is stored as the MRP — derive the discounted price paid.
         const { sellingPrice, mrp, discountPercent } = getOrderItemPricing(
           item,
           priceEstimateRatio,
@@ -155,25 +114,13 @@ export function ItemsOrderedSection({
                     params: { id: productId },
                   });
               }}
-              className="flex-row"
-              style={{
-                paddingHorizontal: exactScale(16),
-                paddingVertical: exactScale(12),
-              }}
+              style={s.itemRow}
             >
-              <View
-                className="border border-[#919EAB33] bg-[#FAFAFA] items-center justify-center overflow-hidden"
-                style={{
-                  width: exactScale(72),
-                  height: exactScale(72),
-                  borderRadius: exactScale(8),
-                  marginRight: exactScale(12),
-                }}
-              >
+              <View style={s.itemImageBox}>
                 {item.medicineSnapshot?.image ? (
                   <Image
                     source={{ uri: item.medicineSnapshot.image }}
-                    style={s.productImg50}
+                    style={s.itemImg}
                     contentFit="contain"
                     cachePolicy="memory-disk"
                   />
@@ -184,32 +131,22 @@ export function ItemsOrderedSection({
                   />
                 )}
               </View>
-              <View className="flex-1">
-                <View className="flex-row justify-between items-start">
+              <View style={s.itemInfoCol}>
+                <View style={s.itemTitlePriceRow}>
                   <Text
-                    style={[s.labelSm, { paddingRight: exactScale(8) }]}
-                    className="font-inter-semibold text-brand-text flex-1"
+                    style={s.itemNameText}
                     numberOfLines={2}
                   >
                     {item.medicineSnapshot?.name ?? item.medicineId}
                   </Text>
-                  <View className="items-end">
-                    <Text
-                      style={s.labelSm}
-                      className="font-inter-bold text-brand-text"
-                    >
+                  <View style={s.itemPriceCol}>
+                    <Text style={s.itemSellingPrice}>
                       {sellingPrice
                         ? `₹${parseFloat((sellingPrice * item.quantity).toFixed(2))}`
                         : "—"}
                     </Text>
-                    {/* Only show the struck-through MRP when there's an actual
-                      discount (mrp > selling price) — otherwise it renders a
-                      strikethrough over the same price on non-discounted items. */}
                     {hasDiscount && (
-                      <Text
-                        style={[s.statusBadge, { marginTop: exactScale(2) }]}
-                        className="font-inter text-brand-subtext line-through"
-                      >
+                      <Text style={s.itemMrpPrice}>
                         ₹{parseFloat((mrp * item.quantity).toFixed(2))}
                       </Text>
                     )}
@@ -217,45 +154,21 @@ export function ItemsOrderedSection({
                 </View>
                 {(item.medicineSnapshot?.brand ||
                   item.medicineSnapshot?.pack) && (
-                  <Text
-                    style={[s.labelSm, { marginTop: exactScale(2) }]}
-                    className="font-inter-medium text-brand-subtext"
-                  >
+                  <Text style={s.itemMetaText}>
                     {[item.medicineSnapshot.brand, item.medicineSnapshot.pack]
                       .filter(Boolean)
                       .join(" • ")}
                   </Text>
                 )}
-                <View
-                  className="flex-row items-center justify-between"
-                  style={{ marginTop: exactScale(8) }}
-                >
-                  <View
-                    style={{
-                      borderWidth: exactScale(1),
-                      borderColor: "#E2E8F0",
-                      backgroundColor: "#F3F4F6",
-                      borderRadius: exactScale(4),
-                      paddingHorizontal: exactScale(10),
-                      paddingVertical: exactScale(2),
-                    }}
-                  >
-                    <Text
-                      style={s.statusBadge}
-                      className="font-inter-semibold text-brand-text"
-                    >
+                <View style={s.itemQtyDiscountRow}>
+                  <View style={s.qtyBadge}>
+                    <Text style={s.qtyBadgeText}>
                       Qty: {item.quantity}
                     </Text>
                   </View>
 
-                  {/* Discount % on the right — show the stored discount directly
-                    (like the web) so it matches the product page exactly, rather
-                    than re-deriving it from the rounded paid price. */}
                   {hasDiscount && (
-                    <Text
-                      style={s.labelSm}
-                      className="font-inter-bold text-brand-primary"
-                    >
+                    <Text style={s.discountPercentText}>
                       {parseFloat(discountPercent.toFixed(2))}% off
                     </Text>
                   )}
@@ -263,14 +176,7 @@ export function ItemsOrderedSection({
               </View>
             </Touchable>
             {index < arr.length - 1 && (
-              <View
-                style={{
-                  borderTopWidth: 1,
-                  borderColor: "#E5E7EB",
-                  marginHorizontal: exactScale(20),
-                  borderStyle: "dashed",
-                }}
-              />
+              <View style={s.itemDivider} />
             )}
           </View>
         );

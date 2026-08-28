@@ -1,13 +1,16 @@
 import { useThumbnailRemoval } from "@/src/components/animations/flyToCart";
 import { icons } from "@/src/constants/icons";
-import { exactScale } from "@/src/utils/exactScale";
 import { Image, type ImageSource } from "expo-image";
 import React, { useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
+import {
+  CART_THUMB_SIZE,
+  IMAGE_SIZE,
+  styles as s,
+} from "./CartBannerThumbnail.styles";
 
-// Exported so the banner can centre the smoke puff on the same circle.
-export const CART_THUMB_SIZE = exactScale(44);
+export { CART_THUMB_SIZE };
 
 interface CartBannerThumbnailProps {
   /** Cart rows carry a URI string; an optimistic add carries an ImageSource or require number. */
@@ -20,8 +23,6 @@ interface CartBannerThumbnailProps {
   offsetLeft?: number;
 }
 
-// The Home cart banner's 44px circle. Same design as before — this only adds
-// the removal animation the category banner's ThumbnailItem already had.
 export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
   image,
   isPending,
@@ -45,10 +46,8 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
   }
 
   const size = CART_THUMB_SIZE;
-  const imageSize = exactScale(30);
+  const imageSize = IMAGE_SIZE;
 
-  // Normalize source to support remote URI string, ImageSource object, and local require(...) number.
-  // Falsy values, empty strings, and empty URI objects resolve to undefined so the local placeholder SVG renders.
   const source = useMemo(() => {
     if (!image) return undefined;
     if (typeof image === "number") return image;
@@ -71,7 +70,6 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
 
   const showImage = Boolean(source && !hasError);
 
-  // The puff is drawn by the banner, not here — the pill clips its own children.
   return (
     <View
       style={{
@@ -84,38 +82,19 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
       <Animated.View
         style={[
           containerStyle,
-          {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            backgroundColor: "#FFFFFF",
-            borderWidth: 1,
-            borderColor: "#919EAB33",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-            zIndex: 1,
-          },
+          s.thumbContainer,
         ]}
       >
         <Animated.View
           style={[
-            {
-              width: imageSize,
-              height: imageSize,
-              alignItems: "center",
-              justifyContent: "center",
-            },
+            s.imageWrapper,
             imageStyle,
           ]}
         >
           {showImage ? (
             <Image
               source={source}
-              style={{ width: "100%", height: "100%" }}
+              style={s.image}
               contentFit="contain"
               cachePolicy="memory-disk"
               onError={() => setHasError(true)}
@@ -125,19 +104,11 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
           )}
         </Animated.View>
 
-        {/* White mask, so the image dissolves into the circle's own interior. */}
+        {/* White mask */}
         <Animated.View
           style={[
             maskStyle,
-            {
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              backgroundColor: "#FFFFFF",
-            },
+            s.mask,
           ]}
         />
       </Animated.View>

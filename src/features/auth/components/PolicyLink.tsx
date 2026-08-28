@@ -1,12 +1,10 @@
 import { openLegalLink } from "@/src/utils/browser";
 import React, { useEffect } from "react";
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-interface PolicyLinkProps {
+export interface PolicyLinkProps {
   isVisible: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   url?: string;
 }
 

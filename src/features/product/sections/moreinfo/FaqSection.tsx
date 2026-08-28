@@ -1,9 +1,10 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { FaqItem } from "@/src/features/product/types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
+import { styles as s } from "./moreinfo.styles";
 
 const INITIAL_FAQ_COUNT = 4;
 
@@ -14,26 +15,15 @@ const FaqRow: React.FC<FaqItem & { open: boolean; onToggle: () => void }> = ({
   onToggle,
 }) => {
   return (
-    <View
-      className="border border-[#F1F2F4] rounded-[12px] bg-white overflow-hidden"
-      style={{ marginTop: exactScale(8) }}
-    >
+    <View style={s.faqRow}>
       <Touchable
         onPress={onToggle}
         throttleMs={0}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        className="flex-row items-center justify-between"
-        style={{ padding: exactScale(14) }}
+        style={s.faqHeader}
       >
-        <Text
-          className="flex-1 font-inter-bold text-brand-text"
-          style={{
-            fontSize: moderateScale(14),
-            lineHeight: moderateScale(19),
-            marginRight: exactScale(10),
-          }}
-        >
+        <Text style={s.faqQuestion}>
           {question}
         </Text>
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
@@ -42,17 +32,8 @@ const FaqRow: React.FC<FaqItem & { open: boolean; onToggle: () => void }> = ({
       </Touchable>
 
       {open ? (
-        <View
-          className="border-t border-[#F6F7F8]"
-          style={{ padding: exactScale(14) }}
-        >
-          <Text
-            className="font-inter-medium text-[#5E6670]"
-            style={{
-              fontSize: moderateScale(13),
-              lineHeight: moderateScale(20),
-            }}
-          >
+        <View style={s.faqAnswerContainer}>
+          <Text style={s.faqAnswerText}>
             {answer}
           </Text>
         </View>
@@ -77,7 +58,7 @@ export const FaqSection: React.FC<{ faqs: FaqItem[] }> = ({ faqs }) => {
   };
 
   return (
-    <View style={{ marginTop: -exactScale(8) }}>
+    <View style={s.faqContainer}>
       {visibleFaqs.map((faq, index) => (
         <FaqRow
           key={`${faq.question}-${index}`}
@@ -95,13 +76,10 @@ export const FaqSection: React.FC<{ faqs: FaqItem[] }> = ({ faqs }) => {
           throttleMs={0}
           accessibilityRole="button"
           accessibilityState={{ expanded: showAll }}
-          className="mt-3 self-start px-2 py-1"
+          style={s.faqShowAllBtn}
         >
-          <Text
-            className="font-inter-bold text-brand-primary"
-            style={{ fontSize: moderateScale(13) }}
-          >
-            {showAll ? "View Less FAQs" : "View More FAQs"}
+          <Text style={s.faqShowAllText}>
+            {showAll ? "View Less FAQs" : `View All (${faqs.length}) FAQs`}
           </Text>
         </Touchable>
       ) : null}

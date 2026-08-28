@@ -3,7 +3,8 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { Image, type ImageSource } from "expo-image";
 import React from "react";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./ConfirmModal.styles";
 
 /** Generic reusable confirm modal. No domain-specific defaults. */
 export interface ConfirmModalProps {
@@ -47,76 +48,66 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     onRequestClose={onCancel}
   >
     <Pressable
-      className="flex-1 bg-black/50 items-center justify-center px-6"
+      style={s.backdropPressable}
       onPress={onCancel}
     >
-      <Pressable onPress={(e) => e.stopPropagation()} className="w-full">
-        <View className="bg-white rounded-2xl px-6 py-6 w-full relative">
+      <Pressable onPress={(e) => e.stopPropagation()} style={s.modalContentPressable}>
+        <View style={s.modalCard}>
           {icon && (
             <Touchable
               onPress={onCancel}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F1F2F4] items-center justify-center"
+              style={s.closeBtn}
             >
-              <icons.close_dark width={14} height={14} />
+              <icons.close_dark width={exactScale(14)} height={exactScale(14)} />
             </Touchable>
           )}
 
           {icon && (
             <View
-              className="self-center w-28 h-28 rounded-full items-center justify-center mb-4"
-              style={{ backgroundColor: iconBg }}
+              style={[s.iconCircle, { backgroundColor: iconBg }]}
             >
               <Image
                 source={icon}
-                style={{ width: 36, height: 36 }}
+                style={{ width: exactScale(36), height: exactScale(36) }}
                 contentFit="contain"
               />
             </View>
           )}
 
           <Text
-            className={`font-inter-bold text-[#222222] mb-2 ${icon ? "text-center" : ""}`}
-            style={{ fontSize: moderateScale(17) }}
+            style={[s.titleText, icon ? { textAlign: "center" } : undefined]}
           >
             {title}
           </Text>
           <Text
-            className={`font-inter-medium text-[#6A6A6A] mb-6 leading-5 ${icon ? "text-center" : ""}`}
-            style={{ fontSize: moderateScale(13) }}
+            style={[s.messageText, icon ? { textAlign: "center" } : undefined]}
           >
             {message}
           </Text>
-          <View className="flex-row gap-4">
+          <View style={s.buttonRow}>
             <Touchable
               activeOpacity={0.7}
-              className="flex-1 items-center justify-center py-3.5 rounded-lg border border-[#919EAB33]"
+              style={s.cancelButton}
               onPress={onCancel}
             >
-              <Text
-                className="font-inter-semibold text-[#222222]"
-                style={{ fontSize: moderateScale(14) }}
-              >
+              <Text style={s.cancelButtonText}>
                 {cancelLabel}
               </Text>
             </Touchable>
             <Touchable
               activeOpacity={0.85}
               disabled={confirmLoading}
-              className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-lg"
-              style={{ backgroundColor: confirmBg }}
+              style={[s.confirmButton, { backgroundColor: confirmBg }]}
               onPress={onConfirm}
             >
               {confirmLoading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 !icon && showConfirmIcon && (
-                  <icons.delete_white width={16} height={16} fill="#FFFFFF" />
+                  <icons.delete_white width={exactScale(16)} height={exactScale(16)} fill="#FFFFFF" />
                 )
               )}
-              <Text
-                className="font-inter-semibold text-white"
-                style={{ fontSize: moderateScale(14) }}
-              >
+              <Text style={s.confirmButtonText}>
                 {confirmLoading ? (confirmLoadingLabel ?? confirmLabel) : confirmLabel}
               </Text>
             </Touchable>

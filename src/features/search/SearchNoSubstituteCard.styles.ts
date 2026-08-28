@@ -1,0 +1,118 @@
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  cardRoot: {
+    width: "100%",
+    borderRadius: exactScale(12),
+    backgroundColor: "#FFFFFF",
+    overflow: "hidden",
+    marginBottom: exactScale(20),
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+  },
+  splitRow: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  leftSide: {
+    flex: 1,
+    padding: exactScale(16),
+  },
+  rightSide: {
+    flex: 1,
+    padding: exactScale(16),
+    backgroundColor: "#FEF1F1",
+    justifyContent: "flex-start",
+  },
+  titleCol: {
+    marginBottom: exactScale(24),
+  },
+  name: {
+    fontFamily: "Inter-SemiBold",
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: exactScale(4),
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(22),
+    letterSpacing: -0.2,
+  },
+  desc: {
+    fontFamily: "Inter-Medium",
+    fontWeight: "500",
+    color: "#6B7280",
+    marginTop: exactScale(2),
+    fontSize: moderateScale(12),
+  },
+  priceCol: {
+    marginTop: "auto",
+  },
+  searchedPrice: {
+    fontFamily: "Inter-ExtraBold",
+    fontWeight: "800",
+    color: "#111827",
+    marginBottom: exactScale(6),
+    fontSize: moderateScale(18),
+    lineHeight: moderateScale(18),
+    letterSpacing: -0.2,
+  },
+  searchedStatus: {
+    fontFamily: "Inter-SemiBold",
+    fontWeight: "600",
+    color: "#FF383C",
+    marginTop: exactScale(4),
+    fontSize: moderateScale(12),
+    lineHeight: moderateScale(12),
+  },
+  noSubText: {
+    fontFamily: "Inter-Bold",
+    fontWeight: "700",
+    color: "#730404",
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(20),
+  },
+  dividerLine: {
+    height: 1,
+    width: "100%",
+    backgroundColor: "#EAEAEA",
+  },
+  bottomSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(14),
+    backgroundColor: "#FFFFFF",
+  },
+  noSubRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    minWidth: 0,
+  },
+  noSubLabel: {
+    fontFamily: "Inter-SemiBold",
+    fontWeight: "600",
+    color: "#111827",
+    marginLeft: exactScale(12),
+    flexShrink: 1,
+    fontSize: moderateScale(14),
+  },
+  addBtn: {
+    minWidth: exactScale(78),
+    height: exactScale(35),
+    alignSelf: "flex-start",
+    borderRadius: exactScale(6),
+    borderWidth: 1,
+    paddingVertical: exactScale(8),
+    paddingHorizontal: exactScale(24),
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  requestText: {
+    fontFamily: "Inter-Bold",
+    fontWeight: "700",
+    fontSize: moderateScale(14),
+  },
+});

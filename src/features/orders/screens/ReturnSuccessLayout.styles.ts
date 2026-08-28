@@ -1,0 +1,182 @@
+import { colors } from "@/src/constants/theme";
+import { typography } from "@/src/constants/typography";
+import { exactScale, moderateScale, verticalScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: "#F8F9FB",
+  },
+  scrollContent: {
+    padding: exactScale(16),
+    paddingBottom: verticalScale(100),
+  },
+  headerSection: {
+    alignItems: "center",
+    marginTop: verticalScale(32),
+    marginBottom: verticalScale(24),
+  },
+  checkIconBox: {
+    width: exactScale(64),
+    height: exactScale(64),
+    borderRadius: exactScale(32),
+    backgroundColor: "#E4F6EB",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: verticalScale(16),
+  },
+  headerTitle: {
+    fontSize: typography.h2.fontSize,
+    lineHeight: typography.h2.lineHeight,
+    fontWeight: "700",
+    color: colors.text,
+    textAlign: "center",
+    marginBottom: verticalScale(8),
+  },
+  headerDesc: {
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
+    fontWeight: "400",
+    color: colors.subtext,
+    textAlign: "center",
+    paddingHorizontal: exactScale(16),
+  },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: exactScale(12),
+    padding: exactScale(16),
+    marginBottom: verticalScale(16),
+  },
+  cardRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  rowIconBox: {
+    width: exactScale(40),
+    height: exactScale(40),
+    borderRadius: exactScale(20),
+    backgroundColor: "#E4F6EB",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: exactScale(12),
+  },
+  rowCaption: {
+    fontSize: typography.caption.fontSize,
+    color: colors.subtext,
+    marginBottom: verticalScale(2),
+  },
+  rowValue: {
+    fontSize: moderateScale(14),
+    fontWeight: "600",
+    color: colors.text,
+  },
+  rowDivider: {
+    height: 1,
+    backgroundColor: "#F1F5F9",
+    marginVertical: verticalScale(16),
+  },
+  timelineCard: {
+    backgroundColor: colors.white,
+    borderRadius: exactScale(12),
+    padding: exactScale(16),
+    paddingBottom: exactScale(32),
+  },
+  timelineCardTitle: {
+    fontSize: typography.title.fontSize,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: verticalScale(24),
+  },
+  timelineWrap: {
+    paddingLeft: exactScale(8),
+  },
+  timelineItem: {
+    flexDirection: "row",
+    marginBottom: verticalScale(32),
+  },
+  timelineIconContainer: {
+    alignItems: "center",
+    width: exactScale(36),
+    marginRight: exactScale(16),
+  },
+  circleFilled: {
+    width: exactScale(36),
+    height: exactScale(36),
+    borderRadius: exactScale(18),
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+    backgroundColor: colors.primary,
+  },
+  circleOutline: {
+    width: exactScale(36),
+    height: exactScale(36),
+    borderRadius: exactScale(18),
+    borderWidth: 1,
+    backgroundColor: colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+  },
+  timelineLine: {
+    position: "absolute",
+    top: exactScale(36),
+    bottom: -verticalScale(32),
+    width: 1,
+    zIndex: 1,
+    backgroundColor: colors.primary,
+  },
+  timelineLineDotted: {
+    position: "absolute",
+    top: exactScale(36),
+    bottom: -verticalScale(32),
+    width: 1,
+    zIndex: 1,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    paddingVertical: 4,
+  },
+  dot: {
+    width: 2,
+    height: 3,
+    backgroundColor: "#E2E8F0",
+    marginBottom: 4,
+  },
+  timelineContent: {
+    flex: 1,
+    justifyContent: "center",
+    paddingTop: exactScale(4),
+  },
+  timelineTitle: {
+    fontSize: moderateScale(15),
+    fontWeight: "600",
+    color: colors.text,
+    marginBottom: verticalScale(4),
+  },
+  timelineSubtitle: {
+    fontSize: moderateScale(13),
+    fontWeight: "400",
+    color: colors.subtext,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: exactScale(16),
+    backgroundColor: "#F8F9FB",
+  },
+  homeBtn: {
+    backgroundColor: colors.primary,
+    paddingVertical: verticalScale(14),
+    borderRadius: exactScale(8),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  homeBtnText: {
+    color: colors.white,
+    fontSize: moderateScale(16),
+    fontWeight: "600",
+  },
+});

@@ -1,7 +1,6 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
 import { icons } from "@/src/constants/icons";
-import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import type { Product } from "@/src/features/product/types";
@@ -70,34 +69,37 @@ export const HomeProductCard: React.FC<Props> = React.memo(
 
     return (
       <View
-        className="rounded-[12px] overflow-hidden bg-transparent"
-        style={{
-          width: cardWidth,
-          height: cardHeight,
-          borderWidth: 0.77,
-          borderColor: "#919EAB33",
-        }}
+        style={[
+          s.cardRoot,
+          {
+            width: cardWidth,
+            height: cardHeight,
+          },
+        ]}
       >
         {/* Tappable area → product detail */}
         <Touchable
           activeOpacity={0.85}
           onPress={handleCardPress}
           onPressIn={handlePrefetch}
-          style={{ flex: 1 }}
+          style={s.touchableMain}
         >
           {/* Image */}
           <View
-            style={{ height: imageSize * 1.5 }}
-            className="bg-white items-center justify-center"
+            style={[
+              s.imageWrap,
+              { height: imageSize * 1.5 },
+            ]}
           >
             {!!item.discount && (
               <View
-                style={{ backgroundColor: badgeBgColor }}
-                className="absolute top-2 left-3 px-2 py-0.5 rounded z-10"
+                style={[
+                  s.badgeWrap,
+                  { backgroundColor: badgeBgColor },
+                ]}
               >
                 <Text
                   style={[s.badgeText, { color: badgeTextColor }]}
-                  className="font-inter-bold"
                 >
                   {item.discount}
                 </Text>
@@ -121,38 +123,32 @@ export const HomeProductCard: React.FC<Props> = React.memo(
 
           {/* Product info */}
           <View
-            style={{ backgroundColor: detailsBgColor }}
-            className="flex-1 px-3 pt-3"
+            style={[
+              s.infoArea,
+              { backgroundColor: detailsBgColor },
+            ]}
           >
             <Text
               numberOfLines={2}
               style={s.name}
-              className="font-inter-medium text-brand-text"
             >
               {item.name}
             </Text>
             <Text
               style={s.description}
-              className="font-inter-medium text-brand-subtext mt-1"
             >
               {item.description}
             </Text>
-            <View className="flex-row items-center gap-x-1.5 mt-2">
-              <Text style={s.price} className="font-inter-bold text-[#0F172A]">
+            <View style={s.priceRow}>
+              <Text style={s.price}>
                 ₹{Number(item.price).toFixed(2)}
               </Text>
               {!!item.originalPrice && item.originalPrice > item.price && (
-                <View className="flex-row items-center">
-                  <Text
-                    style={s.mrpLabel}
-                    className="font-inter text-brand-subtext mr-1"
-                  >
+                <View style={s.mrpWrap}>
+                  <Text style={s.mrpLabel}>
                     MRP
                   </Text>
-                  <Text
-                    style={s.mrpValue}
-                    className="font-inter text-brand-subtext line-through"
-                  >
+                  <Text style={s.mrpValue}>
                     ₹{Number(item.originalPrice).toFixed(2)}
                   </Text>
                 </View>
@@ -161,55 +157,42 @@ export const HomeProductCard: React.FC<Props> = React.memo(
           </View>
         </Touchable>
 
-        {/* Cart button — NOT inside the card TouchableOpacity */}
-        <View style={{ backgroundColor: detailsBgColor }} className="px-3 pb-3">
+        {/* Cart button */}
+        <View style={[s.buttonContainer, { backgroundColor: detailsBgColor }]}>
           {count === 0 ? (
             <Touchable
               activeOpacity={0.85}
               onPress={disableCart ? undefined : increment}
               disabled={isPending || disableCart}
-              className="rounded-[10px] items-center justify-center bg-white"
-              style={{
-                height: CART_BUTTON_HEIGHT,
-                borderWidth: 1,
-                borderColor: buttonColor,
-              }}
+              style={[
+                s.addBtnTouchable,
+                { borderColor: buttonColor },
+              ]}
             >
               <Text
                 style={[s.addToCart, { color: buttonColor }]}
-                className="font-inter-bold"
               >
                 {isPending ? "Adding..." : "Add to Cart"}
               </Text>
             </Touchable>
           ) : (
             <View
-              className="flex-row items-center justify-between rounded-[10px]"
-              style={{
-                height: CART_BUTTON_HEIGHT,
-                backgroundColor: buttonColor,
-              }}
+              style={[
+                s.cartBtnActive,
+                { backgroundColor: buttonColor },
+              ]}
             >
               <Touchable
                 onPress={decrement}
                 disabled={isPending}
                 activeOpacity={0.7}
-                className="flex-1 h-full items-center justify-center"
+                style={s.counterBtn}
               >
-                <Text
-                  style={s.counter}
-                  className="font-inter-medium text-white leading-none"
-                >
+                <Text style={s.counter}>
                   −
                 </Text>
               </Touchable>
-              <View
-                style={{
-                  width: s.counterVal.width,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+              <View style={s.counterValWrap}>
                 {isPending ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
@@ -221,7 +204,6 @@ export const HomeProductCard: React.FC<Props> = React.memo(
                         opacity: opacityAnim,
                       },
                     ]}
-                    className="font-inter-bold text-white text-center"
                   >
                     {count}
                   </Animated.Text>
@@ -231,12 +213,9 @@ export const HomeProductCard: React.FC<Props> = React.memo(
                 onPress={increment}
                 disabled={isPending}
                 activeOpacity={0.7}
-                className="flex-1 h-full items-center justify-center"
+                style={s.counterBtn}
               >
-                <Text
-                  style={s.counter}
-                  className="font-inter-medium text-white leading-none"
-                >
+                <Text style={s.counter}>
                   +
                 </Text>
               </Touchable>

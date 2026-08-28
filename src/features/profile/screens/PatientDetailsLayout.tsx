@@ -12,6 +12,7 @@ import { getAge } from "@/src/utils/patient";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
+import { exactScale } from "@/src/utils/exactScale";
 import { requireInternet } from "@/src/utils/offline";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
@@ -38,16 +39,26 @@ const PatientCard = ({
     <View>
       <View
         className="flex-row items-center"
-        style={{ paddingHorizontal: 10, paddingVertical: 14 }}
+        style={{
+          paddingHorizontal: exactScale(10),
+          paddingVertical: exactScale(14),
+        }}
       >
         <View
           className="items-center justify-center rounded-full mr-3"
           style={[
             s.patientAvatar,
-            { width: 48, height: 48, backgroundColor: "#E3EEEE" },
+            {
+              width: exactScale(48),
+              height: exactScale(48),
+              backgroundColor: "#E3EEEE",
+            },
           ]}
         >
-          <icons.user_active width={22} height={22} />
+          <icons.user_active
+            width={exactScale(22)}
+            height={exactScale(22)}
+          />
         </View>
         <View className="flex-1">
           <Text
@@ -91,16 +102,21 @@ const PatientCard = ({
         <View
           style={{
             width: 1,
-            height: 16,
+            height: exactScale(16),
             backgroundColor: "#E1E5E8",
-            marginRight: 8,
+            marginRight: exactScale(8),
           }}
         />
         <Touchable
           onPress={() => onEdit(item)}
           activeOpacity={0.6}
           className="mr-3"
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={{
+            top: exactScale(10),
+            bottom: exactScale(10),
+            left: exactScale(10),
+            right: exactScale(10),
+          }}
         >
           <Text
             style={s.patientDetail}
@@ -113,12 +129,20 @@ const PatientCard = ({
           onPress={() => onDelete(item.id)}
           disabled={isDeleting}
           activeOpacity={0.6}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={{
+            top: exactScale(10),
+            bottom: exactScale(10),
+            left: exactScale(10),
+            right: exactScale(10),
+          }}
         >
           {isDeleting ? (
             <ActivityIndicator size="small" color="#CA2B25" />
           ) : (
-            <icons.delete_red width={20} height={20} />
+            <icons.delete_red
+              width={exactScale(20)}
+              height={exactScale(20)}
+            />
           )}
         </Touchable>
       </View>
@@ -187,9 +211,15 @@ export const PatientDetailsLayout: React.FC = () => {
           activeOpacity={0.85}
           onPress={() => router.push("/profile/patients/add")}
           className="bg-[#0F7635] flex-row items-center justify-center"
-          style={{ height: 50, borderRadius: 12 }}
+          style={{
+            height: exactScale(50),
+            borderRadius: exactScale(12),
+          }}
         >
-          <icons.plus_light width={18} height={18} />
+          <icons.plus_light
+            width={exactScale(18)}
+            height={exactScale(18)}
+          />
           <Text
             style={s.patientName}
             className="font-inter-semibold text-white ml-2"
@@ -202,9 +232,9 @@ export const PatientDetailsLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 40,
+          paddingHorizontal: exactScale(16),
+          paddingTop: exactScale(16),
+          paddingBottom: exactScale(40),
           flexGrow: 1,
         }}
         className="flex-1"
@@ -233,7 +263,11 @@ export const PatientDetailsLayout: React.FC = () => {
         ) : (
           <View
             className="bg-white overflow-hidden"
-            style={{ borderWidth: 1, borderColor: "#EEF0F2", borderRadius: 12 }}
+            style={{
+              borderWidth: 1,
+              borderColor: "#EEF0F2",
+              borderRadius: exactScale(12),
+            }}
           >
             {members.map((item, index) => (
               <PatientCard

@@ -6,30 +6,12 @@ import React from "react";
 import { Image, Text, View } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { BenefitBadges } from "./BenefitBadges";
-import { CARD_WIDTH } from "./constants";
+import { CARD_WIDTH, DEFAULT_CORPORATE_BADGES } from "./constants";
 
 interface CorporateBenefitsPageProps {
   creditsBalance: number;
   onCta: () => void;
 }
-
-const DEFAULT_CORPORATE_BADGES = [
-  {
-    label: "Earn coins",
-    description: "on every order",
-    icon: HOME_IMAGES.walletOutlinePurple,
-  },
-  {
-    label: "Use coins",
-    description: "for discounts",
-    icon: HOME_IMAGES.pillPink,
-  },
-  {
-    label: "More benefits",
-    description: "exclusive for you",
-    icon: HOME_IMAGES.giftOutlineBlue,
-  },
-];
 
 export const CorporateBenefitsPage: React.FC<CorporateBenefitsPageProps> = ({
   creditsBalance,

@@ -8,7 +8,7 @@ import {
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import React, { useEffect, useRef } from "react";
 import { Text, View } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -18,6 +18,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
+import { styles as s } from "./CategoryCartBanner.styles";
 
 interface CategoryCartBannerProps {
   onPress?: () => void;
@@ -32,11 +33,8 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
   const ctx = useFlyToCartSafe();
 
   // Expand to the original designed pill width (centered)
-  const PILL_W = 250;
+  const PILL_W = exactScale(250);
 
-  // visualCartCount only drives the fly-animation timing (circle → pill
-  // expansion) — the displayed number always trusts the real unique cart-line
-  // count, same as CartFloatingBanner, so it can't drift or get stuck.
   const { cartLineCount } = useCart();
   const visualCartCount = ctx?.visualCartCount ?? 0;
   const visualCartImages = ctx?.visualCartImages ?? [];
@@ -45,7 +43,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
 
   // ── Animated values ─────────────────────────────────────────────────────────
   const opacity = useSharedValue(0);
-  const bannerWidth = useSharedValue(60); // starts as circle (60px)
+  const bannerWidth = useSharedValue(exactScale(60)); // starts as circle (60px)
   const textOpacity = useSharedValue(0);
   const chevronOpacity = useSharedValue(0);
 
@@ -54,55 +52,42 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
   const expansionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Blinkit animation state machine ─────────────────────────────────────────
+  // ── Animation state machine ─────────────────────────────────────────
   useEffect(() => {
     const visible = visualCartCount > 0;
 
     if (visible && !wasVisible.current) {
-      // ── FIRST ITEM ADDED ────────────────────────────────────────────────────
-      // Step 1: appear immediately as a circle (fly is in the air)
       wasVisible.current = true;
-      bannerWidth.value = 60;
+      bannerWidth.value = exactScale(60);
       textOpacity.value = 0;
       chevronOpacity.value = 0;
       opacity.value = withTiming(1, { duration: 160 });
 
-      // Step 2: fly lands at 750ms → image visible in circle
-      // Step 3: after 200ms pause (user sees image in circle), expand to pill
       if (expansionTimer.current) clearTimeout(expansionTimer.current);
-      // Clear a pending reset from a just-reversed removal, or it fires mid-expansion and collapses the banner.
       if (resetTimer.current) clearTimeout(resetTimer.current);
       expansionTimer.current = setTimeout(() => {
         bannerWidth.value = withSpring(PILL_W, WIDTH_SPRING);
-        // Step 4: text fades in mid-expansion
         textOpacity.value = withDelay(240, withTiming(1, { duration: 200 }));
-        // Step 5: chevron fades in last
         chevronOpacity.value = withDelay(330, withTiming(1, { duration: 180 }));
-      }, 950); // 750ms fly + 200ms pause to see image in circle before expanding
+      }, 950);
     } else if (!visible && wasVisible.current) {
-      // ── CART EMPTIED — reverse of expansion (pill → circle → gone) ──────────
       wasVisible.current = false;
       if (expansionTimer.current) clearTimeout(expansionTimer.current);
 
-      // Step 1: chevron + text fade out immediately
       chevronOpacity.value = withTiming(0, { duration: 140 });
       textOpacity.value = withTiming(0, { duration: 180 });
 
-      // Step 2: after text gone, shrink width back to circle
-      bannerWidth.value = withDelay(160, withSpring(60, WIDTH_SPRING));
-
-      // Step 3: after shrink, fade the circle out
+      bannerWidth.value = withDelay(160, withSpring(exactScale(60), WIDTH_SPRING));
       opacity.value = withDelay(480, withTiming(0, { duration: 180 }));
 
-      // Silently reset so next first-add replays circle→pill
       if (resetTimer.current) clearTimeout(resetTimer.current);
       resetTimer.current = setTimeout(() => {
-        bannerWidth.value = 60;
+        bannerWidth.value = exactScale(60);
         textOpacity.value = 0;
         chevronOpacity.value = 0;
       }, 700);
     }
-  }, [visualCartCount, PILL_W]);
+  }, [visualCartCount, PILL_W, bannerWidth, chevronOpacity, opacity, textOpacity]);
 
   useEffect(
     () => () => {
@@ -118,7 +103,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
       const t = setTimeout(() => {
         bannerRef.current?.measureInWindow((x, y, w, h) => {
           if (x >= 0 && y > 0) {
-            // Circle (60px): drop to center. Full pill: drop to thumbnail slot.
             const destX = w <= 70 ? x + w / 2 : x + 40;
             ctx.setDestinationCoords({ x: destX, y: y + h / 2 });
           }
@@ -143,7 +127,6 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
     opacity: opacity.value,
   }));
 
-  // Width: main expansion + subtle pulse on each subsequent add
   const pillStyle = useAnimatedStyle(() => ({
     width:
       bannerWidth.value +
@@ -167,7 +150,7 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
     <Animated.View
       style={[
         containerStyle,
-        { width: "100%", alignItems: "center", justifyContent: "center" },
+        s.container,
       ]}
     >
       <Animated.View
@@ -175,29 +158,16 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
         onLayout={handleLayout}
         style={[
           pillStyle,
-          {
-            height: exactScale(52),
-            backgroundColor: "#0F7635",
-            borderRadius: 999,
-            overflow: "hidden",
-            boxShadow: "0px 4px 16px 0px rgba(0, 0, 0, 0.2)",
-          },
+          s.pill,
         ]}
       >
         <Touchable
           activeOpacity={1}
           onPress={onPress}
-          style={{
-            width: "100%",
-            height: "100%",
-            flexDirection: "row",
-            alignItems: "center",
-            paddingLeft: exactScale(12),
-            paddingRight: exactScale(16),
-          }}
+          style={s.touchable}
         >
-          {/* Thumbnails — visible from the moment circle appears */}
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {/* Thumbnails */}
+          <View style={s.thumbnailRow}>
             {visualCartImages.length > 0 ? (
               visualCartImages.map((item, index) => (
                 <ThumbnailItem
@@ -210,61 +180,37 @@ export const CategoryCartBanner: React.FC<CategoryCartBannerProps> = ({
                 />
               ))
             ) : visualCartCount > 0 ? (
-              <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: "#fff",
-                  borderWidth: 2,
-                  borderColor: "#fff",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <icons.placeholder width={20} height={20} />
+              <View style={s.fallbackPlaceholderBox}>
+                <icons.placeholder width={exactScale(20)} height={exactScale(20)} />
               </View>
             ) : null}
           </View>
 
-          {/* "View cart" + count — fade in mid-expansion */}
+          {/* "View cart" + count */}
           <Animated.View
             style={[
-              { flex: 1, marginLeft: exactScale(10), justifyContent: "center" },
+              s.textCol,
               textStyle,
             ]}
           >
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: moderateScale(14.5),
-                fontWeight: "700",
-                lineHeight: moderateScale(18),
-              }}
-            >
+            <Text style={s.viewCartText}>
               View cart
             </Text>
             <AnimatedCount count={cartLineCount} />
           </Animated.View>
 
-          {/* Chevron — fades in last */}
+          {/* Chevron */}
           <Animated.View
             style={[
               chevronStyle,
-              {
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: "rgba(255,255,255,0.2)",
-                alignItems: "center",
-                justifyContent: "center",
-              },
+              s.chevronBox,
             ]}
           >
-            <icons.arrow_forward_ios_white width={12} height={12} />
+            <icons.arrow_forward_ios_white width={exactScale(12)} height={exactScale(12)} />
           </Animated.View>
         </Touchable>
       </Animated.View>
     </Animated.View>
   );
 };
+CategoryCartBanner.displayName = "CategoryCartBanner";

@@ -8,22 +8,18 @@ import Svg, {
   LinearGradient as SvgLinearGradient,
   Text as SvgText,
 } from "react-native-svg";
+import { styles as s } from "./SearchColumnHeaders.styles";
 
 export const SearchColumnHeaders = ({ colWidth }: { colWidth: number }) => {
   // Safety check for colWidth to prevent native crashes on Android
   const safeColWidth = Math.max(0, colWidth || 0);
 
   return (
-    <View style={{ backgroundColor: "#FBFBFB" }} className="flex-row mx-4">
-      <View className="flex-1 items-center justify-center py-3">
-        <Text
-          style={{ letterSpacing: 0.5, fontSize: moderateScale(11) }}
-          className="font-inter-bold text-brand-subtext uppercase"
-        >
-          YOU SEARCHED
-        </Text>
+    <View style={s.headerRow}>
+      <View style={s.headerCell}>
+        <Text style={s.youSearchedText}>YOU SEARCHED</Text>
       </View>
-      <View className="flex-1 items-center justify-center py-3">
+      <View style={s.headerCell}>
         <Svg height={14} width={safeColWidth}>
           <Defs>
             <SvgLinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">

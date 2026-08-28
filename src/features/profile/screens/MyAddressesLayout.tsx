@@ -11,6 +11,7 @@ import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
 import { AddressType } from "@/src/types/address";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { profileStyles as s } from "../profile.styles";
@@ -25,10 +26,28 @@ const labelToType = (label: string): AddressType => {
 
 const TypeIcon = ({ type }: { type: AddressType }) => {
   if (type === "home")
-    return <icons.home_add width={18} height={18} fill="#0F7635" />;
+    return (
+      <icons.home_add
+        width={exactScale(18)}
+        height={exactScale(18)}
+        fill="#0F7635"
+      />
+    );
   if (type === "office")
-    return <icons.business width={18} height={18} fill="#0F7635" />;
-  return <icons.location_pin width={20} height={20} fill="#0F7635" />;
+    return (
+      <icons.business
+        width={exactScale(18)}
+        height={exactScale(18)}
+        fill="#0F7635"
+      />
+    );
+  return (
+    <icons.location_pin
+      width={exactScale(20)}
+      height={exactScale(20)}
+      fill="#0F7635"
+    />
+  );
 };
 
 const AddressCard = ({
@@ -55,12 +74,16 @@ const AddressCard = ({
       style={{
         borderWidth: 1,
         borderColor: "#DFE3E8",
-        borderRadius: 12,
+        borderRadius: exactScale(12),
       }}
     >
       <View
         className="flex-row items-center gap-x-3"
-        style={{ paddingHorizontal: 14, paddingTop: 18, paddingBottom: 10 }}
+        style={{
+          paddingHorizontal: exactScale(14),
+          paddingTop: exactScale(18),
+          paddingBottom: exactScale(10),
+        }}
       >
         <TypeIcon type={type} />
         <Text
@@ -81,7 +104,13 @@ const AddressCard = ({
         )}
       </View>
       <Text
-        style={[s.addrAction, { paddingHorizontal: 10, paddingBottom: 14 }]}
+        style={[
+          s.addrAction,
+          {
+            paddingHorizontal: exactScale(10),
+            paddingBottom: exactScale(14),
+          },
+        ]}
         className="font-inter-regular text-[#6A6A6A] leading-[22px]"
         numberOfLines={3}
         ellipsizeMode="tail"
@@ -92,7 +121,7 @@ const AddressCard = ({
         style={{
           height: 1,
           backgroundColor: "#E1E5E8",
-          marginHorizontal: 10,
+          marginHorizontal: exactScale(10),
         }}
       />
       <View className="flex-row items-center justify-between px-3 py-3">
@@ -100,9 +129,18 @@ const AddressCard = ({
           className="flex-row items-center gap-x-1.5"
           activeOpacity={0.6}
           onPress={() => onEdit(item.id)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={{
+            top: exactScale(10),
+            bottom: exactScale(10),
+            left: exactScale(10),
+            right: exactScale(10),
+          }}
         >
-          <icons.edit_icon width={18} height={18} fill="#6A6A6A" />
+          <icons.edit_icon
+            width={exactScale(18)}
+            height={exactScale(18)}
+            fill="#6A6A6A"
+          />
           <Text
             style={s.addrAction}
             className="font-inter-semibold text-[#6A6A6A]"
@@ -115,13 +153,22 @@ const AddressCard = ({
           activeOpacity={0.6}
           onPress={() => onDelete(item.id)}
           disabled={isDeleting}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={{
+            top: exactScale(10),
+            bottom: exactScale(10),
+            left: exactScale(10),
+            right: exactScale(10),
+          }}
         >
           {isDeleting ? (
             <ActivityIndicator size="small" color="#6A6A6A" />
           ) : (
             <>
-              <icons.delete_icon width={18} height={18} fill="#6A6A6A" />
+              <icons.delete_icon
+                width={exactScale(18)}
+                height={exactScale(18)}
+                fill="#6A6A6A"
+              />
               <Text
                 style={s.addrAction}
                 className="font-inter-semibold text-[#6A6A6A]"
@@ -195,9 +242,15 @@ export const MyAddressesLayout: React.FC = () => {
           activeOpacity={0.85}
           onPress={() => router.push("/profile/addresses/add")}
           className="bg-[#0F7635] flex-row items-center justify-center"
-          style={{ height: 50, borderRadius: 12 }}
+          style={{
+            height: exactScale(50),
+            borderRadius: exactScale(12),
+          }}
         >
-          <icons.plus_light width={18} height={18} />
+          <icons.plus_light
+            width={exactScale(18)}
+            height={exactScale(18)}
+          />
           <Text
             style={s.addrTitle}
             className="font-inter-semibold text-white ml-2"
@@ -210,9 +263,9 @@ export const MyAddressesLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: adjustedBottom + 24,
+          paddingHorizontal: exactScale(16),
+          paddingTop: exactScale(16),
+          paddingBottom: adjustedBottom + exactScale(24),
           flexGrow: 1,
         }}
         className="flex-1"

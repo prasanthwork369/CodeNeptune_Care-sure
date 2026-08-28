@@ -1,9 +1,10 @@
 import { RETURN_STATUS_LABELS } from "../../constants/return-status";
 import { Order } from "../../types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
 import { SectionCard } from "./SectionCard";
+import { styles as s } from "./tracking.styles";
 
 interface ReturnStatusSectionProps {
   returns: Order["returns"];
@@ -17,21 +18,18 @@ export function ReturnStatusSection({
   if (!returns?.length && !showWindowExpiredMessage) return null;
 
   return (
-    <SectionCard
-      style={{
-        paddingHorizontal: exactScale(16),
-        paddingVertical: exactScale(16),
-      }}
-    >
+    <SectionCard style={s.deliveryCard}>
       {!!returns?.length && (
         <Text
-          className="font-inter-semibold text-brand-text"
-          style={{ fontSize: moderateScale(14), marginBottom: exactScale(10) }}
+          style={[
+            s.sectionTitle,
+            { marginBottom: exactScale(10) },
+          ]}
         >
           Return Status
         </Text>
       )}
-      <View style={{ gap: exactScale(8) }}>
+      <View style={s.returnStatusList}>
         {returns?.map((r) => {
           const info = RETURN_STATUS_LABELS[r.status] ?? {
             label: "Return",
@@ -42,18 +40,19 @@ export function ReturnStatusSection({
           return (
             <View
               key={r.id}
-              className="self-start rounded"
-              style={{
-                borderWidth: 1,
-                borderColor: info.border,
-                backgroundColor: info.bg,
-                paddingHorizontal: exactScale(10),
-                paddingVertical: exactScale(6),
-              }}
+              style={[
+                s.returnStatusBadge,
+                {
+                  borderColor: info.border,
+                  backgroundColor: info.bg,
+                },
+              ]}
             >
               <Text
-                className="font-inter-bold tracking-[0.5px]"
-                style={{ fontSize: moderateScale(11), color: info.text }}
+                style={[
+                  s.returnStatusBadgeText,
+                  { color: info.text },
+                ]}
               >
                 {info.label}
               </Text>
@@ -62,10 +61,7 @@ export function ReturnStatusSection({
         })}
       </View>
       {showWindowExpiredMessage && (
-        <Text
-          className="font-inter-medium text-brand-subtext"
-          style={{ fontSize: moderateScale(12) }}
-        >
+        <Text style={s.windowExpiredText}>
           The return window for this order has expired.
         </Text>
       )}

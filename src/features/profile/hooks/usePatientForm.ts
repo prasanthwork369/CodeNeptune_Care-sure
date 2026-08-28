@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
 import { validateDob } from "@/src/utils/patient";
 import type { FamilyMember, FamilyMemberInput } from "../types";
+import { PATIENT_RELATIONSHIPS } from "../constants/profile.constants";
 
-export const RELATIONSHIPS = [
-  "Self",
-  "Wife",
-  "Husband",
-  "Mother",
-  "Father",
-  "Other",
-];
+export { PATIENT_RELATIONSHIPS as RELATIONSHIPS };
 
 export interface PatientFormErrors {
   name?: string;
@@ -21,16 +15,10 @@ export interface PatientFormErrors {
 }
 
 /**
- * Field state, hydration, validation, and dirty-check for the add/edit
- * patient form. Shared by AddPatientLayout (full screen) and AddPatientSheet
- * (bottom sheet) so a validation/dirty-check fix only has to be made once.
- * Input handlers (onChangeText etc.) stay in each screen, since they carry
- * screen-specific wiring (e.g. the native digit-filter refs).
+ * Field state, hydration, validation, and dirty-check for patient forms.
  */
 export function usePatientForm(
   editPatient?: FamilyMember | null,
-  // Sheet passes `isVisible` here so the form resets on every open, even for
-  // repeated add-mode use where `editPatient` stays null across opens.
   resetSignal: unknown = true,
 ) {
   const [name, setName] = useState("");
@@ -52,7 +40,7 @@ export function usePatientForm(
       if (editPatient.dateOfBirth)
         setDobDate(new Date(editPatient.dateOfBirth));
       const rel = editPatient.relationship ?? "";
-      const isOther = !!rel && !RELATIONSHIPS.slice(0, -1).includes(rel);
+      const isOther = !!rel && !PATIENT_RELATIONSHIPS.slice(0, -1).includes(rel as any);
       setRelationship(isOther ? "Other" : rel);
       setOtherRelationship(isOther ? rel : "");
       setGender(editPatient.gender ?? "");
@@ -66,8 +54,7 @@ export function usePatientForm(
       setGender("");
     }
     setErrors({});
-    // Keyed on the patient's id (not the object) so a parent re-render with a
-    // new-but-equal `editPatient` reference doesn't stomp in-progress edits.
+    // Keyed on the patient's id so re-renders don't stomp in-progress edits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editPatient?.id, resetSignal]);
 

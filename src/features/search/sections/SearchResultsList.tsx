@@ -7,12 +7,13 @@ import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { SearchColumnHeaders } from "./SearchColumnHeaders";
+import { styles as s } from "./SearchResultsList.styles";
 
 const ListFooter = () => (
   <ActivityIndicator
     size="small"
     color="#0F7635"
-    style={{ marginVertical: 12 }}
+    style={s.listFooter}
   />
 );
 
@@ -100,7 +101,7 @@ export const SearchResultsList = React.memo(
         switch (resolveItemType(item)) {
           case "comparison":
             return (
-              <View className="px-4">
+              <View style={s.itemPadding}>
                 <SearchProductCard
                   data={toComparisonData(item)}
                   onBeforeNavigate={onBeforeProductNavigate}
@@ -109,7 +110,7 @@ export const SearchResultsList = React.memo(
             );
           case "no-substitute":
             return (
-              <View className="px-4">
+              <View style={s.itemPadding}>
                 <SearchNoSubstituteCard
                   data={toSearchedOnlyData(item)}
                   onBeforeNavigate={onBeforeProductNavigate}
@@ -118,7 +119,7 @@ export const SearchResultsList = React.memo(
             );
           default:
             return (
-              <View className="px-4">
+              <View style={s.itemPadding}>
                 <SearchRecommendCard
                   data={toRecommendData(item)}
                   onPress={onRecommendPress}
@@ -153,7 +154,7 @@ export const SearchResultsList = React.memo(
         // user has to press twice to open the product.
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={contentStyle}
-        className="flex-1"
+        style={{ flex: 1 }}
         stickyHeaderIndices={hasComparisonRows ? [0] : undefined}
         getItemType={resolveItemType}
         // Wider pre-render buffer beyond the viewport (default 250) so cells

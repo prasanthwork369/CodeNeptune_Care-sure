@@ -15,6 +15,8 @@ import type { CategoryProduct } from "@/src/features/categories/types";
 import type { Product } from "@/src/features/product/types";
 import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
+import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./FeaturedProductsLayout.styles";
 
 // The featured endpoint has no paging, so the page asks for a larger limit and
 // shows everything it returns.
@@ -80,7 +82,7 @@ const FeaturedProductsContent: React.FC = () => {
   }, [refetch]);
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="More Affordable Choices" />
 
       <ProductGrid
@@ -90,18 +92,17 @@ const FeaturedProductsContent: React.FC = () => {
         onRefresh={handleRefresh}
         onProductPress={handleProductPress}
         error={error}
-        paddingBottom={adjustedBottom + 100}
+        paddingBottom={adjustedBottom + exactScale(100)}
       />
 
       <View
         pointerEvents={totalItems > 0 ? "box-none" : "none"}
-        style={{
-          position: "absolute",
-          bottom: adjustedBottom + 20,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-        }}
+        style={[
+          s.cartBannerWrap,
+          {
+            bottom: adjustedBottom + exactScale(20),
+          },
+        ]}
       >
         <CategoryCartBanner onPress={() => router.push("/(commerce)/cart")} />
       </View>

@@ -31,8 +31,6 @@ const DeliveryLocationHint: React.FC = () => {
     (store) => store.setJustConfirmedLocation,
   );
 
-  // Also greets the delivery location on a fresh Home open, not just after an
-  // explicit address change — mirrors it fading in once, then hiding again.
   useEffect(() => {
     const timer = setTimeout(
       () => setJustConfirmedLocation(true),
@@ -66,11 +64,8 @@ const DeliveryLocationHint: React.FC = () => {
       }}
     >
       <View style={s.locationHintArrow} />
-      <View className="flex-row items-center" style={s.locationHintBubble}>
-        <Text
-          style={s.locationHintText}
-          className="font-inter-medium flex-shrink"
-        >
+      <View style={s.locationHintBubble}>
+        <Text style={s.locationHintText}>
           Your order will be delivered here
         </Text>
         <Touchable
@@ -103,19 +98,19 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
     const router = useNav();
     const insets = useSafeAreaInsets();
     const { balance, loading: balanceLoading } = useWalletBalance();
-    const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+    const isAuthenticated = useAuthStore((st) => st.isAuthenticated);
     const { latestPrescription, hasPendingPrescription } =
       usePrescriptionBanner();
 
-    // Field selectors, or unrelated notification writes re-render this header.
-    const lastSeenRxId = useNotificationStore((s) => s.lastSeenRxId);
-    const lastSeenRxStatus = useNotificationStore((s) => s.lastSeenRxStatus);
-    const setLastSeenRx = useNotificationStore((s) => s.setLastSeenRx);
-    const syncRxUnread = useNotificationStore((s) => s.syncRxUnread);
+    // Field selectors
+    const lastSeenRxId = useNotificationStore((st) => st.lastSeenRxId);
+    const lastSeenRxStatus = useNotificationStore((st) => st.lastSeenRxStatus);
+    const setLastSeenRx = useNotificationStore((st) => st.setLastSeenRx);
+    const syncRxUnread = useNotificationStore((st) => st.syncRxUnread);
     const clearRxUnreadDisplay = useNotificationStore(
-      (s) => s.clearRxUnreadDisplay,
+      (st) => st.clearRxUnreadDisplay,
     );
-    const displayedRxUnread = useNotificationStore((s) => s.displayedRxUnread);
+    const displayedRxUnread = useNotificationStore((st) => st.displayedRxUnread);
     const { unreadCount: apiUnreadCount } = useNotifications();
     const isRxUnread =
       hasPendingPrescription &&
@@ -123,19 +118,12 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
       (latestPrescription.id !== lastSeenRxId ||
         String(latestPrescription.status) !== lastSeenRxStatus);
 
-    // A background prescription refetch (Home refocus) may only raise this
-    // bit; it drops only when the user opens notifications — see
-    // notificationStore.syncRxUnread.
     useEffect(() => {
       syncRxUnread(!!isRxUnread);
     }, [isRxUnread, syncRxUnread]);
 
     const unreadCount = apiUnreadCount + (displayedRxUnread ? 1 : 0);
 
-    // Guests have no wallet at all, so ₹0 is their real value, not a guess.
-    // A signed-in user with no balance yet (cold start, no in-memory cache)
-    // gets a skeleton instead — never a false ₹0 while the real value is
-    // still unknown.
     const isBalancePending =
       isAuthenticated && (balanceLoading || balance == null);
     const walletDisplay =
@@ -145,16 +133,14 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
 
     return (
       <View
-        className="flex-row justify-between items-center px-5 pb-2"
-        // Keep controls below the status bar/notch with only a compact visual gap.
-        style={{ paddingTop: insets.top + 10 }}
+        style={[
+          s.root,
+          { paddingTop: insets.top + exactScale(10) },
+        ]}
       >
         {/* Left: Delivery Location */}
-        <View style={{ flex: 1, minWidth: 0, position: "relative" }}>
-          <Text
-            style={s.deliverLabel}
-            className="font-inter-semibold uppercase"
-          >
+        <View style={s.leftContainer}>
+          <Text style={s.deliverLabel}>
             DELIVER TO
           </Text>
           <Touchable
@@ -162,13 +148,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
             onPress={onPressLocation}
             accessibilityRole="button"
             accessibilityLabel={`Change delivery location, current ${location.shortCity || location.city}`}
-            className="flex-row items-center mt-1"
-            style={{ minWidth: 0 }}
+            style={s.locationTouchable}
           >
-            {/* City only — serviceability is already enforced when picking a location. */}
+            {/* City only */}
             <Text
-              style={[s.locationText, { flexShrink: 1 }]}
-              className="font-inter-bold capitalize"
+              style={s.locationText}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
@@ -176,17 +160,17 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
             </Text>
             <icons.arrow_drop_down
               fill="#1C1B1F"
-              style={[s.dropDownIcon, { flexShrink: 0 }]}
+              style={s.dropDownIcon}
             />
           </Touchable>
           <DeliveryLocationHint />
         </View>
 
         {/* Right: Wallet + Notification */}
-        <View className="flex-row items-start gap-3" style={{ flexShrink: 0 }}>
+        <View style={s.rightContainer}>
           <Touchable
             onPress={() => router.push("/profile/wallet")}
-            className="items-center"
+            style={s.walletTouchable}
             accessibilityRole="button"
             accessibilityLabel={
               isBalancePending
@@ -194,17 +178,14 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
                 : `Wallet, balance ${walletDisplay}`
             }
           >
-            <View
-              style={s.iconBtn}
-              className="rounded-full justify-center items-center bg-white"
-            >
+            <View style={s.iconBtn}>
               <Image
                 source={HOME_IMAGES.wallet}
                 style={s.walletIcon}
                 contentFit="contain"
               />
             </View>
-            <View style={[s.walletBadgeWrap, { marginTop: -exactScale(14) }]}>
+            <View style={s.walletBadgeWrap}>
               {isBalancePending ? (
                 <ShimmerBlock
                   width={exactScale(28)}
@@ -212,10 +193,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
                   borderRadius={4}
                 />
               ) : (
-                // Single line — the wrap's fixed height assumes one text row.
                 <Text
                   style={s.walletBadgeText}
-                  className="font-inter-bold"
                   numberOfLines={1}
                 >
                   {walletDisplay}
@@ -238,18 +217,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = React.memo(
             accessibilityRole="button"
             accessibilityLabel={`Notifications, ${unreadCount} unread`}
             style={s.notificationBtn}
-            className="justify-center items-center bg-white relative"
           >
             <NotificationIcon color={colors.text} style={s.notificationIcon} />
             {unreadCount > 0 && (
-              <View
-                style={s.badge}
-                className="absolute -top-1 -right-1 bg-[#C22923] rounded-full items-center justify-center px-1 border border-white"
-              >
-                <Text
-                  style={s.badgeText}
-                  className="font-inter-bold text-white leading-none"
-                >
+              <View style={s.badge}>
+                <Text style={s.badgeText}>
                   {unreadCount}
                 </Text>
               </View>

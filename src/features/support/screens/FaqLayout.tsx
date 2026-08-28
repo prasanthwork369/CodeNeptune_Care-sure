@@ -8,8 +8,9 @@ import { ScrollView, Text, View } from "react-native";
 import { useFaqs } from "@/src/features/home/hooks/useWebsiteContent";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { Skeleton } from "@/src/components/ui/Skeleton";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import type { Faq } from "@/src/features/support/types";
+import { styles as s } from "./FaqLayout.styles";
 
 // Each row is validated rather than trusted, in case the CMS returns a
 // malformed entry.
@@ -22,19 +23,12 @@ const FaqSkeleton = () => (
   <ScrollView
     showsVerticalScrollIndicator={false}
     overScrollMode="auto"
-    contentContainerStyle={{ padding: 16 }}
+    contentContainerStyle={{ padding: exactScale(16) }}
   >
-    <View
-      className="rounded-xl overflow-hidden"
-      style={{
-        borderWidth: 1,
-        borderColor: "#EEEFF1",
-        backgroundColor: "#FFFFFF",
-      }}
-    >
+    <View style={s.skeletonCard}>
       {[1, 2, 3, 4, 5].map((_, index) => (
         <View key={index}>
-          <View className="px-5 py-6 flex-row items-center justify-between">
+          <View style={s.skeletonRow}>
             <Skeleton
               width={index % 2 === 0 ? "75%" : "85%"}
               height={16}
@@ -62,7 +56,7 @@ export const FaqLayout: React.FC = () => {
   );
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="FAQs" backgroundColor="#FFFFFF" />
       {isLoading ? (
         <FaqSkeleton />
@@ -78,24 +72,16 @@ export const FaqLayout: React.FC = () => {
           retrying={isFetching}
         />
       ) : faqs.length === 0 ? (
-        <View className="flex-1 items-center justify-center p-8">
-          <Text
-            className="font-inter-medium text-brand-subtext text-center"
-            style={{ fontSize: moderateScale(14) }}
-          >
-            No FAQs found at the moment.
-          </Text>
+        <View style={s.emptyRoot}>
+          <Text style={s.emptyText}>No FAQs found at the moment.</Text>
         </View>
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
           overScrollMode="auto"
-          contentContainerStyle={{ padding: 16 }}
+          contentContainerStyle={{ padding: exactScale(16) }}
         >
-          <View
-            className="rounded-xl overflow-hidden"
-            style={{ borderWidth: 1, borderColor: "#EEEFF1" }}
-          >
+          <View style={s.faqCard}>
             {faqs.map((item, index) => (
               <View key={index}>
                 <Touchable
@@ -103,17 +89,9 @@ export const FaqLayout: React.FC = () => {
                     setOpenIndex((prev) => (prev === index ? null : index))
                   }
                   activeOpacity={0.7}
-                  className="flex-row items-center px-5 py-6"
+                  style={s.rowTouchable}
                 >
-                  <Text
-                    className="flex-1 font-inter-semibold text-brand-text pr-3"
-                    style={{
-                      fontSize: moderateScale(15),
-                      lineHeight: moderateScale(22),
-                    }}
-                  >
-                    {item.question}
-                  </Text>
+                  <Text style={s.rowQuestion}>{item.question}</Text>
                   {openIndex === index ? (
                     <icons.arrow_up width={15} height={15} fill="#1C1B1F" />
                   ) : (
@@ -121,16 +99,8 @@ export const FaqLayout: React.FC = () => {
                   )}
                 </Touchable>
                 {openIndex === index && (
-                  <View className="px-5 pb-5">
-                    <Text
-                      className="font-inter-medium text-brand-subtext"
-                      style={{
-                        fontSize: moderateScale(13),
-                        lineHeight: moderateScale(20),
-                      }}
-                    >
-                      {item.answer}
-                    </Text>
+                  <View style={s.answerWrap}>
+                    <Text style={s.answerText}>{item.answer}</Text>
                   </View>
                 )}
                 {index < faqs.length - 1 && (

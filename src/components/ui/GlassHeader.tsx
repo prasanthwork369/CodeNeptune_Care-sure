@@ -2,12 +2,13 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
 import { useNav } from "@/src/hooks/useNav";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Platform, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { styles as s } from "./GlassHeader.styles";
 
 export interface GlassHeaderProps {
   title: string;
@@ -36,6 +37,7 @@ export const GlassHeader: React.FC<GlassHeaderProps> = ({
   return (
     <View
       style={[
+        s.headerContainer,
         {
           paddingTop: Math.max(insets.top, exactScale(20)) + exactScale(8),
           overflow: "hidden",
@@ -47,7 +49,6 @@ export const GlassHeader: React.FC<GlassHeaderProps> = ({
         },
         style,
       ]}
-      className="px-4 pb-2 z-20"
     >
       <BlurView
         intensity={blurIntensity}
@@ -65,21 +66,10 @@ export const GlassHeader: React.FC<GlassHeaderProps> = ({
         style={StyleSheet.absoluteFill}
       />
 
-      <View
-        style={{ height: exactScale(48) }}
-        className="flex-row items-center justify-between"
-      >
+      <View style={s.contentRow}>
         <Touchable
           onPress={handleBack}
-          className="mr-3 rounded-full items-center justify-center"
-          style={{
-            width: exactScale(44),
-            height: exactScale(44),
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            borderWidth: 1,
-            borderColor: "rgba(145, 158, 171, 0.25)",
-            boxShadow: "0px 2px 6px 0px rgba(0, 0, 0, 0.05)",
-          }}
+          style={s.backButton}
         >
           <icons.arrow_back
             width={exactScale(18)}
@@ -89,8 +79,7 @@ export const GlassHeader: React.FC<GlassHeaderProps> = ({
         </Touchable>
 
         <Text
-          className="font-inter-bold flex-1"
-          style={{ color: "#1F2937", fontSize: moderateScale(18) }}
+          style={s.titleText}
           numberOfLines={1}
         >
           {title}

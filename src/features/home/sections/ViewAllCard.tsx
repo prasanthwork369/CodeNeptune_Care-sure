@@ -1,8 +1,9 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
+import { styles as s } from "./ViewAllCard.styles";
 
 interface ViewAllCardProps {
   width: number;
@@ -18,8 +19,6 @@ interface ViewAllCardProps {
 
 const DEFAULT_ACCENT = "#0F7635";
 
-// Trailing card in a horizontal product list, so the last scroll lands on a
-// way into the full catalogue instead of dead space.
 export const ViewAllCard: React.FC<ViewAllCardProps> = ({
   width,
   onPress,
@@ -33,29 +32,22 @@ export const ViewAllCard: React.FC<ViewAllCardProps> = ({
     onPressIn={onPressIn}
     activeOpacity={0.85}
     accessibilityRole="button"
-    className="bg-white rounded-[12px] items-center justify-center"
-    style={{
-      width,
-      // Measured from the row so the card stands level with the product cards.
-      height: height || undefined,
-      // Border matches the product cards beside it.
-      borderWidth: 0.77,
-      borderColor: "#919EAB33",
-      paddingHorizontal: exactScale(12),
-    }}
+    style={[
+      s.cardRoot,
+      {
+        width,
+        height: height || undefined,
+      },
+    ]}
   >
     <View
-      className="items-center justify-center"
-      style={{
-        width: exactScale(64),
-        height: exactScale(64),
-        borderRadius: exactScale(32),
-        // Same tint the product cards use for their discount badge.
-        backgroundColor: `${accentColor}1A`,
-        marginBottom: exactScale(14),
-      }}
+      style={[
+        s.iconCircle,
+        {
+          backgroundColor: `${accentColor}1A`,
+        },
+      ]}
     >
-      {/* fill="currentColor" in the SVG, so `color` tints it. */}
       <icons.arrow_right
         width={exactScale(30)}
         height={exactScale(30)}
@@ -64,17 +56,16 @@ export const ViewAllCard: React.FC<ViewAllCardProps> = ({
     </View>
 
     <Text
-      className="font-inter-bold text-center"
-      style={{ fontSize: moderateScale(16), color: accentColor }}
+      style={[
+        s.titleText,
+        { color: accentColor },
+      ]}
     >
       View All
     </Text>
 
     {totalCount != null && (
-      <Text
-        className="font-inter-medium text-brand-subtext text-center"
-        style={{ fontSize: moderateScale(13), marginTop: exactScale(6) }}
-      >
+      <Text style={s.subtitleText}>
         See {totalCount}+ Products
       </Text>
     )}

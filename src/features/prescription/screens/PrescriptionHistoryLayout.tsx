@@ -16,13 +16,14 @@ import type {
 import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { PrescriptionHistoryItem } from "../sections/history";
+import { styles as s } from "./PrescriptionHistoryLayout.styles";
 
 // Status options for the filter sheet. `null` = show all.
 const STATUS_FILTERS: { label: string; value: number | null }[] = [
@@ -64,46 +65,46 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
 
-  const mapItem = (item: ApiPrescription) => ({
-    // Same CS-XXXXXX shape My Orders renders, so one reference reads alike everywhere
-    id: formatOrderId(item.prescriptionOrderId ?? item.id),
-    rawId: item.id,
-    status:
-      PRESCRIPTION_STATUS_LABELS[
-        item.status as keyof typeof PRESCRIPTION_STATUS_LABELS
-      ] ?? PRESCRIPTION_STATUS_LABELS[PRESCRIPTION_STATUS.NEW],
-    patientName:
-      item.ocrData?.patientName ??
-      [item.customer?.firstName, item.customer?.lastName]
-        .filter(Boolean)
-        .join(" ")
-        .trim(),
-    doctorName: item.doctorName ?? "",
-    uploadedDate: formatDate(item.createdAt),
-    image: getPrescriptionImageUrls(item),
-    source: source ?? undefined,
-    toPay: toPay ?? undefined,
-    fromPreview: fromPreview ?? undefined,
-    prescriptionOrderId: item.prescriptionOrderId ?? null,
-    reviewNotes: item.reviewNotes ?? null,
-    rejectionReasons: item.ocrData?.rejectionReasons ?? [],
-  });
-
   const query = search.trim().toLowerCase();
 
   const items = useMemo(() => {
+    const mapItem = (item: ApiPrescription) => ({
+      id: formatOrderId(item.prescriptionOrderId ?? item.id),
+      rawId: item.id,
+      status:
+        PRESCRIPTION_STATUS_LABELS[
+          item.status as keyof typeof PRESCRIPTION_STATUS_LABELS
+        ] ?? PRESCRIPTION_STATUS_LABELS[PRESCRIPTION_STATUS.NEW],
+      patientName:
+        item.ocrData?.patientName ??
+        [item.customer?.firstName, item.customer?.lastName]
+          .filter(Boolean)
+          .join(" ")
+          .trim(),
+      doctorName: item.doctorName ?? "",
+      uploadedDate: formatDate(item.createdAt),
+      image: getPrescriptionImageUrls(item),
+      source: source ?? undefined,
+      toPay: toPay ?? undefined,
+      fromPreview: fromPreview ?? undefined,
+      prescriptionOrderId: item.prescriptionOrderId ?? null,
+      reviewNotes: item.reviewNotes ?? null,
+      rejectionReasons: item.ocrData?.rejectionReasons ?? [],
+    });
+
     return prescriptions
       .filter((p) => statusFilter === null || p.status === statusFilter)
       .map(mapItem)
-      .filter((item: ReturnType<typeof mapItem>) => {
+      .filter((item) => {
         if (!query) return true;
         return (
           item.id.toLowerCase().includes(query) ||
           item.patientName.toLowerCase().includes(query) ||
-          item.doctorName.toLowerCase().includes(query)
+          item.doctorName.toLowerCase().includes(query) ||
+          item.uploadedDate.toLowerCase().includes(query)
         );
       });
-  }, [prescriptions, query, source, toPay, fromPreview, statusFilter]);
+  }, [prescriptions, statusFilter, source, toPay, fromPreview, query]);
 
   const renderItem = useCallback(
     ({ item }: { item: PrescriptionHistoryItemData }) => (
@@ -112,15 +113,15 @@ export const PrescriptionHistoryLayout: React.FC = () => {
     [],
   );
 
-  // Search and filter chips are live controls over server data — gating only
-  // the list left them (and a cached, possibly-stale list) floating over the
-  // offline/error state.
   if (liveState) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="My Prescriptions" />
         {liveState === "offline" ? (
-          <NoInternetState onRetry={() => void refetch()} retrying={refreshing} />
+          <NoInternetState
+            onRetry={() => void refetch()}
+            retrying={refreshing}
+          />
         ) : (
           <RetryState
             title="Couldn't load prescriptions"
@@ -133,82 +134,73 @@ export const PrescriptionHistoryLayout: React.FC = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="My Prescriptions" />
 
-      <View className="px-5 pt-6">
-        <SearchBar
-          placeholder="Search by ID, patient or doctor"
-          onSearch={setSearch}
-        />
-      </View>
+      {/* Search */}
+      <SearchBar
+        placeholder="Search with order id or date..."
+        onSearch={setSearch}
+      />
 
-      {/* Status filter chips — always visible, "All" selected by default */}
-      <View
-        className="flex-row flex-wrap px-5 pt-4"
-        style={{ gap: exactScale(8) }}
-      >
-        {STATUS_FILTERS.map((opt) => {
-          const selected = statusFilter === opt.value;
+      {/* Filter tabs */}
+      <View style={s.filtersRow}>
+        {STATUS_FILTERS.map((f) => {
+          const active = statusFilter === f.value;
           return (
             <Touchable
-              key={String(opt.value)}
+              key={f.label}
+              onPress={() => setStatusFilter(f.value)}
               activeOpacity={0.8}
-              onPress={() => setStatusFilter(opt.value)}
-              className="rounded-full border"
-              style={{
-                paddingHorizontal: exactScale(16),
-                paddingVertical: exactScale(8),
-                borderColor: selected ? "#0F7635" : "#E0E0E0",
-                backgroundColor: selected ? "#0F7635" : "#FFFFFF",
-              }}
+              style={[s.filterPill, active && s.filterPillActive]}
             >
               <Text
-                className="font-inter-medium"
-                style={{
-                  fontSize: moderateScale(13),
-                  color: selected ? "#FFFFFF" : "#6A6A6A",
-                }}
+                style={[
+                  s.filterPillText,
+                  active && s.filterPillTextActive,
+                ]}
               >
-                {opt.label}
+                {f.label}
               </Text>
             </Touchable>
           );
         })}
       </View>
 
-      {loading ? (
-        <View style={{ padding: 20, gap: 12 }}>
-          <ShimmerBlock height={exactScale(110)} borderRadius={12} />
-          <ShimmerBlock height={exactScale(110)} borderRadius={12} />
-          <ShimmerBlock height={exactScale(110)} borderRadius={12} />
-        </View>
-      ) : (
-        <AppFlashList
-          data={items}
-          // rawId, not the display id — formatOrderId keeps only 6 chars and two can collide
-          keyExtractor={(item) => item.rawId}
-          renderItem={renderItem}
-          contentContainerStyle={{
-            padding: 20,
-            paddingBottom: adjustedBottom + 20,
-            flexGrow: 1,
-          }}
-          showsVerticalScrollIndicator={false}
-          refreshing={refreshing}
-          onRefresh={refetch}
-          ListEmptyComponent={
-            <View className="flex-1 items-center justify-center py-16">
-              <Text
-                className="font-inter-medium text-brand-subtext"
-                style={{ fontSize: moderateScale(14) }}
-              >
+      {/* List */}
+      <AppFlashList
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={{
+          ...s.listContent,
+          paddingBottom: adjustedBottom + exactScale(16),
+        }}
+        refreshing={refreshing}
+        onRefresh={refetch}
+        ListEmptyComponent={
+          loading ? (
+            <View style={{ gap: exactScale(12) }}>
+              {[1, 2, 3].map((k) => (
+                <ShimmerBlock
+                  key={k}
+                  height={exactScale(160)}
+                  borderRadius={exactScale(12)}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={s.emptyCenter}>
+              <Text style={s.emptyTitle}>
                 No prescriptions found
               </Text>
+              <Text style={s.emptySubtitle}>
+                {search ? "Try a different search" : "Your uploaded prescriptions will appear here"}
+              </Text>
             </View>
-          }
-        />
-      )}
+          )
+        }
+      />
     </View>
   );
 };

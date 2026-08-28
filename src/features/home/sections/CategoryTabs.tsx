@@ -6,6 +6,7 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { TabItem } from "./TabItem";
+import { styles as s } from "./CategoryTabs.styles";
 
 interface CategoryTabsProps {
   tabs: CategoryTab[];
@@ -25,21 +26,15 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
 
   if (isLoading) {
     return (
-      <View className="border-b border-[#919EAB33]">
+      <View style={s.root}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           scrollEnabled={false}
-          contentContainerStyle={{
-            paddingHorizontal: exactScale(16),
-            // Matches the loaded state so the row doesn't jump when data lands.
-            paddingTop: exactScale(4),
-            paddingBottom: exactScale(12),
-            gap: exactScale(32),
-          }}
+          contentContainerStyle={s.skeletonScroll}
         >
           {Array.from({ length: 5 }).map((_, i) => (
-            <View key={i} className="items-center gap-y-2">
+            <View key={i} style={s.skeletonItem}>
               <Skeleton
                 width={exactScale(40)}
                 height={exactScale(40)}
@@ -58,17 +53,12 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
   }
 
   return (
-    <View className="border-b border-[#919EAB33]">
+    <View style={s.root}>
       <ScrollView
         ref={scrollViewRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: exactScale(16),
-          paddingTop: exactScale(4),
-          paddingBottom: 0,
-          alignItems: "flex-end",
-        }}
+        contentContainerStyle={s.scrollContent}
       >
         {tabs.map((tab) => (
           <TabItem
@@ -82,14 +72,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
 
         <Animated.View
           style={[
-            {
-              height: exactScale(5),
-              position: "absolute",
-              bottom: 0,
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
-              backgroundColor: "#107539", // Darker, brand-specific green from image
-            },
+            s.activeIndicator,
             animatedIndicatorStyle,
           ]}
         />

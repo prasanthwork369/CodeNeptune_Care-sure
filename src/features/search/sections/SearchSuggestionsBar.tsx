@@ -1,7 +1,7 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { icons } from "@/src/constants/icons";
 import { durations, easings } from "@/src/theme/animations";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Animated, {
@@ -9,6 +9,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { styles as s } from "./SearchSuggestionsBar.styles";
 
 interface SearchSuggestionsBarProps {
   suggestions: string[];
@@ -45,29 +46,25 @@ export const SearchSuggestionsBar: React.FC<SearchSuggestionsBarProps> = ({
   return (
     <Animated.View
       testID="search-suggestions-bar"
-      style={[{ overflow: "hidden" }, containerStyle]}
+      style={[s.wrapper, containerStyle]}
       pointerEvents={visible ? "auto" : "none"}
       accessibilityRole="summary"
       accessibilityLabel="Related search suggestions"
     >
       <View
-        className="border-b border-[#919EAB1A] bg-white pb-2"
+        style={s.innerRow}
         onLayout={(e) => setContentHeight(e.nativeEvent.layout.height)}
       >
         {suggestions.map((suggestion, index) => (
           <Touchable
             key={`${suggestion}-${index}`}
             onPress={() => onSelect(suggestion)}
-            className="flex-row items-center px-4 py-3 gap-x-2.5"
+            style={s.suggestionItem}
             accessibilityRole="button"
             accessibilityLabel={`Search for ${suggestion}`}
           >
-            <icons.search_grey width={16} height={16} />
-            <Text
-              numberOfLines={1}
-              className="flex-1 font-inter-medium text-[#222222]"
-              style={{ fontSize: moderateScale(13) }}
-            >
+            <icons.search_grey width={exactScale(16)} height={exactScale(16)} />
+            <Text numberOfLines={1} style={s.suggestionText}>
               {suggestion}
             </Text>
           </Touchable>

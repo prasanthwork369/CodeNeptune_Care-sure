@@ -2,7 +2,6 @@ import { colors } from "@/src/theme";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { Platform, StyleSheet } from "react-native";
 
-// Field-level red, deliberately lighter than the app-wide colors.error (#DC2626).
 const FIELD_ERROR = "#EF4444";
 
 export const styles = StyleSheet.create({
@@ -23,14 +22,9 @@ export const styles = StyleSheet.create({
     gap: scale(10),
     marginTop: verticalScale(8),
   },
-  // Static variants, so no style object is rebuilt per keystroke.
   inputWrapIdle: { borderColor: colors.border },
   inputWrapFocused: { borderColor: colors.primary },
   inputWrapError: { borderColor: FIELD_ERROR },
-  // Press feedback for the hint shield (no android_ripple — that combo with
-  // an absolutely-positioned overlay was swallowing the tap on Android
-  // instead of forwarding it to the native phone-number-hint call).
-  shieldPressed: { backgroundColor: "rgba(15, 118, 53, 0.08)" },
   prefix: {
     fontSize: moderateScale(17),
     fontWeight: "500",
@@ -42,10 +36,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 0,
     fontSize: moderateScale(15),
-    // Android renders weight via the loaded font file itself (fontWeight is
-    // ignored once fontFamily is set to a specific static Inter weight) --
-    // use the Regular weight file directly instead of setting a numeric
-    // fontWeight that has no effect.
     fontFamily: Platform.OS === "android" ? "Inter_400Regular" : undefined,
     fontWeight: Platform.OS === "android" ? "normal" : "400",
     letterSpacing: 0,

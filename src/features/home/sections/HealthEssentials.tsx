@@ -31,8 +31,6 @@ import { exactScale } from "@/src/utils/exactScale";
 
 const ROW_GAP = exactScale(14);
 
-// Hoisted: an inline arrow is a new component type every render, which remounts
-// every separator in the row instead of reusing them.
 const ProductSeparator = () => <View style={{ width: ROW_GAP }} />;
 
 const FALLBACK_THEMES = [
@@ -100,13 +98,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     brand,
     onLayout,
   }) => {
-    // Image area height is tied to card width; the details area below it
-    // sizes itself to its own content instead of a forced half-split (see
-    // PopularSubstitutes.tsx for the same fix and why).
     const imageAreaHeight = cardWidth * 0.875;
     const imageSize = imageAreaHeight * 0.65;
 
-    // One source object for the card, the cart row and the fly animation.
     const imageSource = useMemo(
       () => (thumbnailUrl ? { uri: resolveAssetUrl(thumbnailUrl) } : undefined),
       [thumbnailUrl],
@@ -141,8 +135,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     }, [prefetchProduct, productId]);
 
     const handleAdd = useCallback(async () => {
-      // Only animate on a confirmed add: offline the increment refuses and a
-      // fly-in would falsely show the item landing in the cart.
       const added = await increment();
       if (added) triggerFly();
     }, [increment, triggerFly]);
@@ -154,15 +146,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
     return (
       <View
-        className="bg-white rounded-[12px] overflow-hidden"
-        style={{
-          width: cardWidth,
-          borderWidth: 0.77,
-          borderColor: "#919EAB33",
-        }}
+        style={[
+          s.cardRoot,
+          { width: cardWidth },
+        ]}
         onLayout={onLayout}
       >
-        {/* Image area — fixed height, tied to card width */}
+        {/* Image area */}
         <Touchable
           activeOpacity={0.85}
           onPress={() => {
@@ -172,32 +162,25 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             onPress(productId, name, previewImage, brand);
           }}
           onPressIn={handlePrefetch}
-          style={{
-            height: imageAreaHeight,
-            backgroundColor: contentBg,
-            paddingBottom: exactScale(4),
-          }}
+          style={[
+            s.imageAreaTouchable,
+            {
+              height: imageAreaHeight,
+              backgroundColor: contentBg,
+            },
+          ]}
         >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#FFFFFF",
-              borderTopLeftRadius: 12,
-              borderTopRightRadius: 12,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={s.imageAreaInner}>
             <View
               ref={imageRef}
               collapsable={false}
-              style={{
-                width: imageSize,
-                height: imageSize,
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-              }}
+              style={[
+                s.imageWrap,
+                {
+                  width: imageSize,
+                  height: imageSize,
+                },
+              ]}
             >
               <icons.placeholder
                 width={imageSize * 0.7}
@@ -206,11 +189,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
               {hasImage && (
                 <Image
                   source={imageSource}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    position: "absolute",
-                  }}
+                  style={s.productImage}
                   contentFit="contain"
                   cachePolicy="memory-disk"
                   recyclingKey={productId || id}
@@ -223,11 +202,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             <View
               style={[
                 s.badgeContainer,
-                { backgroundColor: discountBg, zIndex: 10, overflow: "hidden" },
+                { backgroundColor: discountBg },
               ]}
             >
               <Text
-                style={[s.badge, { color: accentColor, fontWeight: "800" }]}
+                style={[s.badge, { color: accentColor }]}
               >
                 {discountLabel}
               </Text>
@@ -236,16 +215,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
           )}
         </Touchable>
 
-        {/* Details area — sized to its own content, not a forced half-split */}
+        {/* Details area */}
         <View
-          style={{
-            backgroundColor: contentBg,
-            borderBottomLeftRadius: 12,
-            borderBottomRightRadius: 12,
-            paddingHorizontal: exactScale(12),
-            paddingTop: exactScale(12),
-            flexDirection: "column",
-          }}
+          style={[
+            s.detailsArea,
+            { backgroundColor: contentBg },
+          ]}
         >
           <Touchable
             activeOpacity={0.85}
@@ -254,20 +229,16 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
           >
             <Text
               style={s.name}
-              className="font-inter-medium text-brand-text"
               numberOfLines={1}
             >
               {name}
             </Text>
             {!!description && (
-              <Text style={s.description} className="mt-0.5" numberOfLines={1}>
+              <Text style={s.description} numberOfLines={1}>
                 {description}
               </Text>
             )}
-            <View
-              className="flex-row items-center gap-x-1.5 mt-1.5"
-              style={{ marginBottom: exactScale(8) }}
-            >
+            <View style={s.priceRow}>
               <Text style={s.price}>₹{Number(price).toFixed(2)}</Text>
               {mrp > price && (
                 <Text style={s.mrp}>₹{Number(mrp).toFixed(2)}</Text>
@@ -275,14 +246,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             </View>
           </Touchable>
 
-          {/* Button — fixed padding, always at bottom */}
-          <View
-            style={{
-              paddingTop: exactScale(6),
-              paddingBottom: exactScale(12),
-              alignItems: "center",
-            }}
-          >
+          {/* Button */}
+          <View style={s.buttonWrap}>
             {count === 0 ? (
               <Touchable
                 onPress={handleAdd}
@@ -300,28 +265,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                   onPress={decrement}
                   disabled={isPending}
                   activeOpacity={0.7}
-                  className="w-9 h-9 items-center justify-center"
+                  style={s.counterBtn}
                 >
-                  <Text
-                    style={s.counter}
-                    className="font-inter-medium text-white leading-none"
-                  >
+                  <Text style={s.counter}>
                     −
                   </Text>
                 </Touchable>
-                <View
-                  style={{
-                    width: exactScale(24),
-                    height: exactScale(24),
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+                <View style={s.counterNumberBox}>
                   {isPending ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
                     <Animated.Text
-                      className="font-inter-bold text-white text-center"
                       style={[
                         s.counterVal,
                         {
@@ -338,12 +292,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                   onPress={increment}
                   disabled={isPending}
                   activeOpacity={0.7}
-                  className="w-9 h-9 items-center justify-center"
+                  style={s.counterBtn}
                 >
-                  <Text
-                    style={s.counter}
-                    className="font-inter-medium text-white leading-none"
-                  >
+                  <Text style={s.counter}>
                     +
                   </Text>
                 </Touchable>
@@ -369,8 +320,6 @@ interface HealthEssentialsSectionProps {
   onViewAll?: (subcategory: ApiFeaturedSubcategory) => void;
 }
 
-// Exported so the Home feed can render each subcategory as its own virtualized
-// row (see HomeLayout) instead of mounting every row at once.
 export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
   React.memo(({ subcategory, themeIndex, onProductPress, onViewAll }) => {
     const prefetchCategory = usePrefetchCategoryProducts();
@@ -379,8 +328,7 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
     const meta: ApiFeaturedSubcategoryMetadata | null =
       subcategory.featuredMetadata;
     const fallback = FALLBACK_THEMES[themeIndex % FALLBACK_THEMES.length];
-    const cardWidth = (width - 20 - 14 - 36) / 2;
-    // Cards size to their own content, so measure a real one to match it.
+    const cardWidth = (width - exactScale(20) - exactScale(14) - exactScale(36)) / 2;
     const [rowHeight, setRowHeight] = useState(0);
 
     const gradientStart = meta?.bgGradientStart?.trim() || "#FFFFFF";
@@ -423,7 +371,6 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
             packSize={String(p.packSize ?? "")}
             unit={p.unit}
             brand={p.brandName}
-            // Measure one real card; the View All card then matches it.
             onLayout={
               index === 0
                 ? (e) => setRowHeight(e.nativeEvent.layout.height)
@@ -445,40 +392,28 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
             style={StyleSheet.absoluteFill}
           />
 
-          <View className="pt-6 pb-8">
-            <View className="px-4 flex-row justify-between items-center mb-4">
-              <View className="flex-1 pr-2">
-                <Text
-                  style={s.sectionTitle}
-                  className="font-inter-bold text-brand-text"
-                >
+          <View style={s.sectionWrap}>
+            <View style={s.sectionHeaderRow}>
+              <View style={s.sectionTitleCol}>
+                <Text style={s.sectionTitle}>
                   {title}
                 </Text>
-                <View className="mt-1">
-                  <Text
-                    className="font-inter-extrabold"
-                    style={[s.sectionSubtitle, { color: text2Color }]}
-                  >
+                <View style={{ marginTop: exactScale(4) }}>
+                  <Text style={[s.sectionSubtitle, { color: text2Color }]}>
                     {subtitle}
                   </Text>
                   <LinearGradient
                     colors={[lineColor, "rgba(255,255,255,0)"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={{
-                      height: exactScale(3),
-                      width: exactScale(160),
-                      marginTop: exactScale(6),
-                      borderRadius: exactScale(2),
-                      opacity: 0.6,
-                    }}
+                    style={s.subtitleUnderline}
                   />
                 </View>
               </View>
               {!!headerImage && (
                 <Image
                   source={{ uri: resolveAssetUrl(headerImage) }}
-                  style={{ width: "25%", height: exactScale(75) }}
+                  style={s.headerImage}
                   contentFit="contain"
                 />
               )}
@@ -489,11 +424,7 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
               showsHorizontalScrollIndicator={false}
               nestedScrollEnabled
               directionalLockEnabled
-              contentContainerStyle={{
-                flexDirection: "row",
-                paddingLeft: exactScale(20),
-                paddingRight: exactScale(40),
-              }}
+              contentContainerStyle={s.scrollContent}
             >
               {subcategory.products.map((item, index) => (
                 <React.Fragment key={item.id}>
@@ -501,14 +432,11 @@ export const HealthEssentialsSection: React.FC<HealthEssentialsSectionProps> =
                   {renderProduct({ item, index })}
                 </React.Fragment>
               ))}
-              {/* Sits after the last product so scrolling to the end
-                  leads into this subcategory. */}
               {onViewAll && subcategory.products.length > 0 && (
                 <View style={{ marginLeft: ROW_GAP }}>
                   <ViewAllCard
                     width={cardWidth}
                     height={rowHeight}
-                    // Same accent the row's product cards use.
                     accentColor={lineColor}
                     onPress={() => onViewAll(subcategory)}
                     onPressIn={() => {

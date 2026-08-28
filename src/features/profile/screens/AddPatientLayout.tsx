@@ -1,22 +1,17 @@
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
-import { icons } from "@/src/constants/icons";
-import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
-import {
-  RELATIONSHIPS,
-  usePatientForm,
-} from "@/src/features/profile/hooks/usePatientForm";
-import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
-import { formatDobDisplay, getMaxDob, getMinDob } from "@/src/utils/patient";
-import { sanitize } from "@/src/utils/validation";
-import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
-import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
+import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
+import { usePatientForm } from "@/src/features/profile/hooks/usePatientForm";
+import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
+import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
-import { useLocalSearchParams } from "expo-router";
+import { exactScale } from "@/src/utils/exactScale";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
+import { useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -24,43 +19,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
-
-const GENDERS = [
-  { label: "Male", value: "MALE", icon: <icons.male width={16} height={16} /> },
-  {
-    label: "Female",
-    value: "FEMALE",
-    icon: <icons.female width={16} height={16} />,
-  },
-  {
-    label: "Prefer not to say",
-    value: "OTHER",
-    icon: <icons.back_hand width={16} height={16} />,
-  },
-];
-
-const input: object = {
-  borderWidth: 1,
-  borderColor: "#919EAB33",
-  borderRadius: 12,
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-  fontSize: moderateScale(14),
-  fontWeight: "500",
-  color: "#1A1C1E",
-  backgroundColor: "#fff",
-  marginBottom: 18,
-};
-const labelStyle = "font-inter-bold text-brand-text mb-2";
-const labelTextStyle: object = { fontSize: moderateScale(14) };
-const errorText: object = {
-  color: "#EF4444",
-  fontSize: moderateScale(12),
-  marginTop: -12,
-  marginBottom: 12,
-};
+import { PatientFormFields } from "../components/PatientFormFields";
+import { styles as s } from "./AddPatientLayout.styles";
 
 export const AddPatientLayout: React.FC = () => {
   const router = useNav();
@@ -74,8 +34,6 @@ export const AddPatientLayout: React.FC = () => {
 
   const editPatient = id ? (members.find((m) => m.id === id) ?? null) : null;
   const isEditMode = !!editPatient;
-  const maxDob = getMaxDob();
-  const minDob = getMinDob();
 
   const {
     name,
@@ -83,9 +41,9 @@ export const AddPatientLayout: React.FC = () => {
     mobile,
     setMobile,
     dob,
+    setDob,
     dobDate,
     setDobDate,
-    setDob,
     showDatePicker,
     setShowDatePicker,
     relationship,
@@ -100,7 +58,14 @@ export const AddPatientLayout: React.FC = () => {
     isFormValid,
     validate,
     buildPayload,
-  } = usePatientForm(editPatient);
+  } = usePatientForm(editPatient, true);
+
+  const isSaveDisabled =
+    isSubmitting || !isFormValid || (isEditMode && !isDirty) || isOffline;
+
+  const setMobileRef = (ref: TextInput | null) => {
+    if (ref) applyDigitsOnlyFilter(ref, 10);
+  };
 
   const handleSubmit = async () => {
     if (inFlight.current) return;
@@ -110,330 +75,82 @@ export const AddPatientLayout: React.FC = () => {
     setIsSubmitting(true);
     try {
       const payload = buildPayload();
-      if (isEditMode && editPatient)
+      if (isEditMode && editPatient) {
         await updateMember(editPatient.id, payload);
-      else await addMember(payload);
+      } else {
+        await addMember(payload);
+      }
       setSaveCompleted(true);
-      setTimeout(() => router.back(), 0);
+      router.back();
     } catch {
-      inFlight.current = false;
+      // Error surfaced by useFamilyMembers mutation toast
+    } finally {
       setIsSubmitting(false);
+      inFlight.current = false;
     }
   };
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
-      <UnsavedChangesGuard
-        hasUnsavedChanges={!saveCompleted && isDirty && (!id || !!editPatient)}
-      />
+    <View style={s.root}>
+      <UnsavedChangesGuard hasUnsavedChanges={!saveCompleted && isDirty} />
       <ScreenHeader
-        title={isEditMode ? "Edit Patient Details" : "Enter Patient Details"}
-        backgroundColor="#F5F6FB"
-        showBorder={false}
+        title={isEditMode ? "Edit Patient" : "Add Patient Details"}
+        backgroundColor="#FFFFFF"
+        showBorder
       />
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={s.avoidingView}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          overScrollMode="auto"
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingTop: 8,
-            paddingBottom: adjustedBottom + 90,
-          }}
-          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[
+            s.scrollContent,
+            { paddingBottom: adjustedBottom + exactScale(32) },
+          ]}
         >
-          <Text className={labelStyle} style={labelTextStyle}>
-            Name
-            <RequiredMark />
-          </Text>
-          <TextInput
-            placeholder="Enter the name"
-            placeholderTextColor="#6A6A6A"
-            value={name}
-            onChangeText={(t) => {
-              setName(t);
-              setErrors((e) => ({ ...e, name: undefined }));
-            }}
-            style={[input, errors.name ? { borderColor: "#EF4444" } : {}]}
+          <PatientFormFields
+            name={name}
+            setName={setName}
+            mobile={mobile}
+            setMobile={setMobile}
+            dob={dob}
+            setDob={setDob}
+            dobDate={dobDate}
+            setDobDate={setDobDate}
+            showDatePicker={showDatePicker}
+            setShowDatePicker={setShowDatePicker}
+            relationship={relationship}
+            setRelationship={setRelationship}
+            otherRelationship={otherRelationship}
+            setOtherRelationship={setOtherRelationship}
+            gender={gender}
+            setGender={setGender}
+            errors={errors}
+            setErrors={setErrors}
+            setMobileRef={setMobileRef}
           />
-          {errors.name && <Text style={errorText}>{errors.name}</Text>}
-
-          <Text className={labelStyle} style={labelTextStyle}>
-            Mobile Number
-            <RequiredMark />
-          </Text>
-          <View
-            style={[
-              { flexDirection: "row", alignItems: "center", height: 52 },
-              input,
-              errors.mobile ? { borderColor: "#EF4444" } : {},
-              { paddingVertical: 0, paddingHorizontal: 16, marginBottom: 18 },
-            ]}
-          >
-            <Text
-              style={{
-                fontSize: moderateScale(14),
-                fontWeight: "500",
-                color: "#1A1C1E",
-                marginRight: 8,
-              }}
-            >
-              +91 |
-            </Text>
-            <TextInput
-              ref={(r) => applyDigitsOnlyFilter(r, 10)}
-              placeholder="10 digit number"
-              placeholderTextColor="#6A6A6A"
-              keyboardType="number-pad"
-              value={mobile}
-              onChangeText={(t) => {
-                if (mobile.length === 10 && t.startsWith(mobile)) return;
-                setMobile(sanitize.phone(t));
-                setErrors((e) => ({ ...e, mobile: undefined }));
-              }}
-              style={{
-                flex: 1,
-                fontSize: moderateScale(14),
-                fontWeight: "500",
-                color: "#1A1C1E",
-                height: "100%",
-              }}
-            />
-          </View>
-          {errors.mobile && <Text style={errorText}>{errors.mobile}</Text>}
-
-          <Text className={labelStyle} style={labelTextStyle}>
-            Relationship
-            <RequiredMark />
-          </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 8,
-              marginBottom:
-                errors.relationship && relationship !== "Other" ? 6 : 18,
-            }}
-          >
-            {RELATIONSHIPS.map((item) => {
-              const sel = relationship === item;
-              return (
-                <Touchable
-                  key={item}
-                  onPress={() => {
-                    setRelationship(item);
-                    setErrors((e) => ({ ...e, relationship: undefined }));
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingVertical: 7,
-                    paddingHorizontal: 14,
-                    borderRadius: 999,
-                    borderWidth: 1,
-                    borderColor: sel ? "#0F763533" : "#919EAB33",
-                    backgroundColor: sel ? "#F1FFF6" : "#fff",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: moderateScale(13),
-                      fontWeight: "500",
-                      color: sel ? "#0F7635" : "#6A6A6A",
-                    }}
-                  >
-                    {item}
-                  </Text>
-                </Touchable>
-              );
-            })}
-          </View>
-          {errors.relationship && relationship !== "Other" && (
-            <Text style={[errorText, { marginTop: 0, marginBottom: 12 }]}>
-              {errors.relationship}
-            </Text>
-          )}
-          {relationship === "Other" && (
-            <View style={{ marginBottom: 18 }}>
-              <TextInput
-                placeholder="Please specify relationship"
-                placeholderTextColor="#6A6A6A"
-                value={otherRelationship}
-                onChangeText={(t) => {
-                  setOtherRelationship(t);
-                  setErrors((e) => ({ ...e, otherRelationship: undefined }));
-                }}
-                style={[
-                  input,
-                  { marginBottom: 0 },
-                  errors.otherRelationship ? { borderColor: "#EF4444" } : {},
-                ]}
-                autoFocus
-              />
-              {errors.otherRelationship && (
-                <Text style={[errorText, { marginTop: 6, marginBottom: 0 }]}>
-                  {errors.otherRelationship}
-                </Text>
-              )}
-            </View>
-          )}
-
-          <Text className={labelStyle} style={labelTextStyle}>
-            Date Of Birth
-            <RequiredMark />
-          </Text>
-          <Touchable
-            onPress={() => {
-              setShowDatePicker(true);
-              setErrors((e) => ({ ...e, dob: undefined }));
-            }}
-            style={[
-              { flexDirection: "row", alignItems: "center" },
-              input,
-              errors.dob ? { borderColor: "#EF4444" } : {},
-            ]}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={{
-                flex: 1,
-                fontSize: moderateScale(14),
-                fontWeight: "500",
-                color: dob ? "#1A1C1E" : "#919EAB",
-              }}
-            >
-              {formatDobDisplay(dob) || "DD-MM-YYYY"}
-            </Text>
-            <icons.calendar_month width={20} height={20} fill="#919EAB" />
-          </Touchable>
-          {errors.dob && <Text style={errorText}>{errors.dob}</Text>}
-          <DatePickerModal
-            visible={showDatePicker}
-            value={dobDate}
-            minimumDate={minDob}
-            maximumDate={maxDob}
-            onClose={() => setShowDatePicker(false)}
-            onChange={(selected) => {
-              setDobDate(selected);
-              const d = selected.getDate().toString().padStart(2, "0");
-              const m = (selected.getMonth() + 1).toString().padStart(2, "0");
-              setDob(`${selected.getFullYear()}-${m}-${d}`);
-            }}
-          />
-
-          <Text className={labelStyle} style={labelTextStyle}>
-            Gender
-            <RequiredMark />
-          </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 8,
-              marginBottom: errors.gender ? 6 : 28,
-            }}
-          >
-            {GENDERS.map(({ label: g, value: gVal, icon }) => {
-              const sel = gender === gVal;
-              return (
-                <Touchable
-                  key={gVal}
-                  onPress={() => {
-                    setGender(gVal);
-                    setErrors((e) => ({ ...e, gender: undefined }));
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingVertical: 10,
-                    paddingHorizontal: 14,
-                    borderRadius: 999,
-                    borderWidth: 1,
-                    borderColor: sel ? "#0F763533" : "#919EAB33",
-                    backgroundColor: sel ? "#F1FFF6" : "#fff",
-                    gap: 5,
-                  }}
-                >
-                  {React.cloneElement(
-                    icon as React.ReactElement<{ color?: string }>,
-                    {
-                      color: sel ? "#0F7635" : "#919EAB",
-                    },
-                  )}
-                  <Text
-                    style={{
-                      fontSize: moderateScale(11),
-                      fontWeight: "500",
-                      color: sel ? "#0F7635" : "#6A6A6A",
-                    }}
-                  >
-                    {g}
-                  </Text>
-                </Touchable>
-              );
-            })}
-          </View>
-          {errors.gender && (
-            <Text
-              style={{
-                color: "#EF4444",
-                fontSize: moderateScale(12),
-                marginTop: -4,
-                marginBottom: 16,
-              }}
-            >
-              {errors.gender}
-            </Text>
-          )}
         </ScrollView>
 
-        <View
-          className="absolute bottom-0 left-0 right-0 px-5 bg-[#F5F6FB]"
-          style={{ paddingBottom: Math.max(adjustedBottom, 20) + 14 }}
-        >
+        <View style={[s.bottomBar, { paddingBottom: adjustedBottom + exactScale(12) }]}>
           <Touchable
-            activeOpacity={0.85}
+            testID="save-patient-btn"
             onPress={handleSubmit}
-            disabled={
-              isSubmitting ||
-              isOffline ||
-              !isFormValid ||
-              (isEditMode && !isDirty)
-            }
-            style={{
-              backgroundColor: "#0F7635",
-              borderRadius: 14,
-              paddingVertical: 18,
-              alignItems: "center",
-              opacity:
-                isSubmitting ||
-                isOffline ||
-                !isFormValid ||
-                (isEditMode && !isDirty)
-                  ? 0.5
-                  : 1,
-            }}
+            disabled={isSaveDisabled}
+            style={[
+              s.submitBtn,
+              isSaveDisabled ? s.submitBtnDisabled : s.submitBtnEnabled,
+            ]}
           >
-            <Text
-              style={{
-                fontSize: moderateScale(15),
-                fontWeight: "600",
-                color: "#fff",
-              }}
-            >
-              {isSubmitting
-                ? isEditMode
-                  ? "Updating…"
-                  : "Adding…"
-                : isEditMode
-                  ? "Update Details"
-                  : "Add Patient"}
-            </Text>
+            {isSubmitting ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={s.submitBtnText}>
+                {isEditMode ? "Update Details" : "Add Patient"}
+              </Text>
+            )}
           </Touchable>
         </View>
       </KeyboardAvoidingView>

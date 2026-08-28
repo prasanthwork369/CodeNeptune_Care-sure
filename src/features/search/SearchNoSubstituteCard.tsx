@@ -5,11 +5,8 @@ import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { useSubstituteRequest } from "@/src/features/search/hooks/useSubstituteRequest";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
-import { moderateScale } from "@/src/utils/exactScale";
-import {
-  cartCounterStyles as cc,
-  searchCardStyles as s,
-} from "./search.styles";
+import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./SearchNoSubstituteCard.styles";
 
 interface SearchNoSubstituteCardProps {
   data: {
@@ -19,13 +16,10 @@ interface SearchNoSubstituteCardProps {
       name: string;
       manufacturer?: string;
       description?: string;
-      price: number | null; // absent when the backend omits a price
+      price: number | null;
       status: string;
     };
   };
-  // Called right before navigating to Product Details — lets the search
-  // screen tear down its keyboard/suggestions state first, since this card
-  // pushes to its own route directly rather than through a results-list callback.
   onBeforeNavigate?: () => void;
 }
 
@@ -64,83 +58,53 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
       activeOpacity={0.5}
       onPress={handleCardPress}
       onPressIn={handlePrefetch}
-      style={{ borderWidth: 1, borderColor: "#919EAB33" }}
-      className="w-full rounded-[12px] bg-white overflow-hidden mb-5"
+      style={s.cardRoot}
     >
       {/* Top Section: Split */}
-      <View className="flex-row w-full">
+      <View style={s.splitRow}>
         {/* Left Side — searched product */}
-        <View className="flex-1 p-4">
-          <View className="mb-6">
-            <Text
-              style={s.name}
-              className="font-inter-semibold text-brand-text mb-1 leading-snug tracking-tight"
-            >
+        <View style={s.leftSide}>
+          <View style={s.titleCol}>
+            <Text style={s.name} numberOfLines={2}>
               {data.searched.name}
             </Text>
             {data.searched.description ? (
-              <Text
-                style={s.desc}
-                className="font-inter-medium text-brand-subtext mt-0.5"
-                numberOfLines={1}
-              >
+              <Text style={s.desc} numberOfLines={1}>
                 {data.searched.description}
               </Text>
             ) : null}
             {data.searched.manufacturer ? (
-              <Text
-                style={s.desc}
-                className="font-inter-medium text-brand-subtext mt-0.5"
-                numberOfLines={1}
-              >
+              <Text style={s.desc} numberOfLines={1}>
                 {data.searched.manufacturer}
               </Text>
             ) : null}
           </View>
-          <View className="mt-auto">
+          <View style={s.priceCol}>
             {data.searched.price != null && (
-              <Text
-                style={s.price}
-                className="font-inter-extrabold text-brand-text mb-1.5 tracking-tight"
-              >
+              <Text style={s.searchedPrice}>
                 ₹{Number(data.searched.price).toFixed(2)}
               </Text>
             )}
-            <Text
-              style={s.savings}
-              className="font-inter-semibold text-[#FF383C] mt-1"
-            >
-              {data.searched.status}
-            </Text>
+            <Text style={s.searchedStatus}>{data.searched.status}</Text>
           </View>
         </View>
 
         {/* Right Side — no substitute message */}
-        <View className="flex-1 p-4 bg-[#FEF1F1] justify-start">
-          <Text
-            className="font-inter-bold text-[#730404]"
-            style={{
-              fontSize: moderateScale(14),
-              lineHeight: moderateScale(20),
-            }}
-          >
+        <View style={s.rightSide}>
+          <Text style={s.noSubText}>
             Sorry! We couldn&apos;t find a substitute
           </Text>
         </View>
       </View>
 
       {/* Horizontal Divider Line */}
-      <View className="h-[1px] w-full bg-[#EAEAEA]" />
+      <View style={s.dividerLine} />
 
-      {/* Bottom Section: Uniform Actions Row */}
-      <View className="flex-row justify-between items-center px-4 py-3.5 bg-white">
-        <View className="flex-row items-center flex-1 min-w-0">
-          <icons.info_error width={18} height={18} />
-          <Text
-            numberOfLines={2}
-            style={[s.sameComp, { flexShrink: 1 }]}
-            className="font-inter-semibold text-brand-text ml-3"
-          >
+      {/* Bottom Section */}
+      <View style={s.bottomSection}>
+        <View style={s.noSubRow}>
+          <icons.info_error width={exactScale(18)} height={exactScale(18)} />
+          <Text numberOfLines={2} style={s.noSubLabel}>
             No substitute available
           </Text>
         </View>
@@ -150,21 +114,17 @@ export const SearchNoSubstituteCard: React.FC<SearchNoSubstituteCardProps> = ({
           disabled={isPending || isSuccess}
           activeOpacity={0.85}
           style={[
-            cc.addBtn,
+            s.addBtn,
             {
               borderColor: isSuccess ? "#10B981" : "#FF383C",
               backgroundColor: isSuccess ? "#ECFDF5" : "transparent",
-              flexShrink: 0,
             },
           ]}
         >
           {isPending ? (
             <ActivityIndicator size="small" color="#FF383C" />
           ) : (
-            <Text
-              style={[s.label, { color: isSuccess ? "#10B981" : "#FF383C" }]}
-              className="font-inter-bold"
-            >
+            <Text style={[s.requestText, { color: isSuccess ? "#10B981" : "#FF383C" }]}>
               {isSuccess ? "Requested" : "Request"}
             </Text>
           )}

@@ -4,7 +4,7 @@ import { exactScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../../orders.styles";
+import { styles as s } from "./tracking.styles";
 
 interface SavingsBreakdownSectionProps {
   totalSaved: number;
@@ -28,29 +28,20 @@ export function SavingsBreakdownSection({
     coinsDiscount === 0;
 
   return (
-    <View className="mx-base rounded-lg overflow-hidden border border-[#919EAB33] bg-white">
+    <View style={s.savingsWrapper}>
       <LinearGradient
         colors={["#FBFEFC", "#EBFAF0"]}
         start={{ x: 0.5, y: 1 }}
         end={{ x: 0.5, y: 0 }}
       >
-        <View
-          className="flex-row items-center justify-between"
-          style={{
-            paddingHorizontal: exactScale(16),
-            paddingVertical: exactScale(12),
-          }}
-        >
-          <View
-            className="flex-row items-center"
-            style={{ gap: exactScale(8) }}
-          >
+        <View style={s.savingsHeaderRow}>
+          <View style={s.savingsHeaderTitleRow}>
             <icons.percent_discount
               width={exactScale(18)}
               height={exactScale(18)}
               fill="#0F7635"
             />
-            <Text style={s.labelMd} className="font-inter-bold text-brand-text">
+            <Text style={s.savingsHeaderTitle}>
               Saving this order
             </Text>
           </View>
@@ -58,15 +49,10 @@ export function SavingsBreakdownSection({
             colors={["#68D36C", "#329939"]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
-            style={{ borderRadius: exactScale(6), overflow: "hidden" }}
+            style={s.savingsPillGradient}
           >
-            <View
-              style={{
-                paddingHorizontal: exactScale(10),
-                paddingVertical: exactScale(4),
-              }}
-            >
-              <Text style={s.labelSm} className="font-inter-bold text-white">
+            <View style={s.savingsPillInner}>
+              <Text style={s.savingsPillText}>
                 ₹{totalSaved.toFixed(2)}
               </Text>
             </View>
@@ -74,103 +60,53 @@ export function SavingsBreakdownSection({
           </LinearGradient>
         </View>
       </LinearGradient>
-      <View
-        style={{
-          paddingHorizontal: exactScale(16),
-          paddingVertical: exactScale(8),
-        }}
-      >
+      <View style={s.savingsBreakdownContent}>
         {productDiscount > 0 && (
-          <View
-            className="flex-row justify-between items-center"
-            style={{ paddingVertical: exactScale(8) }}
-          >
-            <Text
-              style={s.labelSm}
-              className="font-inter-medium text-[#6A6A6A]"
-            >
+          <View style={s.discountRow}>
+            <Text style={s.discountLabel}>
               Product Discount
             </Text>
-            <Text
-              style={s.labelSm}
-              className="font-inter-semibold text-[#0F7635]"
-            >
+            <Text style={s.discountValue}>
               -₹{productDiscount.toFixed(2)}
             </Text>
           </View>
         )}
         {couponDiscount > 0 && (
-          <View
-            className="flex-row justify-between items-center"
-            style={{ paddingVertical: exactScale(8) }}
-          >
-            <Text
-              style={s.labelSm}
-              className="font-inter-medium text-[#6A6A6A]"
-            >
+          <View style={s.discountRow}>
+            <Text style={s.discountLabel}>
               Coupon Discount
             </Text>
-            <Text
-              style={s.labelSm}
-              className="font-inter-semibold text-[#0F7635]"
-            >
+            <Text style={s.discountValue}>
               -₹{couponDiscount.toFixed(2)}
             </Text>
           </View>
         )}
         {walletDiscount > 0 && (
-          <View
-            className="flex-row justify-between items-center"
-            style={{ paddingVertical: exactScale(8) }}
-          >
-            <Text
-              style={s.labelSm}
-              className="font-inter-medium text-[#6A6A6A]"
-            >
+          <View style={s.discountRow}>
+            <Text style={s.discountLabel}>
               CareSure Wallet
             </Text>
-            <Text
-              style={s.labelSm}
-              className="font-inter-semibold text-[#0F7635]"
-            >
+            <Text style={s.discountValue}>
               -₹{walletDiscount.toFixed(2)}
             </Text>
           </View>
         )}
         {coinsDiscount > 0 && (
-          <View
-            className="flex-row justify-between items-center"
-            style={{ paddingVertical: exactScale(8) }}
-          >
-            <Text
-              style={s.labelSm}
-              className="font-inter-medium text-[#6A6A6A]"
-            >
+          <View style={s.discountRow}>
+            <Text style={s.discountLabel}>
               CareSure Coins
             </Text>
-            <Text
-              style={s.labelSm}
-              className="font-inter-semibold text-[#0F7635]"
-            >
+            <Text style={s.discountValue}>
               -₹{coinsDiscount.toFixed(2)}
             </Text>
           </View>
         )}
         {hasNoDiscounts && (
-          <View
-            className="flex-row justify-between items-center"
-            style={{ paddingVertical: exactScale(8) }}
-          >
-            <Text
-              style={s.labelSm}
-              className="font-inter-medium text-[#6A6A6A]"
-            >
+          <View style={s.discountRow}>
+            <Text style={s.discountLabel}>
               No discounts applied
             </Text>
-            <Text
-              style={s.labelSm}
-              className="font-inter-semibold text-[#0F7635]"
-            >
+            <Text style={s.discountValue}>
               ₹0.00
             </Text>
           </View>

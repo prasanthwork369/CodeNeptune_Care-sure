@@ -8,15 +8,21 @@ import { useNav } from "@/src/hooks/useNav";
 import { useRefillReminder } from "@/src/features/prescription/hooks/useRefillReminder";
 import { PrescriptionReminder } from "@/src/features/prescription/types";
 import { moderateScale } from "@/src/utils/exactScale";
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, Animated, Share, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Share, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import Svg, {
   Defs,
   LinearGradient as SvgGradient,
   Stop,
   Text as SvgText,
 } from "react-native-svg";
-import { orderStyles as s } from "../orders.styles";
+import { orderStyles } from "../orders.styles";
+import { styles as s } from "./PrescriptionCard.styles";
 
 export interface Prescription {
   id: string;
@@ -81,62 +87,36 @@ const Toggle = ({
   value: boolean;
   onToggle: () => void;
 }) => {
-  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const offset = useSharedValue(value ? 18 : 0);
+
   useEffect(() => {
-    Animated.spring(anim, {
-      toValue: value ? 1 : 0,
-      useNativeDriver: true,
-      friction: 8,
-      tension: 50,
-    }).start();
-  }, [anim, value]);
-  const translateX = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 18],
-  });
+    offset.value = withSpring(value ? 18 : 0, {
+      damping: 15,
+      stiffness: 120,
+    });
+  }, [offset, value]);
+
+  const thumbStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: offset.value }],
+  }));
+
   return (
     <Touchable onPress={onToggle} activeOpacity={0.85}>
       <View
-        style={{
-          width: 40,
-          height: 22,
-          borderRadius: 11,
-          backgroundColor: value ? "#0F7635" : "#D1D5DB",
-          justifyContent: "center",
-          padding: 2,
-        }}
+        style={[
+          s.toggleTrack,
+          { backgroundColor: value ? "#0F7635" : "#D1D5DB" },
+        ]}
       >
         <Animated.View
-          style={{
-            width: 18,
-            height: 18,
-            borderRadius: 9,
-            backgroundColor: "#FFFFFF",
-            transform: [{ translateX }],
-            shadowColor: "#919EAB33",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.15,
-            shadowRadius: 2,
-            elevation: 2,
-          }}
+          style={[
+            s.toggleThumb,
+            thumbStyle,
+          ]}
         />
       </View>
     </Touchable>
   );
-};
-
-const optionRowStyle = {
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  paddingHorizontal: 16,
-  paddingVertical: 12,
-};
-
-const optionTextStyle = {
-  fontSize: moderateScale(14),
-  fontWeight: "500" as const,
-  color: "#222222",
-  marginLeft: 12,
 };
 
 export const PrescriptionCard = React.memo(function PrescriptionCard({
@@ -147,8 +127,6 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
   onDownloadPress: (url: string, fileName: string) => void;
 }) {
   const router = useNav();
-  // Server-backed refill reminder; undefined lets the hook fetch it when the
-  // list response didn't include the reminder field.
   const refill = useRefillReminder({
     prescriptionId: item.id,
     initialReminder: item.reminder,
@@ -168,7 +146,6 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
         patientName: item.patient,
         uploadedDate: item.date,
         source: "view_only",
-        // Pass status and order ID so the prescription viewer knows if it is verified
         status: item.status,
         prescriptionOrderId: item.prescriptionOrderId ?? "",
       },
@@ -206,7 +183,6 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
   };
 
   const statusStyle = getStatusStyle(item.status);
-  // Per-file reasons when OCR rejected it; otherwise a pharmacist's single note.
   const reasons = item.rejectionReasons?.length
     ? item.rejectionReasons
     : item.reviewNotes?.trim()
@@ -215,67 +191,47 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
   const showReason = item.status === "Rejected" && reasons.length > 0;
 
   return (
-    <View
-      className="bg-white mb-4 overflow-hidden"
-      style={{
-        borderWidth: 1,
-        borderColor: "#DFE3E8",
-        borderRadius: 12,
-      }}
-    >
-      {/* Keep the status badge and overflow menu in their original top row. */}
-      <View
-        className="flex-row items-center justify-between"
-        style={{ paddingHorizontal: 10, paddingTop: 12, paddingBottom: 4 }}
-      >
+    <View style={s.card}>
+      {/* Top row: status badge and overflow menu */}
+      <View style={s.headerRow}>
         <View
-          style={{
-            backgroundColor: statusStyle.bg,
-            borderRadius: 5,
-            paddingHorizontal: 10,
-            paddingVertical: 4,
-          }}
+          style={[
+            s.statusBadge,
+            { backgroundColor: statusStyle.bg },
+          ]}
         >
           <Text
-            style={{
-              fontSize: moderateScale(11),
-              fontWeight: "600",
-              color: statusStyle.text,
-            }}
+            style={[
+              s.statusText,
+              { color: statusStyle.text },
+            ]}
           >
             {item.status}
           </Text>
         </View>
         <Touchable
           activeOpacity={0.7}
-          className="p-1"
+          style={s.menuBtn}
           onPress={() => setShowOptions(true)}
         >
           <icons.ellipsis_vertical width={20} height={20} color="#6A6A6A" />
         </Touchable>
       </View>
 
-      {/* Prescription icon and reference. */}
-      <View
-        className="flex-row items-center"
-        style={{ paddingHorizontal: 10, paddingTop: 4, paddingBottom: 12 }}
-      >
-        <View
-          className="w-10 h-10 items-center justify-center mr-3"
-          style={{ backgroundColor: "#E8F6ED", borderRadius: 10 }}
-        >
+      {/* Prescription icon and reference */}
+      <View style={s.rxTitleRow}>
+        <View style={s.rxIconBox}>
           <icons.note_book width={22} height={22} />
         </View>
-        <View className="flex-1">
+        <View style={{ flex: 1 }}>
           <Text
-            style={s.labelXl}
-            className="font-inter-bold text-[#0F1724]"
+            style={orderStyles.labelXl}
             numberOfLines={1}
           >
             {item.rxId}
           </Text>
           {refill.isActive && refill.nextRemindDate && (
-            <View className="mt-0.5">
+            <View style={{ marginTop: 2 }}>
               <ReminderText
                 date={formatReminderDateShort(refill.nextRemindDate)}
               />
@@ -284,44 +240,31 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
         </View>
       </View>
 
-      <View
-        style={{
-          paddingHorizontal: 10,
-          paddingBottom: 16,
-          gap: 16,
-        }}
-      >
-        <View className="flex-row items-center">
+      <View style={s.rxDetailsList}>
+        <View style={s.detailRow}>
           <icons.calendar_today width={17} height={17} fill="#6A6A6A" />
-          <Text
-            style={s.labelSm}
-            className="font-inter-medium text-[#6A6A6A] ml-2.5"
-          >
+          <Text style={s.detailText}>
             {item.date}
           </Text>
         </View>
-        {/* A rejected prescription was never read, so patient and doctor are
-            always empty — the reason below is all there is to show. */}
         {!showReason && (
           <>
-            <View className="flex-row items-center">
+            <View style={s.detailRow}>
               <icons.person_outline width={17} height={17} fill="#6A6A6A" />
               <Text
-                className="font-inter-medium ml-2.5"
                 style={[
-                  s.labelSm,
+                  s.detailText,
                   { color: item.patient ? "#6A6A6A" : "#C0C0C0" },
                 ]}
               >
                 {item.patient || "—"}
               </Text>
             </View>
-            <View className="flex-row items-center">
+            <View style={s.detailRow}>
               <icons.stethoscope width={16} height={16} fill="#6A6A6A" />
               <Text
-                className="font-inter-medium ml-2.5"
                 style={[
-                  s.labelSm,
+                  s.detailText,
                   { color: item.doctor ? "#6A6A6A" : "#C0C0C0" },
                 ]}
               >
@@ -336,50 +279,28 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
         <Touchable
           activeOpacity={0.6}
           onPress={() => setShowReasons(true)}
-          style={{ paddingHorizontal: 10, paddingBottom: 16 }}
+          style={s.rejectionWrap}
         >
-          <Text
-            className="font-inter-bold text-[#C22307]"
-            style={{ fontSize: moderateScale(13), letterSpacing: 0.3 }}
-          >
+          <Text style={s.rejectionHeading}>
             CANCELLATION REASON
           </Text>
           <Text
-            className="font-inter-medium text-[#222222] mt-1.5"
-            style={{
-              fontSize: moderateScale(14),
-              lineHeight: moderateScale(20),
-            }}
-            // Full text lives in the modal so the card stays a fixed height.
+            style={s.rejectionBody}
             numberOfLines={2}
           >
             {reasons[0]}
           </Text>
-          <Text
-            className="font-inter-semibold text-[#C22307] mt-1.5"
-            style={{ fontSize: moderateScale(12) }}
-          >
+          <Text style={s.viewMoreText}>
             View More
           </Text>
         </Touchable>
       )}
 
-      {/* Nothing to remind about or reorder once a prescription is rejected. */}
       {!showReason && (
         <>
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#E1E5E8",
-              marginHorizontal: 10,
-            }}
-          />
-
-          <View
-            className="flex-row items-center justify-between"
-            style={{ paddingHorizontal: 10, paddingVertical: 14 }}
-          >
-            <View className="flex-row items-center">
+          <View style={s.divider} />
+          <View style={s.footerRow}>
+            <View style={s.enableReminderRow}>
               <Toggle
                 value={refill.isActive}
                 onToggle={() => {
@@ -387,21 +308,17 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
                   else refill.cancelReminder();
                 }}
               />
-              <Text
-                style={s.labelMd}
-                className="font-inter-semibold text-[#222222] ml-2.5"
-              >
+              <Text style={s.enableReminderText}>
                 Enable Reminder
               </Text>
             </View>
             <Touchable
               activeOpacity={0.85}
-              className="bg-[#0F7635] px-5 py-2.5"
+              style={[
+                s.reorderBtn,
+                { opacity: item.prescriptionOrderId ? 1 : 0.4 },
+              ]}
               disabled={!item.prescriptionOrderId}
-              style={{
-                opacity: item.prescriptionOrderId ? 1 : 0.4,
-                borderRadius: 10,
-              }}
               onPress={() => {
                 if (item.prescriptionOrderId) {
                   router.push({
@@ -414,10 +331,7 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
                 }
               }}
             >
-              <Text
-                style={s.labelSm}
-                className="font-inter-semibold text-white"
-              >
+              <Text style={s.reorderBtnText}>
                 Reorder
               </Text>
             </Touchable>
@@ -441,40 +355,30 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
         <CardOptionsMenu
           onClose={() => setShowOptions(false)}
           backdropStyle={{ zIndex: 9 }}
-          popoverStyle={{
-            position: "absolute",
-            top: 48,
-            right: 8,
-            width: 210,
-            backgroundColor: "#FFFFFF",
-            borderRadius: 16,
-            borderWidth: 1,
-            borderColor: "#919EAB33",
-            zIndex: 10,
-          }}
+          popoverStyle={s.popover}
           items={[
             {
               key: "view",
               icon: <icons.eye width={20} height={20} fill="#6A6A6A" />,
               label: "View Prescription",
-              rowStyle: { ...optionRowStyle, paddingVertical: 10 },
-              textStyle: optionTextStyle,
+              rowStyle: { ...s.optionRow, paddingVertical: 10 },
+              textStyle: s.optionText,
               onPress: handleView,
             },
             {
               key: "download",
               icon: <icons.download_gray width={20} height={20} />,
               label: "Download",
-              rowStyle: optionRowStyle,
-              textStyle: optionTextStyle,
+              rowStyle: s.optionRow,
+              textStyle: s.optionText,
               onPress: handleDownload,
             },
             {
               key: "share",
               icon: <icons.share_gray width={20} height={20} />,
               label: "Share",
-              rowStyle: optionRowStyle,
-              textStyle: optionTextStyle,
+              rowStyle: s.optionRow,
+              textStyle: s.optionText,
               onPress: handleShare,
             },
           ]}
@@ -483,3 +387,4 @@ export const PrescriptionCard = React.memo(function PrescriptionCard({
     </View>
   );
 });
+PrescriptionCard.displayName = "PrescriptionCard";

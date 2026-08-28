@@ -25,7 +25,6 @@ const ScrollingColumn = ({
 }) => {
   const translateY = useSharedValue(0);
 
-  // Each item is 100px + gap (16px) = 116px
   const itemSize = 100;
   const gap = 16;
   const cycleHeight = images.length * (itemSize + gap);
@@ -37,14 +36,11 @@ const ScrollingColumn = ({
   const isVisible = useIsVisible();
 
   React.useEffect(() => {
-    // An infinite withRepeat keeps the UI thread working forever, so it must
-    // stop when this screen isn't focused or the app is backgrounded.
+    // Pause animation when screen is not visible to save UI thread resources
     if (!isVisible) {
       cancelAnimation(translateY);
       return;
     }
-    // Finish the current leg at the same speed instead of the full duration,
-    // so resuming from a paused mid-scroll position doesn't look slower.
     const remaining = cycleHeight + translateY.value;
     const remainingDuration = duration * (remaining / cycleHeight);
     translateY.value = withSequence(
@@ -97,7 +93,6 @@ const ScrollingColumn = ({
   );
 };
 
-// Memoised: 4 columns x 12 tiles, and the panel re-renders on every keystroke.
 export const AuthMedicineBackground = React.memo(() => {
   return (
     <View className="flex-row justify-center h-full overflow-hidden bg-white">
@@ -130,17 +125,14 @@ export const AuthMedicineBackground = React.memo(() => {
         />
       </View>
 
-      {/* Top Subtle Gradient for Status Bar Visibility */}
+      {/* Top subtle gradient for status bar visibility */}
       <LinearGradient
         colors={["rgba(255,255,255,0.7)", "rgba(255,255,255,0)"]}
         style={{ position: "absolute", top: 0, left: 0, right: 0, height: 100 }}
         pointerEvents="none"
       />
 
-      {/* Bottom Professional Linear Gradient Fade — 150 matches
-          AuthScreenShell's backgroundStyle shrink-minimum (verticalScale(150))
-          on purpose, so the fade always reaches solid white exactly at the
-          form panel's top edge instead of leaving a hard-edged seam there. */}
+      {/* Bottom gradient fade into solid white form panel */}
       <LinearGradient
         colors={[
           "rgba(255,255,255,0)",

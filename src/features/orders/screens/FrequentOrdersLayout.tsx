@@ -11,10 +11,11 @@ import { useFrequentlyOrdered } from "@/src/features/orders/hooks/useOrders";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
+import { ProductCard } from "../sections/frequent";
+import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./FrequentOrdersLayout.styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
-import { ProductCard } from "../sections/frequent";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 
 export const FrequentOrdersLayout: React.FC = () => {
   const router = useNav();
@@ -63,15 +64,11 @@ export const FrequentOrdersLayout: React.FC = () => {
     [],
   );
 
-  // id is required and unique per row; productId is optional and not
-  // guaranteed unique, so it's not a safe key on its own.
   const keyExtractor = useCallback((item: FrequentOrderItem) => item.id, []);
 
-  // Category chips, search and the list are live filters over server data —
-  // gating only the list left them floating over the offline/error state.
   if (liveState) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+      <View style={s.root}>
         <ScreenHeader title="Frequently Ordered List" backgroundColor="#FFFFFF" />
         {liveState === "offline" ? (
           <NoInternetState onRetry={() => void refetch()} retrying={isFetching} />
@@ -87,23 +84,14 @@ export const FrequentOrdersLayout: React.FC = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+    <View style={s.root}>
       <ScreenHeader
         title="Frequently Ordered List"
         backgroundColor="#FFFFFF"
         rightSlot={
-          <View style={{ position: "relative" }}>
+          <View style={s.cartBtnWrap}>
             <Touchable
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: "#fff",
-                borderWidth: 1,
-                borderColor: "#919EAB33",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={s.cartBtn}
               onPress={() => router.push("/(commerce)/cart")}
             >
               <icons.cart_svg width={24} height={24} fill="#222222" />
@@ -111,25 +99,9 @@ export const FrequentOrdersLayout: React.FC = () => {
             {cartLineCount > 0 && (
               <View
                 pointerEvents="none"
-                style={{
-                  position: "absolute",
-                  top: -4,
-                  right: -4,
-                  width: 20,
-                  height: 20,
-                  borderRadius: 10,
-                  backgroundColor: "#C22923",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={s.cartBadge}
               >
-                <Text
-                  style={{
-                    fontSize: moderateScale(10),
-                    fontWeight: "700",
-                    color: "#fff",
-                  }}
-                >
+                <Text style={s.cartBadgeText}>
                   {cartLineCount}
                 </Text>
               </View>
@@ -138,46 +110,21 @@ export const FrequentOrdersLayout: React.FC = () => {
         }
       />
 
-      {/* Search bar — hidden alongside the list it filters (offline/error
-          already returned above), or it sits over content that isn't there. */}
+      {/* Search bar */}
       {frequentlyOrdered.length > 0 && (
-        <View
-          style={{
-            paddingHorizontal: exactScale(16),
-            paddingTop: exactScale(12),
-            paddingBottom: exactScale(10),
-            backgroundColor: "#fff",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#F5F6FB",
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: "#EEEFF1",
-              height: 46,
-              paddingHorizontal: exactScale(12),
-            }}
-          >
+        <View style={s.searchBarWrap}>
+          <View style={s.searchBox}>
             <icons.search
               width={18}
               height={18}
-              style={{ marginRight: exactScale(8) }}
+              style={s.searchIcon}
             />
             <TextInput
               value={search}
               onChangeText={setSearch}
               placeholder="Search your ordered products..."
               placeholderTextColor="#6A6A6A"
-              style={{
-                flex: 1,
-                fontSize: moderateScale(14),
-                fontWeight: "400",
-                color: "#1C2024",
-                paddingVertical: 0,
-              }}
+              style={s.searchInput}
               returnKeyType="done"
               autoCorrect={false}
               autoCapitalize="none"
@@ -196,17 +143,11 @@ export const FrequentOrdersLayout: React.FC = () => {
 
       {/* Category filter chips */}
       {categories.length > 1 && (
-        <View
-          style={{ backgroundColor: "#fff", paddingBottom: exactScale(10) }}
-        >
+        <View style={s.categoryFilterWrap}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: exactScale(16),
-              gap: exactScale(8),
-              alignItems: "center",
-            }}
+            contentContainerStyle={s.categoryFilterContent}
           >
             {categories.map((cat) => {
               const active = activeFilter === cat;
@@ -215,21 +156,16 @@ export const FrequentOrdersLayout: React.FC = () => {
                   key={cat}
                   onPress={() => setActiveFilter(cat)}
                   activeOpacity={0.7}
-                  style={{
-                    paddingHorizontal: exactScale(16),
-                    paddingVertical: exactScale(6),
-                    borderRadius: 20,
-                    backgroundColor: active ? "#0F7635" : "#F5F6FB",
-                    borderWidth: 1,
-                    borderColor: active ? "#0F7635" : "#EEEFF1",
-                  }}
+                  style={[
+                    s.chip,
+                    active ? s.chipActive : s.chipInactive,
+                  ]}
                 >
                   <Text
-                    style={{
-                      fontSize: moderateScale(13),
-                      fontWeight: active ? "600" : "500",
-                      color: active ? "#fff" : "#637381",
-                    }}
+                    style={[
+                      s.chipText,
+                      active ? s.chipTextActive : s.chipTextInactive,
+                    ]}
                   >
                     {cat}
                   </Text>
@@ -240,51 +176,27 @@ export const FrequentOrdersLayout: React.FC = () => {
         </View>
       )}
 
-      <View style={{ height: 1, backgroundColor: "#F0F1F3" }} />
+      <View style={s.divider} />
 
       {isLoading ? (
-        <View
-          style={{
-            paddingHorizontal: exactScale(16),
-            paddingTop: exactScale(14),
-            gap: exactScale(12),
-          }}
-        >
+        <View style={s.shimmerList}>
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
           <ShimmerBlock height={exactScale(96)} borderRadius={12} />
         </View>
       ) : filtered.length === 0 ? (
         <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            paddingHorizontal: exactScale(32),
-            paddingBottom: adjustedBottom + exactScale(80),
-          }}
+          style={[
+            s.emptyWrap,
+            { paddingBottom: adjustedBottom + exactScale(80) },
+          ]}
         >
-          <Text
-            style={{
-              fontSize: moderateScale(16),
-              fontWeight: "600",
-              color: "#637381",
-              textAlign: "center",
-            }}
-          >
+          <Text style={s.emptyTitle}>
             {search || activeFilter !== "All"
               ? "No products found"
               : "No frequently ordered products yet"}
           </Text>
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              fontWeight: "400",
-              color: "#919EAB",
-              marginTop: exactScale(6),
-              textAlign: "center",
-            }}
-          >
+          <Text style={s.emptySubtitle}>
             {search || activeFilter !== "All"
               ? "Try a different name or filter"
               : "Your frequently ordered products will appear here"}
@@ -297,10 +209,10 @@ export const FrequentOrdersLayout: React.FC = () => {
           keyExtractor={keyExtractor}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            paddingTop: exactScale(14),
-            paddingBottom: adjustedBottom + exactScale(32),
-          }}
+          contentContainerStyle={[
+            s.listContent,
+            { paddingBottom: adjustedBottom + exactScale(32) },
+          ]}
         />
       )}
     </View>

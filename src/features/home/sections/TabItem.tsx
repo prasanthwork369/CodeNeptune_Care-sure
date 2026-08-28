@@ -46,12 +46,12 @@ export const TabItem: React.FC<TabItemProps> = ({
       accessibilityRole="tab"
       accessibilityLabel={tab.label}
       accessibilityState={{ selected: isActive }}
-      className="items-center justify-end mx-4 pb-3 px-1"
+      style={s.touchable}
     >
       <Animated.View
         style={[
           animatedStyle,
-          { alignItems: "center", justifyContent: "flex-end" },
+          s.contentWrap,
         ]}
       >
         {/* Skipped entirely when there is no icon, so no blank box is reserved. */}
@@ -67,8 +67,7 @@ export const TabItem: React.FC<TabItemProps> = ({
         {/* Active swaps to wider semibold; wrapping would hide the growth. */}
         <Text
           numberOfLines={1}
-          style={s.label}
-          className={`text-brand-text ${isActive ? "font-inter-semibold" : "font-inter-medium"}`}
+          style={isActive ? s.labelActive : s.labelInactive}
         >
           {tab.label}
         </Text>

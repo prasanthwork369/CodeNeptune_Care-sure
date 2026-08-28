@@ -32,6 +32,7 @@ import {
 } from "../components/NotificationRow";
 import { NotificationsSkeleton } from "../components/NotificationsSkeleton";
 import { styles as s } from "../notifications.styles";
+import { styles as ls } from "./NotificationsLayout.styles";
 
 // Flattened so FlashList can virtualize section headers and notification rows
 // as a single scrollable list instead of mounting every row up front.
@@ -332,29 +333,33 @@ export const NotificationsLayout: React.FC = () => {
       />
     )
   ) : showEmpty ? (
-    <View className="flex-1 items-center justify-center">
+    <View style={ls.emptyCenter}>
       <icons.notification
         width={s.emptyIcon.width}
         height={s.emptyIcon.height}
         fill="#D1D5DB"
       />
       <Text
-        style={s.emptyTitle}
-        className="font-inter-semibold text-brand-subtext mt-4"
+        style={[
+          s.emptyTitle,
+          {
+            fontFamily: "Inter-SemiBold",
+            fontWeight: "600",
+            color: "#6B7280",
+            marginTop: exactScale(16),
+          },
+        ]}
       >
         No notifications yet
       </Text>
-      <Text
-        style={s.emptySub}
-        className="font-inter text-[#9CA3AF] mt-1 text-center"
-      >
+      <Text style={[s.emptySub, ls.emptySubText]}>
         {"We'll notify you about orders and offers"}
       </Text>
     </View>
   ) : null;
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={ls.root}>
       <ScreenHeader
         title="Recent Notification"
         showBorder
@@ -386,11 +391,10 @@ export const NotificationsLayout: React.FC = () => {
           keyExtractor={keyExtractor}
           getItemType={getItemType}
           renderItem={renderItem}
-          className="flex-1"
           // Explicit on the list itself, not just the ancestor View — the
           // native scroll surface needs its own opaque background so a
           // hardware-layer/overscroll frame can't reveal black underneath it.
-          style={{ backgroundColor: "#FFFFFF" }}
+          style={ls.listStyle}
           // Rows carry a gesture-handler-wrapped swipeable + variable-height
           // text, so the library's default 250dp pre-render buffer can't keep
           // up with a fast fling in either direction — cells genuinely

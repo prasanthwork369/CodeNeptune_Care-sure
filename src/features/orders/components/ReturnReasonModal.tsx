@@ -72,6 +72,7 @@ export function ReturnReasonModal({
 
   const insets = useSafeAreaInsets();
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (isVisible) {
       const matched = reasons.find((r) => r.label === initialData?.reason);
@@ -86,6 +87,7 @@ export function ReturnReasonModal({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const isOtherSelected = selectedReasonId === OTHER_OPTION;
   const selectedReason = reasons.find((r) => r.id === selectedReasonId);

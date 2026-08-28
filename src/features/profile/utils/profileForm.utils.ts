@@ -1,8 +1,4 @@
-export const GENDERS = [
-  { label: "Male", value: "MALE" },
-  { label: "Female", value: "FEMALE" },
-  { label: "Prefer not to say", value: "OTHER" },
-] as const;
+export { GENDERS } from "../constants/profile.constants";
 
 /**
  * Normalizes a Date object or ISO date string to a stable "YYYY-MM-DD" string.

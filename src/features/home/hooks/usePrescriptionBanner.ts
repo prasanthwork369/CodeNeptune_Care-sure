@@ -6,7 +6,7 @@ import { ApiPrescription } from "@/src/features/prescription/types";
 import { useAuthStore } from "@/src/store/authStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { logger } from "@/src/utils/logger";
 
 const RECENT_PRESCRIPTIONS_LIMIT = 1;
@@ -50,7 +50,9 @@ export const usePrescriptionBanner = ({
 
   // Ref so the callback can read the latest value without being a dep
   const hasJustUploadedRef = useRef(hasJustUploadedPrescription);
-  hasJustUploadedRef.current = hasJustUploadedPrescription;
+  useEffect(() => {
+    hasJustUploadedRef.current = hasJustUploadedPrescription;
+  }, [hasJustUploadedPrescription]);
 
   const { mutate: dismissPrescription } = useDismissPrescription();
 
@@ -81,7 +83,7 @@ export const usePrescriptionBanner = ({
           }
         });
       }
-    }, [isAuthenticated, refetchOnFocus]),
+    }, [isAuthenticated, refetchOnFocus, refetch, setHasJustUploadedPrescription]),
   );
 
   const isRejected = status === PRESCRIPTION_STATUS.CANCELLED;

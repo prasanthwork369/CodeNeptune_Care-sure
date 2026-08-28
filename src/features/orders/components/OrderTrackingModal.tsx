@@ -48,7 +48,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
       d,
       withTiming(0, { duration: 260, easing: EASE_OUT }),
     );
-  }, [triggered]);
+  }, [index, opacity, translateY, triggered]);
 
   const rowStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -68,7 +68,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
     } else {
       pulse.value = 0;
     }
-  }, [step.isActive]);
+  }, [pulse, step.isActive]);
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: 1 + pulse.value * 0.9 }],
     opacity: 0.4 * (1 - pulse.value),
@@ -86,7 +86,7 @@ function ModalStepRow({ step, index, isLast, triggered }: StepRowProps) {
     } else {
       blink.value = 1;
     }
-  }, [step.isActive]);
+  }, [blink, step.isActive]);
   const blinkStyle = useAnimatedStyle(() => ({ opacity: blink.value }));
 
   const lineColor = step.completed && !step.isActive ? "#16A34A" : "#E5E7EB";

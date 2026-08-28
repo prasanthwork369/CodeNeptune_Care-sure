@@ -1,0 +1,92 @@
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  backdropPressable: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: exactScale(24),
+  },
+  modalContentPressable: {
+    width: "100%",
+  },
+  modalCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: exactScale(16),
+    paddingHorizontal: exactScale(24),
+    paddingVertical: exactScale(24),
+    width: "100%",
+    position: "relative",
+  },
+  closeBtn: {
+    position: "absolute",
+    top: exactScale(16),
+    right: exactScale(16),
+    width: exactScale(36),
+    height: exactScale(36),
+    borderRadius: exactScale(18),
+    backgroundColor: "#F1F2F4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconCircle: {
+    alignSelf: "center",
+    width: exactScale(112),
+    height: exactScale(112),
+    borderRadius: exactScale(56),
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: exactScale(16),
+  },
+  titleText: {
+    fontFamily: "Inter-Bold",
+    fontWeight: "700",
+    color: "#222222",
+    marginBottom: exactScale(8),
+    fontSize: moderateScale(17),
+  },
+  messageText: {
+    fontFamily: "Inter-Medium",
+    fontWeight: "500",
+    color: "#6A6A6A",
+    marginBottom: exactScale(24),
+    lineHeight: moderateScale(20),
+    fontSize: moderateScale(13),
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: exactScale(16),
+  },
+  cancelButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: exactScale(14),
+    borderRadius: exactScale(8),
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+  },
+  cancelButtonText: {
+    fontFamily: "Inter-SemiBold",
+    fontWeight: "600",
+    color: "#222222",
+    fontSize: moderateScale(14),
+  },
+  confirmButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: exactScale(8),
+    paddingVertical: exactScale(14),
+    borderRadius: exactScale(8),
+  },
+  confirmButtonText: {
+    fontFamily: "Inter-SemiBold",
+    fontWeight: "600",
+    color: "#FFFFFF",
+    fontSize: moderateScale(14),
+  },
+});

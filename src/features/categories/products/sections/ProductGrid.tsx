@@ -2,7 +2,7 @@ import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import type { CategoryProduct } from "@/src/features/categories/types";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import React, { useCallback, useMemo } from "react";
@@ -14,9 +14,10 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { CategoryProductCard } from "./CategoryProductCard";
+import { styles as s } from "./ProductGrid.styles";
 
-const GRID_PADDING = 16;
-const GRID_GAP = 10;
+const GRID_PADDING = exactScale(16);
+const GRID_GAP = exactScale(10);
 // Half the gap lives on each cell, so the outer edge still lands on GRID_PADDING.
 const CELL_GAP = GRID_GAP / 2;
 
@@ -30,11 +31,6 @@ interface ProductGridProps {
   onRefresh: () => void;
   onProductPress: (product: CategoryProduct) => void;
   paddingBottom: number;
-  /**
-   * The list query's error, if it failed. Only consulted when there are no
-   * products to show — a failed background refresh must never replace a grid
-   * the user is already looking at.
-   */
   error?: unknown;
 }
 
@@ -52,9 +48,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   const errorState = useQueryErrorState(error);
   const cardWidth = (width - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-  // Guards against a second pull-to-refresh firing while one is already in
-  // flight — RefreshControl's own `refreshing` prop reflects the real query
-  // state below, but this is a belt-and-braces check against duplicate calls.
   const handleRefresh = useCallback(() => {
     if (isRefreshing) return;
     onRefresh();
@@ -85,9 +78,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     [cardWidth, onProductPress],
   );
 
-  // Ahead of the skeleton: an offline retry keeps isLoading true while it is
-  // in flight, and swapping back to a full-screen skeleton would hide the
-  // Retry button the user just pressed.
   if (products.length === 0 && errorState === "offline") {
     return <NoInternetState onRetry={onRefresh} retrying={isRefreshing} />;
   }
@@ -102,29 +92,29 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: GRID_PADDING, paddingBottom }}
       >
-        <View className="flex-row flex-wrap justify-between">
+        <View style={s.skeletonGrid}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <View key={i} style={{ width: cardWidth }} className="mb-6">
+            <View key={i} style={[s.skeletonItem, { width: cardWidth }]}>
               <Skeleton
                 width={cardWidth}
                 height={cardWidth * 1.05}
-                borderRadius={14}
+                borderRadius={exactScale(14)}
               />
-              <View className="mt-2 gap-y-2">
+              <View style={s.skeletonDetails}>
                 <Skeleton
                   width={cardWidth * 0.4}
-                  height={28}
-                  borderRadius={6}
+                  height={exactScale(28)}
+                  borderRadius={exactScale(6)}
                 />
                 <Skeleton
                   width={cardWidth * 0.9}
-                  height={14}
-                  borderRadius={4}
+                  height={exactScale(14)}
+                  borderRadius={exactScale(4)}
                 />
                 <Skeleton
                   width={cardWidth * 0.6}
-                  height={12}
-                  borderRadius={4}
+                  height={exactScale(12)}
+                  borderRadius={exactScale(4)}
                 />
               </View>
             </View>
@@ -150,11 +140,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       }}
       refreshControl={refreshControl}
       ListEmptyComponent={
-        <View className="flex-1 items-center justify-center py-20">
-          <Text
-            className="font-inter-medium text-brand-subtext"
-            style={{ fontSize: moderateScale(15) }}
-          >
+        <View style={s.emptyWrap}>
+          <Text style={s.emptyText}>
             No products found
           </Text>
         </View>
@@ -162,3 +149,4 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     />
   );
 };
+ProductGrid.displayName = "ProductGrid";

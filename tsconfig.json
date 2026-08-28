@@ -12,6 +12,8 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts",
-    "jest-env.d.ts"
+    "jest-env.d.ts",
+    "image.d.ts",
+    "type.d.ts"
   ]
 }

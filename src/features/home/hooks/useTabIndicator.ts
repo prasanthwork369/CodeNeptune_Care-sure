@@ -51,7 +51,7 @@ export const useTabIndicator = (activeId: string) => {
         });
       }, 50);
     }
-  }, [activeId, activeLayout?.x, activeLayout?.width]);
+  }, [activeId, activeLayout, indicatorX, opacity]);
 
   const animatedIndicatorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: indicatorX.value }],

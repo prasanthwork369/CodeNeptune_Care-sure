@@ -20,8 +20,6 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { profileStyles as s } from "@/src/features/profile/profile.styles";
-
 import { styles as cardStyles } from "../wallet.styles";
 import { TransactionHistorySheet } from "../components/TransactionHistorySheet";
 import { WalletInfoModal } from "../components/WalletInfoModal";
@@ -374,17 +372,11 @@ export const WalletLayout: React.FC = () => {
 
         {/* Transaction History Section Header */}
         <View style={cardStyles.historyHeader}>
-          <Text
-            style={s.walletTitle}
-            className="font-inter-extrabold text-brand-text"
-          >
+          <Text style={cardStyles.historyTitle}>
             Transaction History
           </Text>
           <Touchable onPress={() => router.push("/profile/wallet/history")}>
-            <Text
-              style={s.walletTxTitle}
-              className="font-inter-bold text-[#FF8A00]"
-            >
+            <Text style={cardStyles.viewAllText}>
               View All
             </Text>
           </Touchable>
@@ -408,10 +400,7 @@ export const WalletLayout: React.FC = () => {
               retrying={logsRefreshing}
             />
           ) : previewTxs.length === 0 ? (
-            <Text
-              style={s.walletLabel}
-              className="font-inter text-brand-subtext text-center py-6"
-            >
+            <Text style={cardStyles.noTransactionsText}>
               No transactions yet
             </Text>
           ) : (
@@ -420,16 +409,10 @@ export const WalletLayout: React.FC = () => {
                 <View style={cardStyles.txRow}>
                   <TransactionIcon type={tx.iconType} />
                   <View style={cardStyles.txDetails}>
-                    <Text
-                      style={s.walletTxTitle}
-                      className="font-inter-medium text-brand-text"
-                    >
+                    <Text style={cardStyles.txTitleText}>
                       {tx.title}
                     </Text>
-                    <Text
-                      style={[s.walletSub, cardStyles.txDateText]}
-                      className="font-inter text-brand-subtext mt-0.5"
-                    >
+                    <Text style={cardStyles.txDateSubtitle}>
                       {tx.date}
                     </Text>
                   </View>
@@ -442,7 +425,7 @@ export const WalletLayout: React.FC = () => {
                       />
                       <Text
                         style={[
-                          s.walletTxTitle,
+                          cardStyles.txTitleText,
                           cardStyles.txAmountText,
                           { color: tx.amountColor },
                         ]}

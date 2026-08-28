@@ -1,11 +1,12 @@
 import { ShimmerBlock } from "@/src/components/ui/shimmer";
 import { Transaction } from "../types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { ListRenderItem } from "@shopify/flash-list";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
 import { TxRow } from "./TxRow";
+import { styles as s } from "./WalletHistoryPage.styles";
 
 interface WalletHistoryPageProps {
   transactions: Transaction[];
@@ -39,14 +40,7 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
 
   if (loading) {
     return (
-      <View
-        style={{
-          width,
-          paddingHorizontal: exactScale(16),
-          paddingTop: exactScale(16),
-          gap: exactScale(12),
-        }}
-      >
+      <View style={[{ width }, s.loadingContainer]}>
         <ShimmerBlock height={exactScale(74)} borderRadius={8} />
         <ShimmerBlock height={exactScale(74)} borderRadius={8} />
         <ShimmerBlock height={exactScale(74)} borderRadius={8} />
@@ -57,16 +51,8 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
 
   if (transactions.length === 0) {
     return (
-      <View style={{ width }}>
-        <Text
-          style={{
-            textAlign: "center",
-            color: "#9CA3AF",
-            fontWeight: "500",
-            fontSize: moderateScale(14),
-            marginTop: 40,
-          }}
-        >
+      <View style={[{ width }, s.emptyContainer]}>
+        <Text style={s.emptyText}>
           No transactions
         </Text>
       </View>
@@ -74,20 +60,20 @@ export const WalletHistoryPage: React.FC<WalletHistoryPageProps> = ({
   }
 
   return (
-    <View style={{ width, flex: 1 }}>
+    <View style={[{ width }, s.pageContainer]}>
       <AppFlashList
         data={transactions}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom, backgroundColor: "#FFFFFF" }}
+        contentContainerStyle={[{ paddingBottom }, s.listContent]}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.3}
         ListFooterComponent={
           isFetchingNextPage ? (
             <ActivityIndicator
               color="#0F7635"
-              style={{ paddingVertical: exactScale(16) }}
+              style={s.footerLoader}
             />
           ) : null
         }

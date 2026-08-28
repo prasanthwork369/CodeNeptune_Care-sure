@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native";
 import { CART_BUTTON_HEIGHT } from "@/src/constants/theme";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./HomeProductCardSkeleton.styles";
 
 const CardSkeleton = () => {
   const cardWidth = exactScale(164);
@@ -11,18 +12,20 @@ const CardSkeleton = () => {
 
   return (
     <View
-      className="bg-white rounded-[12px] overflow-hidden"
-      style={{
-        width: cardWidth,
-        height: cardHeight,
-        borderWidth: 0.77,
-        borderColor: "#919EAB33",
-      }}
+      style={[
+        s.cardRoot,
+        {
+          width: cardWidth,
+          height: cardHeight,
+        },
+      ]}
     >
       {/* Image area */}
       <View
-        style={{ height: imageSize * 1.5 }}
-        className="items-center justify-center px-2 pb-2 pt-7"
+        style={[
+          s.imageArea,
+          { height: imageSize * 1.5 },
+        ]}
       >
         <Skeleton
           width={imageSize}
@@ -32,25 +35,25 @@ const CardSkeleton = () => {
       </View>
 
       {/* Details area */}
-      <View style={{ backgroundColor: "#F2FFF9" }} className="flex-1 px-3 pt-3">
+      <View style={s.detailsArea}>
         <Skeleton
           width="85%"
           height={exactScale(14)}
-          style={{ marginBottom: exactScale(6) }}
+          style={s.line1}
         />
         <Skeleton
           width="60%"
           height={exactScale(12)}
-          style={{ marginBottom: exactScale(10) }}
+          style={s.line2}
         />
-        <View className="flex-row items-center gap-x-2">
+        <View style={s.pricesRow}>
           <Skeleton width={exactScale(48)} height={exactScale(16)} />
           <Skeleton width={exactScale(36)} height={exactScale(12)} />
         </View>
       </View>
 
       {/* Add to cart button */}
-      <View style={{ backgroundColor: "#F2FFF9" }} className="px-3 pb-3 pt-2">
+      <View style={s.buttonArea}>
         <Skeleton
           width="100%"
           height={CART_BUTTON_HEIGHT}
@@ -66,11 +69,7 @@ export const HomeProductCardSkeleton = ({ count = 4 }: { count?: number }) => (
     horizontal
     showsHorizontalScrollIndicator={false}
     scrollEnabled={false}
-    contentContainerStyle={{
-      paddingLeft: exactScale(20),
-      paddingRight: exactScale(40),
-      gap: exactScale(14),
-    }}
+    contentContainerStyle={s.scrollContent}
   >
     {Array.from({ length: count }).map((_, i) => (
       <CardSkeleton key={i} />

@@ -1,8 +1,8 @@
 import { HOME_IMAGES } from "@/src/constants/images";
 import { Transaction, TxIconType } from "../types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Image, Text, View } from "react-native";
+import { styles as s } from "./TxRow.styles";
 
 const TransactionIcon = ({ type }: { type: TxIconType }) => {
   const isCredit = type === "plus" || type === "coin_credit" || type === "cash";
@@ -16,18 +16,14 @@ const TransactionIcon = ({ type }: { type: TxIconType }) => {
           : HOME_IMAGES.accountBalanceDebit;
   return (
     <View
-      style={{
-        width: exactScale(44),
-        height: exactScale(44),
-        borderRadius: exactScale(22),
-        backgroundColor: isCredit ? "#DFF3E6" : "#FCE8E8",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      style={[
+        s.iconContainer,
+        { backgroundColor: isCredit ? "#DFF3E6" : "#FCE8E8" },
+      ]}
     >
       <Image
         source={src}
-        style={{ width: exactScale(18), height: exactScale(18) }}
+        style={s.iconImage}
         resizeMode="contain"
       />
     </View>
@@ -45,73 +41,44 @@ export const TxRow = React.memo(function TxRow({
 }) {
   return (
     <View>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: exactScale(24),
-          paddingVertical: exactScale(15),
-        }}
-      >
+      <View style={s.rowItem}>
         <TransactionIcon type={tx.iconType} />
-        <View style={{ flex: 1, marginLeft: exactScale(16) }}>
-          <Text
-            style={{
-              fontSize: moderateScale(15),
-              fontWeight: "600",
-              color: "#111827",
-            }}
-          >
+        <View style={s.detailsWrap}>
+          <Text style={s.titleText}>
             {tx.title}
           </Text>
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              color: "#6B7280",
-              marginTop: exactScale(2),
-            }}
-          >
+          <Text style={s.dateText}>
             {tx.date}
           </Text>
         </View>
         {tx.isCoin ? (
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <View style={s.coinAmountWrap}>
             <Image
               source={HOME_IMAGES.dollarCoins}
-              style={{ width: exactScale(16), height: exactScale(16) }}
+              style={s.coinIcon}
               resizeMode="contain"
             />
             <Text
-              style={{
-                fontSize: moderateScale(15),
-                fontWeight: "700",
-                color: tx.amountColor,
-              }}
+              style={[
+                s.amountText,
+                { color: tx.amountColor },
+              ]}
             >
               {tx.amount}
             </Text>
           </View>
         ) : (
           <Text
-            style={{
-              fontSize: moderateScale(15),
-              fontWeight: "700",
-              color: tx.amountColor,
-            }}
+            style={[
+              s.amountText,
+              { color: tx.amountColor },
+            ]}
           >
             {tx.amount}
           </Text>
         )}
       </View>
-      {!isLast && (
-        <View
-          style={{
-            height: 1,
-            backgroundColor: "#E5E7EB",
-            marginHorizontal: exactScale(16),
-          }}
-        />
-      )}
+      {!isLast && <View style={s.separator} />}
     </View>
   );
 });

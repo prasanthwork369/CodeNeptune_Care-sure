@@ -27,6 +27,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, useWindowDimensions, View } from "react-native";
+import { styles as s } from "./SearchPageLayout.styles";
 
 const toComparisonData = (item: ApiSearchMedicine) => {
   const rec = item.recommendation!;
@@ -310,12 +311,12 @@ export const SearchPageLayout = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={s.root}>
       <LinearGradient
         colors={["#EAF7D6", "#FFFFFF"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
-        className="absolute top-0 left-0 right-0 h-[110px]"
+        style={s.gradientOverlay}
       />
 
       <ProductHeader
@@ -347,7 +348,7 @@ export const SearchPageLayout = () => {
           onProductPress={handleProductPress}
         />
       ) : (
-        <View className="flex-1">
+        <View style={s.searchingBody}>
           {query.trim().length >= 2 && (
             <SearchSuggestionsBar
               suggestions={suggestions}

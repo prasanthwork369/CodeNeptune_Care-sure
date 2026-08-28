@@ -51,9 +51,6 @@ const FrequentItem = React.memo(
         slug: item.slug,
         price: item.price,
         originalPrice: item.originalPrice,
-        // Pass the discount so the cart charges the discounted price, not the
-        // MRP — the backend derives selling = mrp * (1 - discountPercent/100),
-        // matching the web ProductCard's add-to-cart.
         discountPercent: item.discountPercent,
         image: item.image,
         requiresPrescription: item.requiresPrescription,
@@ -76,27 +73,16 @@ const FrequentItem = React.memo(
 
     const handleAdd = useCallback(async () => {
       if (disableCart) return;
-      // Only animate on a confirmed add: offline the increment refuses and a
-      // fly-in would falsely show the item landing in the cart.
       const added = await increment();
       if (added) triggerFly();
     }, [disableCart, increment, triggerFly]);
 
     return (
-      <View
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: exactScale(12),
-          borderWidth: 1,
-          borderColor: "#919EAB1A",
-        }}
-        className="p-3 mb-2.5 flex-row items-center justify-between"
-      >
+      <View style={s.itemRoot}>
         {/* Tappable area → product detail */}
         <Touchable
           activeOpacity={0.85}
           onPress={() => {
-            // productId only: the medicine id cannot resolve on the product route.
             if (!item.productId) return;
             const previewImage =
               typeof item.image === "string"
@@ -110,29 +96,13 @@ const FrequentItem = React.memo(
             );
           }}
           onPressIn={handlePrefetch}
-          className="flex-row items-center flex-1"
+          style={s.itemMainTouchable}
         >
-          <View
-            style={[
-              s.imgBox,
-              {
-                backgroundColor: "#fff",
-                borderRadius: exactScale(12),
-                borderWidth: 1,
-                borderColor: "#919EAB1A",
-                marginRight: exactScale(12),
-              },
-            ]}
-          >
+          <View style={s.imgBox}>
             <View
               ref={imageRef}
               collapsable={false}
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-              }}
+              style={s.imgContainer}
             >
               <icons.placeholder
                 width={exactScale(44)}
@@ -141,7 +111,7 @@ const FrequentItem = React.memo(
               {hasImage && (
                 <Image
                   source={item.image}
-                  style={[s.imgInner, { position: "absolute" }]}
+                  style={s.imgInner}
                   contentFit="contain"
                   cachePolicy="memory-disk"
                   recyclingKey={item.productId || item.id}
@@ -150,32 +120,17 @@ const FrequentItem = React.memo(
               )}
             </View>
             {!!item.discount && (
-              <View
-                style={{
-                  position: "absolute",
-                  top: exactScale(6),
-                  left: exactScale(6),
-                  backgroundColor: "#E8F5E9",
-                  paddingHorizontal: exactScale(5),
-                  paddingVertical: exactScale(2),
-                  borderRadius: exactScale(4),
-                  zIndex: 10,
-                  overflow: "hidden",
-                }}
-              >
-                <Text
-                  style={[s.badge, { fontWeight: "800", color: "#0F7635" }]}
-                >
+              <View style={s.badgeWrap}>
+                <Text style={s.badge}>
                   {item.discount}
                 </Text>
                 <OfferShine borderRadius={exactScale(4)} />
               </View>
             )}
           </View>
-          <View className="flex-1">
+          <View style={s.infoCol}>
             <Text
               style={s.name}
-              className="font-inter-semibold text-brand-text mb-0.5"
               numberOfLines={1}
             >
               {item.name}
@@ -183,7 +138,6 @@ const FrequentItem = React.memo(
             {!!item.brand && (
               <Text
                 style={s.brand}
-                className="font-inter-medium text-brand-subtext mb-1"
                 numberOfLines={1}
               >
                 {item.brand}
@@ -192,22 +146,18 @@ const FrequentItem = React.memo(
             {!!item.description && (
               <Text
                 style={s.description}
-                className="font-inter text-brand-subtext mb-2"
                 numberOfLines={1}
               >
                 {item.description}
               </Text>
             )}
-            <View className="flex-row items-center gap-x-2">
-              <Text className="text-base font-inter-bold text-brand-text">
+            <View style={s.priceRow}>
+              <Text style={s.price}>
                 ₹{(Number(item.price) || 0).toFixed(2)}
               </Text>
               {!!item.originalPrice &&
                 Number(item.originalPrice) > Number(item.price) && (
-                  <Text
-                    style={s.mrp}
-                    className="font-inter text-brand-subtext line-through"
-                  >
+                  <Text style={s.mrp}>
                     ₹{(Number(item.originalPrice) || 0).toFixed(2)}
                   </Text>
                 )}
@@ -221,63 +171,33 @@ const FrequentItem = React.memo(
             onPress={disableCart ? undefined : handleAdd}
             disabled={isPending || disableCart}
             activeOpacity={0.85}
-            className="rounded-[8px] bg-white ml-3"
-            style={{
-              borderWidth: 1,
-              borderColor: "#0F7635",
-              width: exactScale(72),
-              height: exactScale(36),
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={s.addBtnWrap}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#0F7635" />
             ) : (
-              <Text
-                style={[s.addBtn, { color: "#0F7635" }]}
-                className="font-inter-bold"
-              >
+              <Text style={s.addBtn}>
                 ADD
               </Text>
             )}
           </Touchable>
         ) : (
-          <View
-            className="flex-row items-center rounded-[8px] overflow-hidden ml-3"
-            style={{ backgroundColor: "#0F7635", minWidth: 72 }}
-          >
+          <View style={s.cartBtnActive}>
             <Touchable
               onPress={disableCart ? undefined : decrement}
               disabled={isPending || disableCart}
               activeOpacity={0.7}
-              style={{
-                width: exactScale(32),
-                paddingVertical: exactScale(8),
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={s.counterBtn}
             >
-              <Text
-                style={s.counter}
-                className="font-inter-medium text-white leading-none"
-              >
+              <Text style={s.counter}>
                 −
               </Text>
             </Touchable>
-            <View
-              style={{
-                flex: 1,
-                paddingVertical: exactScale(8),
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            <View style={s.counterValueWrap}>
               {isPending ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <Animated.Text
-                  className="font-inter-bold text-white text-center"
                   style={[
                     s.counterVal,
                     {
@@ -294,17 +214,9 @@ const FrequentItem = React.memo(
               onPress={disableCart ? undefined : increment}
               disabled={isPending || disableCart}
               activeOpacity={0.7}
-              style={{
-                width: exactScale(32),
-                paddingVertical: exactScale(8),
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={s.counterBtn}
             >
-              <Text
-                style={s.counter}
-                className="font-inter-medium text-white leading-none"
-              >
+              <Text style={s.counter}>
                 +
               </Text>
             </Touchable>
@@ -333,20 +245,20 @@ export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> =
       if (!visibleSubstitutes.length) return null;
 
       return (
-        <View className="px-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lg font-inter-bold text-brand-text">
+        <View style={s.root}>
+          <View style={s.headerRow}>
+            <Text style={s.titleText}>
               {title}
             </Text>
             {!!onViewAll && (
               <Touchable onPress={onViewAll} accessibilityRole="button">
-                <Text className="text-base font-inter-semibold text-brand-primary">
+                <Text style={s.viewAllText}>
                   View All
                 </Text>
               </Touchable>
             )}
           </View>
-          <View className="gap-y-4">
+          <View style={s.listGap}>
             {visibleSubstitutes.map((item, index) => (
               <FrequentItem
                 key={`${item?.productId ?? item?.id ?? index}-${index}`}

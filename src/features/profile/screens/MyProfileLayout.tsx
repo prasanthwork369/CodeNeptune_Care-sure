@@ -1,6 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { asError } from "@/src/api/errors";
-import { UpdateProfilePayload } from "../types";
 import { DatePickerModal } from "@/src/components/ui/DatePickerModal";
 import { GorhomBottomSheet } from "@/src/components/ui/GorhomBottomSheet";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
@@ -13,7 +11,7 @@ import { useProfile } from "@/src/features/profile/hooks/useProfile";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { format, validate } from "@/src/utils/validation";
 import { getMaxDob, getMinDob, validateDob } from "@/src/utils/patient";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
@@ -21,103 +19,17 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
-  type KeyboardTypeOptions,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmailVerifyModal } from "../components/EmailVerifyModal";
-import { GENDERS } from "../utils/profileForm.utils";
+import { ProfileEditField } from "../components/ProfileEditField";
+import { GENDERS } from "../constants/profile.constants";
 import { useProfileFormState } from "../hooks/useProfileFormState";
-
-type ProfileEditFieldProps = {
-  label: string;
-  value: string;
-  onChangeText?: (value: string) => void;
-  placeholder?: string;
-  editable?: boolean;
-  keyboardType?: KeyboardTypeOptions;
-  error?: string;
-  rightSlot?: React.ReactNode;
-};
-
-const ProfileEditField: React.FC<ProfileEditFieldProps> = ({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  editable = true,
-  keyboardType = "default",
-  error,
-  rightSlot,
-}) => (
-  <View style={{ marginBottom: 16 }}>
-    <Text
-      style={{
-        fontSize: moderateScale(13),
-        fontWeight: "600",
-        color: "#222222",
-        marginBottom: 6,
-      }}
-    >
-      {label}
-    </Text>
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: editable ? "#FFFFFF" : "#F5F6FB",
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: "#E8E8E8",
-        paddingHorizontal: 14,
-        minHeight: 48,
-      }}
-    >
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#6A6A6A"
-        editable={editable}
-        keyboardType={keyboardType}
-        // Caret color only — the OEM default caret is invisible on the white
-        // field on Android 10. selectionColor is intentionally NOT set: on
-        // Android it tints/enlarges the insertion handle into an oversized green
-        // teardrop over the text. Add Patient sets neither and renders correctly.
-        cursorColor="#0F7635"
-        caretHidden={false}
-        style={{
-          flex: 1,
-          paddingVertical: 12,
-          fontSize: moderateScale(14),
-          color: editable ? "#111827" : "#637381",
-          paddingLeft: 0,
-          paddingRight: rightSlot ? 10 : 0,
-          // Override the global patch's includeFontPadding:false — on Android 10
-          // the collapsed line box renders an oversized selection handle over the
-          // text. Restoring font padding matches Add Patient's working input.
-          includeFontPadding: true,
-        }}
-      />
-      {rightSlot}
-    </View>
-    {error ? (
-      <Text
-        style={{
-          fontSize: moderateScale(12),
-          fontWeight: "500",
-          color: "#EF4444",
-          marginTop: 4,
-        }}
-      >
-        {error}
-      </Text>
-    ) : null}
-  </View>
-);
+import { UpdateProfilePayload } from "../types";
+import { styles as s } from "./MyProfileLayout.styles";
 
 export const MyProfileLayout: React.FC = () => {
   const router = useNav();
@@ -126,11 +38,21 @@ export const MyProfileLayout: React.FC = () => {
   const { requestVerify, requesting } = useEmailVerification();
   const isOffline = useIsOffline();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [gender, setGender] = useState("");
-  const [dob, setDob] = useState<Date | null>(null);
+  // Seeded synchronously from profile (already available on first render via
+  // cached initialData) so the first render never compares empty fields
+  // against a populated profile — that mismatch briefly made hasChanges true
+  // and flashed the Save button enabled before this effect corrected it.
+  const [firstName, setFirstName] = useState(() => profile?.firstName ?? "");
+  const [lastName, setLastName] = useState(() => profile?.lastName ?? "");
+  const [email, setEmail] = useState(() => profile?.email ?? "");
+  const [gender, setGender] = useState(() => {
+    if (!profile?.gender) return "";
+    const val = profile.gender.toUpperCase();
+    return GENDERS.some((x) => x.value === val) ? val : "";
+  });
+  const [dob, setDob] = useState<Date | null>(() =>
+    profile?.dateOfBirth ? new Date(profile.dateOfBirth) : null,
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderSheet, setShowGenderSheet] = useState(false);
   const [showEmailVerify, setShowEmailVerify] = useState(false);
@@ -138,11 +60,8 @@ export const MyProfileLayout: React.FC = () => {
   const [dobError, setDobError] = useState("");
   const [saveCompleted, setSaveCompleted] = useState(false);
 
-  // Hydrate the form once per profile (keyed by id). A background refetch of the
-  // same profile returns a new object each time; re-syncing on every change would
-  // clobber the user's in-progress edits — e.g. revert a changed email back to
-  // the verified one and make the Verify button disappear.
-  const hydratedIdRef = useRef<string | null>(null);
+  // Hydrate form once per profile id to prevent clobbering in-flight edits during refetches
+  const hydratedIdRef = useRef<string | null>(profile?.id ?? null);
   useEffect(() => {
     if (!profile || hydratedIdRef.current === profile.id) return;
     hydratedIdRef.current = profile.id;
@@ -178,16 +97,11 @@ export const MyProfileLayout: React.FC = () => {
     isOffline,
   });
 
-  // Show the "Verified" badge only while the field still holds the exact
-  // address that was verified. Once the user edits the email it's a new,
-  // unverified address, so the Verify button must re-enable.
   const isCurrentEmailVerified =
     !!profile?.isEmailVerified &&
     !!normalizedEmail &&
     normalizedEmail.toLowerCase() === (profile.email ?? "").trim().toLowerCase();
 
-  // Dismiss the keyboard first so it doesn't stay open over the gender sheet
-  // when a text field (name/email) was focused.
   const handleGenderPick = () => {
     Keyboard.dismiss();
     setShowGenderSheet(true);
@@ -221,20 +135,10 @@ export const MyProfileLayout: React.FC = () => {
       setTimeout(() => router.back(), 0);
     } catch (e) {
       const err = asError(e);
-      if (__DEV__) {
-        console.error("[Profile Update Error]", err);
-        // Log full API validation details to identify which field is failing
-        if (err?.data)
-          console.error(
-            "[Profile Update Details]",
-            JSON.stringify(err.data, null, 2),
-          );
-      }
+      if (__DEV__) console.error("[Profile Update Error]", err);
     }
   };
 
-  // Sends the OTP to the entered email, then opens the verify sheet.
-  // Validation errors show inline under the field (not a popup alert).
   const handleVerifyEmail = async () => {
     const result = validate.email(email);
     if (!result.valid) {
@@ -254,17 +158,12 @@ export const MyProfileLayout: React.FC = () => {
 
   const handleEmailVerified = () => {
     setShowEmailVerify(false);
-    // Profile is refreshed via React Query invalidation inside useEmailVerification.
-    // isEmailVerified on the profile object will flip to true, which updates the
-    // rightSlot badge automatically — no Alert needed.
   };
 
-  // Opens the dedicated Delete Account confirmation screen, which handles the
-  // actual deletion (and the "lose access to" details from the design).
   const handleDeleteAccount = () => router.push("/profile/delete-account");
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+    <View style={s.root}>
       <UnsavedChangesGuard hasUnsavedChanges={!saveCompleted && hasChanges} />
       <ScreenHeader title="My Profile" backgroundColor="#FFFFFF" showBorder />
 
@@ -272,9 +171,8 @@ export const MyProfileLayout: React.FC = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         overScrollMode="auto"
-        contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
+        contentContainerStyle={s.scrollContent}
       >
-        {/* First Name */}
         <ProfileEditField
           label="First Name"
           value={firstName}
@@ -282,7 +180,6 @@ export const MyProfileLayout: React.FC = () => {
           placeholder="Enter first name"
         />
 
-        {/* Last Name */}
         <ProfileEditField
           label="Last Name"
           value={lastName}
@@ -290,7 +187,6 @@ export const MyProfileLayout: React.FC = () => {
           placeholder="Enter last name"
         />
 
-        {/* Mobile Number */}
         <ProfileEditField
           label="Mobile Number"
           value={format.phone(profile?.phoneNumber)}
@@ -299,7 +195,6 @@ export const MyProfileLayout: React.FC = () => {
           rightSlot={profile?.isPhoneVerified ? <VerifiedBadge /> : null}
         />
 
-        {/* Email */}
         <ProfileEditField
           label="Email"
           value={email}
@@ -312,123 +207,56 @@ export const MyProfileLayout: React.FC = () => {
           error={emailError}
           rightSlot={
             isCurrentEmailVerified ? (
-              // Already verified — show a green badge, no action needed.
               <VerifiedBadge />
             ) : email ? (
-              // Not yet verified — show the Verify button
               <Touchable
                 onPress={handleVerifyEmail}
                 disabled={requesting}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                hitSlop={{
+                  top: exactScale(8),
+                  bottom: exactScale(8),
+                  left: exactScale(8),
+                  right: exactScale(8),
+                }}
               >
                 {requesting ? (
                   <ActivityIndicator size="small" color="#0F7635" />
                 ) : (
-                  <Text
-                    style={{
-                      fontSize: moderateScale(13),
-                      fontWeight: "600",
-                      color: "#0F7635",
-                    }}
-                  >
-                    Verify
-                  </Text>
+                  <Text style={s.verifyText}>Verify</Text>
                 )}
               </Touchable>
             ) : null
           }
         />
 
-        {/* Gender + Date of Birth row */}
-        <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
-          {/* Gender */}
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                fontWeight: "600",
-                color: "#222222",
-                marginBottom: 6,
-              }}
-            >
-              Gender
-            </Text>
+        <View style={s.dobRow}>
+          <View style={s.dobCol}>
+            <Text style={s.fieldLabel}>Gender</Text>
             <Touchable
               onPress={handleGenderPick}
               activeOpacity={0.8}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#FFFFFF",
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: "#E8E8E8",
-                paddingHorizontal: 14,
-                height: 48,
-              }}
+              style={s.pickerBtn}
             >
-              <Text
-                style={{
-                  flex: 1,
-                  fontSize: moderateScale(14),
-                  color: gender ? "#111827" : "#AAAAAA",
-                }}
-              >
+              <Text style={gender ? s.pickerText : s.pickerPlaceholder}>
                 {GENDERS.find((x) => x.value === gender)?.label || "Select"}
               </Text>
-              <icons.down_arrow width={16} height={16} />
+              <icons.down_arrow width={exactScale(16)} height={exactScale(16)} />
             </Touchable>
           </View>
 
-          {/* Date of Birth */}
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                fontWeight: "600",
-                color: "#222222",
-                marginBottom: 6,
-              }}
-            >
-              Date of Birth
-            </Text>
+          <View style={s.dobCol}>
+            <Text style={s.fieldLabel}>Date of Birth</Text>
             <Touchable
               onPress={() => setShowDatePicker(true)}
               activeOpacity={0.8}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#FFFFFF",
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: "#E8E8E8",
-                paddingHorizontal: 14,
-                height: 48,
-              }}
+              style={s.pickerBtn}
             >
-              <Text
-                style={{
-                  flex: 1,
-                  fontSize: moderateScale(14),
-                  color: formattedDob ? "#111827" : "#AAAAAA",
-                }}
-              >
+              <Text style={formattedDob ? s.pickerText : s.pickerPlaceholder}>
                 {formattedDob || "DD-MM-YYYY"}
               </Text>
-              <icons.calendar_month width={18} height={18} />
+              <icons.calendar_month width={exactScale(18)} height={exactScale(18)} />
             </Touchable>
-            {dobError ? (
-              <Text
-                style={{
-                  fontSize: moderateScale(12),
-                  fontWeight: "500",
-                  color: "#EF4444",
-                  marginTop: 4,
-                }}
-              >
-                {dobError}
-              </Text>
-            ) : null}
+            {dobError ? <Text style={s.fieldError}>{dobError}</Text> : null}
           </View>
         </View>
 
@@ -444,62 +272,21 @@ export const MyProfileLayout: React.FC = () => {
           }}
         />
 
-        {error ? (
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              fontWeight: "500",
-              color: "#EF4444",
-              marginBottom: 12,
-            }}
-          >
-            {error}
-          </Text>
-        ) : null}
+        {error ? <Text style={s.generalError}>{error}</Text> : null}
 
-        {/* Delete Account — matches the "Your Information" / Logout card-row
-            pattern so the whole row is the tap target and the style stays
-            consistent with the rest of the app. */}
-        <View style={{ marginTop: 24 }}>
-          <View className="bg-white rounded-lg overflow-hidden border border-[#919EAB33]">
+        <View style={s.deleteCardWrapper}>
+          <View style={s.deleteCard}>
             <Touchable onPress={handleDeleteAccount} activeOpacity={0.6}>
-              {/* Label and caption share a column so the arrow centres against
-                  the whole block, not just the first line. */}
-              <View className="flex-row items-center px-4 py-[14px]">
-                <View className="flex-1">
-                  <Text
-                    className="font-inter-semibold"
-                    style={{ fontSize: moderateScale(14), color: "#CA2B25" }}
-                  >
-                    Delete Account
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: moderateScale(12),
-                      color: "#6B7280",
-                      lineHeight: moderateScale(18),
-                      paddingTop: 4,
-                    }}
-                  >
+              <View style={s.deleteRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.deleteTitle}>Delete Account</Text>
+                  <Text style={s.deleteDesc}>
                     Deleting your account will remove all your order, wallet
                     amount and any active referral
                   </Text>
                 </View>
-                <View
-                  className="ml-2 items-center justify-center"
-                  style={{
-                    width: exactScale(36),
-                    height: exactScale(36),
-                    borderRadius: exactScale(18),
-                    backgroundColor: "#FFFFFF",
-                    borderWidth: 1,
-                    borderColor: "#919EAB33",
-                  }}
-                >
-                  <icons.arrow_forward_gray
-                    width={exactScale(18)}
-                    height={exactScale(18)}
-                  />
+                <View style={s.deleteArrowWrap}>
+                  <icons.arrow_forward_gray width={exactScale(18)} height={exactScale(18)} />
                 </View>
               </View>
             </Touchable>
@@ -507,67 +294,38 @@ export const MyProfileLayout: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Save Changes */}
-      <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "#F5F6FB" }}>
-        <View
-          style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12 }}
-        >
+      <SafeAreaView edges={["bottom"]} style={s.bottomArea}>
+        <View style={s.bottomPadding}>
           <Touchable
             testID="save-profile-btn"
             onPress={handleSave}
             disabled={isSaveDisabled}
             activeOpacity={0.85}
-            style={{
-              backgroundColor: "#0F7635",
-              borderRadius: 10,
-              height: 52,
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: isSaveDisabled ? 0.5 : 1,
-            }}
+            style={[
+              s.saveBtn,
+              isSaveDisabled ? s.saveBtnDisabled : s.saveBtnEnabled,
+            ]}
           >
             {updating ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text
-                style={{
-                  fontSize: moderateScale(15),
-                  fontWeight: "600",
-                  color: "#FFFFFF",
-                }}
-              >
-                Save Changes
-              </Text>
+              <Text style={s.saveBtnText}>Save Changes</Text>
             )}
           </Touchable>
         </View>
       </SafeAreaView>
 
-      {/* Gender Picker Sheet */}
       <GorhomBottomSheet
         isVisible={showGenderSheet}
         onClose={() => setShowGenderSheet(false)}
       >
         <BottomSheetView
-          // Adjusted bottom inset so the last option isn't hidden behind the
-          // Android 3-button nav bar (edge-to-edge is enabled); consistent with
-          // the tab bar / other bottom UI.
-          style={{
-            paddingHorizontal: 20,
-            paddingTop: 24,
-            paddingBottom: adjustedBottom + 8,
-          }}
+          style={[
+            s.genderSheetContent,
+            { paddingBottom: adjustedBottom + exactScale(8) },
+          ]}
         >
-          <Text
-            style={{
-              fontSize: moderateScale(16),
-              fontWeight: "700",
-              color: "#111827",
-              marginBottom: 16,
-            }}
-          >
-            Select Gender
-          </Text>
+          <Text style={s.genderSheetTitle}>Select Gender</Text>
           {GENDERS.map((g) => (
             <Touchable
               key={g.value}
@@ -576,32 +334,26 @@ export const MyProfileLayout: React.FC = () => {
                 setShowGenderSheet(false);
               }}
               activeOpacity={0.8}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingVertical: 14,
-              }}
+              style={s.genderRow}
             >
               <Text
-                style={{
-                  fontSize: moderateScale(15),
-                  fontWeight: gender === g.value ? "600" : "400",
-                  color: gender === g.value ? "#0F7635" : "#111827",
-                }}
+                style={gender === g.value ? s.genderLabelActive : s.genderLabel}
               >
                 {g.label}
               </Text>
               {gender === g.value && (
-                <icons.check_circle width={20} height={20} fill="#0F7635" />
+                <icons.check_circle
+                  width={exactScale(20)}
+                  height={exactScale(20)}
+                  fill="#0F7635"
+                />
               )}
             </Touchable>
           ))}
-          <View style={{ height: 8 }} />
+          <View style={{ height: exactScale(8) }} />
         </BottomSheetView>
       </GorhomBottomSheet>
 
-      {/* Email Verification Modal */}
       <EmailVerifyModal
         isVisible={showEmailVerify}
         email={email.trim()}

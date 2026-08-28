@@ -3,13 +3,8 @@ import { Image } from "expo-image";
 import React from "react";
 import { Text, View, useWindowDimensions } from "react-native";
 import { SvgUri } from "react-native-svg";
-
 import { ApiAppContent } from "@/src/features/home/types";
-import {
-  exactScale,
-  moderateScale,
-  verticalScale,
-} from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { styles as s } from "./HomeFooter.styles";
 
 interface HomeFooterProps {
@@ -38,7 +33,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
     const { width } = useWindowDimensions();
 
     if (isLoading || !appContent) {
-      return <View className="h-20" />;
+      return <View style={s.loadingSpacer} />;
     }
 
     const footerTitle = appContent.footer?.title ?? "";
@@ -51,13 +46,7 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
       <View>
         {/* Always With You Banner */}
         {footerHeartUrl ? (
-          <View
-            style={{
-              paddingTop: exactScale(10),
-              paddingBottom: 0,
-              paddingHorizontal: exactScale(20),
-            }}
-          >
+          <View style={s.heartBanner}>
             {isSvg(footerHeartUrl) ? (
               <SvgUri
                 uri={footerHeartUrl}
@@ -89,22 +78,11 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
               contentFit="cover"
               contentPosition="bottom"
             />
-            <View
-              style={{
-                position: "absolute",
-                left: exactScale(20),
-                top: exactScale(20),
-                gap: 0,
-              }}
-            >
+            <View style={s.skylineOverlayTextWrap}>
               {footerWords.map((word, idx) => (
                 <Text
                   key={idx}
-                  style={{
-                    fontSize: moderateScale(60),
-                    lineHeight: verticalScale(65),
-                  }}
-                  className="font-inter-extrabold text-[#D4D4D4] uppercase"
+                  style={s.skylineWordText}
                 >
                   {word}
                 </Text>
@@ -114,12 +92,12 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
         ) : null}
 
         <View
-          className="flex-row justify-between items-start w-full px-5"
-          style={{
-            marginTop: footerImageUrl ? -exactScale(50) : 0,
-            marginBottom: exactScale(20),
-            paddingTop: exactScale(10),
-          }}
+          style={[
+            s.labelsRow,
+            {
+              marginTop: footerImageUrl ? -exactScale(50) : 0,
+            },
+          ]}
         >
           {(appContent.footer?.labels ?? []).map((label, idx) => {
             const isLeft = idx === 0;
@@ -127,9 +105,9 @@ export const HomeFooter: React.FC<HomeFooterProps> = React.memo(
             const textAlign = isLeft ? "left" : isRight ? "right" : "center";
 
             return (
-              <View key={idx} className="items-start">
+              <View key={idx} style={s.labelItem}>
                 <RemoteIcon uri={label.icon} style={s.icon} />
-                <Text style={[s.label, { textAlign }]} className="mt-1">
+                <Text style={[s.label, { textAlign }]}>
                   {label.text}
                 </Text>
               </View>

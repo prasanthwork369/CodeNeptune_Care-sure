@@ -5,31 +5,16 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { LinearGradient } from "expo-linear-gradient";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { UploadMethodCardProps } from "@/src/features/prescription/types";
-import { moderateScale } from "@/src/utils/exactScale";
+import { styles as s } from "./choose-method.styles";
 
 const RadioButton = ({ selected }: { selected: boolean }) => (
   <View
-    style={{
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      borderWidth: 2,
-      borderColor: selected ? "#0F7635" : "#C4C4C4",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "#fff",
-    }}
+    style={[
+      s.radioCircle,
+      { borderColor: selected ? "#0F7635" : "#C4C4C4" },
+    ]}
   >
-    {selected && (
-      <View
-        style={{
-          width: 11,
-          height: 11,
-          borderRadius: 5.5,
-          backgroundColor: "#0F7635",
-        }}
-      />
-    )}
+    {selected && <View style={s.radioDot} />}
   </View>
 );
 
@@ -43,49 +28,25 @@ export const UploadMethodCard: React.FC<UploadMethodCardProps> = ({
         colors={["#FCF5FF", "#E8F3FF"]}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
-        style={{
-          borderRadius: 14,
-          borderWidth: 1,
-          borderColor: "#919EAB33",
-          padding: 14,
-        }}
+        style={s.uploadCardGradient}
       >
-        <View
-          style={{
-            backgroundColor: "#D0ECFD",
-            alignSelf: "flex-start",
-            marginBottom: 12,
-          }}
-          className="rounded px-2 py-0.5"
-        >
-          <Text
-            style={{ color: "#1A1C1E", fontSize: moderateScale(10) }}
-            className="font-inter-semibold uppercase tracking-wider"
-          >
+        <View style={s.badge}>
+          <Text style={s.badgeText}>
             Order Now
           </Text>
         </View>
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-start flex-1 pr-4">
+        <View style={s.cardContentRow}>
+          <View style={s.cardLeftCol}>
             <Image
               source={HOME_IMAGES.prescription}
-              style={{ width: 30, height: 30 }}
+              style={s.prescriptionIcon}
               contentFit="contain"
             />
-            <View className="flex-1 ml-3">
-              <Text
-                className="font-inter-bold text-[#1A1C1E]"
-                style={{ fontSize: moderateScale(14) }}
-              >
+            <View style={s.cardTextCol}>
+              <Text style={s.cardTitle}>
                 Upload Prescription
               </Text>
-              <Text
-                className="font-inter-medium text-[#6A6A6A] mt-0.5"
-                style={{
-                  fontSize: moderateScale(12),
-                  lineHeight: moderateScale(17),
-                }}
-              >
+              <Text style={s.cardDesc}>
                 The following items require verification before purchase.
               </Text>
             </View>

@@ -13,7 +13,7 @@ import { icons } from "@/src/constants/icons";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useSelectPatient } from "@/src/features/prescription/hooks/useSelectPatient";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { getAge } from "@/src/utils/patient";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { format } from "@/src/utils/validation";
@@ -104,12 +104,10 @@ export const SelectPatientLayout: React.FC = () => {
   );
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader
         title="Select Patient"
         rightSlot={
-          // showEmptyState excludes the error case on purpose (see the hook),
-          // so it alone doesn't hide this when there's nothing to add to yet.
           showEmptyState || (!loading && listErrorState && members.length === 0) ? undefined : (
             <Touchable
               onPress={() => {
@@ -118,10 +116,7 @@ export const SelectPatientLayout: React.FC = () => {
               }}
               activeOpacity={0.8}
             >
-              <Text
-                className="font-inter-bold text-[#0F7635]"
-                style={{ fontSize: moderateScale(13) }}
-              >
+              <Text style={s.addPatientHeaderBtn}>
                 ADD PATIENT
               </Text>
             </Touchable>
@@ -130,8 +125,6 @@ export const SelectPatientLayout: React.FC = () => {
       />
 
       {!loading && listErrorState && members.length === 0 ? (
-        // Ahead of the form: with no patients the whole flow is unusable, and
-        // the empty state below would claim the account has none.
         listErrorState === "offline" ? (
           <NoInternetState
             onRetry={() => void refetch()}
@@ -156,29 +149,25 @@ export const SelectPatientLayout: React.FC = () => {
           <ScrollView
             showsVerticalScrollIndicator={false}
             overScrollMode="auto"
-            className="flex-1"
-            contentContainerStyle={{
-              ...s.scrollContent,
-              paddingBottom: adjustedBottom + exactScale(90),
-            }}
+            style={{ flex: 1 }}
+            contentContainerStyle={[
+              s.scrollContent,
+              {
+                paddingBottom: adjustedBottom + exactScale(90),
+              },
+            ]}
           >
             {prescriptionItems.length > 0 && (
-              // No bottom margin here: the dashed divider below already owns
-              // the spacing (marginVertical), so an extra mb-4 would make the
-              // gap under the line double the gap above it.
               <View>
-                <Text
-                  className="font-inter-semibold text-[#1A1C1E] mb-[10px]"
-                  style={{ fontSize: moderateScale(14) }}
-                >
+                <Text style={s.sectionTitle}>
                   Prescription
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View className="flex-row" style={{ gap: exactScale(10) }}>
+                  <View style={s.rxThumbContainer}>
                     <Touchable
                       onPress={() => setIsUploadSheetVisible(true)}
                       disabled={isAddingImage}
-                      className="w-[72px] h-[72px] rounded-[10px] border border-[#919EAB33] bg-[#FCFDFF] items-center justify-center"
+                      style={s.rxAddPhotoBtn}
                     >
                       {isAddingImage ? (
                         <ActivityIndicator size="small" color="#0F7635" />
@@ -187,74 +176,38 @@ export const SelectPatientLayout: React.FC = () => {
                       )}
                     </Touchable>
                     {prescriptionItems.map((item, index) => (
-                      <View
-                        key={index}
-                        style={{ position: "relative", width: 72, height: 72 }}
-                      >
+                      <View key={index} style={s.rxThumbItemWrap}>
                         <Touchable
                           activeOpacity={0.8}
                           onPress={() => handleViewPrescription(index)}
-                          className="w-[72px] h-[72px] rounded-[10px] overflow-hidden border border-[#919EAB33] bg-[#F9FAFB]"
+                          style={s.rxThumbItem}
                         >
                           {isPdf(item.localUri, item.type) ? (
-                            <View className="flex-1 items-center justify-center">
+                            <View style={s.rxPdfThumbBox}>
                               <icons.upload_file width={22} height={22} />
-                              <Text
-                                className="font-inter-bold text-[#1A1C1E] mt-0.5"
-                                style={{ fontSize: moderateScale(8) }}
-                              >
+                              <Text style={s.rxPdfThumbText}>
                                 PDF
                               </Text>
                             </View>
                           ) : (
                             <Image
                               source={{ uri: item.localUri }}
-                              style={{ width: "100%", height: "100%" }}
+                              style={s.rxImage}
                               resizeMode="contain"
                             />
                           )}
                           {removingImageIndex === index && (
-                            <View
-                              style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "rgba(255,255,255,0.7)",
-                              }}
-                            >
+                            <View style={s.rxRemovingOverlay}>
                               <ActivityIndicator size="small" color="#0F7635" />
                             </View>
                           )}
                         </Touchable>
 
-                        {/* Remove (X) badge — mirrors the web ImageUpload */}
                         <Touchable
                           onPress={() => removeImage(index)}
                           disabled={removingImageIndex !== null}
                           hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                          style={{
-                            position: "absolute",
-                            top: 6,
-                            right: 6,
-                            width: 20,
-                            height: 20,
-                            borderRadius: 10,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            backgroundColor: "#FFFFFF",
-                            borderWidth: 1,
-                            borderColor: "#919EAB33",
-                            elevation: 2,
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 1 },
-                            shadowOpacity: 0.1,
-                            shadowRadius: 1,
-                            zIndex: 30,
-                          }}
+                          style={s.rxRemoveBadge}
                         >
                           <icons.close_small
                             width={10}
@@ -266,30 +219,20 @@ export const SelectPatientLayout: React.FC = () => {
                     ))}
                   </View>
                 </ScrollView>
-                <View
-                  style={{
-                    borderTopWidth: 1.5,
-                    borderColor: "#E5E7EB",
-                    borderStyle: "dashed",
-                    marginVertical: exactScale(16),
-                  }}
-                />
+                <View style={s.dashedDivider} />
               </View>
             )}
 
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 16 }}
+              style={s.patientsScrollView}
             >
-              <View className="flex-row pr-1" style={{ gap: exactScale(8) }}>
+              <View style={s.patientsRow}>
                 {loading ? (
                   <PatientChipSkeleton />
                 ) : members.length === 0 ? (
-                  <Text
-                    className="font-inter text-[#919EAB] py-2"
-                    style={{ fontSize: moderateScale(12) }}
-                  >
+                  <Text style={s.noPatientsText}>
                     No patients yet. Tap &quot;ADD PATIENT&quot;
                   </Text>
                 ) : (
@@ -300,21 +243,24 @@ export const SelectPatientLayout: React.FC = () => {
                         key={p.id}
                         onPress={() => setSelectedPatientId(p.id)}
                         activeOpacity={0.8}
-                        className="px-[14px] py-[9px] rounded-md border"
-                        style={{
-                          borderColor: sel ? "#0F7635" : "#E0E0E0",
-                          backgroundColor: sel ? "#0F7635" : "#fff",
-                        }}
+                        style={[
+                          s.patientChip,
+                          {
+                            borderColor: sel ? "#0F7635" : "#E0E0E0",
+                            backgroundColor: sel ? "#0F7635" : "#FFFFFF",
+                          },
+                        ]}
                       >
                         <Text
-                          className="font-inter-medium"
-                          style={{
-                            color: sel ? "#FFFFFF" : "#6A6A6A",
-                            fontSize: moderateScale(13),
-                          }}
+                          style={[
+                            s.patientChipText,
+                            {
+                              color: sel ? "#FFFFFF" : "#6A6A6A",
+                            },
+                          ]}
                         >
                           {p.name}{" "}
-                          <Text className="font-inter">({p.relationship})</Text>
+                          <Text>({p.relationship})</Text>
                         </Text>
                       </Touchable>
                     );
@@ -323,33 +269,19 @@ export const SelectPatientLayout: React.FC = () => {
               </View>
             </ScrollView>
 
-            <Text
-              className="font-inter-bold text-[#222222] mb-2"
-              style={{ fontSize: moderateScale(13) }}
-            >
+            <Text style={s.sectionHeadingBold}>
               Doctor will reach you at
             </Text>
-            <View className="mb-4">
-              <View className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] bg-white">
+            <View style={s.phoneRowWrapper}>
+              <View style={s.phoneInputBox}>
                 {editingPhone ? (
-                  <View className="flex-1 flex-row items-center">
-                    <Text
-                      className="font-inter-semibold text-[#222222] mr-1"
-                      style={{ fontSize: moderateScale(14) }}
-                    >
+                  <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                    <Text style={s.phoneCountryPrefix}>
                       +91
                     </Text>
-                    <View
-                      style={{
-                        width: 1,
-                        height: 16,
-                        backgroundColor: "#919EAB33",
-                        marginRight: 2,
-                      }}
-                    />
+                    <View style={s.phonePrefixDivider} />
                     <TextInput
                       ref={(r) => applyDigitsOnlyFilter(r, 10)}
-                      className="flex-1 font-inter-semibold text-[#222222]"
                       style={s.contactInput}
                       value={phoneValue}
                       onChangeText={handlePhoneChange}
@@ -361,7 +293,6 @@ export const SelectPatientLayout: React.FC = () => {
                   </View>
                 ) : (
                   <Text
-                    className="flex-1"
                     style={[
                       s.contactValue,
                       {
@@ -380,42 +311,29 @@ export const SelectPatientLayout: React.FC = () => {
                   onPress={handleUpdatePhone}
                   disabled={savingPhone}
                   activeOpacity={0.7}
-                  // hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   {savingPhone ? (
                     <ActivityIndicator size="small" color="#0F7635" />
                   ) : (
-                    <Text
-                      className="font-inter-bold text-[#0F7635]"
-                      style={{ fontSize: moderateScale(13) }}
-                    >
+                    <Text style={s.phoneActionText}>
                       {editingPhone ? "Done" : "Edit"}
                     </Text>
                   )}
                 </Touchable>
               </View>
               {!!phoneError && (
-                <Text
-                  className="font-inter-medium text-[#EF4444] mt-1.5 px-1"
-                  style={{ fontSize: moderateScale(12) }}
-                >
+                <Text style={s.phoneErrorText}>
                   {phoneError}
                 </Text>
               )}
             </View>
 
-            <View className="flex-row mb-4" style={{ gap: exactScale(12) }}>
-              <View className="flex-1">
-                <Text
-                  className="font-inter-bold text-[#222222] mb-2"
-                  style={{ fontSize: moderateScale(13) }}
-                >
+            <View style={s.vitalsRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={s.sectionHeadingBold}>
                   Age
                 </Text>
-                <View
-                  className="border border-[#919EAB33] rounded-md px-[14px] bg-white"
-                  style={s.vitalCard}
-                >
+                <View style={s.vitalCard}>
                   {selectedPatient?.dateOfBirth ? (
                     (() => {
                       const [, value, unit] =
@@ -430,11 +348,11 @@ export const SelectPatientLayout: React.FC = () => {
                             ? "Days old"
                             : unit;
                       return (
-                        <Text style={{ fontSize: moderateScale(14) }}>
-                          <Text className="font-inter-bold text-[#222222]">
+                        <Text style={s.vitalCardText}>
+                          <Text style={s.vitalValueBold}>
                             {value}
                           </Text>
-                          <Text className="font-inter-medium text-[#919EAB]">
+                          <Text style={s.vitalUnitSubtext}>
                             {" "}
                             {unitLabel}
                           </Text>
@@ -442,35 +360,23 @@ export const SelectPatientLayout: React.FC = () => {
                       );
                     })()
                   ) : (
-                    <Text
-                      className="font-inter-bold text-[#222222]"
-                      style={{ fontSize: moderateScale(14) }}
-                    >
+                    <Text style={[s.vitalCardText, s.vitalValueBold]}>
                       —
                     </Text>
                   )}
                 </View>
               </View>
               <View>
-                <Text
-                  className="font-inter-bold text-[#222222] mb-2"
-                  style={{ fontSize: moderateScale(13) }}
-                >
+                <Text style={s.sectionHeadingBold}>
                   Gender
                 </Text>
-                <View
-                  className="flex-row items-center bg-[#F1FFF6] border border-[#0F763533] rounded-full px-6"
-                  style={s.genderCard}
-                >
+                <View style={s.genderCard}>
                   {selectedPatient?.gender === "FEMALE" ? (
                     <icons.female width={18} height={18} color="#0F7635" />
                   ) : (
                     <icons.male width={18} height={18} color="#0F7635" />
                   )}
-                  <Text
-                    className="ml-1.5 font-inter-bold text-[#0F7635]"
-                    style={{ fontSize: moderateScale(13) }}
-                  >
+                  <Text style={s.genderCardText}>
                     {selectedPatient?.gender
                       ? selectedPatient.gender.charAt(0) +
                         selectedPatient.gender.slice(1).toLowerCase()
@@ -480,20 +386,16 @@ export const SelectPatientLayout: React.FC = () => {
               </View>
             </View>
 
-            <Text
-              className="font-inter-bold text-[#222222] mb-2"
-              style={{ fontSize: moderateScale(13) }}
-            >
+            <Text style={s.sectionHeadingBold}>
               Select Your Health Problem
             </Text>
             <Touchable
               onPress={() => setShowHealthSheet(true)}
-              className="flex-row items-center justify-between border border-[#919EAB33] rounded-md px-[14px] bg-white mb-4"
               style={s.healthSelector}
               activeOpacity={0.85}
             >
               {selectedHealthProblem ? (
-                <View className="flex-row items-center gap-[10px]">
+                <View style={s.healthSelectedContent}>
                   {selectedHealthProblem.icon &&
                   (selectedHealthProblem.icon.startsWith("http") ||
                     selectedHealthProblem.icon.startsWith("/") ||
@@ -504,27 +406,16 @@ export const SelectPatientLayout: React.FC = () => {
                       style={{ borderRadius: 12 }}
                     />
                   ) : (
-                    <Text
-                      style={{
-                        fontSize: moderateScale(20),
-                        lineHeight: moderateScale(24),
-                      }}
-                    >
+                    <Text style={s.healthEmoji}>
                       {selectedHealthProblem.icon}
                     </Text>
                   )}
-                  <Text
-                    className="font-inter-medium text-[#1A1C1E]"
-                    style={{ fontSize: moderateScale(14) }}
-                  >
+                  <Text style={s.healthLabel}>
                     {selectedHealthProblem.label}
                   </Text>
                 </View>
               ) : (
-                <Text
-                  className="font-inter text-[#6A6A6A]"
-                  style={{ fontSize: moderateScale(14) }}
-                >
+                <Text style={s.healthPlaceholder}>
                   Select
                 </Text>
               )}
@@ -532,22 +423,18 @@ export const SelectPatientLayout: React.FC = () => {
             </Touchable>
 
             {selectedHealthProblem?.id === "other" && (
-              <View className="mb-4">
+              <View style={s.customProblemWrapper}>
                 <TextInput
                   value={customProblemText}
                   onChangeText={setCustomProblemText}
                   placeholder="Type the health problem..."
                   placeholderTextColor="#6A6A6A"
-                  className="w-full font-inter text-[#1A1C1E] bg-white border border-[#919EAB33] rounded-md px-[14px]"
                   style={s.customProblemInput}
                 />
               </View>
             )}
 
-            <Text
-              className="font-inter-bold text-[#222222] mb-2"
-              style={{ fontSize: moderateScale(13) }}
-            >
+            <Text style={s.sectionHeadingBold}>
               Help us understand your symptoms
             </Text>
             <TextInput
@@ -557,7 +444,6 @@ export const SelectPatientLayout: React.FC = () => {
               multiline
               value={symptoms}
               onChangeText={setSymptoms}
-              className="border border-[#919EAB33] rounded-md px-[14px] bg-white font-inter text-[#1A1C1E]"
               style={s.symptomsInput}
             />
           </ScrollView>
@@ -604,9 +490,6 @@ export const SelectPatientLayout: React.FC = () => {
         onClose={() => setIsUploadSheetVisible(false)}
         toPay={toPay}
         patientMemberId={selectedPatient?.id}
-        // Override the default pickers so images are uploaded and appended to
-        // this screen's list, instead of navigating back into Preview. The
-        // delay lets the sheet dismiss before the OS picker opens.
         onUploadFile={() => {
           setIsUploadSheetVisible(false);
           setTimeout(addImageFromLibrary, 400);

@@ -7,7 +7,7 @@ import {
 import { useIsVisible } from "@/src/hooks/ui/useVisibleInterval";
 import { tabBarVisible } from "@/src/store/tabBarVisibility";
 import { Image } from "expo-image";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import Animated, {
   cancelAnimation,
@@ -20,10 +20,9 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-
-import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
 import { HOME_IMAGES } from "@/src/constants/images";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./PrescriptionFloatingBanner.styles";
 
 const DURATION = 250;
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
@@ -67,8 +66,6 @@ export const PrescriptionFloatingBanner = ({
 }: PrescriptionFloatingBannerProps) => {
   const slideY = useSharedValue(visible ? 0 : 150);
   const opacity = useSharedValue(visible ? 1 : 0);
-  // The tab bar's own shared value — read directly so the banner reshapes on
-  // the same frame as the bar rather than trailing it through a store update.
   const tabBarAnim = tabBarVisible;
   const progressAnim = useSharedValue(0);
 
@@ -78,8 +75,6 @@ export const PrescriptionFloatingBanner = ({
 
   // Auto-progress: loop 0 → 0.88 over 10s, snap back to 0, repeat
   useEffect(() => {
-    // An infinite withRepeat keeps the UI thread working forever, so it must
-    // stop when Home is not on screen or the app is backgrounded.
     if (!isUnderReview || !isVisible) {
       cancelAnimation(progressAnim);
       progressAnim.value = withTiming(0, { duration: DURATION });
@@ -118,12 +113,6 @@ export const PrescriptionFloatingBanner = ({
   const exact77 = exactScale(77);
   const exact12 = exactScale(12);
 
-  // The upload button is always collapsed exactly when the bar is hidden, so
-  // one value drives the whole reshape. Deriving it from a second, JS-driven
-  // value would run the shrink on two clocks and read as a broken two-stage
-  // animation.
-  // paddingRight reserves real space for the FAB, so it stays a true layout
-  // property — a transform would move the pill instead of resizing it.
   const containerStyle = useAnimatedStyle(() => ({
     paddingLeft: exact12,
     paddingRight: interpolate(tabBarAnim.value, [0, 1], [exact77, exact12]),
@@ -132,9 +121,6 @@ export const PrescriptionFloatingBanner = ({
     zIndex: 10,
   }));
 
-  // Inline progress pill: fills a dynamic track width based on expansion state.
-  // Stays a real width (not a transform) because the subtitle text next to it
-  // depends on that width via flex to know how much room it has to truncate into.
   const trackWidthStyle = useAnimatedStyle(() => {
     const trackWidth = interpolate(tabBarAnim.value, [0, 1], [48, 90]);
     return {
@@ -142,163 +128,99 @@ export const PrescriptionFloatingBanner = ({
     };
   });
 
-  // Fill tracks the track's own (still layout-driven) width via 100%, then
-  // scales in from the left — keeps the continuous 10s loop off layout entirely.
   const progressBarStyle = useAnimatedStyle(() => ({
     width: "100%",
     transformOrigin: "0% 50%",
     transform: [{ scaleX: progressAnim.value }],
   }));
 
-  const subtitleText = config.subtitle;
+  const getStatusIcon = () => {
+    switch (status) {
+      case PRESCRIPTION_STATUS.APPROVED:
+        return HOME_IMAGES.prescriptionApproved;
+      case PRESCRIPTION_STATUS.CANCELLED:
+        return HOME_IMAGES.prescriptionRejected;
+      default:
+        return HOME_IMAGES.prescription;
+    }
+  };
 
   return (
     <Animated.View style={containerStyle}>
-      <View
-        style={{
-          // Lighter than the tab bar pill's 15% — the banner sits over content.
-          boxShadow: "0px 0px 20px 0px #00000017",
-          borderRadius: exactScale(999),
-          backgroundColor: "white",
-        }}
-      >
-        <View
-          style={{
-            borderRadius: exactScale(999),
-            overflow: "hidden",
-            backgroundColor: "white",
-          }}
-          className="border border-[#0000000D]"
-        >
-          <View
-            className="flex-row items-center bg-white"
-            style={{ borderRadius: exactScale(999), height: PILL_HEIGHT }}
+      <View style={s.pillShadowWrap}>
+        <View style={s.pillBorderWrap}>
+          <Touchable
+            activeOpacity={0.9}
+            onPress={onPress}
+            style={{ width: "100%" }}
           >
-            <Touchable
-              activeOpacity={0.7}
-              onPress={onPress}
-              style={{ flex: 1 }}
-            >
-              <View
-                className="flex-row items-center px-3"
-                style={{ borderRadius: exactScale(999), height: PILL_HEIGHT }}
-              >
-                {/* Rx Icon */}
-                <View className="mr-3 items-center justify-center">
-                  {status === PRESCRIPTION_STATUS.APPROVED ? (
-                    <Image
-                      source={HOME_IMAGES.prescriptionApproved}
-                      style={{ width: exactScale(44), height: exactScale(44) }}
-                      contentFit="contain"
-                    />
-                  ) : status === PRESCRIPTION_STATUS.CANCELLED ? (
-                    <Image
-                      source={HOME_IMAGES.prescriptionRejected}
-                      style={{ width: exactScale(36), height: exactScale(36) }}
-                      contentFit="contain"
-                    />
-                  ) : (
-                    <Image
-                      source={HOME_IMAGES.prescription}
-                      style={{ width: exactScale(44), height: exactScale(44) }}
-                      contentFit="contain"
-                    />
-                  )}
-                </View>
+            <View style={s.bannerInnerRow}>
+              {/* Rx Icon */}
+              <Image
+                source={getStatusIcon()}
+                style={
+                  status === PRESCRIPTION_STATUS.CANCELLED
+                    ? s.iconImageCancelled
+                    : s.iconImage
+                }
+                contentFit="contain"
+              />
 
-                {/* Text section */}
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    gap: exactScale(3),
-                    minWidth: 0,
-                  }}
+              {/* Text Container */}
+              <View style={s.textCol}>
+                <Text
+                  numberOfLines={1}
+                  style={s.titleText}
                 >
-                  <Text
-                    className="font-inter-bold text-[#1A1C1E]"
-                    numberOfLines={1}
-                    style={{
-                      fontSize: moderateScale(13),
-                      lineHeight: moderateScale(17),
-                    }}
-                  >
-                    {config.title}
-                  </Text>
-
-                  {/* Subtitle + inline progress pill */}
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: exactScale(6),
-                    }}
-                  >
-                    <Text
-                      className="font-inter-medium text-[#6A6A6A]"
-                      numberOfLines={1}
-                      style={{ flexShrink: 1, fontSize: moderateScale(11) }}
+                  {config.title}
+                </Text>
+                <View style={s.subtitleRow}>
+                  {config.showProgress && (
+                    <Animated.View
+                      style={[
+                        s.progressTrack,
+                        trackWidthStyle,
+                      ]}
                     >
-                      {subtitleText}
-                    </Text>
-
-                    {config.showProgress && (
                       <Animated.View
                         style={[
-                          {
-                            height: exactScale(6),
-                            borderRadius: exactScale(999),
-                            backgroundColor: "#E5E7EB",
-                            overflow: "hidden",
-                            flexShrink: 0,
-                          },
-                          trackWidthStyle,
+                          s.progressFill,
+                          progressBarStyle,
                         ]}
-                      >
-                        <Animated.View
-                          style={[
-                            {
-                              height: exactScale(6),
-                              borderRadius: exactScale(999),
-                              backgroundColor: "#0F7635",
-                            },
-                            progressBarStyle,
-                          ]}
-                        />
-                      </Animated.View>
-                    )}
-                  </View>
+                      />
+                    </Animated.View>
+                  )}
+                  <Text
+                    numberOfLines={1}
+                    style={s.subtitleText}
+                  >
+                    {config.subtitle}
+                  </Text>
                 </View>
               </View>
-            </Touchable>
 
-            {onClose && (
-              <Touchable
-                activeOpacity={0.7}
-                onPress={onClose}
-                hitSlop={{
-                  top: exactScale(10),
-                  bottom: exactScale(10),
-                  left: exactScale(10),
-                  right: exactScale(10),
-                }}
-                style={{
-                  width: exactScale(32),
-                  height: exactScale(32),
-                  borderRadius: exactScale(16),
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: exactScale(8),
-                }}
-              >
-                <icons.close_small
-                  width={exactScale(12)}
-                  height={exactScale(12)}
-                  fill="#9CA3AF"
-                />
-              </Touchable>
-            )}
-          </View>
+              {/* Close/Dismiss Button */}
+              {onClose && (
+                <Touchable
+                  onPress={onClose}
+                  activeOpacity={0.7}
+                  hitSlop={{
+                    top: exactScale(10),
+                    bottom: exactScale(10),
+                    left: exactScale(10),
+                    right: exactScale(10),
+                  }}
+                  style={s.closeBtn}
+                >
+                  <icons.close_small
+                    width={exactScale(12)}
+                    height={exactScale(12)}
+                    fill="#9CA3AF"
+                  />
+                </Touchable>
+              )}
+            </View>
+          </Touchable>
         </View>
       </View>
     </Animated.View>

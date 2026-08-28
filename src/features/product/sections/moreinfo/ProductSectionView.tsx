@@ -1,26 +1,20 @@
 import { HtmlContent } from "@/src/components/ui/HtmlContent";
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
 import { ProductSection } from "@/src/features/product/types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
 import { AdviceCardsSection } from "./AdviceCardsSection";
 import { BulletListSection } from "./BulletListSection";
 import { FaqSection } from "./FaqSection";
 import { KeyValueSection } from "./KeyValueSection";
+import { styles as s } from "./moreinfo.styles";
 
 const SectionCard: React.FC<{
   title: string;
   children: React.ReactNode;
 }> = ({ title, children }) => (
-  <View
-    className="rounded-[12px] border border-[#F1F2F4] bg-white"
-    style={{ padding: exactScale(16), marginBottom: exactScale(12) }}
-  >
-    <Text
-      className="font-inter-bold text-brand-text"
-      style={{ fontSize: moderateScale(15), marginBottom: exactScale(12) }}
-    >
+  <View style={s.sectionCard}>
+    <Text style={s.sectionCardTitle}>
       {title}
     </Text>
     {children}

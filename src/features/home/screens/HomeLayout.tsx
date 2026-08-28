@@ -61,6 +61,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { styles as s } from "./HomeLayout.styles";
 
 // FlashList has no built-in Reanimated wrapper the way RN's FlatList does, so
 // the scroll-driven tab bar / sticky search animations (useAnimatedScrollHandler)
@@ -111,12 +112,12 @@ const HomeContent: React.FC = () => {
   // Select stable setters individually so HomeLayout never subscribes to the
   // whole UI store — otherwise every isFeedScrolling toggle would re-render
   // the entire feed, which is exactly the jank we're removing here.
-  const setTabBarVisible = useUIStore((s) => s.setTabBarVisible);
+  const setTabBarVisible = useUIStore((st) => st.setTabBarVisible);
   const setUploadButtonCollapsed = useUIStore(
-    (s) => s.setUploadButtonCollapsed,
+    (st) => st.setUploadButtonCollapsed,
   );
-  const setFeedScrolling = useUIStore((s) => s.setFeedScrolling);
-  const setHomeFocused = useUIStore((s) => s.setHomeFocused);
+  const setFeedScrolling = useUIStore((st) => st.setFeedScrolling);
+  const setHomeFocused = useUIStore((st) => st.setHomeFocused);
   const { totalItems } = useCartRead();
   // Owns the focus refetch for Home; the header and floating banner read the
   // same shared query without triggering their own.
@@ -147,9 +148,9 @@ const HomeContent: React.FC = () => {
     whatsapp: settings?.whatsappNumber || settings?.contactPhone,
   });
   const { displayLocation } = useDeliveryAddress();
-  const reopenLocationSheet = useLocationStore((s) => s.reopenLocationSheet);
+  const reopenLocationSheet = useLocationStore((st) => st.reopenLocationSheet);
   const setReopenLocationSheet = useLocationStore(
-    (s) => s.setReopenLocationSheet,
+    (st) => st.setReopenLocationSheet,
   );
 
   // Sequential onboarding: location → notification → unlock signup popup.
@@ -310,14 +311,12 @@ const HomeContent: React.FC = () => {
     }, 120);
   }, [setFeedScrolling, stopScrollJank]);
 
-  // Stable identity for the memoized HomeHeader — a fresh object/closure each
-  // render would defeat its React.memo and re-render the header needlessly.
+  // Stable identity for the memoized HomeHeader
   const openLocationSheet = useCallback(
     () => setIsLocationSheetVisible(true),
     [],
   );
-  // Reads the resolved delivery address, so the header names the same address
-  // the location sheet checks and checkout ships to.
+  // Reads the resolved delivery address
   const headerLocation = useMemo(
     () => displayLocation ?? DELIVERY_LOCATION,
     [displayLocation],
@@ -328,7 +327,7 @@ const HomeContent: React.FC = () => {
     () => (
       <Touchable
         onPress={goToUpload}
-        className="border-l border-[#919EAB33] pl-3 ml-1"
+        style={s.searchUploadSlot}
       >
         <icons.uploadActive width={exactScale(22)} height={exactScale(22)} />
       </Touchable>
@@ -370,9 +369,7 @@ const HomeContent: React.FC = () => {
     return feedSections;
   }, [frequentlyOrdered.length, isSubcategoriesLoading, featuredSubcategories]);
 
-  // Every section renders its own one-off layout except healthEssentialsRow,
-  // which repeats per subcategory — giving it a distinct type keeps FlashList
-  // from ever recycling a singleton section's view into a repeating row.
+  // Every section renders its own one-off layout except healthEssentialsRow
   const getSectionItemType = useCallback(
     (item: HomeSection) => ("kind" in item ? item.kind : item.id),
     [],
@@ -383,7 +380,7 @@ const HomeContent: React.FC = () => {
       // Flattened Health Essentials row — one subcategory per list item.
       if ("kind" in item && item.kind === "healthEssentialsRow") {
         return (
-          <View style={{ marginTop: exactScale(10) }}>
+          <View style={s.sectionGap10}>
             <HealthEssentialsSection
               subcategory={item.subcategory}
               themeIndex={item.themeIndex}
@@ -403,26 +400,22 @@ const HomeContent: React.FC = () => {
               }}
             >
               <View
-                style={{
-                  position: "absolute",
-                  top: -(insets.top + exactScale(400)),
-                  left: 0,
-                  right: 0,
-                  height: exactScale(400),
-                  backgroundColor: "#DEF5B0",
-                }}
+                style={[
+                  s.heroUnderlay,
+                  { top: -(insets.top + exactScale(400)) },
+                ]}
               />
               <LinearGradient
                 colors={["#DEF5B0", "#EAF9D1", "#F6FDF0", "#FFFFFF"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
-                style={{
-                  position: "absolute",
-                  top: -insets.top,
-                  left: 0,
-                  right: 0,
-                  height: exactScale(350) + insets.top,
-                }}
+                style={[
+                  s.heroGradient,
+                  {
+                    top: -insets.top,
+                    height: exactScale(350) + insets.top,
+                  },
+                ]}
               />
               <HomeHeader
                 location={headerLocation}
@@ -438,13 +431,13 @@ const HomeContent: React.FC = () => {
         case "search":
           return (
             <View
-              style={{
-                marginTop: -(insets.top + exactScale(8)) - exactScale(30),
-                paddingTop: insets.top + exactScale(8),
-                paddingBottom: exactScale(14),
-                paddingHorizontal: exactScale(36),
-                backgroundColor: "transparent",
-              }}
+              style={[
+                s.searchSection,
+                {
+                  marginTop: -(insets.top + exactScale(8)) - exactScale(30),
+                  paddingTop: insets.top + exactScale(8),
+                },
+              ]}
             >
               <Animated.View style={searchBarAnim}>
                 <SearchBar
@@ -460,13 +453,9 @@ const HomeContent: React.FC = () => {
 
         case "quickActions":
           return (
-            // `entering` ties the fade-in to this view's own mount inside the
-            // FlashList item, unlike a parent-scheduled shared-value timer
-            // (the old useSlideUp approach) which could fire before this view
-            // existed to consume it and leave the row stuck invisible.
             <Animated.View
               entering={FadeInDown.delay(50).duration(350)}
-              style={{ marginTop: exactScale(5) }}
+              style={s.quickActionsWrap}
             >
               <QuickActions
                 actions={QUICK_ACTIONS}
@@ -477,7 +466,7 @@ const HomeContent: React.FC = () => {
 
         case "categories":
           return (
-            <View style={{ marginTop: exactScale(10) }}>
+            <View style={s.sectionGap10}>
               <ShopByCategories
                 tabs={tabs}
                 cards={cards}
@@ -489,7 +478,7 @@ const HomeContent: React.FC = () => {
 
         case "banner":
           return (
-            <View style={{ marginTop: exactScale(20) }}>
+            <View style={s.sectionGap20}>
               <BannerCarousel
                 banners={appContent?.banners ?? EMPTY_BANNERS}
                 categories={cards}
@@ -500,7 +489,7 @@ const HomeContent: React.FC = () => {
 
         case "smartSubstitution":
           return (
-            <View style={{ marginTop: exactScale(20) }}>
+            <View style={s.sectionGap20}>
               <SmartSubstitution
                 products={featuredProducts}
                 isLoading={isFeaturedLoading}
@@ -513,7 +502,7 @@ const HomeContent: React.FC = () => {
 
         case "frequent":
           return (
-            <View style={{ marginTop: exactScale(10) }}>
+            <View style={s.sectionGap10}>
               <FrequentSubstitutes
                 substitutes={frequentlyOrdered}
                 onProductPress={handleProductPress}
@@ -524,7 +513,7 @@ const HomeContent: React.FC = () => {
 
         case "healthEssentials":
           return (
-            <View style={{ marginTop: exactScale(10) }}>
+            <View style={s.sectionGap10}>
               <HealthEssentials
                 subcategories={featuredSubcategories}
                 isLoading={isSubcategoriesLoading}
@@ -536,7 +525,7 @@ const HomeContent: React.FC = () => {
 
         case "trust":
           return (
-            <View style={{ marginTop: exactScale(10) }}>
+            <View style={s.sectionGap10}>
               <WhyFamiliesTrustUs
                 promise={appContent?.promise}
                 isLoading={isHomeLoading}
@@ -546,7 +535,7 @@ const HomeContent: React.FC = () => {
 
         case "footer":
           return (
-            <View style={{ marginTop: exactScale(20) }}>
+            <View style={s.sectionGap20}>
               <HomeFooter appContent={appContent} isLoading={isHomeLoading} />
             </View>
           );
@@ -575,6 +564,7 @@ const HomeContent: React.FC = () => {
       isSubcategoriesLoading,
       openLocationSheet,
       goToSearch,
+      prefetchSearch,
       searchRightSlot,
       searchBarAnim,
       tabs,
@@ -585,8 +575,6 @@ const HomeContent: React.FC = () => {
   const listContentStyle = useMemo(
     () => ({
       backgroundColor: "#FFFFFF",
-      // Offsets the list's own `marginTop: -insets.top` (see the list's
-      // style prop) so visible content still starts in the same place.
       paddingTop: insets.top,
       paddingBottom: TAB_BAR_HEIGHT + (hasFloatingBanner ? exactScale(75) : 0),
     }),
@@ -601,7 +589,7 @@ const HomeContent: React.FC = () => {
         tintColor="#36B37E"
         colors={["#36B37E"]}
         progressBackgroundColor="#FFFFFF"
-        progressViewOffset={insets.top + 30}
+        progressViewOffset={insets.top + exactScale(30)}
       />
     ),
     [isRefreshing, onRefresh, insets.top],
@@ -614,10 +602,10 @@ const HomeContent: React.FC = () => {
     featuredProducts.length === 0 &&
     featuredSubcategories.length === 0;
 
-  // Cold launch started offline: do not display stale cached content, show full NoInternetState
+  // Cold launch started offline
   if (coldLaunchOffline && isOffline) {
     return (
-      <View className="flex-1 bg-white">
+      <View style={s.root}>
         <NoInternetState
           onRetry={() => void onRefresh()}
           retrying={isRefreshing}
@@ -626,12 +614,10 @@ const HomeContent: React.FC = () => {
     );
   }
 
-  // Only when the SQLite seed left nothing to show either — a failed refresh
-  // over cached sections keeps them on screen, with the global banner explaining
-  // why they are stale.
+  // Error state
   if (errorState && hasNoHomeContent && !isHomeLoading) {
     return (
-      <View className="flex-1 bg-white">
+      <View style={s.root}>
         {errorState === "offline" ? (
           <NoInternetState
             onRetry={() => void onRefresh()}
@@ -649,11 +635,8 @@ const HomeContent: React.FC = () => {
   }
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Invisible while the hero (with its own gradient extending up behind
-          the status bar) is still in view — avoids double-painting/seaming
-          against it. Snaps to solid white only once the hero has scrolled
-          past, matching the hero gradient's own end color at that point. */}
+    <View style={s.root}>
+      {/* Invisible while hero is in view */}
       <Animated.View
         style={[safeAreaBgStyle, { backgroundColor: "#FFFFFF" }]}
       />
@@ -668,7 +651,7 @@ const HomeContent: React.FC = () => {
         overScrollMode="auto"
         decelerationRate="normal"
         nestedScrollEnabled
-        style={{ flex: 1, marginTop: -insets.top, backgroundColor: "#FFFFFF" }}
+        style={[s.list, { marginTop: -insets.top }]}
         contentContainerStyle={listContentStyle}
         onScroll={handleScroll}
         onScrollBeginDrag={handleScrollStart}
@@ -698,8 +681,6 @@ const HomeContent: React.FC = () => {
   );
 };
 
-// The provider sits outside HomeContent so its state changes re-render only the
-// fly-to-cart consumers, not the whole feed.
 export const HomeLayout: React.FC = () => (
   <FlyToCartProvider>
     <HomeContent />

@@ -14,6 +14,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { styles as s } from "./preview.styles";
 
 const isPdf = (uri: string, type?: string) =>
   type === "application/pdf" || uri.toLowerCase().endsWith(".pdf");
@@ -41,7 +42,7 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = React.memo(
     // Reset zoom when active item changes
     useEffect(() => {
       resetZoom();
-    }, [activeItem?.localUri]);
+    }, [activeItem?.localUri, resetZoom]);
 
     // Per-URI, so revisiting an already-displayed thumbnail skips the
     // skeleton, and a never-seen one always gets it — independent of index.
@@ -94,42 +95,33 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = React.memo(
     }));
 
     return (
-      <View style={{ flex: 1, position: "relative" }}>
+      <View style={s.displayRoot}>
         <View
-          className="rounded-md overflow-hidden"
-          style={{
-            flex: 1,
-            shadowColor: "#919EAB33",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.5,
-            shadowRadius: 1,
-            elevation: 0,
-            borderWidth: 1,
-            borderColor: "#919EAB33",
-            backgroundColor: "#F9FAFB",
-          }}
+          style={s.displayCard}
           onLayout={(e) => onLayout(e.nativeEvent.layout.height)}
         >
           {activeItem && isPdf(activeItem.localUri, activeItem.type) ? (
             <PdfViewer
               uri={activeItem.localUri}
-              style={{
-                width: containerWidth,
-                height: previewHeight,
-                backgroundColor: "#F9FAFB",
-              }}
+              style={[
+                s.pdfContainer,
+                {
+                  width: containerWidth,
+                  height: previewHeight,
+                },
+              ]}
               onError={() => Alert.alert("Error", "Could not load PDF.")}
             />
           ) : activeItem && previewHeight > 0 ? (
             <GestureDetector gesture={composedGesture}>
               <Animated.View
-                style={{
-                  width: containerWidth,
-                  height: previewHeight,
-                  overflow: "hidden",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={[
+                  s.animatedViewCenter,
+                  {
+                    width: containerWidth,
+                    height: previewHeight,
+                  },
+                ]}
               >
                 {!isActiveLoaded && (
                   <View
@@ -167,26 +159,7 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = React.memo(
         {showPrev && (
           <Touchable
             onPress={onPrev}
-            style={{
-              position: "absolute",
-              left: -20,
-              top: "50%",
-              marginTop: -24,
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              backgroundColor: "#fff",
-              borderWidth: 1,
-              borderColor: "#919EAB33",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 20,
-              elevation: 8,
-              shadowColor: "#919EAB33",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.1,
-              shadowRadius: 20,
-            }}
+            style={[s.navArrowBtn, s.navArrowBtnLeft]}
           >
             <icons.arrow_back_ios width={16} height={16} fill="#222222" />
           </Touchable>
@@ -195,26 +168,7 @@ export const PreviewDisplay: React.FC<PreviewDisplayProps> = React.memo(
         {showNext && (
           <Touchable
             onPress={onNext}
-            style={{
-              position: "absolute",
-              right: -20,
-              top: "50%",
-              marginTop: -24,
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              backgroundColor: "#fff",
-              borderWidth: 1,
-              borderColor: "#919EAB33",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 20,
-              elevation: 8,
-              shadowColor: "#919EAB33",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.1,
-              shadowRadius: 20,
-            }}
+            style={[s.navArrowBtn, s.navArrowBtnRight]}
           >
             <icons.arrow_forward_ios width={16} height={16} fill="#222222" />
           </Touchable>

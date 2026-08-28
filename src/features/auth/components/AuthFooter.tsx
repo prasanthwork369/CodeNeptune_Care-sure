@@ -8,7 +8,6 @@ import { styles as s } from "./AuthFooter.styles";
 
 type LinkKey = "terms" | "privacy" | "refund";
 
-// Memoised: takes no props, but the login/OTP panels re-render on every keystroke.
 export const AuthFooter: React.FC = React.memo(() => {
   const { data: links } = useMobileAppLinks();
   const [policy, setPolicy] = useState<{ title: string; url?: string } | null>(
@@ -22,10 +21,8 @@ export const AuthFooter: React.FC = React.memo(() => {
     setPolicy({ title, url });
   };
 
-  // Stable, or PolicyLink's effect re-opens the link on every render.
   const handleClosePolicy = useCallback(() => setPolicy(null), []);
 
-  // Bordered element, not an inline <Text>: borders don't apply to text spans.
   const renderLink = (key: LinkKey, label: string, url?: string) => (
     <Pressable
       accessibilityRole="link"
@@ -49,7 +46,7 @@ export const AuthFooter: React.FC = React.memo(() => {
   );
 
   return (
-    <View style={s.wrap}>
+    <View>
       <View className="flex-row items-center justify-center gap-x-2 mb-2">
         <icons.verified_user width={s.icon.width} height={s.icon.height} />
         <Text style={s.secureText}>Secure & Encrypted</Text>

@@ -1,9 +1,10 @@
 import { icons } from "@/src/constants/icons";
 import { useUIStore } from "@/src/store/uiStore";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { AppButton } from "./AppButton";
+import { styles as s } from "./NoInternetState.styles";
 
 interface NoInternetStateProps {
   onRetry: () => void;
@@ -35,44 +36,17 @@ export const NoInternetState: React.FC<NoInternetStateProps> = ({
   };
 
   return (
-    <View className="flex-1 bg-white items-center justify-center px-6">
-      <View
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          transform: [{ translateY: exactScale(-10) }],
-        }}
-      >
-        <View
-          style={{
-            width: exactScale(262),
-            height: exactScale(204),
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: exactScale(30),
-          }}
-        >
+    <View style={s.container}>
+      <View style={s.contentWrapper}>
+        <View style={s.iconBox}>
           <icons.no_internet width={exactScale(262)} height={exactScale(204)} />
         </View>
 
-        <Text
-          className="font-inter-semibold text-black text-center"
-          style={{
-            fontSize: moderateScale(18),
-            lineHeight: moderateScale(20),
-          }}
-        >
+        <Text style={s.titleText}>
           No Internet Connection
         </Text>
 
-        <Text
-          className="font-inter-medium text-[#6A6A6A] text-center"
-          style={{
-            fontSize: moderateScale(14),
-            lineHeight: moderateScale(22),
-            marginTop: exactScale(6),
-          }}
-        >
+        <Text style={s.subtitleText}>
           Please check your network
         </Text>
 
@@ -82,22 +56,8 @@ export const NoInternetState: React.FC<NoInternetStateProps> = ({
           disabled={retrying}
           onPress={handleRetry}
           variant="outline"
-          style={{
-            width: exactScale(137),
-            height: moderateScale(14) * 2.8,
-            borderRadius: exactScale(6),
-            marginTop: exactScale(15),
-            borderWidth: 1,
-            borderColor: "#0F7635",
-            backgroundColor: "#FFFFFF",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: 1,
-          }}
-          textStyle={{
-            fontSize: moderateScale(14),
-            color: "#0F7635",
-          }}
+          style={s.retryButton}
+          textStyle={s.retryButtonText}
           accessibilityLabel="Try again"
           accessibilityHint="Attempts to load the content again"
         />

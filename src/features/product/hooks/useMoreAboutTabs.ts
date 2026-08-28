@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { ApiAdditionalDataMap } from "@/src/features/product/types";
 import { parseProductSections } from "@/src/utils/productSections";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -20,7 +21,10 @@ export const useMoreAboutTabs = (
   // Ref mirror prevents duplicate state updates and redundant animations/scrolls
   // when scroll events fire repeatedly before React finishes re-rendering.
   const activeTabIdRef = useRef<string | null>(activeTabId);
-  activeTabIdRef.current = activeTabId;
+
+  useEffect(() => {
+    activeTabIdRef.current = activeTabId;
+  }, [activeTabId]);
 
   const tabsScrollRef = useRef<ScrollView>(null);
   const pendingScrollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -30,6 +34,7 @@ export const useMoreAboutTabs = (
 
   // Reset tab selection when product data changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedTabId(null);
     activeTabIdRef.current = null;
     indicatorWidth.value = 0;

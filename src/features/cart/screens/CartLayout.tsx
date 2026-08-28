@@ -1,26 +1,27 @@
-import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
-import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
 import { LocationBottomSheet } from "@/src/components/location/LocationBottomSheet";
 import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
 import { ScreenHeader } from "@/src/components/ui/ScreenHeader";
+import { BillDetailsSheet } from "@/src/features/cart/components/BillDetailsSheet";
+import { CareSureCoinsSheet } from "@/src/features/cart/components/CareSureCoinsSheet";
+import {
+  CART_CONTENT_LAYOUT,
+  SAVINGS_BANNER_ENTERING,
+  SAVINGS_BANNER_EXITING,
+} from "@/src/features/cart/constants/cart.constants";
+import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
-import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
-import { exactScale } from "@/src/utils/exactScale";
 import React from "react";
 import { View } from "react-native";
 import Animated, {
-  FadeInDown,
-  FadeOutUp,
-  LinearTransition,
-  ReduceMotion,
   useAnimatedScrollHandler,
   useSharedValue,
 } from "react-native-reanimated";
+import { styles as s } from "./CartLayout.styles";
 import {
   CartBillSummary,
   CartCoinsSection,
@@ -38,16 +39,6 @@ import {
   CartTerms,
   CartWalletSection,
 } from "../sections";
-
-const SAVINGS_BANNER_ENTERING = FadeInDown.duration(220).reduceMotion(
-  ReduceMotion.System,
-);
-const SAVINGS_BANNER_EXITING = FadeOutUp.duration(180).reduceMotion(
-  ReduceMotion.System,
-);
-const CART_CONTENT_LAYOUT = LinearTransition.duration(220).reduceMotion(
-  ReduceMotion.System,
-);
 
 export const CartLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
@@ -110,10 +101,7 @@ export const CartLayout: React.FC = () => {
     cartError,
     refetchCart,
   } = useCartCalculations();
-  // Cart is transactional: prices, stock and totals below are all server state
-  // the user is about to act on, so offline replaces the screen rather than
-  // showing a cached bill. A signed-out cart lives in the local store and the
-  // network was never going to supply it, so it stays visible.
+
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const liveState = useLiveScreenState({
     error: cartError,
@@ -124,27 +112,21 @@ export const CartLayout: React.FC = () => {
 
   const addressActionLabel = hasSavedAddress ? "Change" : "Add Address";
   const hasRxItem = lines.some((line) => line.rx);
-
   const shouldShowSavingsBanner = totalSavings > 0;
 
-  // Drives the savings banner's shrink-on-scroll — normal height at rest,
-  // compact once the cart starts scrolling.
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
   });
 
-  // Measures how long the cart takes to load its server data, not screen dwell.
   usePerformanceTrace({
     traceName: PERF_TRACES.CART_LOAD,
     isLoading: isCartLoading,
   });
 
-  // Ahead of the skeleton: offline is known from device state, so there is no
-  // fetch worth waiting on before saying so.
   if (liveState === "offline") {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Cart" showBorder={true} />
         <NoInternetState
           onRetry={() => void refetchCart()}
@@ -154,11 +136,9 @@ export const CartLayout: React.FC = () => {
     );
   }
 
-  // React Query's isLoading is initial-load only. Do not replace an already
-  // restored cart during mutations or background work.
   if (isCartLoading && lines.length === 0) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Cart" showBorder={true} />
         <CartInitialSkeleton />
       </View>
@@ -167,7 +147,7 @@ export const CartLayout: React.FC = () => {
 
   if (liveState === "error") {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Cart" showBorder={true} />
         <RetryState
           title="Couldn't load your cart"
@@ -180,7 +160,7 @@ export const CartLayout: React.FC = () => {
 
   if (lines.length === 0) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Cart" showBorder={true} />
         <CartEmptyState
           featuredProducts={featuredProducts}
@@ -191,7 +171,7 @@ export const CartLayout: React.FC = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="Cart" />
 
       {shouldShowSavingsBanner && (
@@ -210,7 +190,7 @@ export const CartLayout: React.FC = () => {
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
-        contentContainerStyle={{ paddingBottom: exactScale(24) }}
+        contentContainerStyle={s.scrollContent}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >

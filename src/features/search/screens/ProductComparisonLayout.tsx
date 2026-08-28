@@ -23,9 +23,10 @@ import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
 import { useLocationStore } from "@/src/store/locationStore";
 import { RecommendedProduct, SearchedProduct } from "@/src/features/search/types";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useCallback, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+import { styles as s } from "./ProductComparisonLayout.styles";
 
 interface ProductComparisonLayoutProps {
   id: string;
@@ -133,7 +134,7 @@ export const ProductComparisonLayout: React.FC<
   // middle left a live cart footer over the offline state.
   if (liveState) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <View style={s.root}>
         <ProductHeader
           query={raw?.name ?? ""}
           cartCount={cartCount}
@@ -153,8 +154,8 @@ export const ProductComparisonLayout: React.FC<
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <View style={s.root}>
+      <View style={s.innerWrap}>
         {/* Header gradient removed to match ProductDetailsLayout */}
 
         <ProductHeader
@@ -167,27 +168,11 @@ export const ProductComparisonLayout: React.FC<
         {isLoading ? (
           <ProductDetailsSkeleton />
         ) : !searched || !recommended ? (
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingHorizontal: 32,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: moderateScale(16),
-                fontWeight: "600",
-                color: "#333232",
-                textAlign: "center",
-              }}
-            >
-              Product not found
-            </Text>
+          <View style={s.notFoundContainer}>
+            <Text style={s.notFoundText}>Product not found</Text>
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
+          <View style={s.contentWrap}>
             <ScrollView
               ref={mainScrollRef}
               nestedScrollEnabled
@@ -200,8 +185,8 @@ export const ProductComparisonLayout: React.FC<
                 // Without this, the comparison cards sit flush against the
                 // search bar above whenever there's no salt composition banner.
                 paddingBottom: isRecommendedInCart
-                  ? adjustedBottom + 100
-                  : adjustedBottom + 24,
+                  ? adjustedBottom + exactScale(100)
+                  : adjustedBottom + exactScale(24),
               }}
               style={{ flex: 1 }}
               overScrollMode="auto"
@@ -241,7 +226,7 @@ export const ProductComparisonLayout: React.FC<
                   product?.isReturnable ? "Returnable" : "Not Returnable"
                 }
               />
-              <View style={{ backgroundColor: "#FFFFFF" }}>
+              <View style={s.trustedBg}>
                 <WhyFamiliesTrustUs
                   promise={appContent?.promise}
                   isLoading={isHomeLoading}

@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import { ChooseMethodFooterProps } from "@/src/features/prescription/types";
-import { moderateScale } from "@/src/utils/exactScale";
+import { styles as s } from "./choose-method.styles";
 
 export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
   toPay,
@@ -15,23 +15,13 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
   return (
     <StickyFooter
       safeAreaBottom={safeAreaBottom}
-      contentStyle={{
-        flexDirection: "row",
-        alignItems: "center",
-        maxWidth: undefined,
-      }}
+      contentStyle={s.footerContent}
     >
       <View>
-        <Text
-          className="font-inter-medium text-brand-text"
-          style={{ fontSize: moderateScale(11) }}
-        >
+        <Text style={s.toPayLabel}>
           To Pay
         </Text>
-        <Text
-          className="font-inter-extrabold text-brand-text"
-          style={{ fontSize: moderateScale(18) }}
-        >
+        <Text style={s.toPayAmount}>
           ₹{Number(toPay).toFixed(2)}
         </Text>
       </View>
@@ -39,7 +29,7 @@ export const ChooseMethodFooter: React.FC<ChooseMethodFooterProps> = ({
         title={buttonLabel}
         onPress={onProceed}
         disabled={!canProceed}
-        style={{ flex: 1, marginLeft: 40 }}
+        style={s.proceedBtn}
       />
     </StickyFooter>
   );

@@ -2,8 +2,8 @@ import { CustomSwitch } from "@/src/components/ui/CustomSwitch";
 import { HOME_IMAGES } from "@/src/constants/images";
 import React from "react";
 import { Image, Text, View } from "react-native";
-import { moderateScale } from "@/src/utils/exactScale";
 import { formatReminderDate } from "@/src/utils/reminderDate";
+import { styles as s } from "./medicine-comparison.styles";
 
 interface RefillReminderProps {
   value: boolean;
@@ -17,56 +17,29 @@ export const RefillReminder: React.FC<RefillReminderProps> = ({
   reminderDate,
 }) => (
   <View
-    style={{
-      marginHorizontal: 16,
-      marginTop: 12,
-      backgroundColor: "#fff",
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: "#919EAB33",
-      paddingHorizontal: 16,
-      paddingTop: 14,
-      paddingBottom: value ? 10 : 14,
-    }}
+    style={[
+      s.refillReminderRoot,
+      { paddingBottom: value ? 10 : 14 },
+    ]}
   >
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <View style={s.refillHeaderRow}>
       <Image
         source={HOME_IMAGES.clockIcon}
-        style={{ width: 36, height: 36 }}
+        style={s.clockIcon}
         resizeMode="contain"
       />
-      <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text
-          style={{
-            fontSize: moderateScale(14),
-            fontWeight: "700",
-            color: "#111827",
-          }}
-        >
+      <View style={s.refillTextCol}>
+        <Text style={s.refillTitle}>
           Refill Reminder
         </Text>
-        <Text
-          style={{
-            fontSize: moderateScale(12),
-            fontWeight: "500",
-            color: "#6B7280",
-            marginTop: 2,
-          }}
-        >
+        <Text style={s.refillSubtitle}>
           Never miss your medicines
         </Text>
       </View>
       <CustomSwitch value={value} onValueChange={onToggle} />
     </View>
     {value && (
-      <Text
-        style={{
-          fontSize: moderateScale(12),
-          fontWeight: "500",
-          color: "#6B7280",
-          marginTop: 10,
-        }}
-      >
+      <Text style={s.refillNote}>
         {reminderDate
           ? `We'll remind you on ${formatReminderDate(reminderDate)}`
           : "We'll remind you at the time you set"}

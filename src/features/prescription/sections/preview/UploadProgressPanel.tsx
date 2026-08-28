@@ -1,6 +1,6 @@
-import { moderateScale } from "@/src/utils/exactScale";
 import React from "react";
 import { Text, View } from "react-native";
+import { styles as s } from "./preview.styles";
 
 interface UploadProgressPanelProps {
   total: number;
@@ -16,56 +16,31 @@ interface UploadProgressPanelProps {
 export const UploadProgressPanel: React.FC<UploadProgressPanelProps> =
   React.memo(({ total, done, percent, failed, saving }) => {
     return (
-      <View
-        className="bg-white border-t border-[#919EAB1A]"
-        style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 4 }}
-      >
-        <View className="flex-row items-center justify-between">
-          <Text
-            className="font-inter-semibold text-[#1A1C1E]"
-            style={{ fontSize: moderateScale(14) }}
-          >
+      <View style={s.progressPanel}>
+        <View style={s.progressHeaderRow}>
+          <Text style={s.progressTitle}>
             {saving ? "Saving prescription…" : "Uploading prescriptions…"}
           </Text>
-          <Text
-            className="font-inter-semibold text-[#0F7635]"
-            style={{ fontSize: moderateScale(14) }}
-          >
+          <Text style={s.progressPercent}>
             {percent}%
           </Text>
         </View>
 
-        <Text
-          className="font-inter-medium text-[#6A6A6A]"
-          style={{ fontSize: moderateScale(12), marginTop: 4 }}
-        >
+        <Text style={s.progressSubtext}>
           {done} of {total} files completed
           {failed > 0 ? ` · ${failed} failed` : ""}
         </Text>
 
-        <View
-          style={{
-            height: 6,
-            borderRadius: 999,
-            backgroundColor: "#E5E7EB",
-            overflow: "hidden",
-            marginTop: 10,
-          }}
-        >
+        <View style={s.progressBarTrack}>
           <View
-            style={{
-              height: 6,
-              borderRadius: 999,
-              backgroundColor: "#0F7635",
-              width: `${Math.max(0, Math.min(100, percent))}%`,
-            }}
+            style={[
+              s.progressBarFill,
+              { width: `${Math.max(0, Math.min(100, percent))}%` },
+            ]}
           />
         </View>
 
-        <Text
-          className="font-inter-medium text-[#6A6A6A]"
-          style={{ fontSize: moderateScale(11), marginTop: 8 }}
-        >
+        <Text style={s.progressKeepOpenText}>
           Please keep the app open while your files upload.
         </Text>
       </View>

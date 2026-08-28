@@ -1,22 +1,15 @@
 import React from "react";
 import { View, ScrollView, Text } from "react-native";
-import {
-  gridStyles as s,
-  CARD_RADIUS,
-  CARD_WIDTH,
-  CARD_IMAGE_LEFT,
-  CARD_IMAGE_WIDTH,
-  CARD_IMAGE_HEIGHT,
-} from "../categories.styles";
 import { Image } from "expo-image";
 import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryCard } from "@/src/features/home/types";
 import { useTabBarStore } from "@/src/store/useTabBarStore";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { usePrefetchCategoryProducts } from "@/src/features/categories/hooks/useCategories";
+import { styles as s } from "./CategoriesGrid.styles";
 
 interface CategoriesGridProps {
   cards: CategoryCard[];
@@ -37,37 +30,25 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 }) => {
   const router = useNav();
   const prefetchCategory = usePrefetchCategoryProducts();
-  // cardImage's left/width/height in categories.styles.ts were authored
-  // against the fixed CARD_WIDTH design value — since cardWidth is now
-  // computed dynamically to fill the grid, scale those proportionally too
-  // so the image keeps reaching the card's right/bottom edge as designed.
-  const imageScale = cardWidth / CARD_WIDTH;
-  const cardImageStyle = {
-    ...s.cardImage,
-    left: CARD_IMAGE_LEFT * imageScale,
-    width: CARD_IMAGE_WIDTH * imageScale,
-    height: CARD_IMAGE_HEIGHT * imageScale,
-  };
-
-  const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
+  const tabBarHeight = useTabBarStore((state) => state.tabBarHeight);
 
   if (isLoading) {
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
-        className="flex-1"
+        style={s.scrollView}
         contentContainerStyle={{
           padding,
-          paddingBottom: tabBarHeight + safeAreaBottom + 32,
+          paddingBottom: tabBarHeight + safeAreaBottom + exactScale(32),
         }}
       >
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+        <View style={s.skeletonGrid}>
           {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton
               key={i}
               width={cardWidth}
               height={cardHeight}
-              borderRadius={12}
+              borderRadius={exactScale(12)}
             />
           ))}
         </View>
@@ -78,17 +59,19 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1, height: "100%" }}
-      contentContainerStyle={{
-        padding: padding,
-        flexGrow: 1,
-        paddingBottom: tabBarHeight + safeAreaBottom + 32,
-      }}
+      style={s.scrollView}
+      contentContainerStyle={[
+        s.scrollContent,
+        {
+          padding,
+          paddingBottom: tabBarHeight + safeAreaBottom + exactScale(32),
+        },
+      ]}
     >
-      <View style={{ gap: 14 }}>
+      <View style={s.gridContainer}>
         {Array.from({ length: Math.ceil(Math.max(cards.length, 3) / 3) }).map(
           (_, rowIndex) => (
-            <View key={`row-${rowIndex}`} style={{ flexDirection: "row", gap: 10 }}>
+            <View key={`row-${rowIndex}`} style={s.gridRow}>
               {[0, 1, 2].map((col) => {
                 const index = rowIndex * 3 + col;
                 const card = cards[index];
@@ -123,24 +106,23 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                           : undefined,
                       })
                     }
-                    style={{
-                      width: cardWidth,
-                      height: cardHeight,
-                      alignItems: "center",
-                    }}
+                    style={[
+                      s.cardTouchable,
+                      {
+                        width: cardWidth,
+                        height: cardHeight,
+                      },
+                    ]}
                   >
                     {/* Light blue rounded image container matching design */}
                     <View
-                      style={{
-                        width: cardWidth,
-                        height: cardWidth,
-                        backgroundColor: "#EDF4FE",
-                        borderRadius: 12,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: 2,
-                        position: "relative",
-                      }}
+                      style={[
+                        s.imageContainer,
+                        {
+                          width: cardWidth,
+                          height: cardWidth,
+                        },
+                      ]}
                     >
                       <icons.placeholder
                         width={cardWidth * 0.52}
@@ -149,11 +131,7 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                       {card.image ? (
                         <Image
                           source={card.image}
-                          style={{
-                            width: "92%",
-                            height: "92%",
-                            position: "absolute",
-                          }}
+                          style={s.cardImage}
                           contentFit="contain"
                           cachePolicy="memory-disk"
                         />
@@ -162,14 +140,7 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 
                     {/* Category Title Text below the image container */}
                     <Text
-                      style={{
-                        fontSize: moderateScale(11),
-                        lineHeight: moderateScale(14),
-                        textAlign: "center",
-                        color: "#1E293B",
-                        marginTop: 6,
-                      }}
-                      className="font-inter-semibold"
+                      style={s.cardLabel}
                       numberOfLines={2}
                     >
                       {card.label.replace("\n", " ")}
@@ -184,3 +155,4 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
     </ScrollView>
   );
 };
+CategoriesGrid.displayName = "CategoriesGrid";

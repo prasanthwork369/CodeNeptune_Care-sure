@@ -2,7 +2,6 @@ import { colors } from "@/src/theme";
 import { moderateScale, scale, verticalScale } from "@/src/utils/exactScale";
 import { Platform, StyleSheet } from "react-native";
 
-// Field-level red, deliberately lighter than the app-wide colors.error (#DC2626).
 const FIELD_ERROR = "#EF4444";
 
 export const styles = StyleSheet.create({
@@ -25,7 +24,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  // Static variants, so six boxes don't rebuild styles per keystroke.
   boxBorderThin: { borderWidth: 1 },
   boxBorderThick: { borderWidth: 2 },
   boxIdle: { borderColor: "#D0D5DD" },
@@ -39,7 +37,6 @@ export const styles = StyleSheet.create({
     fontSize: moderateScale(24),
     fontFamily: Platform.OS === "android" ? "Inter_700Bold" : undefined,
     fontWeight: "700",
-    // Android only: iOS ignores the props above, so a short line box shifts the digit up.
     lineHeight: Platform.OS === "android" ? verticalScale(24) : undefined,
     letterSpacing: 0,
     color: "#111827",
@@ -51,11 +48,6 @@ export const styles = StyleSheet.create({
     borderRadius: 1,
     backgroundColor: "#0F7635",
   },
-  // 1x1 point tucked in the corner — NOT overlaying the boxes. When it
-  // covered the row, Android's native input grabbed taps (pointerEvents
-  // "none" is ignored for TextInput there) and showed its teal selection
-  // handle over the boxes. Off to the side, the box Pressables own every
-  // tap and focus() it programmatically; keyboard + SMS autofill still work.
   hiddenInput: {
     position: "absolute",
     top: 0,
@@ -86,10 +78,8 @@ export const styles = StyleSheet.create({
     fontSize: moderateScale(13),
     fontWeight: "700",
     color: "#0F7635",
-    // Hugs the glyphs so the gap below is this style's alone, not font metrics'.
     lineHeight: moderateScale(15),
   },
-  // Border, not textDecorationLine: RN can't offset an underline, so iOS drew it tight.
   resendUnderline: {
     borderBottomWidth: 1,
     borderBottomColor: "#0F7635",
@@ -118,5 +108,4 @@ export const styles = StyleSheet.create({
     color: "white",
     marginRight: scale(8),
   },
-  arrow: { width: moderateScale(13), height: moderateScale(13) },
 });

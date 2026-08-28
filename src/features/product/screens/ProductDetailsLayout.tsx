@@ -15,7 +15,7 @@ import {
   PERF_TRACES,
   usePerformanceTrace,
 } from "@/src/services/firebase";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { formatPackLabel } from "@/src/utils/packLabel";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -32,6 +32,7 @@ import {
   StickyMoreAboutTabs,
   TrustBadge,
 } from "@/src/features/product/sections";
+import { styles as s } from "./ProductDetailsLayout.styles";
 
 export const ProductDetailsLayout: React.FC = () => {
   // Backend doesn't yet distinguish "checked, no substitute exists" from
@@ -99,6 +100,7 @@ export const ProductDetailsLayout: React.FC = () => {
   // Preselect whichever variant is already in the cart, falling back to first.
   useEffect(() => {
     if (variants.length > 0 && !selectedVariantId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedVariantId(inCartVariantId ?? variants[0].id);
     }
   }, [variants, selectedVariantId, inCartVariantId]);
@@ -183,7 +185,7 @@ export const ProductDetailsLayout: React.FC = () => {
   // cached price floating over the offline state.
   if (liveState) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <View style={s.root}>
         {/* Title and back only — no price or pack, which are the stale values
             this screen is refusing to show. */}
         <ProductDetailsHeader title={medicineName} onBack={goBack} />
@@ -200,11 +202,10 @@ export const ProductDetailsLayout: React.FC = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-        <View style={{ flex: 1 }}>
-          {/* Header gradient removed per design — keep solid white background */}
-
+    <View style={s.root}>
+      <View style={s.container}>
+        <View style={s.inner}>
+          {/* Header solid white background */}
           <ProductDetailsHeader
             title={medicineName}
             onBack={goBack}
@@ -224,27 +225,13 @@ export const ProductDetailsLayout: React.FC = () => {
               previewBrand={previewBrand}
             />
           ) : !product ? (
-            <View
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingHorizontal: exactScale(32),
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: moderateScale(16),
-                  fontWeight: "600",
-                  color: "#333232",
-                  textAlign: "center",
-                }}
-              >
+            <View style={s.notFoundContainer}>
+              <Text style={s.notFoundText}>
                 Product not found
               </Text>
             </View>
           ) : (
-            <View style={{ flex: 1 }}>
+            <View style={s.scrollContainer}>
               <ScrollView
                 ref={mainScrollRef}
                 nestedScrollEnabled
@@ -253,8 +240,8 @@ export const ProductDetailsLayout: React.FC = () => {
                 scrollEventThrottle={16}
                 removeClippedSubviews={false}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: adjustedBottom + 80 }}
-                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: adjustedBottom + exactScale(80) }}
+                style={s.scrollContainer}
                 overScrollMode="auto"
               >
                 <View>
@@ -316,13 +303,6 @@ export const ProductDetailsLayout: React.FC = () => {
               <ProductDetailsFooter
                 productId={id}
                 medicineUuid={medicineId}
-                // Only fall back to base-product matching for
-                // variant-less products. For products with
-                // variants, baseMedicineId is identical across
-                // all variants — matching on it would make the
-                // footer show "in cart" for every variant once
-                // any one of them (or the base id itself) is
-                // in the cart.
                 baseMedicineId={variants.length > 0 ? undefined : raw?.id}
                 variantId={activeVariantId}
                 product={footerProduct}

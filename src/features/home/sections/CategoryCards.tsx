@@ -8,7 +8,6 @@ import type { CategoryCard } from "@/src/features/home/types";
 import { Skeleton } from "@/src/components/ui/Skeleton";
 import { exactScale } from "@/src/utils/exactScale";
 import { useResponsiveTier } from "@/src/hooks/ui/useResponsiveTier";
-
 import { usePrefetchCategoryProducts } from "@/src/features/categories/hooks/useCategories";
 
 interface CategoryCardsProps {
@@ -65,18 +64,17 @@ export const CategoryCards: React.FC<CategoryCardsProps> = ({
           }
           accessibilityRole="button"
           accessibilityLabel={card.label}
-          style={{
-            backgroundColor: card.bgColor,
-            width: cardWidth,
-            height: cardHeight,
-            borderRadius: exactScale(10),
-          }}
-          className="overflow-hidden justify-start"
+          style={[
+            s.cardTouchable,
+            {
+              backgroundColor: card.bgColor,
+              width: cardWidth,
+              height: cardHeight,
+              borderRadius: exactScale(10),
+            },
+          ]}
         >
-          <Text
-            style={s.cardLabel}
-            className="font-inter-semibold text-brand-text leading-tight z-10"
-          >
+          <Text style={s.cardLabel}>
             {card.label}
           </Text>
           {card.image ? (

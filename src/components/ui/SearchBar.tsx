@@ -20,14 +20,6 @@ interface SearchBarProps {
   rightSlot?: React.ReactNode;
 }
 
-const containerStyle = {
-  shadowColor: "#919EAB",
-  shadowOffset: { width: 0, height: exactScale(16) },
-  shadowRadius: 20,
-  shadowOpacity: 0.04,
-  elevation: 1,
-} as const;
-
 // Memoised: wraps an animated cycler inside the frequently re-rendering feed.
 export const SearchBar: React.FC<SearchBarProps> = React.memo(
   ({
@@ -58,13 +50,12 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
         >
           <View
             style={[
-              containerStyle,
+              s.touchableContainer,
               { backgroundColor: isPressed ? "#F5F7F9" : "#FFFFFF" },
             ]}
-            className="flex-row items-center rounded-md px-4 py-3 border border-[#919EAB33]"
           >
             <icons.search width={SEARCH_ICON_SIZE} height={SEARCH_ICON_SIZE} />
-            <View className="flex-1 ml-2 py-1.5 overflow-hidden">
+            <View style={s.cyclerWrapper}>
               {useHomeCycler ? (
                 <HomeSearchCycler />
               ) : words && words.length > 0 ? (
@@ -72,29 +63,24 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
                   words={words}
                   lineHeight={PLACEHOLDER_LINE_HEIGHT}
                   style={s.cyclerText}
-                  className="font-inter-medium text-brand-subtext"
                 />
               ) : (
                 <Text
                   style={s.placeholderText}
-                  className="font-inter-medium text-brand-subtext"
                   numberOfLines={1}
                 >
                   {placeholder}
                 </Text>
               )}
             </View>
-            {rightSlot && <View className="ml-2">{rightSlot}</View>}
+            {rightSlot && <View style={s.rightSlotWrap}>{rightSlot}</View>}
           </View>
         </Touchable>
       );
     }
 
     return (
-      <View
-        style={containerStyle}
-        className="flex-row items-center bg-white rounded-md px-4 py-3.5 border border-[#919EAB33]"
-      >
+      <View style={s.inputContainer}>
         <icons.search width={SEARCH_ICON_SIZE} height={SEARCH_ICON_SIZE} />
         <TextInput
           placeholder={placeholder}
@@ -105,7 +91,6 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
             onSearch?.(text);
           }}
           style={s.inputText}
-          className="flex-1 font-inter text-brand-text py-1.5 ml-2"
         />
         {query.length > 0 && (
           <Touchable
@@ -124,7 +109,7 @@ export const SearchBar: React.FC<SearchBarProps> = React.memo(
             />
           </Touchable>
         )}
-        {rightSlot && <View className="ml-2">{rightSlot}</View>}
+        {rightSlot && <View style={s.rightSlotWrap}>{rightSlot}</View>}
       </View>
     );
   },

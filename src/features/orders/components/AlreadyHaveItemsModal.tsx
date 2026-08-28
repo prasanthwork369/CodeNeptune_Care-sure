@@ -1,6 +1,6 @@
 import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import { moderateScale } from "@/src/utils/exactScale";
 import {
   ActivityIndicator,
@@ -31,9 +31,9 @@ export const AlreadyHaveItemsModal: React.FC<AlreadyHaveItemsModalProps> = ({
   const insets = useSafeAreaInsets();
 
   // Null until first opened, so every order card doesn't mount a native Modal.
-  const hasOpened = useRef(false);
-  if (visible) hasOpened.current = true;
-  if (!visible && !hasOpened.current) return null;
+  const [hasOpened, setHasOpened] = useState(false);
+  if (visible && !hasOpened) setHasOpened(true);
+  if (!visible && !hasOpened) return null;
 
   return (
     <Modal

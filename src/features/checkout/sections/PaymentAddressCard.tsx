@@ -1,9 +1,9 @@
 import { icons } from "@/src/constants/icons";
-import { PaymentAddressCardProps } from "../types";
+import type { PaymentAddressCardProps } from "../types";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { styles as s } from "./PaymentAddressCard.styles";
 
 export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
   hasAddress,
@@ -12,45 +12,21 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
   onPress,
 }) => {
   return (
-    <View style={{ marginBottom: exactScale(24) }}>
-      <Text
-        style={{
-          fontSize: moderateScale(16),
-          fontWeight: "700",
-          color: "#1A1C1E",
-          marginBottom: exactScale(12),
-          marginLeft: exactScale(4),
-        }}
-      >
-        Delivery Address
-      </Text>
+    <View style={s.wrapper}>
+      <Text style={s.heading}>Delivery Address</Text>
       <Touchable
         activeOpacity={0.85}
         onPress={onPress}
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: 20,
-          padding: exactScale(16),
-          flexDirection: "row",
-          alignItems: "center",
-          borderWidth: hasAddress ? 0 : 1.5,
-          borderColor: "#FCA5A5",
-          shadowColor: "#919EAB33",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.04,
-          shadowRadius: 12,
-          elevation: 4,
-        }}
+        style={[
+          s.card,
+          hasAddress ? s.cardSelected : s.cardMissing,
+        ]}
       >
         <View
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 16,
-            backgroundColor: hasAddress ? "#F0FDF4" : "#FEF2F2",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={[
+            s.iconBox,
+            hasAddress ? s.iconBoxGreen : s.iconBoxRed,
+          ]}
         >
           <icons.location_on
             width={24}
@@ -58,40 +34,17 @@ export const PaymentAddressCard: React.FC<PaymentAddressCardProps> = ({
             fill={hasAddress ? "#0F7635" : "#EF4444"}
           />
         </View>
-        <View style={{ flex: 1, marginLeft: exactScale(16) }}>
-          <Text
-            style={{
-              fontSize: moderateScale(14),
-              fontWeight: "700",
-              color: "#1A1C1E",
-            }}
-          >
+        <View style={s.infoCol}>
+          <Text style={s.label}>
             {hasAddress
               ? (deliveryLabel ?? "Default Address")
               : "No Address Selected"}
           </Text>
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              fontWeight: "500",
-              color: "#6B7280",
-              marginTop: exactScale(4),
-            }}
-            numberOfLines={1}
-          >
+          <Text style={s.subLabel} numberOfLines={1}>
             {hasAddress ? deliveryCity! : "Please select a delivery location"}
           </Text>
         </View>
-        <View
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 16,
-            backgroundColor: "#F3F4F6",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <View style={s.arrowBox}>
           <icons.arrow_forward_ios width={12} height={12} fill="#9CA3AF" />
         </View>
       </Touchable>

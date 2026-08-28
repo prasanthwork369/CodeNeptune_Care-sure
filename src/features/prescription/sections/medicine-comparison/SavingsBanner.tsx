@@ -2,7 +2,7 @@ import { HOME_IMAGES } from "@/src/constants/images";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, Text } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { styles as s } from "./medicine-comparison.styles";
 
 interface SavingsBannerProps {
   amount: number;
@@ -13,30 +13,16 @@ export const SavingsBanner: React.FC<SavingsBannerProps> = ({ amount }) => (
     colors={["#D0EBFE", "#D7FFEA"]}
     start={{ x: 0, y: 0.5 }}
     end={{ x: 1, y: 0.5 }}
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      // Centred + scaled to match the cart's banner.
-      justifyContent: "center",
-      paddingHorizontal: exactScale(16),
-      paddingVertical: exactScale(12),
-      gap: exactScale(10),
-    }}
+    style={s.savingsBannerGradient}
   >
     <Image
       source={HOME_IMAGES.discountTag}
-      style={{ width: exactScale(32), height: exactScale(32) }}
+      style={s.savingsTagIcon}
       resizeMode="contain"
     />
-    <Text
-      style={{
-        fontSize: moderateScale(14),
-        fontWeight: "600",
-        color: "#0A0A0A",
-      }}
-    >
+    <Text style={s.savingsText}>
       {"You saved  "}
-      <Text style={{ fontWeight: "800" }}>₹{Number(amount).toFixed(0)}</Text>
+      <Text style={s.savingsAmountBold}>₹{Number(amount).toFixed(0)}</Text>
       {" on this Order"}
     </Text>
   </LinearGradient>

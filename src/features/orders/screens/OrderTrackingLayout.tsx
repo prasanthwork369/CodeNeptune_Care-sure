@@ -11,7 +11,7 @@ import { useOrderById } from "@/src/features/orders/hooks/useOrderById";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { formatOrderId } from "@/src/utils/order";
 import { getCancellationReason, isOrderDelayed } from "@/src/utils/orderDelay";
 import { useLocalSearchParams } from "expo-router";
@@ -35,7 +35,6 @@ import {
 } from "../constants/order-status";
 import { useOrderTrackingSteps } from "../hooks/useOrderTrackingSteps";
 import { useReturnEligibility } from "../hooks/useReturnEligibility";
-import { orderStyles as s } from "../orders.styles";
 import {
   DeliveryAddressSection,
   ItemsOrderedSection,
@@ -48,6 +47,7 @@ import {
 } from "../sections/tracking";
 import { ORDER_STATUS, TrackingStep } from "../types";
 import { buildCartInputs } from "../utils/reorderCart";
+import { styles as s } from "./OrderTrackingLayout.styles";
 
 const EASE_OUT = Easing.out(Easing.cubic);
 
@@ -76,7 +76,7 @@ function TrackingStepRow({
       d,
       withTiming(0, { duration: 260, easing: EASE_OUT }),
     );
-  }, [triggered]);
+  }, [index, triggered, opacity, translateY]);
 
   const rowStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -93,146 +93,60 @@ function TrackingStepRow({
   const renderDot = () => {
     if (step.cancelled) {
       return (
-        <View
-          style={{
-            width: exactScale(18),
-            height: exactScale(18),
-            borderRadius: exactScale(9),
-            backgroundColor: "#DC2626",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              color: "#FFF",
-              fontSize: moderateScale(9),
-              fontWeight: "700",
-              lineHeight: moderateScale(11),
-            }}
-          >
+        <View style={s.dotCancelled}>
+          <Text style={s.dotCancelledText}>
             ✕
           </Text>
         </View>
       );
     }
     if (step.isActive) {
-      // Current stop — solid green with white ring: clearly marks "you are here"
       return (
-        <View
-          style={{
-            width: exactScale(22),
-            height: exactScale(22),
-            borderRadius: exactScale(11),
-            backgroundColor: "#16A34A",
-            borderWidth: exactScale(3),
-            borderColor: "#DCFCE7",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              width: exactScale(8),
-              height: exactScale(8),
-              borderRadius: exactScale(4),
-              backgroundColor: "#fff",
-            }}
-          />
+        <View style={s.dotActive}>
+          <View style={s.dotActiveInner} />
         </View>
       );
     }
     if (step.completed) {
       return (
-        <View
-          style={{
-            width: exactScale(18),
-            height: exactScale(18),
-            borderRadius: exactScale(9),
-            backgroundColor: "#16A34A",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: moderateScale(9),
-              fontWeight: "700",
-              lineHeight: moderateScale(11),
-            }}
-          >
+        <View style={s.dotCompleted}>
+          <Text style={s.dotCompletedText}>
             ✓
           </Text>
         </View>
       );
     }
-    // Pending — empty grey ring
     return (
-      <View
-        style={{
-          width: exactScale(16),
-          height: exactScale(16),
-          borderRadius: exactScale(8),
-          borderWidth: exactScale(1.5),
-          borderColor: "#D1D5DB",
-          backgroundColor: "#fff",
-        }}
-      />
+      <View style={s.dotPending} />
     );
   };
 
   return (
-    <Animated.View
-      style={[
-        { flexDirection: "row", paddingHorizontal: exactScale(16) },
-        rowStyle,
-      ]}
-    >
-      <View
-        style={{
-          width: exactScale(26),
-          alignItems: "center",
-          alignSelf: "stretch",
-        }}
-      >
-        <View
-          style={{
-            height: exactScale(24),
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+    <Animated.View style={[s.stepRow, rowStyle]}>
+      <View style={s.stepLeftCol}>
+        <View style={s.stepDotWrap}>
           {renderDot()}
         </View>
         {!isLast && (
           <View
-            style={{
-              width: exactScale(2),
-              flex: 1,
-              backgroundColor: lineColor,
-            }}
+            style={[
+              s.stepLine,
+              { backgroundColor: lineColor },
+            ]}
           />
         )}
       </View>
       <View
-        style={{
-          flex: 1,
-          paddingLeft: exactScale(10),
-          paddingBottom: isLast ? exactScale(4) : exactScale(10),
-        }}
+        style={[
+          s.stepContentCol,
+          { paddingBottom: isLast ? exactScale(4) : exactScale(10) },
+        ]}
       >
-        <Text
-          style={[s.labelSm, { color: textColor }]}
-          className="font-inter-semibold"
-        >
+        <Text style={[s.stepTitle, { color: textColor }]}>
           {step.title}
         </Text>
         {(step.completed || step.cancelled) && !!step.time && (
-          <Text
-            style={s.labelSm}
-            className="font-inter text-brand-subtext mt-0.5"
-          >
+          <Text style={s.stepTime}>
             {step.time}
           </Text>
         )}
@@ -318,9 +232,6 @@ export const OrderTrackLayout: React.FC = () => {
         }
       }
       setIsCartModalVisible(false);
-      // isProceeding stays true (button keeps its "Adding to cart..." state)
-      // until this same timeout fires — clearing it earlier would flip the
-      // button back to "Re Order" while this screen is still visible.
       cartNavTimer.current = setTimeout(() => {
         cartNavTimer.current = null;
         router.push("/(commerce)/cart");
@@ -340,16 +251,11 @@ export const OrderTrackLayout: React.FC = () => {
     }
   };
 
-  // Adjusted during render, not in an effect, to avoid a setState-in-effect
-  // cascade — latches the entrance animation on once order data arrives.
   if (order !== orderSeenForAnim) {
     setOrderSeenForAnim(order);
     if (order && !animTriggered) setAnimTriggered(true);
   }
 
-  // Bundled into one memo keyed on `order` — this screen polls every 30s and
-  // also re-renders on every local UI toggle (modals/sheets/isProceeding),
-  // none of which should re-run this derivation.
   const {
     statusInfo,
     items,
@@ -421,8 +327,6 @@ export const OrderTrackLayout: React.FC = () => {
       !TERMINAL_OR_CANCELLED_STATUSES.includes(order.status) &&
       order?.isCorporateGeneratedOrder !== true;
 
-    // Same "toStatus → timestamp" lookup the tracking steps use, needed here
-    // to show the precise "Delivered on" date in the header above.
     const deliveredLogTime = (order?.statusLogs ?? []).reduce<string | null>(
       (acc, log) =>
         log.toStatus === "7" && log.createdAt ? log.createdAt : acc,
@@ -463,6 +367,7 @@ export const OrderTrackLayout: React.FC = () => {
   const toastOpacity = useSharedValue(0);
   const toastTranslate = useSharedValue(15);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     let fadeOutTimer: NodeJS.Timeout;
     let hideTimer: NodeJS.Timeout;
@@ -499,6 +404,7 @@ export const OrderTrackLayout: React.FC = () => {
       clearTimeout(hideTimer);
     };
   }, [hasActiveReturnRequest, isPlaceholderData, toastOpacity, toastTranslate]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const animatedToastStyle = useAnimatedStyle(() => {
     return {
@@ -507,11 +413,9 @@ export const OrderTrackLayout: React.FC = () => {
     };
   });
 
-  // Ahead of the skeleton: a tracked order's status is live server state, so
-  // offline shows that rather than a timeline that may already be wrong.
   if (liveState) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Order Details" showBorder />
         {liveState === "offline" ? (
           <NoInternetState
@@ -531,16 +435,15 @@ export const OrderTrackLayout: React.FC = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Order Details" showBorder />
         <OrderTrackingSkeleton />
       </View>
     );
   }
 
-
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader
         title={
           order?.orderId || orderId
@@ -551,15 +454,11 @@ export const OrderTrackLayout: React.FC = () => {
         rightSlot={
           isInvoiceAvailable && !isPlaceholderData ? (
             <Touchable
-              className="flex-row items-center"
-              style={{ gap: exactScale(4) }}
+              style={s.getInvoiceBtn}
               activeOpacity={0.7}
               onPress={() => setInvoiceModalVisible(true)}
             >
-              <Text
-                style={s.labelMd}
-                className="font-inter-semibold text-brand-primary"
-              >
+              <Text style={s.getInvoiceText}>
                 Get Invoice
               </Text>
               <icons.download
@@ -574,22 +473,20 @@ export const OrderTrackLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
-        contentContainerStyle={{
-          paddingTop: exactScale(12),
-          paddingBottom:
-            Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
-          gap: exactScale(10),
-        }}
+        contentContainerStyle={[
+          s.scrollContent,
+          {
+            paddingBottom:
+              Math.max(adjustedBottom, exactScale(16)) + exactScale(16),
+          },
+        ]}
       >
-        <View className="px-4 py-3 mx-base">
-          <Text
-            style={s.labelSm}
-            className="font-inter-medium text-brand-text tracking-[0.5px]"
-          >
+        <View style={s.headerStatusWrap}>
+          <Text style={s.headerStatusLabel}>
             {order?.status === 7 ? "Order Delivered on" : "Order placed on"}
           </Text>
-          <View className="flex-row items-center justify-start mt-1">
-            <Text style={s.label20} className="font-inter-bold text-brand-text">
+          <View style={s.headerStatusDateRow}>
+            <Text style={s.headerStatusDateText}>
               {order?.status === 7
                 ? formatDate(
                     deliveredLogTime ??
@@ -599,30 +496,26 @@ export const OrderTrackLayout: React.FC = () => {
                 : formatDate(order?.createdAt)}
             </Text>
             <View
-              style={{
-                borderWidth: 1,
-                borderRadius: 6,
-                borderColor: statusInfo?.border ?? "#E5E7EB",
-                backgroundColor: statusInfo?.bg ?? "#F3F4F6",
-              }}
-              className="px-2 py-1.5 ml-3"
+              style={[
+                s.headerStatusBadge,
+                {
+                  borderColor: statusInfo?.border ?? "#E5E7EB",
+                  backgroundColor: statusInfo?.bg ?? "#F3F4F6",
+                },
+              ]}
             >
               <Text
                 style={[
-                  s.statusBadge,
+                  s.headerStatusBadgeText,
                   { color: statusInfo?.text ?? "#6B7280" },
                 ]}
-                className="font-inter-bold tracking-[0.5px] uppercase"
               >
                 {statusInfo?.label ?? "—"}
               </Text>
             </View>
           </View>
           {showExpectedDelivery && (
-            <Text
-              style={s.labelSm}
-              className="font-inter-medium text-brand-subtext mt-1.5"
-            >
+            <Text style={s.expectedDeliveryText}>
               Expected delivery: {formatDate(order?.estimatedDelivery)}
             </Text>
           )}
@@ -633,11 +526,8 @@ export const OrderTrackLayout: React.FC = () => {
           cancellationReason={cancellationReason}
         />
 
-        <SectionCard className="pt-4 pb-2">
-          <Text
-            style={s.labelMd}
-            className="font-inter-bold text-brand-text mb-4 px-4"
-          >
+        <SectionCard style={s.trackingSectionCard}>
+          <Text style={s.trackingSectionTitle}>
             Order Tracking
           </Text>
           {trackingSteps.slice(0, 3).map((step, index, arr) => (
@@ -651,25 +541,13 @@ export const OrderTrackLayout: React.FC = () => {
           ))}
           {trackingSteps.length > 3 && (
             <>
-              <View
-                style={{
-                  borderTopWidth: 1,
-                  borderColor: "#E5E7EB",
-                  marginHorizontal: exactScale(10),
-                  borderStyle: "dashed",
-                  marginTop: exactScale(4),
-                }}
-              />
+              <View style={s.trackingDivider} />
               <Touchable
-                className="flex-row items-center justify-center"
-                style={{ paddingVertical: exactScale(12) }}
+                style={s.viewAllUpdatesBtn}
                 activeOpacity={0.7}
                 onPress={() => setTrackingModalVisible(true)}
               >
-                <Text
-                  style={[s.labelSm, { marginRight: exactScale(4) }]}
-                  className="font-inter-semibold text-brand-primary"
-                >
+                <Text style={s.viewAllUpdatesText}>
                   View all updates
                 </Text>
                 <icons.arrow_down_green
@@ -699,28 +577,12 @@ export const OrderTrackLayout: React.FC = () => {
 
         <SectionCard>
           <Touchable
-            className="flex-row items-center justify-between"
-            style={{
-              paddingHorizontal: exactScale(16),
-              paddingVertical: exactScale(16),
-            }}
+            style={s.billCardRow}
             activeOpacity={0.7}
             onPress={() => setBillSheetVisible(true)}
           >
-            <View
-              className="flex-row items-center"
-              style={{ gap: exactScale(12) }}
-            >
-              <View
-                style={{
-                  borderWidth: 1,
-                  borderColor: "#E2E8F0",
-                  width: exactScale(40),
-                  height: exactScale(40),
-                  borderRadius: exactScale(4),
-                }}
-                className="bg-[#F8FAFC] items-center justify-center"
-              >
+            <View style={s.billLeftCol}>
+              <View style={s.billIconBox}>
                 <icons.description
                   width={exactScale(20)}
                   height={exactScale(20)}
@@ -728,28 +590,16 @@ export const OrderTrackLayout: React.FC = () => {
                 />
               </View>
               <View>
-                <Text
-                  style={s.labelMd}
-                  className="font-inter-bold text-brand-text"
-                >
+                <Text style={s.billTitle}>
                   Total Bill
                 </Text>
-                <Text
-                  style={s.statusBadge}
-                  className="font-inter-medium text-brand-subtext"
-                >
+                <Text style={s.billSubtitle}>
                   Incl.charges
                 </Text>
               </View>
             </View>
-            <View
-              className="flex-row items-center"
-              style={{ gap: exactScale(8) }}
-            >
-              <Text
-                style={s.labelLg}
-                className="font-inter-bold text-brand-text"
-              >
+            <View style={s.billRightCol}>
+              <Text style={s.billTotalText}>
                 {order?.total != null
                   ? `₹${Number(order.total).toFixed(2)}`
                   : "—"}
@@ -785,18 +635,10 @@ export const OrderTrackLayout: React.FC = () => {
 
       {showReturnToast && (
         <Animated.View
-          className="flex-row items-center bg-[#FEF9C3] border border-[#FDE047] shadow-sm"
           style={[
+            s.returnToast,
             {
-              position: "absolute",
-              left: exactScale(16),
-              right: exactScale(16),
               bottom: adjustedBottom + exactScale(78) + exactScale(12),
-              borderRadius: exactScale(8),
-              paddingHorizontal: exactScale(16),
-              paddingVertical: exactScale(12),
-              zIndex: 99,
-              elevation: 5,
             },
             animatedToastStyle,
           ]}
@@ -806,50 +648,36 @@ export const OrderTrackLayout: React.FC = () => {
             height={exactScale(14)}
             fill="#0F7635"
           />
-          <Text
-            style={[s.labelSm, { marginLeft: exactScale(8), flex: 1 }]}
-            className="font-inter-semibold text-brand-text"
-          >
+          <Text style={s.returnToastText}>
             Return Status
           </Text>
         </Animated.View>
       )}
 
       <View
-        className="bg-white border-t border-[#919EAB33]"
-        style={{
-          paddingHorizontal: exactScale(16),
-          paddingTop: exactScale(12),
-          paddingBottom: adjustedBottom + exactScale(16),
-        }}
+        style={[
+          s.reorderBar,
+          { paddingBottom: adjustedBottom + exactScale(16) },
+        ]}
       >
         <Touchable
-          className="items-center"
+          style={[
+            s.reorderBtn,
+            { opacity: isProceeding || isPlaceholderData ? 0.75 : 1 },
+          ]}
           activeOpacity={0.85}
           onPress={handleReOrder}
           disabled={isProceeding || isPlaceholderData}
-          style={{
-            backgroundColor: "#0F7635",
-            borderRadius: exactScale(8),
-            paddingVertical: exactScale(15),
-            opacity: isProceeding || isPlaceholderData ? 0.75 : 1,
-          }}
         >
           {isProceeding ? (
-            <View
-              className="flex-row items-center"
-              style={{ gap: exactScale(8) }}
-            >
+            <View style={s.reorderBtnAddingRow}>
               <ActivityIndicator size="small" color="#fff" />
-              <Text
-                style={s.labelMd}
-                className="font-inter-semibold text-white"
-              >
+              <Text style={s.reorderBtnText}>
                 Adding to cart...
               </Text>
             </View>
           ) : (
-            <Text style={s.labelMd} className="font-inter-semibold text-white">
+            <Text style={s.reorderBtnText}>
               Re Order
             </Text>
           )}

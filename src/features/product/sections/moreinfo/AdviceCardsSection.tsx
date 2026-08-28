@@ -1,13 +1,14 @@
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { SafetyAdviceItem } from "@/src/features/product/types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import React, { useRef, useState } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import Animated, { Easing, LinearTransition } from "react-native-reanimated";
+import { Touchable } from "@/src/components/ui/Touchable";
+import { styles as s } from "./moreinfo.styles";
 
 const CARD_WIDTH_COLLAPSED = exactScale(175);
 const CARD_WIDTH_EXPANDED = exactScale(280);
-// Collapsed cards show this many lines, which is what bounds their height.
 const COLLAPSED_LINES = 4;
 const PREVIEW_LENGTH = 80;
 
@@ -25,8 +26,6 @@ const badgeColors = (label: string) => {
   return { backgroundColor: "#EDFDF4", color: "#006C51" };
 };
 
-// Mirrors the original CareSure "How It Works" carousel: compact horizontal
-// cards expand in place and the selected card recentres in the viewport.
 export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
   items,
 }) => {
@@ -58,18 +57,16 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
       ref={cardsScrollRef}
       horizontal
       nestedScrollEnabled
-      // iOS must be able to take over touches that start on card text so a
-      // horizontal drag scrolls the carousel instead of staying with the child.
       canCancelContentTouches
       directionalLockEnabled
       scrollEnabled
       showsHorizontalScrollIndicator={false}
-      className="mt-4 pb-2"
-      contentContainerStyle={{ paddingRight: exactScale(16) }}
+      style={s.adviceScroll}
+      contentContainerStyle={s.adviceScrollContent}
       bounces={false}
       overScrollMode="never"
     >
-      <View className="flex-row items-stretch">
+      <View style={s.adviceCardsRow}>
         {items.map((item, index) => {
           const id = item.title || String(index);
           const description = item.description ?? "";
@@ -83,46 +80,46 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
               layout={LinearTransition.duration(250).easing(
                 Easing.out(Easing.quad),
               )}
-              className="mr-3 rounded-[12px] border border-[#919EAB33] bg-white p-3"
-              style={{
-                width: isExpanded ? CARD_WIDTH_EXPANDED : CARD_WIDTH_COLLAPSED,
-              }}
+              style={[
+                s.adviceCard,
+                {
+                  width: isExpanded
+                    ? CARD_WIDTH_EXPANDED
+                    : CARD_WIDTH_COLLAPSED,
+                },
+              ]}
               onLayout={(event) => {
                 cardXOffsets.current[id] = event.nativeEvent.layout.x;
               }}
             >
-              {/* The exported SVG already carries its own rounded background and brand
-                  colour, so it is drawn as-is: no wrapper fill, no tint. */}
               {item.image ? (
                 <RemoteIcon
                   uri={item.image}
                   size={exactScale(48)}
-                  style={{ marginBottom: exactScale(16) }}
+                  style={s.adviceIcon}
                 />
               ) : null}
 
               {item.title ? (
-                <Text
-                  className="mb-2 font-inter-semibold text-brand-text"
-                  style={{ fontSize: moderateScale(14) }}
-                >
+                <Text style={s.adviceTitle}>
                   {item.title}
                 </Text>
               ) : null}
 
               {colors && item.label ? (
                 <View
-                  className="mb-2 self-start rounded-[4px] px-2 py-1"
-                  style={{ backgroundColor: colors.backgroundColor }}
+                  style={[
+                    s.adviceBadge,
+                    { backgroundColor: colors.backgroundColor },
+                  ]}
                 >
                   <Text
-                    className="font-inter-semibold"
+                    style={[
+                      s.adviceBadgeText,
+                      { color: colors.color },
+                    ]}
                     numberOfLines={1}
                     adjustsFontSizeToFit
-                    style={{
-                      color: colors.color,
-                      fontSize: moderateScale(10),
-                    }}
                   >
                     {item.label}
                   </Text>
@@ -131,29 +128,25 @@ export const AdviceCardsSection: React.FC<{ items: SafetyAdviceItem[] }> = ({
 
               {description ? (
                 <>
-                  {/* Clamped by lines, not characters: 80 characters still wrap to any
-                      height in a 175px card, which is what let the cards grow unbounded. */}
                   <Text
                     numberOfLines={isExpanded ? undefined : COLLAPSED_LINES}
-                    className="font-inter-medium text-brand-subtext"
-                    style={{
-                      fontSize: moderateScale(12),
-                      lineHeight: moderateScale(18),
-                    }}
+                    style={s.adviceDescription}
                   >
                     {description}
                   </Text>
+
                   {expandable ? (
-                    <Text
+                    <Touchable
                       onPress={() => toggleExpand(id)}
-                      className="font-inter-bold text-[#0F7635]"
-                      style={{
-                        fontSize: moderateScale(12),
-                        marginTop: exactScale(6),
-                      }}
+                      throttleMs={0}
+                      accessibilityRole="button"
+                      accessibilityState={{ expanded: isExpanded }}
+                      style={s.adviceExpandBtn}
                     >
-                      {isExpanded ? "Show less" : "Read More"}
-                    </Text>
+                      <Text style={s.adviceExpandText}>
+                        {isExpanded ? "View Less" : "View More"}
+                      </Text>
+                    </Touchable>
                   ) : null}
                 </>
               ) : null}

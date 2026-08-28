@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { AppButton } from "./AppButton";
+import { styles as s } from "./RetryState.styles";
 
 interface RetryStateProps {
   onRetry: () => void;
@@ -16,17 +16,11 @@ export const RetryState: React.FC<RetryStateProps> = ({
   message = "We couldn't load this content. Please try again.",
   retrying = false,
 }) => (
-  <View className="flex-1 items-center justify-center px-8 py-12">
-    <Text
-      className="font-inter-semibold text-[#222222] text-center"
-      style={{ fontSize: moderateScale(17) }}
-    >
+  <View style={s.container}>
+    <Text style={s.titleText}>
       {title}
     </Text>
-    <Text
-      className="font-inter-regular text-[#6A6A6A] text-center"
-      style={{ fontSize: moderateScale(13), marginTop: exactScale(6) }}
-    >
+    <Text style={s.messageText}>
       {message}
     </Text>
     <AppButton
@@ -34,7 +28,7 @@ export const RetryState: React.FC<RetryStateProps> = ({
       size="sm"
       loading={retrying}
       onPress={onRetry}
-      style={{ width: exactScale(120), marginTop: exactScale(18) }}
+      style={s.button}
       accessibilityHint="Attempts to load the content again"
     />
   </View>

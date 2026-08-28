@@ -16,6 +16,7 @@ import {
   logToTransactions,
   WalletTabKey,
 } from "../walletHistory.helpers";
+import { styles as s } from "./WalletHistoryLayout.styles";
 
 const TABS: { key: WalletTabKey; label: string }[] = [
   { key: "All", label: "All" },
@@ -82,7 +83,7 @@ export const WalletHistoryLayout: React.FC = () => {
   // screen on its own.
   if (liveState) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+      <View style={s.container}>
         <ScreenHeader
           title="Transaction History"
           backgroundColor="#FFFFFF"
@@ -105,7 +106,7 @@ export const WalletHistoryLayout: React.FC = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+    <View style={s.container}>
       <ScreenHeader
         title="Transaction History"
         backgroundColor="#FFFFFF"
@@ -125,7 +126,7 @@ export const WalletHistoryLayout: React.FC = () => {
       />
 
       <View
-        style={{ flex: 1 }}
+        style={s.pagerWrapper}
         onLayout={(e) => setPageWidth(e.nativeEvent.layout.width)}
       >
         {pageWidth > 0 && (

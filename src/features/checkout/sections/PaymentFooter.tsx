@@ -1,8 +1,9 @@
 import { AppButton } from "@/src/components/ui/AppButton";
 import { StickyFooter } from "@/src/components/ui/StickyFooter";
 import ArrowForwardIosWhite from "@/assets/icons/arrow_forward_ios_white.svg";
-import { PaymentFooterProps } from "../types";
+import type { PaymentFooterProps } from "../types";
 import React from "react";
+import { styles as s } from "./PaymentFooter.styles";
 
 export const PaymentFooter: React.FC<PaymentFooterProps> = ({
   onPress,
@@ -13,7 +14,7 @@ export const PaymentFooter: React.FC<PaymentFooterProps> = ({
   return (
     <StickyFooter
       safeAreaBottom={safeAreaBottom}
-      style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
+      style={s.footer}
     >
       <AppButton
         title={hasAddress ? "Confirm Order" : "Set Delivery Address"}

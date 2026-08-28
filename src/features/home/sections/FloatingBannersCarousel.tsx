@@ -31,6 +31,7 @@ import { CartFloatingBanner } from "./CartFloatingBanner";
 import { PrescriptionFloatingBanner } from "./PrescriptionFloatingBanner";
 import { getPrescriptionImageUrls } from "@/src/features/prescription/utils/prescription";
 import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./FloatingBannersCarousel.styles";
 
 interface DotProps {
   index: number;
@@ -38,8 +39,7 @@ interface DotProps {
   total: number;
 }
 
-// Room reserved below the banner for its 20px boxShadow. The carousel clips its
-// slides (overflow + ScrollView), so without this the shadow is sliced off flat.
+// Room reserved below the banner for its 20px boxShadow.
 const SHADOW_ROOM = exactScale(24);
 
 // How far the banners drop when the tab bar hides.
@@ -56,20 +56,17 @@ const BannerBottomFade = ({ extraBottom = 0 }: { extraBottom?: number }) => (
     ]}
     locations={[0, 0.35, 0.65, 1]}
     pointerEvents="none"
-    style={{
-      position: "absolute",
-      bottom: -exactScale(120) + extraBottom,
-      left: 0,
-      right: 0,
-      height: exactScale(200),
-      zIndex: -1,
-    }}
+    style={[
+      s.bottomFade,
+      {
+        bottom: -exactScale(120) + extraBottom,
+      },
+    ]}
   />
 );
 
 const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
   const style = useAnimatedStyle(() => {
-    // Shift progress by -1 since page index 1 is item A (Dot 0) and page index 2 is item B (Dot 1)
     const shifted = progress.value - 1;
     const norm = ((shifted % total) + total) % total;
     let dist = Math.abs(norm - index);
@@ -77,7 +74,6 @@ const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
       dist = total - dist;
     }
 
-    // Interpolate color: solid white (active) to semi-transparent white (inactive)
     const colorVal = interpolateColor(
       dist,
       [0, 1],
@@ -91,11 +87,7 @@ const Dot: React.FC<DotProps> = React.memo(({ index, progress, total }) => {
   return (
     <Animated.View
       style={[
-        {
-          width: exactScale(4),
-          height: exactScale(4),
-          borderRadius: exactScale(2),
-        },
+        s.dotBase,
         style,
       ]}
     />
@@ -111,23 +103,14 @@ export const FloatingBannersCarousel = () => {
   const { totalItems } = useCartRead();
   const { latestPrescription, hasPendingPrescription, dismissBanner } =
     usePrescriptionBanner();
-  const isRxFromCartFlow = useUIStore((s) => s.isRxFromCartFlow);
-  // Pause autoplay while the home feed is scrolling or Home is blurred. Read
-  // from the store here (rather than via props) so neither toggle re-renders
-  // the whole feed.
-  const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
-  const isHomeFocused = useUIStore((s) => s.isHomeFocused);
+  const isRxFromCartFlow = useUIStore((st) => st.isRxFromCartFlow);
+  const isFeedScrolling = useUIStore((st) => st.isFeedScrolling);
+  const isHomeFocused = useUIStore((st) => st.isHomeFocused);
   const focused = isHomeFocused && !isFeedScrolling;
   const isAppForeground = useIsAppForeground();
 
   const [isCartInteracting, setIsCartInteracting] = useState(false);
-  // The cart mutation has no onMutate, so totalItems trails the server by a
-  // round-trip. visualCartCount is bumped the moment the fly launches — without
-  // it the banner would appear only after the flying image had already landed.
   const visualCartCount = useFlyToCartSafe()?.visualCartCount ?? 0;
-  // Keep the banner mounted through a Remove tap (totalItems hits 0 before
-  // the close animation finishes) so it can hide smoothly instead of
-  // snapping out instantly.
   const isCartActive =
     totalItems > 0 || visualCartCount > 0 || isCartInteracting;
   const isRxActive = hasPendingPrescription;
@@ -152,8 +135,6 @@ export const FloatingBannersCarousel = () => {
 
   const startAutoplay = useCallback(() => {
     stopAutoplay();
-    // Foreground check kept out of `focused` on purpose: folding it in there
-    // would also reset the banner index on background and jump on resume.
     if (
       bothActive &&
       focused &&
@@ -181,7 +162,7 @@ export const FloatingBannersCarousel = () => {
     }
   }, [bothActive, isCartActive, isRxActive, width, progress]);
 
-  // Autoplay timer controller: starts/pauses on focus, app foreground, and cart bottom sheet interaction
+  // Autoplay timer controller
   useEffect(() => {
     if (bothActive && focused && !isCartInteracting && isAppForeground) {
       startAutoplay();
@@ -221,8 +202,6 @@ export const FloatingBannersCarousel = () => {
     }
   }, [activeBannerIndex, bothActive, width, progress]);
 
-  // Both ride the same shared value as the tab bar, so the banners travel on
-  // the identical frame instead of chasing it through a store update.
   const animatedContainerStyle = useAnimatedStyle(() => ({
     transform: [
       {
@@ -284,8 +263,6 @@ export const FloatingBannersCarousel = () => {
         },
       });
     } else if (!isRxFromCartFlow) {
-      // Under review: open the prescription itself. The notifications list says
-      // nothing about it and reads as the wrong screen entirely.
       if (latestPrescription.status === PRESCRIPTION_STATUS.NEW) {
         router.push({
           pathname: "/(prescription)/prescription-viewer",
@@ -295,7 +272,6 @@ export const FloatingBannersCarousel = () => {
             doctorName: latestPrescription.doctorName ?? "",
             patientName: latestPrescription.ocrData?.patientName ?? "",
             uploadedDate: latestPrescription.createdAt ?? "",
-            // Nothing to action while it is still being reviewed.
             source: "view_only",
           },
         });
@@ -337,8 +313,6 @@ export const FloatingBannersCarousel = () => {
 
   const handleScrollEndDrag = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      // If velocity is present, momentum scrolling is underway and onMomentumScrollEnd
-      // will handle the authoritative settlement once deceleration completes.
       const hasVelocity = Math.abs(e.nativeEvent.velocity?.x ?? 0) > 0.01;
       if (!hasVelocity) {
         handleScrollEnd(e.nativeEvent.contentOffset.x);
@@ -356,9 +330,6 @@ export const FloatingBannersCarousel = () => {
 
   if (!isCartActive && !isRxActive) return null;
 
-  // Distance from screen bottom to the top of the LiquidTabBar pill:
-  // paddingBottom (adjustedBottom + extraGap) + vertical centering offset
-  // Match the tab pill's bottom-aligned position.
   const TAB_BAR_HEIGHT = PILL_HEIGHT + adjustedBottom + extraGap;
 
   return (
@@ -367,16 +338,11 @@ export const FloatingBannersCarousel = () => {
         <Animated.View
           pointerEvents="box-none"
           style={[
+            s.bothActiveCarouselWrap,
             {
-              position: "absolute",
-              // Dropped by SHADOW_ROOM and grown by the same amount; each slide
-              // adds it back as padding, so the banner lands where it always did.
               bottom: TAB_BAR_HEIGHT + exactScale(8) - SHADOW_ROOM,
-              left: 0,
               width: width,
               height: exactScale(90) + SHADOW_ROOM,
-              justifyContent: "flex-end",
-              zIndex: 100,
             },
             animatedContainerStyle,
           ]}
@@ -385,12 +351,12 @@ export const FloatingBannersCarousel = () => {
           {/* Slides Container */}
           <View
             pointerEvents="box-none"
-            style={{
-              width: "100%",
-              height: exactScale(82) + SHADOW_ROOM,
-              overflow: "hidden",
-              zIndex: 10,
-            }}
+            style={[
+              s.slidesContainer,
+              {
+                height: exactScale(82) + SHADOW_ROOM,
+              },
+            ]}
           >
             <Animated.ScrollView
               ref={scrollViewRef as React.Ref<Animated.ScrollView>}
@@ -412,12 +378,13 @@ export const FloatingBannersCarousel = () => {
             >
               {/* Index 0: Prescription (Dummy for loop) */}
               <View
-                style={{
-                  width: width,
-                  height: "100%",
-                  justifyContent: "flex-end",
-                  paddingBottom: 1 + SHADOW_ROOM,
-                }}
+                style={[
+                  s.slideItem,
+                  {
+                    width: width,
+                    paddingBottom: 1 + SHADOW_ROOM,
+                  },
+                ]}
               >
                 <PrescriptionFloatingBanner
                   visible={true}
@@ -433,12 +400,13 @@ export const FloatingBannersCarousel = () => {
 
               {/* Index 1: Cart (Real) */}
               <View
-                style={{
-                  width: width,
-                  height: "100%",
-                  justifyContent: "flex-end",
-                  paddingBottom: 1 + SHADOW_ROOM,
-                }}
+                style={[
+                  s.slideItem,
+                  {
+                    width: width,
+                    paddingBottom: 1 + SHADOW_ROOM,
+                  },
+                ]}
               >
                 <CartFloatingBanner
                   visible={true}
@@ -449,12 +417,13 @@ export const FloatingBannersCarousel = () => {
 
               {/* Index 2: Prescription (Real) */}
               <View
-                style={{
-                  width: width,
-                  height: "100%",
-                  justifyContent: "flex-end",
-                  paddingBottom: 1 + SHADOW_ROOM,
-                }}
+                style={[
+                  s.slideItem,
+                  {
+                    width: width,
+                    paddingBottom: 1 + SHADOW_ROOM,
+                  },
+                ]}
               >
                 <PrescriptionFloatingBanner
                   visible={true}
@@ -470,12 +439,13 @@ export const FloatingBannersCarousel = () => {
 
               {/* Index 3: Cart (Dummy for loop) */}
               <View
-                style={{
-                  width: width,
-                  height: "100%",
-                  justifyContent: "flex-end",
-                  paddingBottom: 1 + SHADOW_ROOM,
-                }}
+                style={[
+                  s.slideItem,
+                  {
+                    width: width,
+                    paddingBottom: 1 + SHADOW_ROOM,
+                  },
+                ]}
               >
                 <CartFloatingBanner
                   visible={true}
@@ -488,23 +458,9 @@ export const FloatingBannersCarousel = () => {
             {/* Bottom Dots Indicator Badge */}
             <Animated.View
               style={[
+                s.dotsBadge,
                 {
-                  position: "absolute",
-                  // Offset by the same room the slides gained, so the badge
-                  // stays pinned to the banner instead of dropping with it.
                   bottom: exactScale(3) + SHADOW_ROOM,
-                  alignSelf: "center",
-                  height: exactScale(12),
-                  paddingHorizontal: exactScale(6),
-                  borderRadius: exactScale(7),
-                  backgroundColor: "#9E9E9E",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: exactScale(4),
-                  // zIndex alone handles stacking; elevation would also cast a
-                  // dark Android drop shadow under the badge.
-                  zIndex: 20,
                 },
                 dotsAnimatedStyle,
               ]}
@@ -520,18 +476,15 @@ export const FloatingBannersCarousel = () => {
             <Animated.View
               pointerEvents="box-none"
               style={[
+                s.singleBannerWrap,
                 {
-                  position: "absolute",
                   bottom: TAB_BAR_HEIGHT + exactScale(8),
-                  left: 0,
-                  right: 0,
-                  zIndex: 50,
                 },
                 animatedContainerStyle,
               ]}
             >
               <BannerBottomFade />
-              <View pointerEvents="box-none" style={{ zIndex: 10, width: "100%" }}>
+              <View pointerEvents="box-none" style={s.singleBannerInner}>
                 <PrescriptionFloatingBanner
                   visible={isRxActive}
                   status={latestPrescription?.status ?? PRESCRIPTION_STATUS.NEW}
@@ -550,18 +503,15 @@ export const FloatingBannersCarousel = () => {
             <Animated.View
               pointerEvents="box-none"
               style={[
+                s.singleBannerWrap,
                 {
-                  position: "absolute",
                   bottom: TAB_BAR_HEIGHT + exactScale(8),
-                  left: 0,
-                  right: 0,
-                  zIndex: 50,
                 },
                 animatedContainerStyle,
               ]}
             >
               <BannerBottomFade />
-              <View pointerEvents="box-none" style={{ zIndex: 10, width: "100%" }}>
+              <View pointerEvents="box-none" style={s.singleBannerInner}>
                 <CartFloatingBanner
                   visible={isCartActive}
                   onViewCart={() => router.push("/(commerce)/cart")}

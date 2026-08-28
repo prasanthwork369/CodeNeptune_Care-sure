@@ -34,8 +34,9 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.26)",
   },
   titleText: {
-    // Avoid fontWeight with custom fonts to prevent fallback issues on iOS/Android
+    fontFamily: "Inter-ExtraBold",
     fontWeight: "800",
+    color: "#111827",
     fontSize: moderateScale(20),
     lineHeight: TITLE_LINE_HEIGHT,
     letterSpacing: 0,

@@ -32,6 +32,7 @@ export const useMoreAboutScrollNavigation = (
     // Sync both the state and its ref mirror so handleScroll reads the correct
     // baseline after a product change (e.g. navigating between PDPs).
     isStickyRef.current = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSticky(false);
   }, [additionalData]);
 

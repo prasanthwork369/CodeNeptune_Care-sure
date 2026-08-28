@@ -1,64 +1,51 @@
 import React from "react";
 import { View, ScrollView } from "react-native";
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { styles as s } from "./SearchSkeleton.styles";
+import { exactScale } from "@/src/utils/exactScale";
 
 export const SearchSkeleton = () => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 100 }}
-      className="flex-1"
+      contentContainerStyle={s.container}
+      style={{ flex: 1 }}
     >
       {/* Mocking ColumnHeaders */}
-      <View className="flex-row mx-4 mt-2 mb-4">
-        <View className="flex-1 items-center">
+      <View style={s.headerRow}>
+        <View style={s.headerCell}>
           <Skeleton width={80} height={12} />
         </View>
-        <View className="flex-1 items-center">
+        <View style={s.headerCell}>
           <Skeleton width={100} height={12} />
         </View>
       </View>
 
       {[1, 2, 3, 4].map((i) => (
-        <View key={i} className="px-4 mb-5">
-          <View
-            style={{ borderWidth: 1, borderColor: "#919EAB33" }}
-            className="w-full rounded-[12px] bg-white overflow-hidden"
-          >
+        <View key={i} style={s.itemWrapper}>
+          <View style={s.cardRoot}>
             {/* Top Section */}
-            <View className="flex-row w-full">
+            <View style={s.splitRow}>
               {/* Left Side */}
-              <View className="flex-1 p-4">
-                <View className="mb-6">
-                  <Skeleton
-                    width="90%"
-                    height={16}
-                    style={{ marginBottom: 8 }}
-                  />
+              <View style={s.sidePad}>
+                <View style={s.topCol}>
+                  <Skeleton width="90%" height={16} style={{ marginBottom: 8 }} />
                   <Skeleton width="60%" height={12} />
                 </View>
-                <View className="mt-auto">
-                  <Skeleton
-                    width={60}
-                    height={22}
-                    style={{ marginBottom: 6 }}
-                  />
+                <View style={s.bottomAuto}>
+                  <Skeleton width={60} height={22} style={{ marginBottom: 6 }} />
                   <Skeleton width={50} height={12} />
                 </View>
               </View>
 
               {/* Right Side */}
-              <View className="flex-1 p-4">
-                <View className="mb-6">
-                  <Skeleton
-                    width="90%"
-                    height={16}
-                    style={{ marginBottom: 8 }}
-                  />
+              <View style={s.sidePad}>
+                <View style={s.topCol}>
+                  <Skeleton width="90%" height={16} style={{ marginBottom: 8 }} />
                   <Skeleton width="60%" height={12} />
                 </View>
-                <View className="mt-auto">
-                  <View className="flex-row items-baseline gap-x-2 mb-1.5">
+                <View style={s.bottomAuto}>
+                  <View style={s.priceBaseRow}>
                     <Skeleton width={60} height={22} />
                     <Skeleton width={40} height={14} />
                   </View>
@@ -68,13 +55,13 @@ export const SearchSkeleton = () => {
             </View>
 
             {/* Divider */}
-            <View className="h-[1px] w-full bg-[#EAEAEA]" />
+            <View style={s.divider} />
 
             {/* Bottom Row */}
-            <View className="flex-row justify-between items-center px-4 py-3.5 bg-white">
-              <View className="flex-row items-center">
+            <View style={s.bottomRow}>
+              <View style={s.bottomLeft}>
                 <Skeleton width={18} height={18} borderRadius={9} />
-                <Skeleton width={120} height={12} style={{ marginLeft: 8 }} />
+                <Skeleton width={120} height={12} style={{ marginLeft: exactScale(8) }} />
               </View>
               <Skeleton width={70} height={34} borderRadius={8} />
             </View>

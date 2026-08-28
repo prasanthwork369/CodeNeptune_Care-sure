@@ -7,7 +7,6 @@ export interface LoginFormProps {
   onPhoneChange: (text: string) => void;
   onSubmitEditing?: () => void;
   inputRef?: React.RefObject<TextInput | null>;
-  /** Transparent overlay that spends the first tap on the number hint. */
   hintShieldVisible?: boolean;
   onHintPress?: () => void;
 }
@@ -19,9 +18,7 @@ export interface LoginSubmitButtonProps {
 }
 
 export interface OtpFormProps {
-  /** One entry per box; "" renders an empty box. */
   slots: string[];
-  /** Text held by the hidden input — filled digits only. */
   inputValue: string;
   otpError: string;
   error: string | null;
@@ -33,6 +30,12 @@ export interface OtpFormProps {
   onResend: () => void;
   onSubmitEditing?: () => void;
   inputRef: React.Ref<TextInput>;
+}
+
+export interface OtpSubmitButtonProps {
+  loading: boolean;
+  isValid: boolean;
+  onVerify: () => void;
 }
 
 export * from "./signupBonus";

@@ -1,54 +1,21 @@
 import { icons } from "@/src/constants/icons";
-import { PaymentHeaderProps } from "../types";
+import type { PaymentHeaderProps } from "../types";
 import { Touchable } from "@/src/components/ui/Touchable";
 import React from "react";
 import { Text, View } from "react-native";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { styles as s } from "./PaymentHeader.styles";
 
 export const PaymentHeader: React.FC<PaymentHeaderProps> = ({
   onBack,
   title,
 }) => {
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingBottom: exactScale(12),
-        marginBottom: exactScale(24),
-        borderBottomWidth: 1,
-        borderBottomColor: "#919EAB33",
-      }}
-    >
-      <Touchable
-        onPress={onBack}
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: 22,
-          backgroundColor: "#fff",
-          alignItems: "center",
-          justifyContent: "center",
-          shadowColor: "#919EAB33",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 8,
-          elevation: 3,
-        }}
-      >
+    <View style={s.headerRow}>
+      <Touchable onPress={onBack} style={s.backBtn}>
         <icons.arrow_back width={20} height={20} fill="#1A1C1E" />
       </Touchable>
-      <Text
-        style={{
-          fontSize: moderateScale(18),
-          fontWeight: "700",
-          color: "#1A1C1E",
-        }}
-      >
-        {title}
-      </Text>
-      <View style={{ width: 44 }} />
+      <Text style={s.title}>{title}</Text>
+      <View style={s.spacer} />
     </View>
   );
 };

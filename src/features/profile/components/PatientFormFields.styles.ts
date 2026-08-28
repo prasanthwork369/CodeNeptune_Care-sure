@@ -1,0 +1,132 @@
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  fieldWrap: {
+    marginBottom: exactScale(16),
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: exactScale(8),
+  },
+  label: {
+    fontSize: moderateScale(14),
+    fontWeight: "700",
+    color: "#222222",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+    borderRadius: exactScale(12),
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(14),
+    fontSize: moderateScale(14),
+    fontWeight: "500",
+    color: "#1A1C1E",
+    backgroundColor: "#fff",
+    height: exactScale(52),
+  },
+  phoneInputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+    borderRadius: exactScale(12),
+    backgroundColor: "#fff",
+    paddingHorizontal: exactScale(16),
+    height: exactScale(52),
+  },
+  phonePrefix: {
+    fontSize: moderateScale(14),
+    fontWeight: "600",
+    color: "#222222",
+    marginRight: exactScale(8),
+  },
+  phoneDivider: {
+    width: 1,
+    height: exactScale(20),
+    backgroundColor: "#919EAB33",
+    marginRight: exactScale(12),
+  },
+  phoneInput: {
+    flex: 1,
+    fontSize: moderateScale(14),
+    fontWeight: "500",
+    color: "#1A1C1E",
+    paddingVertical: exactScale(14),
+  },
+  datePickerBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+    borderRadius: exactScale(12),
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(14),
+    backgroundColor: "#fff",
+    height: exactScale(52),
+  },
+  dateText: {
+    fontSize: moderateScale(14),
+    fontWeight: "500",
+    color: "#1A1C1E",
+  },
+  datePlaceholder: {
+    fontSize: moderateScale(14),
+    fontWeight: "500",
+    color: "#919EAB80",
+  },
+  chipGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: exactScale(8),
+  },
+  chip: {
+    paddingHorizontal: exactScale(16),
+    paddingVertical: exactScale(10),
+    borderRadius: exactScale(10),
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+    backgroundColor: "#fff",
+  },
+  chipSelected: {
+    borderColor: "#0F7635",
+    backgroundColor: "#F0FDF4",
+  },
+  chipText: {
+    fontSize: moderateScale(13),
+    fontWeight: "500",
+    color: "#637381",
+  },
+  chipTextSelected: {
+    fontWeight: "700",
+    color: "#0F7635",
+  },
+  genderChip: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: exactScale(6),
+    paddingVertical: exactScale(12),
+    paddingHorizontal: exactScale(8),
+    borderRadius: exactScale(10),
+    borderWidth: 1,
+    borderColor: "#919EAB33",
+    backgroundColor: "#fff",
+  },
+  genderChipSelected: {
+    borderColor: "#0F7635",
+    backgroundColor: "#F0FDF4",
+  },
+  errorText: {
+    color: "#EF4444",
+    fontSize: moderateScale(12),
+    marginTop: exactScale(4),
+  },
+  otherInputWrap: {
+    marginTop: exactScale(10),
+  },
+});

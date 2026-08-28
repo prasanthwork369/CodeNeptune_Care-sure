@@ -1,0 +1,68 @@
+import { exactScale } from "@/src/utils/exactScale";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  blurWrap: {
+    overflow: "hidden",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: exactScale(10),
+    paddingBottom: exactScale(14),
+    paddingHorizontal: exactScale(16),
+    backgroundColor: "#FFFFFF",
+  },
+  logoBox: {
+    width: exactScale(60),
+    height: exactScale(60),
+    borderRadius: exactScale(10),
+    borderWidth: 1.05,
+    borderColor: "#919EAB33",
+    paddingVertical: exactScale(10),
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#919EAB0A",
+    shadowOffset: { width: 0, height: exactScale(10) },
+    shadowRadius: 20,
+    shadowOpacity: 1,
+    elevation: 1,
+  },
+  searchTouchable: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    height: exactScale(60),
+    borderRadius: exactScale(10),
+    borderWidth: 1.05,
+    borderColor: "#919EAB33",
+    paddingHorizontal: exactScale(10),
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#919EAB0A",
+    shadowOffset: { width: 0, height: exactScale(10) },
+    shadowRadius: 20,
+    shadowOpacity: 1,
+    elevation: 1,
+  },
+  searchPlaceholderText: {
+    flex: 1,
+    marginLeft: exactScale(8),
+    fontSize: exactScale(14),
+    fontFamily: "Inter-Medium",
+    fontWeight: "500",
+    color: "#6A6A6A",
+  },
+  uploadSlot: {
+    borderLeftWidth: 1,
+    borderLeftColor: "#919EAB33",
+    paddingLeft: exactScale(12),
+    marginLeft: exactScale(4),
+  },
+  gradientOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: exactScale(30),
+  },
+});

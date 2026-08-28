@@ -21,10 +21,8 @@ import {
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
-
-// Diameter of the prev/next page buttons; also used to centre them vertically.
-const PAGE_BTN = 40;
+import { exactScale } from "@/src/utils/exactScale";
+import { PAGE_BTN, styles as s } from "./PrescriptionViewerLayout.styles";
 
 export const PrescriptionViewerLayout: React.FC = () => {
   const router = useNav();
@@ -145,10 +143,10 @@ export const PrescriptionViewerLayout: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="Prescription" />
 
-      <View className="flex-1" onLayout={onContainerLayout}>
+      <View style={s.container} onLayout={onContainerLayout}>
         {cannotLoadPage && (
           <NoInternetState onRetry={() => setReloadKey((n) => n + 1)} />
         )}
@@ -158,22 +156,24 @@ export const PrescriptionViewerLayout: React.FC = () => {
             <PdfViewer
               key={reloadKey}
               uri={currentUrl}
-              style={{
-                width,
-                height: containerHeight,
-                backgroundColor: "#F5F6FB",
-              }}
+              style={[
+                s.pdfViewer,
+                {
+                  width,
+                  height: containerHeight,
+                },
+              ]}
             />
           ) : (
             <GestureDetector gesture={composedGesture}>
               <Animated.View
-                style={{
-                  width,
-                  height: containerHeight,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
+                style={[
+                  s.imageViewer,
+                  {
+                    width,
+                    height: containerHeight,
+                  },
+                ]}
               >
                 <AnimatedImage
                   key={reloadKey}
@@ -191,18 +191,14 @@ export const PrescriptionViewerLayout: React.FC = () => {
               activeOpacity={0.8}
               disabled={pageIndex === 0}
               onPress={() => goToPage(pageIndex - 1)}
-              className="absolute items-center justify-center"
-              style={{
-                left: 16,
-                top: containerHeight / 2 - PAGE_BTN / 2,
-                width: PAGE_BTN,
-                height: PAGE_BTN,
-                borderRadius: PAGE_BTN / 2,
-                backgroundColor: "#FFFFFF",
-                opacity: pageIndex === 0 ? 0.35 : 1,
-                borderWidth: 1,
-                borderColor: "#919EAB33",
-              }}
+              style={[
+                s.pageBtn,
+                s.pageBtnLeft,
+                {
+                  top: containerHeight / 2 - PAGE_BTN / 2,
+                  opacity: pageIndex === 0 ? 0.35 : 1,
+                },
+              ]}
             >
               <icons.arrow_back_ios width={14} height={14} fill="#222222" />
             </Touchable>
@@ -211,36 +207,27 @@ export const PrescriptionViewerLayout: React.FC = () => {
               activeOpacity={0.8}
               disabled={pageIndex === urls.length - 1}
               onPress={() => goToPage(pageIndex + 1)}
-              className="absolute items-center justify-center"
-              style={{
-                right: 16,
-                top: containerHeight / 2 - PAGE_BTN / 2,
-                width: PAGE_BTN,
-                height: PAGE_BTN,
-                borderRadius: PAGE_BTN / 2,
-                backgroundColor: "#FFFFFF",
-                opacity: pageIndex === urls.length - 1 ? 0.35 : 1,
-                borderWidth: 1,
-                borderColor: "#919EAB33",
-              }}
+              style={[
+                s.pageBtn,
+                s.pageBtnRight,
+                {
+                  top: containerHeight / 2 - PAGE_BTN / 2,
+                  opacity: pageIndex === urls.length - 1 ? 0.35 : 1,
+                },
+              ]}
             >
               <icons.arrow_forward_ios width={14} height={14} fill="#222222" />
             </Touchable>
 
             <View
-              className="absolute self-center"
-              style={{
-                bottom: hasFooter ? 16 : adjustedBottom + 16,
-                backgroundColor: "rgba(0,0,0,0.65)",
-                borderRadius: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 5,
-              }}
+              style={[
+                s.pageCounterBadge,
+                {
+                  bottom: hasFooter ? exactScale(16) : adjustedBottom + exactScale(16),
+                },
+              ]}
             >
-              <Text
-                className="font-inter-semibold text-white"
-                style={{ fontSize: moderateScale(12) }}
-              >
+              <Text style={s.pageCounterText}>
                 {pageIndex + 1} / {urls.length}
               </Text>
             </View>
@@ -251,8 +238,10 @@ export const PrescriptionViewerLayout: React.FC = () => {
       {/* Both footer actions lead into server flows, so they go with the page. */}
       {cannotLoadPage ? null : showVerifiedCard ? (
         <View
-          style={{ paddingBottom: adjustedBottom + 12 }}
-          className="px-5 pt-4 bg-white border-t border-[#EEEFF1]"
+          style={[
+            s.footerVerifiedContainer,
+            { paddingBottom: adjustedBottom + exactScale(12) },
+          ]}
         >
           <Touchable
             activeOpacity={0.85}
@@ -265,22 +254,16 @@ export const PrescriptionViewerLayout: React.FC = () => {
                 },
               });
             }}
-            className="flex-row items-center bg-[#F1FEF8] border border-[#0F763533] rounded-xl p-4"
+            style={s.verifiedCard}
           >
-            <View className="mr-3 bg-[#D1F2E1] rounded-full p-2 items-center justify-center">
+            <View style={s.verifiedIconBox}>
               <icons.check_circle width={20} height={20} fill="#0F7635" />
             </View>
-            <View className="flex-1 justify-center">
-              <Text
-                className="font-inter-bold text-[#111827]"
-                style={{ fontSize: moderateScale(14) }}
-              >
+            <View style={s.verifiedTextCol}>
+              <Text style={s.verifiedTitle}>
                 Prescription Verified
               </Text>
-              <Text
-                className="font-inter-medium text-[#6A6A6A] mt-0.5"
-                style={{ fontSize: moderateScale(12) }}
-              >
+              <Text style={s.verifiedSubtitle}>
                 Your medicines are ready to order
               </Text>
             </View>
@@ -290,18 +273,17 @@ export const PrescriptionViewerLayout: React.FC = () => {
       ) : (
         showSelect && (
           <View
-            className="flex-row gap-3 px-5 pt-3 bg-white border-t border-[#EEEFF1]"
-            style={{ paddingBottom: adjustedBottom + 12 }}
+            style={[
+              s.footerSelectContainer,
+              { paddingBottom: adjustedBottom + exactScale(12) },
+            ]}
           >
             <Touchable
               onPress={handleSelect}
               activeOpacity={0.85}
-              className="flex-1 items-center justify-center py-3.5 rounded-lg bg-brand-primary"
+              style={s.selectBtn}
             >
-              <Text
-                className="font-inter-semibold text-white"
-                style={{ fontSize: moderateScale(14) }}
-              >
+              <Text style={s.selectBtnText}>
                 Select
               </Text>
             </Touchable>

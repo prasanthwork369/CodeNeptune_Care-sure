@@ -111,8 +111,8 @@ export interface ApiProductDetail {
     price: string;
     mrp?: string;
     discountPercentage: number;
-    manufacturer: string | { name: string; [key: string]: any } | null;
-    brand?: { name: string; [key: string]: any } | null;
+    manufacturer: string | { name: string; [key: string]: unknown } | null;
+    brand?: { name: string; [key: string]: unknown } | null;
     thumbnailUrl: string;
   } | null;
 }

@@ -263,4 +263,36 @@ export const styles = StyleSheet.create({
   loadingIndicatorInline: {
     marginLeft: exactScale(4),
   },
+  // Section heading typography
+  historyTitle: {
+    fontSize: moderateScale(16),
+    fontFamily: "Inter-ExtraBold",
+    fontWeight: "800",
+    color: "#111827",
+  },
+  viewAllText: {
+    fontSize: moderateScale(14),
+    fontFamily: "Inter-Bold",
+    fontWeight: "700",
+    color: "#FF8A00",
+  },
+  noTransactionsText: {
+    fontSize: moderateScale(14),
+    fontFamily: "Inter-Regular",
+    color: "#6A6A6A",
+    textAlign: "center",
+    paddingVertical: exactScale(24),
+  },
+  txTitleText: {
+    fontSize: moderateScale(14),
+    fontFamily: "Inter-Medium",
+    fontWeight: "500",
+    color: "#111827",
+  },
+  txDateSubtitle: {
+    fontSize: moderateScale(12),
+    fontFamily: "Inter-Regular",
+    color: "#6A6A6A",
+    marginTop: exactScale(2),
+  },
 });

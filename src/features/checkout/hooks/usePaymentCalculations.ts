@@ -259,7 +259,7 @@ export function usePaymentCalculations() {
             imageUrl: orderItems[0]?.medicineSnapshot?.image,
             itemCount: orderItems.length,
           })
-          .catch((e: any) => {
+          .catch((e: unknown) => {
             if (__DEV__) logger.debug("[OrderNotification] failed:", e);
           });
       }

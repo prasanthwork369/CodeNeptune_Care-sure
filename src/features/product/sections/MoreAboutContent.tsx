@@ -1,12 +1,13 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { SECTION_DESIGN_TYPE } from "@/src/constants/product-section-design";
 import { ProductSection } from "@/src/features/product/types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
+import { exactScale } from "@/src/utils/exactScale";
 import { htmlToPlainText } from "@/src/utils/productSections";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { ProductSectionView } from "./moreinfo/ProductSectionView";
+import { styles as s } from "./product-sections.styles";
 
 const DESCRIPTION_PREVIEW_HEIGHT = exactScale(220);
 const DESCRIPTION_PREVIEW_CHARACTERS = 360;
@@ -30,15 +31,9 @@ export const MoreAboutContent: React.FC<MoreAboutContentProps> = ({
       descriptionCharacters > DESCRIPTION_PREVIEW_CHARACTERS);
 
   return (
-    <View className="mx-2 mb-4 overflow-hidden rounded-[12px] bg-white">
-      <View className="px-2 pb-5 pt-4">
-        <Text
-          className="mb-3 font-inter-bold text-brand-text"
-          style={{
-            fontSize: moderateScale(15),
-            lineHeight: moderateScale(20),
-          }}
-        >
+    <View style={s.moreAboutContentCard}>
+      <View style={s.moreAboutContentInner}>
+        <Text style={s.moreAboutSectionTitle}>
           {section.title}
         </Text>
 
@@ -79,12 +74,9 @@ export const MoreAboutContent: React.FC<MoreAboutContentProps> = ({
             onPress={() => setExpanded((current) => !current)}
             accessibilityRole="button"
             accessibilityState={{ expanded }}
-            className="mt-3 self-start px-2 py-1"
+            style={s.viewMoreToggleBtn}
           >
-            <Text
-              className="font-inter-bold text-brand-primary"
-              style={{ fontSize: moderateScale(13) }}
-            >
+            <Text style={s.viewMoreToggleText}>
               {expanded ? "View Less" : "View More"}
             </Text>
           </Touchable>
@@ -97,11 +89,7 @@ export const MoreAboutContent: React.FC<MoreAboutContentProps> = ({
 export const MoreAboutHeading: React.FC<{ medicineName: string }> = ({
   medicineName,
 }) => (
-  <Text
-    className="mx-4 mb-4 mt-6 font-inter-bold text-brand-text"
-    style={{ fontSize: moderateScale(17) }}
-    accessibilityRole="header"
-  >
-    More About {medicineName}
+  <Text style={s.moreAboutHeading}>
+    More about {medicineName}
   </Text>
 );

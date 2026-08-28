@@ -1,4 +1,5 @@
 import { Touchable } from "@/src/components/ui/Touchable";
+import { AUTH_CONFIG } from "@/src/features/auth/constants/auth.constants";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -12,12 +13,9 @@ import Animated, {
 import { OtpFormProps } from "../types";
 import { styles as s } from "./OtpForm.styles";
 
-const OTP_LENGTH = 6;
-// One over the code length, or replacing a digit in a full code fires no change event.
+const { OTP_LENGTH } = AUTH_CONFIG;
 const INPUT_MAX_LENGTH = OTP_LENGTH + 1;
 
-// Blinking caret shown in the active empty box — the real TextInput is
-// invisible, so this stands in for its cursor.
 const Caret = () => {
   const opacity = useSharedValue(1);
   useEffect(() => {
@@ -48,13 +46,8 @@ export const OtpForm: React.FC<OtpFormProps> = ({
   inputRef,
 }) => {
   const [focused, setFocused] = useState(false);
-  // Only paint error-red borders while there are digits to flag. After a
-  // wrong code clears the boxes, the field is empty — red on empty boxes
-  // hides the active highlight and looks broken. The error message below
-  // still shows; the boxes go back to a clean active-green state to retype.
   const showError = !!(otpError || error) && slots.some(Boolean);
 
-  // Stable, or the native filter re-applies on every keystroke.
   const setInputRef = useCallback(
     (el: TextInput | null) => {
       applyDigitsOnlyFilter(el);
@@ -70,12 +63,6 @@ export const OtpForm: React.FC<OtpFormProps> = ({
 
   return (
     <View>
-      {/* Plain View — NOT a Pressable. A parent Pressable competes with the
-          per-box Pressables for the Android touch responder and usually
-          wins, so individual box taps never fired. Each box is now the sole
-          tap target. The invisible TextInput sits behind them
-          (pointerEvents none) purely to hold the value and drive the OS
-          keyboard / SMS autofill. */}
       <View style={s.boxRow}>
         {[...Array(OTP_LENGTH)].map((_, index) => {
           const isActive = focused && index === activeIndex;

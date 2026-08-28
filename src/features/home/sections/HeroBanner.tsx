@@ -33,7 +33,6 @@ const HERO_GRADIENT = ["#CFE9A8", "#DEF0BF", "#ECF6D6", "#F6FBE8"] as const;
 const GRADIENT_START = { x: 0.5, y: 0 } as const;
 const GRADIENT_END = { x: 0.5, y: 1 } as const;
 
-// TEMP DEBUG — remove once the avatar-disappears cause is confirmed.
 const debugLog = (...args: unknown[]) => {
   if (__DEV__) console.log(`[HeroBanner ${new Date().toISOString()}]`, ...args);
 };
@@ -53,8 +52,6 @@ function useSlideUp(delayMs: number, debugLabel?: string) {
     );
   }, [delayMs, opacity, translateY]);
 
-  // TEMP DEBUG — proves whether the avatar's own opacity/translateY ever
-  // gets reset (e.g. by a remount replaying useSlideUp's mount effect).
   useAnimatedReaction(
     () => ({ o: opacity.value, t: translateY.value }),
     (cur, prev) => {
@@ -78,8 +75,6 @@ interface HeroBannerProps {
   isLoading?: boolean;
 }
 
-// TEMP DEBUG — distinguishes a genuine remount (new id) from a re-render
-// of the same instance in the logs below.
 let heroInstanceCounter = 0;
 
 export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
@@ -99,21 +94,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
     const dynamicBadgeIconWidth = exactScale(16.6) * scale;
     const dynamicBadgeIconHeight = exactScale(20.5) * scale;
 
-    // Hooks must be called before any early return
     const leftAnim = useSlideUp(200, "left");
     const rightAnim = useSlideUp(400, "avatar");
 
-    // FlashList's initial layout pass can tear down and remount the first
-    // cell before it settles, cancelling this Image mid-load — and
-    // expo-image never retries a cancelled/failed load on its own. Reload
-    // once (bounded) on error so a cold-start hiccup doesn't leave the
-    // avatar blank until the user pulls to refresh.
-    //
-    // Gated on avatarLoaded: expo-image can fire onError for a background
-    // revalidation blip on a URL that already loaded and is still on
-    // screen. Remounting (key bump) in that case would tear down a
-    // perfectly good image and show blank — so only retry a load that
-    // never succeeded in the first place.
     const [avatarReloadKey, setAvatarReloadKey] = useState(0);
     const avatarRetries = useRef(0);
     const avatarLoaded = useRef(false);
@@ -155,16 +138,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
       setAvatarReloadKey((k) => k + 1);
     };
 
-    // A system dialog (location/notification permission prompt) pauses and
-    // resumes the host Activity — on some OEM skins the absolutely-positioned,
-    // layered avatar Image doesn't get redrawn on resume even though nothing
-    // in JS changed, leaving it blank with no error/data event to react to.
-    // Force one remount on the first real resume after backgrounding.
-    //
-    // Only when the avatar hasn't actually loaded yet: the same "active"
-    // transition also fires for in-app permission prompts (see
-    // useHomeOnboarding) where the image is already fine on screen —
-    // remounting it there is what was blanking it.
     useEffect(() => {
       let skippedInitial = false;
       const sub = AppState.addEventListener("change", (state) => {
@@ -184,10 +157,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
       return () => sub.remove();
     }, [instanceId]);
 
-    // Catches the case the mount/unmount log can't: HeroBanner itself stays
-    // mounted but flips back to the skeleton branch, swapping the real
-    // Image out for a shimmer placeholder — that looks like the avatar
-    // "disappearing" with no unmount ever logged.
     debugLog(
       `#${instanceId} render branch ->`,
       isLoading ? "skeleton" : !content ? "skeleton(no content)" : "loaded",
@@ -201,18 +170,15 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
 
     if (isLoading || !content) {
       return (
-        // Same container and geometry as the loaded card, so nothing shifts.
         <View style={[styles.container, dStyles.containerHeight]}>
           <LinearGradient
             colors={HERO_GRADIENT}
             start={GRADIENT_START}
             end={GRADIENT_END}
-            style={styles.gradientCard}
-            className="flex-row items-stretch"
+            style={[styles.gradientCard, { flexDirection: "row", alignItems: "stretch" }]}
           >
             <View
-              style={dStyles.textBlock}
-              className="flex-[1.2] justify-start"
+              style={[dStyles.textBlock, { flex: 1.2, justifyContent: "flex-start" }]}
             >
               <Skeleton
                 width="72%"
@@ -240,8 +206,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
             </View>
           </LinearGradient>
 
-          {/* Person placeholder — inset within the real image's box so it hints
-            at the figure instead of filling the card with a slab. */}
           <View
             style={[styles.avatar, dStyles.avatar, styles.skeletonAvatarBox]}
           >
@@ -269,35 +233,28 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
           colors={HERO_GRADIENT}
           start={GRADIENT_START}
           end={GRADIENT_END}
-          style={styles.gradientCard}
-          className="flex-row items-stretch"
+          style={[styles.gradientCard, { flexDirection: "row", alignItems: "stretch" }]}
         >
           {/* ── Left: Text block ── */}
           <Animated.View
-            style={[leftAnim, dStyles.textBlock]}
-            className="flex-[1.2] justify-start"
+            style={[leftAnim, dStyles.textBlock, { flex: 1.2, justifyContent: "flex-start" }]}
           >
             <View>
               <View
-                className="flex-row flex-wrap items-center"
-                style={{ minWidth: 0 }}
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  minWidth: 0,
+                }}
               >
-                <Text
-                  style={[styles.titleText, dStyles.titleText]}
-                  className="text-brand-text"
-                >
+                <Text style={[styles.titleText, dStyles.titleText]}>
                   {title}
                   {title ? " " : ""}
                 </Text>
-                {/* Kept together, no-wrap: subtitle reads as one phrase with
-                    the cycling word ("for Your Medicine") and must never
-                    split onto separate lines from it. */}
-                <View className="flex-row items-center">
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
                   {subtitle ? (
-                    <Text
-                      style={[styles.titleText, dStyles.titleText]}
-                      className="text-brand-text"
-                    >
+                    <Text style={[styles.titleText, dStyles.titleText]}>
                       {subtitle}{" "}
                     </Text>
                   ) : null}
@@ -308,8 +265,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
                       style={StyleSheet.flatten([
                         styles.titleText,
                         dStyles.titleText,
+                        { color: "#0F7635" },
                       ])}
-                      className="text-brand-primary"
                     />
                   )}
                 </View>
@@ -332,7 +289,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = React.memo(
           </Animated.View>
         </LinearGradient>
 
-        {/* ── Right: Person image (positioned absolute, sibling to allow overflow) ── */}
+        {/* ── Right: Person image (positioned absolute) ── */}
         <Animated.View style={[styles.avatar, dStyles.avatar, rightAnim]}>
           <Image
             key={avatarReloadKey}

@@ -12,6 +12,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { styles as s } from "./StickySearchHeader.styles";
 
 interface StickySearchHeaderProps {
   visible: SharedValue<number>;
@@ -20,12 +21,6 @@ interface StickySearchHeaderProps {
   onPressUpload: () => void;
 }
 
-/**
- * Floating logo + search bar shown once the inline hero search bar has
- * scrolled past the top (see useStickySearchBar). Sits above the
- * ScrollView so it can use a real BlurView backdrop, which a
- * stickyHeaderIndices section can't host cleanly.
- */
 export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
   ({ visible, onPressSearch, onPressInSearch, onPressUpload }) => {
     const insets = useSafeAreaInsets();
@@ -62,9 +57,6 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
       zIndex: 110,
     };
 
-    // No blurTarget is wired up, so Android already falls back to a flat
-    // tint here rather than a real per-frame blur — still worth detaching
-    // while hidden, since it stays a mounted native view either way.
     if (!rendered) {
       return (
         <Animated.View
@@ -83,37 +75,15 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
           intensity={10}
           tint="systemUltraThinMaterialLight"
           blurMethod="none"
-          style={{ overflow: "hidden" }}
+          style={s.blurWrap}
         >
           <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: exactScale(10),
-              paddingTop: insets.top + exactScale(5),
-              paddingBottom: exactScale(14),
-              paddingHorizontal: exactScale(16),
-              backgroundColor: "#FFFFFF",
-            }}
+            style={[
+              s.headerRow,
+              { paddingTop: insets.top + exactScale(5) },
+            ]}
           >
-            <View
-              style={{
-                width: exactScale(60),
-                height: exactScale(60),
-                borderRadius: exactScale(10),
-                borderWidth: 1.05,
-                borderColor: "#919EAB33",
-                paddingVertical: exactScale(10),
-                backgroundColor: "#FFFFFF",
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: "#919EAB0A",
-                shadowOffset: { width: 0, height: exactScale(10) },
-                shadowRadius: 20,
-                shadowOpacity: 1,
-                elevation: 1,
-              }}
-            >
+            <View style={s.logoBox}>
               <icons.logo width={exactScale(32)} height={exactScale(32)} />
             </View>
 
@@ -121,39 +91,18 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
               onPress={onPressSearch}
               onPressIn={onPressInSearch}
               activeOpacity={1}
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                height: exactScale(60),
-                borderRadius: exactScale(10),
-                borderWidth: 1.05,
-                borderColor: "#919EAB33",
-                paddingHorizontal: exactScale(10),
-                backgroundColor: "#FFFFFF",
-                shadowColor: "#919EAB0A",
-                shadowOffset: { width: 0, height: exactScale(10) },
-                shadowRadius: 20,
-                shadowOpacity: 1,
-                elevation: 1,
-              }}
+              style={s.searchTouchable}
             >
               <icons.search width={exactScale(18)} height={exactScale(18)} />
               <Text
                 numberOfLines={1}
-                style={{
-                  flex: 1,
-                  marginLeft: exactScale(8),
-                  fontSize: exactScale(14),
-                  fontWeight: "500",
-                  color: "#6A6A6A",
-                }}
+                style={s.searchPlaceholderText}
               >
                 Search affordable substitute
               </Text>
               <Touchable
                 onPress={onPressUpload}
-                className="border-l border-[#919EAB33] pl-3 ml-1"
+                style={s.uploadSlot}
               >
                 <icons.uploadActive
                   width={exactScale(22)}
@@ -164,7 +113,7 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
           </View>
         </BlurView>
 
-        {/* Smoothstep alpha ramp — a linear ramp with few stops bands visibly on Android */}
+        {/* Smoothstep alpha ramp */}
         <LinearGradient
           colors={[
             "rgba(255,255,255,1)",
@@ -177,13 +126,10 @@ export const StickySearchHeader: React.FC<StickySearchHeaderProps> = React.memo(
             "rgba(255,255,255,0)",
           ]}
           locations={[0, 0.47, 0.55, 0.64, 0.73, 0.82, 0.91, 1]}
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: searchBarBottom,
-            height: exactScale(30),
-          }}
+          style={[
+            s.gradientOverlay,
+            { top: searchBarBottom },
+          ]}
           pointerEvents="none"
         />
       </Animated.View>

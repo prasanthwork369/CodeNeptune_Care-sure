@@ -34,7 +34,6 @@ interface AuthScreenShellProps {
   footer?: React.ReactNode;
 }
 
-// Crash guard only — see backgroundStyle below.
 const MIN_BACKGROUND_HEIGHT = verticalScale(80);
 
 export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
@@ -49,18 +48,9 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
   const backgroundHeight = screenHeight * 0.6;
   const [keyboardHeight, setKeyboardHeight] = React.useState(0);
 
-  // Real-time native tracking (useReanimatedKeyboardAnimation) turned out to
-  // report no movement at all in this app's setup — confirmed by removing
-  // the correction layer and finding the panel didn't move whatsoever. So we
-  // drive the animation ourselves: keyboardWillShow/Hide fire BEFORE the
-  // native transition starts and report both the target height and the
-  // native animation's own duration, so our withTiming runs concurrently
-  // with — and matches the length of — the real keyboard transition.
   const kbHeight = useSharedValue(0);
-  // Target height of the in-flight animation — kbHeight.value mid-animation
-  // reads the interpolated value, so the "did" listeners compare against
-  // this ref to know whether a correction is actually needed.
   const kbTarget = React.useRef(0);
+
   React.useEffect(() => {
     const animateTo = (height: number, duration: number) => {
       kbTarget.current = height;
@@ -77,10 +67,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
       KeyboardEvents.addListener("keyboardWillHide", (e) =>
         animateTo(0, e.duration || 250),
       ),
-      // Fallback + correction: some OEM keyboards (Samsung, MIUI/Poco) skip
-      // the "will" events entirely, or settle taller than announced once
-      // their accessory toolbar appears — without this the panel stays
-      // pinned at the bottom and the keyboard covers the inputs.
+      // Fallback correction for OEM keyboards that omit will events or resize with accessory bars
       KeyboardEvents.addListener("keyboardDidShow", (e) => {
         if (Math.abs(kbTarget.current - e.height) > 1) animateTo(e.height, 120);
       }),
@@ -96,31 +83,16 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     transform: [{ translateY: -Math.max(0, kbHeight.value - adjustedBottom) }],
   }));
 
-  // Measured, not guessed: the sticky block's resting (pre-transform) top Y,
-  // relative to `container` — which starts flush with this screen's own top,
-  // so it's effectively the panel's resting Y on screen. A fixed height/floor
-  // formula here can only match the panel's *actual* position by coincidence
-  // (it did, briefly, at exactly one pair of magic numbers, and broke the
-  // instant OTP's longer content or deeper keyboard offset shifted the
-  // panel's real position without shifting the guess the same amount).
-  // Bridged into a shared value via an effect (not mutated directly in the
-  // onLayout handler) — React Compiler's immutability check only knows to
-  // skip analyzing useEffect bodies, same as kbHeight above.
   const [panelRestY, setPanelRestY] = React.useState(backgroundHeight);
   const panelTopY = useSharedValue(backgroundHeight);
   React.useEffect(() => {
     panelTopY.value = panelRestY;
   }, [panelRestY, panelTopY]);
+
   const handleStickyLayout = (e: LayoutChangeEvent) => {
     setPanelRestY(e.nativeEvent.layout.y);
   };
 
-  // Keep the medicine background's bottom fade attached to the form edge.
-  // The form rises with the keyboard; without resizing this layer, the form
-  // covers the fade and leaves a hard transition on both Login and OTP.
-  // MIN_BACKGROUND_HEIGHT is only a crash guard for before the first
-  // onLayout measurement lands (or a pathological content/keyboard
-  // combination) — panelTopY is what actually drives this now.
   const backgroundStyle = useAnimatedStyle(() => ({
     height: Math.max(
       MIN_BACKGROUND_HEIGHT,
@@ -128,7 +100,6 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
     ),
   }));
 
-  // iOS lifts by nearly the full keyboard, so the bottom inset would double as a gap.
   const footerPaddingBottom =
     Platform.OS === "ios" && keyboardHeight > 0
       ? verticalScale(16)
@@ -163,6 +134,7 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
       useNativeDriver: true,
     }).start();
   };
+
   const handleSkipPressOut = () => {
     RNAnimated.spring(skipScale, {
       toValue: 1,
@@ -174,12 +146,12 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
 
   return (
     <View style={styles.root}>
-      {/* Background illustration — fixed behind everything */}
+      {/* Background illustration */}
       <Animated.View style={[styles.bgWrapper, backgroundStyle]}>
         <AuthMedicineBackground />
       </Animated.View>
 
-      {/* Skip button — fixed top-right */}
+      {/* Skip button */}
       <RNAnimated.View
         style={[
           styles.skipWrapper,
@@ -214,10 +186,10 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
       </RNAnimated.View>
 
       <View style={styles.container}>
-        {/* Tap area above the sticky block — dismiss keyboard */}
+        {/* Dismiss keyboard on tap outside */}
         <Pressable onPress={Keyboard.dismiss} style={styles.dismissTapArea} />
 
-        {/* Entire bottom block (panel + footer incl. policy links) rides as one unit, translating in sync with the keyboard */}
+        {/* Floating panel + footer riding with keyboard */}
         <Animated.View
           style={[stickyStyle, { maxHeight: availableContentHeight }]}
           onLayout={handleStickyLayout}
@@ -229,7 +201,6 @@ export const AuthScreenShell: React.FC<AuthScreenShellProps> = ({
             keyboardDismissMode="on-drag"
             contentContainerStyle={styles.scrollContent}
           >
-            {/* White panel */}
             <View
               style={[
                 styles.panel,

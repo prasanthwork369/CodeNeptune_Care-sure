@@ -3,40 +3,18 @@ import { icons } from "@/src/constants/icons";
 import { FrequentSubstitutes } from "@/src/features/home/sections";
 import { useLastMinuteBuy } from "@/src/features/product/hooks/useFeaturedMedicines";
 import { ApiSearchHistoryItem } from "@/src/features/search/types";
-import { moderateScale, verticalScale } from "@/src/utils/exactScale";
+import { verticalScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
-import { searchRecentStyles as s } from "../search.styles";
+import { styles as s } from "./SearchRecentSection.styles";
 
 const DeleteBadge = ({ onPress }: { onPress: () => void }) => (
   <Touchable
     onPress={onPress}
     hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-    style={{
-      position: "absolute",
-      top: 3,
-      right: 1,
-      width: 14,
-      height: 14,
-      borderRadius: 7,
-      backgroundColor: "#FFE4E4",
-      borderWidth: 1,
-      borderColor: "#FFBDBD",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 10,
-    }}
+    style={s.deleteBadge}
   >
-    <Text
-      style={{
-        fontSize: moderateScale(7),
-        color: "#E53E3E",
-        fontWeight: "700",
-        lineHeight: moderateScale(9),
-      }}
-    >
-      ✕
-    </Text>
+    <Text style={s.deleteBadgeText}>✕</Text>
   </Touchable>
 );
 
@@ -70,17 +48,12 @@ export const SearchRecentSection = React.memo(
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={s.scrollContent}
       >
         {history.length > 0 && (
-          <View className="px-4 pt-5">
-            <View className="flex-row justify-between items-center mb-3">
-              <Text
-                style={s.sectionTitle}
-                className="font-inter-bold text-brand-text"
-              >
-                Recent Searches
-              </Text>
+          <View style={s.historySectionWrap}>
+            <View style={s.sectionHeaderRow}>
+              <Text style={s.sectionTitle}>Recent Searches</Text>
               <Touchable
                 onPress={onClear}
                 disabled={isClearing}
@@ -89,36 +62,19 @@ export const SearchRecentSection = React.memo(
                 {isClearing ? (
                   <ActivityIndicator size="small" color="#0F7635" />
                 ) : (
-                  <Text
-                    style={s.clearBtn}
-                    className="font-inter-semibold text-brand-primary"
-                  >
-                    Clear All
-                  </Text>
+                  <Text style={s.clearBtn}>Clear All</Text>
                 )}
               </Touchable>
             </View>
-            <View className="flex-row flex-wrap gap-2">
+            <View style={s.chipRow}>
               {history.map((item) => (
-                <View
-                  key={item.id}
-                  style={{
-                    position: "relative",
-                    paddingTop: 8,
-                    paddingRight: 8,
-                  }}
-                >
+                <View key={item.id} style={s.chipWrapper}>
                   <Touchable
                     onPress={() => onTermPress(item.query)}
-                    className="flex-row items-center bg-white border border-[#919EAB33] rounded-sm px-3 py-1.5 gap-x-1.5"
+                    style={s.chipTouchable}
                   >
                     <icons.resent width={14} height={14} fill="#6A6A6A" />
-                    <Text
-                      style={s.chipText}
-                      className="font-inter-medium text-brand-text"
-                    >
-                      {item.query}
-                    </Text>
+                    <Text style={s.chipText}>{item.query}</Text>
                   </Touchable>
                   <DeleteBadge onPress={() => onDeleteHistoryItem(item.id)} />
                 </View>
@@ -128,36 +84,19 @@ export const SearchRecentSection = React.memo(
         )}
 
         {visibleTrending.length > 0 && (
-          <View className="px-4 pt-5">
-            <View className="flex-row items-center gap-x-1.5 mb-3">
-              <Text
-                style={s.sectionTitle}
-                className="font-inter-bold text-brand-text"
-              >
-                Trending Search
-              </Text>
+          <View style={s.historySectionWrap}>
+            <View style={s.sectionHeaderRow}>
+              <Text style={s.sectionTitle}>Trending Search</Text>
             </View>
-            <View className="flex-row flex-wrap gap-2">
+            <View style={s.chipRow}>
               {visibleTrending.map((term) => (
-                <View
-                  key={term}
-                  style={{
-                    position: "relative",
-                    paddingTop: 8,
-                    paddingRight: 8,
-                  }}
-                >
+                <View key={term} style={s.chipWrapper}>
                   <Touchable
                     onPress={() => onTermPress(term)}
-                    className="flex-row items-center bg-white border border-[#919EAB33] rounded-sm px-3 py-1.5 gap-x-1.5"
+                    style={s.chipTouchable}
                   >
                     <icons.fire width={13} height={13} />
-                    <Text
-                      style={s.chipText}
-                      className="font-inter-medium text-brand-text"
-                    >
-                      {term}
-                    </Text>
+                    <Text style={s.chipText}>{term}</Text>
                   </Touchable>
                   <DeleteBadge
                     onPress={() =>
@@ -170,7 +109,7 @@ export const SearchRecentSection = React.memo(
           </View>
         )}
 
-        <View style={{ paddingTop: verticalScale(30) }}>
+        <View style={[s.frequentWrap, { paddingTop: verticalScale(30) }]}>
           {showFrequent && lastMinuteBuy.length > 0 && (
             <FrequentSubstitutes
               substitutes={lastMinuteBuy}

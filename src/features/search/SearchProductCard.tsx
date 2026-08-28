@@ -6,11 +6,8 @@ import { icons } from "@/src/constants/icons";
 import { useNav } from "@/src/hooks/useNav";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
-import { moderateScale } from "@/src/utils/exactScale";
-import {
-  cartCounterStyles as cc,
-  searchCardStyles as s,
-} from "./search.styles";
+import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./SearchProductCard.styles";
 
 interface SearchRowProps {
   data: {
@@ -25,13 +22,13 @@ interface SearchRowProps {
       name: string;
       brandName: string;
       description?: string;
-      price: number | null; // absent when the backend omits a price
+      price: number | null;
       status: string;
     };
     recommended: {
       name: string;
       manufacturer: string;
-      price: number | null; // absent when the backend omits a price
+      price: number | null;
       originalPrice: number | null;
       savings: number;
       description?: string;
@@ -40,9 +37,6 @@ interface SearchRowProps {
       unit?: string;
     };
   };
-  // Called right before navigating to Product Details — lets the search
-  // screen tear down its keyboard/suggestions state first, since this card
-  // pushes to its own route directly rather than through a results-list callback.
   onBeforeNavigate?: () => void;
 }
 
@@ -79,7 +73,6 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
       productId: data.recProductId || data.productId,
       name: data.recommended.name,
       slug: data.recSlug || data.slug,
-      // 0 when the backend sent no price — useCartActions blocks the add.
       price: data.recommended.price ?? 0,
       originalPrice: data.recommended.originalPrice ?? undefined,
       image: data.recommended.image,
@@ -99,122 +92,78 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
       activeOpacity={0.5}
       onPress={handleCardPress}
       onPressIn={handlePrefetch}
-      style={{ borderWidth: 1, borderColor: "#919EAB33" }}
-      className="w-full rounded-[12px] bg-white overflow-hidden mb-5"
+      style={s.cardRoot}
     >
       {/* Top Section: Split Comparison */}
-      <View className="flex-row w-full">
+      <View style={s.splitRow}>
         {/* Left Side (White Background) */}
-        <View className="flex-1 p-4">
-          <View className="mb-6">
-            <Text
-              style={s.name}
-              className="font-inter-semibold text-brand-text mb-1 leading-snug tracking-tight"
-            >
+        <View style={s.leftSide}>
+          <View style={s.titleCol}>
+            <Text style={s.name} numberOfLines={2}>
               {data.searched.name}
             </Text>
             {data.searched.description ? (
-              <Text
-                style={s.desc}
-                className="font-inter-medium text-brand-subtext mt-0.5"
-                numberOfLines={1}
-              >
+              <Text style={s.desc} numberOfLines={1}>
                 {data.searched.description}
               </Text>
             ) : null}
             {data.searched.brandName ? (
-              <Text
-                style={s.desc}
-                className="font-inter-medium text-brand-subtext mt-0.5"
-                numberOfLines={1}
-              >
+              <Text style={s.desc} numberOfLines={1}>
                 {data.searched.brandName}
               </Text>
             ) : null}
           </View>
-          <View className="mt-auto">
+          <View style={s.priceCol}>
             {data.searched.price != null && (
-              <Text
-                style={s.price}
-                className="font-inter-extrabold text-brand-text mb-1.5 tracking-tight"
-              >
+              <Text style={s.searchedPrice}>
                 ₹{Number(data.searched.price).toFixed(2)}
               </Text>
             )}
-            <Text
-              style={s.savings}
-              className="font-inter-semibold text-[#FF383C] mt-1"
-            >
-              {data.searched.status}
-            </Text>
+            <Text style={s.searchedStatus}>{data.searched.status}</Text>
           </View>
         </View>
 
         {/* Right Side (Pale Yellow Background) */}
-        <View className="flex-1 p-4 bg-[#FFFDEB]">
-          <View className="mb-6">
-            <Text
-              style={s.name}
-              className="font-inter-semibold text-brand-text mb-1 leading-snug tracking-tight"
-            >
+        <View style={s.rightSide}>
+          <View style={s.titleCol}>
+            <Text style={s.name} numberOfLines={2}>
               {data.recommended.name}
             </Text>
             {data.recommended.description ? (
-              <Text
-                style={s.desc}
-                className="font-inter-medium text-brand-subtext mt-0.5"
-                numberOfLines={1}
-              >
+              <Text style={s.desc} numberOfLines={1}>
                 {data.recommended.description}
               </Text>
             ) : null}
             {data.recommended.manufacturer ? (
-              <Text
-                style={s.desc}
-                className="font-inter-medium text-[#009989] mt-0.5"
-                numberOfLines={1}
-              >
+              <Text style={s.descManufacturer} numberOfLines={1}>
                 {data.recommended.manufacturer}
               </Text>
             ) : null}
           </View>
-          <View className="mt-auto">
-            <View
-              className="flex-row items-baseline flex-wrap gap-x-2 mb-1.5"
-              style={{ rowGap: moderateScale(2) }}
-            >
+          <View style={s.priceCol}>
+            <View style={s.recPriceRow}>
               {data.recommended.price != null && (
-                <Text
-                  style={[s.price, { lineHeight: moderateScale(20) }]}
-                  className="font-inter-extrabold text-brand-text tracking-tight"
-                >
+                <Text style={s.recPrice}>
                   ₹{Number(data.recommended.price).toFixed(2)}
                 </Text>
               )}
               {data.recommended.originalPrice != null &&
                 data.recommended.price != null &&
                 data.recommended.originalPrice > data.recommended.price && (
-                  <Text
-                    style={[s.mrp, { lineHeight: moderateScale(16) }]}
-                    className="font-inter-semibold text-brand-subtext line-through"
-                    numberOfLines={1}
-                  >
+                  <Text style={s.recMrp} numberOfLines={1}>
                     ₹{Number(data.recommended.originalPrice).toFixed(2)}
                   </Text>
                 )}
             </View>
             {data.recommended.savings > 0 && (
-              <View className="flex-row items-center mt-0.5">
+              <View style={s.savingsRow}>
                 <icons.sell
-                  width={15}
-                  height={15}
+                  width={exactScale(15)}
+                  height={exactScale(15)}
                   fill="#0F7635"
                   style={s.sellIcon}
                 />
-                <Text
-                  style={s.savings}
-                  className="font-inter-bold text-brand-primary ml-1.5 tracking-tight mt-1"
-                >
+                <Text style={s.savingsText}>
                   Save ₹{Number(data.recommended.savings).toFixed(2)}
                 </Text>
               </View>
@@ -224,18 +173,13 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
       </View>
 
       {/* Horizontal Divider Line */}
-      <View className="h-[1px] w-full bg-[#EAEAEA]" />
+      <View style={s.dividerLine} />
 
       {/* Bottom Section: Uniform Actions Row */}
-      <View className="flex-row justify-between items-center px-4 py-3.5 bg-white">
-        <View className="flex-row items-center">
-          <icons.check_circle width={18} height={18} fill="#0F7635" />
-          <Text
-            style={s.sameComp}
-            className="font-inter-semibold text-brand-primary ml-2 uppercase tracking-wide"
-          >
-            SAME COMPOSITION
-          </Text>
+      <View style={s.bottomSection}>
+        <View style={s.sameCompRow}>
+          <icons.check_circle width={exactScale(18)} height={exactScale(18)} fill="#0F7635" />
+          <Text style={s.sameCompText}>SAME COMPOSITION</Text>
         </View>
 
         {count === 0 ? (
@@ -243,50 +187,36 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
             onPress={handleIncrement}
             disabled={isPending}
             activeOpacity={0.85}
-            style={cc.addBtn}
+            style={s.addBtn}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#0F7635" />
             ) : (
-              <Text
-                style={[cc.addText, { color: "#0F7635" }]}
-                className="font-inter-bold"
-              >
-                ADD
-              </Text>
+              <Text style={s.addText}>ADD</Text>
             )}
           </Touchable>
         ) : (
-          <View
-            className="flex-row items-center justify-between rounded-[10px] overflow-hidden"
-            style={cc.wrapActive}
-          >
+          <View style={s.wrapActive}>
             <Touchable
               onPress={handleDecrement}
               disabled={isPending}
               activeOpacity={0.7}
-              style={cc.btn}
+              style={s.btn}
             >
-              <Text
-                style={cc.plusMinus}
-                className="font-inter-medium text-white leading-none"
-              >
-                −
-              </Text>
+              <Text style={s.plusMinus}>−</Text>
             </Touchable>
-            <View style={cc.countContainer}>
+            <View style={s.countContainer}>
               {isPending ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <Animated.Text
                   style={[
-                    cc.countText,
+                    s.countText,
                     {
                       transform: [{ translateY: slideAnim }],
                       opacity: opacityAnim,
                     },
                   ]}
-                  className="font-inter-bold text-white text-center"
                 >
                   {count}
                 </Animated.Text>
@@ -296,14 +226,9 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
               onPress={handleIncrement}
               disabled={isPending}
               activeOpacity={0.7}
-              style={cc.btn}
+              style={s.btn}
             >
-              <Text
-                style={cc.plusMinus}
-                className="font-inter-medium text-white leading-none"
-              >
-                +
-              </Text>
+              <Text style={s.plusMinus}>+</Text>
             </Touchable>
           </View>
         )}

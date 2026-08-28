@@ -1,0 +1,5 @@
+export const AUTH_CONFIG = {
+  OTP_LENGTH: 6,
+  PHONE_DIGITS: 10,
+  RESEND_COOLDOWN_SECONDS: 30,
+} as const;

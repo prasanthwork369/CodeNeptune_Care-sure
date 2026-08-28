@@ -5,7 +5,6 @@ import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useCategories } from "@/src/features/categories/hooks/useCategories";
 import React, { useState } from "react";
 import { View, useWindowDimensions } from "react-native";
-
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
 import {
@@ -13,6 +12,7 @@ import {
   CategoriesGrid,
   CategoriesHeaderActions,
 } from "@/src/features/categories/sections";
+import { styles as s } from "./CategoriesLayout.styles";
 
 const SIDEBAR_WIDTH = exactScale(80);
 const GRID_PADDING = exactScale(12);
@@ -41,7 +41,7 @@ export const CategoriesLayout: React.FC = () => {
   const activeCards = cards.filter((card) => card.tabId === effectiveTabId);
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={s.root}>
       {liveState ? (
         liveState === "offline" ? (
           <NoInternetState
@@ -58,7 +58,7 @@ export const CategoriesLayout: React.FC = () => {
             showBorder
             rightSlot={<CategoriesHeaderActions />}
           />
-          <View className="flex-1 flex-row">
+          <View style={s.contentRow}>
             <CategoriesSidebar
               tabs={tabs}
               activeTabId={effectiveTabId}

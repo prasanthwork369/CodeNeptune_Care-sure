@@ -1,20 +1,27 @@
 import { Touchable } from "@/src/components/ui/Touchable";
 import { ANIMATIONS } from "@/src/constants/images";
 import { DotLottie } from "@lottiefiles/dotlottie-react-native";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
-  Easing,
   Modal,
   Pressable,
   ScrollView,
+  StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
+import Animated, {
+  Easing,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
-import { moderateScale } from "@/src/utils/exactScale";
+import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
@@ -34,48 +41,45 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
   const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  // Single value drives backdrop + card opacity + card scale together.
-  // One animation = one visual event, no perception of "double open".
-  const enterAnim = useRef(new Animated.Value(0)).current;
-
-  const cardScale = enterAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.93, 1],
-  });
-
+  const enterProgress = useSharedValue(0);
   const [isNavigating, setIsNavigating] = useState(false);
-  const hasBeenShown = useRef(false);
-
-  // Reset before the native frame paints — no stale values on first show.
-  useLayoutEffect(() => {
-    if (!isVisible) return;
-    enterAnim.setValue(0);
-  }, [isVisible]);
 
   useEffect(() => {
-    let anim: Animated.CompositeAnimation;
     if (isVisible) {
-      hasBeenShown.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsNavigating(false);
-      anim = Animated.timing(enterAnim, {
-        toValue: 1,
+      enterProgress.value = withTiming(1, {
         duration: 280,
-        useNativeDriver: true,
         easing: Easing.out(Easing.cubic),
       });
-      anim.start();
     } else {
-      if (!hasBeenShown.current) return;
-      anim = Animated.timing(enterAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-        easing: Easing.in(Easing.quad),
-      });
-      anim.start(() => onClosed?.());
+      enterProgress.value = withTiming(
+        0,
+        {
+          duration: 200,
+          easing: Easing.in(Easing.quad),
+        },
+        (finished) => {
+          if (finished && onClosed) {
+            runOnJS(onClosed)();
+          }
+        },
+      );
     }
-    return () => anim?.stop();
-  }, [isVisible]);
+  }, [isVisible, onClosed, enterProgress]);
+
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: enterProgress.value,
+  }));
+
+  const cardAnimStyle = useAnimatedStyle(() => ({
+    opacity: enterProgress.value,
+    transform: [
+      {
+        scale: interpolate(enterProgress.value, [0, 1], [0.93, 1]),
+      },
+    ],
+  }));
 
   return (
     <Modal
@@ -86,91 +90,56 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
       navigationBarTranslucent
       onRequestClose={onClose}
     >
-      {/* Backdrop — driven by the same enterAnim as the card */}
+      {/* Backdrop */}
       <Animated.View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.55)",
-          opacity: enterAnim,
-        }}
+        style={[
+          styles.backdrop,
+          backdropStyle,
+        ]}
       />
       <Pressable
-        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+        style={styles.backdropTouch}
         onPress={onClose}
       />
 
       {/* Centered popup */}
       <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingHorizontal: 24,
-          paddingBottom: adjustedBottom,
-        }}
+        style={[
+          styles.centerContainer,
+          { paddingBottom: adjustedBottom },
+        ]}
         pointerEvents="box-none"
       >
         <Animated.View
-          style={{
-            width: "100%",
-            maxHeight: Math.max(
-              0,
-              screenHeight - insets.top - insets.bottom - 32,
-            ),
-            backgroundColor: "#FFFFFF",
-            borderRadius: 24,
-            paddingHorizontal: 24,
-            paddingTop: 28,
-            paddingBottom: 24,
-            opacity: enterAnim,
-            transform: [{ scale: cardScale }],
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 12 },
-            shadowOpacity: 0.18,
-            shadowRadius: 24,
-            elevation: 16,
-          }}
+          style={[
+            styles.card,
+            {
+              maxHeight: Math.max(
+                0,
+                screenHeight - insets.top - insets.bottom - exactScale(32),
+              ),
+            },
+            cardAnimStyle,
+          ]}
         >
           <ScrollView
             bounces={false}
             showsVerticalScrollIndicator={false}
             style={{ flexShrink: 1 }}
-            contentContainerStyle={{ alignItems: "center" }}
+            contentContainerStyle={styles.scrollContent}
           >
             <DotLottie
               source={ANIMATIONS.pharmacy}
               autoplay
               loop
-              style={{ width: 200, height: 200 }}
+              style={styles.lottie}
             />
 
-            <Text
-              style={{
-                fontSize: moderateScale(20),
-                fontWeight: "700",
-                color: "#111827",
-                textAlign: "center",
-                marginTop: 4,
-                marginBottom: 8,
-              }}
-            >
+            <Text style={styles.title}>
               Reviewing Your Prescription
             </Text>
 
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                fontWeight: "400",
-                color: "#6B7280",
-                textAlign: "center",
-                lineHeight: moderateScale(20),
-                marginBottom: 24,
-              }}
-            >
+            <Text style={styles.subtitle}>
               Our licensed pharmacist is carefully checking your prescription
               and preparing your medicines
             </Text>
@@ -187,25 +156,12 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
                 });
               });
             }}
-            style={{
-              width: "100%",
-              backgroundColor: "#0F7635",
-              borderRadius: 14,
-              paddingVertical: 16,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={styles.gotItBtn}
           >
             {isNavigating ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
-              <Text
-                style={{
-                  fontSize: moderateScale(15),
-                  fontWeight: "600",
-                  color: "#FFFFFF",
-                }}
-              >
+              <Text style={styles.gotItBtnText}>
                 GOT IT
               </Text>
             )}
@@ -215,3 +171,68 @@ export const PrescriptionReviewSheet: React.FC<Props> = ({
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
+  },
+  backdropTouch: {
+    ...StyleSheet.absoluteFill,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: exactScale(24),
+  },
+  card: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: exactScale(24),
+    paddingHorizontal: exactScale(24),
+    paddingTop: exactScale(28),
+    paddingBottom: exactScale(24),
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    elevation: 16,
+  },
+  scrollContent: {
+    alignItems: "center",
+  },
+  lottie: {
+    width: exactScale(200),
+    height: exactScale(200),
+  },
+  title: {
+    fontSize: moderateScale(20),
+    fontWeight: "700",
+    color: "#111827",
+    textAlign: "center",
+    marginTop: exactScale(4),
+    marginBottom: exactScale(8),
+  },
+  subtitle: {
+    fontSize: moderateScale(13),
+    fontWeight: "400",
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: moderateScale(20),
+    marginBottom: exactScale(24),
+  },
+  gotItBtn: {
+    width: "100%",
+    backgroundColor: "#0F7635",
+    borderRadius: exactScale(14),
+    paddingVertical: exactScale(16),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gotItBtnText: {
+    fontSize: moderateScale(15),
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+});

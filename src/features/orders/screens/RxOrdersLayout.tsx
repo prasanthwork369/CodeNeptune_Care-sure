@@ -17,9 +17,9 @@ import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { requireInternet } from "@/src/utils/offline";
 import { downloadFile } from "@/src/utils/fileDownload";
 import { AppFlashList } from "@/src/components/lists/AppFlashList";
+import { styles as s } from "./RxOrdersLayout.styles";
 import React, { useCallback, useMemo } from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../orders.styles";
 
 function formatDate(iso: string) {
   if (!iso) return "";
@@ -49,8 +49,6 @@ function mapItem(item: ApiPrescription): Prescription {
     imageUrls: getPrescriptionImageUrls(item),
     rejectionReasons: item.ocrData?.rejectionReasons ?? [],
     reviewNotes: item.reviewNotes ?? null,
-    // Keep undefined as-is: undefined = "list didn't include it, fetch it";
-    // null = "known: no reminder set". The hook treats them differently.
     reminder: item.reminder,
   };
 }
@@ -63,9 +61,6 @@ export const RxOrdersLayout: React.FC = () => {
 
   const data = useMemo(() => prescriptions.map(mapItem), [prescriptions]);
 
-  // Live, like My Orders: status (pending/verified/rejected) moves
-  // server-side, so offline replaces the screen rather than showing a cached
-  // list whose status may already be wrong.
   const liveState = useLiveScreenState({
     error,
     hasData: data.length > 0,
@@ -74,9 +69,6 @@ export const RxOrdersLayout: React.FC = () => {
 
   const keyExtractor = useCallback((item: Prescription) => item.id, []);
 
-  // Stable across every row/render — downloads fetch over the network, so
-  // gate before starting one. Kept out of renderItem so PrescriptionCard's
-  // memo isn't defeated by a fresh function identity on every row render.
   const handleDownloadPress = useCallback((url: string, fileName: string) => {
     if (!requireInternet()) return;
     downloadFile(url, fileName);
@@ -91,7 +83,7 @@ export const RxOrdersLayout: React.FC = () => {
 
   if (liveState) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="My Prescriptions" backgroundColor="#FFFFFF" />
         {liveState === "offline" ? (
           <NoInternetState
@@ -110,7 +102,7 @@ export const RxOrdersLayout: React.FC = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="My Prescriptions" backgroundColor="#FFFFFF" />
       {loading ? (
         <RxOrdersSkeleton />
@@ -119,20 +111,13 @@ export const RxOrdersLayout: React.FC = () => {
           data={data}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          contentContainerStyle={{
-            padding: 16,
-            paddingBottom: 40,
-            flexGrow: 1,
-          }}
+          contentContainerStyle={s.listContent}
           showsVerticalScrollIndicator={false}
           refreshing={refreshing}
           onRefresh={refetch}
           ListEmptyComponent={
-            <View className="flex-1 items-center justify-center py-16">
-              <Text
-                style={s.labelMd}
-                className="font-inter-medium text-[#6A6A6A]"
-              >
+            <View style={s.emptyWrap}>
+              <Text style={s.emptyText}>
                 No prescriptions found
               </Text>
             </View>

@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     ...sharedText,
     flexShrink: 0,
     color: "#6A6A6A",
+    fontFamily: "Inter-Medium",
     fontWeight: "500",
   },
   suggestion: {
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     color: "#4B5563",
+    fontFamily: "Inter-SemiBold",
     fontWeight: "600",
   },
 });

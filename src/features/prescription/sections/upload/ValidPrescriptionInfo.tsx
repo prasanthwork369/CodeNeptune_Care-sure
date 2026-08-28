@@ -1,13 +1,12 @@
 import { HOME_IMAGES } from "@/src/constants/images";
-import { colors } from "@/src/constants/theme";
 import { useUploadConfig } from "@/src/hooks/queries/useSettings";
 import React from "react";
 import { Text, View } from "react-native";
 import { Image } from "expo-image";
 import Svg, { Line } from "react-native-svg";
-import { styles as s } from "./ValidPrescriptionInfo.styles";
 import { exactScale } from "@/src/utils/exactScale";
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { styles as s } from "./upload.styles";
 
 const VALID_ITEMS = [
   "Doctor's details",
@@ -30,20 +29,16 @@ export const ValidPrescriptionInfo: React.FC = () => {
   const rxImgH = Math.round(rxImgW * 1.23);
 
   return (
-    <View
-      className="bg-white rounded-[14px] p-4"
-      style={{ borderWidth: 1, borderColor: "#919EAB33" }}
-    >
-      <View className="flex-row">
+    <View style={s.card}>
+      <View style={s.validRow}>
         <View
-          style={{
-            backgroundColor: "#F2FFFA",
-            borderWidth: 1,
-            borderColor: "#919EAB33",
-            width: rxBoxW,
-            height: rxBoxH,
-          }}
-          className="rounded-[12px] items-center justify-center"
+          style={[
+            s.sampleRxBox,
+            {
+              width: rxBoxW,
+              height: rxBoxH,
+            },
+          ]}
         >
           <Image
             source={HOME_IMAGES.samplePrescription}
@@ -51,30 +46,18 @@ export const ValidPrescriptionInfo: React.FC = () => {
             contentFit="contain"
           />
         </View>
-        <View className="flex-1 ml-4">
-          <Text
-            style={s.sectionTitle}
-            className="font-inter-bold text-[#1A1C1E] mb-2"
-          >
+        <View style={s.validRightCol}>
+          <Text style={s.validSectionTitle}>
             Valid prescription includes:
           </Text>
           {VALID_ITEMS.map((item, idx) => (
-            <View key={item} className="flex-row items-center mt-1.5">
-              <View
-                style={[s.numberCircle, { backgroundColor: colors.primary }]}
-                className="rounded-full items-center justify-center mr-2"
-              >
-                <Text
-                  style={s.numberText}
-                  className="font-inter-bold text-white leading-none"
-                >
+            <View key={item} style={s.validItemRow}>
+              <View style={s.numberCircle}>
+                <Text style={s.numberText}>
                   {idx + 1}
                 </Text>
               </View>
-              <Text
-                style={s.itemLabel}
-                className="font-inter-medium text-[#1A1C1E]"
-              >
+              <Text style={s.validItemLabel}>
                 {item}
               </Text>
             </View>
@@ -82,7 +65,7 @@ export const ValidPrescriptionInfo: React.FC = () => {
         </View>
       </View>
 
-      <View style={{ height: 2, marginVertical: 14 }}>
+      <View style={s.dashedSeparator}>
         <Svg height="2" width="100%">
           <Line
             x1="0"
@@ -99,32 +82,33 @@ export const ValidPrescriptionInfo: React.FC = () => {
 
       {uploadRulesReady ? (
         <>
-          {/* Values come from the backend. The centralized hook supplies the
-              safe offline fallback only when that request has actually failed. */}
-          <Text
-            style={s.footerNote}
-            className="font-inter text-brand-subtext mb-1"
-          >
+          <Text style={s.footerNote}>
             File size should be less than {maxSizeLabel}
           </Text>
-          <Text
-            style={s.footerNote}
-            className="font-inter text-brand-subtext mb-1"
-          >
+          <Text style={s.footerNote}>
             Supported formats: PDF, JPG, JPEG, PNG
           </Text>
-          <Text
-            style={s.footerNote}
-            className="font-inter text-brand-subtext mb-1"
-          >
+          <Text style={s.footerNote}>
             Prescription should be less than {validityLabel} old
           </Text>
         </>
       ) : (
-        <View style={{ gap: exactScale(6) }}>
-          <Skeleton width="72%" height={exactScale(12)} borderRadius={4} />
-          <Skeleton width="84%" height={exactScale(12)} borderRadius={4} />
-          <Skeleton width="78%" height={exactScale(12)} borderRadius={4} />
+        <View style={{ gap: exactScale(8) }}>
+          <Skeleton
+            width={exactScale(220)}
+            height={exactScale(12)}
+            borderRadius={exactScale(4)}
+          />
+          <Skeleton
+            width={exactScale(260)}
+            height={exactScale(12)}
+            borderRadius={exactScale(4)}
+          />
+          <Skeleton
+            width={exactScale(240)}
+            height={exactScale(12)}
+            borderRadius={exactScale(4)}
+          />
         </View>
       )}
     </View>

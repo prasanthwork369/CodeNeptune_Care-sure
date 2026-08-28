@@ -125,8 +125,6 @@ export const DigitalPrescriptionModal: React.FC<
   };
 
   const prescriptions = clinicalData?.prescriptions || [];
-  const rx = prescriptions[activePatientIdx] || {};
-  const medicines = rx.medicines || [];
   const doctorName =
     clinicalData?.doctorSnapshot?.name ??
     clinicalData?.doctorName ??
@@ -137,16 +135,16 @@ export const DigitalPrescriptionModal: React.FC<
     "Cs-0001";
   const doctorSignature = clinicalData?.doctorSnapshot?.signatureUrl || "";
 
-  const issueDate = new Date(
-    clinicalData?.approvedAt || orderCreatedAt || new Date(),
-  );
-  const expiryDate = new Date(issueDate);
-  // Validity is the backend's rule, not the app's — printing a longer expiry
-  // than the server honours tells the patient the prescription is still valid
-  // when it is not.
-  expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
-
   const variables = useMemo(() => {
+    const rx = clinicalData?.prescriptions?.[activePatientIdx] || {};
+    const medicines = rx.medicines || [];
+
+    const issueDate = new Date(
+      clinicalData?.approvedAt || orderCreatedAt || new Date(),
+    );
+    const expiryDate = new Date(issueDate);
+    expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
+
     // Read the nested `patient` object first (the real API shape, same as the
     // web RxModal); fall back to the flat fields for older payloads.
     const ageVal = rx.patient?.age ?? rx.patientAge;
@@ -173,14 +171,15 @@ export const DigitalPrescriptionModal: React.FC<
       })),
     };
   }, [
+    activePatientIdx,
+    clinicalData?.approvedAt,
+    clinicalData?.prescriptions,
     doctorName,
-    regNumber,
-    orderId,
-    rx,
-    medicines,
     doctorSignature,
-    issueDate,
-    expiryDate,
+    orderCreatedAt,
+    orderId,
+    regNumber,
+    validityMonths,
   ]);
 
   const {
@@ -198,41 +197,40 @@ export const DigitalPrescriptionModal: React.FC<
     if (!template?.body) return "";
     let body = template.body;
 
-    // Template design width is 680px.
-    // Calculate viewport scale based on device screen layout.
-    const containerWidth = screenWidth - 40;
-    const scale = containerWidth / 530;
+    const baseWidth = 800;
+    const padding = 32;
+    const availableWidth = screenWidth - padding;
+    const scale = availableWidth / baseWidth;
 
-    const zoomStyle = `
+    const previewStyle = `
       <style>
         html, body {
           margin: 0 !important;
           padding: 0 !important;
-          zoom: ${scale.toFixed(3)} !important;
-          -webkit-text-size-adjust: none !important;
+          width: ${baseWidth}px !important;
+          min-width: ${baseWidth}px !important;
           background-color: #ffffff !important;
+          zoom: ${scale} !important;
+          -webkit-text-size-adjust: none !important;
+          overflow-x: hidden !important;
         }
       </style>
     `;
+    const metaTag = `<meta name="viewport" content="width=${baseWidth}, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
 
-    const metaTag = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">`;
-
-    if (!body.includes("viewport")) {
-      if (body.includes("<head>")) {
-        body = body.replace("<head>", `<head>${metaTag}${zoomStyle}`);
-      } else {
-        body = metaTag + zoomStyle + body;
-      }
-    } else if (body.includes("<head>")) {
-      body = body.replace("<head>", `<head>${zoomStyle}`);
+    if (body.includes("<head>")) {
+      body = body.replace("<head>", `<head>${metaTag}${previewStyle}`);
+    } else {
+      body = metaTag + previewStyle + body;
     }
     return body;
-  }, [template?.body, screenWidth]);
+  }, [template, screenWidth]);
 
   // Print variant of the same template — no device-width `zoom` (that fits the
   // phone screen, not a PDF page). Renders at the design's natural width with
   // page margins so long medicine lists flow onto extra pages without clipping,
   // and color-exact so logos/signatures/coloured backgrounds print correctly.
+  /* eslint-disable react-hooks/preserve-manual-memoization */
   const printHtml = useMemo(() => {
     if (!template?.body) return "";
     let body = template.body;
@@ -257,7 +255,8 @@ export const DigitalPrescriptionModal: React.FC<
       body = metaTag + printStyle + body;
     }
     return body;
-  }, [template?.body]);
+  }, [template]);
+  /* eslint-enable react-hooks/preserve-manual-memoization */
 
   if (!clinicalData || prescriptions.length === 0) {
     return null;

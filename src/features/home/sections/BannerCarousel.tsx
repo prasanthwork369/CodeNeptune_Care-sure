@@ -17,6 +17,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import { useSharedValue } from "react-native-reanimated";
 import { CarouselDot } from "@/src/components/animations/carousel";
 import { exactScale } from "@/src/utils/exactScale";
+import { styles as s } from "./BannerCarousel.styles";
 
 interface BannerCarouselProps {
   banners: ApiBanner[];
@@ -79,8 +80,8 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
     // Both subscribed here (not passed as props) so the home feed doesn't
     // re-render on scroll start/stop or on focus changes — only this carousel
     // reacts, to pause autoplay.
-    const isFeedScrolling = useUIStore((s) => s.isFeedScrolling);
-    const isHomeFocused = useUIStore((s) => s.isHomeFocused);
+    const isFeedScrolling = useUIStore((st) => st.isFeedScrolling);
+    const isHomeFocused = useUIStore((st) => st.isHomeFocused);
     const autoplayActive = isHomeFocused && !isFeedScrolling;
 
     const stopAutoplay = useCallback(() => {
@@ -106,9 +107,9 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
         stopAutoplay();
         return;
       }
-      const sub = AppState.addEventListener("change", (s: AppStateStatus) => {
-        appActiveRef.current = s === "active";
-        if (s === "active") {
+      const sub = AppState.addEventListener("change", (state: AppStateStatus) => {
+        appActiveRef.current = state === "active";
+        if (state === "active") {
           startAutoplay();
         } else {
           stopAutoplay();
@@ -161,9 +162,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
             categories.map((c) => ({ slug: c.slug, familySlug: c.familySlug })),
           );
         }
-        // Unknown slug (typo, renamed, or a category missing from the family
-        // map): land on the category list rather than pushing an unmatched path,
-        // which would drop the user on the router's raw "Unmatched Route" screen.
+        // Unknown slug: land on category list
         router.push(BANNER_ROUTE_MAP[link.toLowerCase()] ?? "/categories");
       },
       [router, categories],
@@ -175,17 +174,13 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
           activeOpacity={item.link ? 0.9 : 1}
           onPress={() => handlePress(item.link)}
           disabled={!item.link}
-          className="px-4"
+          style={s.itemTouchable}
           accessibilityLabel={item.alt}
           accessibilityRole="button"
         >
           <Image
             source={{ uri: item.imageUrl }}
-            style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: exactScale(16),
-            }}
+            style={s.itemImage}
             contentFit="cover"
             cachePolicy="memory-disk"
           />
@@ -196,7 +191,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
 
     if (isLoading) {
       return (
-        <View className="px-4">
+        <View style={s.skeletonContainer}>
           <Skeleton
             width="100%"
             height={bannerHeight}
@@ -230,7 +225,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = React.memo(
         />
 
         {canLoop && (
-          <View className="flex-row justify-center items-center mt-2 gap-x-1.5">
+          <View style={s.dotsContainer}>
             {banners.map((_, i) => (
               <CarouselDot
                 key={i}

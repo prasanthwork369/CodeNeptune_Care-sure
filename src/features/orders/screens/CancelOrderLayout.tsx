@@ -16,6 +16,9 @@ import { formatOrderId } from "@/src/utils/order";
 import { RemoteIcon } from "@/src/components/ui/RemoteIcon";
 import { RequiredMark } from "@/src/components/ui/RequiredMark";
 import { resolveAssetUrl } from "@/src/utils/urls";
+import { requireInternet } from "@/src/utils/offline";
+import { OTHER_OPTION } from "../constants/cancel.constants";
+import { styles as s } from "./CancelOrderLayout.styles";
 import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -26,9 +29,6 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { requireInternet } from "@/src/utils/offline";
-
-const OTHER_OPTION = "__other__";
 
 // A backend reason, or the synthetic "Other" row — which carries a string id
 // instead of the numeric ones the backend returns.
@@ -145,9 +145,9 @@ export function CancelOrderLayout() {
 
   if (orderLoading) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Cancel Order" showBorder />
-        <View className="flex-1 items-center justify-center">
+        <View style={s.loadingCenter}>
           <ActivityIndicator color="#0F7635" />
         </View>
       </View>
@@ -155,7 +155,7 @@ export function CancelOrderLayout() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F6FB" }}>
+    <View style={s.root}>
       <ScreenHeader title="Cancel Order" showBorder />
 
       <KeyboardAwareScrollView
@@ -166,7 +166,7 @@ export function CancelOrderLayout() {
           paddingHorizontal: scale(20),
           paddingTop: verticalScale(24),
           paddingBottom:
-            Math.max(bottomInset, verticalScale(24)) + verticalScale(120), // Extra padding for absolute footer
+            Math.max(bottomInset, verticalScale(24)) + verticalScale(120),
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -174,38 +174,10 @@ export function CancelOrderLayout() {
       >
         {/* Main Card */}
         {!!orderNumber && (
-          <View
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: scale(16),
-              padding: scale(20),
-              width: "100%",
-              borderWidth: 1,
-              borderColor: "#919EAB33",
-            }}
-          >
+          <View style={s.card}>
             {/* Top Order summary section */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-                paddingBottom: verticalScale(16),
-                borderBottomWidth: 1,
-                borderBottomColor: "#F3F4F6",
-              }}
-            >
-              <View
-                style={{
-                  width: scale(40),
-                  height: scale(40),
-                  borderRadius: scale(20),
-                  backgroundColor: "#FFF1F1",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: scale(12),
-                }}
-              >
+            <View style={s.orderSummaryRow}>
+              <View style={s.bagIconBox}>
                 <icons.cancel_order_bag
                   width={moderateScale(20)}
                   height={moderateScale(20)}
@@ -213,38 +185,17 @@ export function CancelOrderLayout() {
                 />
               </View>
               <View>
-                <Text
-                  style={{
-                    fontSize: moderateScale(15),
-                    fontWeight: "700",
-                    color: "#222222",
-                  }}
-                >
+                <Text style={s.orderNumberText}>
                   Order #{orderNumber}
                 </Text>
-                <Text
-                  style={{
-                    fontSize: moderateScale(12),
-                    fontWeight: "400",
-                    color: "#6A6A6A",
-                    marginTop: verticalScale(2),
-                  }}
-                >
+                <Text style={s.orderMetaText}>
                   {itemsCount} Items • ₹{totalAmount.toFixed(0)}
                 </Text>
               </View>
             </View>
 
             {/* Title / Question */}
-            <Text
-              style={{
-                fontSize: moderateScale(14),
-                fontWeight: "700",
-                color: "#222222",
-                marginTop: verticalScale(18),
-                marginBottom: verticalScale(12),
-              }}
-            >
+            <Text style={s.questionText}>
               Why do you want to cancel this order?
               <RequiredMark />
             </Text>
@@ -256,7 +207,7 @@ export function CancelOrderLayout() {
                 style={{ marginVertical: verticalScale(20) }}
               />
             ) : (
-              <View style={{ width: "100%" }}>
+              <View style={s.reasonsContainer}>
                 {(() => {
                   const hasOther = reasons.some((r) =>
                     r.label.toLowerCase().includes("other"),
@@ -272,43 +223,26 @@ export function CancelOrderLayout() {
 
                   return (
                     <>
-                      <View
-                        style={{ width: "100%", maxHeight: verticalScale(260) }}
-                      >
+                      <View style={s.reasonsScrollArea}>
                         <ScrollView
                           nestedScrollEnabled={true}
                           showsVerticalScrollIndicator={true}
-                          contentContainerStyle={{ width: "100%" }}
+                          contentContainerStyle={s.reasonsScrollContent}
                         >
                           {displayReasons.map((reason) => {
                             const isSelected = selectedReasonId === reason.id;
 
                             return (
-                              <View key={reason.id} style={{ width: "100%" }}>
+                              <View key={reason.id} style={s.reasonItemWrap}>
                                 <Touchable
                                   onPress={() => selectReason(reason.id)}
                                   activeOpacity={0.7}
                                   disabled={isCancelling}
-                                  style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    paddingVertical: verticalScale(12),
-                                    width: "100%",
-                                  }}
+                                  style={s.reasonRow}
                                 >
                                   {/* Icon container */}
                                   {!!reason.image_url && (
-                                    <View
-                                      style={{
-                                        width: scale(40),
-                                        height: scale(40),
-                                        borderRadius: scale(20),
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        marginRight: scale(12),
-                                        overflow: "hidden",
-                                      }}
-                                    >
+                                    <View style={s.reasonIconBox}>
                                       <RemoteIcon
                                         uri={resolveAssetUrl(reason.image_url)}
                                         size={scale(40)}
@@ -318,26 +252,12 @@ export function CancelOrderLayout() {
                                   )}
 
                                   {/* Labels */}
-                                  <View
-                                    style={{ flex: 1, marginRight: scale(8) }}
-                                  >
-                                    <Text
-                                      style={{
-                                        fontSize: moderateScale(14),
-                                        fontWeight: "600",
-                                        color: "#222222",
-                                      }}
-                                    >
+                                  <View style={s.reasonTextCol}>
+                                    <Text style={s.reasonLabel}>
                                       {reason.label}
                                     </Text>
                                     {!!reason.description && (
-                                      <Text
-                                        style={{
-                                          fontSize: moderateScale(12),
-                                          color: "#9CA3AF",
-                                          marginTop: verticalScale(2),
-                                        }}
-                                      >
+                                      <Text style={s.reasonDesc}>
                                         {reason.description}
                                       </Text>
                                     )}
@@ -345,28 +265,15 @@ export function CancelOrderLayout() {
 
                                   {/* Radio circle */}
                                   <View
-                                    style={{
-                                      width: scale(22),
-                                      height: scale(22),
-                                      borderRadius: scale(11),
-                                      borderWidth: 1.5,
-                                      borderColor: isSelected
-                                        ? "#0F7635"
-                                        : "#D1D5DB",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      backgroundColor: "#fff",
-                                    }}
+                                    style={[
+                                      s.radioCircle,
+                                      isSelected
+                                        ? s.radioCircleSelected
+                                        : s.radioCircleUnselected,
+                                    ]}
                                   >
                                     {isSelected && (
-                                      <View
-                                        style={{
-                                          width: scale(12),
-                                          height: scale(12),
-                                          borderRadius: scale(6),
-                                          backgroundColor: "#0F7635",
-                                        }}
-                                      />
+                                      <View style={s.radioDot} />
                                     )}
                                   </View>
                                 </Touchable>
@@ -389,22 +296,7 @@ export function CancelOrderLayout() {
                           editable={!isCancelling}
                           multiline
                           numberOfLines={3}
-                          style={{
-                            width: "100%",
-                            minHeight: verticalScale(80),
-                            backgroundColor: "#fff",
-                            borderWidth: 1,
-                            borderColor: "#E5E7EB",
-                            borderRadius: scale(10),
-                            paddingHorizontal: scale(14),
-                            paddingVertical: verticalScale(12),
-                            fontWeight: "400",
-                            fontSize: moderateScale(13),
-                            color: "#1A1C1E",
-                            textAlignVertical: "top",
-                            marginTop: verticalScale(12),
-                            marginBottom: verticalScale(4),
-                          }}
+                          style={s.otherInput}
                         />
                       )}
                     </>
@@ -415,15 +307,7 @@ export function CancelOrderLayout() {
 
             {/* Error display inside the card */}
             {!!error && (
-              <Text
-                style={{
-                  width: "100%",
-                  marginTop: verticalScale(8),
-                  fontWeight: "400",
-                  fontSize: moderateScale(12),
-                  color: "#DC2626",
-                }}
-              >
+              <Text style={s.errorText}>
                 {error}
               </Text>
             )}
@@ -433,18 +317,10 @@ export function CancelOrderLayout() {
 
       {/* Action button — Fixed Footer */}
       <View
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          paddingHorizontal: scale(20),
-          paddingTop: verticalScale(16),
-          paddingBottom: bottomInset + verticalScale(16),
-          backgroundColor: "#fff",
-          borderTopWidth: 1,
-          borderTopColor: "#F3F4F6",
-        }}
+        style={[
+          s.footer,
+          { paddingBottom: bottomInset + verticalScale(16) },
+        ]}
       >
         <Touchable
           testID="cancel-order-submit"
@@ -452,47 +328,20 @@ export function CancelOrderLayout() {
           activeOpacity={0.85}
           disabled={isCancelling || !hasValidReason}
           style={[
-            {
-              width: "100%",
-              paddingVertical: verticalScale(14),
-              borderRadius: scale(12),
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#D32F2F", // brand/mockup red
-            },
-            (isCancelling || !hasValidReason) && { opacity: 0.7 },
+            s.submitBtn,
+            (isCancelling || !hasValidReason) && s.submitBtnDisabled,
           ]}
         >
-          <Text
-            style={{
-              fontSize: moderateScale(16),
-              fontWeight: "700",
-              color: "#fff",
-            }}
-          >
+          <Text style={s.submitBtnText}>
             {isCancelling ? "Cancelling..." : "Cancel Order"}
           </Text>
         </Touchable>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: verticalScale(14),
-            gap: scale(5),
-          }}
-        >
+        <View style={s.footerNotice}>
           <icons.lock_grey
             width={moderateScale(14)}
             height={moderateScale(14)}
           />
-          <Text
-            style={{
-              fontSize: moderateScale(12),
-              fontWeight: "400",
-              color: "#9CA3AF",
-            }}
-          >
+          <Text style={s.footerNoticeText}>
             This action cannot be undone
           </Text>
         </View>

@@ -27,7 +27,6 @@ import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { useNav } from "@/src/hooks/useNav";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import { exactScale } from "@/src/utils/exactScale";
 import React, { useMemo, useState } from "react";
 import { Text, View, useWindowDimensions } from "react-native";
 import Animated, {
@@ -46,6 +45,7 @@ import { usePrescriptionOrderMedicines } from "@/src/features/prescription/hooks
 import { useLocalSearchParams } from "expo-router";
 import { MedicineComparisonSkeleton } from "../components/MedicineComparisonSkeleton";
 import { useComparisonPrescriptionId } from "../hooks/useComparisonPrescriptionId";
+import { styles as s } from "./MedicineComparisonLayout.styles";
 
 import type { ComparisonMedicine } from "../types";
 
@@ -105,7 +105,7 @@ export const MedicineComparisonLayout: React.FC<
   const cardWidth = width - 32;
 
   const setPrescriptionOrderItems = usePrescriptionOrderStore(
-    (s) => s.setItems,
+    (st) => st.setItems,
   );
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
@@ -288,7 +288,7 @@ export const MedicineComparisonLayout: React.FC<
 
   if (liveState) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+      <View style={s.root}>
         <ScreenHeader title="Medicine Comparison" showBorder />
         {liveState === "offline" ? (
           <NoInternetState
@@ -308,37 +308,16 @@ export const MedicineComparisonLayout: React.FC<
 
   if (!propsMedicines && medicines.length === 0) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#F9FAFB",
-          padding: 24,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "500",
-            color: "#6B7280",
-            textAlign: "center",
-            marginBottom: 20,
-          }}
-        >
+      <View style={s.emptyContainer}>
+        <Text style={s.emptyText}>
           No medicine comparison available for this prescription yet.
         </Text>
         <Touchable
           onPress={() => refetch()}
-          style={{
-            backgroundColor: "#0F7635",
-            borderRadius: 12,
-            paddingVertical: 14,
-            paddingHorizontal: 32,
-          }}
+          style={s.refreshBtn}
           activeOpacity={0.85}
         >
-          <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>
+          <Text style={s.refreshBtnText}>
             Refresh
           </Text>
         </Touchable>
@@ -347,16 +326,13 @@ export const MedicineComparisonLayout: React.FC<
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+    <View style={s.root}>
       <ScreenHeader title="Medicine Comparison" showBorder />
 
       <Animated.ScrollView
-        style={{ flex: 1, backgroundColor: "#F9FAFB" }}
+        style={s.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: exactScale(24),
-          borderWidth: 0,
-        }}
+        contentContainerStyle={s.scrollContent}
         stickyHeaderIndices={totalSavings > 0 ? [2] : [1]}
         // A fast fling to the top triggers Android's stretch overscroll, which
         // pulls the banner away from the header and shows this ScrollView's grey
@@ -387,10 +363,10 @@ export const MedicineComparisonLayout: React.FC<
             const { y, height } = e.nativeEvent.layout;
             setMedicinesSectionLayout({ y, height });
           }}
-          style={{ padding: 16, paddingBottom: 0 }}
+          style={s.cardsSection}
         >
           {mergedMedicines.map((item) => (
-            <View key={item.id} style={{ marginBottom: 16 }}>
+            <View key={item.id} style={s.cardItemWrap}>
               <ComparisonCard
                 item={item}
                 cardWidth={cardWidth}

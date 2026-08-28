@@ -16,16 +16,13 @@ import React, {
 import type { ViewabilityConfig, ViewToken } from "react-native";
 import {
   FlatList,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   ScrollView,
   useWindowDimensions,
   View,
 } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
-
-const THUMB_SIZE = exactScale(56);
+import { styles as s } from "./ProductImageViewerLayout.styles";
 
 // ─── Per-page zoomable image ─────────────────────────────────────────────────
 
@@ -35,29 +32,22 @@ interface ZoomablePageProps {
   height: number;
 }
 
-/**
- * Each gallery page owns its own isolated zoom state.
- * Pinch, double-tap, and zoomed pan work independently per page.
- * No shared translateX between pages — zero contamination.
- */
 const ZoomablePage = React.memo(({ uri, width, height }: ZoomablePageProps) => {
   const { composedGesture, zoomAnimatedStyle } = useZoomGesture({
     containerWidth: width,
     containerHeight: height,
-    // No swipe callbacks — swiping between pages is handled by the
-    // native FlatList pager, not Reanimated translateX.
   });
 
   return (
     <GestureDetector gesture={composedGesture}>
       <Animated.View
-        style={{
-          width,
-          height,
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
+        style={[
+          s.zoomableContainer,
+          {
+            width,
+            height,
+          },
+        ]}
       >
         <AnimatedImage
           source={{ uri }}
@@ -71,14 +61,16 @@ const ZoomablePage = React.memo(({ uri, width, height }: ZoomablePageProps) => {
 });
 ZoomablePage.displayName = "ZoomablePage";
 
+const VIEWABILITY_CONFIG: ViewabilityConfig = {
+  itemVisiblePercentThreshold: 50,
+};
+
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
 export const ProductImageViewerLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
   const { width } = useWindowDimensions();
 
-  // FlatList drives containerHeight from its own onLayout, but we still
-  // need an explicit height so each page fills the available space.
   const [containerHeight, setContainerHeight] = useState(0);
 
   const { imageUrls, initialIndex, productName } = useLocalSearchParams<{
@@ -94,23 +86,17 @@ export const ProductImageViewerLayout: React.FC = () => {
 
   const startIndex = Number(initialIndex) || 0;
 
-  // visualActiveIndex drives the thumbnail border and updates as soon as the
-  // next page crosses 50% visibility — no wait for momentum to fully stop.
   const [visualActiveIndex, setVisualActiveIndex] = useState(startIndex);
 
   const flatListRef = useRef<FlatList<string>>(null);
   const thumbListRef = useRef<ScrollView>(null);
 
-  // Prefetch all images into memory-disk cache on mount so pages load
-  // instantly without decode stalls mid-swipe.
   useEffect(() => {
     const validUrls = urls.filter(
       (url): url is string => typeof url === "string" && url.trim().length > 0,
     );
     if (validUrls.length > 0) {
-      void Image.prefetch(validUrls, "memory-disk").catch(() => {
-        // Prefetch failures must not block preview.
-      });
+      void Image.prefetch(validUrls, "memory-disk").catch(() => {});
     }
   }, [urls]);
 
@@ -138,10 +124,7 @@ export const ProductImageViewerLayout: React.FC = () => {
     [width],
   );
 
-  // ── Native paging + viewability callbacks ───────────────────────────────
-
   // Fires as soon as a page becomes >50% visible during the swipe.
-  // Only updates thumbnail visual state — no heavy work.
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       if (viewableItems.length > 0 && viewableItems[0].index != null) {
@@ -150,21 +133,6 @@ export const ProductImageViewerLayout: React.FC = () => {
     },
     [],
   );
-
-  // Must be stable (useRef) — FlatList will warn and re-register listeners
-  // if viewabilityConfigCallbackPairs identity changes between renders.
-  const viewabilityConfig = useRef<ViewabilityConfig>({
-    itemVisiblePercentThreshold: 50,
-  });
-
-  const viewabilityConfigCallbackPairs = useRef([
-    {
-      viewabilityConfig: viewabilityConfig.current,
-      onViewableItemsChanged,
-    },
-  ]);
-
-  // ── Thumbnail tap ───────────────────────────────────────────────────────
 
   const selectImage = useCallback(
     (index: number) => {
@@ -176,12 +144,12 @@ export const ProductImageViewerLayout: React.FC = () => {
   );
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title={productName || "Product Image"} />
 
-      {/* Native paged FlatList — no custom translateX, no offset rebase */}
+      {/* Native paged FlatList */}
       <View
-        className="flex-1 overflow-hidden"
+        style={s.listContainer}
         onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
       >
         {containerHeight > 0 && (
@@ -196,11 +164,8 @@ export const ProductImageViewerLayout: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             bounces={false}
             initialScrollIndex={startIndex}
-            viewabilityConfigCallbackPairs={
-              viewabilityConfigCallbackPairs.current
-            }
-            // Virtualize only 1 page on each side — enough for smooth
-            // swipe while keeping memory low for large galleries.
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={VIEWABILITY_CONFIG}
             windowSize={3}
             initialNumToRender={1}
             maxToRenderPerBatch={2}
@@ -212,21 +177,19 @@ export const ProductImageViewerLayout: React.FC = () => {
 
       {urls.length > 1 && (
         <View
-          className="bg-white border-t border-[#EEEFF1]"
-          style={{
-            paddingVertical: exactScale(12),
-            paddingBottom: adjustedBottom + exactScale(12),
-          }}
+          style={[
+            s.thumbnailStrip,
+            {
+              paddingBottom: adjustedBottom + exactScale(12),
+            },
+          ]}
         >
           <ScrollView
             ref={thumbListRef}
             horizontal
             showsHorizontalScrollIndicator={false}
             bounces={false}
-            contentContainerStyle={{
-              paddingHorizontal: exactScale(16),
-              gap: exactScale(10),
-            }}
+            contentContainerStyle={s.thumbScrollContent}
           >
             {urls.map((uri, index) => {
               const isActive = index === visualActiveIndex;
@@ -234,18 +197,14 @@ export const ProductImageViewerLayout: React.FC = () => {
                 <Touchable
                   key={`${uri}-${index}`}
                   onPress={() => selectImage(index)}
-                  style={{
-                    width: THUMB_SIZE,
-                    height: THUMB_SIZE,
-                    borderRadius: exactScale(8),
-                    borderWidth: isActive ? 2 : 1,
-                    borderColor: isActive ? "#0F7635" : "#E5E7EB",
-                    overflow: "hidden",
-                  }}
+                  style={[
+                    s.thumbWrapper,
+                    isActive && s.thumbWrapperActive,
+                  ]}
                 >
                   <Image
                     source={{ uri }}
-                    style={{ width: "100%", height: "100%" }}
+                    style={s.thumbImage}
                     contentFit="cover"
                     cachePolicy="memory-disk"
                   />

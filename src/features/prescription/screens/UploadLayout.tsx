@@ -23,11 +23,12 @@ import {
   HowItWorks,
   WhyTrustUs,
 } from "../sections/upload";
+import { styles as s } from "./UploadLayout.styles";
 
 export const UploadLayout: React.FC = () => {
   const adjustedBottom = useAdjustedBottomInset();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const clearItems = usePrescriptionDraftStore((s) => s.clearItems);
+  const isAuthenticated = useAuthStore((st) => st.isAuthenticated);
+  const clearItems = usePrescriptionDraftStore((st) => st.clearItems);
 
   const [infoModal, setInfoModal] = useState<{
     title: string;
@@ -85,7 +86,7 @@ export const UploadLayout: React.FC = () => {
   // moved to the front, where the choice is still cheap to abandon.
   if (liveState) {
     return (
-      <View className="flex-1 bg-[#F5F6FB]">
+      <View style={s.root}>
         <ScreenHeader title="Upload Prescription" />
         {liveState === "offline" ? (
           <NoInternetState
@@ -103,7 +104,7 @@ export const UploadLayout: React.FC = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       {infoModal && (
         <InfoModal
           title={infoModal.title}
@@ -147,13 +148,14 @@ export const UploadLayout: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         overScrollMode="auto"
-        className="flex-1"
-        contentContainerStyle={{
-          padding: exactScale(16),
-          gap: exactScale(12),
-          paddingBottom:
-            components.tabBar.height + adjustedBottom + exactScale(40),
-        }}
+        style={s.scrollView}
+        contentContainerStyle={[
+          s.scrollContent,
+          {
+            paddingBottom:
+              components.tabBar.height + adjustedBottom + exactScale(40),
+          },
+        ]}
       >
         <UploadActions
           onPickImage={pickImage}

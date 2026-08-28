@@ -7,7 +7,6 @@ import { ANIMATIONS } from "@/src/constants/images";
 import { useCartWalletSettings } from "@/src/hooks/queries/useSettings";
 import { useAddMoney, useWalletBalance } from "@/src/features/wallet/hooks/useWallet";
 import { useNav } from "@/src/hooks/useNav";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { requireInternet } from "@/src/utils/offline";
 import { DotLottie, type Dotlottie } from "@lottiefiles/dotlottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
@@ -24,6 +23,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { styles as s } from "./AddMoneyLayout.styles";
 
 const PRESETS = [500, 1000, 2000];
 /** Fallback until the backend serves `wallet.maxTopUpAmount`. */
@@ -100,7 +100,7 @@ export const AddMoneyLayout: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#F5F6FB" }}
+      style={s.root}
       behavior="padding"
       keyboardVerticalOffset={-insets.bottom}
     >
@@ -110,23 +110,9 @@ export const AddMoneyLayout: React.FC = () => {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         overScrollMode="auto"
-        contentContainerStyle={{
-          alignItems: "center",
-          paddingTop: 36,
-          paddingBottom: 28,
-          backgroundColor: "#FFFFFF",
-          borderBottomWidth: 1,
-          borderBottomColor: "#F0F0F0",
-        }}
+        contentContainerStyle={s.scrollContent}
       >
-        <Text
-          style={{
-            fontSize: moderateScale(14),
-            fontWeight: "500",
-            color: "#6B7280",
-            marginBottom: 12,
-          }}
-        >
+        <Text style={s.promptText}>
           How much would you like to add?
         </Text>
 
@@ -134,36 +120,21 @@ export const AddMoneyLayout: React.FC = () => {
         <Touchable
           activeOpacity={1}
           onPress={() => inputRef.current?.focus()}
-          style={{ width: "100%", alignItems: "center", marginBottom: 6 }}
+          style={s.inputTouchable}
         >
           <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              // Grow with the amount instead of a fixed width — a fixed width
-              // made long values (5–6 digits) scroll inside the input and clip
-              // the first digit on the left.
-              minWidth: exactScale(200),
-              maxWidth: "92%",
-              paddingHorizontal: exactScale(12),
-              borderBottomWidth: 2,
-              borderBottomColor: hasError
-                ? "#DC2626"
-                : isAmountFocused
-                  ? "#0F7635"
-                  : "#E5E7EB",
-              paddingBottom: 4,
-              gap: exactScale(4),
-            }}
+            style={[
+              s.inputWrapper,
+              {
+                borderBottomColor: hasError
+                  ? "#DC2626"
+                  : isAmountFocused
+                    ? "#0F7635"
+                    : "#E5E7EB",
+              },
+            ]}
           >
-            <Text
-              style={{
-                fontSize: moderateScale(44),
-                fontWeight: "800",
-                color: "#111827",
-              }}
-            >
+            <Text style={s.currencySymbol}>
               ₹
             </Text>
             <TextInput
@@ -187,31 +158,20 @@ export const AddMoneyLayout: React.FC = () => {
               maxLength={6}
               cursorColor="#0F7635"
               selectionColor="#0F7635"
-              style={{
-                fontSize: moderateScale(44),
-                lineHeight: moderateScale(54),
-                fontWeight: "800",
-                color: "#111827",
-                minWidth: 100,
-                minHeight: moderateScale(60),
-                paddingHorizontal: 8,
-                paddingVertical: 0,
-                textAlignVertical: "center",
-                includeFontPadding: false,
-              }}
+              style={s.textInput}
             />
           </View>
           <Text
-            style={{
-              fontSize: moderateScale(12),
-              fontWeight: "500",
-              color: hasError
-                ? "#DC2626"
-                : isAmountFocused
-                  ? "#0F7635"
-                  : "#9CA3AF",
-              marginTop: 6,
-            }}
+            style={[
+              s.helperText,
+              {
+                color: hasError
+                  ? "#DC2626"
+                  : isAmountFocused
+                    ? "#0F7635"
+                    : "#9CA3AF",
+              },
+            ]}
           >
             {hasError
               ? "Amount cannot exceed ₹2,000"
@@ -223,26 +183,19 @@ export const AddMoneyLayout: React.FC = () => {
           <ActivityIndicator
             color="#0F7635"
             size="small"
-            style={{ marginBottom: 20 }}
+            style={s.balanceLoader}
           />
         ) : (
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              fontWeight: "500",
-              color: "#6B7280",
-              marginBottom: 20,
-            }}
-          >
+          <Text style={s.balanceText}>
             Available Balance:{" "}
-            <Text style={{ fontWeight: "700", color: "#111827" }}>
+            <Text style={s.balanceValueBold}>
               ₹{walletBalance.toLocaleString()}
             </Text>
           </Text>
         )}
 
         {/* Preset chips */}
-        <View style={{ flexDirection: "row", gap: 10, marginBottom: 12 }}>
+        <View style={s.presetRow}>
           {PRESETS.map((preset) => {
             const isActive = selectedPreset === preset;
             return (
@@ -250,21 +203,19 @@ export const AddMoneyLayout: React.FC = () => {
                 key={preset}
                 onPress={() => handlePreset(preset)}
                 activeOpacity={0.8}
-                style={{
-                  paddingHorizontal: 20,
-                  paddingVertical: 10,
-                  borderRadius: 8,
-                  borderWidth: 1.5,
-                  borderColor: isActive ? "#0F7635" : "#E5E7EB",
-                  backgroundColor: isActive ? "#EFFFF5" : "#FFFFFF",
-                }}
+                style={[
+                  s.presetChip,
+                  {
+                    borderColor: isActive ? "#0F7635" : "#E5E7EB",
+                    backgroundColor: isActive ? "#EFFFF5" : "#FFFFFF",
+                  },
+                ]}
               >
                 <Text
-                  style={{
-                    fontSize: moderateScale(14),
-                    fontWeight: "600",
-                    color: isActive ? "#0F7635" : "#374151",
-                  }}
+                  style={[
+                    s.presetChipText,
+                    { color: isActive ? "#0F7635" : "#374151" },
+                  ]}
                 >
                   ₹{preset.toLocaleString()}
                 </Text>
@@ -273,52 +224,34 @@ export const AddMoneyLayout: React.FC = () => {
           })}
         </View>
 
-        <Text
-          style={{
-            fontSize: moderateScale(12),
-            fontWeight: "500",
-            color: "#9CA3AF",
-          }}
-        >
+        <Text style={s.maxLimitText}>
           Maximum Top-Up Limit: ₹{MAX_TOPUP.toLocaleString()}
         </Text>
       </ScrollView>
 
-      <View style={{ flex: 1 }} />
+      <View style={s.spacer} />
 
       {/* Proceed Button */}
-      <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "#F5F6FB" }}>
-        <View
-          style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12 }}
-        >
+      <SafeAreaView edges={["bottom"]} style={s.bottomSafeArea}>
+        <View style={s.proceedWrap}>
           <Touchable
             onPress={handleProceed}
             disabled={loading || isSuccess || !numericAmount || hasError}
             activeOpacity={0.85}
-            style={{
-              backgroundColor: "#0F7635",
-              borderRadius: 14,
-              height: 54,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              opacity:
-                loading || isSuccess || !numericAmount || hasError ? 0.5 : 1,
-            }}
+            style={[
+              s.proceedBtn,
+              {
+                opacity:
+                  loading || isSuccess || !numericAmount || hasError ? 0.5 : 1,
+              },
+            ]}
           >
             {loading || isSuccess ? (
               <ActivityIndicator color="#FFFFFF" size="small" />
             ) : (
               <>
                 <icons.lock width={18} height={18} fill="#FFFFFF" />
-                <Text
-                  style={{
-                    fontSize: moderateScale(16),
-                    fontWeight: "600",
-                    color: "#FFFFFF",
-                  }}
-                >
+                <Text style={s.proceedBtnText}>
                   Proceed to Pay ₹{numericAmount.toLocaleString()}
                 </Text>
               </>
@@ -328,23 +261,13 @@ export const AddMoneyLayout: React.FC = () => {
       </SafeAreaView>
 
       {/* Confetti overlay */}
-      <View
-        pointerEvents="none"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 99,
-        }}
-      >
+      <View pointerEvents="none" style={s.confettiOverlay}>
         <DotLottie
           ref={confettiRef}
           source={ANIMATIONS.confetti}
           autoplay={false}
           loop={false}
-          style={{ width: "100%", height: "100%" }}
+          style={s.confettiAnimation}
         />
       </View>
     </KeyboardAvoidingView>

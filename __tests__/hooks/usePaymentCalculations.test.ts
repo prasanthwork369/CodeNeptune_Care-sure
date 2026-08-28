@@ -52,7 +52,7 @@ jest.mock("@/src/features/prescription/services/prescription.service", () => ({
   },
 }));
 
-jest.mock("@/src/services/notifications/orderNotification", () => ({
+jest.mock("@/src/services/notifications", () => ({
   orderNotification: {
     showOrderPlaced: jest.fn().mockResolvedValue(undefined),
   },
@@ -228,7 +228,7 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     });
 
     expect(prescriptionService.upload).toHaveBeenCalledWith({
-      imageUrls: ["https://example.com/rx.jpg"],
+      fileData: [{ url: "https://example.com/rx.jpg" }],
       category: 1,
     });
     expect(mockCreateOrder).toHaveBeenCalledWith(

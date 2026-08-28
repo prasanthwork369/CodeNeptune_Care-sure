@@ -37,6 +37,7 @@ import {
 } from "../sections/preview";
 import { validatePrescriptionFile } from "../utils/prescription";
 import { computeUploadTotals } from "../utils/uploadProgress";
+import { styles as s } from "./PreviewLayout.styles";
 
 const FOLDER = "customers/prescriptions";
 
@@ -77,10 +78,10 @@ export const PreviewLayout: React.FC = () => {
   }>();
 
   // Field selectors — the draft store is written on every upload step.
-  const items = usePrescriptionDraftStore((s) => s.items);
-  const addItems = usePrescriptionDraftStore((s) => s.addItems);
-  const removeFromStore = usePrescriptionDraftStore((s) => s.removeItem);
-  const clearItems = usePrescriptionDraftStore((s) => s.clearItems);
+  const items = usePrescriptionDraftStore((st) => st.items);
+  const addItems = usePrescriptionDraftStore((st) => st.addItems);
+  const removeFromStore = usePrescriptionDraftStore((st) => st.removeItem);
+  const clearItems = usePrescriptionDraftStore((st) => st.clearItems);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export const PreviewLayout: React.FC = () => {
     if (seed.length === 0) return;
     // Merges with anything already picked; addItems dedupes and caps at the configured limit.
     addItems(seed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [submitting, setSubmitting] = useState(false);
@@ -318,17 +320,10 @@ export const PreviewLayout: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#F5F6FB]">
+    <View style={s.root}>
       <ScreenHeader title="Upload Prescription" onBack={handleBackPress} />
 
-      <View
-        style={{
-          flex: 1,
-          paddingHorizontal: 24,
-          paddingTop: 20,
-          paddingBottom: 8,
-        }}
-      >
+      <View style={s.displayContainer}>
         <PreviewDisplay
           activeItem={activeItem}
           screenWidth={screenWidth}

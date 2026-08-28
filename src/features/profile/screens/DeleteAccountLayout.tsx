@@ -275,7 +275,7 @@ export const DeleteAccountLayout: React.FC = () => {
       <ConfirmActionModal
         isVisible={showConfirm}
         message="Are you sure you want to delete your account"
-        icon={<icons.delete_red width={36} height={36} />}
+        icon={<icons.delete_red width={exactScale(36)} height={exactScale(36)} />}
         confirmLabel="Yes"
         cancelLabel="No"
         isLoading={deletingAccount}

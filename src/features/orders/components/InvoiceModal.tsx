@@ -142,7 +142,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     }
 
     return body;
-  }, [screenWidth, template?.body]);
+  }, [screenWidth, template]);
 
   const printHtml = useMemo(() => {
     if (!template?.body) return "";
@@ -192,7 +192,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         @page { size: A4 portrait; margin: 0; }
       </style>`,
     );
-  }, [template?.body]);
+  }, [template]);
 
   const handleDownload = async () => {
     if (downloading || !printHtml || !order) return;

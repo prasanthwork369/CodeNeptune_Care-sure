@@ -1,9 +1,9 @@
 import { icons } from "@/src/constants/icons";
 import { colors } from "@/src/constants/theme";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
+import { styles as s } from "./product-sections.styles";
 
 interface TrustBadgeProps {
   searchedName: string;
@@ -14,16 +14,7 @@ interface TrustBadgeProps {
   recommendedUnitPrice?: string | number;
 }
 
-const Divider = () => (
-  <View
-    style={{
-      borderTopWidth: 1,
-      borderColor: "#E5E7EB",
-      borderStyle: "dashed",
-      marginVertical: 16,
-    }}
-  />
-);
+const Divider = () => <View style={s.trustBadgeDashedDivider} />;
 
 export const TrustBadge: React.FC<TrustBadgeProps> = ({
   searchedName,
@@ -41,43 +32,28 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
       colors={["#F0F8FF", "#FFFFFF"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 0.8 }}
-      style={{
-        paddingTop: exactScale(24),
-        paddingBottom: exactScale(24),
-      }}
+      style={s.trustBadgeRoot}
     >
-      <View className="px-4 mb-6">
-        <Text
-          className="font-inter-bold text-brand-text mb-4 text-center"
-          style={{ fontSize: moderateScale(14) }}
-        >
+      <View style={s.trustBadgeInner}>
+        <Text style={s.trustBadgeTitle}>
           Medicine Comparison
         </Text>
 
-        <View className="bg-white rounded-[16px] p-5 border border-[#919EAB33]">
+        <View style={s.trustBadgeCard}>
           {/* MEDICINE */}
           <View>
-            <Text
-              className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center"
-              style={{ fontSize: moderateScale(12) }}
-            >
+            <Text style={s.trustBadgeFieldLabel}>
               MEDICINE
             </Text>
-            <View className="flex-row items-center justify-between">
+            <View style={s.trustBadgeRow}>
               <Text
-                className="font-inter-semibold text-brand-text"
-                style={{ flex: 1, marginRight: 8, fontSize: moderateScale(14) }}
+                style={s.trustBadgeSearchedText}
                 numberOfLines={2}
               >
                 {searchedName}
               </Text>
               <Text
-                className="font-inter-semibold text-brand-primary"
-                style={{
-                  flex: 1,
-                  textAlign: "right",
-                  fontSize: moderateScale(14),
-                }}
+                style={s.trustBadgeRecommendedText}
                 numberOfLines={2}
               >
                 {recName}
@@ -88,27 +64,18 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
           {/* MANUFACTURER */}
           <View>
-            <Text
-              className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center"
-              style={{ fontSize: moderateScale(12) }}
-            >
+            <Text style={s.trustBadgeFieldLabel}>
               MANUFACTURER
             </Text>
-            <View className="flex-row items-center justify-between">
+            <View style={s.trustBadgeRow}>
               <Text
-                className="font-inter-semibold text-brand-text"
-                style={{ flex: 1, marginRight: 8, fontSize: moderateScale(14) }}
+                style={s.trustBadgeSearchedText}
                 numberOfLines={2}
               >
                 {searchedManufacturer || "—"}
               </Text>
               <Text
-                className="font-inter-semibold text-brand-primary"
-                style={{
-                  flex: 1,
-                  textAlign: "right",
-                  fontSize: moderateScale(14),
-                }}
+                style={s.trustBadgeRecommendedText}
                 numberOfLines={2}
               >
                 {recManufacturer || "—"}
@@ -119,83 +86,46 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
 
           {/* SALT COMPOSITION & STRENGTH */}
           <View>
-            <Text
-              className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center"
-              style={{ fontSize: moderateScale(12) }}
-            >
+            <Text style={s.trustBadgeFieldLabel}>
               SALT COMPOSITION & STRENGTH
             </Text>
-            <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
+            <View style={s.trustBadgeMatchBox}>
               <icons.check_circle
                 width={14}
                 height={14}
                 color={colors.primary}
               />
-              <Text
-                className="font-inter-semibold text-brand-primary ml-1.5"
-                style={{ fontSize: moderateScale(14) }}
-              >
+              <Text style={s.trustBadgeMatchText}>
                 100% Match
               </Text>
             </View>
           </View>
           <Divider />
 
-          {/* MEDICINAL EFFECT */}
+          {/* PRICE COMPARISON */}
           <View>
-            <Text
-              className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center"
-              style={{ fontSize: moderateScale(12) }}
-            >
-              MEDICINAL EFFECT
+            <Text style={s.trustBadgeFieldLabel}>
+              PRICE COMPARISON
             </Text>
-            <View className="flex-row items-center justify-center py-[10px] rounded-[6px] bg-[#F1FFF6] border border-dashed border-brand-primary">
-              <icons.check_circle
-                width={14}
-                height={14}
-                color={colors.primary}
-              />
-              <Text
-                className="font-inter-semibold text-brand-primary ml-1.5"
-                style={{ fontSize: moderateScale(14) }}
-              >
-                Same
-              </Text>
+            <View style={s.trustBadgeRow}>
+              <View style={{ flex: 1, marginRight: 8 }}>
+                <Text style={s.trustBadgeSearchedText}>
+                  {searchedUnitPrice ? `₹${searchedUnitPrice}` : "—"}
+                </Text>
+                <Text style={{ fontSize: 11, color: "#6B7280" }}>
+                  per unit
+                </Text>
+              </View>
+              <View style={{ flex: 1, alignItems: "flex-end" }}>
+                <Text style={s.trustBadgeRecommendedText}>
+                  {recommendedUnitPrice ? `₹${recommendedUnitPrice}` : "—"}
+                </Text>
+                <Text style={{ fontSize: 11, color: "#0F7635" }}>
+                  per unit
+                </Text>
+              </View>
             </View>
           </View>
-
-          {/* PRICE/UNIT — only show when both unit prices are available */}
-          {(searchedUnitPrice != null || recommendedUnitPrice != null) && (
-            <>
-              <Divider />
-              <View>
-                <Text
-                  className="font-inter-semibold text-brand-subtext uppercase tracking-[1px] mb-2 text-center"
-                  style={{ fontSize: moderateScale(12) }}
-                >
-                  PRICE/UNIT
-                </Text>
-                <View className="flex-row items-center justify-between">
-                  <Text
-                    className="font-inter-semibold text-[#111827]"
-                    style={{ fontSize: moderateScale(14) }}
-                  >
-                    {searchedUnitPrice != null
-                      ? `₹${Number(searchedUnitPrice).toFixed(2)}`
-                      : "—"}
-                  </Text>
-                  <Text
-                    className="font-inter-semibold text-brand-primary"
-                    style={{ fontSize: moderateScale(14) }}
-                  >
-                    {recommendedUnitPrice != null
-                      ? `₹${Number(recommendedUnitPrice).toFixed(2)}`
-                      : "—"}
-                  </Text>
-                </View>
-              </View>
-            </>
-          )}
         </View>
       </View>
     </LinearGradient>

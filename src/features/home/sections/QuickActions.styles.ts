@@ -35,6 +35,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     flex: 1,
+    fontFamily: "Inter-SemiBold",
     fontWeight: "600",
     fontSize: typography.body.fontSize,
     color: "#222222",

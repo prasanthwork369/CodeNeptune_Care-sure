@@ -1,10 +1,9 @@
 import { Order } from "../../types";
-import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { format } from "@/src/utils/validation";
 import React from "react";
 import { Text, View } from "react-native";
-import { orderStyles as s } from "../../orders.styles";
 import { SectionCard } from "./SectionCard";
+import { styles as s } from "./tracking.styles";
 
 interface DeliveryAddressSectionProps {
   address: Order["deliveryAddress"];
@@ -14,41 +13,27 @@ export function DeliveryAddressSection({
   address,
 }: DeliveryAddressSectionProps) {
   return (
-    <SectionCard
-      style={{
-        paddingHorizontal: exactScale(16),
-        paddingVertical: exactScale(16),
-      }}
-    >
-      <Text
-        className="font-inter-semibold text-brand-text"
-        style={{ fontSize: moderateScale(14), marginBottom: exactScale(12) }}
-      >
+    <SectionCard style={s.deliveryCard}>
+      <Text style={s.sectionTitle}>
         Deliver To
       </Text>
       {address ? (
-        <View style={{ gap: exactScale(2) }}>
-          <Text style={s.labelSm} className="font-inter-bold text-brand-text">
+        <View style={s.addressCol}>
+          <Text style={s.addressName}>
             {address.name}
           </Text>
-          <Text
-            style={[
-              s.labelSm,
-              { lineHeight: moderateScale(18), marginTop: exactScale(4) },
-            ]}
-            className="font-inter text-brand-subtext"
-          >
+          <Text style={s.addressDetails}>
             {[address.line1, address.line2].filter(Boolean).join(", ")}
             {", "}
             {address.city},{"\n"}
             {address.state.toUpperCase()}, {address.pincode}
           </Text>
-          <Text style={s.labelSm} className="font-inter text-brand-subtext">
+          <Text style={s.addressPhone}>
             Phone : {format.phone(address.phone)}
           </Text>
         </View>
       ) : (
-        <Text style={s.labelSm} className="font-inter text-brand-subtext">
+        <Text style={s.emptyText}>
           —
         </Text>
       )}
