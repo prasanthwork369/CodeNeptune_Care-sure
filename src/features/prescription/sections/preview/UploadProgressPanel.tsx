@@ -5,14 +5,16 @@ import { Text, View } from "react-native";
 interface UploadProgressPanelProps {
   total: number;
   done: number;
-  /** Averaged real byte progress across all files, 0-100. */
+  /** Byte-weighted overall progress across all files, 0-100. */
   percent: number;
   failed: number;
+  /** True while POST /prescriptions runs after every file already hit 100%. */
+  saving?: boolean;
 }
 
 // Memoised: byte progress ticks several times a second and must not re-render the screen.
 export const UploadProgressPanel: React.FC<UploadProgressPanelProps> =
-  React.memo(({ total, done, percent, failed }) => {
+  React.memo(({ total, done, percent, failed, saving }) => {
     return (
       <View
         className="bg-white border-t border-[#919EAB1A]"
@@ -23,7 +25,7 @@ export const UploadProgressPanel: React.FC<UploadProgressPanelProps> =
             className="font-inter-semibold text-[#1A1C1E]"
             style={{ fontSize: moderateScale(14) }}
           >
-            Uploading prescriptions…
+            {saving ? "Saving prescription…" : "Uploading prescriptions…"}
           </Text>
           <Text
             className="font-inter-semibold text-[#0F7635]"
@@ -37,7 +39,7 @@ export const UploadProgressPanel: React.FC<UploadProgressPanelProps> =
           className="font-inter-medium text-[#6A6A6A]"
           style={{ fontSize: moderateScale(12), marginTop: 4 }}
         >
-          {done} of {total} uploaded
+          {done} of {total} files completed
           {failed > 0 ? ` · ${failed} failed` : ""}
         </Text>
 

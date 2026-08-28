@@ -168,19 +168,13 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
       <StickyFooter
         safeAreaBottom={safeAreaBottom}
         contentStyle={{
-          flexDirection: "row",
-          alignItems: "center",
           maxWidth: undefined,
         }}
       >
         <Text
-          className="font-inter-medium text-[#000000]"
+          className="font-inter-medium text-[#1A1C1E] mb-2"
           numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.8}
           style={{
-            flexShrink: 1,
-            marginRight: 12,
             fontSize: moderateScale(14),
           }}
         >
@@ -191,7 +185,7 @@ export const PreviewThumbnails: React.FC<PreviewThumbnailsProps> = ({
           title={submitting ? "Uploading..." : "Proceed"}
           disabled={submitting || items.length === 0}
           loading={submitting}
-          style={{ flex: 1, minWidth: 136 }}
+          style={{ width: "100%" }}
           onPress={onSubmit}
           accessibilityLabel="Proceed with uploaded prescriptions"
           accessibilityState={{

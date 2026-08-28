@@ -6,7 +6,7 @@ import type { FamilyMember, FamilyMemberInput } from "@/src/features/profile/typ
 import type { HealthProblem } from "../types";
 import { sanitize, stripIndianCode, validate } from "@/src/utils/validation";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function useSelectPatient() {
@@ -47,16 +47,18 @@ export function useSelectPatient() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
     null,
   );
-  const selectedPatient =
-    members.find((m) => m.id === selectedPatientId) ?? members[0] ?? null;
-
-  useEffect(() => {
-    if (!selectedPatientId && members.length > 0) {
-      const draftId = useCheckoutDraftStore.getState().patientMemberId;
-      const stillExists = draftId && members.some((m) => m.id === draftId);
-      setSelectedPatientId(stillExists ? draftId : members[0].id);
-    }
-  }, [members, selectedPatientId]);
+  // No explicit pick yet — default to the draft's saved patient if it's
+  // still in the list, otherwise the first member. Derived each render
+  // instead of synced via an effect, since nothing outside this hook reads
+  // selectedPatientId itself (only the resolved selectedPatient below).
+  const selectedPatient = (() => {
+    const explicit = members.find((m) => m.id === selectedPatientId);
+    if (explicit) return explicit;
+    if (members.length === 0) return null;
+    const draftId = useCheckoutDraftStore.getState().patientMemberId;
+    const fromDraft = draftId && members.find((m) => m.id === draftId);
+    return fromDraft || members[0];
+  })();
 
   const [symptoms, setSymptoms] = useState(
     () => useCheckoutDraftStore.getState().symptoms,
@@ -83,12 +85,22 @@ export function useSelectPatient() {
 
   // Keep the edit field to 10 digits only; country code shown separately as a fixed +91.
   const handlePhoneChange = (text: string) => {
+    if (phoneValue.length === 10 && text.startsWith(phoneValue)) return;
     setPhoneValue(sanitize.phone(text));
     setPhoneError("");
   };
 
+  // Skip the API call when "Done" is pressed but the number matches the saved one.
+  const isPhoneUnchanged =
+    phoneValue.trim() === stripIndianCode(selectedPatient?.phone).trim();
+
   const handleUpdatePhone = async () => {
     if (editingPhone) {
+      if (isPhoneUnchanged) {
+        setEditingPhone(false);
+        setPhoneError("");
+        return;
+      }
       const result = validate.phone(phoneValue);
       if (!result.valid) {
         setPhoneError(result.message);
@@ -209,6 +221,7 @@ export function useSelectPatient() {
     handlePhoneChange,
     phoneError,
     savingPhone,
+    isPhoneUnchanged,
     editingPatient,
     setEditingPatient,
     showEmptyState,

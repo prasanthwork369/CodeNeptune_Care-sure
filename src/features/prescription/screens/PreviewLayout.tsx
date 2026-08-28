@@ -23,10 +23,7 @@ import React, {
 } from "react";
 import { BackHandler, View, useWindowDimensions } from "react-native";
 import { UploadPrescriptionSheet } from "../components/UploadPrescriptionSheet";
-import {
-  uploadKeyOf,
-  usePrescriptionUploader,
-} from "../hooks/usePrescriptionUploader";
+import { usePrescriptionUploader } from "../hooks/usePrescriptionUploader";
 import { CapturedAsset, usePrescriptionUploadService } from "../scanner";
 import {
   DuplicateFileModal,
@@ -39,6 +36,7 @@ import {
   UploadProgressPanel,
 } from "../sections/preview";
 import { validatePrescriptionFile } from "../utils/prescription";
+import { computeUploadTotals } from "../utils/uploadProgress";
 
 const FOLDER = "customers/prescriptions";
 
@@ -104,6 +102,10 @@ export const PreviewLayout: React.FC = () => {
   }, []);
 
   const [submitting, setSubmitting] = useState(false);
+  // True only while the standalone flow's POST /prescriptions is in flight,
+  // after every file has already reached 100% — a distinct phase so the
+  // panel can say so instead of sitting at 100% with no explanation.
+  const [savingPrescription, setSavingPrescription] = useState(false);
   const [showConfirmed, setShowConfirmed] = useState(false);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
@@ -134,32 +136,10 @@ export const PreviewLayout: React.FC = () => {
   const goPrev = () => setActiveIndex((prev) => prev - 1);
   const goNext = () => setActiveIndex((prev) => prev + 1);
 
-  // Averaged across files so one large upload can't dominate the bar. Failed
-  // files contribute 0 rather than freezing the percentage at their last value.
-  const uploadTotals = useMemo(() => {
-    const total = items.length;
-    let done = 0;
-    let failed = 0;
-    let sum = 0;
-    for (const item of items) {
-      const state = uploader.states[uploadKeyOf(item)];
-      if (!state) continue;
-      if (state.status === "success") {
-        done += 1;
-        sum += 100;
-      } else if (state.status === "error") {
-        failed += 1;
-      } else {
-        sum += state.progress;
-      }
-    }
-    return {
-      total,
-      done,
-      failed,
-      percent: total > 0 ? Math.round(sum / total) : 0,
-    };
-  }, [items, uploader.states]);
+  const uploadTotals = useMemo(
+    () => computeUploadTotals(items, uploader.states),
+    [items, uploader.states],
+  );
 
   const exitFlow = useCallback(() => {
     // Not cleared here — clearing while the modal closes empties the items
@@ -302,6 +282,7 @@ export const PreviewLayout: React.FC = () => {
         name: item.name,
         size: item.size,
       }));
+      setSavingPrescription(true);
       const result = await prescriptionService.upload({
         fileData,
         category: PRESCRIPTION_CATEGORY.ORDER,
@@ -332,6 +313,7 @@ export const PreviewLayout: React.FC = () => {
     } finally {
       submitLockRef.current = false;
       setSubmitting(false);
+      setSavingPrescription(false);
     }
   };
 
@@ -365,6 +347,7 @@ export const PreviewLayout: React.FC = () => {
           done={uploadTotals.done}
           percent={uploadTotals.percent}
           failed={uploadTotals.failed}
+          saving={savingPrescription}
         />
       )}
 

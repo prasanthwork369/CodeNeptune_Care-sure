@@ -17,6 +17,7 @@ import { exactScale, moderateScale } from "@/src/utils/exactScale";
 import { getAge } from "@/src/utils/patient";
 import { resolveAssetUrl } from "@/src/utils/urls";
 import { format } from "@/src/utils/validation";
+import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
 import React from "react";
 import {
   ActivityIndicator,
@@ -347,12 +348,12 @@ export const SelectPatientLayout: React.FC = () => {
                       }}
                     />
                     <TextInput
+                      ref={(r) => applyDigitsOnlyFilter(r, 10)}
                       className="flex-1 font-inter-semibold text-[#222222]"
                       style={s.contactInput}
                       value={phoneValue}
                       onChangeText={handlePhoneChange}
                       keyboardType="number-pad"
-                      maxLength={10}
                       autoFocus
                       placeholderTextColor="#6A6A6A"
                       placeholder="Enter mobile number"
