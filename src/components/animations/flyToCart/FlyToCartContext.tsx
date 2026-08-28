@@ -20,7 +20,7 @@ import {
 } from "react-native-reanimated";
 
 /** What a card can hand to the fly animation: a remote URI or a bundled asset. */
-export type FlyImage = ImageSource | string | null | undefined;
+export type FlyImage = ImageSource | string | number | null | undefined;
 
 export interface ActiveAnimation {
   id: string;
@@ -235,13 +235,10 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           setVisualCartCount((prev) =>
             prev === totalItems ? prev : totalItems,
           );
-          const cartItemsWithImage = items.filter(
-            (item) => item.image ?? item.metadata?.image,
-          );
-          const newImages: VisualCartImage[] = cartItemsWithImage
+          const newImages: VisualCartImage[] = items
             .map((i) => ({
               id: i.medicineId,
-              image: i.image ?? i.metadata?.image,
+              image: (i.image ?? (i.metadata?.image as FlyImage) ?? null) as FlyImage,
               isPending: false,
             }))
             .slice(-3);
@@ -330,7 +327,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
       // First item: show image immediately in the circle (no pending)
       // so user sees image in circle before expansion starts.
       // Subsequent items: keep isPending so thumbnail only pops in when fly lands.
-      if (imageUrl && productId) {
+      if (productId) {
         const isFirstItem = currentTotal === 0;
         // Use the real cart row id when the item already exists in the cart
         // (e.g. incrementing quantity) so this optimistic entry shares the
@@ -341,7 +338,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
           const filtered = prev.filter((item) => item.id !== visualId);
           return [
             ...filtered,
-            { id: visualId, image: imageUrl, isPending: !isFirstItem },
+            { id: visualId, image: imageUrl ?? null, isPending: !isFirstItem },
           ].slice(-3);
         });
       }
@@ -365,7 +362,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
       setActiveAnimations((prev) => prev.filter((anim) => anim.id !== id));
 
       // Once the flying image lands, transition isPending to false so the thumbnail animates in.
-      if (imageUrl && productId) {
+      if (productId) {
         const visualId = productId;
         setVisualCartImages((prev) =>
           prev.map((item) =>

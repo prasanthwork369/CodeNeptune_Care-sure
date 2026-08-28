@@ -9,6 +9,7 @@ import {
   CARD_IMAGE_HEIGHT,
 } from "../categories.styles";
 import { Image } from "expo-image";
+import { icons } from "@/src/constants/icons";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useNav } from "@/src/hooks/useNav";
 import type { CategoryCard } from "@/src/features/home/types";
@@ -138,13 +139,25 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                         alignItems: "center",
                         justifyContent: "center",
                         padding: 2,
+                        position: "relative",
                       }}
                     >
-                      <Image
-                        source={card.image}
-                        style={{ width: "92%", height: "92%" }}
-                        contentFit="contain"
+                      <icons.placeholder
+                        width={cardWidth * 0.52}
+                        height={cardWidth * 0.52}
                       />
+                      {card.image ? (
+                        <Image
+                          source={card.image}
+                          style={{
+                            width: "92%",
+                            height: "92%",
+                            position: "absolute",
+                          }}
+                          contentFit="contain"
+                          cachePolicy="memory-disk"
+                        />
+                      ) : null}
                     </View>
 
                     {/* Category Title Text below the image container */}

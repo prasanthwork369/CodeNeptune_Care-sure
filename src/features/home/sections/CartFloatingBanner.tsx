@@ -2,6 +2,7 @@ import { useCartFloatingBannerAnimation } from "@/src/features/home/hooks/useCar
 import {
   SmokePuff,
   useFlyToCartSafe,
+  type FlyImage,
   type VisualCartImage,
 } from "@/src/components/animations/flyToCart";
 import { PILL_HEIGHT } from "@/src/components/navigation/LiquidTabBar.styles";
@@ -236,7 +237,11 @@ export const CartFloatingBanner = ({
                   )}
                   <CartBannerThumbnail
                     key={frontThumb?.id ?? "front-stacked"}
-                    image={frontThumb?.image}
+                    image={
+                      frontThumb?.image ??
+                      lastAddedItem?.image ??
+                      (lastAddedItem?.metadata?.image as FlyImage)
+                    }
                     isPending={frontThumb?.isPending}
                     isRemoving={frontThumb?.isRemoving}
                     isBehindRemoving={frontThumb?.isBehindRemoving}

@@ -9,7 +9,7 @@ export const useFlyToCartTrigger = (image: FlyImage, medicineId: string) => {
   const imageRef = useRef<View>(null);
 
   const triggerFly = useCallback(() => {
-    if (!ctx || !image || !medicineId) return;
+    if (!ctx || !medicineId) return;
 
     // `measure`'s native callback has been observed to fire more than once
     // for a single call on some Android devices. Each call to flyToCart bumps

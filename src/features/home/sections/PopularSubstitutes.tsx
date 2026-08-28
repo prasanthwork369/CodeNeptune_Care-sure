@@ -1,4 +1,5 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
+import { icons } from "@/src/constants/icons";
 import { HOME_IMAGES } from "@/src/constants/images";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
@@ -106,6 +107,10 @@ const ProductCard = React.memo(
       product.image,
       cartMedicineId,
     );
+    const [imageError, setImageError] = useState(false);
+    const hasImage = Boolean(
+      (typeof product.image === "number" || product.image?.uri) && !imageError,
+    );
 
     const prefetchProduct = usePrefetchProduct();
     const handlePrefetch = useCallback(() => {
@@ -166,14 +171,32 @@ const ProductCard = React.memo(
             <View
               ref={imageRef}
               collapsable={false}
-              style={{ width: imageSize, height: imageSize }}
+              style={{
+                width: imageSize,
+                height: imageSize,
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
             >
-              <Image
-                source={product.image}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="contain"
-                cachePolicy="memory-disk"
+              <icons.placeholder
+                width={imageSize * 0.7}
+                height={imageSize * 0.7}
               />
+              {hasImage && (
+                <Image
+                  source={product.image}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "absolute",
+                  }}
+                  contentFit="contain"
+                  cachePolicy="memory-disk"
+                  recyclingKey={product.productId || product.id}
+                  onError={() => setImageError(true)}
+                />
+              )}
             </View>
           </View>
           {!!product.discount && (

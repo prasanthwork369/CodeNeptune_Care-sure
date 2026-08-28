@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { colors } from "@/src/constants/theme";
+import { icons } from "@/src/constants/icons";
 import Animated, {
   SharedValue,
   useSharedValue,
@@ -77,19 +78,45 @@ const FloatingItem: React.FC<FloatingItemProps> = ({
     };
   });
 
-  // Normalize image source URI
-  const uri =
-    typeof item.imageUrl === "string" ? item.imageUrl : item.imageUrl?.uri;
-  const imageSource = uri ? { uri } : undefined;
+  const [hasError, setHasError] = React.useState(false);
+
+  // Normalize image source (supports remote URI string, ImageSource object, or local require number)
+  // Falsy values, empty strings, and empty URI objects resolve to undefined so the local placeholder SVG renders.
+  const imageSource = React.useMemo(() => {
+    if (!item.imageUrl) return undefined;
+    if (typeof item.imageUrl === "number") return item.imageUrl;
+    if (typeof item.imageUrl === "string") {
+      const trimmed = item.imageUrl.trim();
+      return trimmed.length > 0 ? { uri: trimmed } : undefined;
+    }
+    if (typeof item.imageUrl === "object") {
+      if ("uri" in item.imageUrl) {
+        const uri = item.imageUrl.uri;
+        if (typeof uri === "string" && uri.trim().length > 0) {
+          return { ...item.imageUrl, uri: uri.trim() };
+        }
+        return undefined;
+      }
+      return item.imageUrl;
+    }
+    return undefined;
+  }, [item.imageUrl]);
+
+  const showImage = Boolean(imageSource && !hasError);
 
   return (
     <Animated.View style={[animatedStyle, styles.shadow]} pointerEvents="none">
-      <Image
-        source={imageSource}
-        style={styles.image}
-        contentFit="contain"
-        cachePolicy="memory-disk"
-      />
+      {showImage ? (
+        <Image
+          source={imageSource}
+          style={styles.image}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <icons.placeholder width="65%" height="65%" />
+      )}
     </Animated.View>
   );
 };

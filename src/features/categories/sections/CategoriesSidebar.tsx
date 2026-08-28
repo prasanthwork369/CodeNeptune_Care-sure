@@ -1,4 +1,5 @@
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { icons } from "@/src/constants/icons";
 import type { CategoryTab } from "@/src/features/home/types";
 import { components } from "@/src/constants/theme";
 import { Image } from "expo-image";
@@ -185,13 +186,25 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: 5,
+                    position: "relative",
                   }}
                 >
-                  <Image
-                    source={tab.imageActive ?? tab.image}
-                    style={{ width: exactScale(40), height: exactScale(40) }}
-                    contentFit="contain"
+                  <icons.placeholder
+                    width={exactScale(28)}
+                    height={exactScale(28)}
                   />
+                  {(tab.imageActive ?? tab.image) ? (
+                    <Image
+                      source={tab.imageActive ?? tab.image}
+                      style={{
+                        width: exactScale(40),
+                        height: exactScale(40),
+                        position: "absolute",
+                      }}
+                      contentFit="contain"
+                      cachePolicy="memory-disk"
+                    />
+                  ) : null}
                 </LinearGradient>
               ) : (
                 <View
@@ -205,13 +218,25 @@ export const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                     marginBottom: 5,
                     borderWidth: 1,
                     borderColor: "#E5E7EB",
+                    position: "relative",
                   }}
                 >
-                  <Image
-                    source={tab.imageInactive ?? tab.image}
-                    style={{ width: exactScale(40), height: exactScale(40) }}
-                    contentFit="contain"
+                  <icons.placeholder
+                    width={exactScale(28)}
+                    height={exactScale(28)}
                   />
+                  {(tab.imageInactive ?? tab.image) ? (
+                    <Image
+                      source={tab.imageInactive ?? tab.image}
+                      style={{
+                        width: exactScale(40),
+                        height: exactScale(40),
+                        position: "absolute",
+                      }}
+                      contentFit="contain"
+                      cachePolicy="memory-disk"
+                    />
+                  ) : null}
                 </View>
               )}
               <Text

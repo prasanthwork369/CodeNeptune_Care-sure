@@ -2,7 +2,7 @@ import { useThumbnailRemoval } from "@/src/components/animations/flyToCart";
 import { icons } from "@/src/constants/icons";
 import { exactScale } from "@/src/utils/exactScale";
 import { Image, type ImageSource } from "expo-image";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -10,8 +10,8 @@ import Animated from "react-native-reanimated";
 export const CART_THUMB_SIZE = exactScale(44);
 
 interface CartBannerThumbnailProps {
-  /** Cart rows carry a URI string; an optimistic add carries an ImageSource. */
-  image?: ImageSource | string | null;
+  /** Cart rows carry a URI string; an optimistic add carries an ImageSource or require number. */
+  image?: ImageSource | string | number | null;
   isPending?: boolean;
   isRemoving?: boolean;
   isBehindRemoving?: boolean;
@@ -36,11 +36,40 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
     isBehindRemoving,
   });
 
+  const [prevImage, setPrevImage] = useState(image);
+  const [hasError, setHasError] = useState(false);
+
+  if (prevImage !== image) {
+    setPrevImage(image);
+    setHasError(false);
+  }
+
   const size = CART_THUMB_SIZE;
   const imageSize = exactScale(30);
 
-  // Wrapping an ImageSource again would hand expo-image {uri:{uri:...}}.
-  const source = typeof image === "string" ? { uri: image } : image;
+  // Normalize source to support remote URI string, ImageSource object, and local require(...) number.
+  // Falsy values, empty strings, and empty URI objects resolve to undefined so the local placeholder SVG renders.
+  const source = useMemo(() => {
+    if (!image) return undefined;
+    if (typeof image === "number") return image;
+    if (typeof image === "string") {
+      const trimmed = image.trim();
+      return trimmed.length > 0 ? { uri: trimmed } : undefined;
+    }
+    if (typeof image === "object") {
+      if ("uri" in image) {
+        const uri = image.uri;
+        if (typeof uri === "string" && uri.trim().length > 0) {
+          return { ...image, uri: uri.trim() };
+        }
+        return undefined;
+      }
+      return image;
+    }
+    return undefined;
+  }, [image]);
+
+  const showImage = Boolean(source && !hasError);
 
   // The puff is drawn by the banner, not here — the pill clips its own children.
   return (
@@ -83,12 +112,13 @@ export const CartBannerThumbnail: React.FC<CartBannerThumbnailProps> = ({
             imageStyle,
           ]}
         >
-          {source ? (
+          {showImage ? (
             <Image
               source={source}
               style={{ width: "100%", height: "100%" }}
               contentFit="contain"
               cachePolicy="memory-disk"
+              onError={() => setHasError(true)}
             />
           ) : (
             <icons.placeholder width={imageSize} height={imageSize} />

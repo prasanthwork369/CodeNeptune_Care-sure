@@ -1,11 +1,12 @@
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
+import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import type { SubstituteProduct } from "@/src/features/product/types";
 import { Image } from "expo-image";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { OfferShine } from "@/src/components/ui/offerShine";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { styles as s } from "./FrequentSubstitutes.styles";
 import { exactScale } from "@/src/utils/exactScale";
@@ -63,6 +64,10 @@ const FrequentItem = React.memo(
     const { slideAnim, opacityAnim } = animations;
 
     const { imageRef, triggerFly } = useFlyToCartTrigger(item.image, item.id);
+    const [imageError, setImageError] = useState(false);
+    const hasImage = Boolean(
+      (typeof item.image === "number" || item.image?.uri) && !imageError,
+    );
 
     const prefetchProduct = usePrefetchProduct();
     const handlePrefetch = useCallback(() => {
@@ -126,14 +131,23 @@ const FrequentItem = React.memo(
                 flex: 1,
                 alignItems: "center",
                 justifyContent: "center",
+                position: "relative",
               }}
             >
-              <Image
-                source={item.image?.uri ? item.image : undefined}
-                style={s.imgInner}
-                contentFit="contain"
-                cachePolicy="memory-disk"
+              <icons.placeholder
+                width={exactScale(44)}
+                height={exactScale(44)}
               />
+              {hasImage && (
+                <Image
+                  source={item.image}
+                  style={[s.imgInner, { position: "absolute" }]}
+                  contentFit="contain"
+                  cachePolicy="memory-disk"
+                  recyclingKey={item.productId || item.id}
+                  onError={() => setImageError(true)}
+                />
+              )}
             </View>
             {!!item.discount && (
               <View
@@ -186,16 +200,17 @@ const FrequentItem = React.memo(
             )}
             <View className="flex-row items-center gap-x-2">
               <Text className="text-base font-inter-bold text-brand-text">
-                ₹{Number(item.price).toFixed(2)}
+                ₹{(Number(item.price) || 0).toFixed(2)}
               </Text>
-              {!!item.originalPrice && item.originalPrice > item.price && (
-                <Text
-                  style={s.mrp}
-                  className="font-inter text-brand-subtext line-through"
-                >
-                  ₹{Number(item.originalPrice).toFixed(2)}
-                </Text>
-              )}
+              {!!item.originalPrice &&
+                Number(item.originalPrice) > Number(item.price) && (
+                  <Text
+                    style={s.mrp}
+                    className="font-inter text-brand-subtext line-through"
+                  >
+                    ₹{(Number(item.originalPrice) || 0).toFixed(2)}
+                  </Text>
+                )}
             </View>
           </View>
         </Touchable>
@@ -304,16 +319,18 @@ FrequentItem.displayName = "FrequentItem";
 export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> =
   React.memo(
     ({
-      substitutes,
+      substitutes = [],
       title = "Frequently Ordered Products",
       onProductPress,
       onViewAll,
       disableCart,
     }) => {
       const visibleSubstitutes = useMemo(
-        () => substitutes.slice(0, HOME_PREVIEW_LIMIT),
+        () => (substitutes ?? []).slice(0, HOME_PREVIEW_LIMIT),
         [substitutes],
       );
+
+      if (!visibleSubstitutes.length) return null;
 
       return (
         <View className="px-4">
@@ -332,7 +349,7 @@ export const FrequentSubstitutes: React.FC<FrequentSubstitutesProps> =
           <View className="gap-y-4">
             {visibleSubstitutes.map((item, index) => (
               <FrequentItem
-                key={`${item.productId ?? item.id}-${index}`}
+                key={`${item?.productId ?? item?.id ?? index}-${index}`}
                 item={item}
                 onProductPress={onProductPress}
                 disableCart={disableCart}

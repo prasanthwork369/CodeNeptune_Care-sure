@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
+import { icons } from "@/src/constants/icons";
 import { SmokePuff } from "./SmokePuff";
 import type { FlyImage } from "./FlyToCartContext";
 import { useThumbnailRemoval } from "./useThumbnailRemoval";
@@ -23,6 +24,11 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
 }) => {
   const { containerStyle, maskStyle, imageStyle, shouldPlaySmoke } =
     useThumbnailRemoval({ isPending, isRemoving, isBehindRemoving });
+
+  const source =
+    typeof imgUrl === "string"
+      ? { uri: imgUrl }
+      : (imgUrl ?? undefined);
 
   return (
     <View
@@ -70,11 +76,16 @@ export const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
             imageStyle,
           ]}
         >
-          <Image
-            source={imgUrl}
-            style={{ width: 28, height: 28, borderRadius: 14 }}
-            contentFit="contain"
-          />
+          {source ? (
+            <Image
+              source={source}
+              style={{ width: 28, height: 28, borderRadius: 14 }}
+              contentFit="contain"
+              cachePolicy="memory-disk"
+            />
+          ) : (
+            <icons.placeholder width={18} height={18} />
+          )}
         </Animated.View>
 
         {/* White mask overlay so the image dissolves into the circle's white interior */}

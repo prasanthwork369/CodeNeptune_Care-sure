@@ -3,6 +3,7 @@ import type {
   ApiFeaturedSubcategoryMetadata,
 } from "@/src/features/categories/types";
 import { useFlyToCartTrigger } from "@/src/components/animations/flyToCart";
+import { icons } from "@/src/constants/icons";
 import { useCartActions } from "@/src/features/cart/hooks/useCartActions";
 import { usePrefetchProduct } from "@/src/features/product/hooks/useProduct";
 import { usePrefetchCategoryProducts } from "@/src/features/categories/hooks/useCategories";
@@ -111,6 +112,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
       [thumbnailUrl],
     );
 
+    const [imageError, setImageError] = useState(false);
+    const hasImage = Boolean(
+      (typeof imageSource === "number" || imageSource?.uri) && !imageError,
+    );
+
     const { count, increment, decrement, animations, isPending } =
       useCartActions({
         medicineId: id,
@@ -185,14 +191,32 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             <View
               ref={imageRef}
               collapsable={false}
-              style={{ width: imageSize, height: imageSize }}
+              style={{
+                width: imageSize,
+                height: imageSize,
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
             >
-              <Image
-                source={imageSource}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="contain"
-                cachePolicy="memory-disk"
+              <icons.placeholder
+                width={imageSize * 0.7}
+                height={imageSize * 0.7}
               />
+              {hasImage && (
+                <Image
+                  source={imageSource}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "absolute",
+                  }}
+                  contentFit="contain"
+                  cachePolicy="memory-disk"
+                  recyclingKey={productId || id}
+                  onError={() => setImageError(true)}
+                />
+              )}
             </View>
           </View>
           {!!discountLabel && (
