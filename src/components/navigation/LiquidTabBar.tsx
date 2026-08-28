@@ -29,6 +29,7 @@ import Animated, {
   interpolateColor,
   runOnJS,
   SharedValue,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -51,6 +52,11 @@ import {
   TabBarGlass,
   UploadButtonGlass,
 } from "./TabBarGlass";
+
+// The only routes this bar renders a pill for. Every other route (Upload,
+// and anything it pushes — Preview, Choose Method, ...) is "no pill active",
+// mapped explicitly below rather than left to an implicit not-found result.
+const PILL_ROUTE_NAMES = ["index", "categories", "profile"] as const;
 
 // Translucent so the glass backdrop reads through the active tab too
 const ACTIVE_BG = "rgba(236,253,245,0.82)";
@@ -375,13 +381,26 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const pillRoutes = useMemo(
     () =>
       state.routes.filter((r) =>
-        ["index", "categories", "profile"].includes(r.name),
+        PILL_ROUTE_NAMES.includes(r.name as (typeof PILL_ROUTE_NAMES)[number]),
       ),
     [state.routes],
   );
 
+  // Explicit membership check rather than relying on findIndex's implicit
+  // -1-when-missing: Upload and every prescription/child route it can push
+  // (Preview, Choose Method, ...) simply aren't pill routes, and must always
+  // resolve to -1 here — never fall through to whichever pill was active
+  // before, and never guess based on array position.
   const activePillIndex = useMemo(() => {
     const activeRoute = state.routes[state.index];
+    if (
+      !activeRoute ||
+      !PILL_ROUTE_NAMES.includes(
+        activeRoute.name as (typeof PILL_ROUTE_NAMES)[number],
+      )
+    ) {
+      return -1;
+    }
     return pillRoutes.findIndex((r) => r.name === activeRoute.name);
   }, [state.index, pillRoutes]);
 
@@ -402,27 +421,44 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const leaderX = useSharedValue(initialPillIndex);
   const followerX = useSharedValue(initialPillIndex);
   const pillOpacity = useSharedValue(activePillIndex === -1 ? 0 : 1);
-  // Single source of truth for which tab's icon/label render as active.
-  // Set instantly (no spring) inside the gesture worklets below so a press
-  // shows its result on the same frame, before navigation has even
-  // resolved. This effect is the fallback sync for everything that changes
-  // the route WITHOUT going through those gestures — Android back, deep
-  // links, a programmatic navigation call elsewhere in the app.
+  // The ONE value anything outside a live drag ever needs to write.
+  // Everything else that represents "which tab is active" — pill
+  // visibility (pillOpacity) and, when not mid-drag, pill position
+  // (leaderX/followerX) — is derived from this by the reaction below, so
+  // a route change from ANY source (gesture, back button, deep link, a
+  // dismissTo/push from elsewhere in the app) can't leave the icon/label
+  // color (which reads activeIndex directly) disagreeing with the pill's
+  // own position or visibility.
   const activeIndex = useSharedValue(initialPillIndex);
+  // True only while a pan drag is actively tracking the finger — lets the
+  // reaction below skip leaderX/followerX while onUpdate is already
+  // driving them directly, so the two don't fight over the same frame.
+  const isDragging = useSharedValue(false);
 
-  useEffect(() => {
-    if (activePillIndex !== -1) {
-      activeIndex.value = activePillIndex;
+  useAnimatedReaction(
+    () => activeIndex.value,
+    (current, previous) => {
+      if (current === previous) return;
+      if (current === -1) {
+        // No pill tab is active here (e.g. on Upload) — fade out and leave
+        // position where it was; the next real activation below always
+        // re-springs it, so nothing stale can show once it's visible again.
+        pillOpacity.value = withTiming(0, { duration: 150 });
+        return;
+      }
       pillOpacity.value = withSpring(1, SNAP_SPRING);
-      leaderX.value = withSpring(activePillIndex, SNAP_SPRING);
-      followerX.value = withSpring(activePillIndex, TRAIL_SPRING);
-    } else {
-      // No pill tab is active here (e.g. on Upload) — clear it instead of
-      // leaving the previous tab's index behind, so nothing can still read
-      // as active once a pill tab becomes current again.
-      activeIndex.value = -1;
-      pillOpacity.value = withTiming(0, { duration: 150 });
-    }
+      if (!isDragging.value) {
+        leaderX.value = withSpring(current, SNAP_SPRING);
+        followerX.value = withSpring(current, TRAIL_SPRING);
+      }
+    },
+  );
+
+  // Sole external writer of activeIndex for anything other than the
+  // gestures below — keeps it (and, through the reaction above, every
+  // other tab-bar visual) following the confirmed route.
+  useEffect(() => {
+    activeIndex.value = activePillIndex;
   }, [activePillIndex]);
 
   const navigateToTab = useCallback(
@@ -446,6 +482,10 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
     () =>
       Gesture.Pan()
         .activeOffsetX([-6, 6])
+        .onStart(() => {
+          "worklet";
+          isDragging.value = true;
+        })
         .onUpdate((e) => {
           "worklet";
           const tw = tabWidthShared.value;
@@ -467,11 +507,16 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
             pillRoutes.length - 1,
             Math.max(0, Math.round(leaderX.value)),
           );
+          isDragging.value = false;
+          // Explicit, not left to the reaction above: activeIndex may
+          // already equal `final` (drag ended back on the tab it started
+          // from), which wouldn't trigger a reaction — the pill still has
+          // to snap back from wherever the finger left it.
+          leaderX.value = withSpring(final, SNAP_SPRING);
+          followerX.value = withSpring(final, TRAIL_SPRING);
           // Instant, unanimated — the icon/label must show the result
           // immediately, not lag behind the pill's own trailing spring.
           activeIndex.value = final;
-          leaderX.value = withSpring(final, SNAP_SPRING);
-          followerX.value = withSpring(final, TRAIL_SPRING);
           runOnJS(navigateToTab)(final);
         }),
     [pillRoutes.length, navigateToTab],
@@ -537,7 +582,15 @@ const LiquidTabBar = ({ state, navigation }: BottomTabBarProps) => {
       ],
       width: tw - startOffset - endOffset + stretch,
       backgroundColor: ACTIVE_BG,
-      opacity: pillOpacity.value,
+      // Hard-gated on activeIndex, not just the animated pillOpacity value:
+      // leaderX/followerX are deliberately left at the last real pill's
+      // position when activeIndex goes to -1 (Upload and anything it
+      // pushes, like Preview) rather than reset, so re-entering a pill tab
+      // doesn't need to spring in from an arbitrary place. That's only safe
+      // if nothing can ever render at that stale position while no pill is
+      // active — this guarantees exactly that, unconditionally, instead of
+      // trusting pillOpacity's own fade to have already reached 0.
+      opacity: activeIndex.value === -1 ? 0 : pillOpacity.value,
     };
   });
 
