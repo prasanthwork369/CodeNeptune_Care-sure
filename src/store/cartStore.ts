@@ -70,6 +70,12 @@ interface CartState {
   // Pending operation tracking
   pendingIds: Record<string, boolean>;
   setPending: (id: string, pending: boolean) => void;
+
+  // True while the post-login guest→account cart merge is running. Cart
+  // reads and the cart socket pause on this so the badge doesn't climb
+  // 1-by-1 through each item merged, then jumps straight to the final count.
+  isMergingCart: boolean;
+  setMergingCart: (isMerging: boolean) => void;
 }
 
 export const useCartPendingStore = create<CartState>()(
@@ -146,6 +152,9 @@ export const useCartPendingStore = create<CartState>()(
         set((s) => ({
           pendingIds: { ...s.pendingIds, [id]: pending },
         })),
+
+      isMergingCart: false,
+      setMergingCart: (isMerging) => set({ isMergingCart: isMerging }),
     }),
     {
       name: "caresure.guest.cart",

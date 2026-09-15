@@ -1,4 +1,5 @@
 import { CreateOrderRequest, OrderMetadata } from "@/src/features/orders/types";
+import { parseMoney } from "@/src/utils/money";
 
 export type OrderBillBreakdown = NonNullable<OrderMetadata["billBreakdown"]>;
 
@@ -84,7 +85,7 @@ export const buildCartOrderItems = (lines: CartOrderLine[]): OrderItems =>
   }));
 
 export const computeItemsSubtotal = (items: OrderItems) =>
-  items.reduce((sum, i) => sum + parseFloat(i.unitPrice) * i.quantity, 0);
+  items.reduce((sum, i) => sum + parseMoney(i.unitPrice) * i.quantity, 0);
 
 export const sumOrderDiscounts = (bill: OrderBillBreakdown) =>
   bill.productDiscount +

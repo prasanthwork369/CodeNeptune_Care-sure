@@ -3,6 +3,7 @@ const mockNative = {
   startFlexibleUpdate: jest.fn(),
   startImmediateUpdate: jest.fn(),
   completeFlexibleUpdate: jest.fn(),
+  addListener: jest.fn(() => ({ remove: jest.fn() })),
 };
 
 let mockPlatform = "android";
@@ -16,6 +17,16 @@ jest.mock("react-native", () => ({
     addListener() {
       return { remove: jest.fn() };
     }
+  },
+}));
+
+jest.mock("expo-modules-core", () => ({
+  ...jest.requireActual("expo-modules-core"),
+  requireOptionalNativeModule: (name: string) => {
+    if (name === "InAppUpdate" && mockPlatform === "android") {
+      return mockNative;
+    }
+    return null;
   },
 }));
 
@@ -101,6 +112,9 @@ describe("InAppUpdate wrapper", () => {
 
   it("reports unsupported when the native module is absent", async () => {
     jest.resetModules();
+    jest.doMock("expo-modules-core", () => ({
+      requireOptionalNativeModule: () => null,
+    }));
     jest.doMock("react-native", () => ({
       Platform: { OS: "android" },
       NativeModules: {},

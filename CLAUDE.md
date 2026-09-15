@@ -70,20 +70,25 @@ than none.
 ```
 app/                 Expo Router routes only
   (auth)/ (tabs)/ (commerce)/ (catalog)/ (prescription)/
+  category/ product/ profile/ search/ notifications/
 src/
   api/               one file per backend resource: *.api.ts
   components/        <feature>/sections/ for screen parts
   constants/         icons, images, status codes, typography
-  features/          self-contained feature packages (prescription-scanner)
+  features/          self-contained feature packages (prescription, cart, etc.)
   hooks/             queries/ mutations/ ui/ + feature hooks at the root
   lib/               infrastructure: react-query, sqlite, storage, crashlytics
-  modules/           JS wrappers for our own native Android modules
+  modules/           TypeScript wrappers for local Expo native modules
   services/          business logic on top of api/
-  store/             Zustand stores
+  store/             Zustand stores (cart, auth, checkout, location, ui, etc.)
   theme/             colours, spacing, animations, screen transitions
   types/             shared types
   utils/             pure helpers, plus utils/offline/
-native/android/      hand-written Kotlin, copied in by plugins/
+modules/             local native Expo modules (Kotlin + expo-module.config.json)
+plugins/             custom Expo config plugins for Android prebuild
+scripts/             build & asset optimization scripts
+.maestro/            E2E UI automation flows
+docs/                comprehensive technical & developer documentation
 ```
 
 **app/** is for routes and screens only. Screens compose components and
@@ -110,17 +115,23 @@ first. `mutations/` is for mutations with no query to belong to.
 `ui/` is for presentation-level hooks.
 
 **store/** holds Zustand stores: cart items (cartStore), auth/token
-(authStore), prescription draft (prescriptionDraftStore), location
-(locationStore), coupons (couponStore). Persist with AsyncStorage when
-needed.
+(authStore), checkout (checkoutStore, checkoutDraftStore), prescription
+draft (prescriptionDraftStore), location (locationStore), coupons
+(couponStore), network state (useNetworkStore), etc. Persist with
+AsyncStorage or SecureStore when needed.
 
 **lib/ vs utils/ vs modules/** — `lib/` is infrastructure wiring
-(react-query client, sqlite, token storage). `utils/` is pure helpers
-with no setup of their own. `modules/` is only the JS side of our own
-native Android modules, whose Kotlin lives in `native/android/` and is
-copied into the generated project by `plugins/withCustomNativeFiles.js`.
-Never edit the generated `android/` folder — it is gitignored and
-regenerated on every prebuild.
+(react-query client, sqlite cache, token storage). `utils/` is pure
+helpers with no setup of their own (plus offline primitives in
+`utils/offline/`). Root **modules/** contains local native Expo Modules
+(`in-app-update`, `native-notifications`, `phone-number-hint`,
+`text-input-filter`), whose Kotlin lives in `modules/<name>/android/`
+and is registered via `expo-module.config.json`. `src/modules/` provides
+the TypeScript typed bridge wrappers. Root **plugins/** contains Expo
+config plugins (`withCropScreenColors`, `withFirebaseNotificationColorFix`,
+`withGradleJvmHeap`, `withNotifeeRepo`, `withProfileable`) executed
+during `expo prebuild`. Never edit the generated `android/` folder — it
+is gitignored and regenerated on every prebuild.
 
 Never expose secret keys anywhere in `src/`.
 

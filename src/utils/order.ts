@@ -6,6 +6,7 @@ import {
   OrderItem,
   OrderMetadata,
 } from "@/src/features/orders/types";
+import { parseMoney } from "@/src/utils/money";
 
 export interface BuildOrderPayloadParams {
   cartItems: CartItem[];
@@ -61,7 +62,7 @@ export function buildOrderPayload({
       // unitPrice from the cart is the MRP; the customer pays mrp*(1-disc/100).
       // Persist the MRP and discount so tracking can show the discounted price
       // (matches useCartCalculations).
-      const mrp = parseFloat(String(i.unitPrice));
+      const mrp = parseMoney(i.unitPrice);
       const discountPercent = Number(
         i.discountPercent ?? i.metadata?.discountPercent ?? 0,
       );
@@ -96,7 +97,7 @@ export function buildOrderPayload({
       Number(
         bill?.subtotal ??
           cartItems.reduce(
-            (s, i) => s + parseFloat(String(i.unitPrice)) * i.quantity,
+            (s, i) => s + parseMoney(i.unitPrice) * i.quantity,
             0,
           ),
       ).toFixed(2),

@@ -38,7 +38,7 @@ describe("ReturnStatusSection", () => {
       />,
     );
 
-    expect(getByText("Return Requested")).toBeTruthy();
+    expect(getByText("Return already requested")).toBeTruthy();
     expect(getByText("Refund Completed")).toBeTruthy();
   });
 

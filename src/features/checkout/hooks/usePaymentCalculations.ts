@@ -15,6 +15,7 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { requireInternet } from "@/src/utils/offline";
+import { usePincode } from "@/src/features/location/hooks/usePincode";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
 import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
@@ -134,6 +135,7 @@ export function usePaymentCalculations() {
   const { address: defaultAddress, displayLocation } = useDeliveryAddress();
   const { items: cartItems, refetch: refetchCart } = useCart();
   const { createOrder, loading: ordering } = useCreateOrder();
+  const { checkServiceability } = usePincode();
 
   const deliveryLabel = displayLocation?.label ?? defaultAddress?.label ?? null;
   const deliveryCity = displayLocation?.city ?? null;
@@ -149,9 +151,42 @@ export function usePaymentCalculations() {
       return;
     }
 
+    // The address's pincode was only confirmed serviceable when it was
+    // added/selected — re-verify here, since serviceability zones can change
+    // (or an address may predate that check entirely) and submitting to a
+    // now-non-serviceable pincode fails much worse than a pre-checkout block.
+    try {
+      const result = await checkServiceability(defaultAddress.pincode);
+      if (!result.serviceable) {
+        Alert.alert(
+          "Delivery Not Available",
+          `We don't deliver to ${defaultAddress.pincode} yet. Please choose a different address.`,
+        );
+        setShowLocationSheet(true);
+        return;
+      }
+    } catch {
+      Alert.alert(
+        "Delivery Check Failed",
+        "Could not verify delivery availability. Please try again.",
+      );
+      return;
+    }
+
     // The calculated bill is the only trusted total. Without it the route param is the
     // sole source, and that is spoofable and can be stale -- refuse rather than send it.
     if (!bill) {
+      Alert.alert(
+        "Order Total Unavailable",
+        "We couldn't confirm your bill. Please go back to your cart and try again.",
+      );
+      return;
+    }
+
+    // A non-finite total (e.g. a malformed/missing price from the backend
+    // poisoning the running sum) must never reach the order payload as the
+    // literal string "NaN" — refuse the same way a missing bill is refused.
+    if (!Number.isFinite(billBreakdown.toPay)) {
       Alert.alert(
         "Order Total Unavailable",
         "We couldn't confirm your bill. Please go back to your cart and try again.",

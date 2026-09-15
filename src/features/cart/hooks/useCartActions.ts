@@ -67,10 +67,15 @@ export const useCartActions = (product: CartActionProduct) => {
   // add/remove elsewhere in the cart. Both cart sources preserve unrelated
   // items' object identity across updates (structural sharing / spread-map),
   // so an unchanged match keeps the same reference and skips the re-render.
+  // Paused during the post-login guest cart merge (see cartMerge.service.ts)
+  // so this — mounted once per product card, i.e. ~25x on Home right after
+  // login — can't independently fetch a partial cart mid-merge.
+  const isMergingCart = useCartPendingStore((s) => s.isMergingCart);
+
   const { data: authCartItem } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isMergingCart,
     staleTime: 10_000,
     select: (cart) => cart.items.find((i) => matchesCartItem(i, product)),
   });

@@ -8,7 +8,7 @@ jest.mock("@/src/api/storage.api", () => ({
   storageApi: { upload: (...a: unknown[]) => mockUpload(...a) },
 }));
 
-jest.mock("@/src/utils/prescription", () => ({
+jest.mock("@/src/features/prescription/utils/prescription", () => ({
   deleteTempCopy: (item: unknown) => mockDeleteTempCopy(item),
 }));
 

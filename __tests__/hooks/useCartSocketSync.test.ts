@@ -66,7 +66,8 @@ describe("useCartSocketSync reconnect token freshness", () => {
     jest.clearAllMocks();
     mockIsAuthenticated = true;
     mockIsForeground = true;
-    mockGetAccessToken.mockReturnValue("refreshed-token");
+    mockGetAccessToken.mockReturnValue(null);
+    (tokenStorage.get as jest.Mock).mockResolvedValue("initial-token");
     Object.keys(socketHandlers).forEach((k) => delete socketHandlers[k]);
     Object.keys(managerHandlers).forEach((k) => delete managerHandlers[k]);
   });
@@ -90,6 +91,7 @@ describe("useCartSocketSync reconnect token freshness", () => {
 
     await waitFor(() => expect(managerHandlers.reconnect_attempt).toBeDefined());
     act(() => {
+      mockGetAccessToken.mockReturnValue("refreshed-token");
       managerHandlers.reconnect_attempt(1);
     });
 
@@ -113,7 +115,7 @@ describe("useCartSocketSync AppState lifecycle", () => {
     jest.clearAllMocks();
     mockIsAuthenticated = true;
     mockIsForeground = true;
-    mockGetAccessToken.mockReturnValue("refreshed-token");
+    mockGetAccessToken.mockReturnValue(null);
     (tokenStorage.get as jest.Mock).mockResolvedValue("initial-token");
     Object.keys(socketHandlers).forEach((k) => delete socketHandlers[k]);
     Object.keys(managerHandlers).forEach((k) => delete managerHandlers[k]);

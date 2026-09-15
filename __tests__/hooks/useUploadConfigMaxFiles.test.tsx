@@ -13,6 +13,7 @@ jest.mock("@tanstack/react-query", () => ({
 jest.mock("@/src/lib/sqlite/cache", () => ({
   apiCache: { getWithMeta: () => undefined },
   withSqliteCache: (_k: string, fn: unknown) => fn,
+  useCachedSeed: () => null,
 }));
 
 const Probe = () => {

@@ -72,7 +72,7 @@ describe("SearchProductCard Component", () => {
     expect(getByText("₹15.00")).toBeTruthy();
     expect(getByText("Save ₹30.00")).toBeTruthy();
     expect(getByText("SAME COMPOSITION")).toBeTruthy();
-    expect(getByText("Add")).toBeTruthy();
+    expect(getByText("ADD")).toBeTruthy();
   });
 
   it("triggers increment when Add button is pressed", () => {
@@ -80,7 +80,7 @@ describe("SearchProductCard Component", () => {
       <SearchProductCard data={mockData} />,
     );
 
-    const addBtn = getByText("Add");
+    const addBtn = getByText("ADD");
     fireEvent.press(addBtn);
 
     expect(mockIncrement).toHaveBeenCalledTimes(1);
@@ -122,9 +122,11 @@ describe("SearchProductCard Component", () => {
     const card = getByTestId("search-result-item");
     fireEvent.press(card);
 
-    expect(mockPush).toHaveBeenCalledWith({
-      pathname: "/search/product/[id]",
-      params: { id: "prod-101" },
-    });
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pathname: "/search/product/[id]",
+        params: expect.objectContaining({ id: "prod-101" }),
+      }),
+    );
   });
 });

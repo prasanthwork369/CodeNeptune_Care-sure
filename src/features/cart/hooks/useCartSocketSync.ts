@@ -81,6 +81,18 @@ export const useCartSocketSync = () => {
 
       socket.on("cart_update", (data: { action: string; cart: Cart }) => {
         if (data?.cart) {
+          // Guest→account merge (mergeGuestCartItems) is mid-flight: each
+          // merged item fires its own cart_update. Skip publishing these
+          // intermediate carts — the merge does one invalidateQueries once
+          // it's done, so the badge jumps straight to the final total
+          // instead of counting up 1-by-1. Normal (non-merge) cart_update
+          // events are unaffected.
+          if (useCartPendingStore.getState().isMergingCart) {
+            if (__DEV__)
+              logger.debug("[Socket] Cart update suppressed (merge in progress)");
+            return;
+          }
+
           // 1. Instantly sync Zustand state (sub-100ms UI updates!)
           setCart(data.cart);
 

@@ -3,6 +3,7 @@ import { cartApi } from "@/src/features/cart/api/cart.api";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import type { CartItem } from "@/src/features/cart/types";
+import { parseMoney } from "@/src/utils/money";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -19,11 +20,15 @@ const EMPTY_ITEMS: CartItem[] = [];
 export const useCartRead = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const guestCart = useCartPendingStore((s) => s.guestCart);
+  // See useCart.ts — paused during the post-login guest cart merge so this
+  // can't fetch a partial cart mid-merge; mergeGuestCartItems's final
+  // invalidate re-fetches once it's back on.
+  const isMergingCart = useCartPendingStore((s) => s.isMergingCart);
 
   const { data: cart, isLoading } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isMergingCart,
     // Mutations keep this cache fresh via setQueryData, so a short staleTime
     // just avoids redundant refetches on every screen focus/tab switch.
     staleTime: 10_000,
@@ -38,7 +43,7 @@ export const useCartRead = () => {
     let price = 0;
     for (const item of items) {
       count += item.quantity;
-      const mrp = parseFloat(String(item.unitPrice));
+      const mrp = parseMoney(item.unitPrice);
       const discountPct =
         item.discountPercent ?? item.metadata?.discountPercent ?? 0;
       price +=
@@ -68,11 +73,12 @@ export const useCartRead = () => {
  */
 export const useCartCount = (): number => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isMergingCart = useCartPendingStore((s) => s.isMergingCart);
 
   const { data: authCount } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isMergingCart,
     staleTime: 10_000,
     select: (cart) => cart?.items.length ?? 0,
   });
@@ -96,11 +102,12 @@ export const useMatchingCartItem = (
   predicate: (item: CartItem) => boolean,
 ): CartItem | undefined => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isMergingCart = useCartPendingStore((s) => s.isMergingCart);
 
   const { data: authMatch } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isMergingCart,
     staleTime: 10_000,
     select: (cart) => cart.items.find(predicate),
   });
@@ -120,11 +127,12 @@ export const useInCartVariantId = (
   variants: { id: string; packSize?: string; unit?: string }[],
 ): string | undefined => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isMergingCart = useCartPendingStore((s) => s.isMergingCart);
 
   const { data: authVariantId } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
-    enabled: isAuthenticated && variants.length > 0,
+    enabled: isAuthenticated && !isMergingCart && variants.length > 0,
     staleTime: 10_000,
     select: (cart) => {
       if (!cart?.items?.length) return undefined;

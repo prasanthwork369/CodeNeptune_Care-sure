@@ -17,9 +17,21 @@ async function buildCartInput(
   item: OrderItem,
 ): Promise<AddToCartInput | null> {
   let unitPrice = Number(item.unitPrice ?? 0);
+  // The backend may surface discount at the item level (as in
+  // getFrequentlyOrdered) rather than inside medicineSnapshot — read both,
+  // same fallback chain the OrderItem type comment documents.
+  let discountPercent = Number(
+    item.discountPercent ??
+      item.discountPercentage ??
+      item.medicineSnapshot?.discountPercent ??
+      item.medicineSnapshot?.discountPercentage ??
+      0,
+  );
 
   if (!unitPrice) {
-    unitPrice = await fetchLivePrice(item);
+    const live = await fetchLivePrice(item);
+    unitPrice = live?.mrp ?? 0;
+    discountPercent = live?.discountPercent ?? 0;
   }
 
   if (!unitPrice) {
@@ -38,14 +50,16 @@ async function buildCartInput(
     medicineSlug: item.medicineSnapshot?.slug ?? item.medicineId,
     unitPrice,
     mrp: unitPrice,
-    discountPercent: 0,
+    discountPercent,
     quantity: item.quantity ?? 1,
     requiresPrescription:
       item.medicineSnapshot?.requiresPrescription ?? false,
   };
 }
 
-async function fetchLivePrice(item: OrderItem): Promise<number> {
+async function fetchLivePrice(
+  item: OrderItem,
+): Promise<{ mrp: number; discountPercent: number } | null> {
   const name = item.medicineSnapshot?.name;
   const slug = item.medicineSnapshot?.slug;
 
@@ -57,12 +71,20 @@ async function fetchLivePrice(item: OrderItem): Promise<number> {
         data.find(
           (r) => r.id === item.medicineId || r.productId === item.medicineId,
         ) ?? data.find((r) => slug && r.slug === slug);
-      if (match) return Number(match.price ?? 0);
+      if (match) {
+        const mrp = Number(match.mrp ?? match.price ?? 0);
+        if (mrp) {
+          return {
+            mrp,
+            discountPercent: Number(match.discountPercentage ?? 0),
+          };
+        }
+      }
     } catch {
       if (__DEV__)
         console.warn("[reorderCart] search failed for", item.medicineId);
     }
   }
 
-  return 0;
+  return null;
 }

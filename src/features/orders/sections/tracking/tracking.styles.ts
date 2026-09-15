@@ -245,6 +245,19 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#60646C",
   },
+  returnReasonBox: {
+    marginTop: exactScale(6),
+    paddingHorizontal: exactScale(10),
+    paddingVertical: exactScale(8),
+    borderRadius: exactScale(8),
+    backgroundColor: "#F9FAFB",
+    gap: exactScale(4),
+  },
+  returnReasonText: {
+    fontSize: moderateScale(12),
+    fontWeight: "500",
+    color: "#374151",
+  },
 
   // ItemsOrderedSection
   itemsHeaderRow: {

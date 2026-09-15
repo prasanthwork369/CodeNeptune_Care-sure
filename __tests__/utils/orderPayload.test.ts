@@ -124,6 +124,22 @@ describe("computeItemsSubtotal / sumOrderDiscounts", () => {
     expect(computeItemsSubtotal(items)).toBeCloseTo(131.5, 2);
   });
 
+  // A malformed/missing backend price (e.g. a delisted medicine) must never
+  // poison the whole subtotal into NaN — the bad line is treated as 0 instead.
+  it("treats a malformed unitPrice as 0 instead of poisoning the total into NaN", () => {
+    const items = buildCartOrderItems([
+      { medicineId: "a", quantity: 2, unitPrice: "50", medicineName: "A" },
+      {
+        medicineId: "b",
+        quantity: 3,
+        unitPrice: undefined as unknown as string,
+        medicineName: "B",
+      },
+    ]);
+
+    expect(computeItemsSubtotal(items)).toBe(100);
+  });
+
   it("adds every discount channel", () => {
     expect(
       sumOrderDiscounts(

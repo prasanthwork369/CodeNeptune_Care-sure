@@ -1,6 +1,7 @@
 import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { Touchable } from "@/src/components/ui/Touchable";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
+import { format } from "@/src/utils/validation";
 import React from "react";
 import { Text, View } from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
@@ -9,15 +10,6 @@ import { OtpForm } from "../components/OtpForm";
 import { OtpSubmitButton } from "../components/OtpSubmitButton";
 import { useOtp } from "../hooks/useOtp";
 import { styles as s } from "./OtpLayout.styles";
-
-const formatPhoneNumber = (rawPhone: string) => {
-  if (!rawPhone) return "";
-  const cleaned = rawPhone.replace(/\s+/g, "");
-  if (cleaned.startsWith("+91") && cleaned.length === 13) {
-    return `+91 ${cleaned.slice(3, 8)} ${cleaned.slice(8)}`;
-  }
-  return rawPhone;
-};
 
 /**
  * Presentation component for the OTP Verification screen.
@@ -57,7 +49,7 @@ export const OtpLayout: React.FC = () => {
           <View className="items-start" style={s.headerContainer}>
             <Text style={s.title}>Verify OTP</Text>
             <View style={s.phoneRow}>
-              <Text style={s.phone}>{formatPhoneNumber(phone || "")}</Text>
+              <Text style={s.phone}>{format.phone(phone)}</Text>
               <Touchable
                 onPress={() => router.back()}
                 style={s.editBtnUnderline}

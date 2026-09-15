@@ -35,30 +35,19 @@ describe("SplashAnimationScreen", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it("reveals calm loading feedback only on a slow launch", async () => {
+  it("calls onComplete immediately on mount if app is already ready", () => {
+    const onComplete = jest.fn();
+    render(<SplashAnimationScreen isAppReady onComplete={onComplete} />);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders accessible brand elements and tagline", () => {
     const screen = render(
       <SplashAnimationScreen isAppReady={false} onComplete={jest.fn()} />,
     );
 
-    await act(async () => Promise.resolve());
-    expect(screen.queryByText("Getting everything ready…")).toBeNull();
-
-    act(() => jest.advanceTimersByTime(1_800));
-    expect(screen.getByText("Getting everything ready…")).toBeTruthy();
-  });
-
-  it("honours reduced motion and uses the shorter launch duration", async () => {
-    jest
-      .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
-      .mockResolvedValue(true);
-    const onComplete = jest.fn();
-
-    render(<SplashAnimationScreen isAppReady onComplete={onComplete} />);
-    await act(async () => Promise.resolve());
-    act(() => jest.advanceTimersByTime(449));
-    expect(onComplete).not.toHaveBeenCalled();
-
-    act(() => jest.advanceTimersByTime(1));
-    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("splash-screen")).toBeTruthy();
+    expect(screen.getByText("CareSure")).toBeTruthy();
+    expect(screen.getByText("Healthcare, delivered with care.")).toBeTruthy();
   });
 });

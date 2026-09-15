@@ -14,7 +14,6 @@
     "optimize-assets": "node scripts/optimize-assets.js"
   },
   "dependencies": {
-    "@expo-google-fonts/inter": "^0.4.2",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@lottiefiles/dotlottie-react-native": "^0.10.0",
     "@notifee/react-native": "^9.1.8",

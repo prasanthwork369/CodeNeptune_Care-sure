@@ -28,6 +28,14 @@ const mockUseLocalSearchParams = useLocalSearchParams as jest.Mock;
 jest.mock("@/src/features/profile/hooks/useAddress");
 const mockUseAddress = useAddress as jest.MockedFunction<typeof useAddress>;
 
+const mockCheckServiceability = jest.fn();
+jest.mock("@/src/features/location/hooks/usePincode", () => ({
+  usePincode: () => ({
+    checkServiceability: mockCheckServiceability,
+    isChecking: false,
+  }),
+}));
+
 describe("AddAddressLayout Component", () => {
   const addAddressMock = jest.fn();
   const updateAddressMock = jest.fn();
@@ -49,6 +57,7 @@ describe("AddAddressLayout Component", () => {
       submitting: false,
       error: null,
     } as any);
+    mockCheckServiceability.mockResolvedValue({ serviceable: true });
   });
 
   it("renders screen header, required form input fields, and address type chips", () => {
@@ -161,5 +170,32 @@ describe("AddAddressLayout Component", () => {
         expect.objectContaining({ id: "addr-1", name: "Jane Doe" }),
       );
     });
+  });
+
+  it("blocks save and shows an inline error when the pincode isn't serviceable", async () => {
+    mockCheckServiceability.mockResolvedValue({ serviceable: false });
+
+    const { getByPlaceholderText, getByText, findByText } =
+      renderWithProviders(<AddAddressLayout />);
+
+    fireEvent.changeText(getByPlaceholderText("Enter Full Name"), "Jane Smith");
+    fireEvent.changeText(
+      getByPlaceholderText("Enter Mobile Number"),
+      "9876543210",
+    );
+    fireEvent.changeText(
+      getByPlaceholderText("Enter House Number"),
+      "Flat 4B, Sunset Apts",
+    );
+    fireEvent.changeText(getByPlaceholderText("Enter City"), "Mumbai");
+    fireEvent.changeText(getByPlaceholderText("Enter State"), "Maharashtra");
+    fireEvent.changeText(getByPlaceholderText("Enter Pincode"), "400001");
+    fireEvent.press(getByText("HOME"));
+
+    fireEvent.press(getByText("Save Address →"));
+
+    expect(await findByText("We don't deliver to 400001 yet.")).toBeTruthy();
+    expect(addAddressMock).not.toHaveBeenCalled();
+    expect(mockBack).not.toHaveBeenCalled();
   });
 });

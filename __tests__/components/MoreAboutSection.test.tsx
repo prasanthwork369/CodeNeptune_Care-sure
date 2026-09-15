@@ -34,7 +34,7 @@ describe("MoreAboutSection", () => {
       />,
     );
 
-    expect(getByText("More About Zonegran Tablet")).toBeTruthy();
+    expect(getByText("More about Zonegran Tablet")).toBeTruthy();
     // Tabs carry a short label; the API title would be far too long for the strip.
     // "Quick Summary" appears twice: the tab label and the content heading.
     expect(getAllByText("Quick Summary")).toHaveLength(2);
@@ -144,7 +144,7 @@ describe("MoreAboutSection", () => {
     expect(getByText("Question 4?")).toBeTruthy();
     expect(queryByText("Question 5?")).toBeNull();
 
-    fireEvent.press(getByText("View More FAQs"));
+    fireEvent.press(getByText("View All (6) FAQs"));
     expect(getByText("Question 5?")).toBeTruthy();
     expect(getByText("Question 6?")).toBeTruthy();
 

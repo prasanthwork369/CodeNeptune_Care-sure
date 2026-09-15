@@ -12,6 +12,7 @@ import { useCouponStore } from "@/src/store/couponStore";
 import { useLocationStore } from "@/src/store/locationStore";
 import { analyticsService } from "@/src/services/firebase";
 import { buildCartSnapshot } from "@/src/utils/cartSnapshot";
+import { parseMoney } from "@/src/utils/money";
 import { CartLine } from "@/src/features/cart/types";
 import type { Product } from "@/src/features/product/types";
 import { useFocusEffect } from "expo-router";
@@ -150,7 +151,7 @@ export function useCartCalculations() {
         // unitPrice from the backend is the MRP (strikethrough price); the
         // payable selling price is derived by applying discountPercent to it —
         // matches customer-website's cart-utils.ts (rawMrp * (1 - discount/100)).
-        const mrp = parseFloat(String(item.unitPrice));
+        const mrp = parseMoney(item.unitPrice);
         const discountPct = parseFloat(
           String(item.discountPercent ?? item.metadata?.discountPercent ?? 0),
         );

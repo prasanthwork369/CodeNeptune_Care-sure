@@ -5,6 +5,7 @@ const mockVerifyOtp = jest.fn();
 const mockRequestOtp = jest.fn();
 const mockAddItem = jest.fn();
 const mockRemoveGuestItem = jest.fn();
+const mockSetMergingCart = jest.fn();
 const mockRequireInternet = jest.fn(() => true);
 const mockReplace = jest.fn();
 
@@ -29,6 +30,7 @@ jest.mock("@/src/store/cartStore", () => ({
     getState: () => ({
       guestCart: mockGuestCart,
       removeGuestItem: mockRemoveGuestItem,
+      setMergingCart: mockSetMergingCart,
     }),
   },
 }));

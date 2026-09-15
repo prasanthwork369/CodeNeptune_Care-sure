@@ -8,6 +8,7 @@ import {
   CheckoutInput,
   UpdateCartItemInput,
 } from "@/src/features/cart/types";
+import { parseMoney } from "@/src/utils/money";
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -17,6 +18,11 @@ export const useCart = () => {
   const updateGuestItem = useCartPendingStore((s) => s.updateGuestItem);
   const removeGuestItem = useCartPendingStore((s) => s.removeGuestItem);
   const clearGuestCart = useCartPendingStore((s) => s.clearGuestCart);
+  // Guest→account merge in progress: hold off this query so its GET /cart
+  // can't land mid-merge with a partial item count. mergeGuestCartItems
+  // invalidates this query once the merge finishes, which then fetches
+  // (since it becomes enabled again) and lands on the final total.
+  const isMergingCart = useCartPendingStore((s) => s.isMergingCart);
 
   const {
     data: cart,
@@ -27,7 +33,7 @@ export const useCart = () => {
   } = useQuery({
     queryKey: QUERY_KEYS.CUSTOMER.CART,
     queryFn: cartApi.getCart,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isMergingCart,
     // Mutations keep this cache fresh via setQueryData, so a short staleTime
     // just avoids redundant refetches on every screen focus/tab switch.
     staleTime: 10_000,
@@ -76,7 +82,7 @@ export const useCart = () => {
   // medicine+variant), so this is the unique cart-line/variant count.
   const cartLineCount = items.length;
   const totalPrice = items.reduce((sum, item) => {
-    const mrp = parseFloat(String(item.unitPrice));
+    const mrp = parseMoney(item.unitPrice);
     const discountPct =
       item.discountPercent ?? item.metadata?.discountPercent ?? 0;
     const price = discountPct > 0 ? mrp * (1 - discountPct / 100) : mrp;

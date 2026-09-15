@@ -46,6 +46,14 @@ jest.mock("@/src/features/location/hooks/useDeliveryAddress", () => ({
   useDeliveryAddress: jest.fn(),
 }));
 
+const mockCheckServiceability = jest.fn();
+jest.mock("@/src/features/location/hooks/usePincode", () => ({
+  usePincode: () => ({
+    checkServiceability: mockCheckServiceability,
+    isChecking: false,
+  }),
+}));
+
 jest.mock("@/src/features/prescription/services/prescription.service", () => ({
   prescriptionService: {
     upload: jest.fn(),
@@ -92,6 +100,8 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
       },
       displayLocation: { label: "Home", city: "Mumbai" },
     });
+
+    mockCheckServiceability.mockResolvedValue({ serviceable: true });
 
     // Both real flows compute a bill before reaching this screen; without one the hook
     // now refuses to place the order rather than trusting the route param.
@@ -148,6 +158,28 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
 
     expect(result.current.showLocationSheet).toBe(true);
     expect(mockCreateOrder).not.toHaveBeenCalled();
+  });
+
+  // A saved address's pincode may have gone non-serviceable since it was
+  // added/selected — re-check at Place Order rather than trusting it blindly.
+  it("refuses to place an order and reopens the location sheet when the address is no longer serviceable", async () => {
+    mockCheckServiceability.mockResolvedValue({ serviceable: false });
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+
+    const { result } = renderHook(() => usePaymentCalculations());
+    expect(result.current.showLocationSheet).toBe(false);
+
+    await act(async () => {
+      await result.current.handlePlaceOrder();
+    });
+
+    expect(mockCheckServiceability).toHaveBeenCalledWith("400001");
+    expect(mockCreateOrder).not.toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Delivery Not Available",
+      expect.stringContaining("400001"),
+    );
+    expect(result.current.showLocationSheet).toBe(true);
   });
 
   // The route param is spoofable, so a missing bill must block the order, not fall back to it.

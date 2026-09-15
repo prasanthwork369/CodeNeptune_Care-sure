@@ -4,6 +4,7 @@ import { Touchable } from "@/src/components/ui/Touchable";
 import { UnsavedChangesGuard } from "@/src/components/ui/UnsavedChangesGuard";
 import { icons } from "@/src/constants/icons";
 import { useAddress } from "@/src/features/profile/hooks/useAddress";
+import { usePincode } from "@/src/features/location/hooks/usePincode";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useNav } from "@/src/hooks/useNav";
 import { applyDigitsOnlyFilter } from "@/src/modules/TextInputFilter";
@@ -57,6 +58,8 @@ export const AddAddressLayout: React.FC = () => {
   } = useAddress();
   const isFirstAddress = !isEdit && (addresses ?? []).length === 0;
   const isOffline = useIsOffline();
+  const { checkServiceability, isChecking: isCheckingServiceability } =
+    usePincode();
   const existing = addresses.find((a) => a.id === id);
 
   const scrollRef = useRef<ScrollView>(null);
@@ -171,6 +174,24 @@ export const AddAddressLayout: React.FC = () => {
       setValidationError("Please select an Address Type");
       return;
     }
+
+    // Format-valid isn't deliverable-valid — confirm the pincode is
+    // actually serviceable before saving, the same check LocationBottomSheet
+    // already runs when picking/confirming an address.
+    try {
+      const result = await checkServiceability(pincode.trim());
+      if (!result.serviceable) {
+        setPincodeError(`We don't deliver to ${pincode.trim()} yet.`);
+        return;
+      }
+    } catch (err) {
+      if (__DEV__) console.error("[Address Save Error] serviceability check failed", err);
+      setValidationError(
+        "Could not verify delivery availability. Please try again.",
+      );
+      return;
+    }
+
     try {
       if (isEdit && id) {
         await updateAddress({
@@ -273,6 +294,7 @@ export const AddAddressLayout: React.FC = () => {
   const isButtonDisabled =
     submitting ||
     saveCompleted ||
+    isCheckingServiceability ||
     !isValid ||
     isOffline ||
     (isEdit && !isDirty);
@@ -549,7 +571,7 @@ export const AddAddressLayout: React.FC = () => {
               isButtonDisabled ? s.submitBtnDisabled : s.submitBtnEnabled,
             ]}
           >
-            {submitting || saveCompleted ? (
+            {submitting || saveCompleted || isCheckingServiceability ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
               <Text style={s.submitBtnText}>
