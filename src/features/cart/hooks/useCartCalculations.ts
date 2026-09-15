@@ -179,6 +179,9 @@ export function useCartCalculations() {
           qty: item.quantity,
           image: imageUri ? { uri: imageUri } : null,
           rx: item.requiresPrescription,
+          priceChanged: !!item.priceChanged,
+          livePrice:
+            item.livePrice != null ? parseMoney(item.livePrice) : undefined,
         };
       }),
     [cartItems],

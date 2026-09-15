@@ -20,6 +20,7 @@ export const cartStyles = StyleSheet.create({
   itemDiscount: { fontSize: moderateScale(13) },
   itemMrp: { fontSize: moderateScale(12) },
   itemPrice: { fontSize: moderateScale(15) },
+  itemPriceChanged: { fontSize: moderateScale(11) },
   listTitle: { fontSize: moderateScale(15) },
 
   // CartFooter

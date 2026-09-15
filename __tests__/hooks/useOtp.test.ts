@@ -28,6 +28,20 @@ jest.mock("@/src/features/auth/hooks/useAuth", () => ({
 jest.mock("@/src/features/cart/api/cart.api", () => ({
   cartApi: {
     addItem: jest.fn().mockResolvedValue({ success: true }),
+    // Default: every requested item "merges" — mirrors the real bulk
+    // endpoint's `added` list, echoing back what it was given.
+    bulkAddItems: jest.fn().mockImplementation(
+      (items: { medicineId: string; quantity: number }[]) =>
+        Promise.resolve({
+          added: items.map((i) => ({
+            medicineId: i.medicineId,
+            name: "",
+            quantity: i.quantity,
+          })),
+          skipped: [],
+          cart: {},
+        }),
+    ),
   },
 }));
 
@@ -129,9 +143,11 @@ describe("useOtp — OTP Flow & Guest Cart Merge", () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(cartApi.addItem).toHaveBeenCalledWith(
+    // This item carries no variant/prescription metadata, so the merge
+    // routes it through the bulk endpoint rather than the single-item one.
+    expect(cartApi.bulkAddItems).toHaveBeenCalledWith([
       expect.objectContaining({ medicineId: "med-101", quantity: 2 }),
-    );
+    ]);
     expect(useCartPendingStore.getState().guestCart.items).toEqual([]);
   });
 

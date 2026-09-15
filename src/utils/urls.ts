@@ -135,6 +135,7 @@ export const API_ENDPOINTS = {
   // ── Cart ─────────────────────────────────────────────────────────────────
   CART: "/api/v1/cart",
   CART_ITEMS: "/api/v1/cart/items",
+  CART_ITEMS_BULK: "/api/v1/cart/items/bulk",
   CART_ITEM_BY_ID: (itemId: string) => `/api/v1/cart/items/${itemId}`,
   CART_CHECKOUT: "/api/v1/cart/checkout",
 

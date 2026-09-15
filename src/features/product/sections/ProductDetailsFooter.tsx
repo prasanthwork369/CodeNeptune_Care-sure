@@ -23,7 +23,11 @@ export const ProductDetailsFooter: React.FC<ProductDetailsFooterProps> =
     }) => {
       const { count, increment, decrement, animations, isPending } =
         useCartActions({
-          medicineId: medicineUuid ?? productId,
+          // Never fall back to productId (the human-readable catalog code) —
+          // an empty string here correctly trips useCartActions' own
+          // `!product.medicineId` guard and blocks the add, instead of
+          // silently sending the catalog code as the cart's medicineId.
+          medicineId: medicineUuid ?? "",
           baseMedicineId,
           variantId: variantId ?? null,
           productId,

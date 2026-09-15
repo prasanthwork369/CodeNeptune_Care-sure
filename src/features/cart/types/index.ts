@@ -15,6 +15,11 @@ export interface CartLine {
   qty: number;
   image: { uri: string } | null;
   rx: boolean;
+  // True when the backend's live catalog price for this item differs from
+  // the price snapshot stored on the cart line — surfaced so the customer
+  // isn't only told about it via the hard block at Place Order.
+  priceChanged?: boolean;
+  livePrice?: number;
 }
 
 export interface CartEmptyStateProps {

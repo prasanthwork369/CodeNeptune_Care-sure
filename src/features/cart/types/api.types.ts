@@ -82,6 +82,20 @@ export interface UpdateCartItemInput {
   quantity: number;
 }
 
+/** POST /cart/items/bulk input — no metadata/variant/prescription fields
+ * exist here; the backend resolves everything else purely from medicineId. */
+export interface BulkAddCartItemInput {
+  medicineId: string;
+  quantity: number;
+  mrp?: number;
+}
+
+export interface BulkAddResult {
+  added: { medicineId: string; name: string; quantity: number }[];
+  skipped: { medicineId: string; reason: string }[];
+  cart: Cart;
+}
+
 export interface CheckoutInput {
   pharmacyId: string;
   deliveryType: "HOME_DELIVERY" | "STORE_PICKUP";

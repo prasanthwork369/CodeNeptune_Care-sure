@@ -3,6 +3,8 @@ import { apiClient } from "@/src/api/client";
 import type {
   Cart,
   AddToCartInput,
+  BulkAddCartItemInput,
+  BulkAddResult,
   UpdateCartItemInput,
   CheckoutInput,
 } from "../types/api.types";
@@ -15,6 +17,18 @@ export const cartApi = {
 
   addItem: async (input: AddToCartInput): Promise<Cart> => {
     const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS, input);
+    return response.data.data;
+  },
+
+  // Server resolves pricing/name/prescription-flag from the catalog by
+  // medicineId alone — no metadata/variant/prescriptionId field exists on
+  // this endpoint. Only call this for items that don't need those preserved.
+  bulkAddItems: async (
+    items: BulkAddCartItemInput[],
+  ): Promise<BulkAddResult> => {
+    const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS_BULK, {
+      items,
+    });
     return response.data.data;
   },
 

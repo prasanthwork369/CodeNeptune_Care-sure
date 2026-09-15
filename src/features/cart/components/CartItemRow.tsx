@@ -45,7 +45,9 @@ function arePropsEqual(prev: CartItemRowProps, next: CartItemRowProps) {
     a.pack === b.pack &&
     a.discount === b.discount &&
     a.rx === b.rx &&
-    a.image?.uri === b.image?.uri
+    a.image?.uri === b.image?.uri &&
+    a.priceChanged === b.priceChanged &&
+    a.livePrice === b.livePrice
   );
 }
 
@@ -149,6 +151,18 @@ export const CartItemRow: React.FC<CartItemRowProps> = React.memo(
                   className="font-inter-bold text-brand-primary mt-1.5"
                 >
                   {line.discount}
+                </Text>
+              )}
+              {line.priceChanged && (
+                <Text
+                  style={s.itemPriceChanged}
+                  // Amber warning tone already used elsewhere in cart, see
+                  // CartCorporateCreditsSection.
+                  className="font-inter-semibold text-[#B45309] mt-1"
+                >
+                  {line.livePrice != null
+                    ? `Price updated to ₹${line.livePrice.toFixed(2)}`
+                    : "Price updated since you added this"}
                 </Text>
               )}
             </View>

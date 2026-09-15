@@ -4,6 +4,21 @@ import { useOtp } from "@/src/features/auth/hooks/useOtp";
 const mockVerifyOtp = jest.fn();
 const mockRequestOtp = jest.fn();
 const mockAddItem = jest.fn();
+// Default: every requested item "merges" — mirrors the real bulk endpoint's
+// `added` list, echoing back what it was given. Individual tests override
+// this per-call with mockRejectedValueOnce/mockResolvedValueOnce.
+const mockBulkAddItems = jest.fn(
+  (items: { medicineId: string; quantity: number }[]) =>
+    Promise.resolve({
+      added: items.map((i) => ({
+        medicineId: i.medicineId,
+        name: "",
+        quantity: i.quantity,
+      })),
+      skipped: [],
+      cart: {},
+    }),
+);
 const mockRemoveGuestItem = jest.fn();
 const mockSetMergingCart = jest.fn();
 const mockRequireInternet = jest.fn(() => true);
@@ -22,7 +37,10 @@ jest.mock("@/src/features/auth/hooks/useAuth", () => ({
 }));
 
 jest.mock("@/src/features/cart/api/cart.api", () => ({
-  cartApi: { addItem: (...a: unknown[]) => mockAddItem(...a) },
+  cartApi: {
+    addItem: (item: any) => mockAddItem(item),
+    bulkAddItems: (items: any) => mockBulkAddItems(items),
+  },
 }));
 
 jest.mock("@/src/store/cartStore", () => ({
@@ -193,7 +211,9 @@ describe("useOtp duplicate guards", () => {
       });
       await flush();
 
-      expect(mockAddItem).toHaveBeenCalledTimes(2);
+      // Both items carry no variant/prescription metadata, so the merge
+      // batches them into a single bulk request rather than two single-item ones.
+      expect(mockBulkAddItems).toHaveBeenCalledTimes(1);
       expect(mockRemoveGuestItem).toHaveBeenCalledTimes(2);
     });
 
@@ -208,12 +228,12 @@ describe("useOtp duplicate guards", () => {
       });
       await flush();
 
-      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockBulkAddItems).toHaveBeenCalledTimes(1);
     });
 
     it("keeps an item that failed to merge", async () => {
       mockGuestCart = { items: [{ id: "a", medicineId: "m1" }] };
-      mockAddItem.mockRejectedValueOnce(new Error("500"));
+      mockBulkAddItems.mockRejectedValueOnce(new Error("500"));
       const { result } = renderHook(() => useOtp());
 
       await act(async () => {
@@ -221,32 +241,36 @@ describe("useOtp duplicate guards", () => {
       });
       await flush();
 
-      expect(mockAddItem).toHaveBeenCalledTimes(1);
-      // Per-item cleanup preserved: a failure must not drop the guest item.
+      expect(mockBulkAddItems).toHaveBeenCalledTimes(1);
+      // Batch cleanup preserved: a failed batch must not drop its items.
       expect(mockRemoveGuestItem).not.toHaveBeenCalled();
     });
 
     // The latch is released in `finally`, so a failed pass cannot wedge it.
     it("can merge again after a failed pass", async () => {
       mockGuestCart = { items: [{ id: "a", medicineId: "m1" }] };
-      mockAddItem.mockRejectedValueOnce(new Error("500"));
+      mockBulkAddItems.mockRejectedValueOnce(new Error("500"));
       const first = renderHook(() => useOtp());
 
       await act(async () => {
         await first.result.current.handleVerify(VALID);
       });
       await flush();
-      expect(mockAddItem).toHaveBeenCalledTimes(1);
+      expect(mockBulkAddItems).toHaveBeenCalledTimes(1);
 
       // A fresh sign-in in the same session retries the still-present item.
-      mockAddItem.mockResolvedValueOnce(undefined);
+      mockBulkAddItems.mockResolvedValueOnce({
+        added: [{ medicineId: "m1", name: "", quantity: 1 }],
+        skipped: [],
+        cart: {},
+      });
       const second = renderHook(() => useOtp());
       await act(async () => {
         await second.result.current.handleVerify(VALID);
       });
       await flush();
 
-      expect(mockAddItem).toHaveBeenCalledTimes(2);
+      expect(mockBulkAddItems).toHaveBeenCalledTimes(2);
       expect(mockRemoveGuestItem).toHaveBeenCalledTimes(1);
     });
 
