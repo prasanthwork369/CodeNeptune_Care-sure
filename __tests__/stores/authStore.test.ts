@@ -13,6 +13,7 @@ import { useReturnDraftStore } from "@/src/store/returnDraftStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import { AppError } from "@/src/api/errors";
+import { requestQueue } from "@/src/utils/requestQueue";
 
 jest.mock("@/src/lib/storage", () => ({
   tokenStorage: {
@@ -45,7 +46,7 @@ jest.mock("@/src/lib/sqlite/cache", () => ({
 }));
 
 describe("useAuthStore — Auth State & Comprehensive Logout", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     useAuthStore.setState({
       isAuthenticated: false,
@@ -55,6 +56,7 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
       user: null,
     });
     setAccessToken(null);
+    await requestQueue.clear();
   });
 
   it("login updates state, sets access token, and persists to tokenStorage", async () => {
@@ -134,6 +136,22 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     expect(tokenStorage.clearExpiresAt).toHaveBeenCalled();
     expect(tokenStorage.clearRefreshToken).toHaveBeenCalled();
     expect(guestStorage.clear).toHaveBeenCalled();
+  });
+
+  it("logout clears any request queued offline during the previous session, so it can't replay under the next signed-in user", async () => {
+    await requestQueue.add(
+      {
+        method: "patch",
+        url: "/api/v1/customers/notifications/abc123/read",
+      },
+      () => {},
+      () => {},
+    );
+    expect(requestQueue.length).toBe(1);
+
+    await useAuthStore.getState().logout();
+
+    expect(requestQueue.length).toBe(0);
   });
 
   it("initialize loads token and cached profile instantly from SQLite", async () => {

@@ -4,6 +4,7 @@ import type { CustomerProfile } from "../features/profile/types";
 import { setAccessToken } from "../api/client";
 import { queryClient } from "@/src/lib/react-query/queryClient";
 import { apiCache } from "@/src/lib/sqlite/cache";
+import { requestQueue } from "@/src/utils/requestQueue";
 import { usePrescriptionDraftStore } from "./prescriptionDraftStore";
 import { useLastRouteStore } from "./lastRouteStore";
 import { useCheckoutDraftStore } from "./checkoutDraftStore";
@@ -96,6 +97,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     queryClient.clear();
     // Clear entire user cache on logout
     apiCache.clear();
+    // Drop any requests queued offline under this session — otherwise they
+    // can replay under the next signed-in user's token after reconnect.
+    await requestQueue.clear();
 
     await tokenStorage.clear();
     await tokenStorage.clearExpiresAt();

@@ -6,9 +6,11 @@ import { logger } from "@/src/utils/logger";
 import { requestQueue } from "@/src/utils/requestQueue";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { asError, toAppError } from "./errors";
+import { AppError, asError, toAppError } from "./errors";
 
-// Checks if a request is safe to queue offline (e.g. read notifications, search history)
+// Checks if a request is safe to queue offline (idempotent notification
+// writes only). Search-history writes are deliberately excluded — they carry
+// user-entered search text and are not persisted/replayed offline for privacy.
 const isQueueableRequest = (config: AxiosRequestConfig): boolean => {
   const method = (config.method ?? "").toLowerCase();
   const url = config.url ?? "";
@@ -17,15 +19,6 @@ const isQueueableRequest = (config: AxiosRequestConfig): boolean => {
     return (
       url.startsWith("/api/v1/customers/notifications/") &&
       (url.endsWith("/read") || url.endsWith("/dismiss"))
-    );
-  }
-  if (method === "post") {
-    return url === API_ENDPOINTS.SEARCH_HISTORY;
-  }
-  if (method === "delete") {
-    return (
-      url === API_ENDPOINTS.SEARCH_HISTORY ||
-      url.startsWith(`${API_ENDPOINTS.SEARCH_HISTORY}/`)
     );
   }
   return false;
@@ -56,10 +49,21 @@ let failedQueue: {
 // Backoff cooldown if token refresh fails due to network/server errors
 const REFRESH_COOLDOWN_MS = 5000;
 let refreshCooldownUntil = 0;
+// The classified error from that transient failure, so requests made during
+// the cooldown window reject with the real reason instead of a false 401
+let lastRefreshFailure: AppError | null = null;
 
 const processQueue = (error: unknown, token: string | null) => {
   failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
   failedQueue = [];
+};
+
+/** Test seam — refresh/cooldown module state outlives a single test case. */
+export const resetRefreshStateForTests = (): void => {
+  isRefreshing = false;
+  failedQueue = [];
+  refreshCooldownUntil = 0;
+  lastRefreshFailure = null;
 };
 
 export const apiClient: AxiosInstance = axios.create({
@@ -136,7 +140,10 @@ apiClient.interceptors.response.use(
 
     if (err.response?.status === 401 && !original?._retry && !isAuthPath) {
       if (Date.now() < refreshCooldownUntil) {
-        return Promise.reject(toAppError(err));
+        // A prior refresh attempt failed transiently (network/timeout/5xx);
+        // surface that real reason instead of misreporting this 401 as a
+        // session expiry.
+        return Promise.reject(lastRefreshFailure ?? toAppError(err));
       }
 
       if (__DEV__)
@@ -173,6 +180,7 @@ apiClient.interceptors.response.use(
 
         if (__DEV__) logger.debug("[apiClient] Background refresh SUCCESS");
         refreshCooldownUntil = 0;
+        lastRefreshFailure = null;
 
         // Update in-memory token + persist to SecureStore
         _accessToken = newToken;
@@ -186,7 +194,11 @@ apiClient.interceptors.response.use(
         return apiClient(original);
       } catch (e) {
         if (__DEV__) console.error("[apiClient] Background refresh FAILED:", e);
-        processQueue(e, null);
+        // Classify the refresh call's own failure — not the original request's
+        // 401 — so a transient refresh failure never surfaces as a false
+        // session expiry, and waiting requests reject with the same error.
+        const refreshError = toAppError(e);
+        processQueue(refreshError, null);
         // Logout only on 401/403 (expired session); keep logged in on 5xx server errors
         const refreshStatus = asError(e).response?.status;
         if (refreshStatus === 401 || refreshStatus === 403) {
@@ -194,8 +206,9 @@ apiClient.interceptors.response.use(
           onUnauthorized?.();
         } else {
           refreshCooldownUntil = Date.now() + REFRESH_COOLDOWN_MS;
+          lastRefreshFailure = refreshError;
         }
-        return Promise.reject(toAppError(err));
+        return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }

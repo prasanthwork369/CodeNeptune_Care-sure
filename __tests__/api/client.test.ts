@@ -3,6 +3,7 @@ import {
   setAccessToken,
   getAccessToken,
   setUnauthorizedHandler,
+  resetRefreshStateForTests,
 } from "@/src/api/client";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import { tokenStorage } from "@/src/lib/storage";
@@ -30,6 +31,10 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
     jest.clearAllMocks();
     setAccessToken(null);
     useNetworkStore.setState({ isConnected: true });
+    // isRefreshing/refreshCooldownUntil/lastRefreshFailure are module-private
+    // state that would otherwise leak between tests (e.g. a cooldown set by
+    // a transient-failure test bleeding into the next test's fresh 401).
+    resetRefreshStateForTests();
   });
 
   describe("Token Accessors", () => {
@@ -148,6 +153,169 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
     });
   });
 
+  describe("Refresh Failure Classification", () => {
+    const getResponseInterceptors = () => {
+      const handler = (apiClient.interceptors.response as any).handlers[0];
+      return { onFulfilled: handler.fulfilled, onRejected: handler.rejected };
+    };
+
+    it("runs only ONE refresh for multiple simultaneous 401s, and retries every waiting request once it resolves", async () => {
+      const { onRejected } = getResponseInterceptors();
+      const spyPost = jest.spyOn(axios, "post").mockResolvedValueOnce({
+        data: { data: { accessToken: "shared-token", expiresIn: 3600 } },
+      });
+
+      apiClient.defaults.adapter = jest.fn().mockImplementation((config) =>
+        Promise.resolve({
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config,
+          data: { url: config.url },
+        }),
+      ) as any;
+
+      const err1 = {
+        response: { status: 401 },
+        config: { url: "/api/protected-a", headers: {} },
+      };
+      const err2 = {
+        response: { status: 401 },
+        config: { url: "/api/protected-b", headers: {} },
+      };
+
+      const [res1, res2] = await Promise.all([
+        onRejected(err1),
+        onRejected(err2),
+      ]);
+
+      expect(spyPost).toHaveBeenCalledTimes(1);
+      expect(res1.data).toEqual({ url: "/api/protected-a" });
+      expect(res2.data).toEqual({ url: "/api/protected-b" });
+
+      spyPost.mockRestore();
+    });
+
+    it("does not log out and classifies as a timeout — not unauthorized — when the refresh call itself times out", async () => {
+      const { onRejected } = getResponseInterceptors();
+      const mockUnauthorizedHandler = jest.fn();
+      setUnauthorizedHandler(mockUnauthorizedHandler);
+      setAccessToken("still-valid-token");
+
+      const spyPost = jest.spyOn(axios, "post").mockRejectedValueOnce({
+        isAxiosError: true,
+        code: "ECONNABORTED",
+        message: "timeout of 10000ms exceeded",
+      });
+
+      const err = {
+        response: { status: 401 },
+        config: { url: "/api/protected-route", headers: {} },
+      };
+
+      await expect(onRejected(err)).rejects.toMatchObject({ kind: "timeout" });
+      expect(mockUnauthorizedHandler).not.toHaveBeenCalled();
+      expect(getAccessToken()).toBe("still-valid-token");
+
+      spyPost.mockRestore();
+    });
+
+    it("does not log out and classifies as a server error — not unauthorized — when the refresh call returns 5xx", async () => {
+      const { onRejected } = getResponseInterceptors();
+      const mockUnauthorizedHandler = jest.fn();
+      setUnauthorizedHandler(mockUnauthorizedHandler);
+      setAccessToken("still-valid-token");
+
+      const spyPost = jest.spyOn(axios, "post").mockRejectedValueOnce({
+        isAxiosError: true,
+        response: { status: 503, data: {} },
+      });
+
+      const err = {
+        response: { status: 401 },
+        config: { url: "/api/protected-route", headers: {} },
+      };
+
+      await expect(onRejected(err)).rejects.toMatchObject({
+        kind: "server",
+        status: 503,
+      });
+      expect(mockUnauthorizedHandler).not.toHaveBeenCalled();
+      expect(getAccessToken()).toBe("still-valid-token");
+
+      spyPost.mockRestore();
+    });
+
+    it("keeps surfacing the transient failure's classification for requests made during the cooldown window, instead of a false unauthorized", async () => {
+      const { onRejected } = getResponseInterceptors();
+      const spyPost = jest.spyOn(axios, "post").mockRejectedValueOnce({
+        isAxiosError: true,
+        response: { status: 503, data: {} },
+      });
+
+      const firstErr = {
+        response: { status: 401 },
+        config: { url: "/api/protected-first", headers: {} },
+      };
+      await expect(onRejected(firstErr)).rejects.toMatchObject({
+        kind: "server",
+      });
+      expect(spyPost).toHaveBeenCalledTimes(1);
+
+      // A second, unrelated 401 arrives while still inside the cooldown
+      // window opened by the transient failure above.
+      const secondErr = {
+        response: { status: 401 },
+        config: { url: "/api/protected-second", headers: {} },
+      };
+      await expect(onRejected(secondErr)).rejects.toMatchObject({
+        kind: "server",
+      });
+      // No second refresh attempt — the cooldown short-circuited it, and the
+      // rejection still reflects the real transient reason, not "unauthorized".
+      expect(spyPost).toHaveBeenCalledTimes(1);
+
+      spyPost.mockRestore();
+    });
+
+    it("rejects every waiting concurrent request with the same classified error when the shared refresh fails transiently", async () => {
+      const { onRejected } = getResponseInterceptors();
+      let rejectPost!: (e: unknown) => void;
+      const postPromise = new Promise((_resolve, reject) => {
+        rejectPost = reject;
+      });
+      const spyPost = jest
+        .spyOn(axios, "post")
+        .mockReturnValueOnce(postPromise as any);
+
+      const err1 = {
+        response: { status: 401 },
+        config: { url: "/api/a", headers: {} },
+      };
+      const err2 = {
+        response: { status: 401 },
+        config: { url: "/api/b", headers: {} },
+      };
+
+      const p1 = onRejected(err1);
+      const p2 = onRejected(err2);
+
+      rejectPost({ isAxiosError: true, code: "ECONNABORTED" });
+
+      const [r1, r2] = await Promise.allSettled([p1, p2]);
+      expect(r1.status).toBe("rejected");
+      expect(r2.status).toBe("rejected");
+      expect((r1 as PromiseRejectedResult).reason).toMatchObject({
+        kind: "timeout",
+      });
+      expect((r2 as PromiseRejectedResult).reason).toMatchObject({
+        kind: "timeout",
+      });
+
+      spyPost.mockRestore();
+    });
+  });
+
   describe("Offline Queueable Writes", () => {
     const getRequestInterceptor = () => {
       const handler = (apiClient.interceptors.request as any).handlers[0];
@@ -177,11 +345,12 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
       });
     });
 
-    it("tags search-history record/delete/clear as queueable when offline", async () => {
+    it("does NOT queue search-history writes offline — hard-rejects instead so search terms are never persisted to disk", async () => {
       const interceptor = getRequestInterceptor();
       const record = {
         method: "post",
         url: "/api/v1/customers/search-history",
+        data: { query: "amoxicillin 500mg" },
         headers: {},
       };
       const deleteItem = {
@@ -191,11 +360,14 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
       };
 
       await expect(interceptor(record)).rejects.toMatchObject({
-        code: "NETWORK_OFFLINE_QUEUEABLE",
+        message: "Network offline",
+        code: "NETWORK_OFFLINE",
       });
       await expect(interceptor(deleteItem)).rejects.toMatchObject({
-        code: "NETWORK_OFFLINE_QUEUEABLE",
+        message: "Network offline",
+        code: "NETWORK_OFFLINE",
       });
+      expect(requestQueue.length).toBe(0);
     });
 
     it("still hard-rejects unsafe mutations (order creation, cart, checkout) when offline", async () => {
@@ -272,8 +444,12 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
     });
   });
 
-  describe("Queue Cleared On Logout", () => {
-    it("clears the offline queue when the unauthorized handler runs (app/_layout.tsx wiring)", async () => {
+  describe("Offline Queue Cleared On Logout", () => {
+    // useAuthStore.logout() is the single centralized place that clears the
+    // offline queue — exercised end-to-end (both the forced unauthorized
+    // path and manual logout converge on it) in authStore.test.ts. This just
+    // sanity-checks requestQueue.clear() empties a queued offline request.
+    it("requestQueue.clear() empties a queued offline request", async () => {
       await requestQueue.clear();
       useNetworkStore.setState({ isConnected: false });
       const { onRejected } = (() => {
@@ -291,8 +467,6 @@ describe("apiClient — Interceptors and Auth Lifecycle", () => {
       }).catch(() => {});
       expect(requestQueue.length).toBe(1);
 
-      // Mirrors setUnauthorizedHandler's callback in app/_layout.tsx, which
-      // calls queryClient.clear(); requestQueue.clear(); logout().
       await requestQueue.clear();
 
       expect(requestQueue.length).toBe(0);

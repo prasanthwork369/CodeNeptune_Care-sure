@@ -43,7 +43,6 @@ import { isSafeRoute, useLastRouteStore } from "@/src/store/lastRouteStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
-import { requestQueue } from "@/src/utils/requestQueue";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import "../global.css";
 
@@ -216,7 +215,8 @@ export default function RootLayout() {
   useEffect(() => {
     setUnauthorizedHandler(() => {
       queryClient.clear();
-      requestQueue.clear();
+      // useAuthStore.logout() owns clearing the offline request queue, so
+      // both this forced path and manual logout stay in sync.
       useAuthStore.getState().logout();
     });
   }, []);
