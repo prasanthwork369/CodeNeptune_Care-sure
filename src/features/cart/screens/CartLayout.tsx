@@ -9,7 +9,9 @@ import {
   SAVINGS_BANNER_ENTERING,
   SAVINGS_BANNER_EXITING,
 } from "@/src/features/cart/constants/cart.constants";
+import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
+import { useLegacyCartRepair } from "@/src/features/cart/hooks/useLegacyCartRepair";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useLiveScreenState } from "@/src/hooks/ui/useLiveScreenState";
 import { PERF_TRACES, usePerformanceTrace } from "@/src/services/firebase";
@@ -101,6 +103,13 @@ export const CartLayout: React.FC = () => {
     cartError,
     refetchCart,
   } = useCartCalculations();
+
+  // Rewrites any cart row still holding a variant UUID in medicineId (written
+  // by builds before that fix) — those are rejected at Place Order, and Cart
+  // is the only route into checkout. Shares useCart's cached query, so this
+  // adds no extra fetch.
+  const { cart } = useCart();
+  useLegacyCartRepair(cart);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const liveState = useLiveScreenState({
