@@ -15,10 +15,8 @@ export const cartApi = {
     return response.data.data;
   },
 
-  // `idempotencyKey` is stable for one logical add, so a request replayed at
-  // the transport layer (the 401 refresh retry, or a resend after a dropped
-  // response) is a no-op server-side instead of double-applying the quantity —
-  // order-service dedupes on (cartId, idempotencyKey) in cart_mutation_idempotency.
+  // Backend dedupes on (cartId, idempotencyKey), so a replayed request is a
+  // no-op instead of double-applying the quantity.
   addItem: async (
     input: AddToCartInput,
     idempotencyKey?: string,

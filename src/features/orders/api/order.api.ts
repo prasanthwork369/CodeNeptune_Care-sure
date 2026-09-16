@@ -43,12 +43,8 @@ export const orderApi = {
     data: CreateOrderRequest,
     idempotencyKey?: string,
   ): Promise<Order> => {
-    // Dedupe of a retried order is driven by the TOP-LEVEL body field —
-    // order-service reads `data.idempotencyKey` (orders.validator.ts →
-    // create-order.usecase.ts) and never inspects the header. Setting it here
-    // too means a caller that passes the key as an argument can't accidentally
-    // ship a payload the backend would treat as a fresh order.
-    // The header is still sent as a conventional hint for proxies/logging.
+    // Dedupe runs off the top-level body field; the backend never reads the
+    // header. Set here too so an arg-passing caller can't miss it.
     const body: CreateOrderRequest = idempotencyKey
       ? { ...data, idempotencyKey: data.idempotencyKey ?? idempotencyKey }
       : data;

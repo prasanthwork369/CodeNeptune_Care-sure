@@ -6,50 +6,27 @@ import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
 import { logger } from "@/src/utils/logger";
 import type { Cart, CartItem } from "../types";
 
-/**
- * Heals cart rows written before the variant-id fix.
- *
- * Builds up to that fix stored the `medicine_variants.id` in the row's
- * `medicineId`. Catalog (`/medicines/bulk`) and pricing (`medicine_stock`)
- * are both keyed to `medicines.id` by foreign key, so order-service can
- * resolve neither for such a row and rejects the whole order at Place Order
- * ("Unable to verify the current price for: <uuid>"). Shipping the fix alone
- * stops new bad rows but leaves anyone mid-cart permanently unable to check
- * out, so those rows have to be rewritten once.
- *
- * Detection is exact rather than heuristic: only the old code produced a row
- * whose `medicineId` equals its own `metadata.selectedVariantId`, because it
- * wrote the variant UUID into both. A correctly-written row can never match —
- * its medicineId comes from `medicines` and its selectedVariantId from
- * `medicine_variants`, which are different tables with different keys.
- */
+// Only the old code wrote the variant UUID into both fields, so this signature
+// is exact — a correct row's two ids come from different tables.
 function isLegacyVariantRow(item: CartItem): boolean {
   const variantId = item.metadata?.selectedVariantId;
   return !!variantId && item.medicineId === variantId;
 }
 
-/**
- * Rewrites one row: add the corrected line first, then drop the broken one.
- *
- * Deliberately add-then-remove. If the add fails the customer still has their
- * original (unbuyable, but present) line and we simply leave it for the next
- * attempt; removing first would risk losing the item outright when the add
- * then fails. The transient worst case is a visible duplicate, which the
- * customer can delete — strictly better than silent data loss.
- */
+/** Rewrites one row with the parent medicineId. */
 async function repairRow(item: CartItem): Promise<boolean> {
-  // Catalog code (e.g. "CS-BDSMYG") the old client stored alongside the row.
-  // It is the only handle back to the parent medicine, since the row's own
-  // medicineId resolves to nothing server-side.
+  // The row's own medicineId resolves to nothing server-side, so the catalog
+  // code stored by the old client is the only handle back to the parent.
   const catalogId = item.metadata?.productId;
   if (!catalogId) return false;
 
   const product = await medicineApi.getProductByCatalogId(catalogId);
   const parentMedicineId = product?.id;
-  // A parent that still equals the variant id would just rewrite the same
-  // broken row, so treat it as unresolvable and leave the row untouched.
+  // Same id back would just rewrite the same broken row.
   if (!parentMedicineId || parentMedicineId === item.medicineId) return false;
 
+  // Add before remove: a failed add leaves the item in place instead of
+  // deleting it into a failure.
   await cartApi.addItem(
     {
       medicineId: parentMedicineId,
@@ -62,8 +39,6 @@ async function repairRow(item: CartItem): Promise<boolean> {
       quantity: item.quantity,
       requiresPrescription: item.requiresPrescription,
       image: item.image,
-      // Carried over as-is so the variant selection, pack label and any other
-      // display metadata survive the rewrite.
       metadata: item.metadata,
     },
     newIdempotencyKey(),
@@ -74,10 +49,9 @@ async function repairRow(item: CartItem): Promise<boolean> {
 }
 
 /**
- * Repairs every legacy row in the current cart, then refreshes it once.
- *
- * Returns the number of rows rewritten. Never throws: a cart that cannot be
- * repaired is left exactly as it was, which is no worse than before this ran.
+ * Heals cart rows written before the variant-id fix — they hold a variant UUID
+ * in medicineId, which order-service can't price, so checkout rejects them.
+ * Never throws: an unrepairable cart is left exactly as it was.
  */
 export async function repairLegacyVariantCartRows(
   queryClient: QueryClient,
@@ -91,13 +65,9 @@ export async function repairLegacyVariantCartRows(
     try {
       if (await repairRow(item)) repaired += 1;
     } catch (err) {
-      // Per-row catch: one unresolvable product must not stop the rest.
+      // One unresolvable product must not stop the rest.
       if (__DEV__) {
-        logger.debug(
-          "[CartRepair] Could not repair row, leaving it in place:",
-          item.id,
-          err,
-        );
+        logger.debug("[CartRepair] Row left in place:", item.id, err);
       }
     }
   }

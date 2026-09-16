@@ -13,17 +13,9 @@ import { analyticsService } from "@/src/services/firebase";
 import type { CartItem } from "../types";
 
 /**
- * Product identity for cart operations.
- *
- * medicineId is ALWAYS the parent `medicines.id` UUID — including for pack-size
- * variants. The selected variant travels in `metadata.selectedVariantId`, which
- * is what order-service reads: add-item.usecase.ts pulls the variant out of
- * metadata, and postgres-cart.repository.ts matches an existing line on
- * (cartId, medicineId, metadata->>'selectedVariantId'), so different variants
- * of one medicine already get their own cart rows without overloading
- * medicineId. Sending a `medicine_variants.id` here instead breaks checkout —
- * catalog `/medicines/bulk` and `medicine_stock` are both keyed to
- * `medicines.id`, so order-service can't resolve a price and rejects the order.
+ * Product identity for cart operations. medicineId is always the parent
+ * `medicines.id` — a variant UUID here can't be priced and fails checkout.
+ * The backend already separates variants via metadata.selectedVariantId.
  */
 export interface CartActionProduct {
   medicineId: string; // Parent `medicines.id` UUID — never a variant UUID.
@@ -42,10 +34,9 @@ export interface CartActionProduct {
   requiresPrescription?: boolean;
 }
 
-/** The variant a cart row represents, or null for a plain (non-variant) line. */
+/** The variant a cart row represents, or null for a plain line. */
 function cartItemVariantId(item: CartItem): string | null {
-  // `variantId` isn't a declared key on CartItemMetadata, so it arrives as
-  // `unknown` through the index signature — accept it only when it's a string.
+  // `variantId` is untyped via the index signature, so narrow it.
   const legacy = item.metadata?.variantId;
   return (
     item.metadata?.selectedVariantId ??
@@ -53,18 +44,8 @@ function cartItemVariantId(item: CartItem): string | null {
   );
 }
 
-// Matching is variant-aware: now that every surface sends the parent medicineId,
-// a medicineId-only match would make each variant's card read (and edit) another
-// variant's row, so the variant must agree too — mirroring the backend's own
-// (cartId, medicineId, metadata->>'selectedVariantId') lookup.
-//
-// The legacy clause still matches rows written by builds that stored the variant
-// UUID in medicineId, so carts created before this fix stay editable.
-//
-// The catalog-id fallback reconciles the same product across surfaces (e.g. a
-// recommended item shown both in a comparison card and a standalone card) when
-// their medicineId differs. It stays limited to variant-less rows so it never
-// conflates two pack-size variants that share one productId.
+// Variant-aware: every variant now shares a medicineId, so matching on it
+// alone would let one variant's card edit another's row.
 function matchesCartItem(item: CartItem, product: CartActionProduct): boolean {
   const wantVariantId = product.variantId ?? null;
   const itemVariantId = cartItemVariantId(item);
