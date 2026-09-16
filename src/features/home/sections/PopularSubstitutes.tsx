@@ -68,8 +68,9 @@ const ProductCard = React.memo(
       useCartActions(
         v
           ? {
-              medicineId: v.id,
-              baseMedicineId: product.id,
+              // Parent medicine id — the variant is carried by variantId and
+              // stored in metadata.selectedVariantId.
+              medicineId: product.id,
               variantId: v.id,
               productId: product.productId,
               name: product.name,

@@ -15,14 +15,20 @@ import type { CartItem } from "../types";
 /**
  * Product identity for cart operations.
  *
- * For variants: pass medicineId = variant.id (the variant UUID).
- * The backend cart unique-key is (cartId, medicineId) — variant UUIDs ensure separate rows.
- * variantId is stored in metadata only (frontend display use).
+ * medicineId is ALWAYS the parent `medicines.id` UUID — including for pack-size
+ * variants. The selected variant travels in `metadata.selectedVariantId`, which
+ * is what order-service reads: add-item.usecase.ts pulls the variant out of
+ * metadata, and postgres-cart.repository.ts matches an existing line on
+ * (cartId, medicineId, metadata->>'selectedVariantId'), so different variants
+ * of one medicine already get their own cart rows without overloading
+ * medicineId. Sending a `medicine_variants.id` here instead breaks checkout —
+ * catalog `/medicines/bulk` and `medicine_stock` are both keyed to
+ * `medicines.id`, so order-service can't resolve a price and rejects the order.
  */
 export interface CartActionProduct {
-  medicineId: string; // For variants: the variant UUID. For base products: the medicine UUID.
-  baseMedicineId?: string; // Base medicine UUID — fallback for items added from listing cards (no variant).
-  variantId?: string | null; // Stored in metadata; not used for cart matching (backend limitation).
+  medicineId: string; // Parent `medicines.id` UUID — never a variant UUID.
+  baseMedicineId?: string; // Legacy alias for the parent id — extra match candidate for rows written by older builds.
+  variantId?: string | null; // Selected variant UUID; stored in metadata.selectedVariantId.
   productId?: string; // Catalog ID (e.g. "CS-BDSMYG") — stored in metadata only
   name: string;
   slug?: string;
@@ -36,29 +42,58 @@ export interface CartActionProduct {
   requiresPrescription?: boolean;
 }
 
-// Primary match: medicineId = variant UUID (new items).
-// Fallback: metadata.selectedVariantId match for items added with old code (medicineId = parent UUID).
-// Stable catalog-id fallback: reconciles the same product across surfaces
-// (e.g. a recommended item shown both in a comparison card and a standalone
-// card) when their medicineId differs. Excludes variant lines so it never
-// conflates two pack-size variants that share one productId.
-// Exact same predicate the old inline `.find()` used — only where it runs changed.
-function matchesCartItem(item: CartItem, product: CartActionProduct): boolean {
+/** The variant a cart row represents, or null for a plain (non-variant) line. */
+function cartItemVariantId(item: CartItem): string | null {
+  // `variantId` isn't a declared key on CartItemMetadata, so it arrives as
+  // `unknown` through the index signature — accept it only when it's a string.
+  const legacy = item.metadata?.variantId;
   return (
+    item.metadata?.selectedVariantId ??
+    (typeof legacy === "string" ? legacy : null)
+  );
+}
+
+// Matching is variant-aware: now that every surface sends the parent medicineId,
+// a medicineId-only match would make each variant's card read (and edit) another
+// variant's row, so the variant must agree too — mirroring the backend's own
+// (cartId, medicineId, metadata->>'selectedVariantId') lookup.
+//
+// The legacy clause still matches rows written by builds that stored the variant
+// UUID in medicineId, so carts created before this fix stay editable.
+//
+// The catalog-id fallback reconciles the same product across surfaces (e.g. a
+// recommended item shown both in a comparison card and a standalone card) when
+// their medicineId differs. It stays limited to variant-less rows so it never
+// conflates two pack-size variants that share one productId.
+function matchesCartItem(item: CartItem, product: CartActionProduct): boolean {
+  const wantVariantId = product.variantId ?? null;
+  const itemVariantId = cartItemVariantId(item);
+
+  // Legacy rows: medicineId held the variant UUID.
+  if (wantVariantId != null && item.medicineId === wantVariantId) return true;
+
+  const medicineMatches =
     item.medicineId === product.medicineId ||
     (product.baseMedicineId != null &&
-      item.medicineId === product.baseMedicineId) ||
-    (product.variantId != null &&
-      item.metadata?.selectedVariantId === product.variantId) ||
-    (product.productId != null &&
-      !item.metadata?.selectedVariantId &&
-      item.metadata?.productId === product.productId)
+      item.medicineId === product.baseMedicineId);
+  if (medicineMatches) return itemVariantId === wantVariantId;
+
+  if (wantVariantId != null) return itemVariantId === wantVariantId;
+
+  return (
+    product.productId != null &&
+    itemVariantId == null &&
+    item.metadata?.productId === product.productId
   );
 }
 
 export const useCartActions = (product: CartActionProduct) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const pendingKey = product.medicineId;
+  // Variant-scoped: medicineId alone is shared by every pack-size variant of a
+  // medicine, so two variant cards on one screen would block each other.
+  const pendingKey = product.variantId
+    ? `${product.medicineId}-${product.variantId}`
+    : product.medicineId;
 
   // Narrow, per-card subscriptions: each card selects only its own matching
   // item out of the shared cart (server cart via React Query `select`, guest
