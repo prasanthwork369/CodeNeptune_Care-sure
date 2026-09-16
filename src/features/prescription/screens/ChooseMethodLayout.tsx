@@ -52,7 +52,17 @@ export const ChooseMethodLayout: React.FC = () => {
     (typeof members)[0] | null
   >(null);
 
+  // membersLoading means "fetching with no data", so it stays true after a
+  // resumed fetch. Only block when there is also no patient to pick.
+  const isPatientListUnresolved = membersLoading && members.length === 0;
+
+  // Shared by the footer and handleProceed so the two can never disagree.
+  const canProceed =
+    selectedOption === "upload" ||
+    (selectedOption === "call" && !isPatientListUnresolved);
+
   const handleProceed = () => {
+    if (!canProceed) return;
     if (selectedOption === "upload") {
       useUIStore.getState().setIsRxFromCartFlow(true);
       setIsUploadSheetVisible(true);
@@ -69,7 +79,7 @@ export const ChooseMethodLayout: React.FC = () => {
   };
 
   const getButtonLabel = () => {
-    if (membersLoading && selectedOption === "call") return "Loading…";
+    if (selectedOption === "call" && isPatientListUnresolved) return "Loading…";
     return "Proceed";
   };
 
@@ -103,9 +113,7 @@ export const ChooseMethodLayout: React.FC = () => {
       <ChooseMethodFooter
         toPay={toPay}
         safeAreaBottom={adjustedBottom}
-        canProceed={
-          !!selectedOption && (selectedOption === "upload" || !membersLoading)
-        }
+        canProceed={canProceed}
         onProceed={handleProceed}
         buttonLabel={getButtonLabel()}
       />

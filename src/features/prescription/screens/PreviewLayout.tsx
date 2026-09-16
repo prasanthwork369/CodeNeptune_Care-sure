@@ -30,7 +30,6 @@ import {
   FileTooLargeModal,
   InfoModal,
   PreviewDisplay,
-  PreviewSuccessModal,
   PreviewThumbnails,
   RemoveConfirmModal,
   UploadProgressPanel,
@@ -108,7 +107,6 @@ export const PreviewLayout: React.FC = () => {
   // after every file has already reached 100% — a distinct phase so the
   // panel can say so instead of sitting at 100% with no explanation.
   const [savingPrescription, setSavingPrescription] = useState(false);
-  const [showConfirmed, setShowConfirmed] = useState(false);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [duplicateFileName, setDuplicateFileName] = useState("");
@@ -127,10 +125,10 @@ export const PreviewLayout: React.FC = () => {
   const uploadedSnapshot = useRef<PrescriptionItem[]>([]);
   const uploader = usePrescriptionUploader(FOLDER);
   const submitLockRef = useRef(false);
-  // Hosted image URLs produced at Preview for the order flow. The prescription
-  // record itself is NOT created here anymore — it's created at the final
-  // Place Order step — so we stash the URLs to carry forward to payment.
-  const deferredImageUrls = useRef<string[]>([]);
+  // Set once the order flow starts navigating to Select Patient, so the
+  // finally below leaves the progress panel up (and Proceed locked) for the
+  // transition instead of briefly restoring the idle footer.
+  const isNavigatingRef = useRef(false);
   const activeItem = items[activeIndex] ?? items[0];
 
   // React Compiler memoizes these automatically — stable identities for
@@ -269,9 +267,21 @@ export const PreviewLayout: React.FC = () => {
         // now hosted URLs (above); the prescription is created in one POST at
         // the final Place Order step, so any images added later on Select
         // Patient are saved together. Carry the URLs forward.
-        deferredImageUrls.current = uploadedUrls;
         useUIStore.getState().setIsRxFromCartFlow(true);
-        setShowConfirmed(true);
+        isNavigatingRef.current = true;
+        router.replace({
+          pathname: "/(prescription)/select-patient",
+          params: {
+            toPay,
+            // Prescription isn't created yet in the order flow — carry the
+            // hosted image URLs + category so payment can create it in one go.
+            imageUrls: JSON.stringify(uploadedUrls),
+            category: String(PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER),
+            files: JSON.stringify(uploadedSnapshot.current),
+          },
+        });
+        // Draft is cleared by this screen's unmount cleanup — clearing it here
+        // would empty the still-visible list mid-transition.
         return;
       }
 
@@ -313,9 +323,11 @@ export const PreviewLayout: React.FC = () => {
           "Upload failed. Please try again.",
       );
     } finally {
-      submitLockRef.current = false;
-      setSubmitting(false);
-      setSavingPrescription(false);
+      if (!isNavigatingRef.current) {
+        submitLockRef.current = false;
+        setSubmitting(false);
+        setSavingPrescription(false);
+      }
     }
   };
 
@@ -444,28 +456,6 @@ export const PreviewLayout: React.FC = () => {
           setTooLargeSizeMB(null);
           setShowAddSheet(true);
         }}
-      />
-
-      <PreviewSuccessModal
-        visible={showConfirmed}
-        onClose={() => setShowConfirmed(false)}
-        onContinue={() => {
-          router.replace({
-            pathname: "/(prescription)/select-patient",
-            params: {
-              toPay,
-              // Prescription isn't created yet in the order flow — carry the
-              // hosted image URLs + category so payment can create it in one go.
-              imageUrls: JSON.stringify(deferredImageUrls.current),
-              category: String(PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER),
-              files: JSON.stringify(uploadedSnapshot.current),
-            },
-          });
-          // Not closed here — it stays open (and unmounts with the screen)
-          // so closing it doesn't expose the emptied Preview underneath.
-          clearItems();
-        }}
-        safeAreaBottom={adjustedBottom}
       />
 
       <PrescriptionReviewSheet

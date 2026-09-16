@@ -1,6 +1,6 @@
 import { tokenStorage } from "@/src/lib/storage";
-import { isOffline } from "@/src/utils/offline/networkState";
 import { reportOffline } from "@/src/utils/offline/networkFeedback";
+import { isOffline } from "@/src/utils/offline/networkState";
 
 import { logger } from "@/src/utils/logger";
 import { requestQueue } from "@/src/utils/requestQueue";
@@ -73,6 +73,7 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     "x-panel-id": "customer",
+    "x-platform": "mobile_app",
   },
 });
 

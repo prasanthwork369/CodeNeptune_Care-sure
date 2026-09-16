@@ -123,13 +123,6 @@ export interface PreviewThumbnailsProps {
   onRetry?: (item: PrescriptionItem) => void;
 }
 
-export interface PreviewSuccessModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onContinue: () => void;
-  safeAreaBottom: number;
-}
-
 export interface PrescriptionComparisonItem {
   id: string;
   prescribedMedicine: string;
