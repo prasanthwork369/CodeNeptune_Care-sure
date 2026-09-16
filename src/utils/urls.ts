@@ -103,6 +103,7 @@ export const API_ENDPOINTS = {
     `/api/v1/prescriptions/order/${orderId}`,
   PRESCRIPTION_ORDER_MEDICINES: (orderId: string) =>
     `/api/v1/prescriptions/order/${orderId}`,
+  PRESCRIPTION_CALLBACK_REQUESTS: "/api/v1/prescription-callback-requests",
 
   // ── Orders ───────────────────────────────────────────────────────────────
   ORDERS: "/api/v1/orders",

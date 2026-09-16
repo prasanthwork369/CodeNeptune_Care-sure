@@ -5,6 +5,7 @@ import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
+import { requestPharmacistCallback } from "../services/prescriptionCallback.service";
 import type { FamilyMember } from "@/src/features/profile/types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -61,6 +62,20 @@ export const ChooseMethodLayout: React.FC = () => {
     selectedOption === "upload" ||
     (selectedOption === "call" && !isPatientListUnresolved);
 
+  // Queues the call-back for the staff dashboards, then continues. Not
+  // awaited — a failed queue must never block the Call-Us checkout path.
+  const goToPatientSelection = (patientName?: string) => {
+    void requestPharmacistCallback(
+      patientName
+        ? `Call-Us checkout: no prescription for ${patientName}.`
+        : "Call-Us checkout: customer has no prescription.",
+    );
+    router.push({
+      pathname: "/(prescription)/select-patient",
+      params: { toPay },
+    });
+  };
+
   const handleProceed = () => {
     if (!canProceed) return;
     if (selectedOption === "upload") {
@@ -71,10 +86,7 @@ export const ChooseMethodLayout: React.FC = () => {
         setIsAddPatientSheetVisible(true);
         return;
       }
-      router.push({
-        pathname: "/(prescription)/select-patient",
-        params: { toPay },
-      });
+      goToPatientSelection(selectedPatient.name);
     }
   };
 
@@ -182,10 +194,7 @@ export const ChooseMethodLayout: React.FC = () => {
           if (patientId) {
             if (selectedOption === "upload") setIsUploadSheetVisible(true);
             else if (selectedOption === "call")
-              router.push({
-                pathname: "/(prescription)/select-patient",
-                params: { toPay },
-              });
+              goToPatientSelection(patient.name);
           }
         }}
       />

@@ -118,3 +118,18 @@ export interface HealthProblem {
   sortOrder: number;
   isActive: boolean;
 }
+
+// ─── Pharmacist Callback Request ─────────────────────────────────────────────
+
+/** Mirrors order-service createCallbackRequestSchema. */
+export interface CreateCallbackRequestPayload {
+  customerInfo: {
+    id?: string | null;
+    /** min 2 chars server-side. */
+    name: string;
+    /** min 10 chars server-side. */
+    phone: string;
+    email?: string | null;
+  };
+  notes?: string;
+}
