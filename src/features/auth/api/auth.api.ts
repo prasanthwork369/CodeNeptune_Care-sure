@@ -13,7 +13,10 @@ export const authApi = {
     const response = await apiClient.post(API_ENDPOINTS.AUTH_VERIFY_OTP, {
       phone,
       otp,
-      deviceId: deviceId ?? "", // Fallback to empty string if somehow null, keeping it a valid string type
+      // Omitted when unresolvable, never sent as "". The field is
+      // `z.string().min(1).optional()` server-side, so an empty string fails
+      // validation and 422s the whole login; optional means absent.
+      ...(deviceId ? { deviceId } : {}),
       platform: "APP", // Distinguishes the mobile app from the web panel (backend-required)
     });
     return response.data;
