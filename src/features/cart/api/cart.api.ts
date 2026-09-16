@@ -15,8 +15,18 @@ export const cartApi = {
     return response.data.data;
   },
 
-  addItem: async (input: AddToCartInput): Promise<Cart> => {
-    const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS, input);
+  // `idempotencyKey` is stable for one logical add, so a request replayed at
+  // the transport layer (the 401 refresh retry, or a resend after a dropped
+  // response) is a no-op server-side instead of double-applying the quantity —
+  // order-service dedupes on (cartId, idempotencyKey) in cart_mutation_idempotency.
+  addItem: async (
+    input: AddToCartInput,
+    idempotencyKey?: string,
+  ): Promise<Cart> => {
+    const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS, {
+      ...input,
+      ...(idempotencyKey ? { idempotencyKey } : {}),
+    });
     return response.data.data;
   },
 
@@ -25,9 +35,11 @@ export const cartApi = {
   // this endpoint. Only call this for items that don't need those preserved.
   bulkAddItems: async (
     items: BulkAddCartItemInput[],
+    idempotencyKey?: string,
   ): Promise<BulkAddResult> => {
     const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS_BULK, {
       items,
+      ...(idempotencyKey ? { idempotencyKey } : {}),
     });
     return response.data.data;
   },

@@ -146,6 +146,9 @@ export const buildOrderPayload = ({
   discountAmount: String(sumOrderDiscounts(bill).toFixed(2)),
   total: String(Number(bill.toPay).toFixed(2)),
   deliveryType: "HOME_DELIVERY",
+  // Top-level is the only place order-service looks for this; the copy kept in
+  // metadata below is retained for existing consumers of that blob.
+  idempotencyKey,
   patientMemberIds: patientMemberId ? [patientMemberId] : undefined,
   prescriptionId: prescriptionId || undefined,
   isPurchased: prescriptionId ? true : undefined,

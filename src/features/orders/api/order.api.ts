@@ -43,11 +43,18 @@ export const orderApi = {
     data: CreateOrderRequest,
     idempotencyKey?: string,
   ): Promise<Order> => {
-    // Idempotency-Key lets the backend dedupe a retried order instead of
-    // creating a duplicate; sent as a standard header when provided.
+    // Dedupe of a retried order is driven by the TOP-LEVEL body field —
+    // order-service reads `data.idempotencyKey` (orders.validator.ts →
+    // create-order.usecase.ts) and never inspects the header. Setting it here
+    // too means a caller that passes the key as an argument can't accidentally
+    // ship a payload the backend would treat as a fresh order.
+    // The header is still sent as a conventional hint for proxies/logging.
+    const body: CreateOrderRequest = idempotencyKey
+      ? { ...data, idempotencyKey: data.idempotencyKey ?? idempotencyKey }
+      : data;
     const response = await apiClient.post(
       API_ENDPOINTS.ORDERS,
-      data,
+      body,
       idempotencyKey
         ? { headers: { "Idempotency-Key": idempotencyKey } }
         : undefined,

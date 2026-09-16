@@ -80,6 +80,13 @@ export interface CreateOrderRequest {
   symptoms?: string | null;
   metadata?: OrderMetadata;
   isPurchased?: boolean;
+  /**
+   * Stable across retries of one checkout attempt. Must stay TOP-LEVEL:
+   * order-service reads `data.idempotencyKey` off the validated body
+   * (orders.validator.ts createOrderSchema → create-order.usecase.ts), and
+   * ignores both the `Idempotency-Key` header and `metadata.idempotencyKey`.
+   */
+  idempotencyKey?: string;
 }
 
 export interface OrderItem {

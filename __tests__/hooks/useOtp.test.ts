@@ -145,9 +145,12 @@ describe("useOtp — OTP Flow & Guest Cart Merge", () => {
 
     // This item carries no variant/prescription metadata, so the merge
     // routes it through the bulk endpoint rather than the single-item one.
-    expect(cartApi.bulkAddItems).toHaveBeenCalledWith([
-      expect.objectContaining({ medicineId: "med-101", quantity: 2 }),
-    ]);
+    // Second argument is the idempotency key that makes a replayed batch a
+    // no-op server-side instead of double-adding the merged items.
+    expect(cartApi.bulkAddItems).toHaveBeenCalledWith(
+      [expect.objectContaining({ medicineId: "med-101", quantity: 2 })],
+      expect.any(String),
+    );
     expect(useCartPendingStore.getState().guestCart.items).toEqual([]);
   });
 
