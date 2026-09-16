@@ -135,6 +135,11 @@ export const useCartSocketSync = () => {
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.CUSTOMER.NOTIFICATIONS,
         });
+        // Prescription status changes arrive as notifications, so the Rx
+        // banner updates now instead of waiting for the next screen focus.
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CUSTOMER.PRESCRIPTIONS.LIST_ALL,
+        });
       });
 
       socket.on(
