@@ -562,6 +562,7 @@ export const OrderTrackLayout: React.FC = () => {
         <ReturnStatusSection
           returns={order?.returns}
           showWindowExpiredMessage={showWindowExpiredMessage}
+          orderUuid={order?.id}
         />
 
         <ItemsOrderedSection

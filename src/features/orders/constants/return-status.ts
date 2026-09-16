@@ -12,6 +12,10 @@ export const RETURN_STATUS = {
 export type ReturnStatusValue =
   (typeof RETURN_STATUS)[keyof typeof RETURN_STATUS];
 
+// Mirrors order-service's assertCancellable: only before pickup.
+export const isReturnCancellable = (status: number): boolean =>
+  status === RETURN_STATUS.REQUESTED || status === RETURN_STATUS.APPROVED;
+
 // Styled like ORDER_STATUS in src/types/order.ts for visual consistency.
 export const RETURN_STATUS_LABELS: Record<
   number,
