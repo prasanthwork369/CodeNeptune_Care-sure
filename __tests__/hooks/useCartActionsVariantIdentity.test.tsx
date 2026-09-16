@@ -133,6 +133,24 @@ describe("cart variant identity", () => {
     expect(payload.variantId).toBe(VARIANT_A);
   });
 
+  // unitPrice is the selling price, not the MRP — order-service sums
+  // unitPrice * quantity for the subtotal, and web writes the same shape.
+  it("sends the selling price as unitPrice and the MRP separately", async () => {
+    const { result } = renderHook(
+      () => useCartActions(variantProduct(VARIANT_A) as never),
+      { wrapper: wrapperWithCart([]) },
+    );
+
+    await act(async () => {
+      await result.current.increment();
+    });
+
+    const payload = mockAddItem.mock.calls[0][0];
+    expect(payload.unitPrice).toBe(100);
+    expect(payload.mrp).toBe(120);
+    expect(payload.discountPercent).toBe(10);
+  });
+
   it("omits selectedVariantId for a product with no variant", async () => {
     const { result } = renderHook(
       () => useCartActions(variantProduct(null) as never),

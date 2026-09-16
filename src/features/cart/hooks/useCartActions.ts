@@ -156,11 +156,10 @@ export const useCartActions = (product: CartActionProduct) => {
           String(product.slug ?? "").trim() ||
           String(product.productId ?? "").trim() ||
           product.medicineId;
-        // unitPrice must be the MRP — the backend derives the selling price
-        // as unitPrice * (1 - discountPercent/100), matching customer-website's
-        // ProductCard.tsx (unitPrice: mrp, mrp: mrp, discountPercent).
+        // unitPrice is the selling price and mrp the strikethrough — the
+        // backend sums unitPrice * quantity for the subtotal, same as web.
+        const unitPrice = Number(product.price ?? 0);
         const mrp = Number(product.originalPrice ?? product.price ?? 0);
-        const unitPrice = mrp;
         const discountPercent = Number(product.discountPercent ?? 0);
         const imageUri =
           typeof product.image === "object" && product.image?.uri

@@ -49,7 +49,9 @@ async function buildCartInput(
     medicineName: item.medicineSnapshot?.name ?? item.medicineId,
     medicineSlug: item.medicineSnapshot?.slug ?? item.medicineId,
     unitPrice,
-    mrp: unitPrice,
+    // Real MRP where the order carried one, so the strikethrough survives
+    // the reorder instead of collapsing to the selling price.
+    mrp: Number(item.mrp ?? item.medicineSnapshot?.mrp ?? unitPrice),
     discountPercent,
     quantity: item.quantity ?? 1,
     requiresPrescription:

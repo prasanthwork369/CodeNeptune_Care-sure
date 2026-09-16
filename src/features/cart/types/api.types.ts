@@ -24,7 +24,10 @@ export interface CartItem {
   // variantId is NOT returned as top-level by backend — check metadata.selectedVariantId instead
   medicineName: string;
   medicineSlug: string;
+  /** Selling price per unit, after discount (order-service cart.entity.ts). */
   unitPrice: string | number;
+  /** Strikethrough MRP stored alongside unitPrice. */
+  mrpPrice?: string | number | null;
   quantity: number;
   requiresPrescription: boolean;
   prescriptionId?: string | null;

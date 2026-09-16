@@ -8,7 +8,7 @@ import {
   CheckoutInput,
   UpdateCartItemInput,
 } from "@/src/features/cart/types";
-import { parseMoney } from "@/src/utils/money";
+import { resolveCartLinePricing } from "@/src/features/cart/utils/cartPricing";
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -81,13 +81,11 @@ export const useCart = () => {
   // Each entry in `items` is already a unique cart line (one per
   // medicine+variant), so this is the unique cart-line/variant count.
   const cartLineCount = items.length;
-  const totalPrice = items.reduce((sum, item) => {
-    const mrp = parseMoney(item.unitPrice);
-    const discountPct =
-      item.discountPercent ?? item.metadata?.discountPercent ?? 0;
-    const price = discountPct > 0 ? mrp * (1 - discountPct / 100) : mrp;
-    return sum + price * item.quantity;
-  }, 0);
+  const totalPrice = items.reduce(
+    (sum, item) =>
+      sum + resolveCartLinePricing(item).price * item.quantity,
+    0,
+  );
 
   return {
     cart: activeCart,
