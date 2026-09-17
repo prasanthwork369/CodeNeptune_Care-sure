@@ -3,7 +3,7 @@ export const IMAGES = {
   medicine1: require("../../assets/images/auth/medicine-1.webp"),
   medicine2: require("../../assets/images/auth/medicine-2.webp"),
   medicine3: require("../../assets/images/auth/medicine-3.webp"),
-  medicine4: require("../../assets/images/auth/medicine-4.png"),
+  medicine4: require("../../assets/images/auth/medicine-4.webp"),
   medicine5: require("../../assets/images/auth/medicine-5.webp"),
   medicine6: require("../../assets/images/auth/medicine-6.webp"),
   medicine7: require("../../assets/images/auth/medicine-7.webp"),
@@ -45,16 +45,16 @@ export const HOME_IMAGES = {
   // UI Icons
   call: require("../../assets/images/icons/call.webp"),
   whatsapp: require("../../assets/images/icons/whatsapp.webp"),
-  updateBell: require("../../assets/images/icons/update-bell.png"),
+  updateBell: require("../../assets/images/icons/update-bell.webp"),
   wallet: require("../../assets/images/icons/wallet.webp"),
   walletCredit: require("../../assets/images/wallet/wallet-credit.webp"),
   corporateCredit: require("../../assets/images/wallet/corporate-credit.webp"),
   corporateBenefits: require("../../assets/images/wallet/corporate-benefits.webp"),
   giftBoxGreen: require("../../assets/images/wallet/gift-box-green.webp"),
   taxBuilding: require("../../assets/images/wallet/tax-building.webp"),
-  walletOutlinePurple: require("../../assets/icons/wallet-outline-purple.png"),
-  pillPink: require("../../assets/icons/pill-pink.png"),
-  giftOutlineBlue: require("../../assets/icons/gift-outline-blue.png"),
+  walletOutlinePurple: require("../../assets/icons/wallet-outline-purple.webp"),
+  pillPink: require("../../assets/icons/pill-pink.webp"),
+  giftOutlineBlue: require("../../assets/icons/gift-outline-blue.webp"),
   swap: require("../../assets/images/icons/swap.webp"),
   prescriptions: require("../../assets/images/icons/prescriptions.webp"),
   verifiedUser: require("../../assets/images/icons/verified-user.webp"),
@@ -109,10 +109,10 @@ export const HOME_IMAGES = {
   prescriptionInstructions: require("../../assets/images/prescription/prescription-instructions.webp"),
   prescriptionMedicine: require("../../assets/images/prescription/prescription-medicine.webp"),
   noPatient: require("../../assets/images/prescription/no-patient.webp"),
-  splashIcon: require("../../assets/images/splash-icon.png"),
+  splashIcon: require("../../assets/images/splash-icon.webp"),
 
   // Orders
-  corporateOrderBadge: require("../../assets/images/orders/corporate-order-badge.png"),
+  corporateOrderBadge: require("../../assets/images/orders/corporate-order-badge.webp"),
 
   // Delete Account
   deleteAccount: require("../../assets/images/icons/delete-account.webp"),

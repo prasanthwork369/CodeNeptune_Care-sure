@@ -7,7 +7,7 @@ import { handleNotificationAction } from "./notificationActions";
 // Configured brand assets for Android notification icon templates
 const BRAND_COLOR = "#FFFFFF";
 const SMALL_ICON = "notification_icon";
-const LARGE_ICON = require("../../../assets/images/notification-tile.png");
+const LARGE_ICON = require("../../../assets/images/notification-tile.webp");
 
 // Lazy-load notifee only outside Expo Go environment
 const getNotifee = () => require("@notifee/react-native");
