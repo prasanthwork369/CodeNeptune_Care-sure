@@ -20,7 +20,7 @@ export enum StorageKey {
   LAST_LOCATION = 'last_location',
 }
 
-const SECURE_KEYS = new Set([
+const SECURE_KEYS = new Set<string>([
   StorageKey.AUTH_TOKEN,
   StorageKey.REFRESH_TOKEN,
   StorageKey.USER_DATA,
@@ -104,9 +104,9 @@ export async function clearSensitiveData(): Promise<void> {
 /**
  * Helper: Store JSON safely
  */
-export async function setSecureJSON(
+export async function setSecureJSON<T extends Record<string, any>>(
   key: StorageKey | string,
-  value: any,
+  value: T,
 ): Promise<void> {
   const jsonString = JSON.stringify(value);
   await setSecureItem(key, jsonString);
@@ -115,13 +115,13 @@ export async function setSecureJSON(
 /**
  * Helper: Get JSON safely
  */
-export async function getSecureJSON<T = any>(
+export async function getSecureJSON<T = Record<string, any>>(
   key: StorageKey | string,
 ): Promise<T | null> {
   try {
     const jsonString = await getSecureItem(key);
     if (!jsonString) return null;
-    return JSON.parse(jsonString);
+    return JSON.parse(jsonString) as T;
   } catch (error) {
     console.error(`[SecureStorage] Failed to parse JSON for ${key}:`, error);
     return null;
