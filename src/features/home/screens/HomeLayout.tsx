@@ -47,6 +47,7 @@ import {
   usePerformanceTrace,
   useScrollJankTrace,
 } from "@/src/services/firebase";
+import { selectSelectedAddress } from "@/src/store/selectors";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import type { CategoryCard } from "@/src/features/home/types";
