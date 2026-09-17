@@ -44,7 +44,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     associatedDomains: [`applinks:${webHost}`],
   },
   android: {
-    jsEngine: "hermes",
     package: "com.codeneptune.caresure",
     versionCode: 1,
     googleServicesFile: "./google-services.json",

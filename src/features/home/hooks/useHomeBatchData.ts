@@ -1,18 +1,4 @@
-/**
- * Batch load all home screen data in one request
- *
- * Replaces 5 individual hooks:
- * - useHome() → families, tabs, cards, appContent
- * - useFeaturedMedicines() → featured products
- * - useFeaturedSubcategories() → featured categories
- * - useAddress() → user addresses
- * - useFrequentlyOrdered() → frequently ordered items
- *
- * Performance:
- * BEFORE: 5 API calls in series = 460ms
- * AFTER:  1 batch call = 150ms
- * GAIN:   68% faster ⚡
- */
+// Batch home screen data into one request for 68% faster load (1 call vs 5)
 
 import { useBatchData } from '@/src/hooks/queries/useBatchData';
 
@@ -70,21 +56,21 @@ export function useHomeBatchData() {
   return {
     // Home content
     appContent: data?.home?.appContent,
-    families: data?.home?.families,
-    tabs: data?.home?.tabs,
-    cards: data?.home?.cards,
+    families: data?.home?.families ?? [],
+    tabs: (data?.home?.tabs ?? []) as any[],
+    cards: (data?.home?.cards ?? []) as any[],
 
     // Featured products
-    featuredProducts: data?.medicines?.products,
+    featuredProducts: (data?.medicines?.products ?? []) as any[],
 
     // Featured categories
-    subcategories: data?.categories?.subcategories,
+    subcategories: data?.categories?.subcategories ?? [],
 
     // User addresses
-    addresses: data?.addresses,
+    addresses: data?.addresses ?? [],
 
     // Frequently ordered
-    frequentlyOrdered: data?.orders?.data || [],
+    frequentlyOrdered: data?.orders?.data ?? [],
 
     // Loading & error states
     isLoading: batchData.isLoading,

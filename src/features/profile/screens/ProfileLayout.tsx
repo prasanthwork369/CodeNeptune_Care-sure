@@ -44,7 +44,7 @@ export const ProfileLayout: React.FC = () => {
   } = useProfileBatchData();
   const refreshing = false;
   const avatarUploading = false;
-  const uploadAvatar = async () => {};
+  const uploadAvatar = async (uri: string) => {};
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showUpdateSheet, setShowUpdateSheet] = useState(false);

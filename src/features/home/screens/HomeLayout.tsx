@@ -47,7 +47,7 @@ import {
   usePerformanceTrace,
   useScrollJankTrace,
 } from "@/src/services/firebase";
-import { selectSelectedAddress } from "@/src/store/selectors";
+import { selectSelectedLocation } from "@/src/store/selectors";
 import { useLocationStore } from "@/src/store/locationStore";
 import { useUIStore } from "@/src/store/uiStore";
 import type { CategoryCard } from "@/src/features/home/types";
@@ -71,9 +71,7 @@ const AnimatedFlashList = Animated.createAnimatedComponent(
   FlashList,
 ) as unknown as typeof FlashList;
 
-const EMPTY_BANNERS: NonNullable<
-  ReturnType<typeof useHomeData>["appContent"]
->["banners"] = [];
+const EMPTY_BANNERS: any[] = [];
 
 type HomeSectionId =
   | "hero"

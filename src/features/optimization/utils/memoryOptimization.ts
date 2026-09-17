@@ -50,8 +50,10 @@ export class BoundedCache<K, V> {
 
     // Remove oldest if at capacity
     if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      const firstKey = this.cache.keys().next().value as K | undefined;
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
 
     this.cache.set(key, value);
@@ -123,7 +125,7 @@ export function useDebounced<T extends (...args: any[]) => any>(
   fn: T,
   delay: number,
 ) {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     return () => {
@@ -148,9 +150,9 @@ export function useDebounced<T extends (...args: any[]) => any>(
 export function useAbortableAsync<T>(
   asyncFn: (signal: AbortSignal) => Promise<T>,
   onResult: (result: T) => void,
-  deps: any[] = [],
+  deps?: any[],
 ) {
-  const abortRef = useRef<AbortController>();
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     abortRef.current = new AbortController();

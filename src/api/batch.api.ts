@@ -1,23 +1,6 @@
-/**
- * Request Batching Helper
- *
- * Combine multiple related API calls into one request to reduce network overhead.
- * Typical savings: 50-70% fewer API calls
- *
- * Example:
- * Instead of 5 separate requests:
- *   - GET /api/user/profile
- *   - GET /api/cart
- *   - GET /api/orders
- *   - GET /api/addresses
- *   - GET /api/wallet
- *
- * Make 1 batched request:
- *   POST /api/batch with queries: ['profile', 'cart', 'orders', 'addresses', 'wallet']
- */
+// Combine multiple API calls into one batched request to reduce network overhead
 
 import { apiClient } from "./client";
-import axios from "axios";
 
 interface BatchRequest {
   queries: string[];
@@ -48,7 +31,9 @@ export async function batchFetch(
 
   // Single query: use direct API instead of batch overhead
   if (queries.length === 1) {
-    return fetchSingleQuery(queries[0]);
+    return fetchSingleQuery(queries[0]).then(result => ({
+      [queries[0]]: result,
+    }));
   }
 
   try {
@@ -62,7 +47,7 @@ export async function batchFetch(
       console.warn("Batch request had errors:", data.errors);
     }
 
-    return data.data || {};
+    return (data.data as Record<string, unknown>) || {};
   } catch (error) {
     console.error("Batch request failed:", error);
     // Fallback: fetch individual queries

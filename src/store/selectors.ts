@@ -27,7 +27,11 @@ export const selectCartItemCount = (state: ReturnType<typeof useCartPendingStore
 
 export const selectCartTotalPrice = (state: ReturnType<typeof useCartPendingStore.getState>) => {
   const items = state.guestCart?.items ?? [];
-  return items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+  return items.reduce((sum: number, item) => {
+    const price = typeof item.unitPrice === 'number' ? item.unitPrice : 0;
+    const qty = typeof item.quantity === 'number' ? item.quantity : 0;
+    return sum + (price * qty);
+  }, 0);
 };
 
 export const selectCartServerData = (state: ReturnType<typeof useCartPendingStore.getState>) =>
@@ -51,57 +55,56 @@ export const selectUser = (state: ReturnType<typeof useAuthStore.getState>) =>
   state.user;
 
 export const selectUserId = (state: ReturnType<typeof useAuthStore.getState>) =>
-  state.user?.customerId ?? null;
+  state.user?.id ?? null;
 
 export const selectIsLoggedIn = (state: ReturnType<typeof useAuthStore.getState>) =>
-  !!state.user?.customerId;
+  !!state.user?.id;
 
 export const selectAuthToken = (state: ReturnType<typeof useAuthStore.getState>) =>
-  state.accessToken;
+  state.token;
 
 // ============================================================================
 // CHECKOUT STORE SELECTORS
 // ============================================================================
 
-export const selectCheckoutAddress = (state: ReturnType<typeof useCheckoutStore.getState>) =>
-  state.selectedAddress;
+export const selectCheckoutBill = (state: ReturnType<typeof useCheckoutStore.getState>) =>
+  state.bill;
 
-export const selectCheckoutPaymentMethod = (state: ReturnType<typeof useCheckoutStore.getState>) =>
-  state.selectedPaymentMethod;
+export const selectCheckoutCouponCode = (state: ReturnType<typeof useCheckoutStore.getState>) =>
+  state.couponCode;
 
-export const selectCheckoutPromoCode = (state: ReturnType<typeof useCheckoutStore.getState>) =>
-  state.promoCode;
+export const selectCheckoutWalletUsed = (state: ReturnType<typeof useCheckoutStore.getState>) =>
+  state.walletUsed;
 
 // ============================================================================
 // UI STORE SELECTORS
 // ============================================================================
 
-export const selectIsModalOpen = (modalName: string) =>
-  (state: ReturnType<typeof useUIStore.getState>) =>
-    state.modals[modalName] ?? false;
+export const selectGlobalAlert = (state: ReturnType<typeof useUIStore.getState>) =>
+  state.globalAlert;
 
-export const selectIsLoading = (state: ReturnType<typeof useUIStore.getState>) =>
-  state.isLoading;
+export const selectIsTabBarVisible = (state: ReturnType<typeof useUIStore.getState>) =>
+  state.isTabBarVisible;
 
 // ============================================================================
 // COUPON STORE SELECTORS
 // ============================================================================
 
-export const selectActiveCoupons = (state: ReturnType<typeof useCouponStore.getState>) =>
-  state.activeCoupons ?? [];
+export const selectAppliedCoupon = (state: ReturnType<typeof useCouponStore.getState>) =>
+  state.applied;
 
-export const selectSelectedCoupon = (state: ReturnType<typeof useCouponStore.getState>) =>
-  state.selectedCoupon;
+export const selectCouponJustApplied = (state: ReturnType<typeof useCouponStore.getState>) =>
+  state.justApplied;
 
 // ============================================================================
 // LOCATION STORE SELECTORS
 // ============================================================================
 
-export const selectSelectedAddress = (state: ReturnType<typeof useLocationStore.getState>) =>
-  state.selectedAddress;
+export const selectSelectedLocation = (state: ReturnType<typeof useLocationStore.getState>) =>
+  state.location;
 
-export const selectUserAddresses = (state: ReturnType<typeof useLocationStore.getState>) =>
-  state.addresses;
+export const selectSelectedAddressId = (state: ReturnType<typeof useLocationStore.getState>) =>
+  state.selectedAddressId;
 
 // ============================================================================
 // USAGE EXAMPLES

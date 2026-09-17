@@ -1,17 +1,4 @@
-/**
- * Batch load all profile screen data in one request
- *
- * Replaces 4 individual hooks:
- * - useUser() / useProfile() → user profile info
- * - useAddress() → user addresses
- * - useWallet() → wallet balance, history
- * - useOrders() → user order history
- *
- * Performance:
- * BEFORE: 4 API calls = 380ms
- * AFTER:  1 batch call = 120ms
- * GAIN:   68% faster ⚡
- */
+// Batch profile screen data into one request for 68% faster load (1 call vs 4)
 
 import { useBatchData } from '@/src/hooks/queries/useBatchData';
 
@@ -35,25 +22,6 @@ export interface ProfileDataResponse {
     total?: number;
   };
 }
-
-/**
- * Hook to batch load profile screen data
- *
- * @example
- * const data = useProfileBatchData();
- *
- * if (data.isLoading) return <LoadingScreen />;
- * if (data.error) return <ErrorScreen error={data.error} />;
- *
- * return (
- *   <>
- *     <ProfileHeader user={data.user} />
- *     <AddressList addresses={data.addresses} />
- *     <WalletSummary balance={data.walletBalance} />
- *     <OrderHistory orders={data.orders} />
- *   </>
- * );
- */
 export function useProfileBatchData() {
   const batchData = useBatchData({
     queries: [
@@ -71,12 +39,12 @@ export function useProfileBatchData() {
   return {
     // User profile
     user: {
-      id: data?.profile?.id,
-      name: data?.profile?.name,
+      id: data?.profile?.id || '',
+      phoneNumber: data?.profile?.phone || '',
+      firstName: data?.profile?.name?.split(' ')[0],
+      lastName: data?.profile?.name?.split(' ').slice(1).join(' '),
       email: data?.profile?.email,
-      phone: data?.profile?.phone,
-      avatar: data?.profile?.avatar,
-      preferences: data?.profile?.preferences,
+      avatarUrl: data?.profile?.avatar,
     },
 
     // Addresses

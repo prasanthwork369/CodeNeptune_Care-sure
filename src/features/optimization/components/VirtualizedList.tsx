@@ -12,7 +12,7 @@ import React, { useCallback, useMemo } from 'react';
 import { FlatList, FlatListProps } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 
-interface VirtualizedListProps<T> extends Omit<FlatListProps<T>, 'renderItem'> {
+interface VirtualizedListProps<T> extends Omit<FlatListProps<T>, 'renderItem' | 'data'> {
   items: T[];
   renderItem: (item: T, index: number) => React.ReactElement;
   keyExtractor?: (item: T, index: number) => string;
@@ -64,12 +64,11 @@ export function VirtualizedList<T extends { id?: string | number }>(
     // Use FlashList for best performance on large lists
     if (useFlashList && items.length > 50) {
       return (
-        <FlashList
+        <FlashList<T>
           data={items}
           renderItem={renderItemCallback}
           keyExtractor={finalKeyExtractor}
-          estimatedItemSize={estimatedItemSize}
-          {...otherProps}
+          {...(otherProps as any)}
         />
       );
     }
