@@ -9,7 +9,7 @@
  */
 
 import React, { useCallback, useMemo } from 'react';
-import { FlatList, FlatListProps, View } from 'react-native';
+import { FlatList, FlatListProps } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 
 interface VirtualizedListProps<T> extends Omit<FlatListProps<T>, 'renderItem'> {
@@ -32,10 +32,9 @@ interface VirtualizedListProps<T> extends Omit<FlatListProps<T>, 'renderItem'> {
  *   estimatedItemSize={100}
  * />
  */
-export const VirtualizedList = React.memo(
-  <T extends { id?: string | number }>(
-    props: VirtualizedListProps<T>,
-  ) => {
+export function VirtualizedList<T extends { id?: string | number }>(
+  props: VirtualizedListProps<T>,
+) {
     const {
       items,
       renderItem,
@@ -75,21 +74,21 @@ export const VirtualizedList = React.memo(
       );
     }
 
-    // Use FlatList for smaller lists
-    return (
-      <FlatList
-        data={items}
-        renderItem={renderItemCallback}
-        keyExtractor={finalKeyExtractor}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={50}
-        initialNumToRender={10}
-        {...otherProps}
-      />
-    );
-  },
-);
+  // Use FlatList for smaller lists
+  const { data: _, ...flatListProps } = otherProps as any;
+  return (
+    <FlatList
+      data={items}
+      renderItem={renderItemCallback}
+      keyExtractor={finalKeyExtractor}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={10}
+      updateCellsBatchingPeriod={50}
+      initialNumToRender={10}
+      {...flatListProps}
+    />
+  );
+}
 
 VirtualizedList.displayName = 'VirtualizedList';
 

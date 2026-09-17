@@ -46,13 +46,18 @@ import { VirtualizedList } from '@/src/features/optimization/components/Virtuali
 Reduce initial bundle by lazy-loading heavy screens
 
 ```typescript
-import { lazy } from '@/src/features/optimization';
+import { useLazyComponent, LoadingFallback } from '@/src/features/optimization';
 
-const ProfileScreen = lazy(() => import('./ProfileScreen'));
-const CheckoutScreen = lazy(() => import('./CheckoutScreen'));
+export function ProfileRoute() {
+  const { Component: ProfileScreen, isLoading } = useLazyComponent(
+    () => import('./ProfileScreen')
+  );
 
-// Use like normal components
-<ProfileScreen />
+  if (isLoading) return <LoadingFallback />;
+  if (!ProfileScreen) return null;
+
+  return <ProfileScreen />;
+}
 ```
 
 ### 2. Virtual Scrolling (`components/VirtualizedList.tsx`)

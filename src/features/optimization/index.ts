@@ -6,7 +6,7 @@
  */
 
 // Code Splitting & Lazy Loading
-export { lazy, preloadComponent, preloadComponents } from './utils/lazyLoad';
+export { useLazyComponent, preloadComponent, preloadComponents, LoadingFallback } from './utils/lazyLoad';
 
 // Virtual Scrolling
 export { VirtualizedList, VirtualizedSectionList } from './components/VirtualizedList';
