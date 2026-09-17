@@ -5,6 +5,7 @@ import { useNav } from "@/src/hooks/useNav";
 import { NotificationNavigation } from "@/src/services/notifications/NotificationNavigation";
 import { analyticsService } from "@/src/services/firebase";
 import { useNotificationNavigationStore } from "@/src/store/notificationNavigationStore";
+import { useCartPendingStore } from "@/src/store/cartStore";
 import { isExpoGo } from "@/src/utils/environment";
 import { IS_LIVE_API } from "@/src/utils/urls";
 import { validate } from "@/src/utils/validation";
@@ -60,9 +61,7 @@ export function useOtp() {
   );
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Synchronous submission locks to prevent duplicate submissions within a single tick
   const verifyLockRef = useRef(false);
-  const mergeLockRef = useRef(false);
 
   const inputValue = slots.filter(Boolean).join("");
   const code = slots.join("");
@@ -232,16 +231,13 @@ export function useOtp() {
         router.replace("/(tabs)");
       }
 
-      // Merge guest cart in background after navigation
-      void (async () => {
-        if (mergeLockRef.current) return;
-        mergeLockRef.current = true;
-        try {
-          await mergeGuestCartItems(queryClient);
-        } finally {
-          mergeLockRef.current = false;
-        }
-      })();
+      // Merge guest cart silently
+      const guestCart = useCartPendingStore.getState().guestCart;
+      if (guestCart?.items?.length > 0) {
+        void mergeGuestCartItems(queryClient).catch((err) => {
+          if (__DEV__) logger.error("[CartMerge] Silent merge failed:", err);
+        });
+      }
     } catch {
       verifyLockRef.current = false;
       resetOtp();

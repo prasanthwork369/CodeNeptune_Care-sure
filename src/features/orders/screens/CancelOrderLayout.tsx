@@ -30,6 +30,8 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
+const MAX_CANCELLATION_REASON_LENGTH = 1000;
+
 // A backend reason, or the synthetic "Other" row — which carries a string id
 // instead of the numeric ones the backend returns.
 type DisplayReason =
@@ -285,19 +287,38 @@ export function CancelOrderLayout() {
 
                       {/* If Other is selected, show input field outside of the scrollable reasons list */}
                       {isOtherSelected && (
-                        <TextInput
-                          placeholder="Enter cancellation reason..."
-                          placeholderTextColor="#6A6A6A"
-                          value={otherReason}
-                          onChangeText={(value) => {
-                            setOtherReason(value);
-                            if (error && value.trim()) setError("");
-                          }}
-                          editable={!isCancelling}
-                          multiline
-                          numberOfLines={3}
-                          style={s.otherInput}
-                        />
+                        <>
+                          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: verticalScale(12), marginBottom: verticalScale(8) }}>
+                            <Text style={{ fontSize: moderateScale(13), fontWeight: "600", color: "#222222" }}>
+                              Describe your reason
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: moderateScale(12),
+                                fontWeight: "500",
+                                color: otherReason.length > MAX_CANCELLATION_REASON_LENGTH * 0.9 ? "#DC2626" : "#6A6A6A",
+                              }}
+                            >
+                              {otherReason.length}/{MAX_CANCELLATION_REASON_LENGTH}
+                            </Text>
+                          </View>
+                          <TextInput
+                            placeholder="Enter cancellation reason..."
+                            placeholderTextColor="#6A6A6A"
+                            value={otherReason}
+                            onChangeText={(value) => {
+                              // Enforce max length
+                              const capped = value.length > MAX_CANCELLATION_REASON_LENGTH ? value.slice(0, MAX_CANCELLATION_REASON_LENGTH) : value;
+                              setOtherReason(capped);
+                              if (error && capped.trim()) setError("");
+                            }}
+                            editable={!isCancelling}
+                            multiline
+                            numberOfLines={3}
+                            maxLength={MAX_CANCELLATION_REASON_LENGTH}
+                            style={s.otherInput}
+                          />
+                        </>
                       )}
                     </>
                   );

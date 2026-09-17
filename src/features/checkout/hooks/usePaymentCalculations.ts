@@ -265,6 +265,7 @@ export function usePaymentCalculations() {
         subtotal: bill?.subtotal,
         idempotencyKey: idempotencyKeyRef.current,
         couponCode,
+        paymentMethod: selectedMethod,
         walletUsed,
         coinsUsed,
         creditsUsed: corporateCreditsUsed,

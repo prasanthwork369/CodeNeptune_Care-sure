@@ -78,6 +78,7 @@ export interface CreateOrderRequest {
   notes?: string;
   problem?: string | null;
   symptoms?: string | null;
+  paymentMethod?: string;
   metadata?: OrderMetadata;
   isPurchased?: boolean;
   /** Stable across retries. Must stay top-level — the backend ignores both

@@ -4,7 +4,9 @@ import type { Coupon, CouponValidationResult } from "../types/api.types";
 
 export const couponApi = {
   getActiveCoupons: async (): Promise<Coupon[]> => {
-    const response = await apiClient.get(API_ENDPOINTS.COUPONS_ACTIVE);
+    const response = await apiClient.get(API_ENDPOINTS.COUPONS_ACTIVE, {
+      params: { platform: "mobile" },
+    });
     return response.data.data;
   },
 
@@ -15,6 +17,7 @@ export const couponApi = {
     const response = await apiClient.post(API_ENDPOINTS.COUPONS_VALIDATE, {
       code,
       subtotal,
+      platform: "mobile",
     });
     return response.data.data;
   },

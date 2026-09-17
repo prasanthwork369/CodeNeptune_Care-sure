@@ -155,8 +155,9 @@ export const orderApi = {
   },
 
   cancelOrder: async (id: string, reason: string) => {
+    // Cap reason at 1000 chars to prevent API validation failures
     const response = await apiClient.post(API_ENDPOINTS.ORDER_CANCEL(id), {
-      reason,
+      reason: reason?.slice(0, 1000) || "",
     });
     return response.data.data;
   },

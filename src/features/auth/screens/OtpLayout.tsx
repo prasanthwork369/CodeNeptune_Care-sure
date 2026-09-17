@@ -43,48 +43,50 @@ export const OtpLayout: React.FC = () => {
   }
 
   return (
-    <AuthScreenShell
-      footer={
-        <View>
-          <View className="items-start" style={s.headerContainer}>
-            <Text style={s.title}>Verify OTP</Text>
-            <View style={s.phoneRow}>
-              <Text style={s.phone}>{format.phone(phone)}</Text>
-              <Touchable
-                onPress={() => router.back()}
-                style={s.editBtnUnderline}
-                accessibilityRole="button"
-                accessibilityLabel="Edit phone number"
-              >
-                <Text style={s.editBtn}>Edit</Text>
-              </Touchable>
+    <>
+      <AuthScreenShell
+        footer={
+          <View>
+            <View className="items-start" style={s.headerContainer}>
+              <Text style={s.title}>Verify OTP</Text>
+              <View style={s.phoneRow}>
+                <Text style={s.phone}>{format.phone(phone)}</Text>
+                <Touchable
+                  onPress={() => router.back()}
+                  style={s.editBtnUnderline}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit phone number"
+                >
+                  <Text style={s.editBtn}>Edit</Text>
+                </Touchable>
+              </View>
             </View>
+
+            <OtpForm
+              slots={slots}
+              inputValue={inputValue}
+              otpError={otpError}
+              error={error}
+              loading={isButtonLoading}
+              resendCooldown={resendCooldown}
+              activeIndex={activeIndex}
+              onBoxPress={handleBoxPress}
+              onOtpChange={handleOtpChange}
+              onResend={handleResend}
+              onSubmitEditing={() => handleVerify()}
+              inputRef={inputRef}
+            />
+
+            <OtpSubmitButton
+              loading={isButtonLoading}
+              isValid={isValid}
+              onVerify={() => handleVerify()}
+            />
+
+            <AuthFooter />
           </View>
-
-          <OtpForm
-            slots={slots}
-            inputValue={inputValue}
-            otpError={otpError}
-            error={error}
-            loading={isButtonLoading}
-            resendCooldown={resendCooldown}
-            activeIndex={activeIndex}
-            onBoxPress={handleBoxPress}
-            onOtpChange={handleOtpChange}
-            onResend={handleResend}
-            onSubmitEditing={() => handleVerify()}
-            inputRef={inputRef}
-          />
-
-          <OtpSubmitButton
-            loading={isButtonLoading}
-            isValid={isValid}
-            onVerify={() => handleVerify()}
-          />
-
-          <AuthFooter />
-        </View>
-      }
-    />
+        }
+      />
+    </>
   );
 };

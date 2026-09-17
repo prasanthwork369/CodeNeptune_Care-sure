@@ -140,6 +140,19 @@ export const useCartSocketSync = () => {
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.CUSTOMER.PRESCRIPTIONS.LIST_ALL,
         });
+        // Order status changes can arrive as notifications — refresh orders
+        // so tracking screen shows latest status immediately.
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST_ALL,
+        });
+      });
+
+      // Listen to real-time order status updates from Redis/API Gateway
+      socket.on("order_update", (data: { action: string; order: unknown }) => {
+        if (__DEV__) logger.debug("[Socket] Order update:", data);
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST_ALL,
+        });
       });
 
       socket.on(

@@ -102,6 +102,7 @@ export type BuildOrderPayloadArgs = {
   subtotal?: number | null;
   idempotencyKey: string;
   couponCode?: string | null;
+  paymentMethod?: string;
   walletUsed: boolean;
   coinsUsed: boolean;
   creditsUsed: boolean;
@@ -119,6 +120,7 @@ export const buildOrderPayload = ({
   subtotal,
   idempotencyKey,
   couponCode,
+  paymentMethod,
   walletUsed,
   coinsUsed,
   creditsUsed,
@@ -146,6 +148,7 @@ export const buildOrderPayload = ({
   discountAmount: String(sumOrderDiscounts(bill).toFixed(2)),
   total: String(Number(bill.toPay).toFixed(2)),
   deliveryType: "HOME_DELIVERY",
+  paymentMethod: paymentMethod || undefined,
   // Top-level is the only place order-service looks for this; the copy kept in
   // metadata below is retained for existing consumers of that blob.
   idempotencyKey,
