@@ -85,7 +85,9 @@ export function AlertDialog({
 
   // Null until first opened, so a hidden dialog costs no native Modal.
   const hasOpened = useRef(false);
+  // eslint-disable-next-line react-hooks/refs
   if (visible) hasOpened.current = true;
+  // eslint-disable-next-line react-hooks/refs
   if (!visible && !hasOpened.current) return null;
 
   return (

@@ -85,9 +85,11 @@ export const CardOptionsMenu: React.FC<CardOptionsMenuProps> = ({
 }) => {
   // Null until first opened, so hidden rows don't each mount a native Modal.
   const hasOpened = useRef(false);
+  // eslint-disable-next-line react-hooks/refs
   if (modalVisible) hasOpened.current = true;
 
   if (useModal) {
+    // eslint-disable-next-line react-hooks/refs
     if (!modalVisible && !hasOpened.current) return null;
     return (
       <Modal

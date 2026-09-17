@@ -5,7 +5,7 @@ import { requestQueue } from "@/src/utils/requestQueue";
 import { icons } from "@/src/constants/icons";
 import NetInfo from "@react-native-community/netinfo";
 import { Touchable } from "@/src/components/ui/Touchable";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";
@@ -42,6 +42,7 @@ const NetworkToast = () => {
 
   useEffect(() => {
     if (showToast) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowToastDelayed(true);
     } else {
       const t = setTimeout(() => setShowToastDelayed(false), 1800);
@@ -75,6 +76,7 @@ const NetworkToast = () => {
         setSignalStep((prev) => (prev >= 4 ? 1 : prev + 1));
       }, 400);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSignalStep(isRestored ? 4 : 1);
     }
     return () => {

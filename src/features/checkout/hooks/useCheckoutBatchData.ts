@@ -1,17 +1,4 @@
-/**
- * Batch load all checkout screen data in one request
- *
- * Replaces 4 individual hooks:
- * - useCart() → cart items, totals
- * - useAddress() → user addresses
- * - useWallet() → wallet balance, payment methods
- * - useCoupons() → available coupons
- *
- * Performance:
- * BEFORE: 4 API calls = 380ms
- * AFTER:  1 batch call = 120ms
- * GAIN:   68% faster ⚡
- */
+// Batch checkout screen data into one request for 68% faster load (1 call vs 4)
 
 import { useBatchData } from '@/src/hooks/queries/useBatchData';
 

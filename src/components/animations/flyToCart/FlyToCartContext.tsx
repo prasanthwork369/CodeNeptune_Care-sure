@@ -285,11 +285,15 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   // every card consuming it re-renders whenever the destination or cart moves.
   const destinationRef = React.useRef(defaultCoords);
   const totalItemsRef = React.useRef(totalItems);
-  totalItemsRef.current = totalItems;
+
+  React.useEffect(() => {
+    totalItemsRef.current = totalItems;
+  }, [totalItems]);
 
   const setDestinationCoords = useCallback(
     (coords: { x: number; y: number }) => {
       destinationRef.current = coords;
+      // eslint-disable-next-line react-hooks/immutability
       destinationShared.value = coords;
       setDestinationCoordsState(coords);
     },
@@ -351,6 +355,7 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const triggerWidthExpansion = useCallback(() => {
+    // eslint-disable-next-line react-hooks/immutability
     widthExpansion.value = withSequence(
       withTiming(18, { duration: 160 }),
       withSpring(0, { damping: 14, stiffness: 220 }),

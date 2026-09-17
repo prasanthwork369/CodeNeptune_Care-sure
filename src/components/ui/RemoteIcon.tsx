@@ -54,6 +54,7 @@ export const RemoteIcon: React.FC<RemoteIconProps> = ({ uri, size, style }) => {
 
     const cached = svgCache.get(uri);
     if (cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResolved(cached);
       return;
     }

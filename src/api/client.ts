@@ -79,13 +79,6 @@ export const apiClient: AxiosInstance = axios.create({
 
 // Request interceptor: attaches auth header and checks offline status
 apiClient.interceptors.request.use((config) => {
-  // if (__DEV__) {
-  //   if (config.data !== undefined) {
-  //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
-  //   } else {
-  //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
-  //   }
-  // }
   if (isOffline()) {
     if (isQueueableRequest(config)) {
       // Queue safe offline requests, reject others immediately

@@ -11,10 +11,6 @@ import { LoginSubmitButton } from "../components/LoginSubmitButton";
 import { useLogin } from "../hooks/useLogin";
 import { styles as s } from "./LoginLayout.styles";
 
-/**
- * Presentation component for the Login screen.
- * Delegates all state, side effects, validation, and mutations to the `useLogin` hook.
- */
 export const LoginLayout: React.FC = () => {
   const isOffline = useIsOffline();
   const {
