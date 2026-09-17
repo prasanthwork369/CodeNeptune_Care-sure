@@ -25,7 +25,10 @@
       "Bash(yes)",
       "Bash(\"/e/Android/Sdk/cmdline-tools/latest/bin/sdkmanager.bat\" --licenses)",
       "Bash(\"/e/Android/Sdk/cmdline-tools/latest/bin/sdkmanager.bat\" \"platform-tools\" \"platforms;android-36\" \"build-tools;36.0.0\" \"platforms;android-35\" \"build-tools;35.0.0\")",
-      "Bash(\"/e/Android/Sdk/platform-tools/adb.exe\" version *)"
+      "Bash(\"/e/Android/Sdk/platform-tools/adb.exe\" version *)",
+      "Bash(cd \"C:/Users/DELL/Downloads/care-sure-main/care-sure-main/customer-website\" && find src -type d | sort | head -120)",
+      "Read(//c/Users/DELL/Downloads/care-sure-main/care-sure-main/customer-website/**)",
+      "Bash(ls -la \"C:\\\\Users\\\\DELL\\\\Downloads\\\\care-sure-main\\\\care-sure-main\\\\customer-website\")"
     ]
   }
 }

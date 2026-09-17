@@ -53,6 +53,16 @@ For every feature:
 
 --
 
+## Code Comments & Structure
+
+- **Comments**: Single-line only, never paragraphs (`// ...`). Simple and in required places only. Only comment to explain *why* (complex business logic, edge cases, workarounds) in one concise line. Never write multi-line comment blocks or explanatory paragraphs (`/* ... */`). Never add comments describing obvious code (e.g., no `// Title`, `// Button`, `// Header`, `// handle click`).
+- **Structure**: Clean, modular, and easily understandable at a glance.
+  - Self-documenting code with descriptive, intuitive names.
+  - Colocate related styles and helpers where appropriate; avoid unnecessary file fragmentation.
+  - Strictly adhere to the project's architecture boundaries (`app/` for routes, `components/<feature>/` for UI, `hooks/` for logic/queries, `store/` for global state).
+
+--
+
 ## Decision Making
 
 If something is unclear or could be improved, suggest a better
