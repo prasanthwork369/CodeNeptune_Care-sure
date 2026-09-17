@@ -26,7 +26,7 @@ import {
   SmartSubstitution,
   StickySearchHeader,
 } from "@/src/features/home/sections";
-import { useHomeData } from "@/src/features/home/hooks/useHomeData";
+import { useHomeBatchData } from "@/src/features/home/hooks/useHomeBatchData";
 import { useHomeOnboarding } from "@/src/features/home/hooks/useHomeOnboarding";
 import { useHomeScroll } from "@/src/features/home/hooks/useHomeScroll";
 import { usePrefetchSearch } from "@/src/features/search/hooks/useSearch";
@@ -130,16 +130,16 @@ const HomeContent: React.FC = () => {
     tabs,
     cards,
     appContent,
-    isHomeLoading,
     featuredProducts,
-    isFeaturedLoading,
-    featuredSubcategories,
-    isSubcategoriesLoading,
+    subcategories: featuredSubcategories = [],
     frequentlyOrdered,
+    isLoading: isHomeLoading,
     error,
-    isRefreshing,
-    onRefresh,
-  } = useHomeData();
+    refetch: onRefresh,
+  } = useHomeBatchData();
+  const isFeaturedLoading = false; // Batched in single request
+  const isSubcategoriesLoading = false; // Batched in single request
+  const isRefreshing = false; // Not applicable for batch
   const { isOffline, coldLaunchOffline } = useNetworkStatus();
   const errorState = useQueryErrorState(error);
 
