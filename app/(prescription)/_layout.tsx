@@ -1,9 +1,13 @@
 import { useAuthStore } from "@/src/store/authStore";
 import { screenTransitions } from "@/src/theme";
 import { Redirect, Stack } from "expo-router";
+import { useUploadCoordinator } from "@/src/features/prescription/hooks/useUploadCoordinator";
 
 export default function PrescriptionLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  // Start upload coordinator for entire prescription flow
+  useUploadCoordinator();
+
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
   return (

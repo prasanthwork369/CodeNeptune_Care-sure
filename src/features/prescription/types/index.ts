@@ -38,6 +38,9 @@ export interface PrescriptionItem {
    * cleanup can never delete it.
    */
   isTempCopy?: boolean;
+  uploadedUrl?: string;
+  uploadStatus?: "pending" | "uploading" | "uploaded" | "error";
+  uploadError?: string;
 }
 
 export interface Prescription {

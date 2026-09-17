@@ -9,6 +9,15 @@ interface PrescriptionDraftState {
   addItems: (incoming: PrescriptionItem[]) => void;
   removeItem: (index: number) => void;
   clearItems: () => void;
+  updateItem: (
+    index: number,
+    updates: Partial<
+      Pick<
+        PrescriptionItem,
+        "uploadedUrl" | "uploadStatus" | "uploadError"
+      >
+    >,
+  ) => void;
 }
 
 // Persisted so images already picked (but not yet submitted at payment)
@@ -28,7 +37,11 @@ export const usePrescriptionDraftStore = create<PrescriptionDraftState>()(
         for (const item of incoming) {
           const key = `${item.name}_${item.size ?? 0}_${item.type}`;
           if (!seen.has(key)) {
-            uniqueToAdd.push(item);
+            // New items explicitly start with pending status unless already specified
+            uniqueToAdd.push({
+              ...item,
+              uploadStatus: item.uploadStatus ?? "pending",
+            });
             seen.add(key);
           }
         }
@@ -43,6 +56,14 @@ export const usePrescriptionDraftStore = create<PrescriptionDraftState>()(
       removeItem: (index) =>
         set((state) => ({ items: state.items.filter((_, i) => i !== index) })),
       clearItems: () => set({ items: [] }),
+      updateItem: (index, updates) =>
+        set((state) => {
+          const items = [...state.items];
+          if (items[index]) {
+            items[index] = { ...items[index], ...updates };
+          }
+          return { items };
+        }),
     }),
     {
       name: "caresure-prescription-draft",
