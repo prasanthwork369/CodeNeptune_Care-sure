@@ -8,6 +8,7 @@ import { ScrollView, View } from "react-native";
 import { PAYMENT_METHODS } from "../constants/checkout.constants";
 import { usePaymentCalculations } from "../hooks/usePaymentCalculations";
 import { styles as s } from "./PaymentLayout.styles";
+import { useCheckoutBatchData } from "@/src/features/checkout/hooks/useCheckoutBatchData";
 import {
   PaymentAddressCard,
   PaymentFooter,
@@ -32,6 +33,7 @@ export const PaymentLayout: React.FC = () => {
     handlePlaceOrder,
     refetchCart,
   } = usePaymentCalculations();
+  useCheckoutBatchData(); // Batch-load cart, addresses, wallet, coupons
   const adjustedBottom = useAdjustedBottomInset();
 
   const liveState = useLiveScreenState({ error: null, hasData: true });

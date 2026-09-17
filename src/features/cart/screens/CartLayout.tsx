@@ -10,6 +10,7 @@ import {
   SAVINGS_BANNER_EXITING,
 } from "@/src/features/cart/constants/cart.constants";
 import { useCart } from "@/src/features/cart/hooks/useCart";
+import { useCartBatchData } from "@/src/features/cart/hooks/useCartBatchData";
 import { useCartCalculations } from "@/src/features/cart/hooks/useCartCalculations";
 import { useLegacyCartRepair } from "@/src/features/cart/hooks/useLegacyCartRepair";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
