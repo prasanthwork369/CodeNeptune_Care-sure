@@ -71,7 +71,14 @@ export const RemoteIcon: React.FC<RemoteIconProps> = ({ uri, size, style }) => {
         svgCache.set(uri, result);
         setResolved(result);
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!cancelled && __DEV__)
+          console.warn(`[RemoteIcon] Failed to fetch icon at ${uri}:`, err);
+        if (!cancelled) {
+          svgCache.set(uri, { dataUri: null, xml: null });
+          setResolved({ dataUri: null, xml: null });
+        }
+      });
 
     return () => {
       cancelled = true;

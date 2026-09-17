@@ -176,8 +176,14 @@ apiClient.interceptors.response.use(
           },
         );
 
-        const newToken = data.data.accessToken;
-        const expiresIn = data.data.expiresIn;
+        const newToken = data.data?.accessToken;
+        const expiresIn = data.data?.expiresIn;
+
+        if (!newToken || typeof newToken !== "string") {
+          throw new Error(
+            "Invalid token refresh response: accessToken missing or invalid",
+          );
+        }
 
         if (__DEV__) logger.debug("[apiClient] Background refresh SUCCESS");
         refreshCooldownUntil = 0;
@@ -186,7 +192,7 @@ apiClient.interceptors.response.use(
         // Update in-memory token + persist to SecureStore
         _accessToken = newToken;
         await tokenStorage.set(newToken);
-        if (expiresIn) {
+        if (expiresIn && typeof expiresIn === "number") {
           await tokenStorage.setExpiresAt(Date.now() + expiresIn * 1000);
         }
 

@@ -68,7 +68,11 @@ export const useCartSocketSync = () => {
       // reconnect never hands the server the JWT this socket started with.
       socket.io.on("reconnect_attempt", () => {
         const current = getAccessToken();
-        if (current) authHeaders.Authorization = `Bearer ${current}`;
+        if (current) {
+          authHeaders.Authorization = `Bearer ${current}`;
+        } else if (__DEV__) {
+          logger.warn("[Socket] Reconnect attempt without valid token");
+        }
       });
 
       socket.on("connect", () => {

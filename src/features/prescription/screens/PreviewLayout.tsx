@@ -245,9 +245,10 @@ export const PreviewLayout: React.FC = () => {
     // Was a hand-rolled isConnected check calling showOfflineAlert directly;
     // critical: true keeps that same blocking notice through the shared gate.
     if (!requireInternet({ critical: true })) return;
-    // Ref, not the `submitting` state: two taps in the same tick both read the
-    // stale false, and the loser's finally would clear the winner's spinner.
-    if (submitLockRef.current) return;
+    // Atomic submission guard: set ref first to prevent concurrent submissions
+    // Two taps in the same tick both read the stale false, and the loser's
+    // finally would clear the winner's spinner — prevent this by locking first.
+    if (submitting || submitLockRef.current) return;
     submitLockRef.current = true;
     if (__DEV__)
       logger.debug(

@@ -55,7 +55,14 @@ class RequestQueue {
     }
 
     if (this.queue.length >= MAX_SIZE) {
-      reject(new Error("Offline queue full — request dropped"));
+      const method = config.method?.toUpperCase() ?? "UNKNOWN";
+      const url = config.url ?? "unknown";
+      const error = new Error("Offline queue full — request dropped");
+      if (__DEV__)
+        console.warn(
+          `[RequestQueue] Queue overflow: ${method} ${url} dropped. Queue size: ${this.queue.length}`,
+        );
+      reject(error);
       return;
     }
     this.queue.push({ config, resolve, reject });

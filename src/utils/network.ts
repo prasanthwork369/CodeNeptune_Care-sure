@@ -11,11 +11,16 @@ export const initNetworkListener = (axiosInstance: AxiosInstance) => {
   requestQueue.loadFromStorage();
 
   // Eagerly resolve initial state so cold launch status is known immediately
-  NetInfo.fetch().then((state) => {
-    useNetworkStore
-      .getState()
-      .setIsConnected(state.isConnected, state.isInternetReachable);
-  });
+  NetInfo.fetch()
+    .then((state) => {
+      useNetworkStore
+        .getState()
+        .setIsConnected(state.isConnected, state.isInternetReachable);
+    })
+    .catch((err) => {
+      if (__DEV__) console.error("[Network] Initial state fetch failed:", err);
+      useNetworkStore.getState().setIsConnected(false, false);
+    });
 
   return NetInfo.addEventListener((state) => {
     const isConnected = state.isConnected;

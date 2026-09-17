@@ -47,17 +47,22 @@ export function useRefillReminder({
     const fetchDetail = prescriptionOrderId
       ? prescriptionService.getByOrderNumber(prescriptionOrderId)
       : prescriptionService.getById(prescriptionId);
-    fetchDetail.then((res) => {
-      if (__DEV__)
-        logger.debug(
-          "[RefillReminder] hydrate:",
-          res.success
-            ? JSON.stringify(res.data.reminder ?? "NO reminder field")
-            : `failed: ${res.error}`,
-        );
-      if (!cancelled && res.success)
-        setReminderState(res.data.reminder ?? null);
-    });
+    fetchDetail
+      .then((res) => {
+        if (__DEV__)
+          logger.debug(
+            "[RefillReminder] hydrate:",
+            res.success
+              ? JSON.stringify(res.data.reminder ?? "NO reminder field")
+              : `failed: ${res.error}`,
+          );
+        if (!cancelled && res.success)
+          setReminderState(res.data.reminder ?? null);
+      })
+      .catch((err) => {
+        if (__DEV__)
+          logger.debug("[RefillReminder] hydration error:", err);
+      });
     return () => {
       cancelled = true;
     };
