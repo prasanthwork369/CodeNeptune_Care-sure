@@ -5,8 +5,14 @@
  * Reduces network requests by 50-70% compared to individual queries.
  */
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery , useQueryClient } from "@tanstack/react-query";
 import { batchFetch } from "@/src/api/batch.api";
+
+/**
+ * Preload common screen data patterns.
+ * Call these once on app startup.
+ */
+
 
 interface BatchDataOptions {
   queries: string[];
@@ -69,13 +75,6 @@ export function usePrefetchBatchData() {
     });
   };
 }
-
-/**
- * Preload common screen data patterns.
- * Call these once on app startup.
- */
-
-import { useQueryClient } from "@tanstack/react-query";
 
 export function usePrefetchAppStartupData() {
   const queryClient = useQueryClient();

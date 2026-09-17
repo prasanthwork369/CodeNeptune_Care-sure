@@ -5,7 +5,83 @@
  * Typical savings: 50-100MB memory saved per session
  */
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+
+/**
+ * CANCELLATION PATTERNS
+ *
+ * Pattern 1: Cancel on unmount (prevents memory leaks)
+ * ================================================
+ * function MyComponent() {
+ *   const abortController = useAbortController();
+ *
+ *   useEffect(() => {
+ *     fetch('/api/data', { signal: abortController.signal })
+ *       .then(res => res.json())
+ *       .then(setData);
+ *   }, []);
+ * }
+ *
+ * // On unmount: abortController.abort() is called
+ * // → All pending requests cancelled
+ * // → No state updates after unmount
+ *
+ *
+ * Pattern 2: Cancel on navigation
+ * ==============================
+ * function SearchScreen() {
+ *   const abortController = useAbortController();
+ *
+ *   useFocusEffect(() => {
+ *     return () => {
+ *       // Cancel search requests when leaving screen
+ *       abortController.abort();
+ *     };
+ *   }, []);
+ * }
+ *
+ *
+ * Pattern 3: React Query auto-cancellation (RECOMMENDED)
+ * ====================================================
+ * // React Query handles this automatically!
+ * export const useCart = () => {
+ *   return useQuery({
+ *     queryKey: ['cart'],
+ *     queryFn: async ({ signal }) => {
+ *       // signal is passed automatically
+ *       return fetch('/api/cart', { signal });
+ *     },
+ *   });
+ * };
+ *
+ * // No additional work needed - cancels on unmount
+ *
+ *
+ * MEMORY LEAK EXAMPLES
+ *
+ * ❌ LEAK: Request continues after unmount
+ * =======================================
+ * function BadComponent() {
+ *   useEffect(() => {
+ *     fetch('/api/data')
+ *       .then(res => res.json())
+ *       .then(setData); // 💥 Crash: Can't setState after unmount
+ *   }, []);
+ * }
+ *
+ * ✅ FIXED: Request cancelled on unmount
+ * =======================================
+ * function GoodComponent() {
+ *   const abortController = useAbortController();
+ *
+ *   useEffect(() => {
+ *     fetch('/api/data', { signal: abortController.signal })
+ *       .then(res => res.json())
+ *       .then(setData); // ✓ Safe: never called if unmounted
+ *   }, []);
+ * }
+ */
+
 
 /**
  * Create an abort controller for a component lifecycle
@@ -116,80 +192,3 @@ export function useFetch<T>(
 
   return { data, loading, error };
 }
-
-/**
- * CANCELLATION PATTERNS
- *
- * Pattern 1: Cancel on unmount (prevents memory leaks)
- * ================================================
- * function MyComponent() {
- *   const abortController = useAbortController();
- *
- *   useEffect(() => {
- *     fetch('/api/data', { signal: abortController.signal })
- *       .then(res => res.json())
- *       .then(setData);
- *   }, []);
- * }
- *
- * // On unmount: abortController.abort() is called
- * // → All pending requests cancelled
- * // → No state updates after unmount
- *
- *
- * Pattern 2: Cancel on navigation
- * ==============================
- * function SearchScreen() {
- *   const abortController = useAbortController();
- *
- *   useFocusEffect(() => {
- *     return () => {
- *       // Cancel search requests when leaving screen
- *       abortController.abort();
- *     };
- *   }, []);
- * }
- *
- *
- * Pattern 3: React Query auto-cancellation (RECOMMENDED)
- * ====================================================
- * // React Query handles this automatically!
- * export const useCart = () => {
- *   return useQuery({
- *     queryKey: ['cart'],
- *     queryFn: async ({ signal }) => {
- *       // signal is passed automatically
- *       return fetch('/api/cart', { signal });
- *     },
- *   });
- * };
- *
- * // No additional work needed - cancels on unmount
- *
- *
- * MEMORY LEAK EXAMPLES
- *
- * ❌ LEAK: Request continues after unmount
- * =======================================
- * function BadComponent() {
- *   useEffect(() => {
- *     fetch('/api/data')
- *       .then(res => res.json())
- *       .then(setData); // 💥 Crash: Can't setState after unmount
- *   }, []);
- * }
- *
- * ✅ FIXED: Request cancelled on unmount
- * =======================================
- * function GoodComponent() {
- *   const abortController = useAbortController();
- *
- *   useEffect(() => {
- *     fetch('/api/data', { signal: abortController.signal })
- *       .then(res => res.json())
- *       .then(setData); // ✓ Safe: never called if unmounted
- *   }, []);
- * }
- */
-
-import React from "react";
