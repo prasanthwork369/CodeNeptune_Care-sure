@@ -12,7 +12,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "optimize-assets": "node scripts/optimize-assets.js",
-    "bundle:analyze": "expo export --output-format expo && npx source-map-explorer dist/bundles/index.js"
+    "bundle:analyze": "expo export --output-format expo && npx source-map-explorer dist/bundles/index.js",
+    "bundle:report": "node scripts/analyze-bundle.js"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.14",
