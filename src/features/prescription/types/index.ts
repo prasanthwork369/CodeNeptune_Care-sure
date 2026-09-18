@@ -38,6 +38,9 @@ export interface PrescriptionItem {
    * cleanup can never delete it.
    */
   isTempCopy?: boolean;
+  uploadedUrl?: string;
+  uploadStatus?: "pending" | "uploading" | "uploaded" | "error";
+  uploadError?: string;
 }
 
 export interface Prescription {
@@ -121,13 +124,6 @@ export interface PreviewThumbnailsProps {
   /** Per-file upload state, keyed by uploadKeyOf(item). */
   uploadStates?: Record<string, FileUploadState>;
   onRetry?: (item: PrescriptionItem) => void;
-}
-
-export interface PreviewSuccessModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onContinue: () => void;
-  safeAreaBottom: number;
 }
 
 export interface PrescriptionComparisonItem {

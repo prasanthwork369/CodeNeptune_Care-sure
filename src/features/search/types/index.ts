@@ -24,6 +24,7 @@ export interface RecommendedProduct {
   mrpDisplay: string;
   packSize?: string;
   unit?: string;
+  variantId?: string;
 }
 
 export * from "./api.types";

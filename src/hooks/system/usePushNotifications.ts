@@ -229,6 +229,13 @@ export const usePushNotifications = () => {
         if (!response) return;
         const { payload, tapId } = buildTapPayload(response);
         runColdStart(payload, tapId);
+      })
+      .catch((e) => {
+        if (__DEV__)
+          logger.debug(
+            "[PushNotificationHook] getLastNotificationResponseAsync error:",
+            e,
+          );
       });
   }, [isLoaded, navReady]);
 
@@ -237,11 +244,20 @@ export const usePushNotifications = () => {
   // sources above.
   useEffect(() => {
     if (!isLoaded || !navReady || isExpoGo) return;
-    notifeeService.getInitialTap().then((res) => {
-      if (!res) return;
-      const { payload } = buildPayloadFromData(res.data, res.tapId);
-      runColdStart(payload, res.tapId);
-    });
+    notifeeService
+      .getInitialTap()
+      .then((res) => {
+        if (!res) return;
+        const { payload } = buildPayloadFromData(res.data, res.tapId);
+        runColdStart(payload, res.tapId);
+      })
+      .catch((e) => {
+        if (__DEV__)
+          logger.debug(
+            "[PushNotificationHook] notifeeService.getInitialTap error:",
+            e,
+          );
+      });
   }, [isLoaded, navReady]);
 
   // Background → foreground tap: app was alive in the background, the FCM

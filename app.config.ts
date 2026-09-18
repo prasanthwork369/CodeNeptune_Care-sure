@@ -14,6 +14,10 @@ try {
   // fallback if unparseable
 }
 
+// Web product-URL prefixes, mirroring customer-website's PRODUCT_TYPE_CONFIG
+// slugs and the list src/app/+native-intent.ts rewrites.
+const PRODUCT_PATH_PREFIXES = ["/medicines", "/otc", "/fmcg"];
+
 // Single EAS Project ID source of truth to prevent configuration drift
 const easProjectId = "6e53d32b-6a5b-458e-9082-bbc1737ea34c";
 
@@ -53,7 +57,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         action: "VIEW",
         autoVerify: true,
-        data: [{ scheme: "https", host: webHost }],
+        // Only the product paths src/app/+native-intent.ts can actually route
+        // (/{productType}/{slug}/{id} -> /product/{id}). Claiming the whole
+        // host sent every other web link — order emails, /cart, /terms — into
+        // the app, which has no route for them, so they landed on +not-found.
+        data: PRODUCT_PATH_PREFIXES.map((pathPrefix) => ({
+          scheme: "https",
+          host: webHost,
+          pathPrefix,
+        })),
         category: ["BROWSABLE", "DEFAULT"],
       },
     ],

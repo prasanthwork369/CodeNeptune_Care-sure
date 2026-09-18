@@ -12,8 +12,8 @@ import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useReturnDraftStore } from "@/src/store/returnDraftStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
-import { AppError } from "@/src/api/errors";
 import { requestQueue } from "@/src/utils/requestQueue";
+import { messagingService as notificationService } from "@/src/services/firebase";
 
 jest.mock("@/src/lib/storage", () => ({
   tokenStorage: {
@@ -42,6 +42,12 @@ jest.mock("@/src/lib/sqlite/cache", () => ({
     get: jest.fn(),
     set: jest.fn(),
     clear: jest.fn(),
+  },
+}));
+
+jest.mock("@/src/services/firebase", () => ({
+  messagingService: {
+    unregister: jest.fn().mockResolvedValue(undefined),
   },
 }));
 
@@ -184,5 +190,101 @@ describe("useAuthStore — Auth State & Comprehensive Logout", () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().isGuest).toBe(true);
     expect(useAuthStore.getState().isLoaded).toBe(true);
+  });
+
+  it("logout calls notificationService.unregister before clearing access token and session state", async () => {
+    await useAuthStore.getState().login("valid-access-token", 3600);
+
+    let tokenDuringUnregister: string | null = null;
+    (notificationService.unregister as jest.Mock).mockImplementationOnce(async () => {
+      tokenDuringUnregister = getAccessToken();
+    });
+
+    await useAuthStore.getState().logout();
+
+    expect(notificationService.unregister).toHaveBeenCalledTimes(1);
+    // Token must still be present during unregister so backend DELETE can authorize
+    expect(tokenDuringUnregister).toBe("valid-access-token");
+    // Token is cleared after unregister completes
+    expect(getAccessToken()).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it("401 / session-expiry path calling authStore.logout() triggers push unregistration and clears session", async () => {
+    await useAuthStore.getState().login("expired-session-token", 3600);
+
+    // Simulate 401 unauthorized handler invoking logout() directly
+    await useAuthStore.getState().logout();
+
+    expect(notificationService.unregister).toHaveBeenCalledTimes(1);
+    expect(getAccessToken()).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().token).toBeNull();
+  });
+
+  it("logout completes successfully even when notificationService.unregister rejects (resilience to 401/network errors)", async () => {
+    await useAuthStore.getState().login("stale-token", 3600);
+    (notificationService.unregister as jest.Mock).mockRejectedValueOnce(
+      new Error("Backend 401 or network offline"),
+    );
+
+    // Should not throw
+    await expect(useAuthStore.getState().logout()).resolves.not.toThrow();
+
+    expect(notificationService.unregister).toHaveBeenCalledTimes(1);
+    expect(getAccessToken()).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().token).toBeNull();
+    expect(tokenStorage.clear).toHaveBeenCalled();
+  });
+
+  it("User A logout followed by User B login clears previous session and cleanly sets new session", async () => {
+    // 1. User A logs in
+    await useAuthStore.getState().login("user-a-token", 3600);
+    expect(useAuthStore.getState().token).toBe("user-a-token");
+    expect(getAccessToken()).toBe("user-a-token");
+
+    // 2. User A logs out (manual or 401)
+    await useAuthStore.getState().logout();
+    expect(notificationService.unregister).toHaveBeenCalled();
+    expect(useAuthStore.getState().token).toBeNull();
+    expect(getAccessToken()).toBeNull();
+
+    // 3. User B logs in on the same device
+    await useAuthStore.getState().login("user-b-token", 7200);
+    expect(useAuthStore.getState().token).toBe("user-b-token");
+    expect(getAccessToken()).toBe("user-b-token");
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(tokenStorage.set).toHaveBeenCalledWith("user-b-token");
+  });
+
+  it("handles duplicate and concurrent logout invocations safely", async () => {
+    await useAuthStore.getState().login("concurrent-token", 3600);
+
+    // Trigger duplicate/concurrent logout calls
+    await expect(
+      Promise.all([
+        useAuthStore.getState().logout(),
+        useAuthStore.getState().logout(),
+      ]),
+    ).resolves.not.toThrow();
+
+    // Concurrent 401s must not unregister the push token twice
+    expect(notificationService.unregister).toHaveBeenCalledTimes(1);
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().token).toBeNull();
+    expect(getAccessToken()).toBeNull();
+  });
+
+  it("allows a later session to log out again after a previous logout settled", async () => {
+    await useAuthStore.getState().login("session-one", 3600);
+    await useAuthStore.getState().logout();
+    expect(notificationService.unregister).toHaveBeenCalledTimes(1);
+
+    // The in-flight guard must reset, or the next user could never unregister
+    await useAuthStore.getState().login("session-two", 3600);
+    await useAuthStore.getState().logout();
+    expect(notificationService.unregister).toHaveBeenCalledTimes(2);
+    expect(getAccessToken()).toBeNull();
   });
 });

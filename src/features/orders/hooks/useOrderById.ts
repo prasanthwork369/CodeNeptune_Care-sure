@@ -28,7 +28,10 @@ const prefetchOrder = (queryClient: QueryClient, orderId: string): void => {
       queryFn: () => orderApi.getOrderById(orderId),
       meta: BACKGROUND_QUERY_META,
     })
-    .catch(() => {});
+    .catch((err) => {
+      if (__DEV__)
+        console.debug("[prefetchOrder] Cache warmup failed for order:", orderId, err);
+    });
 };
 
 /** Stable callback for wiring prefetchOrder into a notification tap. */

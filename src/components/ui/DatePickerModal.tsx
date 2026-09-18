@@ -47,6 +47,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
 
   React.useEffect(() => {
     if (visible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTempDate(clampDate(value, minimumDate, maximumDate));
       if (Platform.OS === "android" && mode === "datetime") {
         setAndroidStep("date");

@@ -15,8 +15,22 @@ export const cartApi = {
     return response.data.data;
   },
 
-  addItem: async (input: AddToCartInput): Promise<Cart> => {
-    const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS, input);
+  // Backend dedupes on (cartId, idempotencyKey), so a replayed request is a
+  // no-op instead of double-applying the quantity.
+  addItem: async (
+    input: AddToCartInput,
+    idempotencyKey?: string,
+  ): Promise<Cart> => {
+    const response = await apiClient.post(
+      API_ENDPOINTS.CART_ITEMS,
+      {
+        ...input,
+        ...(idempotencyKey ? { idempotencyKey } : {}),
+      },
+      idempotencyKey
+        ? { headers: { "Idempotency-Key": idempotencyKey } }
+        : undefined,
+    );
     return response.data.data;
   },
 
@@ -25,38 +39,70 @@ export const cartApi = {
   // this endpoint. Only call this for items that don't need those preserved.
   bulkAddItems: async (
     items: BulkAddCartItemInput[],
+    idempotencyKey?: string,
   ): Promise<BulkAddResult> => {
-    const response = await apiClient.post(API_ENDPOINTS.CART_ITEMS_BULK, {
-      items,
-    });
+    const response = await apiClient.post(
+      API_ENDPOINTS.CART_ITEMS_BULK,
+      {
+        items,
+        ...(idempotencyKey ? { idempotencyKey } : {}),
+      },
+      idempotencyKey
+        ? { headers: { "Idempotency-Key": idempotencyKey } }
+        : undefined,
+    );
     return response.data.data;
   },
 
   updateItem: async (
     itemId: string,
     input: UpdateCartItemInput,
+    idempotencyKey?: string,
   ): Promise<Cart> => {
     const response = await apiClient.patch(
       API_ENDPOINTS.CART_ITEM_BY_ID(itemId),
       input,
+      idempotencyKey
+        ? { headers: { "Idempotency-Key": idempotencyKey } }
+        : undefined,
     );
     return response.data.data;
   },
 
-  removeItem: async (itemId: string): Promise<Cart> => {
+  removeItem: async (
+    itemId: string,
+    idempotencyKey?: string,
+  ): Promise<Cart> => {
     const response = await apiClient.delete(
       API_ENDPOINTS.CART_ITEM_BY_ID(itemId),
+      idempotencyKey
+        ? { headers: { "Idempotency-Key": idempotencyKey } }
+        : undefined,
     );
     return response.data.data;
   },
 
-  clearCart: async (): Promise<void> => {
-    await apiClient.delete(API_ENDPOINTS.CART);
+  clearCart: async (idempotencyKey?: string): Promise<void> => {
+    await apiClient.delete(
+      API_ENDPOINTS.CART,
+      idempotencyKey
+        ? { headers: { "Idempotency-Key": idempotencyKey } }
+        : undefined,
+    );
   },
 
   // Response shape is not modelled yet — callers must narrow before using it.
-  checkout: async (input: CheckoutInput): Promise<unknown> => {
-    const response = await apiClient.post(API_ENDPOINTS.CART_CHECKOUT, input);
+  checkout: async (
+    input: CheckoutInput,
+    idempotencyKey?: string,
+  ): Promise<unknown> => {
+    const response = await apiClient.post(
+      API_ENDPOINTS.CART_CHECKOUT,
+      input,
+      idempotencyKey
+        ? { headers: { "Idempotency-Key": idempotencyKey } }
+        : undefined,
+    );
     return response.data.data;
   },
 };

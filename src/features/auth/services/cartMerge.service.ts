@@ -3,6 +3,7 @@ import { QUERY_KEYS } from "@/src/lib/react-query/queryKeys";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import type { CartItem } from "@/src/features/cart/types";
 import { QueryClient } from "@tanstack/react-query";
+import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
 
 // Zod-enforced server-side ceiling on POST /cart/items/bulk (see
 // order-service cart.validator.ts's bulkAddToCartSchema).
@@ -49,6 +50,7 @@ async function mergeBulkEligibleItems(items: CartItem[]): Promise<boolean> {
           quantity: item.quantity,
           mrp: resolveMrp(item),
         })),
+        newIdempotencyKey(),
       );
       // `added` lists every item that got a row (new, merged, or
       // quantity-capped) — the only items never in it are cart_full/
@@ -80,21 +82,24 @@ async function mergeSequentialItems(items: CartItem[]): Promise<boolean> {
   let anyMerged = false;
   for (const item of items) {
     try {
-      await cartApi.addItem({
-        medicineId: item.medicineId,
-        variantId: item.metadata?.selectedVariantId || null,
-        medicineName: item.medicineName,
-        medicineSlug: item.medicineSlug,
-        unitPrice: Number(item.unitPrice),
-        mrp: Number(
-          item.metadata?.price || item.originalPrice || item.unitPrice,
-        ),
-        discountPercent: Number(item.discountPercent || 0),
-        quantity: item.quantity,
-        requiresPrescription: item.requiresPrescription,
-        image: item.image,
-        metadata: item.metadata,
-      });
+      await cartApi.addItem(
+        {
+          medicineId: item.medicineId,
+          variantId: item.metadata?.selectedVariantId || null,
+          medicineName: item.medicineName,
+          medicineSlug: item.medicineSlug,
+          unitPrice: Number(item.unitPrice),
+          mrp: Number(
+            item.metadata?.price || item.originalPrice || item.unitPrice,
+          ),
+          discountPercent: Number(item.discountPercent || 0),
+          quantity: item.quantity,
+          requiresPrescription: item.requiresPrescription,
+          image: item.image,
+          metadata: item.metadata,
+        },
+        newIdempotencyKey(),
+      );
       // Remove only items that successfully merge; failed items remain for retry.
       useCartPendingStore.getState().removeGuestItem(item.id);
       anyMerged = true;

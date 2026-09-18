@@ -26,7 +26,7 @@ import {
   SmartSubstitution,
   StickySearchHeader,
 } from "@/src/features/home/sections";
-import { useHomeData } from "@/src/features/home/hooks/useHomeData";
+import { useHomeBatchData } from "@/src/features/home/hooks/useHomeBatchData";
 import { useHomeOnboarding } from "@/src/features/home/hooks/useHomeOnboarding";
 import { useHomeScroll } from "@/src/features/home/hooks/useHomeScroll";
 import { usePrefetchSearch } from "@/src/features/search/hooks/useSearch";
@@ -70,9 +70,7 @@ const AnimatedFlashList = Animated.createAnimatedComponent(
   FlashList,
 ) as unknown as typeof FlashList;
 
-const EMPTY_BANNERS: NonNullable<
-  ReturnType<typeof useHomeData>["appContent"]
->["banners"] = [];
+const EMPTY_BANNERS: any[] = [];
 
 type HomeSectionId =
   | "hero"
@@ -129,16 +127,16 @@ const HomeContent: React.FC = () => {
     tabs,
     cards,
     appContent,
-    isHomeLoading,
     featuredProducts,
-    isFeaturedLoading,
-    featuredSubcategories,
-    isSubcategoriesLoading,
+    subcategories: featuredSubcategories = [],
     frequentlyOrdered,
+    isLoading: isHomeLoading,
+    isRefetching: isRefreshing,
     error,
-    isRefreshing,
-    onRefresh,
-  } = useHomeData();
+    refetch: onRefresh,
+  } = useHomeBatchData();
+  const isFeaturedLoading = false; // Batched in single request
+  const isSubcategoriesLoading = false; // Batched in single request
   const { isOffline, coldLaunchOffline } = useNetworkStatus();
   const errorState = useQueryErrorState(error);
 

@@ -2,6 +2,7 @@ import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { SoftUpdateModal } from "@/src/components/common/SoftUpdateModal";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useProfile } from "@/src/features/profile/hooks/useProfile";
+import { useProfileBatchData } from "@/src/features/profile/hooks/useProfileBatchData";
 import { useInAppUpdate } from "@/src/hooks/system/useInAppUpdate";
 import { useSoftUpdate } from "@/src/hooks/system/useSoftUpdate";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
@@ -37,13 +38,15 @@ export const ProfileLayout: React.FC = () => {
   const tabBarHeight = useTabBarStore((s) => s.tabBarHeight);
   const { logout, loading: isLoggingOut } = useAuth();
   const {
-    profile,
-    loading,
-    refreshing,
-    avatarUploading,
-    refreshProfile,
-    uploadAvatar,
-  } = useProfile();
+    user: profile,
+    isLoading: loading,
+    isRefetching: refreshing,
+    error,
+    refetch: refreshProfile,
+  } = useProfileBatchData();
+  // Avatar upload stays on useProfile — the batch hook is read-only. Its query
+  // is already mounted by the tabs layout, so this adds no extra fetch.
+  const { avatarUploading, uploadAvatar } = useProfile();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showUpdateSheet, setShowUpdateSheet] = useState(false);

@@ -1,10 +1,11 @@
 import { tokenStorage } from "@/src/lib/storage";
-import { isOffline } from "@/src/utils/offline/networkState";
 import { reportOffline } from "@/src/utils/offline/networkFeedback";
+import { isOffline } from "@/src/utils/offline/networkState";
 
 import { logger } from "@/src/utils/logger";
 import { requestQueue } from "@/src/utils/requestQueue";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
+import { isRetryableError, getBackoffDelay, sleep } from "@/src/utils/exponentialBackoff";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { AppError, asError, toAppError } from "./errors";
 
@@ -41,6 +42,7 @@ export function setUnauthorizedHandler(handler: () => void) {
 }
 
 let isRefreshing = false;
+
 let failedQueue: {
   resolve: (v: string) => void;
   reject: (e: unknown) => void;
@@ -48,6 +50,7 @@ let failedQueue: {
 
 // Backoff cooldown if token refresh fails due to network/server errors
 const REFRESH_COOLDOWN_MS = 5000;
+
 let refreshCooldownUntil = 0;
 // The classified error from that transient failure, so requests made during
 // the cooldown window reject with the real reason instead of a false 401
@@ -73,18 +76,12 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     "x-panel-id": "customer",
+    "x-platform": "mobile_app",
   },
 });
 
 // Request interceptor: attaches auth header and checks offline status
 apiClient.interceptors.request.use((config) => {
-  // if (__DEV__) {
-  //   if (config.data !== undefined) {
-  //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`, JSON.stringify(config.data, null, 2));
-  //   } else {
-  //     logger.debug(`[apiClient Outgoing] ${config.method?.toUpperCase()} ${config.url}`);
-  //   }
-  // }
   if (isOffline()) {
     if (isQueueableRequest(config)) {
       // Queue safe offline requests, reject others immediately
@@ -109,6 +106,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 // 401 response interceptor — refresh and retry
+// Also handles retryable transient errors (5xx, timeout) with exponential backoff
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -134,9 +132,34 @@ apiClient.interceptors.response.use(
 
     const original = err.config;
 
+    // Retry transient errors (5xx, timeout, rate limit) with exponential backoff
+    // But NOT auth errors (those use the 401 refresh flow below)
+    if (
+      isRetryableError(err) &&
+      err.response?.status !== 401 &&
+      err.response?.status !== 403
+    ) {
+      const retryCount = (original?._retryCount ?? 0) as number;
+      const delay = getBackoffDelay(retryCount + 1);
+
+      if (delay > 0) {
+        if (__DEV__)
+          logger.debug(
+            `[apiClient] Retrying ${original?.method?.toUpperCase()} ${original?.url} (attempt ${retryCount + 1})`,
+          );
+        original._retryCount = retryCount + 1;
+        await sleep(delay);
+        return apiClient(original);
+      }
+    }
+
+    // Push-device DELETE is session teardown: it runs from logout after the
+    // token is already gone, so refreshing on its 401 would re-enter the
+    // expiry flow and call onUnauthorized again in a loop.
     const isAuthPath =
       original?.url?.includes("auth/refresh") ||
-      original?.url?.includes("auth/logout");
+      original?.url?.includes("auth/logout") ||
+      original?.url?.includes("push-notifications/devices");
 
     if (err.response?.status === 401 && !original?._retry && !isAuthPath) {
       if (Date.now() < refreshCooldownUntil) {
@@ -175,8 +198,14 @@ apiClient.interceptors.response.use(
           },
         );
 
-        const newToken = data.data.accessToken;
-        const expiresIn = data.data.expiresIn;
+        const newToken = data.data?.accessToken;
+        const expiresIn = data.data?.expiresIn;
+
+        if (!newToken || typeof newToken !== "string") {
+          throw new Error(
+            "Invalid token refresh response: accessToken missing or invalid",
+          );
+        }
 
         if (__DEV__) logger.debug("[apiClient] Background refresh SUCCESS");
         refreshCooldownUntil = 0;
@@ -185,7 +214,7 @@ apiClient.interceptors.response.use(
         // Update in-memory token + persist to SecureStore
         _accessToken = newToken;
         await tokenStorage.set(newToken);
-        if (expiresIn) {
+        if (expiresIn && typeof expiresIn === "number") {
           await tokenStorage.setExpiresAt(Date.now() + expiresIn * 1000);
         }
 

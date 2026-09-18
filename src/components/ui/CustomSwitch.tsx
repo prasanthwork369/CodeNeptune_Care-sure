@@ -25,9 +25,8 @@ export const CustomSwitch: React.FC<CustomSwitchProps> = ({
   disabled = false,
   accessibilityLabel,
 }) => {
-  const translateX = useRef(
-    new Animated.Value(value ? KNOB_TRAVEL : 0),
-  ).current;
+  // eslint-disable-next-line react-hooks/refs
+  const translateX = useRef(new Animated.Value(value ? KNOB_TRAVEL : 0)).current;
 
   useEffect(() => {
     Animated.spring(translateX, {

@@ -40,6 +40,7 @@ const PHOTO_SLOTS: { key: SlotKey; label: string; type: string }[] = [
 
 const OTHER_OPTION = "__other__";
 const SNAP_POINTS = ["78%"];
+const MAX_REASON_LENGTH = 1000;
 
 export function ReturnReasonModal({
   isVisible,
@@ -288,24 +289,35 @@ export function ReturnReasonModal({
           {isOtherSelected && (
             <>
               {/* Mirrors "Add details" so the swap causes no shift. */}
-              <Text
-                className="font-inter-bold text-[#222222] py-3"
-                style={{ fontSize: moderateScale(14) }}
-              >
-                Describe the issue
-                <RequiredMark />
-              </Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12, marginBottom: 12 }}>
+                <Text
+                  className="font-inter-bold text-[#222222]"
+                  style={{ fontSize: moderateScale(14) }}
+                >
+                  Describe the issue
+                  <RequiredMark />
+                </Text>
+                <Text
+                  className={`font-inter-medium ${otherReason.length > MAX_REASON_LENGTH * 0.9 ? "text-[#DC2626]" : "text-[#6A6A6A]"}`}
+                  style={{ fontSize: moderateScale(12) }}
+                >
+                  {otherReason.length}/{MAX_REASON_LENGTH}
+                </Text>
+              </View>
               <SafeBottomSheetInput
                 placeholder="Please specify the reason for your return"
                 placeholderTextColor="#6A6A6A"
                 value={otherReason}
                 onChangeText={(value: string) => {
-                  setOtherReason(value);
+                  // Enforce max length
+                  const capped = value.length > MAX_REASON_LENGTH ? value.slice(0, MAX_REASON_LENGTH) : value;
+                  setOtherReason(capped);
                   setErrors((e) => ({ ...e, details: undefined }));
                 }}
                 multiline
                 numberOfLines={4}
-                className={`p-4 border ${errors.details ? "border-[#EF4444]" : "border-[#919EAB33]"} rounded-xl font-inter-medium min-h-[100px] ${errors.details ? "mb-2" : "mb-6"}`}
+                maxLength={MAX_REASON_LENGTH}
+                className={`p-4 border ${errors.details ? "border-[#EF4444]" : "border-[#919EAB33]"} rounded-xl font-inter-medium min-h-[100px] ${errors.details ? "mb-2" : "mb-4"}`}
                 style={{
                   textAlignVertical: "top",
                   backgroundColor: "#FFFFFF",
@@ -326,17 +338,26 @@ export function ReturnReasonModal({
           {/* Hidden for "Other": its field above already captures the free text. */}
           {!isOtherSelected && (
             <>
-              <Text
-                className="font-inter-bold text-[#222222] py-3"
-                style={{ fontSize: moderateScale(14) }}
-              >
-                Add details
-              </Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12, marginBottom: 12 }}>
+                <Text
+                  className="font-inter-bold text-[#222222]"
+                  style={{ fontSize: moderateScale(14) }}
+                >
+                  Add details
+                </Text>
+                <Text
+                  className={`font-inter-medium ${details.length > MAX_REASON_LENGTH * 0.9 ? "text-[#DC2626]" : "text-[#6A6A6A]"}`}
+                  style={{ fontSize: moderateScale(12) }}
+                >
+                  {details.length}/{MAX_REASON_LENGTH}
+                </Text>
+              </View>
               <SafeBottomSheetInput
                 multiline
                 numberOfLines={4}
                 placeholder="Please provide more details about the issue with the product"
                 placeholderTextColor="#6A6A6A"
+                maxLength={MAX_REASON_LENGTH}
                 className="p-4 border border-[#919EAB33] rounded-xl font-inter-medium min-h-[100px] mb-6"
                 style={{
                   textAlignVertical: "top",
@@ -344,7 +365,11 @@ export function ReturnReasonModal({
                   fontSize: moderateScale(14),
                 }}
                 value={details}
-                onChangeText={setDetails}
+                onChangeText={(value: string) => {
+                  // Enforce max length
+                  const capped = value.length > MAX_REASON_LENGTH ? value.slice(0, MAX_REASON_LENGTH) : value;
+                  setDetails(capped);
+                }}
               />
             </>
           )}

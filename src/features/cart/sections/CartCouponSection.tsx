@@ -42,9 +42,12 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
   useEffect(() => {
     const draftCode = useCheckoutDraftStore.getState().couponCode;
     if (appliedCoupon || !draftCode || subtotal <= 0) return;
+
+    let cancelled = false;
     couponApi
       .validateCoupon(draftCode, subtotal)
       .then((result) => {
+        if (cancelled) return;
         if (useCouponStore.getState().applied) return;
         if (result.valid) {
           apply({
@@ -56,7 +59,14 @@ export const CartCouponSection: React.FC<CartCouponSectionProps> = ({
           useCheckoutDraftStore.getState().setCouponCode("");
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!cancelled && __DEV__)
+          console.debug("[CartCoupon] Validation error:", err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [subtotal, appliedCoupon, apply]);
 
   const pick = useMemo(

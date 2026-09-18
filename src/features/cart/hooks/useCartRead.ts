@@ -3,7 +3,7 @@ import { cartApi } from "@/src/features/cart/api/cart.api";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartPendingStore } from "@/src/store/cartStore";
 import type { CartItem } from "@/src/features/cart/types";
-import { parseMoney } from "@/src/utils/money";
+import { resolveCartLinePricing } from "@/src/features/cart/utils/cartPricing";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -43,11 +43,7 @@ export const useCartRead = () => {
     let price = 0;
     for (const item of items) {
       count += item.quantity;
-      const mrp = parseMoney(item.unitPrice);
-      const discountPct =
-        item.discountPercent ?? item.metadata?.discountPercent ?? 0;
-      price +=
-        (discountPct > 0 ? mrp * (1 - discountPct / 100) : mrp) * item.quantity;
+      price += resolveCartLinePricing(item).price * item.quantity;
     }
     return { totalItems: count, totalPrice: price };
   }, [items]);
@@ -139,6 +135,10 @@ export const useInCartVariantId = (
       const inCart = variants.find((v) =>
         cart.items.some(
           (i) =>
+            // Current shape: the variant lives in metadata.
+            i.metadata?.selectedVariantId === v.id ||
+            i.metadata?.variantId === v.id ||
+            // Legacy rows written when medicineId held the variant UUID.
             i.medicineId === v.id ||
             (i.metadata?.packSize === v.packSize &&
               i.metadata?.unit === v.unit),

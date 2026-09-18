@@ -285,7 +285,10 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   // every card consuming it re-renders whenever the destination or cart moves.
   const destinationRef = React.useRef(defaultCoords);
   const totalItemsRef = React.useRef(totalItems);
-  totalItemsRef.current = totalItems;
+
+  React.useEffect(() => {
+    totalItemsRef.current = totalItems;
+  }, [totalItems]);
 
   const setDestinationCoords = useCallback(
     (coords: { x: number; y: number }) => {

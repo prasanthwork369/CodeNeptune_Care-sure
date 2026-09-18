@@ -11,7 +11,7 @@ export const AboutLayout: React.FC = () => {
 
       <View className="flex-1 items-center justify-center gap-y-3 px-8">
         <Image
-          source={require("@/assets/images/icon.png")}
+          source={require("@/assets/images/icon.webp")}
           style={{ width: 100, height: 100, borderRadius: 22 }}
           contentFit="contain"
         />

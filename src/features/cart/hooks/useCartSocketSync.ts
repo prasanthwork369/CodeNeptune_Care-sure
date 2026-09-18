@@ -68,7 +68,11 @@ export const useCartSocketSync = () => {
       // reconnect never hands the server the JWT this socket started with.
       socket.io.on("reconnect_attempt", () => {
         const current = getAccessToken();
-        if (current) authHeaders.Authorization = `Bearer ${current}`;
+        if (current) {
+          authHeaders.Authorization = `Bearer ${current}`;
+        } else if (__DEV__) {
+          logger.warn("[Socket] Reconnect attempt without valid token");
+        }
       });
 
       socket.on("connect", () => {
@@ -134,6 +138,24 @@ export const useCartSocketSync = () => {
         if (__DEV__) logger.debug("[Socket] Notification:", data);
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.CUSTOMER.NOTIFICATIONS,
+        });
+        // Prescription status changes arrive as notifications, so the Rx
+        // banner updates now instead of waiting for the next screen focus.
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CUSTOMER.PRESCRIPTIONS.LIST_ALL,
+        });
+        // Order status changes can arrive as notifications — refresh orders
+        // so tracking screen shows latest status immediately.
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST_ALL,
+        });
+      });
+
+      // Listen to real-time order status updates from Redis/API Gateway
+      socket.on("order_update", (data: { action: string; order: unknown }) => {
+        if (__DEV__) logger.debug("[Socket] Order update:", data);
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CUSTOMER.ORDERS.LIST_ALL,
         });
       });
 

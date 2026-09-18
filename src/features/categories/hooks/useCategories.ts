@@ -170,7 +170,13 @@ export const usePrefetchCategoryProducts = () => {
           staleTime: 60_000,
           meta: BACKGROUND_QUERY_META,
         })
-        .catch(() => {});
+        .catch((err) => {
+          if (__DEV__)
+            console.debug(
+              "[usePrefetchCategoryProducts] Cache warmup failed:",
+              err,
+            );
+        });
     },
     [queryClient],
   );

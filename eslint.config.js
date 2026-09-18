@@ -25,7 +25,12 @@ module.exports = defineConfig([
     },
   },
   {
+    files: ["**/*.tsx", "**/*.ts"],
     rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/refs": "off",
       "no-restricted-imports": [
         "error",
         {

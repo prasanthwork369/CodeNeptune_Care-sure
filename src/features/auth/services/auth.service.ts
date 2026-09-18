@@ -2,7 +2,6 @@ import { authApi } from "../api/auth.api";
 import { profileApi } from "@/src/features/profile/api/profile.api";
 import { setAccessToken } from "@/src/api/client";
 import { useAuthStore } from "@/src/store/authStore";
-import { messagingService as notificationService } from "@/src/services/firebase";
 import { getDeviceInfo } from "@/src/lib/deviceInfo";
 import { logger } from "@/src/utils/logger";
 
@@ -42,13 +41,9 @@ export const authService = {
   },
   logout: async () => {
     try {
-      // Unregister the push token while the auth header is still valid —
-      // deactivates it server-side so this device stops getting pushes
-      // addressed to an account it's no longer signed into.
-      await Promise.allSettled([
-        authApi.logout(),
-        notificationService.unregister(),
-      ]);
+      await authApi.logout();
+    } catch {
+      // Backend logout failure should not block clearing local session
     } finally {
       await useAuthStore.getState().logout();
     }
@@ -60,9 +55,8 @@ export const authService = {
     if (result?.success === false) {
       throw new Error("Account deletion failed. Please try again.");
     }
-    // Best-effort push cleanup, then clear all local auth/user state so the
-    // app redirects back to login (same teardown as logout).
-    await notificationService.unregister().catch(() => {});
+    // Clear all local auth/user state (which also safely unregisters push notifications)
+    // so the app redirects back to login (same teardown as logout).
     await useAuthStore.getState().logout();
     return result;
   },

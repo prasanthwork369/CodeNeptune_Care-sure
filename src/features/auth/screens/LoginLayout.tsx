@@ -11,10 +11,6 @@ import { LoginSubmitButton } from "../components/LoginSubmitButton";
 import { useLogin } from "../hooks/useLogin";
 import { styles as s } from "./LoginLayout.styles";
 
-/**
- * Presentation component for the Login screen.
- * Delegates all state, side effects, validation, and mutations to the `useLogin` hook.
- */
 export const LoginLayout: React.FC = () => {
   const isOffline = useIsOffline();
   const {
@@ -32,7 +28,7 @@ export const LoginLayout: React.FC = () => {
   } = useLogin();
 
   // Expo Router's initial-deep-link anchor (unstable_settings in
-  // app/_layout.tsx) seeds a real Home route beneath this screen on every
+  // src/app/_layout.tsx) seeds a real Home route beneath this screen on every
   // cold, unauthenticated launch — so the default hardware-back pop would
   // silently drop the user into Home without ever going through the
   // explicit Skip button. Exit the app instead, unless the user already

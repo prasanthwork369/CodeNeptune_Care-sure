@@ -152,14 +152,20 @@ const prefetchWallet = (queryClient: QueryClient): void => {
       queryFn: () => walletApi.getBalance(),
       meta: BACKGROUND_QUERY_META,
     })
-    .catch(() => {});
+    .catch((err) => {
+      if (__DEV__)
+        console.debug("[prefetchWallet] Balance prefetch failed:", err);
+    });
   void queryClient
     .prefetchQuery({
       queryKey: firstPageKey,
       queryFn: () => walletApi.getLogs(LOGS_PAGE_SIZE, 0),
       meta: BACKGROUND_QUERY_META,
     })
-    .catch(() => {});
+    .catch((err) => {
+      if (__DEV__)
+        console.debug("[prefetchWallet] Logs prefetch failed:", err);
+    });
 };
 
 /** Stable callback for wiring prefetchWallet into a wallet notification tap. */

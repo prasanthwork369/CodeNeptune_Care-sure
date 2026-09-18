@@ -1,4 +1,4 @@
-import { Address } from "@/src/types/address";
+import { Address , AddressType } from "@/src/types/address";
 import { DeleteConfirmDialog } from "@/src/components/ui/DeleteConfirmDialog";
 import { NoInternetState } from "@/src/components/ui/NoInternetState";
 import { RetryState } from "@/src/components/ui/RetryState";
@@ -10,7 +10,7 @@ import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { useIsOffline } from "@/src/hooks/ui/useIsOffline";
 import { useQueryErrorState } from "@/src/hooks/ui/useQueryErrorState";
 import { useNav } from "@/src/hooks/useNav";
-import { AddressType } from "@/src/types/address";
+
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";

@@ -23,6 +23,7 @@ interface SearchRecommendCardProps {
     discountPercentage: number;
     thumbnailUrl?: string;
     packLabel?: string;
+    variantId?: string;
   };
   onPress: (
     id: string,
@@ -50,7 +51,7 @@ export const SearchRecommendCard: React.FC<SearchRecommendCardProps> =
     const { count, increment, decrement, isPending, animations } =
       useCartActions({
         medicineId: data.id,
-        variantId: null,
+        variantId: data.variantId ?? null,
         productId: data.productId,
         name: data.name,
         price: data.price ?? 0,

@@ -5,7 +5,7 @@ import { requestQueue } from "@/src/utils/requestQueue";
 import { icons } from "@/src/constants/icons";
 import NetInfo from "@react-native-community/netinfo";
 import { Touchable } from "@/src/components/ui/Touchable";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { useAdjustedBottomInset } from "@/src/hooks/ui/useBottomInset";
 import { exactScale } from "@/src/utils/exactScale";

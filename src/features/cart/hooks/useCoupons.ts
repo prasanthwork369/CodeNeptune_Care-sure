@@ -8,9 +8,14 @@ import { useMemo } from "react";
 export const useCoupons = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    queryKey: QUERY_KEYS.CUSTOMER.COUPONS,
+    // Auth state is part of the key: the backend annotates each row with
+    // isUsedUp per customer, so a guest-fetched list must never be reused for
+    // a signed-in one — it would show already-used coupons as available.
+    queryKey: [...QUERY_KEYS.CUSTOMER.COUPONS, isAuthenticated],
     queryFn: couponApi.getActiveCoupons,
-    enabled: isAuthenticated,
+    // GET /coupons/active is public (mounted above authenticateUser) and
+    // resolves the customer optionally, so guests get the same promo list the
+    // website shows them.
     staleTime: 0,
     refetchOnMount: true,
   });

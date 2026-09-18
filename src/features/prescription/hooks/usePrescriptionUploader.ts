@@ -193,5 +193,13 @@ export function usePrescriptionUploader(folder: string) {
     setStates({});
   }, []);
 
-  return { states, isUploading, uploadAll, retryOne, reset };
+  return {
+    states,
+    isUploading,
+    uploadAll,
+    uploadOne,
+    retryOne,
+    reset,
+    uploadKeyOf,
+  };
 }

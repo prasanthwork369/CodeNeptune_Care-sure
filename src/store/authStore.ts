@@ -15,6 +15,7 @@ import { useCheckoutStore } from "./checkoutStore";
 import { useReturnDraftStore } from "./returnDraftStore";
 import { usePrescriptionOrderStore } from "./prescriptionOrderStore";
 import { useCartPendingStore } from "./cartStore";
+import { messagingService as notificationService } from "@/src/services/firebase";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -28,6 +29,10 @@ interface AuthState {
   setUser: (user: CustomerProfile | null) => void;
   logout: () => Promise<void>;
 }
+
+// A failed refresh can fire onUnauthorized more than once, so concurrent 401s
+// would otherwise run push unregister and store teardown twice per session.
+let logoutInFlight: Promise<void> | null = null;
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
@@ -80,30 +85,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setUser: (user) => set({ user }),
 
   logout: async () => {
-    setAccessToken(null);
-    set({ isAuthenticated: false, isGuest: false, token: null, user: null });
-
-    // Clear all user-specific state
-    usePrescriptionDraftStore.getState().clearItems();
-    useCouponStore.getState().remove();
-    useNotificationStore.getState().clear();
-    useLocationStore.getState().clearLocation();
-    useCheckoutStore.getState().clear();
-    useReturnDraftStore.getState().clearReturnDraft();
-    usePrescriptionOrderStore.getState().clear();
-    useCartPendingStore.getState().clearGuestCart();
-    useCheckoutDraftStore.getState().clearDraft();
-    useLastRouteStore.getState().clear();
-    queryClient.clear();
-    // Clear entire user cache on logout
-    apiCache.clear();
-    // Drop any requests queued offline under this session — otherwise they
-    // can replay under the next signed-in user's token after reconnect.
-    await requestQueue.clear();
-
-    await tokenStorage.clear();
-    await tokenStorage.clearExpiresAt();
-    await tokenStorage.clearRefreshToken();
-    await guestStorage.clear();
+    if (logoutInFlight) return logoutInFlight;
+    logoutInFlight = runLogout(set);
+    try {
+      await logoutInFlight;
+    } finally {
+      // Cleared so a later session can log out again.
+      logoutInFlight = null;
+    }
   },
 }));
+
+async function runLogout(set: (partial: Partial<AuthState>) => void) {
+  // Unregister push notification token & clear push cache while accessToken is still available
+  try {
+    await notificationService.unregister();
+  } catch {
+    // Non-blocking: push unregistration failure must never prevent session logout
+  }
+
+  setAccessToken(null);
+  set({ isAuthenticated: false, isGuest: false, token: null, user: null });
+
+  // Clear all user-specific state
+  usePrescriptionDraftStore.getState().clearItems();
+  useCouponStore.getState().remove();
+  useNotificationStore.getState().clear();
+  useLocationStore.getState().clearLocation();
+  useCheckoutStore.getState().clear();
+  useReturnDraftStore.getState().clearReturnDraft();
+  usePrescriptionOrderStore.getState().clear();
+  useCartPendingStore.getState().clearGuestCart();
+  useCheckoutDraftStore.getState().clearDraft();
+  useLastRouteStore.getState().clear();
+  queryClient.clear();
+  // Clear entire user cache on logout
+  apiCache.clear();
+  // Drop any requests queued offline under this session — otherwise they
+  // can replay under the next signed-in user's token after reconnect.
+  await requestQueue.clear();
+
+  await tokenStorage.clear();
+  await tokenStorage.clearExpiresAt();
+  await tokenStorage.clearRefreshToken();
+  await guestStorage.clear();
+}

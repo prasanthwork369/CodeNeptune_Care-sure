@@ -169,6 +169,7 @@ export const useProduct = (productId: string) => {
               ? { uri: resolveAssetUrl(data.recommendation.thumbnailUrl) }
               : undefined,
             productId: data.recommendation.productId,
+            variantId: data.recommendation.medicine_variants?.[0]?.id,
           }
         : null;
 

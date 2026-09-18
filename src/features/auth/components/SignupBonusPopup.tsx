@@ -26,7 +26,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Dimensions, Modal, Pressable, Text, View } from "react-native";
+import { Dimensions, Modal, Pressable, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
@@ -64,7 +64,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
   const { balance } = useWalletBalance();
   const corporateCredits = Number(balance?.corporateCredits || 0);
   const [showConfetti, setShowConfetti] = useState(testMode);
-  const confettiRef = useRef<any>(null);
+  const confettiRef = useRef<React.ElementRef<typeof DotLottie>>(null);
 
   useEffect(() => {
     if (testMode) return;
@@ -141,6 +141,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
       if (confettiTimer) clearTimeout(confettiTimer);
     };
   }, [
+    testMode,
     isAuthenticated,
     user?.id,
     user?.isFirstTimeLogin,
@@ -276,7 +277,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
               style={{ height: pageHeight || undefined, overflow: "hidden" }}
             >
               <Animated.ScrollView
-                ref={scrollViewRef as any}
+                ref={scrollViewRef}
                 horizontal
                 pagingEnabled={isLooping}
                 scrollEnabled={isLooping}

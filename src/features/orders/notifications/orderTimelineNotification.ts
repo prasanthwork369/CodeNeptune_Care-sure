@@ -11,7 +11,7 @@ import {
 // Same branded visuals as notifeeService so local and push notifications match.
 const BRAND_COLOR = "#FFFFFF";
 const SMALL_ICON = "notification_icon";
-const LARGE_ICON = require("../../../../assets/images/notification-tile.png");
+const LARGE_ICON = require("../../../../assets/images/notification-tile.webp");
 
 const getNotifee = () => require("@notifee/react-native");
 

@@ -5,6 +5,7 @@ import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useFamilyMembers } from "@/src/features/profile/hooks/useFamilyMembers";
 import { useNav } from "@/src/hooks/useNav";
 import { useUIStore } from "@/src/store/uiStore";
+import { requestPharmacistCallback } from "../services/prescriptionCallback.service";
 import type { FamilyMember } from "@/src/features/profile/types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -52,7 +53,31 @@ export const ChooseMethodLayout: React.FC = () => {
     (typeof members)[0] | null
   >(null);
 
+  // membersLoading means "fetching with no data", so it stays true after a
+  // resumed fetch. Only block when there is also no patient to pick.
+  const isPatientListUnresolved = membersLoading && members.length === 0;
+
+  // Shared by the footer and handleProceed so the two can never disagree.
+  const canProceed =
+    selectedOption === "upload" ||
+    (selectedOption === "call" && !isPatientListUnresolved);
+
+  // Queues the call-back for the staff dashboards, then continues. Not
+  // awaited — a failed queue must never block the Call-Us checkout path.
+  const goToPatientSelection = (patientName?: string) => {
+    void requestPharmacistCallback(
+      patientName
+        ? `Call-Us checkout: no prescription for ${patientName}.`
+        : "Call-Us checkout: customer has no prescription.",
+    );
+    router.push({
+      pathname: "/(prescription)/select-patient",
+      params: { toPay },
+    });
+  };
+
   const handleProceed = () => {
+    if (!canProceed) return;
     if (selectedOption === "upload") {
       useUIStore.getState().setIsRxFromCartFlow(true);
       setIsUploadSheetVisible(true);
@@ -61,15 +86,12 @@ export const ChooseMethodLayout: React.FC = () => {
         setIsAddPatientSheetVisible(true);
         return;
       }
-      router.push({
-        pathname: "/(prescription)/select-patient",
-        params: { toPay },
-      });
+      goToPatientSelection(selectedPatient.name);
     }
   };
 
   const getButtonLabel = () => {
-    if (membersLoading && selectedOption === "call") return "Loading…";
+    if (selectedOption === "call" && isPatientListUnresolved) return "Loading…";
     return "Proceed";
   };
 
@@ -103,9 +125,7 @@ export const ChooseMethodLayout: React.FC = () => {
       <ChooseMethodFooter
         toPay={toPay}
         safeAreaBottom={adjustedBottom}
-        canProceed={
-          !!selectedOption && (selectedOption === "upload" || !membersLoading)
-        }
+        canProceed={canProceed}
         onProceed={handleProceed}
         buttonLabel={getButtonLabel()}
       />
@@ -174,10 +194,7 @@ export const ChooseMethodLayout: React.FC = () => {
           if (patientId) {
             if (selectedOption === "upload") setIsUploadSheetVisible(true);
             else if (selectedOption === "call")
-              router.push({
-                pathname: "/(prescription)/select-patient",
-                params: { toPay },
-              });
+              goToPatientSelection(patient.name);
           }
         }}
       />

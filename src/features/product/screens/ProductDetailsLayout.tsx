@@ -152,9 +152,11 @@ export const ProductDetailsLayout: React.FC = () => {
     };
   }, [activeProduct, selectedVariant]);
 
-  // When a variant is selected, use the VARIANT's UUID as medicineId.
-  // The backend cart unique-key is medicineId only — different variant UUIDs = separate rows.
-  const medicineId = selectedVariant?.id ?? raw?.id;
+  // Always the parent `medicines.id`, never the variant UUID: it is the id
+  // catalog/pricing (and substitute-requests) resolve against. The selected
+  // variant rides along separately and lands in metadata.selectedVariantId,
+  // which is what gives each variant its own cart row.
+  const medicineId = raw?.id;
   const activeVariantId = selectedVariant?.id ?? null;
 
   const goBack = useCallback(() => router.back(), [router]);
@@ -303,7 +305,6 @@ export const ProductDetailsLayout: React.FC = () => {
               <ProductDetailsFooter
                 productId={id}
                 medicineUuid={medicineId}
-                baseMedicineId={variants.length > 0 ? undefined : raw?.id}
                 variantId={activeVariantId}
                 product={footerProduct}
                 safeAreaBottom={adjustedBottom}

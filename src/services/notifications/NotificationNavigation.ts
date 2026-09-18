@@ -7,10 +7,9 @@ import {
 } from "../../types/notification";
 import { useAuthStore } from "../../store/authStore";
 import { useNotificationNavigationStore } from "../../store/notificationNavigationStore";
+import { EXTERNAL_LINKS } from "@/src/utils/urls";
 import { logger } from "@/src/utils/logger";
 import { getCanonicalType, getNotificationHandler } from "./registry";
-
-const ANDROID_PACKAGE = "com.codeneptune.caresure";
 
 // Protected notification types requiring login
 const AUTH_REQUIRED_TYPES = new Set<NotificationType>([
@@ -206,13 +205,14 @@ export const NotificationNavigation = {
       // Open Play Store/App Store update page
       case NotificationType.APP_UPDATE:
         if (Platform.OS === "android") {
-          Linking.openURL(`market://details?id=${ANDROID_PACKAGE}`).catch(() =>
-            Linking.openURL(
-              `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`,
-            ),
+          Linking.openURL(EXTERNAL_LINKS.playStoreDeepLink).catch(() =>
+            Linking.openURL(EXTERNAL_LINKS.playStoreWeb),
+          );
+        } else if (EXTERNAL_LINKS.appStoreDeepLink) {
+          Linking.openURL(EXTERNAL_LINKS.appStoreDeepLink).catch(() =>
+            Linking.openURL(EXTERNAL_LINKS.appStoreWeb),
           );
         } else if (__DEV__) {
-          // TODO: Add iOS App Store ID when published
           console.warn(
             "[NotificationNavigation] APP_UPDATE tapped on iOS but no App Store ID is configured yet.",
           );

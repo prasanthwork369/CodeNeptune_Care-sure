@@ -1,4 +1,5 @@
 import { isExpoGo } from "@/src/utils/environment";
+import { EXTERNAL_LINKS } from "@/src/utils/urls";
 import React from "react";
 import { Platform, StyleProp, ViewStyle } from "react-native";
 import { WebView } from "react-native-webview";
@@ -23,9 +24,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     const source =
       Platform.OS === "android"
         ? {
-            uri: isLocalFile
-              ? uri
-              : `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(uri)}`,
+            uri: isLocalFile ? uri : EXTERNAL_LINKS.googleDocsViewer(uri),
           }
         : { uri };
 

@@ -1,3 +1,16 @@
+export interface MedicineVariant {
+  id: string;
+  sku: string | null;
+  unit: string;
+  mrp: number;
+  price: number;
+  status: number;
+  packSize: string;
+  quantity: number;
+  medicineId: string;
+  discountPercentage: number;
+}
+
 export interface ApiSearchRecommendation {
   id: string;
   productId: string;
@@ -14,6 +27,7 @@ export interface ApiSearchRecommendation {
   thumbnailUrl: string;
   packagingDetail?: string | null;
   manufacturer?: string | null;
+  medicine_variants?: MedicineVariant[];
 }
 
 export interface ApiSearchMedicine {
@@ -33,6 +47,7 @@ export interface ApiSearchMedicine {
   thumbnailUrl: string;
   packagingDetail?: string | null;
   recommendation: ApiSearchRecommendation | null;
+  medicine_variants?: MedicineVariant[];
   brand?: {
     id: string;
     name: string;

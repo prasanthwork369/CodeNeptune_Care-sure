@@ -13,6 +13,7 @@ import { useLocationStore } from "@/src/store/locationStore";
 import { analyticsService } from "@/src/services/firebase";
 import { buildCartSnapshot } from "@/src/utils/cartSnapshot";
 import { parseMoney } from "@/src/utils/money";
+import { resolveCartLinePricing } from "@/src/features/cart/utils/cartPricing";
 import { CartLine } from "@/src/features/cart/types";
 import type { Product } from "@/src/features/product/types";
 import { useFocusEffect } from "expo-router";
@@ -148,17 +149,13 @@ export function useCartCalculations() {
   const lines: CartLine[] = useMemo(
     () =>
       cartItems.map((item): CartLine => {
-        // unitPrice from the backend is the MRP (strikethrough price); the
-        // payable selling price is derived by applying discountPercent to it —
-        // matches customer-website's cart-utils.ts (rawMrp * (1 - discount/100)).
-        const mrp = parseMoney(item.unitPrice);
-        const discountPct = parseFloat(
-          String(item.discountPercent ?? item.metadata?.discountPercent ?? 0),
-        );
-        const price =
-          discountPct > 0
-            ? parseFloat((mrp * (1 - discountPct / 100)).toFixed(2))
-            : mrp;
+        // unitPrice is the selling price and mrpPrice the strikethrough;
+        // the helper also covers rows written before that was fixed.
+        const {
+          price,
+          mrp,
+          discountPercent: discountPct,
+        } = resolveCartLinePricing(item);
         const imageUri = item.image ?? item.metadata?.image;
         const packSize = item.metadata?.packSize ?? item.packSize;
         const productId =
@@ -241,16 +238,15 @@ export function useCartCalculations() {
       typeof rawImage === "string"
         ? rawImage
         : ((rawImage as { uri?: string } | null)?.uri ?? undefined);
-    // Send the MRP as unitPrice (backend derives the selling price from
-    // unitPrice * (1 - discountPercent/100)) — matches customer-website's
-    // ProductCard.tsx (unitPrice: mrp, mrp: mrp, discountPercent).
+    // unitPrice is the selling price, mrp the strikethrough — same as web.
+    const unitPrice = Number(product.price ?? 0);
     const mrp = Number(product.originalPrice ?? product.price ?? 0);
     return addItem({
       medicineId: String(product.id ?? ""),
       variantId: null,
       medicineName: String(product.name ?? ""),
       medicineSlug: String(product.slug ?? product.id ?? ""),
-      unitPrice: mrp,
+      unitPrice,
       mrp,
       discountPercent: Number(product.discountPercent ?? 0),
       quantity: 1,

@@ -1,4 +1,4 @@
-import { asError } from "@/src/api/errors";
+import { asError, toAppError } from "@/src/api/errors";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
@@ -14,7 +14,7 @@ import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import { requireInternet } from "@/src/utils/offline";
+import { isOffline, requireInternet } from "@/src/utils/offline";
 import { usePincode } from "@/src/features/location/hooks/usePincode";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
@@ -27,6 +27,7 @@ import {
   sumOrderDiscounts,
 } from "@/src/utils/orderPayload";
 import { CreateOrderRequest } from "@/src/features/orders/types";
+import { queueOrderForRetry } from "@/src/features/orders/utils/queueOrder";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
@@ -265,6 +266,7 @@ export function usePaymentCalculations() {
         subtotal: bill?.subtotal,
         idempotencyKey: idempotencyKeyRef.current,
         couponCode,
+        paymentMethod: selectedMethod,
         walletUsed,
         coinsUsed,
         creditsUsed: corporateCreditsUsed,
@@ -328,10 +330,32 @@ export function usePaymentCalculations() {
           err?.data ?? err?.response?.data ?? err?.message,
         );
       }
-      reportError(err, "placeOrder:cart");
-      Alert.alert("Order Failed", orderErrorMessage(err));
-      placingOrderRef.current = false;
-      setPlacingOrder(false);
+
+      // Only a confirmed connection failure may be queued — the same rule
+      // reportActionError and useQueryErrorState use: a bare "network" error
+      // counts as offline only when the device itself reads offline right now.
+      // A missing `response` proves nothing on its own, since every apiClient
+      // rejection is an AppError and those never carry one. Everything else
+      // (validation, 4xx, 5xx, timeout, unexpected) must surface, not replay.
+      const appError = toAppError(e);
+      const isConnectionFailure =
+        appError.kind === "offline" ||
+        (appError.kind === "network" && isOffline());
+
+      if (isConnectionFailure && payload && idempotencyKeyRef.current) {
+        await queueOrderForRetry(payload, idempotencyKeyRef.current);
+        Alert.alert(
+          "Order Queued",
+          "Your order will be placed automatically when you're back online.",
+        );
+        placingOrderRef.current = false;
+        setPlacingOrder(false);
+      } else {
+        reportError(err, "placeOrder:cart");
+        Alert.alert("Order Failed", orderErrorMessage(err));
+        placingOrderRef.current = false;
+        setPlacingOrder(false);
+      }
     } finally {
       stopCheckoutTrace(
         { status: traceStatus },

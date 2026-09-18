@@ -77,6 +77,7 @@ const toComparisonData = (item: ApiSearchMedicine) => {
     recId: rec.id,
     recProductId: rec.productId,
     recSlug: rec.slug,
+    recVariantId: rec.medicine_variants?.[0]?.id,
     searched: {
       name: item.name,
       brandName: item.brand?.name ?? "",
@@ -160,6 +161,7 @@ const toRecommendData = (item: ApiSearchMedicine) => ({
   thumbnailUrl: item.thumbnailUrl
     ? resolveAssetUrl(item.thumbnailUrl)
     : item.thumbnailUrl,
+  variantId: item.medicine_variants?.[0]?.id,
 });
 
 export const SearchPageLayout = () => {

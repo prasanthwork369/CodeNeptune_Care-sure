@@ -79,6 +79,12 @@ export const useProfile = () => {
       // Step 2 — save URL to profile
       await profileApi.updateProfile({ avatarUrl });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMER.PROFILE });
+      // The profile tab renders the avatar from the batched payload, so that
+      // cache must drop too or the old photo returns on the next mount.
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === "batch" && query.queryKey.includes("profile"),
+      });
     } finally {
       setAvatarUploading(false);
     }

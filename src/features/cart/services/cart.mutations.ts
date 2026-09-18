@@ -8,6 +8,7 @@ import type {
   UpdateCartItemInput,
 } from "../types";
 import { cartApi } from "../api/cart.api";
+import { newIdempotencyKey } from "@/src/utils/idempotencyKey";
 
 /**
  * Cart writes as plain functions rather than useMutation hooks.
@@ -22,7 +23,9 @@ export const cartMutations = {
     if (!useAuthStore.getState().isAuthenticated) {
       return useCartPendingStore.getState().addGuestItem(input);
     }
-    const cart = await cartApi.addItem(input);
+    // One key per add attempt — a transport-level replay of this same request
+    // reuses it and is deduped; a genuine later add gets its own key.
+    const cart = await cartApi.addItem(input, newIdempotencyKey());
     queryClient.setQueryData(QUERY_KEYS.CUSTOMER.CART, cart);
     return cart;
   },

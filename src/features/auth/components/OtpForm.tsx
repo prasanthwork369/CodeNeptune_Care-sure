@@ -55,6 +55,7 @@ export const OtpForm: React.FC<OtpFormProps> = ({
       if (typeof inputRef === "function") {
         inputRef(el);
       } else {
+        // eslint-disable-next-line react-hooks/immutability
         (inputRef as React.MutableRefObject<TextInput | null>).current = el;
       }
     },

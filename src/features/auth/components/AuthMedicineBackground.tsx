@@ -43,6 +43,7 @@ const ScrollingColumn = ({
     }
     const remaining = cycleHeight + translateY.value;
     const remainingDuration = duration * (remaining / cycleHeight);
+    // eslint-disable-next-line react-hooks/immutability
     translateY.value = withSequence(
       withTiming(-cycleHeight, {
         duration: remainingDuration,

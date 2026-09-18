@@ -1,6 +1,13 @@
-import { RETURN_STATUS_LABELS } from "../../constants/return-status";
+import {
+  isReturnCancellable,
+  RETURN_STATUS_LABELS,
+} from "../../constants/return-status";
 import { Order } from "../../types";
 import { useReturnDetail } from "../../hooks/useReturnDetail";
+import { useCancelReturn } from "../../hooks/useCancelReturn";
+import { CancelReturnModal } from "../../components/CancelReturnModal";
+import { orderErrorMessage } from "../../utils/orderError";
+import { useToastStore } from "@/src/store/toastStore";
 import { exactScale } from "@/src/utils/exactScale";
 import React, { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
@@ -10,6 +17,8 @@ import { styles as s } from "./tracking.styles";
 interface ReturnStatusSectionProps {
   returns: Order["returns"];
   showWindowExpiredMessage?: boolean;
+  /** Refreshes this order's detail cache after a cancel. */
+  orderUuid?: string;
 }
 
 type ReturnEntry = NonNullable<Order["returns"]>[number];
@@ -20,10 +29,12 @@ function ReturnStatusRow({
   entry,
   expanded,
   onToggle,
+  onCancel,
 }: {
   entry: ReturnEntry;
   expanded: boolean;
   onToggle: () => void;
+  onCancel: (entry: ReturnEntry) => void;
 }) {
   const info = RETURN_STATUS_LABELS[entry.status] ?? {
     label: "Return",
@@ -63,6 +74,16 @@ function ReturnStatusRow({
           {!loading && !returnDetail?.items?.length && (
             <Text style={s.returnReasonText}>No reason on record.</Text>
           )}
+          {/* Backend rejects a cancel past pickup, so only offer it while the
+              return is still cancellable. */}
+          {isReturnCancellable(entry.status) && (
+            <Pressable
+              onPress={() => onCancel(entry)}
+              style={s.returnCancelBtn}
+            >
+              <Text style={s.returnCancelBtnText}>Cancel Return Request</Text>
+            </Pressable>
+          )}
         </View>
       )}
     </View>
@@ -72,8 +93,27 @@ function ReturnStatusRow({
 export function ReturnStatusSection({
   returns,
   showWindowExpiredMessage,
+  orderUuid,
 }: ReturnStatusSectionProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [pendingCancel, setPendingCancel] = useState<ReturnEntry | null>(null);
+  const { cancelReturn, isCancelling } = useCancelReturn();
+
+  const confirmCancel = async (reason: string) => {
+    if (!pendingCancel) return;
+    try {
+      await cancelReturn({
+        returnId: pendingCancel.id,
+        orderUuid,
+        reason,
+      });
+      setPendingCancel(null);
+    } catch (err) {
+      // Surfaces the backend's own message (e.g. already picked up).
+      useToastStore.getState().show(orderErrorMessage(err), "error");
+      setPendingCancel(null);
+    }
+  };
 
   if (!returns?.length && !showWindowExpiredMessage) return null;
 
@@ -98,6 +138,7 @@ export function ReturnStatusSection({
             onToggle={() =>
               setExpandedId((id) => (id === r.id ? null : r.id))
             }
+            onCancel={setPendingCancel}
           />
         ))}
       </View>
@@ -106,6 +147,13 @@ export function ReturnStatusSection({
           The return window for this order has expired.
         </Text>
       )}
+
+      <CancelReturnModal
+        visible={!!pendingCancel}
+        onClose={() => setPendingCancel(null)}
+        onConfirm={confirmCancel}
+        isCancelling={isCancelling}
+      />
     </SectionCard>
   );
 }

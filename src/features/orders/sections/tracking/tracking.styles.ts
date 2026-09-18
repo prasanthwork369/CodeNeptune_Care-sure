@@ -258,6 +258,21 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#374151",
   },
+  returnCancelBtn: {
+    marginTop: exactScale(8),
+    alignSelf: "flex-start",
+    paddingHorizontal: exactScale(12),
+    paddingVertical: exactScale(8),
+    borderRadius: exactScale(8),
+    borderWidth: 1,
+    borderColor: "#FECACA",
+    backgroundColor: "#FEF2F2",
+  },
+  returnCancelBtnText: {
+    fontSize: moderateScale(12),
+    fontWeight: "700",
+    color: "#DC2626",
+  },
 
   // ItemsOrderedSection
   itemsHeaderRow: {

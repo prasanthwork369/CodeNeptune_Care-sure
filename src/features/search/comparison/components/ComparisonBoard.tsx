@@ -21,7 +21,6 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import ReAnimated, {
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -38,15 +37,10 @@ interface ComparisonBoardProps {
   requiresPrescription?: boolean;
 }
 
-// Add-button section sizing. The board height is measured from the columns only,
-// so this section's height is added on top — keep the measurement offset derived
-// from these values so the bottom padding can never drift out of sync and clip.
+// Add-button height must stay in sync with status slot so dashed dividers align
 const ADD_BTN_HEIGHT = 50;
 const ADD_BTN_PAD_TOP = 6;
 const ADD_BTN_PAD_BOTTOM = 16;
-// Total height of the bottom section. Both the recommended card's Add-button
-// section AND the searched card's status slot use this, so the two cards' dashed
-// dividers always line up. Change the padding above and both follow together.
 const ADD_SECTION_HEIGHT =
   ADD_BTN_PAD_TOP + ADD_BTN_HEIGHT + ADD_BTN_PAD_BOTTOM;
 
@@ -78,7 +72,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   const { count, increment, decrement, animations, isPending } = useCartActions(
     {
       medicineId: medicineUuid ?? productId,
-      variantId: null,
+      variantId: recommended.variantId ?? null,
       productId,
       name: recommended.name,
       slug: slug,
@@ -92,26 +86,25 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   );
 
   const { slideAnim, opacityAnim } = animations;
-  const handleIncrement = increment;
-  const handleDecrement = decrement;
 
   const { width: screenWidth } = useWindowDimensions();
   const cardWidth = screenWidth - 32;
 
-  // Both cards can have different two-line names/manufacturers. Measure each
-  // side and use the taller requirement so neither card is clipped.
-  const [boardHeight, setBoardHeight] = useState(380);
-  const [searchedTopHeight, setSearchedTopHeight] = useState(0);
-  const [searchedBottomHeight, setSearchedBottomHeight] = useState(0);
-  const [recommendedHeight, setRecommendedHeight] = useState(0);
+  // Measure both cards separately to ensure neither name/manufacturer is clipped
+  const [heights, setHeights] = useState({
+    board: 380,
+    searchedTop: 0,
+    searchedBottom: 0,
+    recommended: 0,
+  });
+  const { board: boardHeight, searchedTop: searchedTopHeight, searchedBottom: searchedBottomHeight, recommended: recommendedHeight } = heights;
 
+  // Reset heights when product changes to recalculate layout measurements
   useEffect(() => {
-    setBoardHeight(380);
-    setSearchedTopHeight(0);
-    setSearchedBottomHeight(0);
-    setRecommendedHeight(0);
+    setHeights({ board: 380, searchedTop: 0, searchedBottom: 0, recommended: 0 });
   }, [productId]);
 
+  // Recalculate board height based on measured card dimensions
   useEffect(() => {
     const searchedHeight =
       searchedTopHeight > 0 && searchedBottomHeight > 0
@@ -120,24 +113,20 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     const nextHeight = Math.ceil(
       Math.max(380, searchedHeight, recommendedHeight),
     );
-    setBoardHeight((current) =>
-      current === nextHeight ? current : nextHeight,
+    setHeights((current) =>
+      current.board === nextHeight ? current : { ...current, board: nextHeight },
     );
   }, [recommendedHeight, searchedBottomHeight, searchedTopHeight]);
 
-  // Reanimated shared value driving the expandable We Recommended section:
-  // 0 = half-width, 1 = full-width. Written directly from the drag gesture's
-  // UI-thread worklet below — no per-move JS-thread round trip, which is
-  // what the old PanResponder + legacy Animated version paid on every touch
-  // move.
+  // Drives half-width (0) to full-width (1) directly in drag gesture worklet; no JS round-trip
   const expandProgress = useSharedValue(0);
-  // expandProgress's value at gesture start, so onUpdate can offset from it.
+  // Saved at gesture start for relative onUpdate offset calculation
   const expandStart = useSharedValue(0);
   const touchStart = useSharedValue({ x: 0, y: 0 });
-  const isExpanded = useRef(false);
+  const isExpanded = useSharedValue(false);
   const swapRotate = useRef(new Animated.Value(0)).current;
 
-  // Reanimated shared value — UI thread only, zero blink
+  // UI-thread opacity animation driven by drag; zero blink on worklet thread
   const swapBtnOpacity = useSharedValue(1);
   const swapBtnStyle = useAnimatedStyle(() => ({
     opacity: swapBtnOpacity.value,
@@ -145,13 +134,6 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
 
   const animateSwapBtn = (toValue: number) => {
     swapBtnOpacity.value = withTiming(toValue, { duration: 180 });
-  };
-
-  // Bridges the gesture worklet's expand/collapse decision back to the
-  // JS-only `isExpanded` ref, so a later swap-button tap toggles from
-  // wherever the drag settled.
-  const setIsExpandedFlag = (expand: boolean) => {
-    isExpanded.current = expand;
   };
 
   const springConfig = {
@@ -162,28 +144,22 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
   };
 
   const handleSwap = () => {
-    isExpanded.current = !isExpanded.current;
+    isExpanded.value = !isExpanded.value;
 
-    animateSwapBtn(isExpanded.current ? 0 : 1);
+    animateSwapBtn(isExpanded.value ? 0 : 1);
 
     swapRotate.setValue(0);
     Animated.timing(swapRotate, {
-      // Was a hardcoded 380ms, which reads sluggish for a small control and
-      // bypassed the shared scale. durations.slow is the app's 300ms step.
+      // 380ms was sluggish; durations.slow (300ms) matches app scale
       toValue: 1,
       duration: durations.slow,
       useNativeDriver: true,
     }).start();
 
-    expandProgress.value = withSpring(isExpanded.current ? 1 : 0, springConfig);
+    expandProgress.value = withSpring(isExpanded.value ? 1 : 0, springConfig);
   };
 
-  // Mirrors the pre-migration PanResponder exactly: claims the gesture only
-  // once a horizontal move exceeds 5px and is steeper than a 1.5x dx:dy
-  // ratio (so a vertical scroll on the parent screen still wins), and yields
-  // explicitly once a move is clearly vertical instead. Velocity here is in
-  // points/second vs PanResponder's points/ms, hence comparing against 200
-  // (not 0.2) below — same threshold, converted units.
+  // Matches PanResponder logic: claims only on 5px+ horizontal movement steeper than 1.5:1 (dx:dy ratio)
   const dragGesture = Gesture.Pan()
     .manualActivation(true)
     .onTouchesDown((e) => {
@@ -213,28 +189,26 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     })
     .onEnd((e) => {
       const pos = expandProgress.value;
-      // Velocity-first: even a light flick at 200pt/s (== old 0.2pt/ms) is decisive
+      // High velocity (200pt/s) overrides position; otherwise snap to nearest side
       const fastLeft = e.velocityX < -200;
       const fastRight = e.velocityX > 200;
 
       let expand: boolean;
       if (fastLeft) expand = true;
       else if (fastRight) expand = false;
-      // Slow drag — snap to nearest side
       else expand = pos >= 0.5;
 
       expandProgress.value = withSpring(expand ? 1 : 0, springConfig);
       swapBtnOpacity.value = withTiming(expand ? 0 : 1, { duration: 180 });
-      runOnJS(setIsExpandedFlag)(expand);
+      isExpanded.value = expand;
     })
     .onFinalize((_e, success) => {
-      // Another gesture (e.g. scroll) stole the touch — snap to nearest side cleanly.
-      // A normal release already handled everything in onEnd above.
+      // If another gesture stole the touch, snap to nearest side (normal onEnd already handled the rest)
       if (success) return;
       const expand = expandProgress.value >= 0.5;
       expandProgress.value = withSpring(expand ? 1 : 0, springConfig);
       swapBtnOpacity.value = withTiming(expand ? 0 : 1, { duration: 180 });
-      runOnJS(setIsExpandedFlag)(expand);
+      isExpanded.value = expand;
     });
 
   const swapRotateDeg = swapRotate.interpolate({
@@ -242,13 +216,10 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     outputRange: ["0deg", "180deg"],
   });
 
-  // Was an interpolation between two identical colours — it drove a colour
-  // calculation every frame for no visual change. It is simply a constant.
+  // Constant instead of interpolation between two identical colors (no visual change needed)
   const recBgColor = "#FEFFF9";
 
-  // Drives the decorative shell only (see below) — kept as real left/width/
-  // paddingLeft so its rounded corner still self-terminates at every drag
-  // position. It's a childless box now, so resizing it is cheap.
+  // Shell uses real left/width/paddingLeft to preserve rounded corners during drag; no children so cheap to resize
   const expandableSectionStyle = useAnimatedStyle(() => ({
     left: interpolate(expandProgress.value, [0, 1], [cardWidth / 2, 0]),
     width: interpolate(
@@ -259,9 +230,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     paddingLeft: interpolate(expandProgress.value, [0, 1], [4, 0]),
   }));
 
-  // Content clip is fixed at full card width; this translateX reproduces the
-  // shell's left edge exactly (X(t) + paddingLeft(t) above) without resizing
-  // the heavy image/text subtree on every drag frame.
+  // Fixed-width clip with translateX reveals content; avoids resizing heavy image/text tree on every frame
   const contentRevealStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: (cardWidth / 2 + 4) * (1 - expandProgress.value) },
@@ -272,10 +241,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
     opacity: expandProgress.value,
   }));
 
-  // The recommended column lives inside a full-width measurement layer, but in the
-  // collapsed state the visible half-card is narrower by the section's paddingLeft (4)
-  // plus the card's two 1.25px borders. Subtract that so the column's 12px right padding
-  // isn't clipped — matching the searched (left) card's symmetric 12/12 image gap.
+  // Subtract padding (4) and borders (2.5) from half-width so 12px right padding isn't clipped
   const leftColWidth = cardWidth / 2 - 6.5;
 
   return (
@@ -309,7 +275,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             <View
               onLayout={(event) => {
                 const h = Math.ceil(event.nativeEvent.layout.height);
-                setSearchedTopHeight((prev) => (prev === h ? prev : h));
+                setHeights((prev) => (prev.searchedTop === h ? prev : { ...prev, searchedTop: h }));
               }}
             >
               <Text
@@ -375,7 +341,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
               style={{ marginTop: "auto" }}
               onLayout={(event) => {
                 const h = Math.ceil(event.nativeEvent.layout.height);
-                setSearchedBottomHeight((prev) => (prev === h ? prev : h));
+                setHeights((prev) => (prev.searchedBottom === h ? prev : { ...prev, searchedBottom: h }));
               }}
             >
               {/* Spacer matching the savings badge height on the recommended card */}
@@ -400,8 +366,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             </View>
           </View>
 
-          {/* Status Slot Container at the bottom — same height as the recommended
-              card's Add-button section so both cards' dashed dividers line up. */}
+          {/* Status slot; same height as recommended card's add-button so dividers align */}
           <View
             className="px-[12px] pt-6"
             style={{ height: ADD_SECTION_HEIGHT, justifyContent: "center" }}
@@ -416,9 +381,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         </View>
       </View>
 
-      {/* EXPANDABLE WE RECOMMENDED SECTION — decorative shell only. Still
-          real left/width/paddingLeft so the border stays rounded on every
-          edge while dragging; cheap because it has no children. */}
+      {/* Expandable shell (real left/width/paddingLeft, no children, cheap to resize) */}
       <ReAnimated.View
         style={[
           {
@@ -441,9 +404,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             borderRadius: 16,
           }}
         >
-          {/* ADD BUTTON — lives on the shell (still real, animated width) so
-              it resizes smoothly with the card instead of being clipped by
-              the fixed-width content layer below. */}
+          {/* Add button lives on animated shell so it resizes smoothly (not clipped by fixed-width content below) */}
           <View
             style={{
               position: "absolute",
@@ -458,7 +419,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
             {count === 0 ? (
               <AppButton
                 title="ADD"
-                onPress={handleIncrement}
+                onPress={increment}
                 disabled={isPending}
                 loading={isPending}
                 accessibilityRole="button"
@@ -475,7 +436,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 }}
               >
                 <Touchable
-                  onPress={handleDecrement}
+                  onPress={decrement}
                   disabled={isPending}
                   accessibilityRole="button"
                   accessibilityLabel="Decrease quantity"
@@ -513,7 +474,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                   )}
                 </View>
                 <Touchable
-                  onPress={handleIncrement}
+                  onPress={increment}
                   disabled={isPending}
                   accessibilityRole="button"
                   accessibilityLabel="Increase quantity"
@@ -533,10 +494,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         </View>
       </ReAnimated.View>
 
-      {/* Content: fixed-size clip, reveal is a pure translateX — keeps the
-          image/text subtree off the drag's per-frame layout pass. Nothing in
-          here is touchable, so box-none lets taps reach the Add button on
-          the shell below (it sits higher in z-order to stay above the shell). */}
+      {/* Fixed-size clip with pure translateX reveal; box-none lets taps reach add button on shell above */}
       <ReAnimated.View
         pointerEvents="box-none"
         style={{
@@ -563,7 +521,11 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
                 const h = Math.ceil(
                   e.nativeEvent.layout.height + ADD_SECTION_HEIGHT,
                 );
-                setRecommendedHeight((prev) => (prev === h ? prev : h));
+                setHeights((current) =>
+                  current.recommended === h
+                    ? current
+                    : { ...current, recommended: h },
+                );
               }}
             >
               {/* TOP INNER ROW HOLDING COLUMNS */}
@@ -785,7 +747,7 @@ export const ComparisonBoard: React.FC<ComparisonBoardProps> = ({
         </ReAnimated.View>
       </ReAnimated.View>
 
-      {/* FLOATING SWAP BUTTON — Reanimated UI-thread opacity, zero blink */}
+      {/* Floating swap button with UI-thread opacity animation (Reanimated) */}
       <ReAnimated.View
         style={[
           swapBtnStyle,

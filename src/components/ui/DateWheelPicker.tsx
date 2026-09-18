@@ -50,6 +50,7 @@ const WheelCol: React.FC<ColProps> = ({
 
   useEffect(() => {
     ref.current?.scrollTo({ y: index * ITEM_H, animated: false });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActive(index);
   }, [index]);
 

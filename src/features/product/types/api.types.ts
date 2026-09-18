@@ -114,5 +114,6 @@ export interface ApiProductDetail {
     manufacturer: string | { name: string; [key: string]: unknown } | null;
     brand?: { name: string; [key: string]: unknown } | null;
     thumbnailUrl: string;
+    medicine_variants?: MedicineVariant[];
   } | null;
 }

@@ -26,6 +26,9 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   rightSlot,
   variant = "default",
 }) => {
+  const router = useNav();
+  const insets = useSafeAreaInsets();
+
   if (variant === "glass") {
     return (
       <GlassHeader
@@ -36,8 +39,6 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
       />
     );
   }
-  const router = useNav();
-  const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
 
   return (

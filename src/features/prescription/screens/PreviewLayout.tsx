@@ -30,7 +30,6 @@ import {
   FileTooLargeModal,
   InfoModal,
   PreviewDisplay,
-  PreviewSuccessModal,
   PreviewThumbnails,
   RemoveConfirmModal,
   UploadProgressPanel,
@@ -82,6 +81,7 @@ export const PreviewLayout: React.FC = () => {
   const addItems = usePrescriptionDraftStore((st) => st.addItems);
   const removeFromStore = usePrescriptionDraftStore((st) => st.removeItem);
   const clearItems = usePrescriptionDraftStore((st) => st.clearItems);
+  const updateItem = usePrescriptionDraftStore((st) => st.updateItem);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -103,12 +103,30 @@ export const PreviewLayout: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Clean up interrupted uploads on screen mount.
+  // If an item was persisted with uploadStatus="uploading" but no uploadedUrl,
+  // the upload process is gone (app was killed). Reset to "pending" so it retries.
+  // Run only once per mount to avoid infinite loops.
+  useEffect(() => {
+    if (cleanedUpRef.current) return;
+    cleanedUpRef.current = true;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (
+        item.uploadStatus === "uploading" &&
+        !item.uploadedUrl
+      ) {
+        updateItem(i, { uploadStatus: "pending" });
+      }
+    }
+  }, [items, updateItem]);
+
   const [submitting, setSubmitting] = useState(false);
   // True only while the standalone flow's POST /prescriptions is in flight,
   // after every file has already reached 100% — a distinct phase so the
   // panel can say so instead of sitting at 100% with no explanation.
   const [savingPrescription, setSavingPrescription] = useState(false);
-  const [showConfirmed, setShowConfirmed] = useState(false);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [duplicateFileName, setDuplicateFileName] = useState("");
@@ -127,16 +145,53 @@ export const PreviewLayout: React.FC = () => {
   const uploadedSnapshot = useRef<PrescriptionItem[]>([]);
   const uploader = usePrescriptionUploader(FOLDER);
   const submitLockRef = useRef(false);
-  // Hosted image URLs produced at Preview for the order flow. The prescription
-  // record itself is NOT created here anymore — it's created at the final
-  // Place Order step — so we stash the URLs to carry forward to payment.
-  const deferredImageUrls = useRef<string[]>([]);
+  // Set once the order flow starts navigating to Select Patient, so the
+  // finally below leaves the progress panel up (and Proceed locked) for the
+  // transition instead of briefly restoring the idle footer.
+  const isNavigatingRef = useRef(false);
+  // Track if we've already cleaned up interrupted uploads on this mount
+  const cleanedUpRef = useRef(false);
   const activeItem = items[activeIndex] ?? items[0];
 
   // React Compiler memoizes these automatically — stable identities for
   // React.memo(PreviewDisplay) without a manual dependency array to drift.
   const goPrev = () => setActiveIndex((prev) => prev - 1);
   const goNext = () => setActiveIndex((prev) => prev + 1);
+
+  // Sync upload state from uploader to draft items whenever uploader state changes
+  useEffect(() => {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const key = uploader.uploadKeyOf(item);
+      const state = uploader.states[key];
+      if (!state) continue;
+
+      let updates: Partial<
+        Pick<PrescriptionItem, "uploadedUrl" | "uploadStatus" | "uploadError">
+      > = {};
+
+      if (state.status === "success" && state.url) {
+        updates = {
+          uploadedUrl: state.url,
+          uploadStatus: "uploaded",
+          uploadError: undefined,
+        };
+      } else if (state.status === "error") {
+        updates = {
+          uploadStatus: "error",
+          uploadError: state.error,
+        };
+      } else if (state.status === "uploading") {
+        updates = { uploadStatus: "uploading" };
+      } else if (state.status === "pending") {
+        updates = { uploadStatus: "pending" };
+      }
+
+      if (Object.keys(updates).length > 0) {
+        updateItem(i, updates);
+      }
+    }
+  }, [items, uploader.states, updateItem]);
 
   const uploadTotals = useMemo(
     () => computeUploadTotals(items, uploader.states),
@@ -247,36 +302,81 @@ export const PreviewLayout: React.FC = () => {
     // Was a hand-rolled isConnected check calling showOfflineAlert directly;
     // critical: true keeps that same blocking notice through the shared gate.
     if (!requireInternet({ critical: true })) return;
-    // Ref, not the `submitting` state: two taps in the same tick both read the
-    // stale false, and the loser's finally would clear the winner's spinner.
-    if (submitLockRef.current) return;
+    // Atomic submission guard: set ref first to prevent concurrent submissions
+    // Two taps in the same tick both read the stale false, and the loser's
+    // finally would clear the winner's spinner — prevent this by locking first.
+    if (submitting || submitLockRef.current) return;
     submitLockRef.current = true;
     if (__DEV__)
       logger.debug(
-        "[Prescription] Proceed pressed! Starting upload flow for items:",
+        "[Prescription] Proceed pressed! Using already-uploaded URLs from draft for items:",
         items,
       );
     setSubmitting(true);
     uploadedSnapshot.current = [...items];
     try {
-      // Null means at least one file failed; the thumbnails carry a per-file
-      // Retry, so stay on this screen rather than losing the user's work.
-      const uploadedUrls = await uploader.uploadAll(uploadedSnapshot.current);
-      if (!uploadedUrls) return;
+      // Collect already-uploaded URLs from draft items
+      // All files should be uploaded by now due to immediate upload on selection
+      const uploadedUrls = items
+        .map((item) => item.uploadedUrl)
+        .filter(Boolean) as string[];
+
+      // Check if any file is still uploading or failed
+      const hasFailedUploads = items.some((item) => item.uploadStatus === "error");
+      if (hasFailedUploads) {
+        showInfo(
+          "Upload Error",
+          "Some files failed to upload. Please retry them before proceeding.",
+        );
+        return;
+      }
+
+      const hasIncompleteUploads = items.some(
+        (item) =>
+          item.uploadStatus === "uploading" ||
+          (item.uploadStatus === "pending" && !item.uploadedUrl),
+      );
+      if (hasIncompleteUploads) {
+        showInfo(
+          "Still Uploading",
+          "Some files are still uploading. Please wait for them to complete.",
+        );
+        return;
+      }
+
+      if (uploadedUrls.length !== items.length) {
+        showInfo(
+          "Upload Incomplete",
+          "Some files were not uploaded. Please try again.",
+        );
+        return;
+      }
 
       if (source === "cart") {
         // Order flow: DON'T create the prescription record here. The files are
         // now hosted URLs (above); the prescription is created in one POST at
         // the final Place Order step, so any images added later on Select
         // Patient are saved together. Carry the URLs forward.
-        deferredImageUrls.current = uploadedUrls;
         useUIStore.getState().setIsRxFromCartFlow(true);
-        setShowConfirmed(true);
+        isNavigatingRef.current = true;
+        router.replace({
+          pathname: "/(prescription)/select-patient",
+          params: {
+            toPay,
+            // Prescription isn't created yet in the order flow — carry the
+            // hosted image URLs + category so payment can create it in one go.
+            imageUrls: JSON.stringify(uploadedUrls),
+            category: String(PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER),
+            files: JSON.stringify(uploadedSnapshot.current),
+          },
+        });
+        // Draft is cleared by this screen's unmount cleanup — clearing it here
+        // would empty the still-visible list mid-transition.
         return;
       }
 
       // Standalone "upload & notify" flow has no payment step, so it must
-      // create the prescription record now. uploadAll() resolves urls in the
+      // create the prescription record now. uploadedUrls are collected in the
       // same order as uploadedSnapshot.current, so zipping by index pairs each
       // hosted url back up with the original file's name/size.
       const fileData = uploadedSnapshot.current.map((item, i) => ({
@@ -313,9 +413,11 @@ export const PreviewLayout: React.FC = () => {
           "Upload failed. Please try again.",
       );
     } finally {
-      submitLockRef.current = false;
-      setSubmitting(false);
-      setSavingPrescription(false);
+      if (!isNavigatingRef.current) {
+        submitLockRef.current = false;
+        setSubmitting(false);
+        setSavingPrescription(false);
+      }
     }
   };
 
@@ -444,28 +546,6 @@ export const PreviewLayout: React.FC = () => {
           setTooLargeSizeMB(null);
           setShowAddSheet(true);
         }}
-      />
-
-      <PreviewSuccessModal
-        visible={showConfirmed}
-        onClose={() => setShowConfirmed(false)}
-        onContinue={() => {
-          router.replace({
-            pathname: "/(prescription)/select-patient",
-            params: {
-              toPay,
-              // Prescription isn't created yet in the order flow — carry the
-              // hosted image URLs + category so payment can create it in one go.
-              imageUrls: JSON.stringify(deferredImageUrls.current),
-              category: String(PRESCRIPTION_CATEGORY.PRESCRIPTION_ORDER),
-              files: JSON.stringify(uploadedSnapshot.current),
-            },
-          });
-          // Not closed here — it stays open (and unmounts with the screen)
-          // so closing it doesn't expose the emptied Preview underneath.
-          clearItems();
-        }}
-        safeAreaBottom={adjustedBottom}
       />
 
       <PrescriptionReviewSheet

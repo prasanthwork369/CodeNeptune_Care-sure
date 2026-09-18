@@ -1,6 +1,5 @@
 export { PreviewDisplay } from "./PreviewDisplay";
 export { PreviewThumbnails } from "./PreviewThumbnails";
-export { PreviewSuccessModal } from "./PreviewSuccessModal";
 export { InfoModal } from "./InfoModal";
 export { RemoveConfirmModal } from "./RemoveConfirmModal";
 export { DuplicateFileModal } from "./DuplicateFileModal";

@@ -43,11 +43,14 @@ export const orderApi = {
     data: CreateOrderRequest,
     idempotencyKey?: string,
   ): Promise<Order> => {
-    // Idempotency-Key lets the backend dedupe a retried order instead of
-    // creating a duplicate; sent as a standard header when provided.
+    // Dedupe runs off the top-level body field; the backend never reads the
+    // header. Set here too so an arg-passing caller can't miss it.
+    const body: CreateOrderRequest = idempotencyKey
+      ? { ...data, idempotencyKey: data.idempotencyKey ?? idempotencyKey }
+      : data;
     const response = await apiClient.post(
       API_ENDPOINTS.ORDERS,
-      data,
+      body,
       idempotencyKey
         ? { headers: { "Idempotency-Key": idempotencyKey } }
         : undefined,
@@ -152,8 +155,9 @@ export const orderApi = {
   },
 
   cancelOrder: async (id: string, reason: string) => {
+    // Cap reason at 1000 chars to prevent API validation failures
     const response = await apiClient.post(API_ENDPOINTS.ORDER_CANCEL(id), {
-      reason,
+      reason: reason?.slice(0, 1000) || "",
     });
     return response.data.data;
   },
