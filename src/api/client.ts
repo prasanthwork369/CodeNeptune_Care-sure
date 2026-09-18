@@ -153,9 +153,13 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Push-device DELETE is session teardown: it runs from logout after the
+    // token is already gone, so refreshing on its 401 would re-enter the
+    // expiry flow and call onUnauthorized again in a loop.
     const isAuthPath =
       original?.url?.includes("auth/refresh") ||
-      original?.url?.includes("auth/logout");
+      original?.url?.includes("auth/logout") ||
+      original?.url?.includes("push-notifications/devices");
 
     if (err.response?.status === 401 && !original?._retry && !isAuthPath) {
       if (Date.now() < refreshCooldownUntil) {

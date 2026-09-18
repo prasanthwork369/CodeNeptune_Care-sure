@@ -2,7 +2,6 @@ import { authService } from "@/src/features/auth/services/auth.service";
 import { authApi } from "@/src/features/auth/api/auth.api";
 import { profileApi } from "@/src/features/profile/api/profile.api";
 import { useAuthStore } from "@/src/store/authStore";
-import { messagingService as notificationService } from "@/src/services/firebase";
 
 jest.mock("@/src/features/auth/api/auth.api", () => ({
   authApi: {
@@ -21,12 +20,6 @@ jest.mock("@/src/features/profile/api/profile.api", () => ({
 
 jest.mock("@/src/lib/deviceInfo", () => ({
   getDeviceInfo: jest.fn().mockResolvedValue({ deviceId: "device-uuid-123" }),
-}));
-
-jest.mock("@/src/services/firebase", () => ({
-  messagingService: {
-    unregister: jest.fn().mockResolvedValue(undefined),
-  },
 }));
 
 describe("authService — Authentication Lifecycle Integration", () => {
@@ -72,7 +65,7 @@ describe("authService — Authentication Lifecycle Integration", () => {
     expect(setUserSpy).toHaveBeenCalledWith({ id: "u-101", firstName: "Jane" });
   });
 
-  it("logout calls authApi.logout and notificationService.unregister before clearing local auth state", async () => {
+  it("logout calls authApi.logout and delegates session & push cleanup to authStore.logout", async () => {
     const logoutStoreSpy = jest
       .spyOn(useAuthStore.getState(), "logout")
       .mockResolvedValueOnce(undefined);
@@ -80,7 +73,18 @@ describe("authService — Authentication Lifecycle Integration", () => {
     await authService.logout();
 
     expect(authApi.logout).toHaveBeenCalled();
-    expect(notificationService.unregister).toHaveBeenCalled();
+    expect(logoutStoreSpy).toHaveBeenCalled();
+  });
+
+  it("logout proceeds with authStore.logout even if authApi.logout fails", async () => {
+    (authApi.logout as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
+    const logoutStoreSpy = jest
+      .spyOn(useAuthStore.getState(), "logout")
+      .mockResolvedValueOnce(undefined);
+
+    await authService.logout();
+
+    expect(authApi.logout).toHaveBeenCalled();
     expect(logoutStoreSpy).toHaveBeenCalled();
   });
 
@@ -95,8 +99,21 @@ describe("authService — Authentication Lifecycle Integration", () => {
     const res = await authService.deleteAccount("No longer needed");
 
     expect(profileApi.deleteAccount).toHaveBeenCalledWith("No longer needed");
-    expect(notificationService.unregister).toHaveBeenCalled();
     expect(logoutStoreSpy).toHaveBeenCalled();
     expect(res).toEqual({ success: true });
+  });
+
+  it("deleteAccount does not clear auth state if server deletion fails", async () => {
+    (profileApi.deleteAccount as jest.Mock).mockResolvedValueOnce({
+      success: false,
+    });
+    const logoutStoreSpy = jest
+      .spyOn(useAuthStore.getState(), "logout")
+      .mockResolvedValueOnce(undefined);
+
+    await expect(authService.deleteAccount("Reason")).rejects.toThrow(
+      "Account deletion failed. Please try again.",
+    );
+    expect(logoutStoreSpy).not.toHaveBeenCalled();
   });
 });
