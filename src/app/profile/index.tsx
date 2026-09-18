@@ -7,7 +7,7 @@ import { useCallback } from "react";
 // saved "/profile" still resolves somewhere. The tab is canonical.
 //
 // dismissTo, not <Redirect>: replace() doesn't know "(tabs)" is already
-// seeded in this stack's history (see app/index.tsx) and would mount a
+// seeded in this stack's history (see src/app/index.tsx) and would mount a
 // second one — dismissTo reuses the existing instance and switches its tab.
 export default function ProfileIndexRedirect() {
   const router = useNav();

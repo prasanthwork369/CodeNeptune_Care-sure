@@ -1,4 +1,4 @@
-import { redirectSystemPath } from "@/app/+native-intent";
+import { redirectSystemPath } from "@/src/app/+native-intent";
 
 describe("redirectSystemPath — Web & Deep-Link Route Rewriting", () => {
   it("rewrites /medicines/{slug}/{id} web path to /product/{id}", () => {

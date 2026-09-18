@@ -9,9 +9,9 @@ import { AppState, AppStateStatus, Platform, StyleSheet, View } from "react-nati
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import "../src/utils/logBoxIgnore";
-import "../src/utils/patchText";
-import "../src/utils/patchTextInput";
+import "../utils/logBoxIgnore";
+import "../utils/patchText";
+import "../utils/patchTextInput";
 
 import { apiClient, setUnauthorizedHandler } from "@/src/api/client";
 import { ErrorBoundary } from "@/src/components/common/ErrorBoundary";
@@ -40,7 +40,7 @@ import { screenTransitions } from "@/src/theme";
 import { initNetworkListener } from "@/src/utils/network";
 import { getScreenNameForPath } from "@/src/utils/screenNameForPath";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
-import "../global.css";
+import "../../global.css";
 
 // Seed (tabs) in back stack for deep links on cold launch
 export const unstable_settings = {
@@ -81,7 +81,7 @@ export default function RootLayout() {
     analyticsService.logScreenView(getScreenNameForPath(pathname));
   }, [pathname]);
 
-  // Remember last safe screen to restore after permission dialog (app/index.tsx)
+  // Remember last safe screen to restore after permission dialog (src/app/index.tsx)
   useEffect(() => {
     if (!isAuthLoaded || !pathname || !isSafeRoute(pathname)) return;
     const params: Record<string, string> = {};
