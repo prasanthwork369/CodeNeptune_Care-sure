@@ -131,12 +131,12 @@ const HomeContent: React.FC = () => {
     subcategories: featuredSubcategories = [],
     frequentlyOrdered,
     isLoading: isHomeLoading,
+    isRefetching: isRefreshing,
     error,
     refetch: onRefresh,
   } = useHomeBatchData();
   const isFeaturedLoading = false; // Batched in single request
   const isSubcategoriesLoading = false; // Batched in single request
-  const isRefreshing = false; // Not applicable for batch
   const { isOffline, coldLaunchOffline } = useNetworkStatus();
   const errorState = useQueryErrorState(error);
 

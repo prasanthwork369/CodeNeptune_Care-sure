@@ -74,6 +74,8 @@ export function useHomeBatchData() {
 
     // Loading & error states
     isLoading: batchData.isLoading,
+    // Pull-to-refresh only — stays false during the initial load.
+    isRefetching: batchData.isRefetching,
     error: batchData.error,
     refetch: batchData.refetch,
   };
