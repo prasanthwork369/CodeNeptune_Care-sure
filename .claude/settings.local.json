@@ -28,7 +28,8 @@
       "Bash(\"/e/Android/Sdk/platform-tools/adb.exe\" version *)",
       "Bash(cd \"C:/Users/DELL/Downloads/care-sure-main/care-sure-main/customer-website\" && find src -type d | sort | head -120)",
       "Read(//c/Users/DELL/Downloads/care-sure-main/care-sure-main/customer-website/**)",
-      "Bash(ls -la \"C:\\\\Users\\\\DELL\\\\Downloads\\\\care-sure-main\\\\care-sure-main\\\\customer-website\")"
+      "Bash(ls -la \"C:\\\\Users\\\\DELL\\\\Downloads\\\\care-sure-main\\\\care-sure-main\\\\customer-website\")",
+      "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")"
     ]
   }
 }

@@ -1,13 +1,10 @@
-/** Maps incoming web/deep-link product paths (/{productType}/{slug}/{id}) into the app's route format (/product/{id}). */
-
-// Allowed product-type path prefixes for rewrites
+// Map web paths (/{productType}/{slug}/{id}) to app routes (/product/{id})
 const PRODUCT_TYPE_SLUGS = ["medicines", "otc", "fmcg"];
 
 export function redirectSystemPath({
   path,
 }: {
   path: string | null;
-  initial: boolean;
 }): string {
   // Fallback to original path on invalid inputs to prevent launch crashes
   if (!path || typeof path !== "string") return path ?? "/";

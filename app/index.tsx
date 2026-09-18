@@ -8,6 +8,7 @@ export default function Index() {
   const router = useNav();
   // Field selectors: a whole-store subscription re-rendered this and every
   // navigator layout on each setUser call during startup.
+  // Field selectors prevent whole-store subscription re-renders during auth startup
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isGuest = useAuthStore((s) => s.isGuest);
   const isLoaded = useAuthStore((s) => s.isLoaded);
@@ -20,9 +21,7 @@ export default function Index() {
     waitForLastRouteHydration().then(() => setIsRouteLoaded(true));
   }, [isRouteLoaded]);
 
-  // Only set when the app itself sent the user to Settings for a permission
-  // change — a normal kill/reopen must still land on Home. getState() (not a
-  // selector) so this can't flip on the clear below and re-decide mid-flight.
+  // getState() (not selector) prevents re-deciding after pendingRestore clears
   const restoreTarget = useMemo(() => {
     if (!isRouteLoaded) return null;
     const { pathname, params, pendingRestore } = useLastRouteStore.getState();
@@ -36,11 +35,7 @@ export default function Index() {
     if (isRouteLoaded) useLastRouteStore.getState().clearPendingRestore();
   }, [isRouteLoaded]);
 
-  // unstable_settings.initialRouteName already seeds "(tabs)" into this
-  // stack's history below "index" (so deep links keep Home in their back
-  // history). A plain <Redirect> here uses replace(), which doesn't know
-  // about that seeded entry and pushes a second, separately-mounted
-  // "(tabs)" — dismissTo pops back to the existing one instead.
+  // dismissTo respects seeded (tabs) history; Redirect.replace() would create a duplicate
   const goHome = !isLoaded || !isRouteLoaded
     ? false
     : (isAuthenticated || isGuest) && !restoreTarget;

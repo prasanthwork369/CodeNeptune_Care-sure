@@ -41,13 +41,24 @@ import { getScreenNameForPath } from "@/src/utils/screenNameForPath";
 import { useNetworkStore } from "@/src/store/useNetworkStore";
 import "../global.css";
 
-/** Expo Router setting to ensure a cold-started deep link has the home route in its navigation stack history. */
+// Seed (tabs) in back stack for deep links on cold launch
 export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
 
-initDb();
-initCrashReporting();
+try {
+  initDb();
+} catch (err) {
+  if (__DEV__) console.error("[DB] Initialization failed:", err);
+  // Catch DB errors to prevent module-level crash; errors flow to ErrorBoundary
+}
+
+try {
+  initCrashReporting();
+} catch (err) {
+  if (__DEV__) console.error("[Crashlytics] Initialization failed:", err);
+  // Crashlytics is optional; errors should not block app startup
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -69,10 +80,7 @@ export default function RootLayout() {
     analyticsService.logScreenView(getScreenNameForPath(pathname));
   }, [pathname]);
 
-  // Remember the last safe screen so a process recreation (e.g. the user
-  // backgrounded the app to flip a permission in Settings) can restore it
-  // instead of always landing on Home — see app/index.tsx. Gated on
-  // isAuthLoaded so early splash-time pathnames are never captured.
+  // Remember last safe screen to restore after permission dialog (app/index.tsx)
   useEffect(() => {
     if (!isAuthLoaded || !pathname || !isSafeRoute(pathname)) return;
     const params: Record<string, string> = {};
@@ -106,8 +114,7 @@ export default function RootLayout() {
   useEffect(() => {
     setUnauthorizedHandler(() => {
       queryClient.clear();
-      // useAuthStore.logout() owns clearing the offline request queue, so
-      // both this forced path and manual logout stay in sync.
+      // Logout path clears queue; both routes must stay in sync
       useAuthStore.getState().logout();
     });
   }, []);
@@ -193,7 +200,6 @@ export default function RootLayout() {
                   </View>
                 )}
 
-                {/* Render gate modal above all screens */}
                 <AppGate />
               </View>
             </SafeAreaProvider>

@@ -18,6 +18,7 @@ interface SearchRowProps {
     recId?: string;
     recProductId?: string;
     recSlug?: string;
+    recVariantId?: string;
     searched: {
       name: string;
       brandName: string;
@@ -61,6 +62,7 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
   }, [data, router, onBeforeNavigate]);
 
   const prefetchProduct = usePrefetchProduct();
+  
   const handlePrefetch = useCallback(() => {
     const productId = data.productId ?? data.id;
     if (productId) prefetchProduct(productId);
@@ -69,7 +71,7 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
   const { count, increment, decrement, animations, isPending } = useCartActions(
     {
       medicineId: data.recId || data.id,
-      variantId: null,
+      variantId: data.recVariantId ?? null,
       productId: data.recProductId || data.productId,
       name: data.recommended.name,
       slug: data.recSlug || data.slug,
@@ -83,8 +85,6 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
   );
 
   const { slideAnim, opacityAnim } = animations;
-  const handleIncrement = increment;
-  const handleDecrement = decrement;
 
   return (
     <Touchable
@@ -184,7 +184,7 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
 
         {count === 0 ? (
           <Touchable
-            onPress={handleIncrement}
+            onPress={increment}
             disabled={isPending}
             activeOpacity={0.85}
             style={s.addBtn}
@@ -198,7 +198,7 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
         ) : (
           <View style={s.wrapActive}>
             <Touchable
-              onPress={handleDecrement}
+              onPress={decrement}
               disabled={isPending}
               activeOpacity={0.7}
               style={s.btn}
@@ -223,7 +223,7 @@ export const SearchProductCard = React.memo(({ data, onBeforeNavigate }: SearchR
               )}
             </View>
             <Touchable
-              onPress={handleIncrement}
+              onPress={increment}
               disabled={isPending}
               activeOpacity={0.7}
               style={s.btn}
