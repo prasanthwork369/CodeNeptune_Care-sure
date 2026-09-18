@@ -19,8 +19,14 @@ export function useRetryQueuedOrder() {
   useEffect(() => {
     const isOnline = isConnected === true && isInternetReachable === true;
 
+    // Reset flag when offline so retry is possible on next online transition
+    if (!isOnline) {
+      retryAttemptedRef.current = false;
+      return;
+    }
+
     // Only retry once when transitioning to online
-    if (!isOnline || retryAttemptedRef.current) return;
+    if (retryAttemptedRef.current) return;
 
     retryAttemptedRef.current = true;
 
