@@ -1,13 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { isRetryableError, getBackoffDelay, sleep } from "@/src/utils/exponentialBackoff";
 
 const STORAGE_KEY = "offline_request_queue";
 const MAX_SIZE = 50;
+const MAX_RETRY_ATTEMPTS = 3;
 
 interface QueuedRequest {
   config: AxiosRequestConfig;
   resolve: (value: AxiosResponse) => void;
   reject: (reason?: unknown) => void;
+  retryCount?: number;
 }
 
 class RequestQueue {
@@ -80,13 +83,51 @@ class RequestQueue {
     await AsyncStorage.removeItem(STORAGE_KEY);
 
     for (const req of batch) {
+      await this._processWithRetry(axiosInstance, req);
+    }
+  }
+
+  private async _processWithRetry(
+    axiosInstance: (config: AxiosRequestConfig) => Promise<AxiosResponse>,
+    req: QueuedRequest,
+  ): Promise<void> {
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
       try {
         const response = await axiosInstance(req.config);
         req.resolve(response);
+        return;
       } catch (err) {
-        req.reject(err);
+        lastError = err;
+
+        // Don't retry non-transient errors (auth, validation, business logic)
+        if (!isRetryableError(err)) {
+          req.reject(err);
+          return;
+        }
+
+        // If we've exhausted retries, reject
+        if (attempt >= MAX_RETRY_ATTEMPTS) {
+          req.reject(err);
+          return;
+        }
+
+        // Wait before retrying (exponential backoff)
+        const delay = getBackoffDelay(attempt + 1, {
+          initialDelayMs: 200, // Offline queue uses longer initial delay
+          maxDelayMs: 4000,
+          maxRetries: MAX_RETRY_ATTEMPTS,
+        });
+
+        if (delay > 0) {
+          await sleep(delay);
+        }
       }
     }
+
+    // Fallback (shouldn't reach here)
+    req.reject(lastError);
   }
 
   async clear(): Promise<void> {

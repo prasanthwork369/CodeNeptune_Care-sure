@@ -27,7 +27,9 @@ import {
   sumOrderDiscounts,
 } from "@/src/utils/orderPayload";
 import { CreateOrderRequest } from "@/src/features/orders/types";
+import { queueOrderForRetry } from "@/src/features/orders/utils/queueOrder";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
+import { isOffline } from "@/src/utils/offline/networkState";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Alert } from "react-native";
@@ -329,10 +331,29 @@ export function usePaymentCalculations() {
           err?.data ?? err?.response?.data ?? err?.message,
         );
       }
-      reportError(err, "placeOrder:cart");
-      Alert.alert("Order Failed", orderErrorMessage(err));
-      placingOrderRef.current = false;
-      setPlacingOrder(false);
+
+      // If order fails due to network error or offline state, queue it for retry
+      const status = err?.response?.status ?? 0;
+      const isNetworkError =
+        err?.code === "NETWORK_OFFLINE" ||
+        err?.code === "ECONNABORTED" ||
+        !err?.response ||
+        (status >= 500 && status < 600);
+
+      if (isNetworkError && payload && idempotencyKeyRef.current) {
+        await queueOrderForRetry(payload, idempotencyKeyRef.current);
+        Alert.alert(
+          "Order Queued",
+          "Your order will be placed automatically when you're back online.",
+        );
+        placingOrderRef.current = false;
+        setPlacingOrder(false);
+      } else {
+        reportError(err, "placeOrder:cart");
+        Alert.alert("Order Failed", orderErrorMessage(err));
+        placingOrderRef.current = false;
+        setPlacingOrder(false);
+      }
     } finally {
       stopCheckoutTrace(
         { status: traceStatus },

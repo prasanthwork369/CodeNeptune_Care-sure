@@ -5,6 +5,7 @@ import { isOffline } from "@/src/utils/offline/networkState";
 import { logger } from "@/src/utils/logger";
 import { requestQueue } from "@/src/utils/requestQueue";
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT } from "@/src/utils/urls";
+import { isRetryableError, getBackoffDelay, sleep } from "@/src/utils/exponentialBackoff";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { AppError, asError, toAppError } from "./errors";
 
@@ -103,6 +104,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 // 401 response interceptor — refresh and retry
+// Also handles retryable transient errors (5xx, timeout) with exponential backoff
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -127,6 +129,27 @@ apiClient.interceptors.response.use(
     }
 
     const original = err.config;
+
+    // Retry transient errors (5xx, timeout, rate limit) with exponential backoff
+    // But NOT auth errors (those use the 401 refresh flow below)
+    if (
+      isRetryableError(err) &&
+      err.response?.status !== 401 &&
+      err.response?.status !== 403
+    ) {
+      const retryCount = (original?._retryCount ?? 0) as number;
+      const delay = getBackoffDelay(retryCount + 1);
+
+      if (delay > 0) {
+        if (__DEV__)
+          logger.debug(
+            `[apiClient] Retrying ${original?.method?.toUpperCase()} ${original?.url} (attempt ${retryCount + 1})`,
+          );
+        original._retryCount = retryCount + 1;
+        await sleep(delay);
+        return apiClient(original);
+      }
+    }
 
     const isAuthPath =
       original?.url?.includes("auth/refresh") ||

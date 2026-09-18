@@ -22,6 +22,7 @@ import DevPreviewToggler from "@/src/components/dev/DevPreviewToggler";
 import { SplashAnimationScreen } from "@/src/components/splash/SplashAnimationScreen";
 import { AppGate } from "@/src/components/system/AppGate";
 import { CartSyncProvider } from "@/src/components/system/CartSyncProvider";
+import { OrderSyncProvider } from "@/src/components/system/OrderSyncProvider";
 import { PushNotificationProvider } from "@/src/components/system/PushNotificationProvider";
 import { SignupBonusPopup } from "@/src/features/auth/components/SignupBonusPopup";
 import { queryClient } from "@/src/lib/react-query/queryClient";
@@ -179,6 +180,7 @@ export default function RootLayout() {
                     />
                   </Stack>
                   <CartSyncProvider />
+                  <OrderSyncProvider />
                   <PushNotificationProvider />
                 </BottomSheetModalProvider>
                 <NetworkToast />

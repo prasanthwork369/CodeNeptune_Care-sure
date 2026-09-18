@@ -64,7 +64,7 @@ export const SignupBonusPopup: React.FC<Props> = ({
   const { balance } = useWalletBalance();
   const corporateCredits = Number(balance?.corporateCredits || 0);
   const [showConfetti, setShowConfetti] = useState(testMode);
-  const confettiRef = useRef<DotLottie>(null);
+  const confettiRef = useRef<React.ElementRef<typeof DotLottie>>(null);
 
   useEffect(() => {
     if (testMode) return;
