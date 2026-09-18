@@ -4,17 +4,42 @@ import { useBatchData } from '@/src/hooks/queries/useBatchData';
 
 export interface CartBatchDataResponse {
   cart?: {
-    items?: any[];
+    items?: CartItem[];
     total?: number;
     discountPercent?: number;
     originalPrice?: number;
   };
-  addresses?: any[];
+  addresses?: Address[];
   wallet?: {
     balance?: number;
-    paymentMethods?: any[];
+    paymentMethods?: PaymentMethod[];
   };
-  coupons?: any[];
+  coupons?: Coupon[];
+}
+
+interface CartItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface Address {
+  id: string;
+  name: string;
+  street: string;
+}
+
+interface PaymentMethod {
+  id: string;
+  type: string;
+  last4?: string;
+}
+
+interface Coupon {
+  id: string;
+  code: string;
+  discount: number;
 }
 
 export function useCartBatchData() {

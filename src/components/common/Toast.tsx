@@ -54,9 +54,7 @@ export const Toast: React.FC = () => {
   // above it when anchored to the top (keyboard open) — so the slide
   // direction always matches which edge the toast is docked to.
   const offScreenY = dockedToTop ? -120 : 120;
-  // eslint-disable-next-line react-hooks/refs
   const translateY = useRef(new Animated.Value(offScreenY)).current;
-  // eslint-disable-next-line react-hooks/refs
   const opacity = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

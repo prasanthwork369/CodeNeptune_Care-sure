@@ -39,7 +39,6 @@ export function VirtualizedList<T extends { id?: string | number }>(
       items,
       renderItem,
       keyExtractor,
-      estimatedItemSize = 100,
       useFlashList = true,
       ...otherProps
     } = props;

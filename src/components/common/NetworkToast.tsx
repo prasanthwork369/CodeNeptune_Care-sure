@@ -42,7 +42,6 @@ const NetworkToast = () => {
 
   useEffect(() => {
     if (showToast) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowToastDelayed(true);
     } else {
       const t = setTimeout(() => setShowToastDelayed(false), 1800);
@@ -76,7 +75,6 @@ const NetworkToast = () => {
         setSignalStep((prev) => (prev >= 4 ? 1 : prev + 1));
       }, 400);
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSignalStep(isRestored ? 4 : 1);
     }
     return () => {

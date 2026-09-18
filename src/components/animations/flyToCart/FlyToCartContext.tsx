@@ -293,7 +293,6 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   const setDestinationCoords = useCallback(
     (coords: { x: number; y: number }) => {
       destinationRef.current = coords;
-      // eslint-disable-next-line react-hooks/immutability
       destinationShared.value = coords;
       setDestinationCoordsState(coords);
     },
@@ -355,7 +354,6 @@ export const FlyToCartProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const triggerWidthExpansion = useCallback(() => {
-    // eslint-disable-next-line react-hooks/immutability
     widthExpansion.value = withSequence(
       withTiming(18, { duration: 160 }),
       withSpring(0, { damping: 14, stiffness: 220 }),
