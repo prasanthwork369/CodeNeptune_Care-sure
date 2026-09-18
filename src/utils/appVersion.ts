@@ -1,22 +1,6 @@
 import * as Application from "expo-application";
 import { Linking, Platform } from "react-native";
-
-const ANDROID_PACKAGE = "com.codeneptune.caresure";
-const PLAY_APP_URL = `market://details?id=${ANDROID_PACKAGE}`;
-const PLAY_WEB_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
-
-/**
- * Numeric App Store id (the digits in apps.apple.com/app/id123456789).
- * TODO: fill in once the iOS listing exists. Until then iOS falls back to an
- * App Store search — never to Play Store, which an iPhone cannot install from.
- */
-const APP_STORE_ID = "";
-const APPLE_APP_URL = APP_STORE_ID
-  ? `itms-apps://apps.apple.com/app/id${APP_STORE_ID}`
-  : "itms-apps://apps.apple.com/search?term=CareSure";
-const APPLE_WEB_URL = APP_STORE_ID
-  ? `https://apps.apple.com/app/id${APP_STORE_ID}`
-  : "https://apps.apple.com/search?term=CareSure";
+import { EXTERNAL_LINKS } from "./urls";
 
 /**
  * Compares dotted numeric versions ("1.4.0"). Returns -1, 0 or 1.
@@ -70,8 +54,12 @@ export const isUpdateAvailable = (
  */
 export const openAppStore = async (): Promise<void> => {
   const isAndroid = Platform.OS === "android";
-  const appUrl = isAndroid ? PLAY_APP_URL : APPLE_APP_URL;
-  const webUrl = isAndroid ? PLAY_WEB_URL : APPLE_WEB_URL;
+  const appUrl = isAndroid
+    ? EXTERNAL_LINKS.playStoreDeepLink
+    : EXTERNAL_LINKS.appStoreDeepLink || EXTERNAL_LINKS.appStoreWeb;
+  const webUrl = isAndroid
+    ? EXTERNAL_LINKS.playStoreWeb
+    : EXTERNAL_LINKS.appStoreWeb;
   try {
     await Linking.openURL(appUrl);
   } catch {

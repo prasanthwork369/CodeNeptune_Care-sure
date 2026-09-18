@@ -1,4 +1,5 @@
 import { settingsApi, type Settings } from "@/src/api/settings.api";
+import { EXTERNAL_LINKS } from "@/src/utils/urls";
 import { logger } from "@/src/utils/logger";
 import { Alert, Linking } from "react-native";
 
@@ -60,10 +61,9 @@ export const contactService = {
     );
     if (!finalWhatsapp) return Alert.alert("Unable to open", UNAVAILABLE);
     const clean = finalWhatsapp.replace(/\D/g, "");
-    const url =
-      clean.startsWith("91") || clean.length > 10
-        ? `https://wa.me/${clean}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
-        : `https://wa.me/91${clean}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+    const phone =
+      clean.startsWith("91") || clean.length > 10 ? clean : `91${clean}`;
+    const url = EXTERNAL_LINKS.whatsappMessage(phone, WHATSAPP_MESSAGE);
     return openURL(
       url,
       "WhatsApp is not installed. Please install it or call us directly.",

@@ -42,6 +42,7 @@ export function setUnauthorizedHandler(handler: () => void) {
 }
 
 let isRefreshing = false;
+
 let failedQueue: {
   resolve: (v: string) => void;
   reject: (e: unknown) => void;
@@ -49,6 +50,7 @@ let failedQueue: {
 
 // Backoff cooldown if token refresh fails due to network/server errors
 const REFRESH_COOLDOWN_MS = 5000;
+
 let refreshCooldownUntil = 0;
 // The classified error from that transient failure, so requests made during
 // the cooldown window reject with the real reason instead of a false 401

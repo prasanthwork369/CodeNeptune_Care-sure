@@ -168,3 +168,28 @@ export const API_ENDPOINTS = {
   // ── Website Contents ─────────────────────────────────────────────────────
   WEBSITE_CONTENTS_FAQS_ACTIVE: "/api/v1/website-contents/faqs/active",
 };
+
+// ── External Links ───────────────────────────────────────────────────────────
+const ANDROID_PACKAGE = "com.codeneptune.caresure";
+const APP_STORE_ID = process.env.EXPO_PUBLIC_APP_STORE_ID;
+
+export const EXTERNAL_LINKS = {
+  // WhatsApp messaging
+  whatsappDeepLink: (phone: string) => `https://wa.me/${phone}`,
+  whatsappMessage: (phone: string, message: string) =>
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+
+  // Play Store
+  playStoreDeepLink: `market://details?id=${ANDROID_PACKAGE}`,
+  playStoreWeb: `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`,
+
+  // App Store (iOS)
+  appStoreDeepLink: APP_STORE_ID ? `itms-apps://apps.apple.com/app/id${APP_STORE_ID}` : undefined,
+  appStoreWeb: APP_STORE_ID
+    ? `https://apps.apple.com/app/id${APP_STORE_ID}`
+    : "https://apps.apple.com/search?term=CareSure",
+
+  // Google Docs Viewer (for PDF display in WebView)
+  googleDocsViewer: (url: string) =>
+    `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`,
+};
