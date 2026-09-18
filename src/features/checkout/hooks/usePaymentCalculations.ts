@@ -1,4 +1,4 @@
-import { asError } from "@/src/api/errors";
+import { asError, toAppError } from "@/src/api/errors";
 import { useCart } from "@/src/features/cart/hooks/useCart";
 import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
@@ -14,7 +14,7 @@ import { useCheckoutDraftStore } from "@/src/store/checkoutDraftStore";
 import { useCheckoutStore } from "@/src/store/checkoutStore";
 import { useCouponStore } from "@/src/store/couponStore";
 import { usePrescriptionOrderStore } from "@/src/store/prescriptionOrderStore";
-import { requireInternet } from "@/src/utils/offline";
+import { isOffline, requireInternet } from "@/src/utils/offline";
 import { usePincode } from "@/src/features/location/hooks/usePincode";
 import { useNav } from "@/src/hooks/useNav";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
@@ -331,15 +331,18 @@ export function usePaymentCalculations() {
         );
       }
 
-      // If order fails due to network error or offline state, queue it for retry
-      const status = err?.response?.status ?? 0;
-      const isNetworkError =
-        err?.code === "NETWORK_OFFLINE" ||
-        err?.code === "ECONNABORTED" ||
-        !err?.response ||
-        (status >= 500 && status < 600);
+      // Only a confirmed connection failure may be queued — the same rule
+      // reportActionError and useQueryErrorState use: a bare "network" error
+      // counts as offline only when the device itself reads offline right now.
+      // A missing `response` proves nothing on its own, since every apiClient
+      // rejection is an AppError and those never carry one. Everything else
+      // (validation, 4xx, 5xx, timeout, unexpected) must surface, not replay.
+      const appError = toAppError(e);
+      const isConnectionFailure =
+        appError.kind === "offline" ||
+        (appError.kind === "network" && isOffline());
 
-      if (isNetworkError && payload && idempotencyKeyRef.current) {
+      if (isConnectionFailure && payload && idempotencyKeyRef.current) {
         await queueOrderForRetry(payload, idempotencyKeyRef.current);
         Alert.alert(
           "Order Queued",

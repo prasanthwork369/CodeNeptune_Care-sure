@@ -1,5 +1,7 @@
 import { renderHook, act } from "@testing-library/react-native";
 import { usePaymentCalculations } from "@/src/features/checkout/hooks/usePaymentCalculations";
+import { AppError } from "@/src/api/errors";
+import { queueOrderForRetry } from "@/src/features/orders/utils/queueOrder";
 import { useCreateOrder } from "@/src/features/orders/hooks/useCreateOrder";
 import { useDeliveryAddress } from "@/src/features/location/hooks/useDeliveryAddress";
 import { prescriptionService } from "@/src/features/prescription/services/prescription.service";
@@ -66,6 +68,10 @@ jest.mock("@/src/services/notifications", () => ({
   },
 }));
 
+jest.mock("@/src/features/orders/utils/queueOrder", () => ({
+  queueOrderForRetry: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock("@/src/services/firebase", () => ({
   analyticsService: { logPurchase: jest.fn() },
   reportError: jest.fn(),
@@ -85,7 +91,7 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
       createOrder: mockCreateOrder,
       loading: false,
     });
-    useNetworkStore.setState({ isConnected: true });
+    useNetworkStore.setState({ isConnected: true, isInternetReachable: true });
 
     (useDeliveryAddress as jest.Mock).mockReturnValue({
       address: {
@@ -332,5 +338,117 @@ describe("usePaymentCalculations — Order Placement & Idempotency", () => {
     expect(mockRouter.replace).not.toHaveBeenCalled();
 
     spyAlert.mockRestore();
+  });
+
+  // A failed order may only be replayed offline when the error is real evidence
+  // of a connection failure. Every apiClient rejection is an AppError, which
+  // never carries a `response`, so absence of one classifies nothing.
+  describe("offline queue classification", () => {
+    const placeOrder = async () => {
+      const { result } = renderHook(() => usePaymentCalculations());
+      await act(async () => {
+        await result.current.handlePlaceOrder();
+      });
+    };
+
+    let spyAlert: jest.SpyInstance;
+
+    beforeEach(() => {
+      spyAlert = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      spyAlert.mockRestore();
+    });
+
+    it("queues the order when the request failed because the device is offline", async () => {
+      mockCreateOrder.mockRejectedValueOnce(
+        new AppError("offline", "No internet connection."),
+      );
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).toHaveBeenCalledTimes(1);
+      expect(spyAlert).toHaveBeenCalledWith("Order Queued", expect.any(String));
+    });
+
+    // Connection drops mid-request: axios sees no response and the store has
+    // already flipped offline by the time the rejection is classified.
+    it("queues a transport failure when the device itself reads offline", async () => {
+      mockCreateOrder.mockImplementationOnce(async () => {
+        useNetworkStore.setState({ isInternetReachable: false });
+        throw new AppError("network", "Unable to reach server.");
+      });
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).toHaveBeenCalledTimes(1);
+      expect(spyAlert).toHaveBeenCalledWith("Order Queued", expect.any(String));
+    });
+
+    // Device online but the request never landed — a server-side outage, not
+    // an offline state. Queuing it promises a replay that will not be triggered.
+    it("does not queue a transport failure while the device is still online", async () => {
+      mockCreateOrder.mockRejectedValueOnce(
+        new AppError("network", "Unable to reach server."),
+      );
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).not.toHaveBeenCalled();
+      expect(spyAlert).toHaveBeenCalledWith("Order Failed", expect.any(String));
+    });
+
+    it("does not queue a business validation failure", async () => {
+      mockCreateOrder.mockRejectedValueOnce(
+        new AppError("validation", "Item out of stock", 400, {
+          message: "Item out of stock",
+        }),
+      );
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).not.toHaveBeenCalled();
+      expect(spyAlert).toHaveBeenCalledWith("Order Failed", expect.any(String));
+      expect(mockRouter.replace).not.toHaveBeenCalled();
+    });
+
+    it("does not queue a 5xx that carried a response", async () => {
+      mockCreateOrder.mockRejectedValueOnce(
+        new AppError("server", "Server temporarily unavailable.", 503),
+      );
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).not.toHaveBeenCalled();
+      expect(spyAlert).toHaveBeenCalledWith("Order Failed", expect.any(String));
+    });
+
+    // The request was sent, so the order may already exist — replaying it
+    // silently is exactly what orderErrorMessage warns the user against.
+    it("does not queue a timeout", async () => {
+      mockCreateOrder.mockRejectedValueOnce(
+        new AppError("timeout", "Request timed out."),
+      );
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).not.toHaveBeenCalled();
+      expect(spyAlert).toHaveBeenCalledWith(
+        "Order Failed",
+        expect.stringContaining("may already be placed"),
+      );
+    });
+
+    it("does not queue an unexpected programming error", async () => {
+      mockCreateOrder.mockRejectedValueOnce(
+        new TypeError("items is not iterable"),
+      );
+
+      await placeOrder();
+
+      expect(queueOrderForRetry).not.toHaveBeenCalled();
+      expect(spyAlert).toHaveBeenCalledWith("Order Failed", expect.any(String));
+    });
   });
 });
