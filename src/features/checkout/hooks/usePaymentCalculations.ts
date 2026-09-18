@@ -29,7 +29,6 @@ import {
 import { CreateOrderRequest } from "@/src/features/orders/types";
 import { queueOrderForRetry } from "@/src/features/orders/utils/queueOrder";
 import { PRESCRIPTION_CATEGORY } from "@/src/features/prescription/constants/prescription-category";
-import { isOffline } from "@/src/utils/offline/networkState";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Alert } from "react-native";

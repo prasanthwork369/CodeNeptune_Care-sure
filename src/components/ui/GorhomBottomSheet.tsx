@@ -165,7 +165,7 @@ export const GorhomBottomSheet = forwardRef<
           )}
         </>
       ),
-      [handleClose, enableDynamicSizing, closeButtonOffset, hideCloseButton],
+      [handleClose, hideCloseButton],
     );
 
     return (

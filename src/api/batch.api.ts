@@ -42,14 +42,13 @@ export async function batchFetch(
       { queries } as BatchRequest,
     );
 
-    if (data.errors) {
-      // Log errors but return partial data
+    if (data.errors && __DEV__) {
       console.warn("Batch request had errors:", data.errors);
     }
 
     return (data.data as Record<string, unknown>) || {};
   } catch (error) {
-    console.error("Batch request failed:", error);
+    if (__DEV__) console.error("Batch request failed:", error);
     // Fallback: fetch individual queries
     return Promise.all(
       queries.map((q) =>
